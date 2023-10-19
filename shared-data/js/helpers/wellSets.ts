@@ -28,13 +28,11 @@ function _getAllWellSetsForLabware(
 
   return allWells.reduce(
     (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
-      const wellSet = getWellNamePerMultiTip(labwareDef, well, channels)
+      const wellSet = getWellNamePerMultiTip(labwareDef, well, 8)
       if (wellSet === null) {
         return acc
-      } else if (channels === 8) {
-        return [...acc, wellSet]
       } else {
-        return [wellSet]
+        return [...acc, wellSet]
       }
     },
     []

@@ -12,17 +12,15 @@ import { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import { Selector } from '../types'
 import { SubstepItemData } from '../steplist/types'
 
-type MultiChannels = 8 | 96
-
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
   wells: string[]
 ): string[] {
+  const channels = pipetteEntity.spec.channels
   // `wells` is all the wells that pipette's channel 1 interacts with.
-  if (pipetteEntity.spec.channels === 8 || pipetteEntity.spec.channels === 96) {
+  if (channels === 8 || channels === 96) {
     return wells.reduce((acc: string[], well: string) => {
-      const channels = pipetteEntity.spec.channels as MultiChannels
       const setOfWellsForMulti = getWellNamePerMultiTip(
         labwareEntity.def,
         well,

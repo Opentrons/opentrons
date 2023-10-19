@@ -130,5 +130,5 @@ export const getStagingAreaSlots = (
 }
 
 export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
-  return Object.values(pipettes).some(pip => pip.name === 'p1000_96')
+  return Object.values(pipettes).some(pip => pip.spec.channels === 96)
 }

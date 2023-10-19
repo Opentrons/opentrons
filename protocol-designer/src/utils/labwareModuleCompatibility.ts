@@ -131,11 +131,11 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
 
 export const getLabwareCompatibleWithAdapter = (
   adapterLoadName?: string
-): string[] => {
-  return adapterLoadName != null
+): string[] =>
+  adapterLoadName != null
     ? COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterLoadName]
     : []
-}
+
 export const getLabwareIsCustom = (
   customLabwares: LabwareDefByDefURI,
   labwareOnDeck: LabwareOnDeck

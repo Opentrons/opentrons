@@ -232,14 +232,7 @@ export function PipetteFields(props: Props): JSX.Element {
           {i18n.t('button.upload_custom_tip_rack')}
           <input
             type="file"
-            onChange={e =>
-              dispatch(
-                createCustomTiprackDef(
-                  e,
-                  values.left.pipetteName === 'p1000_96'
-                )
-              )
-            }
+            onChange={e => dispatch(createCustomTiprackDef(e))}
           />
         </OutlineButton>
       </div>

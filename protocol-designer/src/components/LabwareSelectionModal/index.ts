@@ -85,12 +85,7 @@ function mergeProps(
       dispatch(closeLabwareSelector())
     },
     onUploadLabware: fileChangeEvent =>
-      dispatch(
-        labwareDefActions.createCustomLabwareDef(
-          fileChangeEvent,
-          stateProps.has96Channel
-        )
-      ),
+      dispatch(labwareDefActions.createCustomLabwareDef(fileChangeEvent)),
     selectLabware: labwareDefURI => {
       if (stateProps.slot) {
         dispatch(

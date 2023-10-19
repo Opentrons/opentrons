@@ -1,3 +1,5 @@
+//  TODO(jr, 10/19/23): should extend getWellNamePerMultiTip to use similar math for 96-channel and 384 well plates
+//  instead of special casing using this util
 export function get96Channel384WellPlateWells(
   all384Wells: string[],
   well: string

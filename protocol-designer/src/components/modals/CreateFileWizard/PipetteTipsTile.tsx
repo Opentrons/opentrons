@@ -237,14 +237,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               </Flex>
               <input
                 type="file"
-                onChange={e =>
-                  dispatch(
-                    createCustomTiprackDef(
-                      e,
-                      values.pipettesByMount[LEFT].pipetteName === 'p1000_96'
-                    )
-                  )
-                }
+                onChange={e => dispatch(createCustomTiprackDef(e))}
               />
             </OutlineButton>
           </Flex>

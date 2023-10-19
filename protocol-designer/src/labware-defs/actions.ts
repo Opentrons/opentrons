@@ -12,9 +12,10 @@ import {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
-import { getAllWellSetsForLabware } from '../utils'
+import { getAllWellSetsForLabware, getHas96Channel } from '../utils'
 import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
+import { getPipetteEntities } from '../step-forms/selectors'
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage
@@ -89,15 +90,15 @@ const getIsOverwriteMismatched = (
 }
 
 const _createCustomLabwareDef: (
-  onlyTiprack: boolean,
-  has96Channel: boolean
-) => (event: React.SyntheticEvent<HTMLInputElement>) => ThunkAction<any> = (
-  onlyTiprack,
-  has96Channel
-) => event => (dispatch, getState) => {
+  onlyTiprack: boolean
+) => (
+  event: React.SyntheticEvent<HTMLInputElement>
+) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
   const allLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getLabwareDefsByURI(getState())
   )
+  const pipetteEntities = getPipetteEntities(getState())
+  const has96Channel = getHas96Channel(pipetteEntities)
   const customLabwareDefs: LabwareDefinition2[] = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
   )
@@ -245,20 +246,12 @@ const _createCustomLabwareDef: (
 }
 
 export const createCustomLabwareDef: (
-  event: React.SyntheticEvent<HTMLInputElement>,
-  has96Channel: boolean
-) => (event: React.SyntheticEvent<HTMLInputElement>) => ThunkAction<any> = (
-  event,
-  has96Channel
-) => _createCustomLabwareDef(false, has96Channel)
+  event: React.SyntheticEvent<HTMLInputElement>
+) => ThunkAction<any> = _createCustomLabwareDef(false)
 
 export const createCustomTiprackDef: (
-  event: React.SyntheticEvent<HTMLInputElement>,
-  has96Channel: boolean
-) => (event: React.SyntheticEvent<HTMLInputElement>) => ThunkAction<any> = (
-  event,
-  has96Channel
-) => _createCustomLabwareDef(true, has96Channel)
+  event: React.SyntheticEvent<HTMLInputElement>
+) => ThunkAction<any> = _createCustomLabwareDef(true)
 
 interface DismissLabwareUploadMessage {
   type: 'DISMISS_LABWARE_UPLOAD_MESSAGE'
