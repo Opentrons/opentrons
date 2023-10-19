@@ -14,7 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+// import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   getFixtureDisplayName,
   STAGING_AREA_LOAD_NAME,
@@ -31,18 +31,23 @@ import { LegacyModal } from '../../molecules/LegacyModal'
 import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import type { DeckConfigData } from '../../pages/DeckConfiguration'
 
-interface AddDeckConfigurationModalProps {
+interface AddFixtureModalProps {
   fixtureLocation: Cutout
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
+  deckConfigData?: DeckConfigData
+  setDeckConfigData?: (deckConfigData: DeckConfigData) => void
   isOnDevice?: boolean
 }
 
-export function AddDeckConfigurationModal({
+export function AddFixtureModal({
   fixtureLocation,
   setShowAddFixtureModal,
+  deckConfigData,
+  setDeckConfigData,
   isOnDevice = false,
-}: AddDeckConfigurationModalProps): JSX.Element {
+}: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
   const modalHeader: ModalHeaderBaseProps = {
@@ -59,7 +64,7 @@ export function AddDeckConfigurationModal({
     width: '23.125rem',
   }
 
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  // const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
   if (
@@ -74,10 +79,19 @@ export function AddDeckConfigurationModal({
   }
 
   const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: fixtureLoadName,
-    })
+    if (deckConfigData != null && setDeckConfigData != null) {
+      const addedFixture = { fixtureLocation, loadName: fixtureLoadName }
+      const currentDeckConfig = deckConfigData.currentDeckConfig.map(fixture =>
+        fixture.fixtureLocation === addedFixture.fixtureLocation
+          ? { ...fixture, ...addedFixture }
+          : fixture
+      )
+      setDeckConfigData({
+        addedFixture,
+        currentDeckConfig,
+      })
+    }
+
     setShowAddFixtureModal(false)
   }
 

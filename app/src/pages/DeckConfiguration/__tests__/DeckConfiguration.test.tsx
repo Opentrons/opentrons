@@ -5,7 +5,7 @@ import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
-import { DeckConfiguration } from '..'
+import { DeckConfigurationEditor } from '..'
 
 const mockPush = jest.fn()
 jest.mock('react-router-dom', () => {
@@ -31,7 +31,7 @@ const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <DeckConfiguration />
+      <DeckConfigurationEditor />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -39,7 +39,7 @@ const render = () => {
   )
 }
 
-describe('DeckConfiguration', () => {
+describe('DeckConfigurationEditor', () => {
   beforeEach(() => {
     mockDeckFixtureSetupInstructionsModal.mockReturnValue(
       <div>mock DeckFixtureSetupInstructionsModal</div>
