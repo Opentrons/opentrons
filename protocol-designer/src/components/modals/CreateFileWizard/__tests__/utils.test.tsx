@@ -38,7 +38,7 @@ describe('getLastCheckedEquipment', () => {
     const result = getLastCheckedEquipment(MOCK_FORM_STATE)
     expect(result).toBe(null)
   })
-  it('should return null if not all the modules are selected', () => {
+  it('should return null if not all the modules or staging areas are selected', () => {
     MOCK_FORM_STATE = {
       ...MOCK_FORM_STATE,
       additionalEquipment: ['trashBin'],
@@ -50,10 +50,16 @@ describe('getLastCheckedEquipment', () => {
     const result = getLastCheckedEquipment(MOCK_FORM_STATE)
     expect(result).toBe(null)
   })
-  it('should return temperature module if other modules are selected', () => {
+  it('should return temperature module if other modules and staging areas are selected', () => {
     MOCK_FORM_STATE = {
       ...MOCK_FORM_STATE,
-      additionalEquipment: ['trashBin'],
+      additionalEquipment: [
+        'trashBin',
+        'stagingArea_A3',
+        'stagingArea_B3',
+        'stagingArea_C3',
+        'stagingArea_D3',
+      ],
       modulesByType: {
         ...MOCK_FORM_STATE.modulesByType,
         heaterShakerModuleType: { onDeck: true, model: null, slot: 'D1' },
@@ -67,6 +73,10 @@ describe('getLastCheckedEquipment', () => {
 
 describe('getTrashSlot', () => {
   it('should return the default slot A3 when there is no staging area in that slot', () => {
+    MOCK_FORM_STATE = {
+      ...MOCK_FORM_STATE,
+      additionalEquipment: ['trashBin'],
+    }
     const result = getTrashSlot(MOCK_FORM_STATE)
     expect(result).toBe(FLEX_TRASH_DEFAULT_SLOT)
   })
