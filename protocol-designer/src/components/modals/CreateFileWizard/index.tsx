@@ -85,6 +85,15 @@ const WIZARD_STEPS: WizardStep[] = [
   'staging_area',
   'modulesAndOther',
 ]
+const WIZARD_STEPS_OT2: WizardStep[] = [
+  'robotType',
+  'metadata',
+  'first_pipette_type',
+  'first_pipette_tips',
+  'second_pipette_type',
+  'second_pipette_tips',
+  'modulesAndOther',
+]
 
 export function CreateFileWizard(): JSX.Element | null {
   const { t } = useTranslation()
@@ -95,7 +104,10 @@ export function CreateFileWizard(): JSX.Element | null {
   )
   const enableDeckModification = useSelector(getEnableDeckModification)
 
-  const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
+    WIZARD_STEPS
+  )
 
   React.useEffect(() => {
     // re-initialize wizard step count when modal is closed
@@ -262,18 +274,18 @@ export function CreateFileWizard(): JSX.Element | null {
     <WizardHeader
       title={t('modal.create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
-      totalSteps={WIZARD_STEPS.length - 1}
+      totalSteps={wizardSteps.length - 1}
       onExit={handleCancel}
     />
   )
-  const currentWizardStep = WIZARD_STEPS[currentStepIndex]
+  const currentWizardStep = wizardSteps[currentStepIndex]
   const goBack = (stepsBack: number = 1): void => {
     if (currentStepIndex >= 0 + stepsBack) {
       setCurrentStepIndex(currentStepIndex - stepsBack)
     }
   }
   const proceed = (stepsForward: number = 1): void => {
-    if (currentStepIndex + stepsForward < WIZARD_STEPS.length) {
+    if (currentStepIndex + stepsForward < wizardSteps.length) {
       setCurrentStepIndex(currentStepIndex + stepsForward)
     }
   }
@@ -285,6 +297,7 @@ export function CreateFileWizard(): JSX.Element | null {
         createProtocolFile={createProtocolFile}
         proceed={proceed}
         goBack={goBack}
+        setWizardSteps={setWizardSteps}
       />
     </ModalShell>
   ) : null
@@ -392,10 +405,25 @@ interface CreateFileFormProps {
   createProtocolFile: (values: FormState) => void
   goBack: () => void
   proceed: () => void
+  setWizardSteps: React.Dispatch<React.SetStateAction<WizardStep[]>>
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
-  const { currentWizardStep, createProtocolFile, proceed, goBack } = props
+  const {
+    currentWizardStep,
+    createProtocolFile,
+    proceed,
+    goBack,
+    setWizardSteps,
+  } = props
+
+  const handleProceedRobotType = (robotType: string): void => {
+    if (robotType === OT2_ROBOT_TYPE) {
+      setWizardSteps(WIZARD_STEPS_OT2)
+    } else {
+      setWizardSteps(WIZARD_STEPS)
+    }
+  }
 
   const contentsByWizardStep: {
     [wizardStep in WizardStep]: (
@@ -403,7 +431,14 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     ) => JSX.Element
   } = {
     robotType: (formikProps: FormikProps<FormState>) => (
-      <RobotTypeTile {...{ ...formikProps, proceed, goBack }} />
+      <RobotTypeTile
+        {...formikProps}
+        goBack={goBack}
+        proceed={() => {
+          handleProceedRobotType(formikProps.values.fields.robotType)
+          proceed()
+        }}
+      />
     ),
     metadata: (formikProps: FormikProps<FormState>) => (
       <MetadataTile {...formikProps} proceed={proceed} goBack={goBack} />
