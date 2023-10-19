@@ -8,28 +8,36 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
-import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
+  STANDARD_SLOT_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
+} from '@opentrons/shared-data'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckFixtureSetupInstructionsModal } from '../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Portal } from '../../App/portal'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type {
+  Cutout,
+  DeckConfiguration,
+  Fixture,
+  LoadFixtureRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
   fixtureLocation: Cutout | null
+  runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
 }
 
 export function ProtocolSetupDeckConfiguration({
   fixtureLocation,
+  runId,
   setSetupScreen,
 }: ProtocolSetupDeckConfigurationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing', 'shared'])
@@ -51,7 +59,39 @@ export function ProtocolSetupDeckConfiguration({
     setShowDiscardChangeModal,
   ] = React.useState<boolean>(false)
 
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
+    id: 'stubbed_load_fixture',
+    commandType: 'loadFixture',
+    params: {
+      fixtureId: 'stubbedFixtureId',
+      loadName: WASTE_CHUTE_LOAD_NAME,
+      location: { cutout: 'D3' },
+    },
+    createdAt: 'fakeTimestamp',
+    startedAt: 'fakeTimestamp',
+    completedAt: 'fakeTimestamp',
+    status: 'succeeded',
+  }
+
+  const requiredFixtureDetails =
+    mostRecentAnalysis?.commands != null
+      ? [
+          // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
+          STUBBED_LOAD_FIXTURE,
+        ]
+      : []
+
+  const deckConfig =
+    (requiredFixtureDetails.map(
+      (fixture): Fixture | false =>
+        fixture.params.fixtureId != null && {
+          fixtureId: fixture.params.fixtureId,
+          fixtureLocation: fixture.params.location.cutout,
+          loadName: fixture.params.loadName,
+        }
+    ) as DeckConfiguration) ?? []
+
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const handleClickAdd = (fixtureLocation: Cutout): void => {
