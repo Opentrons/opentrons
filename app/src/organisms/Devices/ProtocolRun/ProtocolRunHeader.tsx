@@ -163,7 +163,9 @@ export function ProtocolRunHeader({
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
   const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [showDropTipBanner, setShowDropTipBanner] = React.useState(true)
-  const pipettesWithTip = React.useRef<PipettesWithTip[] | null>(null)
+  const [pipettesWithTip, setPipettesWithTip] = React.useState<
+    PipettesWithTip[]
+  >([])
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
     runRecord?.data.errors?.[0] != null
@@ -191,9 +193,9 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     // Reset drop tip state when a new run occurs.
-    if (runStatus === RUN_STATUS_RUNNING) {
+    if (runStatus === RUN_STATUS_IDLE) {
       setShowDropTipBanner(true)
-      pipettesWithTip.current = null
+      setPipettesWithTip([])
     } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
       getPipettesWithTipAttached({
         host,
@@ -203,13 +205,16 @@ export function ProtocolRunHeader({
         isFlex,
       })
         .then(pipettesWithTipAttached => {
-          pipettesWithTip.current = pipettesWithTipAttached.map(pipette => {
-            const specs = getPipetteModelSpecs(pipette.instrumentModel)
-            return {
-              specs,
-              mount: pipette.mount,
+          const newPipettesWithTipAttached = pipettesWithTipAttached.map(
+            pipette => {
+              const specs = getPipetteModelSpecs(pipette.instrumentModel)
+              return {
+                specs,
+                mount: pipette.mount,
+              }
             }
-          })
+          )
+          setPipettesWithTip(() => newPipettesWithTipAttached)
         })
         .catch(e => {
           console.log(`Error checking pipette tip attachement state: ${e}`)
@@ -355,10 +360,7 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
-        {isRunCurrent &&
-        showDropTipBanner &&
-        pipettesWithTip.current != null &&
-        pipettesWithTip.current.length !== 0 ? (
+        {isRunCurrent && showDropTipBanner && pipettesWithTip.length !== 0 ? (
           <ProtocolDropTipBanner
             onLaunchWizardClick={setShowDropTipWizard}
             onCloseClick={() => {
@@ -434,17 +436,19 @@ export function ProtocolRunHeader({
           />
         ) : null}
         {showDropTipWizard &&
-        pipettesWithTip.current != null &&
-        pipettesWithTip.current[0]?.specs != null &&
+        pipettesWithTip[0]?.specs != null &&
         isRunCurrent ? (
           <DropTipWizard
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
-            mount={pipettesWithTip.current[0].mount}
-            instrumentModelSpecs={pipettesWithTip.current[0].specs}
+            mount={pipettesWithTip[0].mount}
+            instrumentModelSpecs={pipettesWithTip[0].specs}
             closeFlow={() => {
               setShowDropTipWizard(false)
-              pipettesWithTip.current = pipettesWithTip.current?.slice(1) ?? []
-              if (pipettesWithTip.current.length === 0) closeCurrentRun()
+              setPipettesWithTip(prevPipettesWithTip => {
+                const pipettesWithTip = prevPipettesWithTip.slice(1) ?? []
+                if (pipettesWithTip.length === 0) closeCurrentRun()
+                return pipettesWithTip
+              })
             }}
           />
         ) : null}

@@ -19,7 +19,7 @@ export function ProtocolDropTipBanner(props: {
   onLaunchWizardClick: (setShowWizard: true) => void
   onCloseClick: () => void
 }): JSX.Element {
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation('drop_tip_wizard')
   const { onLaunchWizardClick, onCloseClick } = props
 
   return (
@@ -36,7 +36,7 @@ export function ProtocolDropTipBanner(props: {
 
         <Flex flexDirection={DIRECTION_ROW}>
           <StyledText as="p" marginRight={SPACING.spacing4}>
-            {t('remove_tips_from_pipette')}
+            {t('remove_the_tips_from_pipette')}
           </StyledText>
           <Btn
             textAlign={ALIGN_START}
