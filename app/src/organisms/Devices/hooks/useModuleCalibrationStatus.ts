@@ -1,6 +1,6 @@
 import omitBy from 'lodash/omitBy'
 import { MAGNETIC_BLOCK_TYPE } from '@opentrons/shared-data'
-import { useIsOT3 } from './useIsOT3'
+import { useIsFlex } from './useIsFlex'
 import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
 import { ProtocolCalibrationStatus } from './useRunCalibrationStatus'
 
@@ -8,7 +8,7 @@ export function useModuleCalibrationStatus(
   robotName: string,
   runId: string
 ): ProtocolCalibrationStatus {
-  const isFlex = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   // TODO: can probably use getProtocolModulesInfo but in a rush to get out 7.0.1
   const moduleRenderInfoForProtocolById = omitBy(
     useModuleRenderInfoForProtocolById(robotName, runId),
