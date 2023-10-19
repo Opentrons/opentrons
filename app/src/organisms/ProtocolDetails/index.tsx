@@ -79,6 +79,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
+import { AnnotatedSteps } from './AnnotatedSteps'
 
 const GRID_STYLE = css`
   display: grid;
@@ -346,7 +347,7 @@ export function ProtocolDetails(
       />
     ),
     stats: enableProtocolStats ? (
-      <ProtocolStats analysis={mostRecentAnalysis} />
+      <AnnotatedSteps analysis={mostRecentAnalysis} />
     ) : null,
   }
 
