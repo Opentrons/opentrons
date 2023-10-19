@@ -264,9 +264,12 @@ export const JogToPosition = (
           </Header>
           {body}
         </Flex>
-        <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing20}>
-          <img width="89px" height="145px" />
-        </Flex>
+        {/* no animations */}
+        <Flex
+          flex="1"
+          alignItems={ALIGN_CENTER}
+          gridGap={SPACING.spacing20}
+        ></Flex>
       </Flex>
       <>
         <JogControls jog={handleJog} />

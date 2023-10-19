@@ -21,6 +21,10 @@ import {
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
+
+import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
+import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
+
 // TODO: get help link article URL
 const NEED_HELP_URL = ''
 
@@ -101,10 +105,17 @@ export const BeforeBeginning = (
               : UNSELECTED_OPTIONS_STYLE
           }
         >
-          {/* <img
-            src={}
-            css={css`max-width: 11rem;`}
-          /> */}
+          <video
+            css={css`
+              max-width: 11rem;
+            `}
+            autoPlay={true}
+            loop={true}
+            controls={false}
+            aria-label="blowout"
+          >
+            <source src={blowoutVideo} />
+          </video>
           <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
         </Flex>
         <Flex
@@ -116,10 +127,17 @@ export const BeforeBeginning = (
               : UNSELECTED_OPTIONS_STYLE
           }
         >
-          {/* <img
-            src={}
-            css={css`max-width: 11rem;`}
-          /> */}
+          <video
+            css={css`
+              max-width: 11rem;
+            `}
+            autoPlay={true}
+            loop={true}
+            controls={false}
+            aria-label="droptip"
+          >
+            <source src={droptipVideo} />
+          </video>
           <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
         </Flex>
       </Flex>
