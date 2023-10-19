@@ -130,7 +130,7 @@ describe('ApplyHistoricOffsets', () => {
     // second candidate table row
     getByText('Slot 2')
     //  4th candidate a labware on adapter on module
-    getByText('Opentrons 96 PCR Adapter in Heater-Shaker Module GEN1 in Slot 3')
+    getByText('Opentrons 96 PCR Heater-Shaker Adapter in Heater-Shaker Module GEN1 in Slot 3')
     // third candidate on module table row
     getByText('Heater-Shaker Module GEN1 in Slot 3')
     getByTestId(

@@ -200,7 +200,7 @@ describe('useRunPipetteInfoByMount hook', () => {
         },
         tipRacksForPipette: [
           {
-            displayName: 'Opentrons 96 Tip Rack 10 µL',
+            displayName: 'Opentrons OT-2 96 Tip Rack 10 µL',
             lastModifiedDate: null,
             tipRackDef: tiprack10ul,
           },
