@@ -75,7 +75,7 @@ Loading Labware
 
 Use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_adapter` and :py:meth:`~.HeaterShakerContext.load_labware` methods to specify what you will place on the module. For the Heater-Shaker, use one of the thermal adapters listed below and labware that fits on the adapter. See :ref:`labware-on-adapters` for examples of loading labware on modules.
 
-The `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several standalone adapter definitions and pre-configured adapter–labware combinations that help make the Heater-Shaker ready to use right out of the box.
+The `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes definitions for both standalone adapters and adapter–labware combinations. These labware definitions help make the Heater-Shaker ready to use right out of the box.
 
 .. note::
     If you plan to :ref:`move labware <moving-labware>` onto or off of the Heater-Shaker during your protocol, you must use a standalone adapter definition, not an adapter–labware combination definiton.

@@ -23,7 +23,7 @@ Loading Labware
 
 Use the Temperature Module’s :py:meth:`~.TemperatureModuleContext.load_adapter` and :py:meth:`~.TemperatureModuleContext.load_labware` methods to specify what you will place on the module. You may use one or both of the methods, depending on the labware you're using. See :ref:`labware-on-adapters` for examples of loading labware on modules.
 
-The `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes standalone adapter definitions and pre-configured adapter–labware combinations that help make the Temperature Module ready to use right out of the box.
+The `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes definitions for both standalone adapters and adapter–labware combinations. These labware definitions help make the Temperature Module ready to use right out of the box.
 
 Standalone Adapters
 -------------------
