@@ -209,7 +209,7 @@ describe('CreateFileWizard', () => {
     next.click()
     getByText('Step 6 / 7')
     //  select a staging area
-    getByText('Staging areas')
+    getByText('Staging area slots')
     next = getByRole('button', { name: 'Next' })
     next.click()
     getByText('Step 7 / 7')

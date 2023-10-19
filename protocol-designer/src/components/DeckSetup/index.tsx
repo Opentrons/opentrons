@@ -36,6 +36,9 @@ import {
   RobotType,
   FLEX_ROBOT_TYPE,
   Cutout,
+  TRASH_BIN_LOAD_NAME,
+  STAGING_AREA_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 import {
   FLEX_TRASH_DEF_URI,
@@ -107,7 +110,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     robotType,
     trashSlot,
   } = props
-
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
   // But when swapping labware when at least one is on a module, we need to be aware
@@ -494,15 +496,15 @@ export const DeckSetup = (): JSX.Element => {
     {
       fixtureId: trash?.id,
       fixtureLocation: trash?.slot as Cutout,
-      loadName: 'trashBin',
+      loadName: TRASH_BIN_LOAD_NAME,
     },
   ]
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => aE.name === 'wasteChute')
+  ).filter(aE => aE.name === WASTE_CHUTE_LOAD_NAME)
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => aE.name === 'stagingArea')
+  ).filter(aE => aE.name === STAGING_AREA_LOAD_NAME)
   const locations = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
   ).map(aE => aE.location)
@@ -545,22 +547,26 @@ export const DeckSetup = (): JSX.Element => {
                       fixtureBaseColor={lightFill}
                     />
                   ))}
-                  {trashBinFixtures.map(fixture => (
-                    <React.Fragment key={fixture.fixtureId}>
-                      <SingleSlotFixture
-                        cutoutLocation={fixture.fixtureLocation}
-                        deckDefinition={deckDef}
-                        slotClipColor={COLORS.transparent}
-                        fixtureBaseColor={lightFill}
-                      />
-                      <FlexTrash
-                        robotType={robotType}
-                        trashIconColor={lightFill}
-                        trashLocation={fixture.fixtureLocation as TrashLocation}
-                        backgroundColor={darkFill}
-                      />
-                    </React.Fragment>
-                  ))}
+                  {trash != null
+                    ? trashBinFixtures.map(fixture => (
+                        <React.Fragment key={fixture.fixtureId}>
+                          <SingleSlotFixture
+                            cutoutLocation={fixture.fixtureLocation}
+                            deckDefinition={deckDef}
+                            slotClipColor={COLORS.transparent}
+                            fixtureBaseColor={lightFill}
+                          />
+                          <FlexTrash
+                            robotType={robotType}
+                            trashIconColor={lightFill}
+                            trashLocation={
+                              fixture.fixtureLocation as TrashLocation
+                            }
+                            backgroundColor={darkFill}
+                          />
+                        </React.Fragment>
+                      ))
+                    : null}
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture
                       key={fixture.id}
