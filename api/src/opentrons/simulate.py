@@ -782,7 +782,6 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(robot_type),
-            drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         )
     )
