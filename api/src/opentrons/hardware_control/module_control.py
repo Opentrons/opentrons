@@ -231,10 +231,10 @@ class AttachedModulesControl:
         return found_module
 
     def load_module_offset(
-        self, module_type: ModuleType, module_id: str, slot: Optional[str] = None
-    ) -> ModuleCalibrationOffset:
+        self, module_type: ModuleType, module_id: str
+    ) -> Optional[ModuleCalibrationOffset]:
         log.info(f"Loading module offset for {module_type} {module_id}")
-        return load_module_calibration_offset(module_type, module_id, slot)
+        return load_module_calibration_offset(module_type, module_id)
 
     def save_module_offset(
         self,
@@ -244,9 +244,9 @@ class AttachedModulesControl:
         slot: str,
         offset: Point,
         instrument_id: Optional[str] = None,
-    ) -> ModuleCalibrationOffset:
+    ) -> Optional[ModuleCalibrationOffset]:
         log.info(f"Saving module {module} {module_id} offset: {offset} for slot {slot}")
         save_module_calibration_offset(
             offset, mount, slot, module, module_id, instrument_id
         )
-        return load_module_calibration_offset(module, module_id, slot)
+        return load_module_calibration_offset(module, module_id)

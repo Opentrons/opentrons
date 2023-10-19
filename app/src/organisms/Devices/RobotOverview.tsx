@@ -112,12 +112,7 @@ export function RobotOverview({
             <Box marginBottom={SPACING.spacing8}>
               <ReachableBanner robot={robot} />
             </Box>
-            {robot != null ? (
-              <UpdateRobotBanner
-                robot={robot}
-                marginBottom={SPACING.spacing8}
-              />
-            ) : null}
+            <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing8} />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader
                 name={robot.name}

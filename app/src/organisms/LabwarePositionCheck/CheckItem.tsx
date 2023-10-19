@@ -327,7 +327,18 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         ]
 
   const handleConfirmPosition = (): void => {
-    let confirmPositionCommands: CreateCommand[] = [
+    const heaterShakerPrepCommands: CreateCommand[] =
+      moduleId != null &&
+      moduleType != null &&
+      moduleType === HEATERSHAKER_MODULE_TYPE
+        ? [
+            {
+              commandType: 'heaterShaker/openLabwareLatch',
+              params: { moduleId },
+            },
+          ]
+        : []
+    const confirmPositionCommands: CreateCommand[] = [
       {
         commandType: 'retractAxis' as const,
         params: {
@@ -342,23 +353,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         commandType: 'retractAxis' as const,
         params: { axis: 'y' },
       },
+      ...heaterShakerPrepCommands,
       ...moveLabwareOffDeck,
     ]
 
-    if (
-      moduleId != null &&
-      moduleType != null &&
-      moduleType === HEATERSHAKER_MODULE_TYPE
-    ) {
-      confirmPositionCommands = [
-        confirmPositionCommands[0],
-        {
-          commandType: 'heaterShaker/openLabwareLatch',
-          params: { moduleId },
-        },
-        confirmPositionCommands[1],
-      ]
-    }
     chainRunCommands(
       [
         { commandType: 'savePosition', params: { pipetteId } },

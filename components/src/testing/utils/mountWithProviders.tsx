@@ -2,6 +2,7 @@ import assert from 'assert'
 import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { mount } from 'enzyme'
 
 import type { Store } from 'redux'
@@ -32,6 +33,8 @@ export function mountWithProviders<Element, State, Action>(
     subscribe: jest.fn(),
     dispatch: jest.fn(),
   }
+
+  const queryClient = new QueryClient()
 
   const I18nWrapper: React.ElementType<
     React.ComponentProps<typeof I18nextProvider>
@@ -67,7 +70,9 @@ export function mountWithProviders<Element, State, Action>(
     i18n: React.ComponentProps<typeof I18nextProvider>['i18n']
   }): JSX.Element => (
     <StateWrapper store={store}>
-      <I18nWrapper i18n={i18n}>{children}</I18nWrapper>
+      <QueryClientProvider client={queryClient}>
+        <I18nWrapper i18n={i18n}>{children}</I18nWrapper>
+      </QueryClientProvider>
     </StateWrapper>
   )
 

@@ -251,7 +251,8 @@ async def add_from_local(request: web.Request) -> web.Response:
         Path(root, file)
         for root, _, files in os.walk("/media")
         for file in files
-        if file.endswith(".pub")
+        # skip hidden files
+        if not file.startswith(".") and file.endswith(".pub")
     ]
     if not pub_keys:
         LOG.warning("No keys found")
@@ -265,16 +266,20 @@ async def add_from_local(request: web.Request) -> web.Response:
     new_keys = list()
     with open(AUTHORIZED_KEYS, "a") as fh:
         for key in pub_keys:
-            with open(key, "r") as gh:
-                ssh_key = gh.read()
-                if "ssh-rsa" not in ssh_key:
-                    LOG.warning(f"Invalid ssh public key: {key}")
-                    continue
-                key_hash = hashlib.new("md5", ssh_key.encode()).hexdigest()
-                if not key_present(key_hash):
-                    fh.write(f"{ssh_key}\n")
-                    LOG.info(f"Added new rsa key: {key}")
+            try:
+                with open(key, "r") as gh:
+                    ssh_key = gh.read().strip()
+                    if "ssh-rsa" not in ssh_key and "ecdsa" not in ssh_key:
+                        LOG.warning(f"Invalid ssh public key: {key}")
+                        continue
+                    key_hash = hashlib.new("md5", ssh_key.encode()).hexdigest()
+                    if not key_present(key_hash):
+                        fh.write(f"{ssh_key}\n")
+                        LOG.info(f"Added new rsa key: {key}")
                     new_keys.append(key_hash)
+            except Exception as e:
+                LOG.error(f"Could not process ssh public key: {key} {e}")
+                continue
 
     return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
         data={"message": f"Added {len(new_keys)} new keys", "key_md5": new_keys},
