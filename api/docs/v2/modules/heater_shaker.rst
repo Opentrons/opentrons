@@ -90,13 +90,13 @@ You can use these standalone adapter definitions to load Opentrons verified or c
 
    * - Adapter Type
      - API Load Name
-   * - Opentrons Universal Flat Adapter
+   * - Opentrons Universal Flat Heater-Shaker Adapter
      - ``opentrons_universal_flat_adapter``
-   * - Opentrons 96 PCR Adapter
+   * - Opentrons 96 PCR Heater-Shaker Adapter
      - ``opentrons_96_pcr_adapter``
-   * - Opentrons 96 Deep Well Adapter
+   * - Opentrons 96 Deep Well Heater-Shaker Adapter
      - ``opentrons_96_deep_well_adapter``
-   * - Opentrons 96 Flat Bottom Adapter
+   * - Opentrons 96 Flat Bottom Heater-Shaker Adapter
      - ``opentrons_96_flat_bottom_adapter``
 
 For example, these commands load a well plate on top of the flat bottom adapter::
