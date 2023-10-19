@@ -31,10 +31,7 @@ interface ChooseLocationProps {
   title: string
   body: string | JSX.Element
   robotType: RobotType
-  moveToXYCoordinate: (
-    x: number,
-    y: number
-  ) => Promise<void | CommandData[] | undefined>
+  moveToXYCoordinate: (x: number, y: number) => Promise<CommandData[] | null>
   isRobotMoving: boolean
   isOnDevice: boolean
 }

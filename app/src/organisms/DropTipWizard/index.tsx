@@ -270,7 +270,7 @@ export const DropTipWizardComponent = (
       )
   }
 
-  const retractAllAxesAndSavePosition = (): Promise<Coordinates | void> => {
+  const retractAllAxesAndSavePosition = (): Promise<Coordinates | null> => {
     if (createdMaintenanceRunId == null)
       return Promise.reject<Coordinates>(
         new Error('no maintenance run present to send move commands to')
@@ -320,17 +320,18 @@ export const DropTipWizardComponent = (
           )
         }
       })
-      .catch(e =>
+      .catch(e => {
         setErrorMessage(
           `error retracting x and y axes or saving position: ${e.message}`
         )
-      )
+        return null
+      })
   }
 
   const moveToXYCoordinate = (
     x: number,
     y: number
-  ): Promise<void | CommandData[] | undefined> => {
+  ): Promise<CommandData[] | null> => {
     if (createdMaintenanceRunId == null)
       return Promise.reject(
         new Error('no maintenance run present to send move commands to')
@@ -361,9 +362,12 @@ export const DropTipWizardComponent = (
             ],
             true
           )
-        }
+        } else return null
       })
-      .catch(e => setErrorMessage(`error moving to position: ${e.message}`))
+      .catch(e => {
+        setErrorMessage(`error moving to position: ${e.message}`)
+        return null
+      })
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
