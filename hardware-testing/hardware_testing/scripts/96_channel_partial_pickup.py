@@ -46,7 +46,7 @@ retract_dist = 100
 retract_speed = 60
 
 leak_test_time = 30
-volume_test = 1000
+test_volume = 1000
 
 def dict_keys_to_line(dict):
     return str.join(",", list(dict.keys())) + "\n"
@@ -345,9 +345,10 @@ async def _main() -> None:
         m_current = float(input("motor_current in amps: "))
         pick_up_speed = float(input("pick up tip speed in mm/s: "))
         hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
+        pick_up_distance = float(input("pick up distance in mm: "))
         await update_pick_up_current(hw_api, mount, m_current)
         await update_pick_up_speed(hw_api, mount, pick_up_speed)
-        # await update_pick_up_distance(hw_api, mount, 20.0)
+        await update_pick_up_distance(hw_api, mount, pick_up_distance)
         # Calibrate to tiprack
         if (args.calibrate):
             pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
@@ -378,25 +379,22 @@ async def _main() -> None:
             deck_slot['deck_slot'][args.dial_slot][Axis.Y.name] = dial_loc.y
             deck_slot['deck_slot'][args.dial_slot]['Z'] = dial_loc.z
             save_config_(path+cal_fn, deck_slot)
-        # if (args.calibrate):
-        #     cp = CriticalPoint.TIP
-        #     # trough_loc = Point(slot_loc[args.trough_slot][0],
-        #     #                     slot_loc[args.trough_slot][1],
-        #     #                     home_w_tip[Axis.by_mount(mount)])
-        #     trough_loc = Point(deck_slot['deck_slot'][args.trough_slot]['X'],
-        #                         deck_slot['deck_slot'][args.trough_slot]['Y'],
-        #                         home_w_tip[Axis.by_mount(mount)])
-        #     print("Move to Trough")
-        #     await move_to_point(hw_api, mount, trough_loc, cp)
-        #     current_position = await hw_api.current_position_ot3(mount, cp)
-        #     trough_loc = await jog(hw_api, current_position, cp)
-        #     trough_loc = Point(trough_loc[Axis.X],
-        #                         trough_loc[Axis.Y],
-        #                         trough_loc[Axis.by_mount(mount)])
-        #     deck_slot['deck_slot'][args.trough_slot][Axis.X.name] = dial_loc.x
-        #     deck_slot['deck_slot'][args.trough_slot][Axis.Y.name] = dial_loc.y
-        #     deck_slot['deck_slot'][args.trough_slot]['Z'] = dial_loc.z
-        #     save_config_(path+cal_fn, deck_slot)
+        if (args.trough):
+            cp = CriticalPoint.TIP
+            trough_loc = Point(deck_slot['deck_slot'][args.trough_slot]['X'],
+                                deck_slot['deck_slot'][args.trough_slot]['Y'],
+                                home_w_tip[Axis.by_mount(mount)])
+            print("Move to Trough")
+            await move_to_point(hw_api, mount, trough_loc, cp)
+            current_position = await hw_api.current_position_ot3(mount, cp)
+            trough_loc = await jog(hw_api, current_position, cp)
+            trough_loc = Point(trough_loc[Axis.X],
+                                trough_loc[Axis.Y],
+                                trough_loc[Axis.by_mount(mount)])
+            deck_slot['deck_slot'][args.trough_slot][Axis.X.name] = dial_loc.x
+            deck_slot['deck_slot'][args.trough_slot][Axis.Y.name] = dial_loc.y
+            deck_slot['deck_slot'][args.trough_slot]['Z'] = dial_loc.z
+            save_config_(path+cal_fn, deck_slot)
 
         num_of_columns = int(input("How many Columns: "))
         num_of_rows = int(input("Number of Rows: "))
@@ -438,21 +436,20 @@ async def _main() -> None:
                     if tip_count % num_of_columns == 0:
                         x_offset = 0
 
-            # if args.trough:
-            #     await move_to_point(hw_api, mount, trough_loc, cp)
-            #     await hw_api.prepare_for_aspirate(mount)
-            #     await hw_api.aspirate(mount, test_volume)
-            #     await hw_api.home_z(mount)
-            #     await countdown(leak_test_time)
-            #     await move_to_point(hw_api, mount, trough_loc, cp)
-            #     await hw_api.dispense(mount)
-            #     await hw_api.home_z(mount)
-                #await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
-            await hw_api.home_z(mount)
+            if args.trough:
+                await hw_api.prepare_for_aspirate(mount)
+                await move_to_point(hw_api, mount, trough_loc, cp)
+                await hw_api.aspirate(mount, test_volume)
+                await hw_api.home_z(mount)
+                await countdown(leak_test_time)
+                await move_to_point(hw_api, mount, trough_loc, cp)
+                await hw_api.dispense(mount)
+                # await hw_api.home_z(mount)
             hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
             await update_drop_tip_speed(hw_api, mount, hw_api.clamp_drop_tip_speed )
             cp = CriticalPoint.TIP
             await move_to_point(hw_api, mount, droptip_loc, cp)
+            input("Feel the Tip!")
             await hw_api.drop_tip(mount)
             await hw_api.home_z(mount)
 
