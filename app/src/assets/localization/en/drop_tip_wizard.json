@@ -1,15 +1,19 @@
 {
   "before_you_begin_do_you_want_to_blowout": "Before you begin, do you need to preserve aspirated liquid?",
+  "begin_removal": "Begin removal",
   "blowout_complete": "blowout complete",
   "choose_blowout_location": "choose blowout location",
   "choose_drop_tip_location": "choose tip-drop location",
-  "drop_tips": "drop tips",
   "drop_tip_complete": "tip drop complete",
+  "drop_tips": "drop tips",
   "no_proceed_to_drop_tip": "No, proceed to tip removal",
   "position_and_blowout": "Ensure that the pipette tip is centered above and level with where you want the liquid to be blown out. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned.",
   "position_and_drop_tip": "Ensure that the pipette tip is centered above and level with where you want to drop the tips. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned.",
   "position_the_pipette": "position the pipette",
+  "remove_the_tips": "You may want to remove the tips from the <strong>{{mount}} Pipette</strong> before using it again in a protocol.",
   "select_blowout_slot": "<block>You can blow out liquid into a labware or dispose of it.</block><block>Select the slot where you want to blow out the liquid on the deck map to the right. Once confirmed, the gantry will move to the chosen slot.</block>",
   "select_drop_tip_slot": "<block>You can return tips to a tip rack or dispose of them.</block><block>Select the slot where you want to drop the tips on the deck map to the right. Once confirmed, the gantry will move to the chosen slot.</block>",
+  "skip": "Skip",
+  "tips_are_attached": "Tips are attached",
   "yes_blow_out_liquid": "Yes, blow out liquid in labware"
 }

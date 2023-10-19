@@ -17,7 +17,7 @@ import { StyledText } from '../../../atoms/text'
 
 export function ProtocolDropTipBanner(props: {
   onLaunchWizardClick: (setShowWizard: true) => void
-  onCloseClick: (setShowBanner: false) => void
+  onCloseClick: () => void
 }): JSX.Element {
   const { t } = useTranslation('run_details')
   const { onLaunchWizardClick, onCloseClick } = props
@@ -25,7 +25,7 @@ export function ProtocolDropTipBanner(props: {
   return (
     <Banner
       type="warning"
-      onCloseClick={() => onCloseClick(false)}
+      onCloseClick={onCloseClick}
       marginBottom={SPACING.spacing16}
       paddingRight={SPACING.spacing16}
     >
