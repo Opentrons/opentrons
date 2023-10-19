@@ -662,7 +662,7 @@ async def test_stop(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop the engine and halt the hardware."""
+    """It should be able to stop the engine and run execution."""
     expected_action = StopAction()
 
     decoy.when(
@@ -674,6 +674,33 @@ async def test_stop(
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
         queue_worker.cancel(),
+    )
+
+
+async def test_stop_for_legacy_core_protocols(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    hardware_stopper: HardwareStopper,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine & run execution and cancel movement tasks."""
+    expected_action = StopAction()
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(expected_action)
+
+    decoy.when(hardware_api.is_movement_execution_taskified()).then_return(True)
+
+    await subject.stop()
+
+    decoy.verify(
+        action_dispatcher.dispatch(expected_action),
+        queue_worker.cancel(),
+        await hardware_api.cancel_execution_and_running_tasks(),
     )
 
 

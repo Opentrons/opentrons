@@ -51,8 +51,8 @@ export interface FetchPipettesResponseBody {
   right: FetchPipettesResponsePipette
 }
 
-interface PipetteSettingsField {
-  value: number | null | undefined
+export interface PipetteSettingsField {
+  value: number | null | boolean | undefined
   default: number
   min?: number
   max?: number
@@ -66,7 +66,7 @@ interface PipetteQuirksField {
 interface QuirksField {
   quirks?: PipetteQuirksField
 }
-type PipetteSettingsFieldsMap = QuirksField & {
+export type PipetteSettingsFieldsMap = QuirksField & {
   [fieldId: string]: PipetteSettingsField
 }
 export interface IndividualPipetteSettings {
@@ -77,3 +77,15 @@ export interface IndividualPipetteSettings {
 type PipetteSettingsById = Partial<{ [id: string]: IndividualPipetteSettings }>
 
 export type PipetteSettings = PipetteSettingsById
+
+export interface PipetteSettingsUpdateFieldsMap {
+  [fieldId: string]: PipetteSettingsUpdateField
+}
+
+export type PipetteSettingsUpdateField = {
+  value: PipetteSettingsField['value']
+} | null
+
+export interface UpdatePipetteSettingsData {
+  fields: { [fieldId: string]: PipetteSettingsUpdateField }
+}

@@ -41,7 +41,7 @@ class AbstractWellCore(ABC):
 
     @abstractmethod
     def get_display_name(self) -> str:
-        """Get the full display name of the well (e.g. "A1 of Some Labware")."""
+        """Get the full display name of the well (e.g. "A1 of Some Labware on 5")."""
 
     @abstractmethod
     def get_name(self) -> str:

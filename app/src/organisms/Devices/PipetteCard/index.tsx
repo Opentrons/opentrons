@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -15,6 +14,7 @@ import {
   useOnClickOutside,
   InstrumentDiagram,
   BORDERS,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -23,12 +23,12 @@ import {
   OT2_ROBOT_TYPE,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-
 import {
-  LEFT,
-  getAttachedPipetteSettingsFieldsById,
-} from '../../../redux/pipettes'
+  useCurrentSubsystemUpdateQuery,
+  usePipetteSettingsQuery,
+} from '@opentrons/react-api-client'
+
+import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
@@ -42,7 +42,7 @@ import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
-import type { State } from '../../../redux/types'
+
 import type { PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type {
@@ -123,9 +123,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
-  const settings = useSelector((state: State) =>
-    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId ?? '')
-  )
+  const settings =
+    usePipetteSettingsQuery({
+      refetchInterval: 5000,
+      enabled: pipetteId != null,
+    })?.data?.[pipetteId ?? '']?.fields ?? null
 
   const [
     selectedPipette,
@@ -226,12 +228,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       )}
       {!pipetteIsBad && subsystemUpdateData == null && (
         <>
-          <Box
-            padding={`${SPACING.spacing16} ${SPACING.spacing8}`}
-            width="100%"
-          >
+          <Box padding={SPACING.spacing16} width="100%">
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
-              <Flex alignItems={ALIGN_START}>
+              <Flex alignItems={ALIGN_CENTER} width="3.75rem" height="3.375rem">
                 {pipetteModelSpecs !== null ? (
                   <InstrumentDiagram
                     pipetteSpecs={pipetteModelSpecs}
@@ -240,6 +239,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     transform={isFlex ? 'scale(0.4)' : 'scale(0.3)'}
                     size="3.125rem"
                     transformOrigin={isFlex ? '-50% -10%' : '20% -10%'}
+                    width="100%"
+                    height="100%"
                   />
                 ) : null}
               </Flex>

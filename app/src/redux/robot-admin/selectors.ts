@@ -1,11 +1,8 @@
-import { add, isWithinInterval } from 'date-fns'
 import { CONNECTABLE } from '../discovery'
 import {
-  RESTART_TIMEOUT_SEC,
   RESTART_PENDING_STATUS,
   RESTART_IN_PROGRESS_STATUS,
   RESTART_SUCCEEDED_STATUS,
-  RESTART_TIMED_OUT_STATUS,
 } from './constants'
 
 import type { ConnectivityStatus } from '../discovery/types'
@@ -43,10 +40,6 @@ export function getNextRestartStatus(
     return RESTART_IN_PROGRESS_STATUS
   }
 
-  if (getRestartHasTimedOut(state, robotName, now)) {
-    return RESTART_TIMED_OUT_STATUS
-  }
-
   return null
 }
 
@@ -57,23 +50,6 @@ function getRestartHasBegun(
 ): boolean {
   const status = robotState(state, robotName)?.restart?.status
   return status === RESTART_PENDING_STATUS && connectivityStatus !== CONNECTABLE
-}
-
-function getRestartHasTimedOut(
-  state: State,
-  robotName: string,
-  now: Date
-): boolean {
-  const restartState = robotState(state, robotName)?.restart
-
-  if (!restartState?.startTime || !getRobotRestarting(state, robotName)) {
-    return false
-  }
-
-  const { startTime } = restartState
-  const endTime = add(startTime, { seconds: RESTART_TIMEOUT_SEC })
-
-  return !isWithinInterval(now, { start: startTime, end: endTime })
 }
 
 function getRestartIsComplete(

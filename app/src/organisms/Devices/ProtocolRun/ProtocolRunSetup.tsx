@@ -34,6 +34,7 @@ import {
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
+  useModuleCalibrationStatus,
   ProtocolCalibrationStatus,
 } from '../hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -123,7 +124,8 @@ export function ProtocolRunSetup({
     },
   }
   const robot = useRobot(robotName)
-  const calibrationStatus = useRunCalibrationStatus(robotName, runId)
+  const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)
+  const calibrationStatusModules = useModuleCalibrationStatus(robotName, runId)
   const isFlex = useIsFlex(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
@@ -198,7 +200,7 @@ export function ProtocolRunSetup({
             ]
           }
           expandStep={setExpandedStepKey}
-          calibrationStatus={calibrationStatus}
+          calibrationStatus={calibrationStatusRobot}
         />
       ),
       // change description for OT-3
@@ -306,7 +308,12 @@ export function ProtocolRunSetup({
                       }
                       rightElement={
                         <StepRightElement
-                          {...{ stepKey, runHasStarted, calibrationStatus }}
+                          {...{ stepKey, runHasStarted, 
+
+                          calibrationStatusRobot,
+                          calibrationStatusModules,
+                          isFlex,
+                            }}
                         />
                       }
                     >
@@ -319,6 +326,7 @@ export function ProtocolRunSetup({
                 </Flex>
               )
             })
+
           )}
         </>
       ) : (
@@ -332,25 +340,42 @@ export function ProtocolRunSetup({
 
 interface StepRightElementProps {
   stepKey: StepKey
-  calibrationStatus: ProtocolCalibrationStatus
+  calibrationStatusRobot: ProtocolCalibrationStatus
+  calibrationStatusModules?: ProtocolCalibrationStatus
   runHasStarted: boolean
+  isFlex: boolean
 }
 function StepRightElement(props: StepRightElementProps): JSX.Element | null {
-  const { stepKey, calibrationStatus, runHasStarted } = props
+  const {
+    stepKey,
+    runHasStarted,
+    calibrationStatusRobot,
+    calibrationStatusModules,
+    isFlex,
+  } = props
   const { t } = useTranslation('protocol_setup')
 
-  if (stepKey === ROBOT_CALIBRATION_STEP_KEY && !runHasStarted) {
+  if (
+    !runHasStarted &&
+    (stepKey === ROBOT_CALIBRATION_STEP_KEY ||
+      (stepKey === MODULE_SETUP_KEY && isFlex))
+  ) {
+    const calibrationStatus =
+      stepKey === ROBOT_CALIBRATION_STEP_KEY
+        ? calibrationStatusRobot
+        : calibrationStatusModules
+
     return (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <Icon
           size={SIZE_1}
           color={
-            calibrationStatus.complete
+            calibrationStatus?.complete
               ? COLORS.successEnabled
               : COLORS.warningEnabled
           }
           marginRight={SPACING.spacing8}
-          name={calibrationStatus.complete ? 'ot-check' : 'alert-circle'}
+          name={calibrationStatus?.complete ? 'ot-check' : 'alert-circle'}
           id="RunSetupCard_calibrationIcon"
         />
         <StyledText
@@ -360,7 +385,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           id="RunSetupCard_calibrationText"
         >
-          {calibrationStatus.complete
+          {calibrationStatus?.complete
             ? t('calibration_ready')
             : t('calibration_needed')}
         </StyledText>

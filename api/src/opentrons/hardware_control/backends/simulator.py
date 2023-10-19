@@ -169,6 +169,9 @@ class Simulator:
         # to the hardware api controller.
         self._module_controls: Optional[AttachedModulesControl] = None
 
+    async def get_serial_number(self) -> Optional[str]:
+        return "simulator"
+
     @property
     def gpio_chardev(self) -> GPIODriverLike:
         return self._gpio_chardev

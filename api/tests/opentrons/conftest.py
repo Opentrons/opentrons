@@ -32,6 +32,7 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
@@ -104,8 +105,12 @@ def is_robot(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.fixture
 def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     for name, func in inspect.getmembers(config.feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
         mock_get_ff = decoy.mock(func=func)
-        decoy.when(mock_get_ff()).then_return(False)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
         monkeypatch.setattr(config.feature_flags, name, mock_get_ff)
 
 
@@ -129,16 +134,11 @@ def protocol_file() -> str:
 
 @pytest.fixture()
 def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
-    root = protocol_file
-    filename = os.path.join(os.path.dirname(__file__), "data", root)
-
-    file = open(filename)
-    text = "".join(list(file))
-    file.seek(0)
-
-    yield Protocol(text=text, filename=filename, filelike=file)
-
-    file.close()
+    filename = os.path.join(os.path.dirname(__file__), "data", protocol_file)
+    with open(filename, encoding="utf-8") as file:
+        text = file.read()
+        file.seek(0)
+        yield Protocol(text=text, filename=filename, filelike=file)
 
 
 @pytest.fixture()
