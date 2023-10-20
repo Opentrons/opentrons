@@ -33,6 +33,7 @@ package_entries = {
     'usb-bridge': PackageEntry('usb_bridge'),
     'system-server': PackageEntry('system_server'),
     'server-utils': PackageEntry('server_utils'),
+    'ipc-messenger': PackageEntry('ipc_messenger'),
 }
 
 project_entries = {
