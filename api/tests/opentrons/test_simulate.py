@@ -74,19 +74,19 @@ def test_simulate_without_filename(protocol: Protocol, protocol_file: str) -> No
         (
             "testosaur_v2.py",
             [
-                "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
+                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 1000 µL on 1",
                 "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
                 "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
-                "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
+                "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on 1",
             ],
         ),
         (
             "testosaur_v2_14.py",
             [
-                "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on slot 1",
+                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
                 "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 500.0 uL/sec",
                 "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 1000.0 uL/sec",
-                "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on slot 1",
+                "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
             ],
         ),
     ],
@@ -110,7 +110,7 @@ def test_simulate_function_json(
     runlog, bundle = simulate.simulate(filelike, "simple.json")
     assert bundle is None
     assert [item["payload"]["text"] for item in runlog] == [
-        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1",
+        "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 1",
         "Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec",
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
@@ -133,17 +133,17 @@ def test_simulate_function_bundle_apiv2(
     assert bundle is None
     assert [item["payload"]["text"] for item in runlog] == [
         "Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from A1 of Opentrons 96 Tip Rack 10 µL on 3",
+        "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
         "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 3",
+        "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
         "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
-        "Picking up tip from C1 of Opentrons 96 Tip Rack 10 µL on 3",
+        "Picking up tip from C1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
         "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
