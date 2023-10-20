@@ -212,6 +212,10 @@ export const DropTipWizardComponent = (
     createdMaintenanceRunId,
     instrumentModelSpecs,
   } = props
+  console.log(
+    '🚀 ~ file: index.tsx:215 ~ createdMaintenanceRunId:',
+    createdMaintenanceRunId
+  )
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation('drop_tip_wizard')
 
@@ -430,6 +434,7 @@ export const DropTipWizardComponent = (
         moveToXYCoordinate={moveToXYCoordinate}
         isRobotMoving={isRobotMoving}
         isOnDevice={isOnDevice}
+        setErrorMessage={setErrorMessage}
       />
     )
   } else if (
