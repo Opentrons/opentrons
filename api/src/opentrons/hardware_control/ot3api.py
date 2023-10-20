@@ -2007,12 +2007,9 @@ class OT3API(
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             spec = self._pipette_handler.plan_ht_pick_up_tip()
             if spec.z_distance_to_tiprack:
-                target_down = target_position_from_relative(
-                    mount,
-                    top_types.Point(spec.z_distance_to_tiprack),
-                    self._current_position,
+                await self.move_rel(
+                    realmount, top_types.Point(z=spec.z_distance_to_tiprack)
                 )
-                await self._move(target_down)
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
             spec = self._pipette_handler.plan_lt_pick_up_tip(
