@@ -194,7 +194,7 @@ class DeckSlotName(str, enum.Enum):
     SLOT_9 = "9"
     SLOT_10 = "10"
     SLOT_11 = "11"
-    FIXED_TRASH = "12"
+    FIXED_TRASH = "1"
 
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
