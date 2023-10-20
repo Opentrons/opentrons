@@ -6,13 +6,13 @@ import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
 
 const mockFunc = jest.fn()
-const mockPush = jest.fn()
+const mockGoBack = jest.fn()
 
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
     ...reactRouterDom,
-    useHistory: () => ({ goBack: mockPush } as any),
+    useHistory: () => ({ goBack: mockGoBack } as any),
   }
 })
 
@@ -49,7 +49,7 @@ describe('DeckConfigurationDiscardChangesModal', () => {
     const [{ getByText }] = render(props)
     getByText('Discard changes').click()
     expect(mockFunc).toHaveBeenCalledWith(false)
-    expect(mockPush).toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping continue editing button', () => {
