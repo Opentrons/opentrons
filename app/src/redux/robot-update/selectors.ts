@@ -115,6 +115,10 @@ export function getRobotUpdateSessionRobotName(state: State): string | null {
   return state.robotUpdate.session?.robotName || null
 }
 
+export function getRobotSessionIsManualFile(state: State): boolean | null {
+  return state.robotUpdate.session?.fileInfo?.isManualFile ?? null
+}
+
 export const getRobotUpdateRobot: (
   state: State
 ) => ViewableRobot | null = createSelector(

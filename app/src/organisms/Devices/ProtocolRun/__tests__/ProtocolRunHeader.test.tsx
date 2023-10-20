@@ -66,6 +66,7 @@ import {
   useTrackProtocolRunEvent,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
   useIsFlex,
@@ -147,6 +148,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 >
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
   typeof useRunCreatedAtTimestamp
@@ -364,6 +368,9 @@ describe('ProtocolRunHeader', () => {
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
     when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseModuleCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ complete: true })
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
     mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
@@ -593,6 +600,28 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Canceling Run' })
     expect(button).toBeDisabled()
     getByText('Stop requested')
+  })
+
+  it('renders a disabled button and when the robot door is open', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockRunningRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+
+    const [{ getByText, getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Resume run' })
+    expect(button).toBeDisabled()
+    getByText('Close robot door')
   })
 
   it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {

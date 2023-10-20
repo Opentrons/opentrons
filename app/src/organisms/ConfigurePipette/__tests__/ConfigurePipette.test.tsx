@@ -35,9 +35,10 @@ describe('ConfigurePipette', () => {
 
   beforeEach(() => {
     props = {
+      isUpdateLoading: false,
+      updateError: null,
       settings: mockPipetteSettingsFieldsMap,
       robotName: mockRobotName,
-      updateRequest: { status: 'pending' },
       updateSettings: jest.fn(),
       closeModal: jest.fn(),
       formId: 'id',

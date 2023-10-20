@@ -1,4 +1,4 @@
-import { getModuleImage } from '../utils'
+import { getFixtureImage, getModuleImage } from '../utils'
 
 describe('getModuleImage', () => {
   it('should render the magnetic module image when the model is a magnetic module gen 1', () => {
@@ -40,4 +40,16 @@ describe('getModuleImage', () => {
     const result = getModuleImage('magneticBlockV1')
     expect(result).toEqual('magnetic_block_gen_1.png')
   })
+})
+
+describe('getFixtureImage', () => {
+  it('should render the staging area image', () => {
+    const result = getFixtureImage('stagingArea')
+    expect(result).toEqual('staging_area_slot.png')
+  })
+  it('should render the waste chute image', () => {
+    const result = getFixtureImage('wasteChute')
+    expect(result).toEqual('waste_chute.png')
+  })
+  //  TODO(jr, 10/17/23): add rest of the test cases when we add the assets
 })

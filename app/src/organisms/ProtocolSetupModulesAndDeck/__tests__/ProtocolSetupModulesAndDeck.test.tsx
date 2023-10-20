@@ -16,13 +16,13 @@ import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_st
 
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs/hooks'
-import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../CommandText/__fixtures__'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
-} from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+} from '../../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { mockApiHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
@@ -32,10 +32,11 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from '../utils'
-import { SetupInstructionsModal } from '../SetupInstructionsModal'
+import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
+import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
-import { ProtocolSetupModules } from '..'
+import { ProtocolSetupModulesAndDeck } from '..'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
@@ -51,6 +52,7 @@ jest.mock('../utils')
 jest.mock('../SetupInstructionsModal')
 jest.mock('../../ModuleWizardFlows')
 jest.mock('../FixtureTable')
+jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -94,6 +96,9 @@ const mockFixtureTable = FixtureTable as jest.MockedFunction<
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery
 >
+const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
+  typeof LocationConflictModal
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -120,7 +125,7 @@ const mockFixture = {
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolSetupModules
+      <ProtocolSetupModulesAndDeck
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
       />
@@ -131,7 +136,7 @@ const render = () => {
   )
 }
 
-describe('ProtocolSetupModules', () => {
+describe('ProtocolSetupModulesAndDeck', () => {
   let mockChainLiveCommands = jest.fn()
 
   beforeEach(() => {
@@ -160,6 +165,9 @@ describe('ProtocolSetupModules', () => {
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
+    mockLocationConflictModal.mockReturnValue(
+      <div>mock location conflict modal</div>
+    )
     mockUseDeckConfigurationQuery.mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
@@ -352,6 +360,7 @@ describe('ProtocolSetupModules', () => {
       .mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('mock FixtureTable')
-    getByText('Location conflict')
+    getByText('Location conflict').click()
+    getByText('mock location conflict modal')
   })
 })

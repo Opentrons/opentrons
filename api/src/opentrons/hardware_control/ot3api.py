@@ -285,6 +285,9 @@ class OT3API(
         )
         await self._backend.update_to_default_current_settings(gantry_load)
 
+    async def get_serial_number(self) -> Optional[str]:
+        return await self._backend.get_serial_number()
+
     async def set_system_constraints_for_calibration(self) -> None:
         self._move_manager.update_constraints(
             get_system_constraints_for_calibration(
@@ -762,12 +765,17 @@ class OT3API(
 
         asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
+    def is_movement_execution_taskified(self) -> bool:
+        return self.taskify_movement_execution
+
+    def should_taskify_movement_execution(self, taskify: bool) -> None:
+        self.taskify_movement_execution = taskify
+
     async def _stop_motors(self) -> None:
         """Immediately stop motors."""
         await self._backend.halt()
 
-    async def _cancel_execution_and_running_tasks(self) -> None:
-        """Cancel execution manager and all running (hardware module) tasks."""
+    async def cancel_execution_and_running_tasks(self) -> None:
         await self._execution_manager.cancel()
 
     async def halt(self, disengage_before_stopping: bool = False) -> None:
@@ -781,7 +789,7 @@ class OT3API(
     async def stop(self, home_after: bool = True) -> None:
         """Stop motion as soon as possible, reset, and optionally home."""
         await self._stop_motors()
-        await self._cancel_execution_and_running_tasks()
+        await self.cancel_execution_and_running_tasks()
         self._log.info("Resetting OT3API")
         await self.reset()
         if home_after:
@@ -1844,6 +1852,10 @@ class OT3API(
             raise
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
+            bottom = dispense_spec.instr.plunger_positions.bottom
+            plunger_target_pos = target_pos[Axis.of_main_tool_actuator(realmount)]
+            if plunger_target_pos > bottom:
+                dispense_spec.instr.ready_to_aspirate = False
 
     async def blow_out(
         self,
@@ -2221,11 +2233,15 @@ class OT3API(
             self._log.warning(f"Could not save calibration: unknown module {module_id}")
             return None
         # TODO (ba, 2023-03-22): gripper_id and pipette_id should probably be combined to instrument_id
-        instrument_id = None
-        if self._gripper_handler.has_gripper():
-            instrument_id = self._gripper_handler.get_gripper().gripper_id
-        elif self._pipette_handler.has_pipette(mount):
+        if self._pipette_handler.has_pipette(mount):
             instrument_id = self._pipette_handler.get_pipette(mount).pipette_id
+        elif mount == OT3Mount.GRIPPER and self._gripper_handler.has_gripper():
+            instrument_id = self._gripper_handler.get_gripper().gripper_id
+        else:
+            self._log.warning(
+                f"Could not save calibration: no instrument found for {mount}"
+            )
+            return None
         module_type = module.MODULE_TYPE
         self._log.info(
             f"Saving module offset: {offset} for module {module_type.name} {module_id}."

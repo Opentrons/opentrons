@@ -41,7 +41,11 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   const { onCloseClick, trashName } = props
   const { values } = useFormikContext<TrashValues>()
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, values.selectedSlot)
+  const isSlotEmpty = getSlotIsEmpty(
+    initialDeckSetup,
+    values.selectedSlot,
+    trashName === 'trashBin'
+  )
   const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const [field] = useField('selectedSlot')
 
@@ -74,7 +78,9 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
             {!isSlotEmpty ? (
               <PDAlert
                 alertType="warning"
-                title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+                title={i18n.t(
+                  `alert.deck_config_placement.SLOT_OCCUPIED.${trashName}`
+                )}
                 description={''}
               />
             ) : null}

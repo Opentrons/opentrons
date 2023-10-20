@@ -345,11 +345,11 @@ If you know that all your liquid handling will take place in a specific mode, th
 Pipette Flow Rates
 ==================
 
-Measured in µL/s, the flow rate determines how much liquid a pipette can aspirate, dispense, and blow-out. Opentrons pipettes have their own default flow rates. The API lets you change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`.InstrumentContext.flow_rate` properties listed below. 
+Measured in µL/s, the flow rate determines how much liquid a pipette can aspirate, dispense, and blow out. Opentrons pipettes have their own default flow rates. The API lets you change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`.InstrumentContext.flow_rate` properties listed below. 
 
 * Aspirate: ``InstrumentContext.flow_rate.aspirate``
 * Dispense: ``InstrumentContext.flow_rate.dispense``
-* Blow-out: ``InstrumentContext.flow_rate.blow_out``
+* Blow out: ``InstrumentContext.flow_rate.blow_out``
 
 These flow rate properties operate independently. This means you can specify different flow rates for each property within the same protocol. For example, let's load a simple protocol and set different flow rates for the attached pipette.
 
@@ -394,17 +394,27 @@ These flow rates will remain in effect until you change the ``flow_rate`` attrib
 Flex Pipette Flow Rates
 -----------------------
 
-The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for Flex pipettes.
+The default flow rates for Flex pipettes depend on the maximum volume of the pipette and the capacity of the currently attached tip. For each pipette–tip configuration, the default flow rate is the same for aspirate, dispense, and blowout actions.
 
-+-------------------------------+-----------------+-----------------+-----------------+
-| Pipette Models                | Aspirate (µL/s) | Dispense (µL/s) | Blow-out (µL/s) |
-+===============================+=================+=================+=================+
-| | **Flex 50 µL pipettes**     | 8               | 8               | 4               |
-| | 1- and 8-channel            |                 |                 |                 |
-+-------------------------------+-----------------+-----------------+-----------------+
-| | **Flex 1000 µL pipettes**   | 160             | 160             | 80              |
-| | 1-, 8-, and 96-channel      |                 |                 |                 |
-+-------------------------------+-----------------+-----------------+-----------------+
+.. list-table::
+    :header-rows: 1
+    
+    * - Pipette Model
+      - Tip Capacity (µL)
+      - Flow Rate (µL/s)
+    * - 50 µL (1- and 8-channel)
+      - All capacities
+      - 57
+    * - 1000 µL (1-, 8-, and 96-channel)
+      - 50
+      - 478
+    * - 1000 µL (1-, 8-, and 96-channel)
+      - 200
+      - 716
+    * - 1000 µL (1-, 8-, and 96-channel)
+      - 1000
+      - 716
+
 
 Additionally, all Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
 
@@ -413,7 +423,7 @@ Additionally, all Flex pipettes have a well bottom clearance of 1 mm for aspirat
 OT-2 Pipette Flow Rates
 -----------------------
 
-The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes. Because the flow rates are the same across all three actions, we've consolidated the data into the "Flow Rates" column.
+The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for OT-2 GEN2 pipettes. Default flow rates are the same across all three actions.
 
 .. list-table::
     :header-rows: 1
@@ -422,25 +432,25 @@ The following table provides data on the default aspirate, dispense, and blow-ou
       - Volume (µL)
       - Flow Rates (µL/s)
     * - P20 Single-Channel GEN2
-      - 1-20
+      - 1–20
       - 
           * API v2.6 or higher: 7.56
           * API v2.5 or lower: 3.78
     * - P300 Single-Channel GEN2
-      - 20-300
+      - 20–300
       - 
           * API v2.6 or higher: 92.86
           * API v2.5 or lower: 46.43
     * - P1000 Single-Channel GEN2
-      - 100-1000
+      - 100–1000
       -
           * API v2.6 or higher: 274.7
           * API v2.5 or lower: 137.35
     * - P20 Multi-Channel GEN2
-      - 1-20
+      - 1–20
       - 7.6
     * - P300 Multi-Channel GEN2
-      - 20-300
+      - 20–300
       - 94
  
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/s and a well bottom clearance of 1 mm for aspirate and dispense actions.

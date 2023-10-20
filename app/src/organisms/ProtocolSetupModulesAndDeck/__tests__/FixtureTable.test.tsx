@@ -9,11 +9,13 @@ import {
 import { i18n } from '../../../i18n'
 import { useLoadedFixturesConfigStatus } from '../../../resources/deck_configuration/hooks'
 import { useFeatureFlag } from '../../../redux/config'
+import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { FixtureTable } from '../FixtureTable'
 import type { LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
 
 jest.mock('../../../redux/config')
 jest.mock('../../../resources/deck_configuration/hooks')
+jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
@@ -21,7 +23,9 @@ const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
 const mockUseLoadedFixturesConfigStatus = useLoadedFixturesConfigStatus as jest.MockedFunction<
   typeof useLoadedFixturesConfigStatus
 >
-
+const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
+  typeof LocationConflictModal
+>
 const mockLoadedFixture = {
   id: 'stubbed_load_fixture',
   commandType: 'loadFixture',
@@ -68,6 +72,9 @@ describe('FixtureTable', () => {
     mockUseLoadedFixturesConfigStatus.mockReturnValue([
       { ...mockLoadedFixture, configurationStatus: 'configured' },
     ])
+    mockLocationConflictModal.mockReturnValue(
+      <div>mock location conflict modal</div>
+    )
   })
 
   it('should render table header and contents', () => {
@@ -100,7 +107,8 @@ describe('FixtureTable', () => {
     props = {
       mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
     }
-    const [{ getByText }] = render(props)
-    getByText('Location conflict')
+    const [{ getByText, getAllByText }] = render(props)
+    getByText('Location conflict').click()
+    getAllByText('mock location conflict modal')
   })
 })

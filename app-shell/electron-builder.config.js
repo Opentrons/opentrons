@@ -7,20 +7,14 @@ const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
 
-const ot3PublishConfig =
+// this will generate either
+// https://builds.opentrons.com/app/ or https://ot3-development.builds.opentrons.com/app/
+// because these environment variables are provided by ci
+const publishConfig =
   OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
     ? {
         provider: 'generic',
         url: `https://${OT_APP_DEPLOY_BUCKET}/${OT_APP_DEPLOY_FOLDER}/`,
-      }
-    : null
-
-const robotStackPublishConfig =
-  OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
-    ? {
-        provider: 's3',
-        bucket: OT_APP_DEPLOY_BUCKET,
-        path: OT_APP_DEPLOY_FOLDER,
       }
     : null
 
@@ -80,7 +74,7 @@ module.exports = async () => ({
     category: 'Science',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
   },
-  publish: project === 'ot3' ? ot3PublishConfig : robotStackPublishConfig,
+  publish: publishConfig,
   generateUpdatesFilesForAllChannels: true,
   beforePack: path.join(__dirname, './scripts/before-pack.js'),
 })

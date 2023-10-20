@@ -5,6 +5,9 @@ import heaterShakerModule from '../../../../assets/images/heater_shaker_module_t
 import thermoModuleGen2 from '../../../../assets/images/thermocycler_gen_2_closed.png'
 import magneticBlockGen1 from '../../../../assets/images/magnetic_block_gen_1.png'
 import stagingArea from '../../../../assets/images/staging_area_slot.png'
+import wasteChute from '../../../../assets/images/waste_chute.png'
+//  TODO(jr, 10/17/23): figure out if we need this asset, I'm stubbing it in for now
+// import wasteChuteStagingArea from '../../../../assets/images/waste_chute_with_staging_area.png'
 import type { FixtureLoadName, ModuleModel } from '@opentrons/shared-data'
 
 export function getModuleImage(model: ModuleModel): string {
@@ -28,14 +31,14 @@ export function getModuleImage(model: ModuleModel): string {
   }
 }
 
-//  TODO(jr, 10/4/23): add correct assets for wasteChute, trashBin, standardSlot
+//  TODO(jr, 10/4/23): add correct assets for trashBin, standardSlot, wasteChuteAndStagingArea
 export function getFixtureImage(fixture: FixtureLoadName): string {
   switch (fixture) {
     case 'stagingArea': {
       return stagingArea
     }
     case 'wasteChute': {
-      return stagingArea
+      return wasteChute
     }
     case 'standardSlot': {
       return stagingArea
