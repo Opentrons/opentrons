@@ -172,7 +172,7 @@ class InstrumentContext(publisher.CommandPublisher):
                          If unspecified, the robot will aspirate from the
                          current position.
         :param rate: A multiplier for the default flow rate of the pipette.
-                     Calculated as `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
+                     Calculated as ``rate`` multiplied by :py:attr:`flow_rate.aspirate <flow_rate>`.
                      If not specified, defaults to 1.0. See :ref:`new-plunger-flow-rates`.
         :type rate: float
         :returns: This instance.
@@ -282,7 +282,7 @@ class InstrumentContext(publisher.CommandPublisher):
                         :py:attr:`current_volume`). If unspecified,
                         the robot will dispense into the current position.
         :param rate: How quickly a pipette dispenses liquid. Measured in µL/s.
-                     Calculated as `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
+                     Calculated as ``rate`` multiplied by :py:attr:`flow_rate.dispense <flow_rate>`.
                      If not specified, defaults to 1.0. See :ref:`new-plunger-flow-rates`.
         :type rate: float
         :param push_out: Continue past the plunger bottom to help ensure all liquid
@@ -297,7 +297,7 @@ class InstrumentContext(publisher.CommandPublisher):
             to guess whether the argument is a volume or location - it is
             required to be a volume. If you want to call ``dispense`` with only
             a location, specify it as a keyword argument:
-            ``instr.dispense(location=wellplate['A1'])``
+            ``pipette.dispense(location=plate['A1'])``.
 
         """
         if self.api_version < APIVersion(2, 15) and push_out:
@@ -393,9 +393,9 @@ class InstrumentContext(publisher.CommandPublisher):
         :type location: types.Location
         :param rate: How quickly a pipette aspirates and dispenses liquid
                     while mixing. The aspiration flow rate is calculated as
-                    ``rate`` * :py:attr:`flow_rate.aspirate <flow_rate>`.
+                    ``rate`` multiplied by :py:attr:`flow_rate.aspirate <flow_rate>`.
                     The dispense flow rate is calculated
-                    as ``rate`` * :py:attr:`flow_rate.dispense <flow_rate>`.
+                    as ``rate`` multiplied by :py:attr:`flow_rate.dispense <flow_rate>`.
                     See :ref:`new-plunger-flow-rates`.
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette.
         :returns: This instance.
@@ -879,11 +879,11 @@ class InstrumentContext(publisher.CommandPublisher):
         in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
-        the `location` argument. The `location` argument can be specified in
+        the ``location`` argument. The ``location`` argument can be specified in
         several ways:
 
             - If the only thing to specify is which well into which to drop
-              a tip, `location` can be a :py:class:`.Well`. For instance,
+              a tip, ``location`` can be a :py:class:`.Well`. For instance,
               if you have a tip rack in a variable called ``tiprack``, you can
               drop a tip into a specific well on that tiprack with the call
               ``instr.drop_tip(tiprack.wells()[0])``. This style of call can
@@ -893,7 +893,7 @@ class InstrumentContext(publisher.CommandPublisher):
               for instance to tell the robot to drop a tip from an unusually
               large height above the tip rack, ``location``
               can be a :py:class:`.types.Location`; for instance, you can call
-              `instr.drop_tip(tiprack.wells()[0].top())`.
+              ``instr.drop_tip(tiprack.wells()[0].top())``.
 
         :param location:
             The location to drop the tip.
