@@ -793,6 +793,7 @@ class OT3PipetteHandler:
         return TipActionSpec(
             tip_action_moves=build_presses(),
             shake_off_moves=self._build_pickup_shakes(instrument),
+            ending_z_retract_distance=instrument.config.end_tip_action_retract_distance_mm,
         )
 
     @staticmethod
