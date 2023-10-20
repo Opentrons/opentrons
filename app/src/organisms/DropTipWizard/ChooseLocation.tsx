@@ -5,7 +5,6 @@ import {
   Flex,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
   RESPONSIVENESS,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
@@ -16,7 +15,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { NeedHelpLink } from '../CalibrationPanels'
+// import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
@@ -24,7 +23,7 @@ import type { CommandData } from '@opentrons/api-client'
 import { SmallButton } from '../../atoms/buttons'
 
 // TODO: get help link article URL
-const NEED_HELP_URL = ''
+// const NEED_HELP_URL = ''
 
 interface ChooseLocationProps {
   handleProceed: () => void
@@ -117,7 +116,7 @@ export const ChooseLocation = (
       </Flex>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SmallButton
-          buttonText={i18n.format(t('shared:confirm_position'), 'capitalize')}
+          buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
           onClick={handleConfirmPosition}
         />
       </Flex>
@@ -129,14 +128,10 @@ export const ChooseLocation = (
         body={body}
         rightElement={DeckLocationSelect}
         footer={
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-          >
-            <NeedHelpLink href={NEED_HELP_URL} />
+          <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
+            {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
             <PrimaryButton onClick={handleConfirmPosition}>
-              {t('shared:confirm_position')}
+              {i18n.format(t('move_to_slot'), 'capitalize')}
             </PrimaryButton>
           </Flex>
         }

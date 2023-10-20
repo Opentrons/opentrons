@@ -21,13 +21,13 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
-import { NeedHelpLink } from '../CalibrationPanels'
+// import { NeedHelpLink } from '../CalibrationPanels'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
 // TODO: get help link article URL
-const NEED_HELP_URL = ''
+// const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
   handleCreateAndSetup: (shouldDispenseLiquid: boolean) => void
@@ -148,11 +148,8 @@ export const BeforeBeginning = (
           <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
         </Flex>
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <NeedHelpLink href={NEED_HELP_URL} />
+      <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
+        {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
         <PrimaryButton
           disabled={isCreateLoading || flowType == null}
           onClick={handleProceed}

@@ -20,7 +20,7 @@ import {
   Icon,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { NeedHelpLink } from '../CalibrationPanels'
+// import { NeedHelpLink } from '../CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'
 import { Jog, JogControls } from '../../molecules/JogControls'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -29,7 +29,7 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PipetteModelSpecs } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
-const NEED_HELP_URL = ''
+// const NEED_HELP_URL = ''
 
 const Header = styled.h1`
   ${TYPOGRAPHY.h1Default}
@@ -140,11 +140,11 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
         <Flex
           width="100%"
           marginTop={SPACING.spacing32}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          justifyContent={JUSTIFY_FLEX_END}
           alignItems={ALIGN_CENTER}
           paddingLeft={SPACING.spacing32}
         >
-          <NeedHelpLink href={NEED_HELP_URL} />
+          {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
           <Flex gridGap={SPACING.spacing8}>
             <SecondaryButton
               onClick={handleGoBack}
@@ -216,36 +216,32 @@ export const JogToPosition = (
     )
   }
 
-  if (isOnDevice) {
-    return (
-      <Flex
-        width="100%"
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing24}
-        padding={SPACING.spacing32}
-      >
-        <JogControls jog={handleJog} isOnDevice={true} />
-        <Flex width="100%" gridGap={SPACING.spacing10}>
-          <Flex width="100%">
-            <SmallButton
-              buttonType="tertiaryLowLight"
-              buttonText={t('shared:go_back')}
-              onClick={handleGoBack}
-            />
-          </Flex>
-          <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
-            <SmallButton
-              buttonText={t('shared:confirm_position')}
-              onClick={() => setShowPositionConfirmation(true)}
-            />
-          </Flex>
+  return isOnDevice ? (
+    <Flex
+      width="100%"
+      alignItems={ALIGN_CENTER}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing24}
+      padding={SPACING.spacing32}
+    >
+      <JogControls jog={handleJog} isOnDevice={true} />
+      <Flex width="100%" gridGap={SPACING.spacing10}>
+        <Flex width="100%">
+          <SmallButton
+            buttonType="tertiaryLowLight"
+            buttonText={t('shared:go_back')}
+            onClick={handleGoBack}
+          />
+        </Flex>
+        <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
+          <SmallButton
+            buttonText={t('shared:confirm_position')}
+            onClick={() => setShowPositionConfirmation(true)}
+          />
         </Flex>
       </Flex>
-    )
-  }
-
-  return (
+    </Flex>
+  ) : (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -262,7 +258,7 @@ export const JogToPosition = (
           <Header>
             {i18n.format(t('position_the_pipette'), 'capitalize')}
           </Header>
-          {body}
+          <StyledText as="p">{body}</StyledText>
         </Flex>
         {/* no animations */}
         <Flex
@@ -276,10 +272,9 @@ export const JogToPosition = (
         <Flex
           width="100%"
           marginTop={SPACING.spacing32}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_FLEX_END}
         >
-          <NeedHelpLink href={NEED_HELP_URL} />
+          {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
           <Flex gridGap={SPACING.spacing8}>
             <SecondaryButton onClick={handleGoBack}>
               {t('shared:go_back')}
