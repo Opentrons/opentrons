@@ -9,10 +9,7 @@ import { PipettingCommandText } from './PipettingCommandText'
 import { TemperatureCommandText } from './TemperatureCommandText'
 import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
-import type {
-  CompletedProtocolAnalysis,
-  RobotType,
-} from '@opentrons/shared-data/js'
+import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RobotType } from '@opentrons/shared-data/js'
 import type { StyleProps } from '@opentrons/components'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
@@ -40,11 +37,11 @@ const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
 
 interface Props extends StyleProps {
   command: RunTimeCommand
-  robotSideAnalysis: CompletedProtocolAnalysis
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   robotType: RobotType
 }
 export function CommandText(props: Props): JSX.Element | null {
-  const { command, robotSideAnalysis, robotType, ...styleProps } = props
+  const { command, analysis, robotType, ...styleProps } = props
   const { t } = useTranslation('protocol_command_text')
 
   switch (command.commandType) {
@@ -56,9 +53,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
-          <PipettingCommandText
-            {...{ command, robotSideAnalysis, robotType }}
-          />
+          <PipettingCommandText {...{ command, analysis, robotType }} />
         </StyledText>
       )
     }
@@ -68,7 +63,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadLiquid': {
       return (
         <StyledText as="p" {...styleProps}>
-          <LoadCommandText {...{ command, robotSideAnalysis, robotType }} />
+          <LoadCommandText {...{ command, analysis, robotType }} />
         </StyledText>
       )
     }
@@ -141,15 +136,13 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
-          <MoveLabwareCommandText
-            {...{ command, robotSideAnalysis, robotType }}
-          />
+          <MoveLabwareCommandText {...{ command, analysis, robotType }} />
         </StyledText>
       )
     }
     case 'configureForVolume': {
       const { volume, pipetteId } = command.params
-      const pipetteName = robotSideAnalysis.pipettes.find(
+      const pipetteName = analysis.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 

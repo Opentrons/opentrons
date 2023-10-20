@@ -238,8 +238,8 @@ export function RunningProtocolCommandList({
                     <CommandIcon command={command} />
                     <CommandText
                       command={command}
-                      robotSideAnalysis={robotSideAnalysis}
                       robotType={robotType}
+                      analysis={robotSideAnalysis}
                       css={COMMAND_ROW_STYLE}
                     />
                   </Flex>

@@ -1,14 +1,18 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import difference from 'lodash/difference'
-import { ALIGN_CENTER, DIRECTION_COLUMN, Flex, Icon, SPACING } from '@opentrons/components'
+import { ALIGN_CENTER, BORDERS, COLORS, DIRECTION_COLUMN, Flex, Icon, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { ProtocolAnalysisOutput, RunTimeCommand } from '@opentrons/shared-data'
 import { CommandText } from '../CommandText'
+import { CommandIcon } from '../RunPreview/CommandIcon'
 import { StyledText } from '../../atoms/text'
 
 interface AnnotatedStepsProps {
   analysis: ProtocolAnalysisOutput | null
+}
+
+interface ParentNode {
+  annotationIndex: number
+  subCommands: RunTimeCommand[]
 }
 
 export const AnnotatedSteps = (
@@ -22,14 +26,14 @@ export const AnnotatedSteps = (
     }
   `
   const annotations = analysis.commandAnnotations ?? []
-  const groupedCommands = analysis.commands.reduce((acc, c) => {
+  const groupedCommands = analysis.commands.reduce<Array<RunTimeCommand | ParentNode>>((acc, c) => {
     const foundAnnotationIndex = annotations.findIndex(a => a.commandIds.includes(c.key))
-    console.log('annotations', annotations)
-    console.log('foundAnnotationIndex', foundAnnotationIndex)
+    const lastAccNode = acc[acc.length - 1]
     if (
       acc.length > 0
-      && acc[acc.length - 1]?.annotationIndex != null
-      && annotations[acc[acc.length - 1]?.annotationIndex]?.commandIds.includes(c.key)
+      && 'annotationIndex' in lastAccNode
+      && lastAccNode.annotationIndex != null
+      && annotations[lastAccNode.annotationIndex]?.commandIds.includes(c.key)
     ) {
       return [
         ...acc.slice(0, -1),
@@ -44,7 +48,6 @@ export const AnnotatedSteps = (
       return [...acc, c]
     }
   }, [])
-  console.log(groupedCommands)
 
   return (
     <Flex
@@ -54,11 +57,11 @@ export const AnnotatedSteps = (
       overflowY="auto"
     >
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16}>
-        {groupedCommands.map(c =>
-          c.annotationIndex != null ? (
-            <AnnotatedGroup analysis={analysis} annotationType={annotations[c.annotationIndex]?.annotationType} subCommands={c.subCommands} />
+        {groupedCommands.map((c, i) =>
+          'annotationIndex' in c && c.annotationIndex != null ? (
+            <AnnotatedGroup key={c.id} analysis={analysis} annotationType={annotations[c.annotationIndex]?.annotationType} subCommands={c.subCommands} />
           ) : (
-            <CommandText key={c.id} robotSideAnalysis={analysis} command={c} />
+            <IndividualCommand key={c.id} index={i} command={c} analysis={analysis} />
           ))}
       </Flex>
     </Flex>
@@ -84,9 +87,7 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
                 <StyledText as="p">{annotationType}</StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing32}>
-                {subCommands.map(c => (
-                  <CommandText key={c.id} robotSideAnalysis={analysis} command={c} />
-                ))}
+                {subCommands.map(c => <IndividualCommand key={c.id} command={c} analysis={analysis} />)}
               </Flex>
             </>
           ) : (
@@ -96,6 +97,40 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
             </Flex>
           )
       }
+    </Flex>
+  )
+}
+
+interface IndividualCommandProps {
+  command: RunTimeCommand
+  analysis: ProtocolAnalysisOutput
+  index: number
+}
+function IndividualCommand(props: IndividualCommandProps): JSX.Element {
+  const { command, analysis, index } = props
+  return (
+    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+      <StyledText
+        minWidth={SPACING.spacing16}
+        fontSize={TYPOGRAPHY.fontSizeCaption}
+      >
+        {index + 1}
+      </StyledText>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        width="100%"
+        border={`solid 1px ${COLORS.transparent}`}
+        backgroundColor={COLORS.fundamentalsBackground}
+        color={COLORS.darkBlackEnabled}
+        borderRadius={BORDERS.radiusSoftCorners}
+        padding={SPACING.spacing8}
+      >
+        <Flex key={command.id} alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+          <CommandIcon command={command} />
+          <CommandText analysis={analysis} command={command} />
+        </Flex>
+      </Flex>
     </Flex>
   )
 }

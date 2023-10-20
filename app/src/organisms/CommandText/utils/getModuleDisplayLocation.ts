@@ -1,9 +1,9 @@
 import { getLoadedModule } from './accessors'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 export function getModuleDisplayLocation(
-  analysis: CompletedProtocolAnalysis,
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   moduleId: string
 ): string {
   const loadedModule = getLoadedModule(analysis, moduleId)

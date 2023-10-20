@@ -233,8 +233,8 @@ export function CurrentRunningProtocolCommand({
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
-            robotSideAnalysis={robotSideAnalysis}
             robotType={robotType}
+            analysis={robotSideAnalysis}
           />
         ) : null}
       </Flex>
