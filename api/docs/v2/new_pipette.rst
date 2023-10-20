@@ -321,7 +321,7 @@ The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a l
 .. note::
     The pipette must not contain liquid when you call ``configure_for_volume()``, or the API will raise an error.
     
-    Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode.
+    Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode. Calling ``configure_for_volume()`` *before* ``pick_up_tip()`` helps to avoid this situation.
 
 In a protocol that handles many different volumes, it's a good practice to call this function immediately before each :py:meth:`.transfer` or :py:meth:`.aspirate`, specifying the volume that you are about to handle. When operating with a list of volumes, nest ``configure_for_volume()`` inside a ``for`` loop to ensure that the pipette is properly configured for each volume:
 
@@ -331,8 +331,8 @@ In a protocol that handles many different volumes, it's a good practice to call 
     sources = plate.columns()[0]
     destinations = plate.columns()[1]
     for i in range(8):
-        pipette50.pick_up_tip()
         pipette50.configure_for_volume(volumes[i])
+        pipette50.pick_up_tip()
         pipette50.aspirate(volume=volumes[i], location=sources[i])
         pipette50.dispense(location=destinations[i])
         pipette50.drop_tip()
