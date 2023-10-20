@@ -47,6 +47,7 @@ from .ot3utils import (
     moving_axes_in_move_group,
     gripper_jaw_state_from_fw,
 )
+from .tip_presence_manager import TipPresenceManager
 
 try:
     import aionotify  # type: ignore[import]
@@ -86,7 +87,6 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
-from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
@@ -127,7 +127,6 @@ from opentrons.hardware_control.types import (
     SubSystemState,
     SubSystem,
     TipStateType,
-    FailedTipStateCheck,
     EstopState,
     GripperJawState,
 )
@@ -172,7 +171,6 @@ from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     EStopNotPresentError,
-    UnmatchedTipPresenceStates,
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
 )
@@ -316,6 +314,7 @@ class OT3Controller:
                 "or door, likely because not running on linux"
             )
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+        self._tip_presence_manager = TipPresenceManager(self._messenger)
 
     async def get_serial_number(self) -> Optional[str]:
         if not self.initialized:
@@ -867,34 +866,6 @@ class OT3Controller:
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
-    async def check_for_tip_presence(
-        self,
-        mount: OT3Mount,
-        tip_state: TipStateType,
-        expect_multiple_responses: bool = False,
-    ) -> None:
-        """Raise an error if the expected tip state does not match the current state."""
-        res = await self.get_tip_present_state(mount, expect_multiple_responses)
-        if res != tip_state.value:
-            raise FailedTipStateCheck(tip_state, res)
-
-    async def get_tip_present_state(
-        self,
-        mount: OT3Mount,
-        expect_multiple_responses: bool = False,
-    ) -> bool:
-        """Get the state of the tip ejector flag for a given mount."""
-        expected_responses = 2 if expect_multiple_responses else 1
-        node = sensor_node_for_mount(OT3Mount(mount.value))
-        assert node != NodeId.gripper
-        res = await get_tip_ejector_state(self._messenger, node, expected_responses)  # type: ignore[arg-type]
-        vals = list(res.values())
-        if not all([r == vals[0] for r in vals]):
-            states = {int(sensor): res[sensor] for sensor in res}
-            raise UnmatchedTipPresenceStates(states)
-        tip_present_state = bool(vals[0])
-        return tip_present_state
-
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[Axis]) -> List[NodeId]:
         return [axis_to_node(Axis.Q)] if Axis.Q in axis_current_keys else []
@@ -1333,3 +1304,17 @@ class OT3Controller:
     def estop_state_machine(self) -> EstopStateMachine:
         """Accessor for the API to get the state machine, if it exists."""
         return self._estop_state_machine
+
+    @property
+    def tip_presence_manager(self) -> TipPresenceManager:
+        return self._tip_presence_manager
+
+    async def update_tip_detector(self, mount: OT3Mount, sensor_count: int) -> None:
+        """Build indiviudal tip detector for a mount."""
+        await self._tip_presence_manager.build_detector(mount, sensor_count)
+
+    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+        return await self.tip_presence_manager.get_tip_status(mount)
+
+    def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
+        return self.tip_presence_manager.current_tip_state(mount)

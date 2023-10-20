@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+from functools import partial
 from typing import List
 from typing_extensions import Literal
 
@@ -39,12 +40,13 @@ class TipDetector:
         self,
         messenger: CanMessenger,
         node: NodeId,
-        number_of_sensors: Literal[1, 2] = 1,
+        number_of_sensors: int = 1,
     ) -> None:
         self._messenger = messenger
         self._node = node
         self._number_of_responses = number_of_sensors
         self._subscribers: List[TipChangeListener] = []
+        self._messenger.add_listener(self._dispatch_tip_notification, self._filter)
 
     def add_subscriber(self, subscriber: TipChangeListener) -> None:
         """Add listener to tip change notification."""
@@ -61,9 +63,6 @@ class TipDetector:
             NodeId(arb_id.parts.originating_node_id) == self._node
         )
 
-    def start(self) -> None:
-        self._messenger.add_listener(self._dispatch_tip_notification, self._filter)
-    
     def __del__(self) -> None:
         self._messenger.remove_listener(self._dispatch_tip_notification)
 

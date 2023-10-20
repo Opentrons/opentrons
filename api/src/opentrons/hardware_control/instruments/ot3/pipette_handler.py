@@ -273,6 +273,7 @@ class OT3PipetteHandler:
             result[
                 "default_push_out_volume"
             ] = instr.active_tip_settings.default_push_out_volume
+            result["tip_presence_responses"] = instr.tip_presence_responses
         return cast(PipetteDict, result)
 
     @property
@@ -892,3 +893,8 @@ class OT3PipetteHandler:
             pip.config.liquid_properties,
         )
         pip.set_liquid_class_by_name(new_class_name.name)
+
+    def get_tip_sensor_count(self, mount: OT3Mount) -> int:
+        if not self.has_pipette(mount):
+            return 0
+        return self.get_pipette(mount).tip_presence_responses

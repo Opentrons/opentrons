@@ -42,6 +42,7 @@ from opentrons.hardware_control.types import (
     StatusBarState,
     EstopState,
     EstopStateNotification,
+    TipStateType,
 )
 from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control.ot3api import OT3API
@@ -462,6 +463,25 @@ def mock_backend_capacitive_pass(
         yield mock_pass
 
 
+@pytest.fixture
+def mock_backend_get_tip_status(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
+    backend = ot3_hardware.managed_obj._backend
+    with patch.object(backend, "get_tip_status", AsyncMock()) as mock_tip_status:
+        yield mock_tip_status
+
+
+@pytest.fixture
+def mock_verify_tip_presence(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj, "verify_tip_presence", AsyncMock()
+    ) as mock_check_tip:
+        yield mock_check_tip
+
+
 load_blowout_configs = [
     {OT3Mount.LEFT: {"channels": 1, "version": (3, 3), "model": "p1000"}},
     {OT3Mount.RIGHT: {"channels": 8, "version": (3, 3), "model": "p50"}},
@@ -471,6 +491,7 @@ load_blowout_configs = [
 
 async def prepare_for_mock_blowout(
     ot3_hardware: ThreadManager[OT3API],
+    mock_backend_get_tip_status: AsyncMock,
     mount: OT3Mount,
     configs: Any,
 ) -> Tuple[Any, ThreadManager[OT3API]]:
@@ -482,8 +503,9 @@ async def prepare_for_mock_blowout(
     instr_data = AttachedPipette(config=pipette_config, id="fakepip")
     await ot3_hardware.cache_pipette(mount, instr_data, None)
     await ot3_hardware.refresh_positions()
+    mock_backend_get_tip_status.return_value = TipStateType.PRESENT
     with patch.object(
-        ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
+        ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.pick_up_tip)
     ) as mock_tip_pickup:
         mock_tip_pickup.side_effect = (
             ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]
@@ -499,6 +521,7 @@ async def prepare_for_mock_blowout(
 @example(blowout_volume=0.0)
 async def test_blow_out_position(
     ot3_hardware: ThreadManager[OT3API],
+    mock_backend_get_tip_status: AsyncMock,
     load_configs: List[Dict[str, Any]],
     blowout_volume: float,
 ) -> None:
@@ -507,7 +530,7 @@ async def test_blow_out_position(
         if configs["channels"] == 96:
             await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
-            ot3_hardware, mount, configs
+            ot3_hardware, mock_backend_get_tip_status, mount, configs
         )
 
         max_allowed_input_distance = (
@@ -548,6 +571,7 @@ async def test_blow_out_position(
 )
 async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
+    mock_backend_get_tip_status: AsyncMock,
     load_configs: List[Dict[str, Any]],
     blowout_volume: float,
 ) -> None:
@@ -556,7 +580,7 @@ async def test_blow_out_error(
         if configs["channels"] == 96:
             await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
-            ot3_hardware, mount, configs
+            ot3_hardware, mock_backend_get_tip_status, mount, configs
         )
 
         max_allowed_input_distance = (
@@ -1385,6 +1409,7 @@ async def test_pick_up_tip_full_tiprack(
     mock_ungrip: AsyncMock,
     mock_move_to_plunger_bottom: AsyncMock,
     mock_home_gear_motors: AsyncMock,
+    mock_verify_tip_presence: AsyncMock,
 ) -> None:
     mock_ungrip.return_value = None
     await ot3_hardware.home()
@@ -1419,9 +1444,9 @@ async def test_pick_up_tip_full_tiprack(
             if moves:
                 for move in moves:
                     for block in move.blocks:
-                        backend._gear_motor_position[
-                            NodeId.pipette_left
-                        ] += block.distance
+                        backend._gear_motor_position[NodeId.pipette_left] += (
+                            block.distance * move.unit_vector[Axis.Q]
+                        )
             elif distance:
                 backend._gear_motor_position[NodeId.pipette_left] += distance
 
@@ -1442,6 +1467,7 @@ async def test_drop_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
     mock_home_gear_motors: AsyncMock,
+    mock_verify_tip_presence: AsyncMock,
 ) -> None:
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
@@ -1488,6 +1514,7 @@ async def test_drop_tip_full_tiprack(
         set_mock_plunger_configs()
 
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+        mock_backend_get_tip_status.return_value = TipStateType.ABSENT
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_ht_drop_tip.assert_called_once_with()
         # first call should be "clamp", moving down
@@ -1724,29 +1751,6 @@ async def test_status_bar_interface(
     for setting, response in settings.items():
         await ot3_hardware.set_status_bar_state(state=setting)
         assert ot3_hardware.get_status_bar_state() == response
-
-
-async def test_tip_presence_disabled_ninety_six_channel(
-    ot3_hardware: ThreadManager[OT3API],
-) -> None:
-    """Test 96 channel tip presence is disabled."""
-    # TODO remove this check once we enable tip presence for 96 chan.
-    with patch.object(
-        ot3_hardware.managed_obj._backend,
-        "check_for_tip_presence",
-        AsyncMock(spec=ot3_hardware.managed_obj._backend.check_for_tip_presence),
-    ) as tip_present:
-        pipette_config = load_pipette_data.load_definition(
-            PipetteModelType("p1000"),
-            PipetteChannelType(96),
-            PipetteVersionType(3, 3),
-        )
-        instr_data = AttachedPipette(config=pipette_config, id="fakepip")
-        await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
-        await ot3_hardware._configure_instruments()
-        await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)
-
-        tip_present.assert_not_called()
 
 
 @pytest.mark.parametrize(
