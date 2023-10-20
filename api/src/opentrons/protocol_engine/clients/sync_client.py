@@ -284,6 +284,16 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.ConfigureForVolumeResult, result)
 
+    def prepare_for_aspirate(
+        self, pipette_id: str
+    ) -> commands.PrepareForAspirateResult:
+        """Execute a PrepareForAspirate command."""
+        request = commands.PrepareForAspirateCreate(
+            params=commands.PrepareForAspirateParams(pipetteId=pipette_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.PrepareForAspirateResult, result)
+
     def aspirate(
         self,
         pipette_id: str,
