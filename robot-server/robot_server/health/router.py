@@ -9,6 +9,8 @@ from robot_server.persistence import get_sql_engine as ensure_sql_engine_is_read
 from robot_server.service.legacy.models import V1BasicResponse
 from .models import Health, HealthLinks
 from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
+
 
 
 LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
@@ -22,8 +24,17 @@ async def get_version():
 
 @health_router.get(path='/door_state', status_code=status.HTTP_200_OK)
 async def get_door_state():
-    state = DoorStateNotification.new_state
-    return {"state": state}
+    gpio0 = build_gpio_chardev("gpiochip0")
+    gpio0.config_by_board_rev()
+    await gpio0.setup()
+    front_button = gpio0.read_front_door_switch()
+    top_button = gpio0.read_top_window_switch()
+    door_state = gpio0.get_door_state()
+    return{"status": {
+        "front_button": front_button,
+        "top_button": top_button,
+        "door_state": door_state
+    }}
 
 
 @health_router.get(
