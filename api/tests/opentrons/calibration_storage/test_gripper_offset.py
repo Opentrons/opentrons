@@ -6,7 +6,7 @@ import importlib
 from opentrons.types import Point
 from opentrons.calibration_storage import (
     types as cs_types,
-    ot3_gripper_offset as gripper,
+    gripper_offset as gripper,
 )
 
 
