@@ -46,6 +46,7 @@ DESCRIPTION = (
     "A package to let processes communite over json-rpc via async sockets.")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
+    "json-rpc==1.15.0",
 ]
 
 

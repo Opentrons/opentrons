@@ -43,8 +43,11 @@ ssh_opts ?= $(default_ssh_opts)
 
 # Source discovery
 # For the python sources
-#ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
-#ot_sources := $(ot_py_sources)
+ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
+ot_sources := $(ot_py_sources)
+
+.PHONY: all
+all: clean sdist wheel
 
 .PHONY: setup
 setup:
