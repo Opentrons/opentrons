@@ -153,7 +153,7 @@ def test_execute_function_json_v3(
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 1",
+        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1",
         "Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec",
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
@@ -191,7 +191,7 @@ def test_execute_function_json_v4(
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 1",
+        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1",
         "Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec",
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
@@ -229,7 +229,7 @@ def test_execute_function_json_v5(
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 1",
+        "Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1",
         "Aspirating 5.0 uL from A1 of Source Plate on 2 at 3.0 uL/sec",
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
