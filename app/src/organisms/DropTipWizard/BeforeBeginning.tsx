@@ -17,6 +17,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   JUSTIFY_FLEX_END,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
@@ -105,6 +107,12 @@ export const BeforeBeginning = (
               : UNSELECTED_OPTIONS_STYLE
           }
         >
+          <Flex
+            height="100%"
+            width="100%"
+            position={POSITION_ABSOLUTE}
+            flex="1"
+          />
           <video
             css={css`
               max-width: 11rem;

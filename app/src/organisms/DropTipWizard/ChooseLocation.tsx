@@ -34,6 +34,7 @@ interface ChooseLocationProps {
   moveToXYCoordinate: (x: number, y: number) => Promise<CommandData[] | null>
   isRobotMoving: boolean
   isOnDevice: boolean
+  setErrorMessage: (arg0: string) => void
 }
 
 export const ChooseLocation = (
@@ -47,6 +48,7 @@ export const ChooseLocation = (
     moveToXYCoordinate,
     isRobotMoving,
     isOnDevice,
+    setErrorMessage,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -76,7 +78,9 @@ export const ChooseLocation = (
         targetX,
         targetY
       )
-      moveToXYCoordinate(targetX, targetY).then(() => handleProceed())
+      moveToXYCoordinate(targetX, targetY)
+        .then(() => handleProceed())
+        .catch(e => setErrorMessage(`${e.message}`))
     }
   }
 
@@ -114,7 +118,7 @@ export const ChooseLocation = (
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SmallButton
           buttonText={i18n.format(t('shared:confirm_position'), 'capitalize')}
-          onClick={handleProceed}
+          onClick={handleConfirmPosition}
         />
       </Flex>
     </Flex>
