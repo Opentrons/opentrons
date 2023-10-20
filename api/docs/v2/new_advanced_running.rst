@@ -122,7 +122,7 @@ Remember, you should only add ``set_offset()`` commands to protocols run outside
 
 .. warning::
 
-	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against other labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
+	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
 
 Using Custom Labware
 --------------------
@@ -144,6 +144,7 @@ To disable the robot server, open a Jupyter terminal session by going to **New >
 Command Line
 ------------
 
+.. TODO update with separate links to OT-2 and Flex setup, when new Flex process is in manual or on help site
 The robot's command line is accessible either by going to **New > Terminal** in Jupyter or `via SSH <https://support.opentrons.com/s/article/Connecting-to-your-OT-2-with-SSH>`_.
 
 To execute a protocol from the robot's command line, copy the protocol file to the robot with ``scp`` and then run the protocol with ``opentrons_execute``:
