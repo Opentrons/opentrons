@@ -212,10 +212,6 @@ export const DropTipWizardComponent = (
     createdMaintenanceRunId,
     instrumentModelSpecs,
   } = props
-  console.log(
-    '🚀 ~ file: index.tsx:215 ~ createdMaintenanceRunId:',
-    createdMaintenanceRunId
-  )
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation('drop_tip_wizard')
 
@@ -540,7 +536,11 @@ export const DropTipWizardComponent = (
       title={i18n.format(t('drop_tips'), 'capitalize')}
       currentStep={shouldDispenseLiquid != null ? currentStepIndex + 1 : null}
       totalSteps={DropTipWizardSteps.length}
-      onExit={handleExit}
+      onExit={
+        currentStepIndex === DropTipWizardSteps.length - 1
+          ? handleCleanUpAndClose
+          : handleExit
+      }
     />
   )
 
