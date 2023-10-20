@@ -376,7 +376,7 @@
         ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
         ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
       ],
-      "brand": { "brand": "Opentrons Flex", "brandId": [] },
+      "brand": { "brand": "Opentrons", "brandId": [] },
       "metadata": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
         "displayCategory": "tipRack",
