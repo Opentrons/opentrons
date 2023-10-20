@@ -26,7 +26,6 @@ import { FLOWS } from '../../../organisms/PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../../../organisms/GripperWizardFlows/constants'
 
 import type { PipetteData, GripperData } from '@opentrons/api-client'
-import type { PipetteMount } from '@opentrons/shared-data'
 
 interface InstrumentDetailsOverflowMenuProps {
   instrument: PipetteData | GripperData
@@ -60,18 +59,16 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
     }
     const pipetteModelSpecs =
       getPipetteModelSpecs((instrument as PipetteData).instrumentModel) ?? null
-    const isPipette = instrument.mount !== 'extension'
 
     const is96Channel =
-      instrument != null &&
-      instrument.ok &&
-      isPipette &&
+      instrument?.ok &&
+      instrument.mount !== 'extension' &&
       instrument.data?.channels === 96
 
     const handleRecalibrate: React.MouseEventHandler = () => {
-      if (instrument != null && instrument.ok) {
+      if (instrument?.ok) {
         setWizardProps(
-          !isPipette
+          instrument.mount === 'extension'
             ? {
                 ...sharedGripperWizardProps,
                 flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
@@ -80,7 +77,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
                 closeFlow: () => {
                   modal.remove()
                 },
-                mount: instrument.mount as PipetteMount,
+                mount: instrument.mount,
                 selectedPipette: is96Channel
                   ? NINETY_SIX_CHANNEL
                   : SINGLE_MOUNT_PIPETTES,
@@ -112,7 +109,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
               </Flex>
             </MenuItem>
           ) : null}
-          {isPipette ? (
+          {instrument.mount !== 'extension' ? (
             <MenuItem
               key="drop-tips"
               onClick={() => setShowDropTipWizard(true)}
@@ -140,7 +137,9 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         {wizardProps != null && !('mount' in wizardProps) ? (
           <GripperWizardFlows {...wizardProps} />
         ) : null}
-        {showDropTipWizard && isPipette && pipetteModelSpecs != null ? (
+        {showDropTipWizard &&
+        instrument.mount !== 'extension' &&
+        pipetteModelSpecs != null ? (
           <DropTipWizard
             robotType={FLEX_ROBOT_TYPE}
             mount={instrument.mount}

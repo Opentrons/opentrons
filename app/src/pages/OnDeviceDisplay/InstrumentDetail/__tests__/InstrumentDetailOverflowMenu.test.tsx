@@ -48,7 +48,7 @@ const MOCK_PIPETTE = {
     },
   },
   instrumentName: 'p1000_single_flex',
-} as PipetteData
+} as any
 
 const MOCK_PIPETTE_WITHOUT_CALIBRATION = {
   mount: 'left',

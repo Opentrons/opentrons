@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import '@testing-library/jest-dom'
-import { fireEvent, waitFor, act } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
   RUN_STATUS_IDLE,
@@ -815,7 +815,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
-  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
+  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
@@ -824,7 +824,9 @@ describe('ProtocolRunHeader', () => {
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
-    getByText('Mock HeaterShakerIsRunningModal')
+    waitFor(() => {
+      getByText('Mock HeaterShakerIsRunningModal')
+    })
   })
 
   it('does not render the confirm attachment modal when there is a heater shaker in the protocol and run is idle', () => {

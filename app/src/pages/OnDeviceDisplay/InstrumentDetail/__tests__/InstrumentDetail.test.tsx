@@ -71,7 +71,7 @@ describe('InstrumentDetail', () => {
             },
           },
           instrumentName: 'p1000_single_flex',
-        },
+        } as any,
         {
           mount: 'extension',
           instrumentType: 'gripper',

@@ -14,7 +14,7 @@ import type {
   PipettingRunTimeCommand,
 } from '@opentrons/shared-data'
 
-interface GetPipettesWithTipAttached {
+export interface GetPipettesWithTipAttached {
   host: HostConfig | null
   runId: string
   isFlex: boolean
@@ -29,6 +29,10 @@ export function getPipettesWithTipAttached({
   attachedInstruments,
   runRecord,
 }: GetPipettesWithTipAttached): Promise<PipetteData[]> {
+  if (attachedInstruments == null || runRecord == null) {
+    return Promise.resolve([])
+  }
+
   return getCommandsExecutedDuringRun(
     host as HostConfig,
     runId
@@ -36,8 +40,8 @@ export function getPipettesWithTipAttached({
     checkPipettesForAttachedTips(
       executedCmdData.data,
       isFlex,
-      runRecord?.data.pipettes,
-      attachedInstruments?.data as PipetteData[]
+      runRecord.data.pipettes,
+      attachedInstruments.data as PipetteData[]
     )
   )
 }
@@ -61,11 +65,9 @@ function getCommandsExecutedDuringRun(
 function checkPipettesForAttachedTips(
   commands: RunCommandSummary[],
   isFlex: boolean,
-  pipettesUsedInRun?: LoadedPipette[],
-  attachedPipettes?: PipetteData[]
+  pipettesUsedInRun: LoadedPipette[],
+  attachedPipettes: PipetteData[]
 ): PipetteData[] {
-  if (pipettesUsedInRun == null || attachedPipettes == null) return []
-
   let pipettesWithUnknownTipStatus = pipettesUsedInRun
   let mountsWithTipAttached: Array<PipetteData['mount']> = []
 
@@ -87,12 +89,7 @@ function checkPipettesForAttachedTips(
     )
   }
 
-  const TIP_EXCHANGE_COMMAND_TYPES = [
-    'dropTip',
-    'dropTipInPlace',
-    'pickUpTip',
-    'pickUpTipInPlace',
-  ]
+  const TIP_EXCHANGE_COMMAND_TYPES = ['dropTip', 'dropTipInPlace', 'pickUpTip']
 
   // Iterate backwards through commands, finding first tip exchange command for each pipette.
   // If there's a chance the tip is still attached, flag the pipette.
