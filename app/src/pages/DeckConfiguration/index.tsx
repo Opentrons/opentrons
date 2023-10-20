@@ -25,10 +25,8 @@ import { Portal } from '../../App/portal'
 
 import type { Cutout, DeckConfiguration, Fixture } from '@opentrons/shared-data'
 
-// type ExtendedDeckConfiguration = Array<Fixture | Omit<Fixture, 'fixtureId'>>
 export interface DeckConfigData {
   addedFixture: Omit<Fixture, 'fixtureId'> | null
-  // currentDeckConfig: ExtendedDeckConfiguration
   currentDeckConfig: DeckConfiguration
 }
 

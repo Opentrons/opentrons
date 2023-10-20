@@ -14,7 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-// import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   getFixtureDisplayName,
   STAGING_AREA_LOAD_NAME,
@@ -64,7 +64,7 @@ export function AddFixtureModal({
     width: '23.125rem',
   }
 
-  // const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
   if (
@@ -78,7 +78,8 @@ export function AddFixtureModal({
     availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
   }
 
-  const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
+  // For Touchscreen app
+  const handleTapAdd = (fixtureLoadName: FixtureLoadName): void => {
     if (deckConfigData != null && setDeckConfigData != null) {
       const addedFixture = { fixtureLocation, loadName: fixtureLoadName }
       const currentDeckConfig = deckConfigData.currentDeckConfig.map(fixture =>
@@ -92,6 +93,15 @@ export function AddFixtureModal({
       })
     }
 
+    setShowAddFixtureModal(false)
+  }
+
+  // For Desktop app
+  const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
+    updateDeckConfiguration({
+      fixtureLocation,
+      loadName: fixtureLoadName,
+    })
     setShowAddFixtureModal(false)
   }
 
@@ -109,7 +119,7 @@ export function AddFixtureModal({
                 <React.Fragment key={fixture}>
                   <AddFixtureButton
                     fixtureLoadName={fixture}
-                    handleClickAdd={handleClickAdd}
+                    handleClickAdd={handleTapAdd}
                   />
                 </React.Fragment>
               ))}

@@ -4,16 +4,16 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 
 import { createDeckConfiguration } from '@opentrons/api-client'
-import {
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
-  WASTE_CHUTE_SLOT,
-} from '@opentrons/shared-data'
+// import {
+//   TRASH_BIN_LOAD_NAME,
+//   WASTE_CHUTE_LOAD_NAME,
+//   WASTE_CHUTE_SLOT,
+// } from '@opentrons/shared-data'
 import { useHost } from '../../api'
 import { useCreateDeckConfigurationMutation } from '..'
 
-import type { HostConfig, Response } from '@opentrons/api-client'
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { HostConfig } from '@opentrons/api-client'
+// import type { DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -23,18 +23,18 @@ const mockCreateDeckConfiguration = createDeckConfiguration as jest.MockedFuncti
 >
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
-const mockDeckConfiguration = [
-  {
-    fixtureId: 'mockFixtureTrashBinId',
-    fixtureLocation: 'C3',
-    loadName: TRASH_BIN_LOAD_NAME,
-  },
-  {
-    fixtureId: 'mockFixtureWasteChuteId',
-    fixtureLocation: WASTE_CHUTE_SLOT,
-    loadName: WASTE_CHUTE_LOAD_NAME,
-  },
-] as DeckConfiguration
+// const mockDeckConfiguration = [
+//   {
+//     fixtureId: 'mockFixtureTrashBinId',
+//     fixtureLocation: 'C3',
+//     loadName: TRASH_BIN_LOAD_NAME,
+//   },
+//   {
+//     fixtureId: 'mockFixtureWasteChuteId',
+//     fixtureLocation: WASTE_CHUTE_SLOT,
+//     loadName: WASTE_CHUTE_LOAD_NAME,
+//   },
+// ] as DeckConfiguration
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
