@@ -77,7 +77,7 @@ Creating the dummy protocol requires you to:
     1. Use the ``metadata`` or ``requirements`` dictionary to specify the API version. (See :ref:`v2-versioning` for details.) Use the same API version as you did in :py:meth:`opentrons.execute.get_protocol_api`.
     2. Define a ``run()`` function.
     3. Load all of your labware in their initial locations.
-    4. Load your smallest capacity pipette and specify its ``tipracks``.
+    4. Load your smallest capacity pipette and specify its ``tip_racks``.
     5. Call ``pick_up_tip()``. Labware Position Check can't run if you don't pick up a tip.
     
 For example, the following dummy protocol will use a P300 Single-Channel GEN2 pipette to enable Labware Position Check for an OT-2 tip rack, NEST reservoir, and NEST flat well plate.
@@ -116,13 +116,13 @@ This automatically generated code uses generic names for the loaded labware. If 
     
 .. versionadded:: 2.12
 
-Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot D2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
+Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot 2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
 
-Remember, you should only add ``.set_offset()`` commands to protocols run outside of the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware* in the *same deck slot* on the *same robot*.
+Remember, you should only add ``set_offset()`` commands to protocols run outside of the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware* in the *same deck slot* on the *same robot*.
 
 .. warning::
 
-	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against other labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``.set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
+	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against other labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
 
 Using Custom Labware
 --------------------
