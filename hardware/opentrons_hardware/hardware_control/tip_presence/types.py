@@ -1,12 +1,14 @@
+"""Tip presence types."""
 import dataclasses
 from typing import Callable
-from typing_extensions import Literal
 
 from opentrons_hardware.firmware_bindings.constants import SensorId
 
 
 @dataclasses.dataclass
 class TipNotification:
+    """Represents a tip update received from a pipette."""
+
     sensor: SensorId
     presence: bool
 

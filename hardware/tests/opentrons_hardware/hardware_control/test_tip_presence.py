@@ -2,8 +2,7 @@
 import pytest
 from mock import AsyncMock
 
-from typing import List, Tuple, cast
-from typing_extensions import Literal
+from typing import List, Tuple
 
 from opentrons_hardware.hardware_control.tip_presence import TipDetector, types
 from opentrons_hardware.firmware_bindings.messages import (
@@ -24,7 +23,6 @@ async def test_get_tip_ejector_state(
     mock_messenger: AsyncMock, message_send_loopback: CanLoopback
 ) -> None:
     """Test that get tip ejector state sends the correct request and receives a response."""
-
     node = NodeId.pipette_left
     detector = TipDetector(mock_messenger, node)
 
