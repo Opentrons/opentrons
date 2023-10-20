@@ -209,11 +209,7 @@ export const GripperWizard = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
-  const requiresFirmwareUpdate = !attachedGripper?.ok
-  const gripperWizardSteps = getGripperWizardSteps(
-    flowType,
-    requiresFirmwareUpdate
-  )
+  const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [
     frontJawOffset,
@@ -309,6 +305,7 @@ export const GripperWizard = (
         proceed={handleProceed}
         subsystem="gripper"
         description={t('firmware_updating')}
+        proceedDescription={t('firmware_up_to_date')}
       />
     )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {

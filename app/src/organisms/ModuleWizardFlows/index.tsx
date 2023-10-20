@@ -8,9 +8,9 @@ import {
 import { COLORS } from '@opentrons/components'
 import {
   CreateCommand,
-  LEFT,
   getModuleType,
   getModuleDisplayName,
+  LEFT,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -61,14 +61,7 @@ export const ModuleWizardFlows = (
   const { t } = useTranslation('module_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
-  const requiresFirmwareUpdate = !attachedPipette?.ok
-  const attachedPipetteMount =
-    attachedPipette?.mount === LEFT ? 'pipette_left' : 'pipette_right'
-
-  const moduleCalibrationSteps = getModuleCalibrationSteps(
-    requiresFirmwareUpdate
-  )
-
+  const moduleCalibrationSteps = getModuleCalibrationSteps()
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
   const [slotName, setSlotName] = React.useState(
@@ -269,8 +262,13 @@ export const ModuleWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={attachedPipetteMount}
+        subsystem={
+          attachedPipette.mount === LEFT ? 'pipette_left' : 'pipette_right'
+        }
         description={t('firmware_update')}
+        proceedDescription={t('firmware_up_to_date', {
+          module: getModuleDisplayName(attachedModule.moduleModel),
+        })}
       />
     )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
