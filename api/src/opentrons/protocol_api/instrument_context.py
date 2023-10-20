@@ -138,7 +138,7 @@ class InstrumentContext(publisher.CommandPublisher):
         The OT-2 default is 400 mm/s. In addition to changing the
         default, the speed of individual motions can be changed with the
         ``speed`` argument of the :py:meth:`InstrumentContext.move_to` method.
-        See also, :ref:`gantry_speed`.
+        See :ref:`gantry_speed`.
         """
         return self._core.get_default_speed()
 
@@ -156,7 +156,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Draw liquid into a pipette tip. Includes parameters that control
         aspiration volume, well location, tip position in a well,
-        and pipette flow rate. See also, :ref:`new-aspirate`.
+        and pipette flow rate. See :ref:`new-aspirate`.
 
         :param volume: The volume to aspirate, measured in µL. If 0 or
                        unspecified, defaults to the maximum volume for
@@ -173,7 +173,7 @@ class InstrumentContext(publisher.CommandPublisher):
                          current position.
         :param rate: A multiplier for the default flow rate of the pipette.
                      Calculated as `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`.
-                     If not specified, defaults to 1.0. See also, :ref:`new-plunger-flow-rates`.
+                     If not specified, defaults to 1.0. See :ref:`new-plunger-flow-rates`.
         :type rate: float
         :returns: This instance.
 
@@ -258,7 +258,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Dispense liquid from a pipette tip. Includes parameters that control
         dispense volume, well location, tip position in a well, and pipette
-        flow rate. See also, :ref:`new-dispense`.
+        flow rate. See :ref:`new-dispense`.
 
         :param volume: The volume to dispense, measured in µL.
                         If 0 or unspecified, defaults to
@@ -270,7 +270,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param location: Where to dispense liquid held in the pipette.
                         If ``location`` is a :py:class:`.Well`,
                         the pipette will dispense at or above the center bottom of the well.
-                        The distance from the bottom is specified by                 
+                        The distance from the bottom is specified by
                         :py:obj:`well_bottom_clearance.dispense <well_bottom_clearance>`.
                         If ``location`` is  :py:class:`.Location`
                         (e.g., the result of :py:meth:`.Well.top` or
@@ -283,7 +283,7 @@ class InstrumentContext(publisher.CommandPublisher):
                         the robot will dispense into the current position.
         :param rate: How quickly a pipette dispenses liquid. Measured in µL/s.
                      Calculated as `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
-                     If not specified, defaults to 1.0. See also, :ref:`new-plunger-flow-rates`.
+                     If not specified, defaults to 1.0. See :ref:`new-plunger-flow-rates`.
         :type rate: float
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                         leaves the tip. Measured in µL. The default value is ``None``.
@@ -380,7 +380,7 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """
         Mixes a volume of liquid by repeatedly aspirating and dispensing it in a single location.
-        See also, :ref:`mix`.
+        See :ref:`mix`.
 
         :param repetitions: Number of times to mix (default is 1).
         :param volume: The volume to mix, measured in µL. If 0 or unspecified,
@@ -396,7 +396,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     ``rate`` * :py:attr:`flow_rate.aspirate <flow_rate>`.
                     The dispense flow rate is calculated
                     as ``rate`` * :py:attr:`flow_rate.dispense <flow_rate>`.
-                    See also, :ref:`new-plunger-flow-rates`.
+                    See :ref:`new-plunger-flow-rates`.
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette.
         :returns: This instance.
 
@@ -454,7 +454,7 @@ class InstrumentContext(publisher.CommandPublisher):
         a small amount of liquid remains in the tip. During
         a blowout, the pipette moves the plunger beyond its normal
         limits to help remove all liquid from the pipette tip.
-        See also, :ref:`blow-out`.
+        See :ref:`blow-out`.
 
         :param location: The blowout location. If no location is specified,
                          the pipette will blow out from its current position.
@@ -605,7 +605,7 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """
         Pull air into the pipette current tip at the current location.
-        See also, :ref:`air-gap`.
+        See :ref:`air-gap`.
 
         :param volume: The amount of air to aspirate, measured in µL.
                        Calling ``air_gap()`` with no arguments uses
@@ -687,7 +687,7 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands.
-        See also, :ref:`basic-tip-pickup`.
+        See :ref:`basic-tip-pickup`.
 
         If no location is passed, the pipette will pick up the next available
         tip in its :py:attr:`InstrumentContext.tip_racks` list.
@@ -869,7 +869,7 @@ class InstrumentContext(publisher.CommandPublisher):
         home_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
-        Drop the current tip. See also, :ref:`pipette-drop-tip`.
+        Drop the current tip. See :ref:`pipette-drop-tip`.
 
         If no location is passed, the pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
@@ -987,7 +987,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def home(self) -> InstrumentContext:
-        """Home the robot. See also, :ref:`utility-homing`.
+        """Home the robot. See :ref:`utility-homing`.
 
         :returns: This instance.
         """
@@ -1395,7 +1395,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def flow_rate(self) -> "FlowRates":
-        """The speeds (in µL/s) configured for the pipette. See also, :ref:`new-plunger-flow-rates`.
+        """The speeds (in µL/s) configured for the pipette. See :ref:`new-plunger-flow-rates`.
 
         This is an object with attributes ``aspirate``, ``dispense``, and
         ``blow_out`` holding the flow rates for the corresponding operation.
@@ -1438,7 +1438,7 @@ class InstrumentContext(publisher.CommandPublisher):
         The tip racks that have been linked to this pipette.
 
         This is the property used to determine which tips to pick up next when
-        calling :py:meth:`pick_up_tip` without arguments. See also, :ref:`basic-tip-pickup`.
+        calling :py:meth:`pick_up_tip` without arguments. See :ref:`basic-tip-pickup`.
         """
         return self._tip_racks
 
@@ -1531,7 +1531,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def channels(self) -> int:
-        """The number of channels on the pipette. See also, :ref:`new-pipette`."""
+        """The number of channels on the pipette. See :ref:`new-pipette`."""
         return self._core.get_channels()
 
     @property  # type: ignore
@@ -1597,7 +1597,7 @@ class InstrumentContext(publisher.CommandPublisher):
         and maximum volume. The pipette remains in the mode set by this function until it is called again.
 
         The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense 1 µL of liquid. Low-volume mode can
-        only be set by calling ``configure_for_volume``. See also, :ref:`pipette-volume-modes`.
+        only be set by calling ``configure_for_volume``. See :ref:`pipette-volume-modes`.
 
         .. note ::
 
