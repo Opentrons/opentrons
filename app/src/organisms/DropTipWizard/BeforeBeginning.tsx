@@ -18,7 +18,6 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
   POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
