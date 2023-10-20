@@ -1428,7 +1428,7 @@ async def test_pick_up_tip_full_tiprack(
         tip_action.side_effect = _update_gear_motor_pos
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
-        pipette_handler.plan_ht_pick_up_tip.assert_called_once_with(OT3Mount.LEFT)
+        pipette_handler.plan_ht_pick_up_tip.assert_called_once_with()
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up
@@ -1489,7 +1489,7 @@ async def test_drop_tip_full_tiprack(
 
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
-        pipette_handler.plan_ht_drop_tip.assert_called_once_with(OT3Mount.LEFT)
+        pipette_handler.plan_ht_drop_tip.assert_called_once_with()
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up

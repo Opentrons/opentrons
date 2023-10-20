@@ -41,7 +41,7 @@ def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
 
 @pytest.fixture
 def subject_ot3(decoy: Decoy, mock_pipette_ot3: OT3Pipette) -> OT3PipetteHandler:
-    inst_by_mount = {types.Mount.LEFT: mock_pipette_ot3, types.Mount.RIGHT: None}
+    inst_by_mount = {OT3Mount.LEFT: mock_pipette_ot3, OT3Mount.RIGHT: None}
     subject = OT3PipetteHandler(attached_instruments=inst_by_mount)
     return subject
 
@@ -142,8 +142,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     request,
 ) -> None:
     """Should return an array with expected length."""
-    tip_length = 25.0
-    mount = types.Mount.LEFT
+    mount = OT3Mount.LEFT
     presses = presses_input
     increment = 1
 
@@ -169,11 +168,9 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
         )
 
     if channels == 96:
-        spec = subject_ot3.plan_ht_pick_up_tip(mount)
+        spec = subject_ot3.plan_ht_pick_up_tip()
     else:
-        spec = subject_ot3.plan_lt_pick_up_tip(
-            mount, presses, increment
-        )
+        spec = subject_ot3.plan_lt_pick_up_tip(mount, presses, increment)
     assert len(spec.tip_action_moves) == expected_array_length
     assert spec.tip_action_moves == request.getfixturevalue(
         expected_pick_up_motor_actions

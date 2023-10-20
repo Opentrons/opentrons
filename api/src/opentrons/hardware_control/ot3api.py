@@ -1970,14 +1970,14 @@ class OT3API(
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 pipette_axis
             ]
-            move_targets = []
-            for move_segment in pipette_spec:
-                move_targets.append(
-                    MoveTarget.build(
-                        position={Axis.Q: move_segment.distance},
-                        max_speed=move_segment.speed,
-                    )
+
+            move_targets = [
+                MoveTarget.build(
+                    position={Axis.Q: move_segment.distance},
+                    max_speed=move_segment.speed or 400,
                 )
+                for move_segment in pipette_spec
+            ]
 
             _, moves = self._move_manager.plan_motion(
                 origin={Axis.Q: gear_origin_float}, target_list=move_targets
@@ -2005,7 +2005,7 @@ class OT3API(
         await self._move_to_plunger_bottom(realmount, rate=1.0)
 
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            spec = self._pipette_handler.plan_ht_pick_up_tip(realmount)
+            spec = self._pipette_handler.plan_ht_pick_up_tip()
             if spec.z_distance_to_tiprack:
                 target_down = target_position_from_relative(
                     mount,
@@ -2015,7 +2015,9 @@ class OT3API(
                 await self._move(target_down)
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
-            spec = self._pipette_handler.plan_lt_pick_up_tip(realmount, presses, increment)
+            spec = self._pipette_handler.plan_lt_pick_up_tip(
+                realmount, presses, increment
+            )
             await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
@@ -2080,20 +2082,20 @@ class OT3API(
         await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
 
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            spec = self._pipette_handler.plan_ht_drop_tip(realmount)
+            spec = self._pipette_handler.plan_ht_drop_tip()
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
             spec = self._pipette_handler.plan_lt_drop_tip(realmount)
             for move in spec.tip_action_moves:
-                await self._backend.set_active_current(move.currents)
-                target_pos = target_position_from_plunger(
-                    realmount, move.distance, self._current_position
-                )
-                await self._move(
-                    target_pos,
-                    speed=move.speed,
-                    home_flagged_axes=False,
-                )
+                async with self._backend.motor_current(move.currents):
+                    target_pos = target_position_from_plunger(
+                        realmount, move.distance, self._current_position
+                    )
+                    await self._move(
+                        target_pos,
+                        speed=move.speed,
+                        home_flagged_axes=False,
+                    )
 
         for shake in spec.shake_off_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])

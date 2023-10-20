@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 import logging
 from typing import (
-    Callable,
     Dict,
     Optional,
     Tuple,
@@ -74,14 +73,14 @@ class LiquidActionSpec:
 class TipActionMoveSpec:
     distance: float
     currents: Optional[Dict[Axis, float]]
-    speed: Optional[float]
+    speed: Optional[
+        float
+    ]  # allow speed for a movement to default to its axes' speed settings
 
 
 @dataclass(frozen=True)
 class TipActionSpec:
-    tip_action_moves: List[
-        TipActionMoveSpec
-    ]
+    tip_action_moves: List[TipActionMoveSpec]
     shake_off_moves: List[Tuple[top_types.Point, Optional[float]]]
     z_distance_to_tiprack: Optional[float] = None
     ending_z_retract_distance: Optional[float] = None
@@ -711,8 +710,9 @@ class OT3PipetteHandler:
 
         return []
 
-    def plan_ht_pick_up_tip(self, mount) -> TipActionSpec:
+    def plan_ht_pick_up_tip(self) -> TipActionSpec:
         # Prechecks: ready for pickup tip and press/increment are valid
+        mount = OT3Mount.LEFT
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
@@ -847,7 +847,8 @@ class OT3PipetteHandler:
             shake_off_moves=[],
         )
 
-    def plan_ht_drop_tip(self, mount: OT3Mount) -> TipActionSpec:
+    def plan_ht_drop_tip(self) -> TipActionSpec:
+        mount = OT3Mount.LEFT
         instrument = self.get_pipette(mount)
 
         drop_seq = self._build_tip_motor_moves(
