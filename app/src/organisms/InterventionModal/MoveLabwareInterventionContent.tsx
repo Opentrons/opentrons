@@ -144,7 +144,6 @@ export function MoveLabwareInterventionContent({
     movedLabwareDefUri != null
       ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
       : null
-
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
     <Flex
@@ -198,13 +197,21 @@ export function MoveLabwareInterventionContent({
               loadedModules={run.modules}
               loadedLabware={run.labware}
               // TODO(bh, 2023-07-19): read trash slot name from protocol
-              trashSlotName={robotType === 'OT-3 Standard' ? 'A3' : undefined}
+              trashLocation={robotType === 'OT-3 Standard' ? 'A3' : undefined}
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(
-                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                    ({
+                      x,
+                      y,
+                      moduleId,
+                      moduleDef,
+                      nestedLabwareDef,
+                      nestedLabwareId,
+                    }) => (
                       <Module key={moduleId} def={moduleDef} x={x} y={y}>
-                        {nestedLabwareDef != null ? (
+                        {nestedLabwareDef != null &&
+                        nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />
                         ) : null}
                       </Module>

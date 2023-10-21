@@ -461,6 +461,11 @@ def _main(
     volumes: List[float],
 ) -> None:
     union_cfg: Union[PhotometricConfig, GravimetricConfig]
+    if not args.jog:
+        ui.print_warning(
+            "overwriting --jog to True, because liquid-probe "
+            "is not repeatable enough for gravimetric tests"
+        )
     if args.photometric:
         cfg_pm: PhotometricConfig = build_photometric_cfg(
             run_args.ctx,
@@ -471,7 +476,7 @@ def _main(
             args.touch_tip,
             args.refill,
             args.extra,
-            args.jog,
+            True,  # NOTE: (andy s) always jog
             args.same_tip,
             args.ignore_fail,
             args.channels,
@@ -495,7 +500,7 @@ def _main(
             args.isolate_channels if args.isolate_channels else [],
             args.isolate_volumes if args.isolate_volumes else [],
             args.extra,
-            args.jog,
+            True,  # NOTE: (andy s) always jog
             args.same_tip,
             args.ignore_fail,
             args.mode,

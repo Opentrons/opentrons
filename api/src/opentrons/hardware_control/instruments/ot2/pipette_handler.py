@@ -263,6 +263,14 @@ class PipetteHandlerProvider(Generic[MountType]):
         return self.get_attached_instruments()
 
     @property
+    def attached_pipettes(self) -> Dict[MountType, PipetteDict]:
+        return self.get_attached_instruments()
+
+    @property
+    def get_attached_pipettes(self) -> Dict[MountType, PipetteDict]:
+        return self.get_attached_instruments()
+
+    @property
     def hardware_instruments(self) -> InstrumentsByMount[MountType]:
         """Do not write new code that uses this."""
         return self._attached_instruments
@@ -662,7 +670,6 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT, mount)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
@@ -896,7 +903,6 @@ class PipetteHandlerProvider(Generic[MountType]):
         home_after,
     ):
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP, mount)
 
         bottom = instrument.plunger_positions.bottom
         droptip = instrument.plunger_positions.drop_tip

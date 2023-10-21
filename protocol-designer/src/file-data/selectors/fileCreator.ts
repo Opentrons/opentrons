@@ -14,8 +14,6 @@ import {
   SPAN7_8_10_11_SLOT,
   Cutout,
 } from '@opentrons/shared-data'
-import { getFileMetadata, getRobotType } from './fileFields'
-import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
 import {
   selectors as labwareDefSelectors,
@@ -27,12 +25,16 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { swatchColors } from '../../components/swatchColors'
+import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
+import { getFileMetadata, getRobotType } from './fileFields'
+import { getInitialRobotState, getRobotStateTimeline } from './commands'
+
 import type {
   PipetteEntity,
   LabwareEntities,
@@ -44,14 +46,14 @@ import type {
   CreateCommand,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV7'
-import type { Selector } from '../../types'
 import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
   LoadFixtureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
+import type { Selector } from '../../types'
+
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -290,7 +292,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       []
     )
 
-    //  TODO(jr, 10/3/23): add staging area, standard slot, and trash bin loadFixtures
+    //  TODO(jr, 10/3/23): add standard slot, and trash bin loadFixtures
     const loadFixtureCommands = reduce<
       AdditionalEquipmentEntity,
       LoadFixtureCreateCommand[]

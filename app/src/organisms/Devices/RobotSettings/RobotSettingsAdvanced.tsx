@@ -13,7 +13,7 @@ import {
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
-import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
+import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -38,7 +38,7 @@ import {
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
-import { UpdateBuildroot } from './UpdateBuildroot'
+import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { Portal } from '../../../App/portal'
 
@@ -70,15 +70,11 @@ export function RobotSettingsAdvanced({
     showDeviceResetModal,
     setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
-  const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
@@ -124,14 +120,6 @@ export function RobotSettingsAdvanced({
 
   return (
     <>
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
-        <UpdateBuildroot
-          robot={robot}
-          close={() => setShowSoftwareUpdateModal(false)}
-        />
-      ) : null}
       <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
@@ -167,7 +155,7 @@ export function RobotSettingsAdvanced({
         <RobotServerVersion robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
-        {isOT3 ? null : (
+        {isFlex ? null : (
           <>
             <Divider marginY={SPACING.spacing16} />
             <UsageSettings
@@ -184,7 +172,7 @@ export function RobotSettingsAdvanced({
           isRobotBusy={isRobotBusy}
         />
 
-        {isOT3 ? (
+        {isFlex ? (
           <>
             <Divider marginY={SPACING.spacing16} />
             <EnableStatusLight robotName={robotName} />
@@ -196,7 +184,7 @@ export function RobotSettingsAdvanced({
         <UpdateRobotSoftware
           robotName={robotName}
           isRobotBusy={isRobotBusy}
-          onUpdateStart={() => setShowSoftwareUpdateModal(true)}
+          onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
         <Troubleshooting robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
@@ -204,7 +192,7 @@ export function RobotSettingsAdvanced({
           updateIsExpanded={updateIsExpanded}
           isRobotBusy={isRobotBusy}
         />
-        {isOT3 ? null : (
+        {isFlex ? null : (
           <>
             <Divider marginY={SPACING.spacing16} />
             <UseOlderProtocol

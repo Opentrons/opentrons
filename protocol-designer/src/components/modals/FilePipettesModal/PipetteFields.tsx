@@ -20,7 +20,11 @@ import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { FormPipettesByMount } from '../../../step-forms'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
+import {
+  getAllowAllTipracks,
+  getAllow96Channel,
+} from '../../../feature-flags/selectors'
+import { RIGHT } from '@opentrons/shared-data/js/constants'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
 
@@ -87,22 +91,31 @@ export function PipetteFields(props: Props): JSX.Element {
   } = props
 
   const allowAllTipracks = useSelector(getAllowAllTipracks)
+  const allow96Channel = useSelector(getAllow96Channel)
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
 
   const initialTabIndex = props.initialTabIndex || 1
 
+  React.useEffect(() => {
+    if (values.left.pipetteName === 'p1000_96') {
+      values.right = { pipetteName: null, tiprackDefURI: null }
+    }
+  }, [values.left])
+
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
+
+    const filter96 = !allow96Channel || mount === RIGHT ? ['p1000_96'] : []
+
     return (
       <Flex width="13.8rem">
         <PipetteSelect
           nameBlocklist={
-            //  filtering out 96-channel for Flex for now
             robotType === OT2_ROBOT_TYPE
               ? OT3_PIPETTES
-              : [...OT2_PIPETTES, 'p1000_96']
+              : [...OT2_PIPETTES, ...filter96]
           }
           enableNoneOption
           tabIndex={tabIndex}
@@ -116,6 +129,7 @@ export function PipetteFields(props: Props): JSX.Element {
             onSetFieldValue(targetToClear, null)
             onSetFieldTouched(targetToClear, false)
           }}
+          disabled={mount === RIGHT && values.left.pipetteName === 'p1000_96'}
           id={`PipetteSelect_${mount}`}
           className={styles.pipette_select}
         />
@@ -145,7 +159,10 @@ export function PipetteFields(props: Props): JSX.Element {
             : null
         }
         tabIndex={initialTabIndex + 2}
-        disabled={isEmpty(values[mount].pipetteName)}
+        disabled={
+          isEmpty(values[mount].pipetteName) ||
+          (mount === RIGHT && values.left.pipetteName === 'p1000_96')
+        }
         options={tiprackOptions}
         value={values[mount].tiprackDefURI}
         name={`pipettesByMount.${mount}.tiprackDefURI`}
@@ -190,6 +207,7 @@ export function PipetteFields(props: Props): JSX.Element {
             key="rightPipetteModel"
             label={i18n.t('modal.pipette_fields.right_pipette')}
             className={formStyles.stacked_row}
+            disabled={values.left.pipetteName === 'p1000_96'}
           >
             {renderPipetteSelect({
               mount: 'right',

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { FlattenSimpleInterpolation } from 'styled-components'
-import { Box } from '..'
+import { Flex } from '../primitives'
+import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
 import singleSrc from '@opentrons/components/src/instrument/single_channel_GEN1_800px.png'
 import multiSrc from '@opentrons/components/src/instrument/multi-channel_GEN1_800px.png'
 import singleGEN2Src from '@opentrons/components/src/instrument/single-channel_GEN2_800px.png'
@@ -40,13 +41,19 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
     }
   }
   return (
-    <Box
+    <Flex
       className={className}
       transform={mount === 'right' ? 'scaleX(-1)' : ''}
       filter={mount === 'right' ? 'FlipH' : ''}
       {...styleProps}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
     >
-      <img src={channels === 96 ? ninetySixSrc : imgSrc} css={imageStyle} />
-    </Box>
+      <img
+        src={channels === 96 ? ninetySixSrc : imgSrc}
+        css={imageStyle}
+        height="100%"
+      />
+    </Flex>
   )
 }

@@ -41,7 +41,8 @@ const updateSet: Record<RobotUpdateTarget, ReleaseSetFilepaths | null> = {
 
 const readFileAndDispatchInfo = (
   dispatch: Dispatch,
-  filename: string
+  filename: string,
+  isManualFile: boolean = false
 ): Promise<void> =>
   readUpdateFileInfo(filename)
     .then(fileInfo => ({
@@ -49,6 +50,7 @@ const readFileAndDispatchInfo = (
       payload: {
         systemFile: fileInfo.systemFile,
         version: fileInfo.versionInfo.opentrons_api_version,
+        isManualFile,
       },
     }))
     .catch((error: Error) => ({
@@ -104,7 +106,12 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, systemFile)
+        uploadSystemFile(host, path, systemFile, progress =>
+          dispatch({
+            type: 'robotUpdate:FILE_UPLOAD_PROGRESS',
+            payload: progress,
+          })
+        )
           .then(() => ({
             type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
@@ -130,7 +137,7 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
 
       case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
-        readFileAndDispatchInfo(dispatch, systemFile)
+        readFileAndDispatchInfo(dispatch, systemFile, true)
         break
       }
 

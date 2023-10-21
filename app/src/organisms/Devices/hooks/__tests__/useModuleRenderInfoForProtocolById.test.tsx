@@ -1,9 +1,11 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { UseQueryResult } from 'react-query'
 
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
 import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -19,13 +21,17 @@ import {
   useStoredProtocolAnalysis,
 } from '..'
 
-import type {
+import {
   ModuleModel,
   ModuleType,
   ProtocolAnalysisOutput,
+  DeckConfiguration,
+  STAGING_AREA_LOAD_NAME,
+  Fixture,
 } from '@opentrons/shared-data'
 import type { ProtocolDetails } from '..'
 
+jest.mock('@opentrons/react-api-client/src/deck_configuration')
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
 jest.mock('../useProtocolDetailsForRun')
@@ -47,7 +53,9 @@ const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFu
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
-
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
 const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
@@ -101,7 +109,7 @@ const MAGNETIC_MODULE_INFO = {
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
   protocolLoadOrder: 0,
-  slotName: '1',
+  slotName: 'D1',
 }
 
 const TEMPERATURE_MODULE_INFO = {
@@ -114,11 +122,20 @@ const TEMPERATURE_MODULE_INFO = {
   nestedLabwareId: null,
   nestedLabwareDisplayName: null,
   protocolLoadOrder: 0,
-  slotName: '1',
+  slotName: 'D1',
 }
+
+const mockFixture = {
+  fixtureId: 'mockId',
+  fixtureLocation: 'D1',
+  loadName: STAGING_AREA_LOAD_NAME,
+} as Fixture
 
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {
+    when(mockUseDeckConfigurationQuery).mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
     when(mockUseAttachedModules)
       .calledWith()
       .mockReturnValue([
@@ -162,10 +179,12 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     )
     expect(result.current).toStrictEqual({
       magneticModuleId: {
+        conflictedFixture: mockFixture,
         attachedModuleMatch: mockMagneticModuleGen2,
         ...MAGNETIC_MODULE_INFO,
       },
       temperatureModuleId: {
+        conflictedFixture: mockFixture,
         attachedModuleMatch: mockTemperatureModuleGen2,
         ...TEMPERATURE_MODULE_INFO,
       },

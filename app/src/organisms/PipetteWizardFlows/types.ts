@@ -38,7 +38,7 @@ export interface AttachProbeStep extends BaseStep {
 
 export interface ResultsStep extends BaseStep {
   section: typeof SECTIONS.RESULTS
-  recalibrate?: boolean
+  nextMount?: string
 }
 export interface MountPipetteStep extends BaseStep {
   section: typeof SECTIONS.MOUNT_PIPETTE

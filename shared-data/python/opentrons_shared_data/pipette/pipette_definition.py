@@ -161,6 +161,13 @@ class TipHandlingConfigurations(PlungerHomingConfigurations):
     distance: float = Field(
         default=0.0, description="The distance to begin a pick up tip from."
     )
+    prep_move_distance: float = Field(
+        default=0.0,
+        description="The distance to move downward before tip pickup or drop-off.",
+    )
+    prep_move_speed: float = Field(
+        default=0.0, description="The speed for the optional preparatory move."
+    )
 
 
 class AvailableSensorDefinition(BaseModel):
@@ -245,6 +252,21 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     )
     quirks: List[pip_types.Quirks] = Field(
         ..., description="The list of quirks available for the loaded configuration"
+    )
+    tip_presence_check_distance_mm: float = Field(
+        default=0,
+        description="The distance the high throughput tip motors will travel to check tip status.",
+        alias="tipPresenceCheckDistanceMM",
+    )
+    connect_tiprack_distance_mm: float = Field(
+        default=0,
+        description="The distance to move the head down to connect with the tiprack before clamping.",
+        alias="connectTiprackDistanceMM",
+    )
+    end_tip_action_retract_distance_mm: float = Field(
+        default=0,
+        description="The distance to move the head up after a tip pickup or dropoff.",
+        alias="endTipActionRetractDistanceMM",
     )
 
     @validator("pipette_type", pre=True)

@@ -8,12 +8,16 @@
     "presses": 0.0,
     "speed": 5.5,
     "increment": 0.0,
-    "distance": 19.0
+    "distance": 10.0,
+    "prep_move_distance": 9.0,
+    "prep_move_speed": 10.0
   },
   "dropTipConfigurations": {
     "current": 1.5,
     "speed": 5.5,
-    "distance": 26.5
+    "distance": 10.5,
+    "prep_move_distance": 16.0,
+    "prep_move_speed": 10.0
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,
@@ -52,5 +56,8 @@
   "plungerHomingConfigurations": {
     "current": 2.0,
     "speed": 5
-  }
+  },
+  "tipPresenceCheckDistanceMM": "8.0",
+  "connectTiprackDistanceMM": "7.0",
+  "endTipActionRetractDistanceMM": "2.0"
 }

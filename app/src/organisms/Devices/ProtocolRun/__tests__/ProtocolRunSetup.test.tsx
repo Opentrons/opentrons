@@ -18,9 +18,10 @@ import { useFeatureFlag } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useIsOT3,
+  useIsFlex,
   useRobot,
   useRunCalibrationStatus,
+  useModuleCalibrationStatus,
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
@@ -43,7 +44,7 @@ jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 jest.mock('../../../../redux/config')
 
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -53,6 +54,9 @@ const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFu
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
@@ -102,7 +106,7 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -201,7 +205,7 @@ describe('ProtocolRunSetup', () => {
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
     it('renders robot calibration setup for OT-3', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       const { getByText } = render()
 
       getByText(
@@ -273,9 +277,41 @@ describe('ProtocolRunSetup', () => {
           ...MOCK_ROTOCOL_LIQUID_KEY,
         } as any)
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: true })
     })
     afterEach(() => {
       resetAllWhenMocks()
+    })
+
+    it('renders calibration ready if robot is Flex and modules are calibrated', () => {
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: true })
+
+      const { getAllByText } = render()
+      expect(getAllByText('Calibration ready').length).toEqual(2)
+    })
+
+    it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: false })
+
+      const { getByText } = render()
+      getByText('STEP 2')
+      getByText('Modules')
+      getByText('Calibration needed')
+    })
+
+    it('does not render calibration element if robot is OT-2', () => {
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+
+      const { getAllByText } = render()
+      expect(getAllByText('Calibration ready').length).toEqual(1)
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
@@ -341,7 +377,7 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for modules and fixtures', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseFeatureFlag)
         .calledWith('enableDeckConfiguration')
         .mockReturnValue(true)

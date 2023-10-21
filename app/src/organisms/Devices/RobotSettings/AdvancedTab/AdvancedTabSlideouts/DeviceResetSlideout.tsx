@@ -35,7 +35,7 @@ import {
 } from '../../../../../redux/analytics'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
   useRobot,
@@ -64,7 +64,7 @@ export function DeviceResetSlideout({
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const runsQueryResponse = useAllRunsQuery()
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
 
   // Calibration data
   const deckCalibrationData = useDeckCalibrationData(robotName)
@@ -86,7 +86,7 @@ export function DeviceResetSlideout({
         )
       : []
 
-  const calibrationOptions = isOT3
+  const calibrationOptions = isFlex
     ? flexCalibrationOptions
     : ot2CalibrationOptions
 
@@ -182,7 +182,7 @@ export function DeviceResetSlideout({
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>
-        {isOT3 ? (
+        {isFlex ? (
           <>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
               <Flex flexDirection={DIRECTION_COLUMN}>
@@ -253,7 +253,7 @@ export function DeviceResetSlideout({
                 {calibrationOptions.map(opt => {
                   let calibrationName = ''
                   if (opt.id === 'pipetteOffsetCalibrations') {
-                    calibrationName = isOT3
+                    calibrationName = isFlex
                       ? t('clear_option_pipette_calibrations')
                       : t(`clear_option_${snakeCase(opt.id)}`)
                   } else {

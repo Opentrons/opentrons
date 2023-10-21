@@ -22,6 +22,7 @@ import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import {
+  clearWifiStatus,
   getNetworkInterfaces,
   postWifiDisconnect,
 } from '../../../../redux/networking'
@@ -111,6 +112,12 @@ export const DisconnectModal = ({
   } else if (isRequestFailed) {
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
   }
+
+  React.useEffect(() => {
+    if (isDisconnected) {
+      dispatch(clearWifiStatus(robotName))
+    }
+  }, [isDisconnected])
 
   return (
     <LegacyModal

@@ -66,9 +66,10 @@ import {
   useTrackProtocolRunEvent,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
-  useIsOT3,
+  useIsFlex,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
@@ -148,6 +149,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
+>
 const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
   typeof useRunCreatedAtTimestamp
 >
@@ -190,7 +194,7 @@ const mockRunFailedModal = RunFailedModal as jest.MockedFunction<
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
@@ -363,7 +367,10 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseModuleCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ complete: true })
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
     mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
@@ -593,6 +600,28 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Canceling Run' })
     expect(button).toBeDisabled()
     getByText('Stop requested')
+  })
+
+  it('renders a disabled button and when the robot door is open', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockRunningRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+
+    const [{ getByText, getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Resume run' })
+    expect(button).toBeDisabled()
+    getByText('Close robot door')
   })
 
   it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -872,7 +901,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('should render door close banner when door is open and enabled safety door switch is on - OT-2', () => {
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     const mockOpenDoorStatus = {
       data: { status: 'open', doorRequiredClosedForProtocol: true },
     }
@@ -882,7 +911,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('should not render door close banner when door is open and enabled safety door switch is off - OT-2', () => {
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     const mockOffSettings = { ...mockSettings, value: false }
     mockGetRobotSettings.mockReturnValue([mockOffSettings])
     const mockOpenDoorStatus = {

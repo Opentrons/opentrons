@@ -1,5 +1,6 @@
 import assert from 'assert'
 import { handleActions } from 'redux-actions'
+import { Reducer } from 'redux'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
@@ -20,7 +21,6 @@ import {
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
   LoadFixtureCreateCommand,
-  STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
   TRASH_BIN_LOAD_NAME,
 } from '@opentrons/shared-data'
@@ -34,17 +34,7 @@ import {
   handleFormChange,
 } from '../../steplist/formLevel'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
-  _getInitialDeckSetupRootState,
-} from '../selectors'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import {
-  createPresavedStepForm,
-  getDeckItemIdInSlot,
-  getIdsInRange,
-} from '../utils'
 import {
   createInitialProfileCycle,
   createInitialProfileStep,
@@ -52,28 +42,41 @@ import {
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import { Reducer } from 'redux'
 import {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
-import {
-  CreateContainerAction,
-  DeleteContainerAction,
-  DuplicateLabwareAction,
-  SwapSlotContentsAction,
-} from '../../labware-ingred/actions'
+import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type {
-  FormData,
-  StepIdType,
-  StepType,
-  ProfileItem,
-  ProfileCycleItem,
-  ProfileStepItem,
-} from '../../form-types'
 import {
+  _getPipetteEntitiesRootState,
+  _getLabwareEntitiesRootState,
+  _getInitialDeckSetupRootState,
+} from '../selectors'
+import {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
+  ToggleIsGripperRequiredAction,
+} from '../actions/additionalItems'
+import {
+  createPresavedStepForm,
+  getDeckItemIdInSlot,
+  getIdsInRange,
+} from '../utils'
+import {
+  CreateModuleAction,
+  CreatePipettesAction,
+  DeleteModuleAction,
+  DeletePipettesAction,
+  EditModuleAction,
+  SubstituteStepFormPipettesAction,
+  ChangeBatchEditFieldAction,
+  ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
+} from '../actions'
+
+import type {
   CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
@@ -89,7 +92,21 @@ import {
   EditProfileStepAction,
   FormPatch,
 } from '../../steplist/actions'
-import {
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+  ProfileItem,
+  ProfileCycleItem,
+  ProfileStepItem,
+} from '../../form-types'
+import type {
+  CreateContainerAction,
+  DeleteContainerAction,
+  DuplicateLabwareAction,
+  SwapSlotContentsAction,
+} from '../../labware-ingred/actions'
+import type {
   AddStepAction,
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
@@ -98,28 +115,12 @@ import {
   SelectTerminalItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps/actions/types'
-import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import {
+import type {
   NormalizedLabware,
   NormalizedLabwareById,
   ModuleEntities,
 } from '../types'
-import {
-  CreateModuleAction,
-  CreatePipettesAction,
-  DeleteModuleAction,
-  DeletePipettesAction,
-  EditModuleAction,
-  SubstituteStepFormPipettesAction,
-  ChangeBatchEditFieldAction,
-  ResetBatchEditFieldChangesAction,
-  SaveStepFormsMultiAction,
-} from '../actions'
-import {
-  CreateDeckFixtureAction,
-  DeleteDeckFixtureAction,
-  ToggleIsGripperRequiredAction,
-} from '../actions/additionalItems'
+
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -1329,10 +1330,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ) => {
           const { fixtureId, loadName, location } = command.params
           const id = fixtureId ?? ''
-          //  TODO(jr, 10/03/23): filtering out staging area for now
-          //  until it is supported
           if (
-            loadName === STAGING_AREA_LOAD_NAME ||
             loadName === STANDARD_SLOT_LOAD_NAME ||
             loadName === TRASH_BIN_LOAD_NAME
           ) {

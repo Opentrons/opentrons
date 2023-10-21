@@ -34,6 +34,7 @@
 .slot_map {
   flex: 1 0 12%;
   max-width: 6rem;
+  margin-top: -1rem;
 }
 
 .row_title {

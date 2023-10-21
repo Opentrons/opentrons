@@ -84,7 +84,8 @@ import {
   useIsRobotViewable,
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
-  useIsOT3,
+  useIsFlex,
+  useModuleCalibrationStatus,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
@@ -149,14 +150,14 @@ export function ProtocolRunHeader({
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
   )
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
   let isDoorOpen = false
-  if (isOT3) {
+  if (isFlex) {
     isDoorOpen = doorStatus?.data.status === 'open'
-  } else if (!isOT3 && Boolean(doorSafetySetting?.value)) {
+  } else if (!isFlex && Boolean(doorSafetySetting?.value)) {
     isDoorOpen = doorStatus?.data.status === 'open'
   } else {
     isDoorOpen = false
@@ -476,10 +477,17 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runId
   )
+  const { complete: isModuleCalibrationComplete } = useModuleCalibrationStatus(
+    robotName,
+    runId
+  )
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
+  const isSetupComplete =
+    isCalibrationComplete &&
+    isModuleCalibrationComplete &&
+    missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getRobotUpdateDisplayInfo(state, robotName)
@@ -543,6 +551,12 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
+  } else if (
+    isDoorOpen &&
+    runStatus != null &&
+    START_RUN_STATUSES.includes(runStatus)
+  ) {
+    disableReason = t('close_door')
   }
 
   if (isProtocolAnalyzing) {

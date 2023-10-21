@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -15,18 +14,21 @@ import {
   useOnClickOutside,
   InstrumentDiagram,
   BORDERS,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import {
-  isOT3Pipette,
+  FLEX_ROBOT_TYPE,
+  isFlexPipette,
   NINETY_SIX_CHANNEL,
+  OT2_ROBOT_TYPE,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-
 import {
-  LEFT,
-  getAttachedPipetteSettingsFieldsById,
-} from '../../../redux/pipettes'
+  useCurrentSubsystemUpdateQuery,
+  usePipetteSettingsQuery,
+} from '@opentrons/react-api-client'
+
+import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
@@ -36,22 +38,18 @@ import { ChangePipette } from '../../ChangePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
-import { useIsOT3 } from '../hooks'
+import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
-import type { State } from '../../../redux/types'
-import type {
-  PipetteModelSpecs,
-  PipetteMount,
-  PipetteName,
-} from '@opentrons/shared-data'
+import type { PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type {
   PipetteWizardFlow,
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
+import { DropTipWizard } from '../../DropTipWizard'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
@@ -101,14 +99,15 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const isOt3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const pipetteName = pipetteModelSpecs?.name
-  const isOT3PipetteAttached = isOT3Pipette(pipetteName as PipetteName)
+  const isFlexPipetteAttached = isFlexPipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteModelSpecs?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
   const [showChangePipette, setChangePipette] = React.useState(false)
+  const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [
     pipetteWizardFlow,
@@ -120,13 +119,15 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     subsystem,
     {
-      enabled: isOt3,
+      enabled: isFlex && pipetteIsBad,
       refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
     }
   )
-  const settings = useSelector((state: State) =>
-    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId ?? '')
-  )
+  const settings =
+    usePipetteSettingsQuery({
+      refetchInterval: 5000,
+      enabled: pipetteId != null,
+    })?.data?.[pipetteId ?? '']?.fields ?? null
 
   const [
     selectedPipette,
@@ -134,16 +135,19 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
 
   const handleChangePipette = (): void => {
-    if (isOT3PipetteAttached && isOt3) {
+    if (isFlexPipetteAttached && isFlex) {
       setPipetteWizardFlow(FLOWS.DETACH)
-    } else if (!isOT3PipetteAttached && isOt3) {
+    } else if (!isFlexPipetteAttached && isFlex) {
       setShowAttachPipette(true)
     } else {
       setChangePipette(true)
     }
   }
+  const handleDropTip = (): void => {
+    setShowDropTipWizard(true)
+  }
   const handleCalibrate = (): void => {
-    if (isOT3PipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
+    if (isFlexPipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
   }
   const handleAboutSlideout = (): void => {
     setShowAboutSlideout(true)
@@ -175,12 +179,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       {pipetteWizardFlow != null ? (
         <PipetteWizardFlows
           flowType={pipetteWizardFlow}
-          mount={
-            //  hardcoding in LEFT mount for whenever a 96 channel is selected
-            selectedPipette === NINETY_SIX_CHANNEL
-              ? LEFT
-              : (mount as PipetteMount)
-          }
+          mount={mount}
           closeFlow={() => {
             setSelectedPipette(SINGLE_MOUNT_PIPETTES)
             setPipetteWizardFlow(null)
@@ -197,6 +196,14 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           closeModal={() => setChangePipette(false)}
         />
       )}
+      {showDropTipWizard && pipetteModelSpecs != null ? (
+        <DropTipWizard
+          robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+          mount={mount}
+          instrumentModelSpecs={pipetteModelSpecs}
+          closeFlow={() => setShowDropTipWizard(false)}
+        />
+      ) : null}
       {showSlideout &&
         pipetteModelSpecs != null &&
         pipetteId != null &&
@@ -221,20 +228,19 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       )}
       {!pipetteIsBad && subsystemUpdateData == null && (
         <>
-          <Box
-            padding={`${SPACING.spacing16} ${SPACING.spacing8}`}
-            width="100%"
-          >
+          <Box padding={SPACING.spacing16} width="100%">
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
-              <Flex alignItems={ALIGN_START}>
+              <Flex alignItems={ALIGN_CENTER} width="3.75rem" height="3.375rem">
                 {pipetteModelSpecs !== null ? (
                   <InstrumentDiagram
                     pipetteSpecs={pipetteModelSpecs}
                     mount={mount}
                     //  pipette images for Flex are slightly smaller so need to be scaled accordingly
-                    transform={isOt3 ? 'scale(0.4)' : 'scale(0.3)'}
+                    transform={isFlex ? 'scale(0.4)' : 'scale(0.3)'}
                     size="3.125rem"
-                    transformOrigin={isOt3 ? '-50% -10%' : '20% -10%'}
+                    transformOrigin={isFlex ? '-50% -10%' : '20% -10%'}
+                    width="100%"
+                    height="100%"
                   />
                 ) : null}
               </Flex>
@@ -243,7 +249,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 flex="100%"
                 paddingLeft={SPACING.spacing8}
               >
-                {isOT3PipetteAttached && !isPipetteCalibrated ? (
+                {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
                     <Trans
                       t={t}
@@ -339,15 +345,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box
             ref={pipetteOverflowWrapperRef}
-            data-testid={`PipetteCard_overflow_menu_${String(
-              pipetteDisplayName
-            )}`}
             onClick={() => setShowOverflowMenu(false)}
           >
             <PipetteOverflowMenu
               pipetteSpecs={pipetteModelSpecs}
               mount={mount}
               handleChangePipette={handleChangePipette}
+              handleDropTip={handleDropTip}
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
               handleCalibrate={handleCalibrate}

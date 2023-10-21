@@ -509,6 +509,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def has_tip(self) -> bool:
         return self._has_tip
 
+    @property
+    def tip_presence_check_dist_mm(self) -> float:
+        return self._config.tip_presence_check_distance_mm
+
+    @property
+    def connect_tiprack_distance_mm(self) -> float:
+        return self._config.connect_tiprack_distance_mm
+
+    @property
+    def end_tip_action_retract_distance_mm(self) -> float:
+        return self._config.end_tip_action_retract_distance_mm
+
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)

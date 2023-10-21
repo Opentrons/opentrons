@@ -145,7 +145,6 @@ def update(
     Recursively update the given dictionary to ensure no data is lost when updating.
     """
     next_key = next(iter_of_configs, None)
-    breakpoint()
     if next_key and isinstance(dict_to_update[next_key], dict):
         dict_to_update[next_key] = update(
             dict_to_update.get(next_key, {}), iter_of_configs, value_to_update
@@ -160,7 +159,6 @@ def build_nozzle_map(
 ) -> Dict[str, List[float]]:
     Y_OFFSET = 9
     X_OFFSET = -9
-    breakpoint()
     if channels == PipetteChannelType.SINGLE_CHANNEL:
         return {"A1": nozzle_offset}
     elif channels == PipetteChannelType.EIGHT_CHANNEL:

@@ -15,6 +15,7 @@ interface LabwarePositionCheckModalProps {
   protocolName: string
   caughtError?: Error
   setMaintenanceRunId: (id: string | null) => void
+  isDeletingMaintenanceRun: boolean
 }
 
 // We explicitly wrap LabwarePositionCheckComponent in an ErrorBoundary because an error might occur while pulling in

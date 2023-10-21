@@ -359,6 +359,17 @@ describe('robot update selectors', () => {
     })
   })
 
+  it('should get whether the robot is updated via a manual file', () => {
+    const state: State = {
+      robotUpdate: {
+        session: { fileInfo: { isManualFile: true } },
+      },
+    } as any
+    const result = selectors.getRobotSessionIsManualFile(state)
+
+    expect(result).toBeTruthy()
+  })
+
   it('should get the robot from session after migration with opentrons- name prefix', () => {
     const state: State = {
       robotUpdate: {

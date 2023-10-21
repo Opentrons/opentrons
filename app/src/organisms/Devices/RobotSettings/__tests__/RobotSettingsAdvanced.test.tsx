@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { getShellUpdateState } from '../../../../redux/shell'
-import { useIsOT3 } from '../../hooks'
+import { useIsFlex } from '../../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
@@ -33,7 +33,7 @@ jest.mock('../../../../redux/shell/update', () => ({
   ...jest.requireActual<{}>('../../../../redux/shell/update'),
   getShellUpdateState: jest.fn(),
 }))
-jest.mock('../../hooks/useIsOT3')
+jest.mock('../../hooks/useIsFlex')
 jest.mock('../AdvancedTab/DeviceReset')
 jest.mock('../AdvancedTab/DisplayRobotName')
 jest.mock('../AdvancedTab/EnableStatusLight')
@@ -93,7 +93,7 @@ const mockUseOlderProtocol = UseOlderProtocol as jest.MockedFunction<
 const mockEnableStatusLight = EnableStatusLight as jest.MockedFunction<
   typeof EnableStatusLight
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const mockUpdateRobotStatus = jest.fn()
 
@@ -141,7 +141,7 @@ describe('RobotSettings Advanced tab', () => {
     mockUseOlderProtocol.mockReturnValue(
       <div>Mock UseOlderProtocol Section</div>
     )
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     mockEnableStatusLight.mockReturnValue(<div>mock EnableStatusLight</div>)
   })
 
@@ -171,7 +171,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render LegacySettings section for Flex', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock LegacySettings Section')).toBeNull()
   })
@@ -197,7 +197,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render ShortTrashBin section for Flex', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock ShortTrashBin Section')).toBeNull()
   })
@@ -218,7 +218,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render UsageSettings for Flex', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock UsageSettings Section')).toBeNull()
   })
@@ -229,7 +229,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render UseOlderAspirateBehavior section for Flex', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock UseOlderAspirateBehavior Section')).toBeNull()
   })
@@ -240,7 +240,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render UseOlderProtocol section for Flex', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     expect(queryByText('Mock UseOlderProtocol Section')).toBeNull()
   })
@@ -251,7 +251,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should render EnableStatusLight section for Flex', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('mock EnableStatusLight')
   })

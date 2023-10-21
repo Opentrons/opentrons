@@ -97,23 +97,23 @@ export const getPipetteWizardSteps = (
             },
             {
               section: SECTIONS.FIRMWARE_UPDATE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
             {
               section: SECTIONS.ATTACH_PROBE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.DETACH_PROBE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.RESULTS,
-              mount: mount,
+              mount: LEFT,
               flowType: FLOWS.CALIBRATE,
             },
           ]
@@ -127,43 +127,43 @@ export const getPipetteWizardSteps = (
           const ALL_STEPS = [
             {
               section: SECTIONS.BEFORE_BEGINNING,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.CARRIAGE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.MOUNTING_PLATE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.MOUNT_PIPETTE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.FIRMWARE_UPDATE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
-            { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.ATTACH },
+            { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
             {
               section: SECTIONS.ATTACH_PROBE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.DETACH_PROBE,
-              mount: mount,
+              mount: LEFT,
               flowType: flowType,
             },
             {
               section: SECTIONS.RESULTS,
-              mount: mount,
+              mount: LEFT,
               flowType: FLOWS.CALIBRATE,
             },
           ]

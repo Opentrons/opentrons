@@ -45,15 +45,16 @@ import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   useAttachedModules,
   useLPCDisabledReason,
+  useModuleCalibrationStatus,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
+import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
+import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   getAreInstrumentsReady,
@@ -66,12 +67,15 @@ import {
 import { useToaster } from '../../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
 import { getLabwareSetupItemGroups } from '../../Protocols/utils'
-import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
+import { ROBOT_MODEL_OT3, getLocalRobot } from '../../../redux/discovery'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../../redux/config'
+import {
+  getIsHeaterShakerAttached,
+  useFeatureFlag,
+} from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 
@@ -336,6 +340,8 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -399,9 +405,7 @@ function PrepareToRun({
     hasMissingModulesForOdd: isMissingModules,
     hasMissingCalForOdd: !areInstrumentsReady,
   })
-  const requiredCalibration = attachedModules.some(
-    module => module.moduleOffset?.last_modified == null
-  )
+  const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
   const [
     showConfirmCancelModal,
@@ -426,7 +430,9 @@ function PrepareToRun({
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
   const modulesStatus =
-    isMissingModules || requiredCalibration ? 'not ready' : 'ready'
+    isMissingModules || !moduleCalibrationStatus.complete
+      ? 'not ready'
+      : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
 
@@ -477,7 +483,7 @@ function PrepareToRun({
   const modulesDetail = (): string => {
     if (isMissingModules) {
       return missingModulesText
-    } else if (requiredCalibration) {
+    } else if (!moduleCalibrationStatus.complete) {
       return t('calibration_required')
     } else {
       return connectedModulesText
@@ -513,6 +519,9 @@ function PrepareToRun({
   const isDoorOpen =
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
+
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -587,7 +596,7 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
-              title={t('modules')}
+              title={enableDeckConfig ? t('modules_and_deck') : t('modules')}
               detail={modulesDetail()}
               status={modulesStatus}
               disabled={protocolModulesInfo.length === 0}
@@ -695,7 +704,10 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupInstruments runId={runId} setSetupScreen={setSetupScreen} />
     ),
     modules: (
-      <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
+      <ProtocolSetupModulesAndDeck
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+      />
     ),
     labware: (
       <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />

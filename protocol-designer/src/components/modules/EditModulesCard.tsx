@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Card } from '@opentrons/components'
+import { Box, Card, SPACING } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -35,6 +35,8 @@ import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 import { FLEX_TRASH_DEF_URI } from '../../constants'
 import { deleteContainer } from '../../labware-ingred/actions'
+import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import { StagingAreasRow } from './StagingAreasRow'
 
 export interface Props {
   modules: ModulesForEditModulesCard
@@ -62,6 +64,9 @@ export function EditModulesCard(props: Props): JSX.Element {
   const wasteChute = Object.values(additionalEquipment).find(
     equipment => equipment?.name === 'wasteChute'
   )
+  const stagingAreas: AdditionalEquipmentEntity[] = Object.values(
+    additionalEquipment
+  ).filter(equipment => equipment?.name === 'stagingArea')
 
   const dispatch = useDispatch()
   const robotType = useSelector(getRobotType)
@@ -107,6 +112,12 @@ export function EditModulesCard(props: Props): JSX.Element {
         : moduleType !== 'magneticBlockType'
   )
 
+  const handleDeleteStagingAreas = (): void => {
+    stagingAreas.forEach(stagingArea => {
+      dispatch(deleteDeckFixture(stagingArea.id))
+    })
+  }
+
   return (
     <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
@@ -121,6 +132,15 @@ export function EditModulesCard(props: Props): JSX.Element {
             }
           />
         )}
+        {isFlex ? (
+          <Box paddingBottom={SPACING.spacing16}>
+            <AdditionalItemsRow
+              handleAttachment={() => dispatch(toggleIsGripperRequired())}
+              isEquipmentAdded={isGripperAttached}
+              name="gripper"
+            />
+          </Box>
+        ) : null}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {
@@ -146,6 +166,10 @@ export function EditModulesCard(props: Props): JSX.Element {
         })}
         {enableDeckModification && isFlex ? (
           <>
+            <StagingAreasRow
+              handleAttachment={handleDeleteStagingAreas}
+              stagingAreas={stagingAreas}
+            />
             <AdditionalItemsRow
               handleAttachment={() =>
                 trashBin != null
@@ -170,13 +194,6 @@ export function EditModulesCard(props: Props): JSX.Element {
               trashBinId={trashBin?.id}
             />
           </>
-        ) : null}
-        {isFlex ? (
-          <AdditionalItemsRow
-            handleAttachment={() => dispatch(toggleIsGripperRequired())}
-            isEquipmentAdded={isGripperAttached}
-            name="gripper"
-          />
         ) : null}
       </div>
     </Card>

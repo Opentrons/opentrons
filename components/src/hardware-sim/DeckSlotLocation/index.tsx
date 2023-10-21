@@ -12,6 +12,7 @@ interface DeckSlotLocationProps extends React.SVGProps<SVGGElement> {
   showExtensions?: boolean
 }
 
+// TODO(bh, 2023-10-11): replace usage of this component with base deck fixtures
 export function DeckSlotLocation(
   props: DeckSlotLocationProps
 ): JSX.Element | null {

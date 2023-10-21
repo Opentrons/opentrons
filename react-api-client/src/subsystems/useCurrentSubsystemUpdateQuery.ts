@@ -24,7 +24,6 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
         subsystem as Subsystem
       ).then(response => response.data),
     {
-      ...options,
       enabled: host !== null,
       onError: () => {
         queryClient.resetQueries([
@@ -33,6 +32,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
           subsystem,
         ])
       },
+      ...options,
     }
   )
 

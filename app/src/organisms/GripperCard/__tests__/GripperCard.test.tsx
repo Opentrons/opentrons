@@ -61,7 +61,7 @@ describe('GripperCard', () => {
 
   it('renders correct info when gripper is attached', () => {
     const { getByText, getByRole } = render(props)
-    const image = getByRole('img', { name: 'flex gripper' })
+    const image = getByRole('img', { name: 'Flex Gripper' })
     expect(image.getAttribute('src')).toEqual('flex_gripper.png')
     getByText('extension mount')
     getByText('Flex Gripper')

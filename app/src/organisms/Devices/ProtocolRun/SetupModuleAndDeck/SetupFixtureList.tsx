@@ -22,15 +22,19 @@ import {
 } from '@opentrons/shared-data'
 import {
   useLoadedFixturesConfigStatus,
-  NOT_CONFIGURED,
   CONFIGURED,
+  CONFLICTING,
+  NOT_CONFIGURED,
 } from '../../../../resources/deck_configuration/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
+import { LocationConflictModal } from './LocationConflictModal'
+import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 
 import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+import type { Cutout } from '@opentrons/shared-data'
 
 interface SetupFixtureListProps {
   loadedFixturesBySlot: LoadedFixturesBySlot
@@ -79,7 +83,6 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
       >
         {map(loadedFixturesBySlot, ({ params, id }) => {
           const { loadName, location } = params
-          console.log(id)
           return (
             <FixtureListItem
               key={`SetupFixturesList_${loadName}_slot_${location.cutout}`}
@@ -98,7 +101,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 interface FixtureListItemProps {
   loadedFixtures: LoadFixtureRunTimeCommand[]
   loadName: FixtureLoadName
-  cutout: string
+  cutout: Cutout
   commandId: string
 }
 
@@ -115,16 +118,23 @@ export function FixtureListItem({
   )?.configurationStatus
 
   let statusLabel
-  if (configurationStatus !== CONFIGURED) {
+  if (
+    configurationStatus === CONFLICTING ||
+    configurationStatus === NOT_CONFIGURED
+  ) {
     statusLabel = (
       <StatusLabel
-        status={configurationStatus ?? ''}
+        status={
+          configurationStatus === CONFLICTING
+            ? t('location_conflict')
+            : configurationStatus
+        }
         backgroundColor={COLORS.warningBackgroundLight}
         iconColor={COLORS.warningEnabled}
         textColor={COLORS.warningText}
       />
     )
-  } else {
+  } else if (configurationStatus === CONFIGURED) {
     statusLabel = (
       <StatusLabel
         status={configurationStatus}
@@ -133,10 +143,36 @@ export function FixtureListItem({
         textColor={COLORS.successText}
       />
     )
+    //  shouldn't run into this case
+  } else {
+    statusLabel = 'status label unknown'
   }
+
+  const [
+    showLocationConflictModal,
+    setShowLocationConflictModal,
+  ] = React.useState<boolean>(false)
+  const [
+    showNotConfiguredModal,
+    setShowNotConfiguredModal,
+  ] = React.useState<boolean>(false)
 
   return (
     <>
+      {showNotConfiguredModal ? (
+        <NotConfiguredModal
+          onCloseClick={() => setShowNotConfiguredModal(false)}
+          cutout={cutout}
+          requiredFixture={loadName}
+        />
+      ) : null}
+      {showLocationConflictModal ? (
+        <LocationConflictModal
+          onCloseClick={() => setShowLocationConflictModal(false)}
+          cutout={cutout}
+          requiredFixture={loadName}
+        />
+      ) : null}
       <Box
         border={BORDERS.styleSolid}
         borderColor={COLORS.medGreyEnabled}
@@ -187,10 +223,18 @@ export function FixtureListItem({
             gridGap={SPACING.spacing10}
           >
             {statusLabel}
-            {configurationStatus === NOT_CONFIGURED ? (
-              //  TODO(jr, 10/4/23): wire up update deck cta
-              <TertiaryButton onClick={() => console.log('wire this up')}>
-                <StyledText as="label">{t('update_deck')}</StyledText>
+            {configurationStatus !== CONFIGURED ? (
+              <TertiaryButton
+                width="max-content"
+                onClick={() =>
+                  configurationStatus === CONFLICTING
+                    ? setShowLocationConflictModal(true)
+                    : setShowNotConfiguredModal(true)
+                }
+              >
+                <StyledText as="label" cursor="pointer">
+                  {t('update_deck')}
+                </StyledText>
               </TertiaryButton>
             ) : null}
           </Flex>

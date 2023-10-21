@@ -108,7 +108,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
       nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
@@ -138,7 +138,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: true,
+      isFlex: true,
       nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
@@ -169,7 +169,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
       nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
@@ -203,7 +203,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
       nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
@@ -261,7 +261,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
       nestedLabwareInfo: {
         nestedLabwareDisplayName: 'mock nested display name',
         sharedSlotId: '7',
@@ -303,7 +303,7 @@ describe('LabwareListItem', () => {
       moduleLocation: null,
       extraAttentionModules: [],
       attachedModuleInfo: {},
-      isOt3: false,
+      isFlex: false,
       nestedLabwareInfo: {
         nestedLabwareDisplayName: 'mock nested display name',
         sharedSlotId: 'A2',
@@ -341,7 +341,7 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
       nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
@@ -373,7 +373,7 @@ describe('LabwareListItem', () => {
       moduleLocation: null,
       extraAttentionModules: [],
       attachedModuleInfo: {},
-      isOt3: false,
+      isFlex: false,
       nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
