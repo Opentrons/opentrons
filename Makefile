@@ -273,4 +273,4 @@ circular-dependencies-js:
 
 .PHONY: test-js-%
 test-js-%:
-	yarn jest $*
+	yarn jest $(tests) $(test_opts) $(cov_opts)

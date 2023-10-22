@@ -85,7 +85,7 @@ jobs:
           make setup-js
       - name: 'opentrons app frontendunit tests'
         run: |
-          make -C app test ----collectCoverage
+          make -C app test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
