@@ -203,6 +203,7 @@ describe('SetupLabwareMap', () => {
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
+          slotName: '1',
         },
       })
 
@@ -213,7 +214,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
-      commands: [],
+      protocolAnalysis: null,
     })
 
     expect(mockModule).not.toHaveBeenCalled()
@@ -233,6 +234,7 @@ describe('SetupLabwareMap', () => {
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
+          slotName: '1',
         },
       })
 
@@ -286,7 +288,7 @@ describe('SetupLabwareMap', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
-      commands: [],
+      protocolAnalysis: null,
     })
 
     getByText('mock module viz magneticModuleType')
