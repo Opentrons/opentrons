@@ -32,6 +32,7 @@ import { useFeatureFlag } from '../../redux/config'
 import type {
   CompletedProtocolAnalysis,
   Cutout,
+  FixtureLoadName,
   LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -40,12 +41,14 @@ interface FixtureTableProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   setFixtureLocation: (fixtureLocation: Cutout) => void
+  setProvidedFixtureOptions: (providedFixtureOptions: FixtureLoadName[]) => void
 }
 
 export function FixtureTable({
   mostRecentAnalysis,
   setSetupScreen,
   setFixtureLocation,
+  setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
@@ -77,6 +80,10 @@ export function FixtureTable({
       : []
 
   const configurations = useLoadedFixturesConfigStatus(requiredFixtureDetails)
+
+  const pickedFixtureOptions = requiredFixtureDetails.map(
+    fixture => fixture.params.loadName
+  )
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -124,6 +131,7 @@ export function FixtureTable({
               ? () => setShowLocationConflictModal(true)
               : () => {
                   setFixtureLocation(fixture.params.location.cutout)
+                  setProvidedFixtureOptions(pickedFixtureOptions)
                   setSetupScreen('deck configuration')
                 }
         } else if (configurationStatus === CONFIGURED) {

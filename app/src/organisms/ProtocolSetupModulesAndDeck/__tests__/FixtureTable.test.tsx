@@ -56,6 +56,7 @@ const mockLoadedStagingAreaFixture = {
 
 const mockSetSetupScreen = jest.fn()
 const mockSetFixtureLocation = jest.fn()
+const mockSetProvidedFixtureOptions = jest.fn()
 
 const render = (props: React.ComponentProps<typeof FixtureTable>) => {
   return renderWithProviders(<FixtureTable {...props} />, {
@@ -70,6 +71,7 @@ describe('FixtureTable', () => {
       mostRecentAnalysis: [] as any,
       setSetupScreen: mockSetSetupScreen,
       setFixtureLocation: mockSetFixtureLocation,
+      setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
     when(mockUseFeatureFlag)
       .calledWith('enableDeckConfiguration')
@@ -131,5 +133,6 @@ describe('FixtureTable', () => {
     getByText('Not configured').click()
     expect(mockSetFixtureLocation).toHaveBeenCalledWith('D3')
     expect(mockSetSetupScreen).toHaveBeenCalledWith('deck configuration')
+    expect(mockSetProvidedFixtureOptions).toHaveBeenCalledWith(['wasteChute'])
   })
 })

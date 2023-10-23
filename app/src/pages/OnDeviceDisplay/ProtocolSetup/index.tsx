@@ -77,7 +77,7 @@ import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
 
 const FETCH_DURATION_MS = 5000
@@ -555,9 +555,12 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
   )
-  const [fixtureLocation, setFixtureLocation] = React.useState<Cutout | null>(
-    null
+  const [fixtureLocation, setFixtureLocation] = React.useState<Cutout>(
+    '' as Cutout
   )
+  const [providedFixtureOptions, setProvidedFixtureOptions] = React.useState<
+    FixtureLoadName[]
+  >([])
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -581,6 +584,8 @@ export function ProtocolSetup(): JSX.Element {
         runId={runId}
         setSetupScreen={setSetupScreen}
         setFixtureLocation={setFixtureLocation}
+        setProvidedFixtureOptions={setProvidedFixtureOptions}
+        providedFixtureOptions={providedFixtureOptions}
       />
     ),
     labware: (
@@ -594,6 +599,7 @@ export function ProtocolSetup(): JSX.Element {
         fixtureLocation={fixtureLocation}
         runId={runId}
         setSetupScreen={setSetupScreen}
+        providedFixtureOptions={providedFixtureOptions}
       />
     ),
   }

@@ -103,6 +103,8 @@ const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const mockSetSetupScreen = jest.fn()
+const mockSetFixtureLocation = jest.fn()
+const mockSetProvidedFixtureOptions = jest.fn()
 
 const calibratedMockApiHeaterShaker = {
   ...mockApiHeaterShaker,
@@ -122,8 +124,6 @@ const mockFixture = {
   loadName: STAGING_AREA_LOAD_NAME,
 } as Fixture
 
-const mockSetFixtureLocation = jest.fn()
-
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -131,6 +131,8 @@ const render = () => {
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
         setFixtureLocation={mockSetFixtureLocation}
+        providedFixtureOptions={[]}
+        setProvidedFixtureOptions={mockSetProvidedFixtureOptions}
       />
     </MemoryRouter>,
     {

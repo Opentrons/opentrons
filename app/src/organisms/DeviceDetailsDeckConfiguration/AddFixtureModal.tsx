@@ -33,14 +33,16 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 interface AddFixtureModalProps {
-  fixtureLocation: Cutout | null
+  fixtureLocation: Cutout
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
+  providedFixtureOptions?: FixtureLoadName[]
   isOnDevice?: boolean
 }
 
 export function AddFixtureModal({
   fixtureLocation,
   setShowAddFixtureModal,
+  providedFixtureOptions,
   isOnDevice = false,
 }: AddFixtureModalProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
@@ -74,6 +76,8 @@ export function AddFixtureModal({
     availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
   }
 
+  const fixtureOptions = providedFixtureOptions ?? availableFixtures
+
   const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
     updateDeckConfiguration({
       fixtureLocation,
@@ -92,7 +96,7 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableFixtures.map(fixture => (
+              {fixtureOptions.map(fixture => (
                 <React.Fragment key={fixture}>
                   <AddFixtureButton
                     fixtureLoadName={fixture}
@@ -108,7 +112,7 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableFixtures.map(fixture => (
+              {fixtureOptions.map(fixture => (
                 <React.Fragment key={fixture}>
                   <Flex
                     flexDirection={DIRECTION_ROW}

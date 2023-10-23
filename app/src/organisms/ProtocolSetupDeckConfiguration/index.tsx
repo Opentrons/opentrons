@@ -16,7 +16,6 @@ import {
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
-import { DeckFixtureSetupInstructionsModal } from '../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Portal } from '../../App/portal'
@@ -25,27 +24,26 @@ import type {
   Cutout,
   DeckConfiguration,
   Fixture,
+  FixtureLoadName,
   LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
-  fixtureLocation: Cutout | null
+  fixtureLocation: Cutout
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  providedFixtureOptions: FixtureLoadName[]
 }
 
 export function ProtocolSetupDeckConfiguration({
   fixtureLocation,
   runId,
   setSetupScreen,
+  providedFixtureOptions,
 }: ProtocolSetupDeckConfigurationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing', 'shared'])
 
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = React.useState<boolean>(false)
   const [
     showConfigurationModal,
     setShowConfigurationModal,
@@ -53,7 +51,7 @@ export function ProtocolSetupDeckConfiguration({
   const [
     targetFixtureLocation,
     setTargetFixtureLocation,
-  ] = React.useState<Cutout | null>(null)
+  ] = React.useState<Cutout>(fixtureLocation)
   const [
     showDiscardChangeModal,
     setShowDiscardChangeModal,
@@ -118,21 +116,12 @@ export function ProtocolSetupDeckConfiguration({
             setShowConfirmationModal={setShowDiscardChangeModal}
           />
         ) : null}
-        {showSetupInstructionsModal ? (
-          <DeckFixtureSetupInstructionsModal
-            setShowSetupInstructionsModal={setShowSetupInstructionsModal}
-            isOnDevice
-          />
-        ) : null}
         {showConfigurationModal &&
         (fixtureLocation != null || targetFixtureLocation != null) ? (
           <AddFixtureModal
-            fixtureLocation={
-              targetFixtureLocation != null
-                ? targetFixtureLocation
-                : fixtureLocation
-            }
+            fixtureLocation={targetFixtureLocation}
             setShowAddFixtureModal={setShowConfigurationModal}
+            providedFixtureOptions={providedFixtureOptions}
             isOnDevice
           />
         ) : null}
@@ -150,6 +139,7 @@ export function ProtocolSetupDeckConfiguration({
           paddingBottom={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
         >
+          DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready
           <DeckConfigurator
             deckConfig={deckConfig}
             handleClickAdd={handleClickAdd}

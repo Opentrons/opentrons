@@ -63,7 +63,7 @@ import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
 
 import type { CommandData } from '@opentrons/api-client'
-import type { Cutout, Fixture } from '@opentrons/shared-data'
+import type { Cutout, Fixture, FixtureLoadName } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
@@ -324,6 +324,8 @@ interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   setFixtureLocation: (fixtureLocation: Cutout) => void
+  providedFixtureOptions: FixtureLoadName[]
+  setProvidedFixtureOptions: (providedFixtureOptions: FixtureLoadName[]) => void
 }
 
 /**
@@ -333,6 +335,8 @@ export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
   setFixtureLocation,
+  providedFixtureOptions,
+  setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
@@ -521,6 +525,7 @@ export function ProtocolSetupModulesAndDeck({
               mostRecentAnalysis={mostRecentAnalysis}
               setSetupScreen={setSetupScreen}
               setFixtureLocation={setFixtureLocation}
+              setProvidedFixtureOptions={setProvidedFixtureOptions}
             />
           ) : null}
         </Flex>

@@ -47,6 +47,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
       fixtureLocation: 'D3',
       runId: 'mockRunId',
       setSetupScreen: mockSetSetupScreen,
+      providedFixtureOptions: [],
     }
     mockDeckConfigurator.mockReturnValue(<div>mock DeckConfigurator</div>)
     when(mockUseMostRecentCompletedAnalysis)
