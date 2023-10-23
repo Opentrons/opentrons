@@ -32,6 +32,8 @@ import {
   useDoorQuery,
 } from '@opentrons/react-api-client'
 import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
@@ -366,8 +368,9 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const shouldUseMetalProbe = useIsFlex(robotName)
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId, shouldUseMetalProbe, protocolName)
+  const isFlex = useIsFlex(robotName)
+  const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
