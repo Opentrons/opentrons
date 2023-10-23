@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
 from opentrons.protocol_engine.types import ModuleOffsetVector
 from opentrons.util.broker import ReadOnlyBroker
@@ -127,7 +127,7 @@ class StateStore(StateView, ActionHandler):
         self,
         *,
         config: Config,
-        deck_definition: DeckDefinitionV3,
+        deck_definition: DeckDefinitionV4,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,

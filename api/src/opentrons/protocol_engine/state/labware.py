@@ -16,7 +16,7 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -104,7 +104,7 @@ class LabwareState:
     labware_offsets_by_id: Dict[str, LabwareOffset]
 
     definitions_by_uri: Dict[str, LabwareDefinition]
-    deck_definition: DeckDefinitionV3
+    deck_definition: DeckDefinitionV4
 
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
@@ -114,7 +114,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV3,
+        deck_definition: DeckDefinitionV4,
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
@@ -304,7 +304,7 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
         return self._state.deck_definition
 
@@ -312,8 +312,31 @@ class LabwareView(HasState[LabwareState]):
         """Get the definition of a slot in the deck."""
         deck_def = self.get_deck_definition()
 
-        for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == slot.id:
+        # TODO(jbl 2023-10-19 this is all incredibly hacky and ultimately we should get rid of SlotDefV3, and maybe
+        #   move all this to another store/provider. However for now, this can be more or less equivalent and not break
+        #   things TM TM TM
+
+        for cutout in deck_def["locations"]["cutouts"]:
+            if cutout["id"] == slot.id:
+                base_position = cutout["position"]
+                break
+        else:
+            raise errors.SlotDoesNotExistError(
+                f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
+            )
+
+        for area in deck_def["locations"]["addressableAreas"]:
+            if area["id"] == slot.id:
+                offset = area["offsetFromCutoutFixture"]
+                position = [offset[0] + base_position[0], offset[1] + base_position[1], offset[2] + base_position[2]]
+                slot_def: SlotDefV3 = {
+                    "id": area["id"],
+                    "position": position,
+                    "boundingBox": area["boundingBox"],
+                    "displayName": area["displayName"],
+                    "compatibleModuleTypes": area["compatibleModuleTypes"],
+                    "matingSurfaceUnitVector": area["matingSurfaceUnitVector"]
+                }
                 return slot_def
 
         raise errors.SlotDoesNotExistError(

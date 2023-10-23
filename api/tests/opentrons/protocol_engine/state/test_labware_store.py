@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
@@ -34,47 +34,25 @@ from .command_fixtures import (
 
 @pytest.fixture
 def subject(
-    ot2_standard_deck_def: DeckDefinitionV3,
-    ot2_fixed_trash_def: LabwareDefinition,
+    ot2_standard_deck_def: DeckDefinitionV4,
 ) -> LabwareStore:
     """Get a LabwareStore test subject."""
     return LabwareStore(
         deck_definition=ot2_standard_deck_def,
-        deck_fixed_labware=[
-            DeckFixedLabware(
-                labware_id="fixedTrash",
-                location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
-                definition=ot2_fixed_trash_def,
-            )
-        ],
+        deck_fixed_labware=[],
     )
 
 
 def test_initial_state(
-    ot2_standard_deck_def: DeckDefinitionV3,
-    ot2_fixed_trash_def: LabwareDefinition,
+    ot2_standard_deck_def: DeckDefinitionV4,
     subject: LabwareStore,
 ) -> None:
     """It should create the labware store with preloaded fixed labware."""
-    expected_trash_uri = uri_from_details(
-        namespace=ot2_fixed_trash_def.namespace,
-        version=ot2_fixed_trash_def.version,
-        load_name=ot2_fixed_trash_def.parameters.loadName,
-    )
-
     assert subject.state == LabwareState(
         deck_definition=ot2_standard_deck_def,
-        labware_by_id={
-            "fixedTrash": LoadedLabware(
-                id="fixedTrash",
-                loadName=ot2_fixed_trash_def.parameters.loadName,
-                definitionUri=expected_trash_uri,
-                location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
-                offsetId=None,
-            )
-        },
+        labware_by_id={},
         labware_offsets_by_id={},
-        definitions_by_uri={expected_trash_uri: ot2_fixed_trash_def},
+        definitions_by_uri={},
     )
 
 
