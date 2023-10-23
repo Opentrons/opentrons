@@ -131,7 +131,6 @@ const render = () => {
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
         setFixtureLocation={mockSetFixtureLocation}
-        providedFixtureOptions={[]}
         setProvidedFixtureOptions={mockSetProvidedFixtureOptions}
       />
     </MemoryRouter>,

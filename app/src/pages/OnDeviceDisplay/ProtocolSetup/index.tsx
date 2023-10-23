@@ -585,7 +585,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         setFixtureLocation={setFixtureLocation}
         setProvidedFixtureOptions={setProvidedFixtureOptions}
-        providedFixtureOptions={providedFixtureOptions}
       />
     ),
     labware: (
