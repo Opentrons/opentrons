@@ -6,6 +6,18 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.0.1
+
+Welcome to the v7.0.1 release of the Opentrons robot software! This release builds on the major release that added support for Opentrons Flex.
+
+This update may take longer than usual if you are updating from v6.x. Allow **approximately 15 minutes** for your robot to restart. This delay will only happen once.
+
+### Known Issues
+
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool.
+
+---
+
 ## Opentrons Robot Software Changes in 7.0.0
 
 Welcome to the v7.0.0 release of the Opentrons robot software! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
@@ -21,7 +33,7 @@ Flex touchscreen
 - Manage instruments: View information about connected pipettes and the gripper. Attach, detach, or recalibrate instruments.
 - Robot settings: Customize the behavior of your Flex, including the LED and touchscreen displays.
 
-Flex features 
+Flex features
 
 - Analyze and run protocols that use the Flex robot, Flex pipettes, and Flex tip racks.
 - Move labware around the deck automatically with the Flex Gripper.
@@ -32,6 +44,7 @@ Python API features
 - Manually move labware around, off of, or onto the deck without ending your protocol.
 - Load adapters separately from labware (to allow moving labware onto or off of the adapter).
 - Use coordinate or numeric deck slot names interchangeably.
+- Set 50 µL pipettes to a low-volume mode for handling very small quantities of liquid.
 
 ### Improved Features
 
@@ -40,6 +53,7 @@ Python API features
 
 ### Bug Fixes
 
+- Fixed a problem with empty files being stored in the robot's database if the robot is power cycled at the wrong time.
 - The API no longer raises an error when dropping tips into labware other than the fixed trash.
 - All API versions now properly track tips, including starting at a well other than A1.
 

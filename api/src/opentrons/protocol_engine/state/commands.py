@@ -507,17 +507,13 @@ class CommandView(HasState[CommandState]):
         else:
             return run_error or finish_error
 
-    def get_running(self) -> Optional[str]:
-        """Return the ID of the command that's currently running, if any."""
-        return self._state.running_command_id
-
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
 
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
-        if self._state.running_command_id is not None:
+        if self._state.running_command_id:
             entry = self._state.commands_by_id[self._state.running_command_id]
             return CurrentCommand(
                 command_id=entry.command.id,

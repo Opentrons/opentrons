@@ -1,7 +1,9 @@
 // Deck Calibration Orchestration Component
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
 
+import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useConditionalConfirm } from '@opentrons/components'
 
@@ -65,11 +67,14 @@ export function CalibrateDeck(
     dispatchRequests,
     showSpinner,
     isJogging,
-    wasExitBeforeCompletion,
+    exitBeforeDeckConfigCompletion,
     offsetInvalidationHandler,
   } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
+
+  const queryClient = useQueryClient()
+  const host = useHost()
 
   const {
     showConfirmation: showConfirmExit,
@@ -97,8 +102,16 @@ export function CalibrateDeck(
   }
 
   function cleanUpAndExit(): void {
-    if (wasExitBeforeCompletion) {
-      wasExitBeforeCompletion.current = true
+    queryClient
+      .invalidateQueries([host, 'calibration'])
+      .catch((e: Error) =>
+        console.error(`error invalidating calibration queries: ${e.message}`)
+      )
+    if (
+      exitBeforeDeckConfigCompletion &&
+      currentStep !== Sessions.DECK_STEP_CALIBRATION_COMPLETE
+    ) {
+      exitBeforeDeckConfigCompletion.current = true
     }
     if (session?.id) {
       dispatchRequests(

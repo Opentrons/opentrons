@@ -11,7 +11,11 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { getLoadedLabware } from './utils/accessors'
-import { getLabwareName, getLabwareDisplayLocation } from './utils'
+import {
+  getLabwareName,
+  getLabwareDisplayLocation,
+  getFinalLabwareLocation,
+} from './utils'
 
 type PipettingRunTimeCommmand =
   | AspirateRunTimeCommand
@@ -32,9 +36,14 @@ export const PipettingCommandText = ({
   const { t } = useTranslation('protocol_command_text')
 
   const { labwareId, wellName } = command.params
-  const labwareLocation = getLoadedLabware(robotSideAnalysis, labwareId)
-    ?.location
-
+  const allPreviousCommands = robotSideAnalysis.commands.slice(
+    0,
+    robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+  )
+  const labwareLocation = getFinalLabwareLocation(
+    labwareId,
+    allPreviousCommands
+  )
   const displayLocation =
     labwareLocation != null
       ? getLabwareDisplayLocation(robotSideAnalysis, labwareLocation, t)
