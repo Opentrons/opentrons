@@ -439,7 +439,7 @@ def simulate(
 
     Each dict element in the run log has the following keys:
 
-        - ``level``: The depth at which this command is nested - if this an
+        - ``level``: The depth at which this command is nested. If this an
           aspirate inside a mix inside a transfer, for instance, it would be 3.
 
         - ``payload``: The command. The human-readable run log text is available at
