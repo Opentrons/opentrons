@@ -267,7 +267,7 @@ async def _main() -> None:
                     args.plunger_speed,
                     args.sensor_threshold]
         test_n , test_f  = file_setup(test_data, details)
-    # Some Constants
+    # Variables
     tip_column = 0
     columns_to_use = 12
     tip_length = {"T1K": 95.7, "T200": 58.35, "T50": 57.9}
@@ -295,8 +295,9 @@ async def _main() -> None:
     try:
         # Home
         await hw_api.home()
-        home_pos = await hw_api.current_position_ot3(mount, refresh=True)
         await hw_api.cache_instruments()
+        # Save home Position relative to nozzle location
+        home_pos = await hw_api.current_position_ot3(mount, refresh=True)
         await hw_api.home_plunger(mount)
         plunger_pos = get_plunger_positions_ot3(hw_api, mount)
         dial_offset = (50, 25, 50)
@@ -305,228 +306,248 @@ async def _main() -> None:
         x_offset = 0
         y_offset = 0
         tips_per_column = 8
-        if args.test == 'precision_liquid_sense_test':
-            cp = CriticalPoint.NOZZLE
-            dial_point = Point(slot_loc[args.dial_slot][0] + dial_offset[0],
-                                slot_loc[args.dial_slot][1] - dial_offset[1],
-                                slot_loc[args.dial_slot][2] + dial_offset[2])
-            await move_to_point(hw_api, mount, dial_point, speed = None, critical_point = cp)
+        cp = CriticalPoint.NOZZLE
+        dial_point = Point(slot_loc[args.dial_slot][0] + dial_offset[0],
+                            slot_loc[args.dial_slot][1] - dial_offset[1],
+                            slot_loc[args.dial_slot][2] + dial_offset[2])
+        await move_to_point(hw_api, mount, dial_point, speed = None, critical_point = cp)
 
-            current_position = await hw_api.current_position_ot3(mount, critical_point = cp,  refresh=True)
-            # Jog Nozzle to Dial Indicator
-            nozzle_loc = await _jog_axis(hw_api, current_position)
-            # Save Dial Indicator Nozzle Position
-            dial_readings = []
-            y_offset = 0
-            for nozzle in range(1, 9):
-                await asyncio.sleep(1)
+        current_position = await hw_api.current_position_ot3(mount, critical_point = cp,  refresh=True)
+        # Jog Nozzle to Dial Indicator
+        nozzle_loc = await _jog_axis(hw_api, current_position)
+        # Save Dial Indicator Nozzle Position
+        dial_readings = []
+        x_offset = 0
+        y_offset = 0
+        tip_count = 0
+        for nozzle in range(1, 96+1):
+            await asyncio.sleep(1)
+             x_offset -= 9
+            if tip_count % 12 == 0:
+                y_offset += 9
+            if tip_count % 12 == 0:
+                x_offset = 0
+            if args.dial_indicator:
                 nozzle_measurement = gauge.read()
                 dial_readings.append(nozzle_measurement)
                 current_position = await hw_api.current_position_ot3(mount, critical_point = cp,  refresh=True)
-                nozzle_pos = Point(nozzle_loc[Axis.X],
+                # Nozzle Location
+                nozzle_pos = Point(nozzle_loc[Axis.X] + x_offset,
+                                    nozzle_loc[Axis.Y] + y_offset,
+                                    nozzle_loc[Axis.by_mount(mount)])
+                if tip_count % 12 == 0:
+                    d_str = ''
+                    for m in measurements:
+                        d_str += str(m) + ','
+                    d_str = d_str[:-1] + '\n'
+                    print(f"{d_str}")
+                    data.append_data_to_file(test_n, test_f, d_str)
+                    # Reset Measurements list
+                    measurements = []
+                    print("\r\n")
+            await move_to_point(hw_api, mount, nozzle_pos, speed = None, critical_point = cp)
+        x_offset = 0
+        y_offset = 0
+        start_time =  time.time()
+        elasped_time = (time.time() - start_time)
+        test_data["Time"] = round(elasped_time, 3)
+        test_data["Pipette Pos(mm)"] = nozzle_measurement
+        test_data["Type"] = "Nozzle"
+        print(test_data)
+        d_str = f"{elasped_time}, {dial_readings[0]}, {dial_readings[1]}, {dial_readings[2]}, {dial_readings[3]}, {dial_readings[4]}, {dial_readings[5]}, {dial_readings[6]}, {dial_readings[7]} \n"
+        data.append_data_to_file(test_n, test_f, d_str)
+        tip_length = tip_length[args.tip_size]
+        approach_speed = 20
+        number_of_columns = int(tips_to_use/tips_per_column)
+        # iterate through columns
+        for tip in range(1, number_of_columns+1):
+            if tip <= 1:
+                cp = CriticalPoint.NOZZLE
+                tiprack_point = Point(slot_loc[args.tiprack_slot][0] + x_offset,
+                                        slot_loc[args.tiprack_slot][1] + y_offset,
+                                        slot_loc[args.tiprack_slot][2])
+                await move_to_point(hw_api, mount, tiprack_point, speed = None, critical_point = cp)
+                # Jog to tiprack location
+                current_position = await hw_api.current_position_ot3(mount, critical_point = cp, refresh=True)
+                tiprack_loc = await _jog_axis(hw_api, current_position)
+                # Pick up tip
+                await hw_api.pick_up_tip(mount, tip_length)
+                current_position = await hw_api.current_position_ot3(mount, critical_point = CriticalPoint.TIP, refresh = True)
+            else:
+                current_position = await hw_api.current_position_ot3(mount, refresh=True)
+                print(f"pos: {current_position}")
+                print(f"{tiprack_loc}")
+                # Move to safe height
+                tiprack_point = Point(tiprack_loc[Axis.X] + x_offset,
+                                    tiprack_loc[Axis.Y] + y_offset,
+                                    tiprack_loc[Axis.by_mount(mount)])
+                cp = CriticalPoint.NOZZLE
+                await move_to_point(hw_api, mount, tiprack_point, speed = None , critical_point = cp)
+                await hw_api.pick_up_tip(mount, tip_length)
+            if args.lp_method == 'push_air':
+                # Move the plunger to the top position
+                await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
+            else:
+                # Move the plunger to the bottom position
+                await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
+            z_safe_height = 20
+            # Relative to tip
+            if tip <= 1:
+                # Move XY to Dial Indicator slot
+                tip_home_pos = hw_api.get_instrument_max_height(mount, CriticalPoint.TIP)
+                tiprack_point = Point(slot_loc[args.dial_slot][0] + dial_offset[0],
+                                        slot_loc[args.dial_slot][1] - dial_offset[1],
+                                        tip_home_pos)
+                cp = CriticalPoint.TIP
+                await move_to_point(hw_api, mount, tiprack_point, speed = None, critical_point = cp)
+                current_position = await hw_api.current_position_ot3(mount,
+                                                                    critical_point = cp,
+                                                                    refresh = True)
+                tip_loc = await _jog_axis(hw_api, current_position)
+            else:
+                cp = CriticalPoint.TIP
+                # # Move XY to Dial Indicator slot
+                dial_loc_tip = Point(tip_loc[Axis.X],
+                                    tip_loc[Axis.Y],
+                                    tip_loc[Axis.by_mount(mount)])
+                await move_to_point(hw_api, mount, dial_loc_tip, speed = approach_speed, critical_point = cp)
+
+            # Save Dial Indicator Tip Position
+            dial_readings = []
+            x_offset = 0
+            y_offset = 0
+            for tip in range(1, 9):
+                await asyncio.sleep(1)
+                tip_measurement = gauge.read()
+                dial_readings.append(tip_measurement)
+                current_position = await hw_api.current_position_ot3(mount, critical_point = cp,  refresh=True)
+                nozzle_pos = Point(nozzle_loc[Axis.X] + x_offset,
                                         nozzle_loc[Axis.Y] + y_offset,
                                         nozzle_loc[Axis.by_mount(mount)])
                 await move_to_point(hw_api, mount, nozzle_pos, speed = None, critical_point = cp)
                 y_offset += 9
-            y_offset = 0
-            start_time =  time.time()
+            # Save Dial Indicator Tip Position
+            await asyncio.sleep(1)
+            tip_measurement = gauge.read()
             elasped_time = (time.time() - start_time)
-            test_data["Time"] = round(elasped_time, 3)
-            test_data["Pipette Pos(mm)"] = nozzle_measurement
-            test_data["Type"] = "Nozzle"
+            test_data["Time_D"] = round(elasped_time, 3)
+            test_data["Pipette Pos(mm)"] = tip_measurement
+            test_data["Type"] = "Tip"
             print(test_data)
-            d_str = f"{elasped_time}, {dial_readings[0]}, {dial_readings[1]}, {dial_readings[2]}, {dial_readings[3]}, {dial_readings[4]}, {dial_readings[5]}, {dial_readings[6]}, {dial_readings[7]} \n"
-            data.append_data_to_file(test_n, test_f, d_str)
-            tip_length = tip_length[args.tip_size]
-            approach_speed = 20
-            number_of_columns = int(tips_to_use/tips_per_column)
-            for tip in range(1, number_of_columns+1):
-                if tip <= 1:
-                    cp = CriticalPoint.NOZZLE
-                    tiprack_point = Point(slot_loc[args.tiprack_slot][0] + x_offset,
-                                            slot_loc[args.tiprack_slot][1] + y_offset,
-                                            slot_loc[args.tiprack_slot][2])
-                    await move_to_point(hw_api, mount, tiprack_point, speed = None, critical_point = cp)
-                    # Jog to tiprack location
-                    current_position = await hw_api.current_position_ot3(mount, critical_point = cp, refresh=True)
-                    tiprack_loc = await _jog_axis(hw_api, current_position)
-                    # Pick up tip
-                    await hw_api.pick_up_tip(mount, tip_length)
-                    current_position = await hw_api.current_position_ot3(mount, critical_point = CriticalPoint.TIP, refresh = True)
-                else:
-                    current_position = await hw_api.current_position_ot3(mount, refresh=True)
-                    print(f"pos: {current_position}")
-                    print(f"{tiprack_loc}")
-                    # Move to safe height
-                    tiprack_point = Point(tiprack_loc[Axis.X] + x_offset,
-                                        tiprack_loc[Axis.Y] + y_offset,
-                                        tiprack_loc[Axis.by_mount(mount)])
-                    cp = CriticalPoint.NOZZLE
-                    await move_to_point(hw_api, mount, tiprack_point, speed = None , critical_point = cp)
-                    await hw_api.pick_up_tip(mount, tip_length)
-                if args.lp_method == 'push_air':
-                    # Move the plunger to the top position
-                    await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[0])
-                else:
-                    # Move the plunger to the bottom position
-                    await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
-                z_safe_height = 20
-                # Relative to tip
-                if tip <= 1:
-                    # Move XY to Dial Indicator slot
-                    tip_home_pos = hw_api.get_instrument_max_height(mount, CriticalPoint.TIP)
-                    tiprack_point = Point(slot_loc[args.dial_slot][0] + dial_offset[0],
-                                            slot_loc[args.dial_slot][1] - dial_offset[1],
-                                            tip_home_pos)
-                    cp = CriticalPoint.TIP
-                    await move_to_point(hw_api, mount, tiprack_point, speed = None, critical_point = cp)
-                    current_position = await hw_api.current_position_ot3(mount,
-                                                                        critical_point = cp,
-                                                                        refresh = True)
-                    tip_loc = await _jog_axis(hw_api, current_position)
-                else:
-                    cp = CriticalPoint.TIP
-                    # # Move XY to Dial Indicator slot
-                    dial_loc_tip = Point(tip_loc[Axis.X],
-                                        tip_loc[Axis.Y],
-                                        tip_loc[Axis.by_mount(mount)])
-                    await move_to_point(hw_api, mount, dial_loc_tip, speed = approach_speed, critical_point = cp)
-
-                # Save Dial Indicator Tip Position
-                dial_readings = []
-                y_offset = 0
-                for tip in range(1, 9):
-                    await asyncio.sleep(1)
-                    tip_measurement = gauge.read()
-                    dial_readings.append(tip_measurement)
-                    current_position = await hw_api.current_position_ot3(mount, critical_point = cp,  refresh=True)
-                    nozzle_pos = Point(nozzle_loc[Axis.X],
-                                            nozzle_loc[Axis.Y] + y_offset,
-                                            nozzle_loc[Axis.by_mount(mount)])
-                    await move_to_point(hw_api, mount, nozzle_pos, speed = None, critical_point = cp)
-                    y_offset += 9
-                # Save Dial Indicator Tip Position
-                await asyncio.sleep(1)
-                tip_measurement = gauge.read()
-                elasped_time = (time.time() - start_time)
-                test_data["Time_D"] = round(elasped_time, 3)
-                test_data["Pipette Pos(mm)"] = tip_measurement
-                test_data["Type"] = "Tip"
-                print(test_data)
-                # Move XY to Dial Indicator slot
-                # Jog to top of trough location
-                if tip <= 1:
-                    home_position = await hw_api.current_position_ot3(mount, refresh=True)
-                    trough_point = Point(slot_loc[args.trough_slot][0],
-                                                        slot_loc[args.trough_slot][1],
-                                                        slot_loc[args.trough_slot][2])
-                    cp = CriticalPoint.TIP
-                    await move_to_point(hw_api, mount, trough_point, speed = None, critical_point = cp)
-                    p_average = await get_average_pressure(hw_api, mount, 20)
-                    current_position = await hw_api.current_position_ot3(mount, refresh=True)
-                    print(" Move to the liquid height")
-                    true_liquid_height = await _jog_axis(hw_api, current_position)
-                    print(" Move up to the top of the well")
-                    trough_loc = await _jog_axis(hw_api, current_position)
-                else:
-                    trough_point = Point(trough_loc[Axis.X],
-                                        trough_loc[Axis.Y],
-                                        trough_loc[Axis.by_mount(mount)])
-                    # Move to trought slot
-                    cp = CriticalPoint.TIP
-                    await move_to_point(hw_api, mount, trough_point, speed = None, critical_point = cp)
-                    p_average = await get_average_pressure(hw_api, mount, 20)
-
-                initial_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
-                initial_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
-                # Probe Liquid
-                init_probe_time = (time.time() - start_time)
-                liquid_height_pos = await hw_api.liquid_probe(mount, probe_settings = liquid_probe_settings)
-                # store_data(ls_data, tip)
-                end_probe_time = (time.time() - start_time)
-                end_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
-                end_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
-                test_data["Time_L"] = elasped_time
-                test_data["Triggered_z_pos"] = liquid_height_pos[0][Axis.by_mount(mount)]
-                test_data["Triggered_zenc_pos"] = liquid_height_pos[1][Axis.by_mount(mount)]
-                test_data["init_Time_L"] = init_probe_time
-                test_data["end_Time_L"] = end_probe_time
-                test_data["init_z_pos(mm)"] = initial_motor_pos[Axis.by_mount(mount)]
-                test_data["init_zenc_pos(mm)"] = initial_enc_pos[Axis.by_mount(mount)]
-                test_data["init_pmotor_pos(mm)"] = initial_motor_pos[Axis.of_main_tool_actuator(mount)]
-                test_data["init_penc_pos(mm)"] = initial_enc_pos[Axis.of_main_tool_actuator(mount)]
-                test_data["end_z_pos(mm)"] = end_motor_pos[Axis.by_mount(mount)]
-                test_data["end_zenc_pos(mm)"] = end_enc_pos[Axis.by_mount(mount)]
-                test_data["end_pmotor_pos(mm)"] = end_motor_pos[Axis.of_main_tool_actuator(mount)]
-                test_data["end_penc_pos(mm)"] = end_enc_pos[Axis.of_main_tool_actuator(mount)]
-                # print(test_data)
-                # print("True Liquid Height: ",true_liquid_height)
-                d_str = f"{elasped_time}, \
-                            {dial_readings[0]}, \
-                            {dial_readings[1]}, \
-                            {dial_readings[2]}, \
-                            {dial_readings[3]}, \
-                            {dial_readings[4]}, \
-                            {dial_readings[5]}, \
-                            {dial_readings[6]}, \
-                            {dial_readings[7]}, \
-                            Tip, \
-                            {liquid_height_pos[0][Axis.by_mount(mount)]}, \
-                            {liquid_height_pos[1][Axis.by_mount(mount)]}, \
-                            {init_probe_time}, \
-                            {end_probe_time}, \
-                            {initial_motor_pos[Axis.by_mount(mount)]}, \
-                            {initial_enc_pos[Axis.by_mount(mount)]}, \
-                            {initial_motor_pos[Axis.of_main_tool_actuator(mount)]}, \
-                            {initial_enc_pos[Axis.of_main_tool_actuator(mount)]}, \
-                            {end_motor_pos[Axis.by_mount(mount)]}, \
-                            {end_enc_pos[Axis.by_mount(mount)]}, \
-                            {end_motor_pos[Axis.of_main_tool_actuator(mount)]}, \
-                            {end_enc_pos[Axis.of_main_tool_actuator(mount)]}, \
-                            {tip}, \
-                            {true_liquid_height[Axis.by_mount(mount)]}, \
-                            {args.mount_speed}, \
-                            {args.plunger_speed}, \
-                            {args.sensor_threshold}, \
-                            {p_average}\n"
-                # print(d_str)
-                init_ls = true_liquid_height[Axis.by_mount(mount)]
-                triggered_ls = liquid_height_pos[1][Axis.by_mount(mount)]
-                delta = init_ls - triggered_ls
-                print("True Liquid Height: ", true_liquid_height[Axis.by_mount(mount)])
-                print("Triggered LS Height: ", liquid_height_pos[1][Axis.by_mount(mount)])
-                print("Liquid Surface Depth: ", delta)
-
-                data.append_data_to_file(test_n, test_f, d_str)
-                if pipette_model == 'p50_multi_flex':
-                    # Blow out a bit
-                    await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2)
-                else:
-                    await move_plunger_relative_ot3(hw_api, mount, 0.25, None, speed = 2)
-                current_position = await hw_api.current_position_ot3(mount,
-                                                                    critical_point = CriticalPoint.TIP,
-                                                                    refresh=True)
-                current_position = await hw_api.current_position_ot3(mount, refresh=True)
-                trash_point = Point(slot_loc["A3"][0] + 50,
-                                    slot_loc["A3"][1] - 20,
-                                    current_position[Axis.by_mount(mount)])
+            # Move XY to Dial Indicator slot
+            # Jog to top of trough location
+            if tip <= 1:
+                home_position = await hw_api.current_position_ot3(mount, refresh=True)
+                trough_point = Point(slot_loc[args.trough_slot][0],
+                                                    slot_loc[args.trough_slot][1],
+                                                    slot_loc[args.trough_slot][2])
                 cp = CriticalPoint.TIP
-                await move_to_point(hw_api, mount, trash_point, speed = None, critical_point = cp)
-                # move plunger to bottom
-                await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
-                # # Move to trash slot
-                # Drop tip
-                await hw_api.drop_tip(mount, home_after = True)
+                await move_to_point(hw_api, mount, trough_point, speed = None, critical_point = cp)
+                p_average = await get_average_pressure(hw_api, mount, 20)
                 current_position = await hw_api.current_position_ot3(mount, refresh=True)
-                await hw_api.move_to(mount, Point(current_position[Axis.X],
-                                                    current_position[Axis.Y],
-                                                    home_pos[Axis.by_mount(mount)]))
-                # cp = CriticalPoint.TIP
-                # await move_to_point(hw_api, mount, trash_point, speed = None, cp)
-                tip_count += 1
-                x_offset += 9
-                target_file = 'pressure_sensor_data.csv'
-                rename_file('/var/', target_file)
+                print(" Move to the liquid height")
+                true_liquid_height = await _jog_axis(hw_api, current_position)
+                print(" Move up to the top of the well")
+                trough_loc = await _jog_axis(hw_api, current_position)
+            else:
+                trough_point = Point(trough_loc[Axis.X],
+                                    trough_loc[Axis.Y],
+                                    trough_loc[Axis.by_mount(mount)])
+                # Move to trought slot
+                cp = CriticalPoint.TIP
+                await move_to_point(hw_api, mount, trough_point, speed = None, critical_point = cp)
+                p_average = await get_average_pressure(hw_api, mount, 20)
+
+            initial_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
+            initial_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
+            # Probe Liquid
+            init_probe_time = (time.time() - start_time)
+            liquid_height_pos = await hw_api.liquid_probe(mount, probe_settings = liquid_probe_settings)
+            # store_data(ls_data, tip)
+            end_probe_time = (time.time() - start_time)
+            end_motor_pos = await hw_api.current_position_ot3(mount, refresh = True)
+            end_enc_pos = await hw_api.encoder_current_position_ot3(mount, refresh = True)
+            test_data["Time_L"] = elasped_time
+            test_data["Triggered_z_pos"] = liquid_height_pos[0][Axis.by_mount(mount)]
+            test_data["Triggered_zenc_pos"] = liquid_height_pos[1][Axis.by_mount(mount)]
+            test_data["init_Time_L"] = init_probe_time
+            test_data["end_Time_L"] = end_probe_time
+            test_data["init_z_pos(mm)"] = initial_motor_pos[Axis.by_mount(mount)]
+            test_data["init_zenc_pos(mm)"] = initial_enc_pos[Axis.by_mount(mount)]
+            test_data["init_pmotor_pos(mm)"] = initial_motor_pos[Axis.of_main_tool_actuator(mount)]
+            test_data["init_penc_pos(mm)"] = initial_enc_pos[Axis.of_main_tool_actuator(mount)]
+            test_data["end_z_pos(mm)"] = end_motor_pos[Axis.by_mount(mount)]
+            test_data["end_zenc_pos(mm)"] = end_enc_pos[Axis.by_mount(mount)]
+            test_data["end_pmotor_pos(mm)"] = end_motor_pos[Axis.of_main_tool_actuator(mount)]
+            test_data["end_penc_pos(mm)"] = end_enc_pos[Axis.of_main_tool_actuator(mount)]
+            # print(test_data)
+            # print("True Liquid Height: ",true_liquid_height)
+            d_str = f"{elasped_time}, \
+                        {dial_readings[0]}, \
+                        {dial_readings[1]}, \
+                        {dial_readings[2]}, \
+                        {dial_readings[3]}, \
+                        {dial_readings[4]}, \
+                        {dial_readings[5]}, \
+                        {dial_readings[6]}, \
+                        {dial_readings[7]}, \
+                        Tip, \
+                        {liquid_height_pos[0][Axis.by_mount(mount)]}, \
+                        {liquid_height_pos[1][Axis.by_mount(mount)]}, \
+                        {init_probe_time}, \
+                        {end_probe_time}, \
+                        {initial_motor_pos[Axis.by_mount(mount)]}, \
+                        {initial_enc_pos[Axis.by_mount(mount)]}, \
+                        {initial_motor_pos[Axis.of_main_tool_actuator(mount)]}, \
+                        {initial_enc_pos[Axis.of_main_tool_actuator(mount)]}, \
+                        {end_motor_pos[Axis.by_mount(mount)]}, \
+                        {end_enc_pos[Axis.by_mount(mount)]}, \
+                        {end_motor_pos[Axis.of_main_tool_actuator(mount)]}, \
+                        {end_enc_pos[Axis.of_main_tool_actuator(mount)]}, \
+                        {tip}, \
+                        {true_liquid_height[Axis.by_mount(mount)]}, \
+                        {args.mount_speed}, \
+                        {args.plunger_speed}, \
+                        {args.sensor_threshold}, \
+                        {p_average}\n"
+            # print(d_str)
+            init_ls = true_liquid_height[Axis.by_mount(mount)]
+            triggered_ls = liquid_height_pos[1][Axis.by_mount(mount)]
+            delta = init_ls - triggered_ls
+            print("True Liquid Height: ", true_liquid_height[Axis.by_mount(mount)])
+            print("Triggered LS Height: ", liquid_height_pos[1][Axis.by_mount(mount)])
+            print("Liquid Surface Depth: ", delta)
+
+            data.append_data_to_file(test_n, test_f, d_str)
+            if pipette_model == 'p50_multi_flex':
+                # Blow out a bit
+                await move_plunger_relative_ot3(hw_api, mount, 1.5, None, speed = 2)
+            else:
+                await move_plunger_relative_ot3(hw_api, mount, 0.25, None, speed = 2)
+            current_position = await hw_api.current_position_ot3(mount,
+                                                                critical_point = CriticalPoint.TIP,
+                                                                refresh=True)
+            current_position = await hw_api.current_position_ot3(mount, refresh=True)
+            trash_point = Point(slot_loc["A3"][0] + 50,
+                                slot_loc["A3"][1] - 20,
+                                current_position[Axis.by_mount(mount)])
+            cp = CriticalPoint.TIP
+            await move_to_point(hw_api, mount, trash_point, speed = None, critical_point = cp)
+            # move plunger to bottom
+            await move_plunger_absolute_ot3(hw_api, mount, plunger_pos[1])
+            # # Move to trash slot
+            # Drop tip
+            await hw_api.drop_tip(mount, home_after = True)
+            current_position = await hw_api.current_position_ot3(mount, refresh=True)
+            await hw_api.move_to(mount, Point(current_position[Axis.X],
+                                                current_position[Axis.Y],
+                                                home_pos[Axis.by_mount(mount)]))
+            # cp = CriticalPoint.TIP
+            # await move_to_point(hw_api, mount, trash_point, speed = None, cp)
+            tip_count += 1
+            x_offset += 9
+            target_file = 'pressure_sensor_data.csv'
+            rename_file('/var/', target_file)
 
         await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     except KeyboardInterrupt:
