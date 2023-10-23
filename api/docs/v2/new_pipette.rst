@@ -318,12 +318,13 @@ The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a l
     
 .. versionadded:: 2.15
 
-Setting the volume mode changes the minimum and maximum volume of Flex 50 µL pipettes as follows:
+Passing different values to ``configure_for_volume()`` changes the minimum and maximum volume of Flex 50 µL pipettes as follows:
 
 .. list-table::
     :header-rows: 1
+    :widths: 2 3 3
     
-    * - ``configure_for_volume()`` Value
+    * - Value
       - Minimum Volume (µL)
       - Maximum Volume (µL)
     * - 1–4.9
