@@ -1619,32 +1619,38 @@ class InstrumentContext(publisher.CommandPublisher):
     def prepare_for_aspirate(self) -> None:
         """Prepare a pipette for aspiration.
 
-        Before pipettes can aspirate volume, the plunger must be at the bottom of the pipette
-        (dropping a tip or blowing out moves the plunger to other positions). This function
-        moves the plunger to the bottom of the pipette to make sure it's ready to aspirate.
+        Before a pipette can aspirate into an empty tip, the plunger must be in its
+        bottom position. After dropping a tip or blowing out, the plunger will be in a
+        different position. This function moves the plunger to the bottom position,
+        regardless of its current position, to make sure that the pipette is ready to
+        aspirate.
 
-        The Opentrons Protocol API generally ensures that the pipette is prepared for aspiration
-        before you aspirate - the pipette is prepared for aspiration after picking up a tip and,
-        if necessary, just before aspiration. You rarely need to call this function.
+        You rarely need to call this function. The API automatically prepares the
+        pipette for aspiration as part of other commands:
+        
+            - After picking up a tip with :py:meth:`.pick_up_tip`.
+            - When calling :py:meth:`.aspirate`, if the pipette isn't already prepared.
+              If the pipette is in a well, it will move out of the well, move the plunger,
+              and then move back.
 
-        However, this function is the way to prepare the pipette explicitly under your control so
-        you can later aspirate from within a well without moving the pipette around. For instance,
-        if you want to write a prewet routine like this:
+        Use ``prepare_to_aspirate`` when you need to control exactly when the plunger
+        motion will happen. A common use case is a pre-wetting routine, which requires
+        preparing for aspiration, moving into a well, and then aspirating *without
+        leaving the well*::
 
-        .. code-block::
+             pipette.move_to(well.top(z=-5))
+             pipette.delay(5)
+             pipette.mix(10, 10)
+             pipette.blow_out()
+             pipette.prepare_for_aspirate()
+             pipette.move_to(well.top(z=-5))
+             pipette.delay(5)
+             pipette.aspirate(10, well.top(z=-5))
 
-             instrument.move_to(well.top(z=-5))
-             instrument.delay(5)
-             instrument.mix(10, 10)
-             instrument.blow_out()
-             instrument.prepare_for_aspirate()
-             instrument.move_to(well.top(z=-5))
-             instrument.delay(5)
-             instrument.aspirate(10, well.top(z=-5))
-
-        The call to ``instrument.prepare_for_aspirate()`` means that the pipette will be prepared for
-        aspirate already when it reaches the last line and does not need to prepare again, so it will
-        not move up out of the well before aspirating.
+        The call to ``prepare_for_aspirate()`` means that the plunger will be in the
+        bottom position before the call to ``aspirate()``. Since it doesn't need to
+        prepare again, it will not move up out of the well to move the plunger. It will
+        aspirate in place.
         """
         if self._core.get_current_volume():
             raise CommandPreconditionViolated(
