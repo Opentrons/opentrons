@@ -23,7 +23,7 @@ discovery_client_dir := ../discovery-client
 # behavior of jest. For instance,
 # make test tests=src/pages/Labware/__tests__/hooks.test.tsx would run only the
 # specified test
-tests ?= $(SRC_PATH)/src
+tests ?=
 cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app/src/**/*.(js|ts|tsx)'
 test_opts ?=
 

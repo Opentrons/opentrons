@@ -85,7 +85,7 @@ jobs:
           make setup-js
       - name: 'test frontend packages'
         run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="app/src/**/*.(js|ts|tsx)" app/src components/src shared-data/js
+          make -C app test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
