@@ -498,6 +498,152 @@ describe('CheckItem', () => {
     )
   })
 
+  it('executes correct chained commands when confirm position clicked with HS and adapter', async () => {
+    props = {
+      ...props,
+      location: { slotName: 'D1', moduleModel: HEATERSHAKER_MODULE_V1 },
+      adapterId: 'adapterId',
+      moduleId: 'heaterShakerId',
+      protocolData: {
+        ...props.protocolData,
+        modules: [
+          {
+            id: 'heaterShakerId',
+            model: HEATERSHAKER_MODULE_V1,
+            location: { slotName: 'D3' },
+            serialNumber: 'firstHSSerial',
+          },
+        ],
+      },
+      workingOffsets: [
+        {
+          location: { slotName: 'D1', moduleModel: HEATERSHAKER_MODULE_V1 },
+          labwareId: 'labwareId1',
+          initialPosition: { x: 1, y: 2, z: 3 },
+          finalPosition: null,
+        },
+      ],
+    }
+    when(mockChainRunCommands)
+      .calledWith(
+        [
+          {
+            commandType: 'savePosition',
+            params: { pipetteId: 'pipetteId1' },
+          },
+          {
+            commandType: 'retractAxis' as const,
+            params: {
+              axis: 'leftZ',
+            },
+          },
+          {
+            commandType: 'retractAxis' as const,
+            params: {
+              axis: 'x',
+            },
+          },
+          {
+            commandType: 'retractAxis' as const,
+            params: {
+              axis: 'y',
+            },
+          },
+          {
+            commandType: 'heaterShaker/openLabwareLatch',
+            params: { moduleId: 'heaterShakerId' },
+          },
+          {
+            commandType: 'moveLabware',
+            params: {
+              labwareId: 'labwareId1',
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+          {
+            commandType: 'moveLabware',
+            params: {
+              labwareId: 'adapterId',
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ],
+        false
+      )
+      .mockImplementation(() =>
+        Promise.resolve([
+          {
+            data: {
+              commandType: 'savePosition',
+              result: { position: mockEndPosition },
+            },
+          },
+          {},
+          {},
+          {},
+          {},
+          {},
+          {},
+        ])
+      )
+
+    const { getByRole } = render(props)
+    await getByRole('button', { name: 'Confirm position' }).click()
+
+    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          commandType: 'savePosition',
+          params: { pipetteId: 'pipetteId1' },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'leftZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'x' },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'y' },
+        },
+        {
+          commandType: 'heaterShaker/openLabwareLatch',
+          params: { moduleId: 'heaterShakerId' },
+        },
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'labwareId1',
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+        {
+          commandType: 'moveLabware',
+          params: {
+            labwareId: 'adapterId',
+            newLocation: 'offDeck',
+            strategy: 'manualMoveWithoutPause',
+          },
+        },
+      ],
+      false
+    )
+    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+      type: 'finalPosition',
+      labwareId: 'labwareId1',
+      location: { slotName: 'D1', moduleModel: HEATERSHAKER_MODULE_V1 },
+      position: mockEndPosition,
+    })
+  })
+
   it('executes thermocycler open lid command on mount if checking labware on thermocycler', () => {
     props = {
       ...props,

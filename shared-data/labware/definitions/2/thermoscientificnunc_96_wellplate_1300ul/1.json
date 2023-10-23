@@ -14,7 +14,7 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "brand": {
-    "brand": "Thermo Scientific Nunc",
+    "brand": "Thermo Scientific",
     "brandId": ["260251", "260252"],
     "links": ["https://www.thermofisher.com/order/catalog/product/260251"]
   },

@@ -17,12 +17,15 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
+  Fixture,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
   NON_CONNECTING_MODULE_TYPES,
+  STANDARD_SLOT_LOAD_NAME,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -56,14 +59,15 @@ import {
 } from './utils'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
+import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
 
+import type { CommandData } from '@opentrons/api-client'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
-import type { CommandData } from '@opentrons/api-client'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 
@@ -86,6 +90,7 @@ interface RenderModuleStatusProps {
     commands: ModulePrepCommandsType[],
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
+  conflictedFixture?: Fixture
 }
 
 function RenderModuleStatus({
@@ -96,8 +101,10 @@ function RenderModuleStatus({
   setShowModuleWizard,
   setPrepCommandErrorMessage,
   chainLiveCommands,
+  conflictedFixture,
 }: RenderModuleStatusProps): JSX.Element {
   const { makeSnackbar } = useToaster()
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
 
   const handleCalibrate = (): void => {
@@ -129,10 +136,21 @@ function RenderModuleStatus({
       {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
     </>
   )
+  if (conflictedFixture != null && enableDeckConfig) {
+    moduleStatus = (
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+        <Chip
+          text={t('location_conflict')}
+          type="warning"
+          background={false}
+          iconName="connection-status"
+        />
 
-  if (
+        <Icon name="more" size="3rem" />
+      </Flex>
+    )
+  } else if (
     isModuleReady &&
-    calibrationStatus.complete &&
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
@@ -184,6 +202,7 @@ interface RowModuleProps {
   ) => Promise<CommandData[]>
   prepCommandErrorMessage: string
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
+  conflictedFixture?: Fixture
 }
 
 function RowModule({
@@ -195,6 +214,7 @@ function RowModule({
   isLoading,
   prepCommandErrorMessage,
   setPrepCommandErrorMessage,
+  conflictedFixture,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
@@ -204,6 +224,10 @@ function RowModule({
     isNonConnectingModule || module.attachedModuleMatch != null
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
+  const [
+    showLocationConflictModal,
+    setShowLocationConflictModal,
+  ] = React.useState<boolean>(false)
 
   return (
     <>
@@ -218,11 +242,20 @@ function RowModule({
           }
         />
       ) : null}
+      {showLocationConflictModal && conflictedFixture != null ? (
+        <LocationConflictModal
+          onCloseClick={() => setShowLocationConflictModal(false)}
+          cutout={conflictedFixture.fixtureLocation}
+          requiredModule={module.moduleDef.model}
+          isOnDevice={true}
+        />
+      ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={
           isModuleReady &&
-          module.attachedModuleMatch?.moduleOffset?.last_modified != null
+          module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
+          conflictedFixture == null
             ? COLORS.green3
             : COLORS.yellow3
         }
@@ -263,6 +296,11 @@ function RowModule({
             flex="3 0 0"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            onClick={
+              conflictedFixture != null
+                ? () => setShowLocationConflictModal(true)
+                : undefined
+            }
           >
             <RenderModuleStatus
               isModuleReady={isModuleReady}
@@ -272,6 +310,7 @@ function RowModule({
               setShowModuleWizard={setShowModuleWizard}
               chainLiveCommands={chainLiveCommands}
               setPrepCommandErrorMessage={setPrepCommandErrorMessage}
+              conflictedFixture={conflictedFixture}
             />
           </Flex>
         )}
@@ -280,7 +319,7 @@ function RowModule({
   )
 }
 
-interface ProtocolSetupModulesProps {
+interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
 }
@@ -288,10 +327,10 @@ interface ProtocolSetupModulesProps {
 /**
  * an ODD screen on the Protocol Setup page
  */
-export function ProtocolSetupModules({
+export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
-}: ProtocolSetupModulesProps): JSX.Element {
+}: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
   const [
@@ -311,7 +350,7 @@ export function ProtocolSetupModules({
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
-
+  const { data: deckConfig } = useDeckConfigurationQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
@@ -465,6 +504,11 @@ export function ProtocolSetupModules({
                   isLoading={isCommandMutationLoading}
                   prepCommandErrorMessage={prepCommandErrorMessage}
                   setPrepCommandErrorMessage={setPrepCommandErrorMessage}
+                  conflictedFixture={deckConfig?.find(
+                    fixture =>
+                      fixture.fixtureLocation === module.slotName &&
+                      fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+                  )}
                 />
               )
             })}

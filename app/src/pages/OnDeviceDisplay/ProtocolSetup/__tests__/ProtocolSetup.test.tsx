@@ -22,12 +22,14 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
 } from '../../../../organisms/Devices/hooks'
+import { getLocalRobot } from '../../../../redux/discovery'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupModules } from '../../../../organisms/ProtocolSetupModules'
-import { getUnmatchedModulesForProtocol } from '../../../../organisms/ProtocolSetupModules/utils'
+import { ProtocolSetupModulesAndDeck } from '../../../../organisms/ProtocolSetupModulesAndDeck'
+import { getUnmatchedModulesForProtocol } from '../../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { useLaunchLPC } from '../../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '../../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockProtocolModuleInfo } from '../../../../organisms/ProtocolSetupInstruments/__fixtures__'
@@ -65,13 +67,14 @@ jest.mock(
 jest.mock(
   '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 )
-jest.mock('../../../../organisms/ProtocolSetupModules')
-jest.mock('../../../../organisms/ProtocolSetupModules/utils')
+jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck')
+jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck/utils')
 jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../../organisms/ToasterOven')
 
@@ -87,8 +90,8 @@ const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunc
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
 >
-const mockProtocolSetupModules = ProtocolSetupModules as jest.MockedFunction<
-  typeof ProtocolSetupModules
+const mockProtocolSetupModulesAndDeck = ProtocolSetupModulesAndDeck as jest.MockedFunction<
+  typeof ProtocolSetupModulesAndDeck
 >
 const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof getUnmatchedModulesForProtocol
@@ -136,6 +139,12 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
+>
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
 >
 
 const render = (path = '/') => {
@@ -210,8 +219,8 @@ describe('ProtocolSetup', () => {
     mockLaunchLPC = jest.fn()
     mockUseLPCDisabledReason.mockReturnValue(null)
     mockUseAttachedModules.mockReturnValue([])
-    mockProtocolSetupModules.mockReturnValue(
-      <div>Mock ProtocolSetupModules</div>
+    mockProtocolSetupModulesAndDeck.mockReturnValue(
+      <div>Mock ProtocolSetupModulesAndDeck</div>
     )
     mockProtocolSetupLiquids.mockReturnValue(
       <div>Mock ProtocolSetupLiquids</div>
@@ -219,6 +228,8 @@ describe('ProtocolSetup', () => {
     mockConfirmCancelRunModal.mockReturnValue(
       <div>Mock ConfirmCancelRunModal</div>
     )
+    mockUseModuleCalibrationStatus.mockReturnValue({ complete: true })
+    mockGetLocalRobot.mockReturnValue({ name: '123' } as any)
     when(mockUseRunControls)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -335,9 +346,9 @@ describe('ProtocolSetup', () => {
       .calledWith([], mockProtocolModuleInfo)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
+    expect(queryByText('Mock ProtocolSetupModulesAndDeck')).toBeNull()
     queryByText('Modules')?.click()
-    getByText('Mock ProtocolSetupModules')
+    getByText('Mock ProtocolSetupModulesAndDeck')
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {

@@ -30,6 +30,7 @@ import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
 import { FLEX_TRASH_DEF_URI } from '../../../constants'
+import { StagingAreasRow } from '../StagingAreasRow'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
@@ -290,9 +291,10 @@ describe('EditModulesCard', () => {
       true
     )
   })
-  it('displays gripper waste chute and trash row with all are attached', () => {
+  it('displays gripper waste chute, staging area, and trash row with all are attached', () => {
     const mockGripperId = 'gripperId'
     const mockWasteChuteId = 'wasteChuteId'
+    const mockStagingAreaId = 'stagingAreaId'
     mockGetEnableDeckModification.mockReturnValue(true)
     mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     mockGetAdditionalEquipment.mockReturnValue({
@@ -301,6 +303,11 @@ describe('EditModulesCard', () => {
         name: 'wasteChute',
         id: mockWasteChuteId,
         location: 'D3',
+      },
+      mockStagingAreaId: {
+        name: 'stagingArea',
+        id: mockStagingAreaId,
+        location: 'B3',
       },
     })
     mockGetLabwareEntities.mockReturnValue({
@@ -316,5 +323,6 @@ describe('EditModulesCard', () => {
     }
     const wrapper = render(props)
     expect(wrapper.find(AdditionalItemsRow)).toHaveLength(3)
+    expect(wrapper.find(StagingAreasRow)).toHaveLength(1)
   })
 })

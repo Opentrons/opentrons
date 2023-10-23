@@ -160,4 +160,4 @@ opentrons-robot-app.tar.gz
 *.swp
 
 # asdf versions file
-*.tool-versions
+.tool-versions

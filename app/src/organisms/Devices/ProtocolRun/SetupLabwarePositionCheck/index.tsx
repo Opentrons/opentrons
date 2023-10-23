@@ -22,6 +22,7 @@ import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
 import type { LabwareOffset } from '@opentrons/api-client'
+import { getLatestCurrentOffsets } from './utils'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void
@@ -74,15 +75,17 @@ export function SetupLabwarePositionCheck(
 
   const { launchLPC, LPCWizard } = useLaunchLPC(runId, protocolName)
 
+  const nonIdentityOffsets = getLatestCurrentOffsets(sortedOffsets)
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       marginTop={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >
-      {sortedOffsets.length > 0 ? (
+      {nonIdentityOffsets.length > 0 ? (
         <CurrentOffsetsTable
-          currentOffsets={sortedOffsets}
+          currentOffsets={nonIdentityOffsets}
           commands={protocolData?.commands ?? []}
           labware={protocolData?.labware ?? []}
           modules={protocolData?.modules ?? []}

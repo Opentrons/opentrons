@@ -18,6 +18,7 @@ interface EquipmentOptionProps extends StyleProps {
   text: React.ReactNode
   image?: React.ReactNode
   showCheckbox?: boolean
+  disabled?: boolean
 }
 export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const {
@@ -26,6 +27,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     isSelected,
     image = null,
     showCheckbox = false,
+    disabled = false,
     ...styleProps
   } = props
   return (
@@ -34,10 +36,13 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       width="21.75rem"
       padding={SPACING.spacing8}
-      border={isSelected ? BORDERS.activeLineBorder : BORDERS.lineBorder}
+      border={
+        isSelected && !disabled ? BORDERS.activeLineBorder : BORDERS.lineBorder
+      }
       borderRadius={BORDERS.borderRadiusSize2}
-      cursor="pointer"
-      onClick={onClick}
+      cursor={disabled ? 'auto' : 'pointer'}
+      backgroundColor={disabled ? COLORS.darkGreyDisabled : COLORS.transparent}
+      onClick={disabled ? undefined : onClick}
       {...styleProps}
     >
       {showCheckbox ? (
@@ -57,7 +62,11 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       >
         {image}
       </Flex>
-      <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
+      <Text
+        as="p"
+        fontSize={TYPOGRAPHY.fontSizeP}
+        color={disabled ? COLORS.errorDisabled : COLORS.darkBlackEnabled}
+      >
         {text}
       </Text>
     </Flex>

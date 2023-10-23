@@ -61,7 +61,7 @@ export function InstrumentsAndModules({
   )?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isFlex = useIsFlex(robotName)
   const [
     subsystemToUpdate,
@@ -153,6 +153,8 @@ export function InstrumentsAndModules({
             subsystem={subsystemToUpdate}
             proceed={() => setSubsystemToUpdate(null)}
             description={t('updating_firmware')}
+            proceedDescription={t('firmware_up_to_date')}
+            isOnDevice={false}
           />
         </ModalShell>
       )}
@@ -182,9 +184,10 @@ export function InstrumentsAndModules({
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
-        {getShowPipetteCalibrationWarning(attachedInstruments) &&
-        (currentRunId == null || isRunTerminal) ? (
-          <Flex paddingBottom={SPACING.spacing16}>
+        {isRobotViewable &&
+        getShowPipetteCalibrationWarning(attachedInstruments) &&
+        (isRunTerminal || currentRunId == null) ? (
+          <Flex paddingBottom={SPACING.spacing16} width="100%">
             <PipetteRecalibrationWarning />
           </Flex>
         ) : null}
@@ -213,7 +216,7 @@ export function InstrumentsAndModules({
                 pipetteIs96Channel={is96ChannelAttached}
                 pipetteIsBad={badLeftPipette != null}
                 updatePipette={() => setSubsystemToUpdate('pipette_left')}
-                isRunActive={currentRunId != null && !isRunTerminal}
+                isRunActive={currentRunId != null && isRunRunning}
               />
               {isFlex && (
                 <GripperCard
@@ -224,7 +227,7 @@ export function InstrumentsAndModules({
                       null
                   }
                   setSubsystemToUpdate={setSubsystemToUpdate}
-                  isRunActive={currentRunId != null && !isRunTerminal}
+                  isRunActive={currentRunId != null && isRunRunning}
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -265,7 +268,7 @@ export function InstrumentsAndModules({
                   pipetteIs96Channel={false}
                   pipetteIsBad={badRightPipette != null}
                   updatePipette={() => setSubsystemToUpdate('pipette_right')}
-                  isRunActive={currentRunId != null && !isRunTerminal}
+                  isRunActive={currentRunId != null && isRunRunning}
                 />
               )}
               {rightColumnModules.map((module, index) => (

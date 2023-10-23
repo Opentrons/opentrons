@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
@@ -8,6 +8,7 @@ import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 import { DeviceDetailsDeckConfiguration } from '../'
 
+jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../DeckFixtureSetupInstructionsModal')
 
@@ -23,6 +24,9 @@ const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutatio
 const mockDeckFixtureSetupInstructionsModal = DeckFixtureSetupInstructionsModal as jest.MockedFunction<
   typeof DeckFixtureSetupInstructionsModal
 >
+const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
+  typeof DeckConfigurator
+>
 
 const render = (
   props: React.ComponentProps<typeof DeviceDetailsDeckConfiguration>
@@ -32,8 +36,6 @@ const render = (
   })
 }
 
-// ToDo(kk:10/05/2023) currently this test covers very basic cases.
-// I will add more cases later.
 describe('DeviceDetailsDeckConfiguration', () => {
   let props: React.ComponentProps<typeof DeviceDetailsDeckConfiguration>
 
@@ -48,6 +50,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     mockDeckFixtureSetupInstructionsModal.mockReturnValue(
       <div>mock DeckFixtureSetupInstructionsModal</div>
     )
+    mockDeckConfigurator.mockReturnValue(<div>mock DeckConfigurator</div>)
   })
 
   it('should render text and button', () => {
@@ -56,6 +59,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     getByRole('button', { name: 'Setup Instructions' })
     getByText('Location')
     getByText('Fixture')
+    getByText('mock DeckConfigurator')
   })
 
   it('should render DeckFixtureSetupInstructionsModal when clicking text button', () => {

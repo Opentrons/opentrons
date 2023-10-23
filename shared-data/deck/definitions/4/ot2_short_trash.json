@@ -354,22 +354,9 @@
   "cutoutFixtures": [
     {
       "id": "singleStandardSlot",
-      "cutoutLocationIds": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11"
-      ],
-      "fixtureType": "singleStandardSlot",
+      "mayMountTo": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
       "displayName": "Standard Slot",
-      "onFixtureAddressableAreas": {
+      "providesAddressableAreas": {
         "1": ["1"],
         "2": ["2"],
         "3": ["3"],
@@ -385,10 +372,9 @@
     },
     {
       "id": "fixedTrashSlot",
-      "cutoutLocationIds": ["12"],
-      "fixtureType": "fixedTrashSlot",
+      "mayMountTo": ["12"],
       "displayName": "Fixed Trash",
-      "onFixtureAddressableAreas": {
+      "providesAddressableAreas": {
         "12": ["shortFixedTrash"]
       }
     }

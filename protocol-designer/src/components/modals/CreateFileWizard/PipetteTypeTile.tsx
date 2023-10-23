@@ -88,7 +88,12 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
 
   return (
     <HandleEnter onEnter={proceed}>
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing32}
+        height="auto"
+        overflowY="auto"
+      >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           height="26rem"

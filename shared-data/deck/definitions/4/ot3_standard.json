@@ -263,7 +263,7 @@
         "dropTipsOffset": [123.25, 45.75, 40.0]
       },
       {
-        "id": "1/8cWasteChute",
+        "id": "1and8ChannelWasteChute",
         "areaType": "wasteChute",
         "offsetFromCutoutFixture": [-13.5, 0, 0],
         "boundingBox": {
@@ -276,7 +276,7 @@
         "dropTipsOffset": [64.0, 21.91, 144.0]
       },
       {
-        "id": "96cWasteChute",
+        "id": "96ChannelWasteChute",
         "areaType": "wasteChute",
         "offsetFromCutoutFixture": [-13.5, 0, 0],
         "boundingBox": {
@@ -399,10 +399,9 @@
   "cutoutFixtures": [
     {
       "id": "singleLeftSlot",
-      "cutoutLocationIds": ["D1", "C1", "B1", "A1"],
-      "fixtureType": "singleLeftSlot",
+      "mayMountTo": ["D1", "C1", "B1", "A1"],
       "displayName": "Standard Slot Left",
-      "onFixtureAddressableAreas": {
+      "providesAddressableAreas": {
         "D1": ["D1"],
         "C1": ["C1"],
         "B1": ["B1"],
@@ -411,10 +410,9 @@
     },
     {
       "id": "singleCenterSlot",
-      "cutoutLocationIds": ["D2", "C2", "B2", "A2"],
-      "fixtureType": "singleCenterSlot",
+      "mayMountTo": ["D2", "C2", "B2", "A2"],
       "displayName": "Standard Slot Center",
-      "onFixtureAddressableAreas": {
+      "providesAddressableAreas": {
         "D2": ["D2"],
         "C2": ["C2"],
         "B2": ["B2"],
@@ -423,10 +421,9 @@
     },
     {
       "id": "singleRightSlot",
-      "cutoutLocationIds": ["D3", "C3", "B3", "A3"],
-      "fixtureType": "singleRightSlot",
+      "mayMountTo": ["D3", "C3", "B3", "A3"],
       "displayName": "Standard Slot Right",
-      "onFixtureAddressableAreas": {
+      "providesAddressableAreas": {
         "D3": ["D3"],
         "C3": ["C3"],
         "B3": ["B3"],
@@ -435,10 +432,9 @@
     },
     {
       "id": "stagingAreaRightSlot",
-      "cutoutLocationIds": ["D3", "C3", "B3", "A3"],
-      "fixtureType": "stagingAreaRightSlot",
+      "mayMountTo": ["D3", "C3", "B3", "A3"],
       "displayName": "Staging Area Slot",
-      "onFixtureAddressableAreas": {
+      "providesAddressableAreas": {
         "D3": ["D3", "D4"],
         "C3": ["C3", "C4"],
         "B3": ["B3", "B4"],
@@ -447,10 +443,9 @@
     },
     {
       "id": "trashBinAdapter",
-      "cutoutLocationIds": ["D1", "C1", "B1", "A1", "D3", "C3", "B3", "A3"],
-      "fixtureType": "trashBinAdapter",
+      "mayMountTo": ["D1", "C1", "B1", "A1", "D3", "C3", "B3", "A3"],
       "displayName": "Slot With Movable Trash",
-      "onFixtureAddressableAreas": {
+      "providesAddressableAreas": {
         "D1": ["movableTrash"],
         "C1": ["movableTrash"],
         "B1": ["movableTrash"],
@@ -462,21 +457,44 @@
       }
     },
     {
-      "id": "wasteChuteRightAdapter",
-      "cutoutLocationIds": ["D3"],
-      "fixtureType": "wasteChuteRightAdapter",
-      "displayName": "Slot With Waste Chute Adapter",
-      "onFixtureAddressableAreas": {
-        "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute"]
+      "id": "wasteChuteRightAdapterCovered",
+      "mayMountTo": ["D3"],
+      "displayName": "Waste Chute Adapter for 1 or 8 Channel Pipettes",
+      "providesAddressableAreas": {
+        "D3": ["1and8ChannelWasteChute"]
       }
     },
     {
-      "id": "wasteChuteRightAdapterWithStagingAreaSlot",
-      "cutoutLocationIds": ["D3"],
-      "fixtureType": "wasteChuteRightAdapterWithStagingAreaSlot",
-      "displayName": "Slot With Waste Chute Adapter and Staging Area Slot",
-      "onFixtureAddressableAreas": {
-        "D3": ["1/8cWasteChute", "96cWasteChute", "gripperWasteChute", "D4"]
+      "id": "wasteChuteRightAdapterNoCover",
+      "mayMountTo": ["D3"],
+      "displayName": "Waste Chute Adapter for 96 Channel Pipette or Gripper",
+      "providesAddressableAreas": {
+        "D3": [
+          "1and8ChannelWasteChute",
+          "96ChannelWasteChute",
+          "gripperWasteChute"
+        ]
+      }
+    },
+    {
+      "id": "stagingAreaSlotWithWasteChuteRightAdapterCovered",
+      "mayMountTo": ["D3"],
+      "displayName": "Staging Slot With Waste Chute Adapter for 96 Channel Pipette or Gripper",
+      "providesAddressableAreas": {
+        "D3": ["1and8ChannelWasteChute", "D4"]
+      }
+    },
+    {
+      "id": "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
+      "mayMountTo": ["D3"],
+      "displayName": "Staging Slot With Waste Chute Adapter and Staging Area Slot",
+      "providesAddressableAreas": {
+        "D3": [
+          "1and8ChannelWasteChute",
+          "96ChannelWasteChute",
+          "gripperWasteChute",
+          "D4"
+        ]
       }
     }
   ],

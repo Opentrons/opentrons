@@ -190,6 +190,9 @@ class OT3Simulator:
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
         self._sim_jaw_state = GripperJawState.HOMED_READY
 
+    async def get_serial_number(self) -> Optional[str]:
+        return "simulator"
+
     @property
     def initialized(self) -> bool:
         """True when the hardware controller has initialized and is ready."""

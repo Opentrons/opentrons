@@ -25,6 +25,7 @@ async def _main(is_simulating: bool) -> None:
     for vol in [max_vol, max_vol / 2, max_vol / 10]:
         await api.aspirate(mount, volume=vol)
         await api.dispense(mount, volume=vol)
+        await api.prepare_for_aspirate(mount)
     await api.remove_tip(mount)
 
     # move the plunger based on position (millimeters)

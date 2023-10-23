@@ -1,10 +1,8 @@
 import { SECTIONS } from './constants'
 import type { ModuleCalibrationWizardStep } from './types'
 
-export const getModuleCalibrationSteps = (
-  requiresFirmwareUpdate: boolean
-): ModuleCalibrationWizardStep[] => {
-  const ALL_STEPS = [
+export const getModuleCalibrationSteps = (): ModuleCalibrationWizardStep[] => {
+  return [
     { section: SECTIONS.BEFORE_BEGINNING },
     { section: SECTIONS.FIRMWARE_UPDATE },
     { section: SECTIONS.SELECT_LOCATION },
@@ -13,8 +11,4 @@ export const getModuleCalibrationSteps = (
     { section: SECTIONS.DETACH_PROBE },
     { section: SECTIONS.SUCCESS },
   ]
-
-  return requiresFirmwareUpdate
-    ? ALL_STEPS
-    : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
 }

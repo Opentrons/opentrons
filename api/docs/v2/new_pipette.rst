@@ -310,7 +310,7 @@ The single- and multi-channel P50 GEN1 pipettes are the exceptions here. If your
 Volume Modes
 ============
 
-The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense 1 µL of liquid. Set low-volume mode by calling :py:meth:`.InstrumentContext.configure_for_volume` with the amount of liquid you plan to aspirate, in µL::
+The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense very small volumes of liquid. Set the volume mode by calling :py:meth:`.InstrumentContext.configure_for_volume` with the amount of liquid you plan to aspirate, in µL::
 
     pipette50.configure_for_volume(1)
     pipette50.pick_up_tip()
@@ -318,12 +318,28 @@ The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a l
     
 .. versionadded:: 2.15
 
+Passing different values to ``configure_for_volume()`` changes the minimum and maximum volume of Flex 50 µL pipettes as follows:
+
+.. list-table::
+    :header-rows: 1
+    :widths: 2 3 3
+    
+    * - Value
+      - Minimum Volume (µL)
+      - Maximum Volume (µL)
+    * - 1–4.9
+      - 1
+      - 30
+    * - 5–50
+      - 5
+      - 50
+
 .. note::
     The pipette must not contain liquid when you call ``configure_for_volume()``, or the API will raise an error.
     
-    Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode.
+    Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode. Calling ``configure_for_volume()`` *before* ``pick_up_tip()`` helps to avoid this situation.
 
-In a protocol that handles many different volumes, it's a good practice to call this function immediately before each :py:meth:`.transfer` or :py:meth:`.aspirate`, specifying the volume that you are about to handle. When operating with a list of volumes, nest ``configure_for_volume()`` inside a ``for`` loop to ensure that the pipette is properly configured for each volume:
+In a protocol that handles many different volumes, it's a good practice to call ``configure_for_volume()`` once for each :py:meth:`.transfer` or :py:meth:`.aspirate`, specifying the volume that you are about to handle. When operating with a list of volumes, nest ``configure_for_volume()`` inside a ``for`` loop to ensure that the pipette is properly configured for each volume:
 
 .. code-block:: python
     
@@ -331,13 +347,13 @@ In a protocol that handles many different volumes, it's a good practice to call 
     sources = plate.columns()[0]
     destinations = plate.columns()[1]
     for i in range(8):
-        pipette50.pick_up_tip()
         pipette50.configure_for_volume(volumes[i])
+        pipette50.pick_up_tip()
         pipette50.aspirate(volume=volumes[i], location=sources[i])
         pipette50.dispense(location=destinations[i])
         pipette50.drop_tip()
 
-If you know that all your liquid handling will take place in a specific mode, then you can call ``configure_for_volume()`` just once with a nominal volume. Or if all the volumes correspond to the pipette's default mode, you don't have to call ``configure_for_volume()`` at all.
+If you know that all your liquid handling will take place in a specific mode, then you can call ``configure_for_volume()`` just once with a representative volume. Or if all the volumes correspond to the pipette's default mode, you don't have to call ``configure_for_volume()`` at all.
 
 
 .. _new-plunger-flow-rates:
@@ -345,11 +361,11 @@ If you know that all your liquid handling will take place in a specific mode, th
 Pipette Flow Rates
 ==================
 
-Measured in µL/s, the flow rate determines how much liquid a pipette can aspirate, dispense, and blow-out. Opentrons pipettes have their own default flow rates. The API lets you change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`.InstrumentContext.flow_rate` properties listed below. 
+Measured in µL/s, the flow rate determines how much liquid a pipette can aspirate, dispense, and blow out. Opentrons pipettes have their own default flow rates. The API lets you change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the :py:obj:`.InstrumentContext.flow_rate` properties listed below. 
 
 * Aspirate: ``InstrumentContext.flow_rate.aspirate``
 * Dispense: ``InstrumentContext.flow_rate.dispense``
-* Blow-out: ``InstrumentContext.flow_rate.blow_out``
+* Blow out: ``InstrumentContext.flow_rate.blow_out``
 
 These flow rate properties operate independently. This means you can specify different flow rates for each property within the same protocol. For example, let's load a simple protocol and set different flow rates for the attached pipette.
 
@@ -394,17 +410,27 @@ These flow rates will remain in effect until you change the ``flow_rate`` attrib
 Flex Pipette Flow Rates
 -----------------------
 
-The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for Flex pipettes.
+The default flow rates for Flex pipettes depend on the maximum volume of the pipette and the capacity of the currently attached tip. For each pipette–tip configuration, the default flow rate is the same for aspirate, dispense, and blowout actions.
 
-+-------------------------------+-----------------+-----------------+-----------------+
-| Pipette Models                | Aspirate (µL/s) | Dispense (µL/s) | Blow-out (µL/s) |
-+===============================+=================+=================+=================+
-| | **Flex 50 µL pipettes**     | 8               | 8               | 4               |
-| | 1- and 8-channel            |                 |                 |                 |
-+-------------------------------+-----------------+-----------------+-----------------+
-| | **Flex 1000 µL pipettes**   | 160             | 160             | 80              |
-| | 1-, 8-, and 96-channel      |                 |                 |                 |
-+-------------------------------+-----------------+-----------------+-----------------+
+.. list-table::
+    :header-rows: 1
+    
+    * - Pipette Model
+      - Tip Capacity (µL)
+      - Flow Rate (µL/s)
+    * - 50 µL (1- and 8-channel)
+      - All capacities
+      - 57
+    * - 1000 µL (1-, 8-, and 96-channel)
+      - 50
+      - 478
+    * - 1000 µL (1-, 8-, and 96-channel)
+      - 200
+      - 716
+    * - 1000 µL (1-, 8-, and 96-channel)
+      - 1000
+      - 716
+
 
 Additionally, all Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
 
@@ -413,7 +439,7 @@ Additionally, all Flex pipettes have a well bottom clearance of 1 mm for aspirat
 OT-2 Pipette Flow Rates
 -----------------------
 
-The following table provides data on the default aspirate, dispense, and blow-out flow rates (in µL/s) for OT-2 GEN2 pipettes. Because the flow rates are the same across all three actions, we've consolidated the data into the "Flow Rates" column.
+The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for OT-2 GEN2 pipettes. Default flow rates are the same across all three actions.
 
 .. list-table::
     :header-rows: 1
@@ -422,25 +448,25 @@ The following table provides data on the default aspirate, dispense, and blow-ou
       - Volume (µL)
       - Flow Rates (µL/s)
     * - P20 Single-Channel GEN2
-      - 1-20
+      - 1–20
       - 
           * API v2.6 or higher: 7.56
           * API v2.5 or lower: 3.78
     * - P300 Single-Channel GEN2
-      - 20-300
+      - 20–300
       - 
           * API v2.6 or higher: 92.86
           * API v2.5 or lower: 46.43
     * - P1000 Single-Channel GEN2
-      - 100-1000
+      - 100–1000
       -
           * API v2.6 or higher: 274.7
           * API v2.5 or lower: 137.35
     * - P20 Multi-Channel GEN2
-      - 1-20
+      - 1–20
       - 7.6
     * - P300 Multi-Channel GEN2
-      - 20-300
+      - 20–300
       - 94
  
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/s and a well bottom clearance of 1 mm for aspirate and dispense actions.

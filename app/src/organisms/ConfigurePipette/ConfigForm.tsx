@@ -16,13 +16,12 @@ import {
 } from './ConfigFormGroup'
 
 import type { FormikProps } from 'formik'
+import type { FormValues } from './ConfigFormGroup'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
-  PipetteSettingsFieldsUpdate,
-} from '../../redux/pipettes/types'
-
-import type { FormValues } from './ConfigFormGroup'
+  UpdatePipetteSettingsData,
+} from '@opentrons/api-client'
 
 export interface DisplayFieldProps extends PipetteSettingsField {
   name: string
@@ -38,7 +37,7 @@ export interface DisplayQuirkFieldProps {
 export interface ConfigFormProps {
   settings: PipetteSettingsFieldsMap
   updateInProgress: boolean
-  updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
+  updateSettings: (params: UpdatePipetteSettingsData) => void
   groupLabels: string[]
   formId: string
 }
@@ -96,14 +95,16 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   handleSubmit: (values: FormValues) => void = values => {
-    const params = mapValues<FormValues, number | boolean | null>(values, v => {
-      if (v === true || v === false) return v
+    const fields = mapValues<
+      FormValues,
+      { value: PipetteSettingsField['value'] } | null
+    >(values, v => {
+      if (v === true || v === false) return { value: v }
       if (v === '' || v == null) return null
-      return Number(v)
+      return { value: Number(v) }
     })
 
-    // @ts-expect-error TODO updateSettings type doesn't include boolean for values of params, but they could be returned.
-    this.props.updateSettings(params)
+    this.props.updateSettings({ fields })
   }
 
   getFieldValue(
@@ -161,7 +162,6 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
       PipetteSettingsFieldsMap,
       string | boolean
     >(fields, f => {
-      // @ts-expect-error TODO: PipetteSettingsFieldsMap doesn't include a boolean value, despite checking for it here
       if (f.value === true || f.value === false) return f.value
       // @ts-expect-error(sa, 2021-05-27): avoiding src code change, use optional chain to access f.value
       return f.value !== f.default ? f.value.toString() : ''

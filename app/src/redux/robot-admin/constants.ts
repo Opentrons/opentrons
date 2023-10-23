@@ -1,14 +1,10 @@
 // general constants
 
-// 5 minute restart timeout
-export const RESTART_TIMEOUT_SEC = 300
-
 // restart statuses
 export const RESTART_PENDING_STATUS: 'restart-pending' = 'restart-pending'
 export const RESTART_IN_PROGRESS_STATUS: 'restart-in-progress' =
   'restart-in-progress'
 export const RESTART_FAILED_STATUS: 'restart-failed' = 'restart-failed'
-export const RESTART_TIMED_OUT_STATUS: 'restart-timed-out' = 'restart-timed-out'
 export const RESTART_SUCCEEDED_STATUS: 'restart-succeeded' = 'restart-succeeded'
 
 // action type strings

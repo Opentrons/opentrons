@@ -1,15 +1,16 @@
 import * as React from 'react'
 import i18n from 'i18next'
-import { renderWithProviders, SlotMap } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 
 import { Portal } from '../../portals/TopPortal'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
+import { FlexSlotMap } from '../FlexSlotMap'
 
-jest.mock('@opentrons/components/src/slotmap/SlotMap')
+jest.mock('../FlexSlotMap')
 jest.mock('../../portals/TopPortal')
 
-const mockSlotMap = SlotMap as jest.MockedFunction<typeof SlotMap>
+const mockFlexSlotMap = FlexSlotMap as jest.MockedFunction<typeof FlexSlotMap>
 const mockPortal = Portal as jest.MockedFunction<typeof Portal>
 
 const render = (props: React.ComponentProps<typeof AdditionalItemsRow>) => {
@@ -26,7 +27,7 @@ describe('AdditionalItemsRow', () => {
       isEquipmentAdded: false,
       name: 'gripper',
     }
-    mockSlotMap.mockReturnValue(<div>mock slot map</div>)
+    mockFlexSlotMap.mockReturnValue(<div>mock slot map</div>)
     mockPortal.mockReturnValue(<div>mock portal</div>)
   })
   it('renders no gripper', () => {

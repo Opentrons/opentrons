@@ -9,6 +9,7 @@ from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
 from . import point_calculations
+from . import stringify
 from ..well import AbstractWellCore
 from ..._liquid import Liquid
 
@@ -72,9 +73,12 @@ class WellCore(AbstractWellCore):
         )
 
     def get_display_name(self) -> str:
-        """Get the well's full display name."""
-        parent = self._engine_client.state.labware.get_display_name(self._labware_id)
-        return f"{self._name} of {parent}"
+        """Get the full display name of the well (e.g. "A1 of Some Labware on 5")."""
+        return stringify.well(
+            engine_client=self._engine_client,
+            well_name=self._name,
+            labware_id=self._labware_id,
+        )
 
     def get_name(self) -> str:
         """Get the name of the well (e.g. "A1")."""

@@ -21,7 +21,6 @@
   "calibration_recommended": "Calibration recommended",
   "calibration_status": "Calibration Status",
   "calibration_status_description": "For accurate and precise movement, calibrate the robot's deck, pipette offsets, and tip lengths.",
-  "calibrations_aborted": "Using current calibrations.",
   "calibrations_complete": "Calibrations complete!",
   "change_tip_rack": "Change tip rack",
   "check_tip_on_block": "Check tip on block",
@@ -130,6 +129,7 @@
   "unknown_custom_tiprack": "unknown custom tip rack",
   "use_calibration_block": "Use Calibration Block",
   "use_trash_bin": "Use trash bin",
+  "using_current_calibrations": "Using current calibrations.",
   "you_can_remove_cal_block": "You can remove the Calibration Block from the deck now.",
   "you_will_need": "You will need:"
 }

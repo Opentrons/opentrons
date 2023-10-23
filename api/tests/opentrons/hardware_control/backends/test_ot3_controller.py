@@ -1163,3 +1163,75 @@ async def test_motor_current(
                             mock.call({Axis.X: 0.0}),
                         ],
                     )
+
+
+@pytest.mark.parametrize(
+    ["axes", "expected_tip_nodes", "expected_normal_nodes"],
+    [
+        [
+            [Axis.X, Axis.Z_L, Axis.Q],
+            {NodeId.pipette_left},
+            {NodeId.gantry_x, NodeId.head_l},
+        ],
+        [[Axis.X, Axis.Z_L], {}, {NodeId.gantry_x, NodeId.head_l}],
+        [[Axis.Q], {NodeId.pipette_left}, {}],
+        [
+            [Axis.X, Axis.Z_L, Axis.P_L, Axis.Q],
+            {NodeId.pipette_left},
+            {NodeId.gantry_x, NodeId.head_l, NodeId.pipette_left},
+        ],
+    ],
+)
+async def test_engage_motors(
+    controller: OT3Controller,
+    axes: List[Axis],
+    expected_tip_nodes: Set[NodeId],
+    expected_normal_nodes: Set[NodeId],
+) -> None:
+    """Test that engaging/disengaging motors works."""
+
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.set_enable_motor",
+        autospec=True,
+    ) as set_normal_axes:
+        with mock.patch(
+            "opentrons.hardware_control.backends.ot3controller.set_enable_tip_motor",
+            autospec=True,
+        ) as set_tip_axes:
+            await controller.engage_axes(axes=axes)
+
+            if len(expected_normal_nodes) > 0:
+                set_normal_axes.assert_awaited_with(
+                    controller._messenger, expected_normal_nodes
+                )
+            else:
+                set_normal_axes.assert_not_awaited()
+            if len(expected_tip_nodes) > 0:
+                set_tip_axes.assert_awaited_with(
+                    controller._messenger, expected_tip_nodes
+                )
+            else:
+                set_tip_axes.assert_not_awaited()
+
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.set_disable_motor",
+        autospec=True,
+    ) as set_normal_axes:
+        with mock.patch(
+            "opentrons.hardware_control.backends.ot3controller.set_disable_tip_motor",
+            autospec=True,
+        ) as set_tip_axes:
+            await controller.disengage_axes(axes=axes)
+
+            if len(expected_normal_nodes) > 0:
+                set_normal_axes.assert_awaited_with(
+                    controller._messenger, expected_normal_nodes
+                )
+            else:
+                set_normal_axes.assert_not_awaited()
+            if len(expected_tip_nodes) > 0:
+                set_tip_axes.assert_awaited_with(
+                    controller._messenger, expected_tip_nodes
+                )
+            else:
+                set_tip_axes.assert_not_awaited()

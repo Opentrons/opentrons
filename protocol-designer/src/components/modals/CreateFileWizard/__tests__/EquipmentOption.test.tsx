@@ -20,6 +20,16 @@ describe('EquipmentOption', () => {
     const { getByText } = render(props)
     getByText('mockText')
   })
+  it('renders the equipment option that is disabled', () => {
+    props = {
+      ...props,
+      disabled: true,
+    }
+    const { getByLabelText } = render(props)
+    expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
+      `background-color: ${COLORS.darkGreyDisabled}`
+    )
+  })
   it('renders the equipment option without check not selected and image', () => {
     props = {
       ...props,

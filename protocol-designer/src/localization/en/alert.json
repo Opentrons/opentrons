@@ -200,6 +200,13 @@
       "body": "Slot {{selectedSlot}} is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker."
     }
   },
+  "deck_config_placement": {
+    "SLOT_OCCUPIED": {
+      "staging_area": "Cannot place staging area",
+      "trashBin": "Cannot place trash bin",
+      "wasteChute": "Cannot place waste chute"
+    }
+  },
   "export_warnings": {
     "no_commands": {
       "heading": "Your protocol has no steps",

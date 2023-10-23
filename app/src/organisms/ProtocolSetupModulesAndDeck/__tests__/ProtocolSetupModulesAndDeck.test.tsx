@@ -1,21 +1,28 @@
 import * as React from 'react'
+import { UseQueryResult } from 'react-query'
 import { waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+import {
+  DeckConfiguration,
+  Fixture,
+  getDeckDefFromRobotType,
+  STAGING_AREA_LOAD_NAME,
+} from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs/hooks'
-import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { mockRobotSideAnalysis } from '../../CommandText/__fixtures__'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
-} from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+} from '../../Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { mockApiHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
@@ -25,10 +32,11 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from '../utils'
-import { SetupInstructionsModal } from '../SetupInstructionsModal'
+import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
+import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
-import { ProtocolSetupModules } from '..'
+import { ProtocolSetupModulesAndDeck } from '..'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
@@ -44,6 +52,7 @@ jest.mock('../utils')
 jest.mock('../SetupInstructionsModal')
 jest.mock('../../ModuleWizardFlows')
 jest.mock('../FixtureTable')
+jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -84,6 +93,12 @@ const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
 const mockFixtureTable = FixtureTable as jest.MockedFunction<
   typeof FixtureTable
 >
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
+const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
+  typeof LocationConflictModal
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -101,11 +116,16 @@ const calibratedMockApiHeaterShaker = {
     last_modified: '2023-06-01T14:42:20.131798+00:00',
   },
 }
+const mockFixture = {
+  fixtureId: 'mockId',
+  fixtureLocation: '10' as any,
+  loadName: STAGING_AREA_LOAD_NAME,
+} as Fixture
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolSetupModules
+      <ProtocolSetupModulesAndDeck
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
       />
@@ -116,7 +136,7 @@ const render = () => {
   )
 }
 
-describe('ProtocolSetupModules', () => {
+describe('ProtocolSetupModulesAndDeck', () => {
   let mockChainLiveCommands = jest.fn()
 
   beforeEach(() => {
@@ -145,6 +165,12 @@ describe('ProtocolSetupModules', () => {
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
+    mockLocationConflictModal.mockReturnValue(
+      <div>mock location conflict modal</div>
+    )
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -322,11 +348,19 @@ describe('ProtocolSetupModules', () => {
     getByText('Calibration required Calibrate pipette first')
   })
 
-  it('should render mock Fixture table when is enableDeckConfiguration on', () => {
+  it('should render mock Fixture table and module location conflict when is enableDeckConfiguration on', () => {
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: calibratedMockApiHeaterShaker,
+      },
+    ])
     when(mockUseFeatureFlag)
       .calledWith('enableDeckConfiguration')
       .mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('mock FixtureTable')
+    getByText('Location conflict').click()
+    getByText('mock location conflict modal')
   })
 })

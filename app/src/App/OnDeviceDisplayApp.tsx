@@ -39,6 +39,7 @@ import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashbo
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScreen'
+import { DeckConfiguration } from '../pages/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
@@ -47,8 +48,14 @@ import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
+import { hackWindowNavigatorOnLine } from './hacks'
+
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
+
+// forces electron to think we're online which means axios won't elide
+// network calls to localhost. see ./hacks.ts for more.
+hackWindowNavigatorOnLine()
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
   {
@@ -184,6 +191,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/emergency-stop',
   },
   {
+    Component: DeckConfiguration,
+    exact: true,
+    name: 'Deck Configuration',
+    path: '/deck-configuration',
+  },
+  {
     Component: () => (
       <>
         <BackButton />
@@ -257,7 +270,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="localhost">
+    <ApiHostProvider hostname="127.0.0.1">
       <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
         <Box width="100%" css="user-select: none;">
           {isIdle ? (
