@@ -243,5 +243,9 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         """
         ...
 
+    def prepare_for_aspirate(self) -> None:
+        """Prepare the pipette to aspirate."""
+        ...
+
 
 InstrumentCoreType = TypeVar("InstrumentCoreType", bound=AbstractInstrument[Any])

@@ -1614,3 +1614,40 @@ class InstrumentContext(publisher.CommandPublisher):
         if last_location and isinstance(last_location.labware, labware.Well):
             self.move_to(last_location.labware.top())
         self._core.configure_for_volume(volume)
+
+    @requires_version(2, 16)
+    def prepare_for_aspirate(self) -> None:
+        """Prepare a pipette for aspiration.
+
+        Before pipettes can aspirate volume, the plunger must be at the bottom of the pipette
+        (dropping a tip or blowing out moves the plunger to other positions). This function
+        moves the plunger to the bottom of the pipette to make sure it's ready to aspirate.
+
+        The Opentrons Protocol API generally ensures that the pipette is prepared for aspiration
+        before you aspirate - the pipette is prepared for aspiration after picking up a tip and,
+        if necessary, just before aspiration. You rarely need to call this function.
+
+        However, this function is the way to prepare the pipette explicitly under your control so
+        you can later aspirate from within a well without moving the pipette around. For instance,
+        if you want to write a prewet routine like this:
+
+        .. code-block::
+
+             instrument.move_to(well.top(z=-5))
+             instrument.delay(5)
+             instrument.mix(10, 10)
+             instrument.blow_out()
+             instrument.prepare_for_aspirate()
+             instrument.move_to(well.top(z=-5))
+             instrument.delay(5)
+             instrument.aspirate(10, well.top(z=-5))
+
+        The call to ``instrument.prepare_for_aspirate()`` means that the pipette will be prepared for
+        aspirate already when it reaches the last line and does not need to prepare again, so it will
+        not move up out of the well before aspirating.
+        """
+        if self._core.get_current_volume():
+            raise CommandPreconditionViolated(
+                message=f"Cannot prepare {str(self)} for aspirate while it contains liquid."
+            )
+        self._core.prepare_for_aspirate()
