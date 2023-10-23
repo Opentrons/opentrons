@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { ALIGN_CENTER, BORDERS, COLORS, DIRECTION_COLUMN, Flex, Icon, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { ALIGN_CENTER, ALIGN_FLEX_START, BORDERS, COLORS, DIRECTION_COLUMN, Flex, Icon, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { ProtocolAnalysisOutput, RunTimeCommand } from '@opentrons/shared-data'
 import { CommandText } from '../CommandText'
 import { CommandIcon } from '../RunPreview/CommandIcon'
@@ -56,12 +56,12 @@ export const AnnotatedSteps = (
       maxHeight="25rem"
       overflowY="auto"
     >
-      <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16} gridGap={SPACING.spacing4}>
         {groupedCommands.map((c, i) =>
           'annotationIndex' in c && c.annotationIndex != null ? (
-            <AnnotatedGroup key={c.id} analysis={analysis} annotationType={annotations[c.annotationIndex]?.annotationType} subCommands={c.subCommands} />
+            <AnnotatedGroup key={i} stepNumber={(i + 1).toString()} analysis={analysis} annotationType={annotations[c.annotationIndex]?.annotationType} subCommands={c.subCommands} />
           ) : (
-            <IndividualCommand key={c.id} index={i} command={c} analysis={analysis} />
+            <IndividualCommand key={i} stepNumber={(i + 1).toString()} command={c} analysis={analysis} />
           ))}
       </Flex>
     </Flex>
@@ -72,9 +72,10 @@ interface AnnotatedGroupProps {
   annotationType: string
   subCommands: RunTimeCommand[]
   analysis: ProtocolAnalysisOutput
+  stepNumber: string
 }
 function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
-  const { subCommands, annotationType, analysis } = props
+  const { subCommands, annotationType, analysis, stepNumber } = props
   const [isExpanded, setIsExpanded] = React.useState(false)
   return (
     <Flex onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
@@ -82,18 +83,37 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
         isExpanded
           ? (
             <>
-              <Flex alignItems={ALIGN_CENTER}>
+              <Flex alignItems={ALIGN_CENTER} alignSelf={ALIGN_FLEX_START}>
+                <StyledText
+                  minWidth={SPACING.spacing16}
+                  fontSize={TYPOGRAPHY.fontSizeCaption}
+                >
+                  {stepNumber}
+                </StyledText>
+                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginLeft={SPACING.spacing8}>{annotationType}</StyledText>
                 <Icon name="chevron-up" size="2rem" />
-                <StyledText as="p">{annotationType}</StyledText>
               </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing32}>
-                {subCommands.map(c => <IndividualCommand key={c.id} command={c} analysis={analysis} />)}
+              <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32} gridGap={SPACING.spacing4}>
+                {subCommands.map((c, i) => (
+                  <IndividualCommand
+                  key={c.id}
+                  command={c}
+                  analysis={analysis}
+                  stepNumber={`${stepNumber}.${(i+1).toString()}`}
+                   />
+                ))}
               </Flex>
             </>
           ) : (
             <Flex alignItems={ALIGN_CENTER}>
+              <StyledText
+                minWidth={SPACING.spacing16}
+                fontSize={TYPOGRAPHY.fontSizeCaption}
+              >
+                {stepNumber}
+              </StyledText>
+              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginLeft={SPACING.spacing8}>{annotationType}</StyledText>
               <Icon name="chevron-down" size="2rem" />
-              <StyledText as="p">{annotationType}</StyledText>
             </Flex>
           )
       }
@@ -104,17 +124,17 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
 interface IndividualCommandProps {
   command: RunTimeCommand
   analysis: ProtocolAnalysisOutput
-  index: number
+  stepNumber: string
 }
 function IndividualCommand(props: IndividualCommandProps): JSX.Element {
-  const { command, analysis, index } = props
+  const { command, analysis, stepNumber } = props
   return (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
       <StyledText
         minWidth={SPACING.spacing16}
         fontSize={TYPOGRAPHY.fontSizeCaption}
       >
-        {index + 1}
+        {stepNumber}
       </StyledText>
       <Flex
         flexDirection={DIRECTION_COLUMN}
