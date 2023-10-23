@@ -190,12 +190,6 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
 }
 
-export interface VectorOffset {
-  x: number
-  y: number
-  z: number
-}
-
 export type ModuleType =
   | typeof MAGNETIC_MODULE_TYPE
   | typeof TEMPERATURE_MODULE_TYPE
