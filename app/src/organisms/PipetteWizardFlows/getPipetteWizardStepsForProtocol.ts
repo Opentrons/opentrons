@@ -7,8 +7,7 @@ import type { PipetteWizardStep } from './types'
 export const getPipetteWizardStepsForProtocol = (
   attachedPipettes: AttachedPipettesFromInstrumentsQuery,
   pipetteInfo: LoadedPipette[],
-  mount: Mount,
-  requiresFirmwareUpdate: boolean
+  mount: Mount
 ): PipetteWizardStep[] => {
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
   const nintySixChannelAttached =
@@ -51,7 +50,7 @@ export const getPipetteWizardStepsForProtocol = (
   ) {
     //    96-channel pipette attached and need to attach single mount pipette
     if (nintySixChannelAttached) {
-      const ALL_STEPS = [
+      return [
         {
           section: SECTIONS.BEFORE_BEGINNING,
           mount: LEFT,
@@ -100,12 +99,9 @@ export const getPipetteWizardStepsForProtocol = (
           flowType: FLOWS.CALIBRATE,
         },
       ]
-      return requiresFirmwareUpdate
-        ? ALL_STEPS
-        : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
       //    Single mount pipette attached and need to attach new single mount pipette
     } else {
-      const ALL_STEPS = [
+      return [
         {
           section: SECTIONS.BEFORE_BEGINNING,
           mount: mount,
@@ -144,9 +140,6 @@ export const getPipetteWizardStepsForProtocol = (
           flowType: FLOWS.CALIBRATE,
         },
       ]
-      return requiresFirmwareUpdate
-        ? ALL_STEPS
-        : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
     }
     //  Single mount pipette attached to both mounts and need to attach 96-channel pipette
   } else if (
@@ -154,7 +147,7 @@ export const getPipetteWizardStepsForProtocol = (
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] != null
   ) {
-    const ALL_STEPS = [
+    return [
       {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: LEFT,
@@ -209,16 +202,13 @@ export const getPipetteWizardStepsForProtocol = (
         flowType: FLOWS.CALIBRATE,
       },
     ]
-    return requiresFirmwareUpdate
-      ? ALL_STEPS
-      : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
     //  Single mount pipette attached to left mount and need to attach 96-channel pipette
   } else if (
     requiredPipette.pipetteName === 'p1000_96' &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] == null
   ) {
-    const ALL_STEPS = [
+    return [
       {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: LEFT,
@@ -267,16 +257,13 @@ export const getPipetteWizardStepsForProtocol = (
         flowType: FLOWS.CALIBRATE,
       },
     ]
-    return requiresFirmwareUpdate
-      ? ALL_STEPS
-      : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
     //  Single mount pipette attached to right mount and need to attach 96-channel pipette
   } else if (
     requiredPipette.pipetteName === 'p1000_96' &&
     attachedPipettes[LEFT] == null &&
     attachedPipettes[RIGHT] != null
   ) {
-    const ALL_STEPS = [
+    return [
       {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: RIGHT,
@@ -325,14 +312,11 @@ export const getPipetteWizardStepsForProtocol = (
         flowType: FLOWS.CALIBRATE,
       },
     ]
-    return requiresFirmwareUpdate
-      ? ALL_STEPS
-      : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
     //  if no pipette is attached to gantry
   } else {
     //  Gantry empty and need to attach 96-channel pipette
     if (requiredPipette.pipetteName === 'p1000_96') {
-      const ALL_STEPS = [
+      return [
         {
           section: SECTIONS.BEFORE_BEGINNING,
           mount: LEFT,
@@ -375,12 +359,9 @@ export const getPipetteWizardStepsForProtocol = (
           flowType: FLOWS.CALIBRATE,
         },
       ]
-      return requiresFirmwareUpdate
-        ? ALL_STEPS
-        : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
       //    Gantry empty and need to attach single mount pipette
     } else {
-      const ALL_STEPS = [
+      return [
         {
           section: SECTIONS.BEFORE_BEGINNING,
           mount: mount,
@@ -413,9 +394,6 @@ export const getPipetteWizardStepsForProtocol = (
           flowType: FLOWS.CALIBRATE,
         },
       ]
-      return requiresFirmwareUpdate
-        ? ALL_STEPS
-        : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
     }
   }
 }
