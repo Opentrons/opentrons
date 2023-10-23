@@ -455,7 +455,7 @@ def simulate(
             ``KeyError``.
 
         - ``logs``: Any log messages that occurred during execution of this
-          command, as a :py:obj:`logging.LogRecord`.
+          command, as a standard Python :py:obj:`~logging.LogRecord`.
 
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
