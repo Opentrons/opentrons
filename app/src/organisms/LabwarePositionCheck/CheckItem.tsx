@@ -54,7 +54,7 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
-  robotType: RobotType
+  shouldUseMetalProbe: boolean 
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
@@ -72,7 +72,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     isRobotMoving,
     existingOffsets,
     setFatalError,
-    robotType,
+    shouldUseMetalProbe,
   } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -136,6 +136,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     }
   }, [moduleId])
 
+
+  console.log('pipetteName', pipetteName)
+  console.log('labwareDef', labwareDef)
+  console.log('pipetteMount', pipetteMount)
   if (pipetteName == null || labwareDef == null || pipetteMount == null)
     return null
 
@@ -263,7 +267,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             wellLocation: {
               origin: 'top' as const,
               offset:
-                robotType === FLEX_ROBOT_TYPE
+                shouldUseMetalProbe 
                   ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
                   : IDENTITY_VECTOR,
             },

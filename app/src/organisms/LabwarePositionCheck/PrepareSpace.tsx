@@ -84,6 +84,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { location, moduleId, labwareDef, protocolData, header, body } = props
 
   const robotType = protocolData.robotType
+  console.log('protocolData', protocolData)
   const isOnDevice = useSelector(getIsOnDevice)
 
   if (protocolData == null || robotType == null) return null

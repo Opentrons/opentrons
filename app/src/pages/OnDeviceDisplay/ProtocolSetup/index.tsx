@@ -44,6 +44,7 @@ import {
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   useAttachedModules,
+  useIsFlex,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
 } from '../../../organisms/Devices/hooks'
@@ -365,7 +366,8 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId, protocolName)
+  const shouldUseMetalProbe = useIsFlex(robotName)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, shouldUseMetalProbe, protocolName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)

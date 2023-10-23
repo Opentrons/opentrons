@@ -10,6 +10,7 @@ interface LabwarePositionCheckModalProps {
   onCloseClick: () => void
   runId: string
   maintenanceRunId: string
+  shouldUseMetalProbe: boolean
   existingOffsets: LabwareOffset[]
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   protocolName: string

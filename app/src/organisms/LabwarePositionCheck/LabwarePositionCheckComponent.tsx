@@ -44,6 +44,7 @@ const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   runId: string
   maintenanceRunId: string
+  shouldUseMetalProbe: boolean
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
   onCloseClick: () => unknown
@@ -59,6 +60,7 @@ export const LabwarePositionCheckComponent = (
   const {
     mostRecentAnalysis,
     existingOffsets,
+    shouldUseMetalProbe,
     runId,
     maintenanceRunId,
     onCloseClick,
@@ -69,7 +71,6 @@ export const LabwarePositionCheckComponent = (
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
-  const robotType = mostRecentAnalysis?.robotType ?? OT2_ROBOT_TYPE
 
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
@@ -194,7 +195,7 @@ export const LabwarePositionCheckComponent = (
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     const dropTipToBeSafeCommands: DropTipCreateCommand[] =
-      robotType === FLEX_ROBOT_TYPE
+      shouldUseMetalProbe 
         ? []
         : (protocolData?.pipettes ?? []).map(pip => ({
             commandType: 'dropTip' as const,
@@ -250,10 +251,12 @@ export const LabwarePositionCheckComponent = (
     )
   }
   if (protocolData == null) return null
-  const LPCSteps = getLabwarePositionCheckSteps(protocolData, robotType)
+  const LPCSteps = getLabwarePositionCheckSteps(protocolData, shouldUseMetalProbe)
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
+  console.log('currentStep', currentStep)
+  console.log('protocolData in top', protocolData)
 
   const handleJog = (
     axis: Axis,
@@ -345,7 +348,7 @@ export const LabwarePositionCheckComponent = (
     currentStep.section === 'CHECK_LABWARE'
   ) {
     modalContent = (
-      <CheckItem {...currentStep} {...movementStepProps} {...{ robotType }} />
+      <CheckItem {...currentStep} {...movementStepProps} {...{ shouldUseMetalProbe }} />
     )
   } else if (currentStep.section === 'ATTACH_PROBE') {
     modalContent = <AttachProbe {...currentStep} {...movementStepProps} />

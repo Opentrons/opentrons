@@ -11,10 +11,10 @@ import { getLabwareDefinitionsFromCommands } from './utils/labware'
 
 export function useLaunchLPC(
   runId: string,
+  shouldUseMetalProbe: boolean,
   protocolName?: string
 ): { launchLPC: () => void; LPCWizard: JSX.Element | null } {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
-
   const {
     createTargetedMaintenanceRun,
   } = useCreateTargetedMaintenanceRunMutation()
@@ -77,6 +77,7 @@ export function useLaunchLPC(
           maintenanceRunId={maintenanceRunId}
           setMaintenanceRunId={setMaintenanceRunId}
           protocolName={protocolName ?? ''}
+          shouldUseMetalProbe={shouldUseMetalProbe} 
           isDeletingMaintenanceRun={isDeletingMaintenanceRun}
         />
       ) : null,
