@@ -84,7 +84,13 @@ class AbstractProtocol(
     def move_labware(
         self,
         labware_core: LabwareCoreType,
-        new_location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
+        new_location: Union[
+            DeckSlotName,
+            LabwareCoreType,
+            ModuleCoreType,
+            WasteChuteCoreType,
+            OffDeckType,
+        ],
         use_gripper: bool,
         pause_for_manual_move: bool,
         pick_up_offset: Optional[Tuple[float, float, float]],

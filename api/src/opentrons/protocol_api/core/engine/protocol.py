@@ -1,5 +1,8 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing import Dict, Optional, Type, Union, List, Tuple
+from typing_extensions import Literal
+
+from opentrons.protocol_api import _waste_chute_dimensions
 
 from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
@@ -145,6 +148,7 @@ class ProtocolCore(
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         load_location = self._convert_labware_location(location=location)
+        assert not isinstance(load_location, WasteChuteLocation)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -204,6 +208,7 @@ class ProtocolCore(
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
         load_location = self._get_non_stacked_location(location=location)
+        assert not isinstance(load_location, WasteChuteLocation)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -248,7 +253,12 @@ class ProtocolCore(
         self,
         labware_core: LabwareCore,
         new_location: Union[
-            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName,
+            LabwareCore,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
+            WasteChuteCore,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,
@@ -256,8 +266,6 @@ class ProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
-        to_location = self._convert_labware_location(location=new_location)
-
         if use_gripper:
             strategy = LabwareMovementStrategy.USING_GRIPPER
         elif pause_for_manual_move:
@@ -272,11 +280,29 @@ class ProtocolCore(
             if pick_up_offset
             else None
         )
-        _drop_offset = (
-            LabwareOffsetVector(x=drop_offset[0], y=drop_offset[1], z=drop_offset[2])
-            if drop_offset
-            else None
-        )
+
+        if isinstance(new_location, WasteChuteCore):
+            # lol
+            to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
+            slot_width = 128
+            slot_height = 86
+            drop_offset_point = (
+                _waste_chute_dimensions.SLOT_ORIGIN_TO_GRIPPER_JAW_CENTER
+                - Point(x=slot_width / 2, y=slot_height / 2)
+            )
+            _drop_offset = LabwareOffsetVector(
+                x=drop_offset_point.x, y=drop_offset_point.y, z=drop_offset_point.z
+            )
+
+        else:
+            to_location = self._convert_labware_location(location=new_location)
+            _drop_offset = (
+                LabwareOffsetVector(
+                    x=drop_offset[0], y=drop_offset[1], z=drop_offset[2]
+                )
+                if drop_offset
+                else None
+            )
 
         # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
         # when move_labware() support is no longer experimental.
@@ -606,3 +632,21 @@ class ProtocolCore(
             return OFF_DECK_LOCATION
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
+
+
+def _waste_chute_fixture_id(
+    with_staging_area_slot_d4: bool, orifice: Literal["wide_open", "columnar_slit"]
+) -> str:
+    if orifice not in {"wide_open", "columnar_slit"}:
+        raise ValueError(
+            f"orifice must be 'wide_open' or 'columnar_slit', not {repr(orifice)}."
+        )
+
+    ids: Dict[Tuple[bool, Literal["wide_open", "columnar_slit"]], str] = {
+        (False, "wide_open"): "wasteChuteRightAdapterNoCover",
+        (False, "columnar_slit"): "wasteChuteRightAdapterCovered",
+        (True, "wide_open"): "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
+        (True, "columnar_slit"): "stagingAreaSlotWithWasteChuteRightAdapterCovered",
+    }
+
+    return ids[with_staging_area_slot_d4, orifice]

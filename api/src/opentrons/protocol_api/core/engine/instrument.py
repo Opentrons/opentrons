@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
+from opentrons.motion_planning.waypoints import DEFAULT_GENERAL_ARC_Z_MARGIN
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
@@ -18,11 +19,14 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.types import Point
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
+
+from ... import _waste_chute_dimensions
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -373,6 +377,69 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
+    def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
+        self._engine_client.drop_tip_in_place(
+            pipette_id=self._pipette_id,
+            home_after=home_after,
+        )
+
+    def drop_tip_in_waste_chute(
+        self, waste_chute_core: WasteChuteCore, home_after: Optional[bool]
+    ) -> None:
+        # TODO: Can we get away with implementing this in two steps like this,
+        # or does drop_tip() need to take the waste chute location because the z-height
+        # depends on the intent of dropping tip? How would Protocol Designer want to implement
+        # this?
+        self._move_to_waste_chute(
+            waste_chute_load_name=waste_chute_core.load_name,
+            force_direct=False,
+            speed=None,
+        )
+        self._drop_tip_in_place(home_after=home_after)
+
+    def _move_to_waste_chute(
+        self,
+        waste_chute_load_name: str,
+        force_direct: bool,
+        speed: Optional[float],
+    ) -> None:
+        if self.get_channels() == 96:
+            if waste_chute_load_name not in {
+                "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
+                "WasteChuteRightAdapterNoCover",
+            }:
+                # TODO: Instead of hard-coding load names, we should see whether the addressable area "96ChannelWasteChute" has
+                # been provided by any loaded fixture."
+                raise ValueError("Wrong waste chute, you silly goose.")
+            slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_96_TIP_A1
+        else:
+            slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
+
+        # TODO: All of this logic to compute the destination coordinate belongs in Protocol Engine.
+        slot_d3 = next(
+            s
+            for s in self._protocol_core.get_deck_definition()["locations"][
+                "orderedSlots"
+            ]
+            if s["id"] == "D3"
+        )
+        slot_d3_origin = Point(*slot_d3["position"])
+        destination_point = slot_d3_origin + slot_origin_to_tip_a1
+        minimum_z = (
+            # TODO: Why isn't DEFAULT_GENERAL_ARC_Z_MARGIN valid?
+            _waste_chute_dimensions.ENVELOPE_HEIGHT
+            + 7.5
+        )
+
+        self.move_to(
+            Location(destination_point, labware=None),
+            well_core=None,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z,
+            # minimum_z_height=minimum_z,
+            speed=speed,
+        )
+
     def home(self) -> None:
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
@@ -394,7 +461,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
-
         if well_core is not None:
             labware_id = well_core.labware_id
             well_name = well_core.get_name()

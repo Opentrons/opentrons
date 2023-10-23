@@ -133,6 +133,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def drop_tip_in_waste_chute(
+        self, waste_chute_core: WasteChuteCoreType, home_after: Optional[bool]
+    ) -> None:
+        ...
+
+    @abstractmethod
     def home(self) -> None:
         ...
 
@@ -237,4 +243,4 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
 
-InstrumentCoreType = TypeVar("InstrumentCoreType", bound=AbstractInstrument[Any])
+InstrumentCoreType = TypeVar("InstrumentCoreType", bound=AbstractInstrument[Any, Any])

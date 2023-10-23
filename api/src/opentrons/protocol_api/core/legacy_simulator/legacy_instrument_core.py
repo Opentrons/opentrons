@@ -250,6 +250,9 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
+    def drop_tip_in_waste_chute(self, waste_chute_core: LegacyWasteChuteCore) -> None:
+        raise APIVersionError("Waste chutes are not supported in this PAPI version.")
+
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
 

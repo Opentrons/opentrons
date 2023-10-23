@@ -31,6 +31,7 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
+from ._waste_chute import WasteChute
 from . import labware, validation
 
 
@@ -858,7 +859,13 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def drop_tip(
         self,
-        location: Optional[Union[types.Location, labware.Well]] = None,
+        location: Optional[
+            Union[
+                types.Location,
+                labware.Well,
+                WasteChute,
+            ]
+        ] = None,
         home_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
@@ -934,7 +941,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
-            well = self.trash_container.wells()[0]
+            # FIXME: Handle the case where .trash_container is a waste chute.
+            well = self.trash_container.wells()[0]  # type: ignore[union-attr]
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
 
@@ -955,6 +963,12 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
 
             well = maybe_well
+
+        elif isinstance(location, WasteChute):
+            # TODO: Publish to run log.
+            self._core.drop_tip_in_waste_chute(location._core, home_after=home_after)
+            self._last_tip_picked_up_from = None
+            return self
 
         else:
             raise TypeError(
