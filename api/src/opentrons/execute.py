@@ -328,9 +328,9 @@ def execute(  # noqa: C901
             'name': command_name,
             'payload': {
               'text': string_command_text,
-               # The rest of this struct is
-               # command-dependent; see
-               # opentrons.commands.commands.
+              # The rest of this struct is
+              # command-dependent; see
+              # opentrons.commands.commands.
              }
           }
 
