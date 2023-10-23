@@ -324,7 +324,6 @@ interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   setFixtureLocation: (fixtureLocation: Cutout) => void
-  providedFixtureOptions: FixtureLoadName[]
   setProvidedFixtureOptions: (providedFixtureOptions: FixtureLoadName[]) => void
 }
 
