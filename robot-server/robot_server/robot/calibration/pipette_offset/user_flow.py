@@ -12,11 +12,29 @@ from typing import (
 )
 from opentrons.calibration_storage import (
     helpers,
-    get_pipette_offset,
-    save_pipette_calibration,
-    delete_pipette_offset_file,
-    load_tip_length_calibration,
 )
+
+from opentrons.config.feature_flags import enable_ot3_hardware_controller as is_ot3
+
+if is_ot3():
+    from opentrons.calibration_storage.ot3.tip_length import (
+        load_tip_length_calibration,
+    )
+    from opentrons.calibration_storage.ot3.pipette_offset import (
+        get_pipette_offset,
+        save_pipette_calibration,
+        delete_pipette_offset_file,
+    )
+else:
+    from opentrons.calibration_storage.ot2.tip_length import (
+        load_tip_length_calibration,
+    )
+    from opentrons.calibration_storage.ot2.pipette_offset import (
+        get_pipette_offset,
+        save_pipette_calibration,
+        delete_pipette_offset_file,
+    )
+
 from opentrons.calibration_storage.ot2 import models
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,

@@ -2,19 +2,37 @@ import logging
 from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
 from typing_extensions import Literal
 
+from opentrons.config.feature_flags import enable_ot3_hardware_controller as is_ot3
 from opentrons.calibration_storage import (
     helpers,
     types as cal_types,
     get_robot_deck_attitude,
     save_robot_deck_attitude,
     get_custom_tiprack_definition_for_tlc,
-    load_tip_length_calibration,
-    save_tip_length_calibration,
-    create_tip_length_data,
-    get_pipette_offset,
-    save_pipette_calibration,
     mark_bad_calibration,
 )
+
+if is_ot3():
+    from opentrons.calibration_storage.ot3.tip_length import (
+        load_tip_length_calibration,
+        save_tip_length_calibration,
+        create_tip_length_data,
+    )
+    from opentrons.calibration_storage.ot3.pipette_offset import (
+        get_pipette_offset,
+        save_pipette_calibration,
+    )
+else:
+    from opentrons.calibration_storage.ot2.tip_length import (
+        load_tip_length_calibration,
+        save_tip_length_calibration,
+        create_tip_length_data,
+    )
+    from opentrons.calibration_storage.ot2.pipette_offset import (
+        get_pipette_offset,
+        save_pipette_calibration,
+    )
+
 from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
