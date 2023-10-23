@@ -482,7 +482,7 @@ def simulate(
                            occur during protocol simulation are best associated
                            with the actions in the protocol that cause them.
                            Default: ``False``
-    :param log_level: The level of logs to capture in the runlog:
+    :param log_level: The level of logs to capture in the run log:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
     :returns: A tuple of a run log for user output, and possibly the required

@@ -315,9 +315,9 @@ def execute(  # noqa: C901
     :param log_level: The level of logs to emit on the command line:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
-    :param emit_runlog: A callback for printing the runlog. If specified, this
+    :param emit_runlog: A callback for printing the run log. If specified, this
         will be called whenever a command adds an entry to the
-        runlog, which can be used for display and progress
+        run log, which can be used for display and progress
         estimation. If specified, the callback should take a
         single argument (the name doesn't matter) which will
         be a dictionary:
