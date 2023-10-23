@@ -1,6 +1,4 @@
 import pytest
-import importlib
-import opentrons
 from typing import cast, Any, TYPE_CHECKING
 
 from opentrons.calibration_storage import (
@@ -21,7 +19,6 @@ from opentrons.calibration_storage.ot3 import (
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons_shared_data.pipette.dev_types import LabwareUri
-    from opentrons_shared_data.deck.dev_types import RobotModel
 
 
 @pytest.fixture

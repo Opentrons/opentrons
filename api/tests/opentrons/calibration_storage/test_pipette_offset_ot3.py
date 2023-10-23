@@ -1,6 +1,4 @@
 import pytest
-import importlib
-import opentrons
 from typing import Any, TYPE_CHECKING
 
 from opentrons.types import Mount, Point
@@ -76,9 +74,6 @@ def test_get_pipette_calibration(
     # needed for proper type checking unfortunately
     from opentrons.calibration_storage.ot3.models.v1 import (
         InstrumentOffsetModel as OT3InstrModel,
-    )
-    from opentrons.calibration_storage.ot2.models.v1 import (
-        InstrumentOffsetModel as OT2InstrModel,
     )
 
     pipette_data = get_pipette_offset("pip1", Mount.LEFT)

@@ -1,5 +1,3 @@
-from opentrons import config
-
 from .ot3 import gripper_offset
 from .ot2 import mark_bad_calibration
 
