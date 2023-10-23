@@ -8,8 +8,6 @@ from robot_server.hardware import get_hardware
 from robot_server.persistence import get_sql_engine as ensure_sql_engine_is_ready
 from robot_server.service.legacy.models import V1BasicResponse
 from .models import Health, HealthLinks
-from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
-from opentrons.drivers.rpi_drivers import build_gpio_chardev
 
 
 
@@ -18,23 +16,25 @@ LOG_PATHS = ["/logs/serial.log", "/logs/api.log", "/logs/server.log"]
 
 health_router = APIRouter()
 
+
+def get_door_switch_required() -> bool:
+    return True
+
+
 @health_router.get(path='/version', status_code=status.HTTP_200_OK)
 async def get_version():
     return {"version": "firerock-stable-6.3.1"}
 
-@health_router.get(path='/door_state', status_code=status.HTTP_200_OK)
-async def get_door_state():
-    gpio0 = build_gpio_chardev("gpiochip0")
-    gpio0.config_by_board_rev()
-    await gpio0.setup()
-    front_button = gpio0.read_front_door_switch()
-    top_button = gpio0.read_top_window_switch()
-    door_state = gpio0.get_door_state()
-    return{"status": {
-        "front_button": front_button,
-        "top_button": top_button,
-        "door_state": door_state
-    }}
+@health_router.get(
+        "/robot/door/status",
+        summary="Get the status of the robot door",
+        description="Get whether the robot is open or closed"
+)
+async def get_door_status(
+    hardware: HardwareControlAPI = Depends(get_hardware)
+):
+    _status = hardware.door_state
+    return {"door_status": _status}
 
 
 @health_router.get(
