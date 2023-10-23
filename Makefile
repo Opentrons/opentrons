@@ -26,6 +26,7 @@ USB_BRIDGE_DIR := usb-bridge
 NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
 PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
+JS_PACKAGES := $(API_CLIENT_DIR) $(APP_SHELL_DIR) $(APP_SHELL_ODD_DIR) $(COMPONENTS_DIR) $(DISCOVERY_CLIENT_DIR) $(LABWARE_LIBRARY_DIR) $(PROTOCOL_DESIGNER_DIR) $(SHARED_DATA_DIR) $(REACT_API_CLIENT_DIR) $(STEP_GENERATION_DIR) $(NODE_USB_BRIDGE_CLIENT_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -198,18 +199,8 @@ test-py: test-py-windows
 	$(MAKE) -C $(USB_BRIDGE_DIR) test
 
 .PHONY: test-js
-test-js:
-	$(MAKE) -C $(API_CLIENT_DIR) test
-	$(MAKE) -C $(APP_SHELL_DIR) test
-	$(MAKE) -C $(APP_SHELL_ODD_DIR) test
-	$(MAKE) -C $(COMPONENTS_DIR) test
-	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) test
-	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test
-	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test
-	$(MAKE) -C $(REACT_API_CLIENT_DIR) test
-	$(MAKE) -C $(SHARED_DATA_DIR) test
-	$(MAKE) -C $(STEP_GENERATION_DIR) test
-	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test
+test-js: tests?=$(JS_PACKAGES)
+test-js: test-js-internal
 
 # lints and typechecks
 .PHONY: lint
@@ -271,6 +262,10 @@ circular-dependencies-js:
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
 
-.PHONY: test-js-%
-test-js-%:
+.PHONY: test-js-internal
+test-js-internal:
 	yarn jest $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-js-%
+test-js-%: 
+	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" $(test_opts) $(cov_opts)
