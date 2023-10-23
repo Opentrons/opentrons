@@ -15,6 +15,9 @@ PORT ?= 8090
 # TODO(mc, 2018-08-07): figure out a better way to do this
 ui_dir := ../app
 
+# Path of source package
+SRC_PATH = app-shell
+
 # cross-platform noop command
 noop := cd .
 
@@ -22,6 +25,14 @@ noop := cd .
 dist_files = $(if $(filter $(1),robot-stack),"dist/**/Opentrons-*","dist/**/Opentrons-OT3-*")
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
+
+# These variables can be overriden when make is invoked to customize the
+# behavior of jest. For instance,
+# make test tests=src/__tests__/http.test.ts would run only the
+# specified test
+tests ?= $(SRC_PATH)/src
+cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app-shell/src/**/*.(js|ts|tsx)'
+test_opts ?=
 
 # Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)

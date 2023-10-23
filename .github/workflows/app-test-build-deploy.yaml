@@ -140,11 +140,13 @@ jobs:
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
-      - name: 'test native(er) packages'
-        run: |
-          make -C app shell --collectCoverage
-          make -C app shell-odd --collectCoverage
-          make -C discovery-client --collectCoverage
+      - name: 'test app shell'
+        run: make -C app-shell test-cov
+      - name: 'test app shell odd'
+        run: make -C app-shell-odd test-cov
+      - name: 'test discovery client'
+        run: make -C discovery-client test-cov
+      # TODO before merging: check to see that coverage report actually gets uploaded for each native package
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
