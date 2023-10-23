@@ -6,6 +6,9 @@ SHELL := bash
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
+export NODE_OPTIONS := --openssl-legacy-provider
+
 .PHONY: all
 all: clean dist
 
@@ -34,6 +37,6 @@ serve: all
 # end to end tests
 .PHONY: test-e2e
 test-e2e:
-	NODE_OPTIONS=--openssl-legacy-provider concurrently --no-color --kill-others --success first --names "labware-library-server,labware-library-tests" \
+	concurrently --no-color --kill-others --success first --names "labware-library-server,labware-library-tests" \
 	"$(MAKE) dev CYPRESS=1 GTM_ID=''" \
 	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"

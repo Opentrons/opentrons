@@ -171,5 +171,5 @@ dev-app-update.yml:
 dev: export NODE_ENV := development
 dev: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev: clean-dev-autoupdate ./dev-app-update.yml
-	NODE_OPTIONS=--openssl-legacy-provider webpack
+	webpack
 	$(electron)

@@ -16,6 +16,9 @@ shell_dir := ../app-shell
 shell_odd_dir := ../app-shell-odd
 discovery_client_dir := ../discovery-client
 
+# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
+export NODE_OPTIONS := --openssl-legacy-provider
+
 # standard targets
 #####################################################################
 
@@ -61,7 +64,7 @@ dev-odd:
 .PHONY: dev-server
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
-	NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --hot
+	webpack-dev-server --hot
 
 .PHONY: dev-shell
 dev-shell:
