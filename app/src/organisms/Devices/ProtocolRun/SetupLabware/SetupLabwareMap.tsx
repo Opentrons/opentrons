@@ -18,7 +18,7 @@ import {
 
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
-import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModules/utils'
+import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { useAttachedModules } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'

@@ -14,7 +14,7 @@ import {
 
 import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModules/utils'
+import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
 import { useAttachedModules, useStoredProtocolAnalysis } from '../../hooks'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
