@@ -42,7 +42,7 @@ describe('FirmwareUpdateModal', () => {
       description: 'A firmware update is required, instrument is updating',
       subsystem: 'pipette_left',
       proceedDescription: 'Firmware is up to date.',
-      isODD: true,
+      isOnDevice: true,
     }
     mockUseInstrumentQuery.mockReturnValue({
       data: {

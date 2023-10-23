@@ -306,7 +306,7 @@ export const GripperWizard = (
         subsystem="gripper"
         description={t('firmware_updating')}
         proceedDescription={t('firmware_up_to_date')}
-        isODD={isOnDevice}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {

@@ -26,7 +26,7 @@ interface FirmwareUpdateModalProps {
   proceedDescription: string
   proceed: () => void
   subsystem: Subsystem
-  isODD: boolean
+  isOnDevice: boolean
 }
 
 const DESCRIPTION_STYLE = css`
@@ -73,7 +73,13 @@ const SPINNER_STYLE = css`
 export const FirmwareUpdateModal = (
   props: FirmwareUpdateModalProps
 ): JSX.Element => {
-  const { proceed, proceedDescription, subsystem, description, isODD } = props
+  const {
+    proceed,
+    proceedDescription,
+    subsystem,
+    description,
+    isOnDevice,
+  } = props
   const [updateId, setUpdateId] = React.useState('')
   const [firmwareText, setFirmwareText] = React.useState('')
   const {
@@ -147,7 +153,7 @@ export const FirmwareUpdateModal = (
         <Icon
           name="ot-spinner"
           aria-label="spinner"
-          size={isODD ? '6.25rem' : '5.125rem'}
+          size={isOnDevice ? '6.25rem' : '5.125rem'}
           css={SPINNER_STYLE}
           spin
         />

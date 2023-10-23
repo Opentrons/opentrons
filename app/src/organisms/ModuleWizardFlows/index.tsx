@@ -269,7 +269,7 @@ export const ModuleWizardFlows = (
         proceedDescription={t('firmware_up_to_date', {
           module: getModuleDisplayName(attachedModule.moduleModel),
         })}
-        isODD={isOnDevice}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
