@@ -70,11 +70,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
             isFlex={isFlex}
           />
         ) : (
-          <SetupLabwareMap
-            runId={runId}
-            protocolAnalysis={protocolAnalysis}
-            robotName={robotName}
-          />
+          <SetupLabwareMap runId={runId} protocolAnalysis={protocolAnalysis} />
         )}
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing16}>

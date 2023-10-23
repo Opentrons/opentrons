@@ -212,7 +212,6 @@ describe('SetupLabwareMap', () => {
       .mockReturnValue({})
 
     const { getByText } = render({
-      robotName: ROBOT_NAME,
       runId: RUN_ID,
       protocolAnalysis: null,
     })
@@ -286,7 +285,6 @@ describe('SetupLabwareMap', () => {
       .mockReturnValue(<div>mock module viz {mockTCModule.type} </div>)
 
     const { getByText } = render({
-      robotName: ROBOT_NAME,
       runId: RUN_ID,
       protocolAnalysis: null,
     })

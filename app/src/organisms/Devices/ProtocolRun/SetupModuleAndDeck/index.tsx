@@ -57,7 +57,7 @@ export const SetupModuleAndDeck = ({
             ) : null}
           </>
         ) : (
-          <SetupModulesMap robotName={robotName} runId={runId} />
+          <SetupModulesMap runId={runId} />
         )}
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>

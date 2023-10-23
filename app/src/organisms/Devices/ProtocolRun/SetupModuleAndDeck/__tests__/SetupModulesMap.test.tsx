@@ -119,7 +119,6 @@ describe('SetupModulesMap', () => {
   let props: React.ComponentProps<typeof SetupModulesMap>
   beforeEach(() => {
     props = {
-      robotName: MOCK_ROBOT_NAME,
       runId: MOCK_RUN_ID,
     }
     when(mockUseProtocolDetailsForRun)

@@ -53,6 +53,7 @@ interface BaseDeckProps {
     moduleChildren?: React.ReactNode
   }>
   deckConfig?: DeckConfiguration
+  deckLayerBlocklist?: string[]
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode
@@ -65,6 +66,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     labwareLocations,
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
+    deckLayerBlocklist = [],
     // TODO(bh, 2023-10-09): remove deck config fixture for Flex after migration to v4
     // deckConfig = EXTENDED_DECK_CONFIG_FIXTURE,
     deckConfig = STANDARD_SLOT_DECK_CONFIG_FIXTURE,
@@ -87,12 +89,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
 
   return (
     <RobotCoordinateSpace
-      height="400px"
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {robotType === OT2_ROBOT_TYPE ? (
-        // module/labware overlay children, reuse the labwareLocations map and moduleLocations map
-        <DeckFromData def={deckDef} layerBlocklist={[]} />
+        <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
       ) : (
         <>
           {singleSlotFixtures.map(fixture => (
