@@ -133,8 +133,9 @@ class LiquidContent:
 
     def set_volume(self, volume: float) -> None:
         """Set volume."""
-        if not 0 <= volume <= self._calc_type.max_volume():
-            raise ValueError(f"Volume out of range: {volume}")
+        _max = self._calc_type.max_volume()
+        if not 0 <= volume <= _max:
+            raise ValueError(f"Volume ({volume}) out of range (max={_max})")
         self._volume = volume
 
     def get_volume(self) -> float:

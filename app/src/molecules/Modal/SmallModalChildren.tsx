@@ -28,6 +28,7 @@ export function SmallModalChildren(
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
         width="100%"
+        whiteSpace="break-spaces"
       >
         <StyledText
           color={COLORS.darkBlackEnabled}

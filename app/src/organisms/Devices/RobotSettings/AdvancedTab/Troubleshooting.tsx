@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { saveAs } from 'file-saver'
+import JSZip from 'jszip'
+import last from 'lodash/last'
 
+import { GET, request } from '@opentrons/api-client'
 import {
   Flex,
   ALIGN_CENTER,
@@ -11,18 +14,16 @@ import {
   SPACING_AUTO,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { INFO_TOAST } from '../../../../atoms/Toast'
+import { ERROR_TOAST, INFO_TOAST } from '../../../../atoms/Toast'
 import { useToaster } from '../../../../organisms/ToasterOven'
-import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
-import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import { useRobot } from '../../hooks'
 
 import type { IconProps } from '@opentrons/components'
-import type { Dispatch } from '../../../../redux/types'
 
 interface TroubleshootingProps {
   robotName: string
@@ -32,33 +33,76 @@ export function Troubleshooting({
   robotName,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
   const robot = useRobot(robotName)
   const controlDisabled = robot?.status !== CONNECTABLE
-  const logsAvailable = robot?.health != null && robot.health.logs
-  const robotLogsDownloading = useSelector(getRobotLogsDownloading)
-  const [toastId, setToastId] = React.useState<string | null>(null)
+  const logsAvailable = robot?.health != null && robot.health.logs != null
+  const [
+    isDownloadingRobotLogs,
+    setIsDownloadingRobotLogs,
+  ] = React.useState<boolean>(false)
   const { makeToast, eatToast } = useToaster()
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
+  const host = useHost()
+
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    const newToastId = makeToast(t('downloading_logs'), INFO_TOAST, {
+    setIsDownloadingRobotLogs(true)
+    const toastId = makeToast(t('downloading_logs'), INFO_TOAST, {
+      disableTimeout: true,
       icon: toastIcon,
     })
-    setToastId(newToastId)
-    if (!controlDisabled && robot?.status === CONNECTABLE)
-      dispatch(downloadLogs(robot))
+
+    if (
+      !controlDisabled &&
+      robot?.status === CONNECTABLE &&
+      robot.health.logs != null &&
+      host != null
+    ) {
+      const zip = new JSZip()
+
+      Promise.all(
+        robot.health.logs.map(log => {
+          const logFileName: string = last(log.split('/')) ?? 'opentrons.log'
+          return request<string>(GET, log, null, host)
+            .then(res => {
+              zip.file(logFileName, res.data)
+            })
+            .catch((e: Error) =>
+              makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+            )
+        })
+      )
+        .then(() => {
+          zip
+            .generateAsync({ type: 'blob' })
+            .then(blob => {
+              saveAs(blob, `${robotName}_logs.zip`)
+            })
+            .catch((e: Error) => {
+              eatToast(toastId)
+              makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+              // avoid no-op on unmount
+              if (mounted.current != null) setIsDownloadingRobotLogs(false)
+            })
+        })
+        .then(() => {
+          eatToast(toastId)
+          if (mounted.current != null) setIsDownloadingRobotLogs(false)
+        })
+        .catch((e: Error) => {
+          eatToast(toastId)
+          makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+          if (mounted.current != null) setIsDownloadingRobotLogs(false)
+        })
+    }
   }
 
-  React.useEffect(() => {
-    if (!robotLogsDownloading && toastId != null) {
-      eatToast(toastId)
-      setToastId(null)
-    }
-  }, [robotLogsDownloading, eatToast, toastId])
+  // set ref on component to check if component is mounted https://react.dev/reference/react/useRef#manipulating-the-dom-with-a-ref
+  const mounted = React.useRef(null)
 
   return (
     <Flex
+      ref={mounted}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       marginTop={SPACING.spacing24}
@@ -81,7 +125,7 @@ export function Troubleshooting({
       </Box>
       <TertiaryButton
         disabled={
-          controlDisabled || logsAvailable == null || robotLogsDownloading
+          controlDisabled || logsAvailable == null || isDownloadingRobotLogs
         }
         marginLeft={SPACING_AUTO}
         onClick={handleClick}

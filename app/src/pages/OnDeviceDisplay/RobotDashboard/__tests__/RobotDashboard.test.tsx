@@ -13,7 +13,7 @@ import { RecentRunProtocolCarousel } from '../../../../organisms/OnDeviceDisplay
 import { Navigation } from '../../../../organisms/Navigation'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { getOnDeviceDisplaySettings } from '../../../../redux/config'
-import { WelcomedModal } from '../WelcomeModal'
+import { WelcomeModal } from '../WelcomeModal'
 import { RobotDashboard } from '../../RobotDashboard'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -56,8 +56,8 @@ const mockRecentRunProtocolCarousel = RecentRunProtocolCarousel as jest.MockedFu
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings
 >
-const mockWelcomeModal = WelcomedModal as jest.MockedFunction<
-  typeof WelcomedModal
+const mockWelcomeModal = WelcomeModal as jest.MockedFunction<
+  typeof WelcomeModal
 >
 
 const render = () => {
@@ -103,6 +103,7 @@ describe('RobotDashboard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
     mockRecentRunProtocolCarousel.mockReturnValue(
       <div>mock RecentRunProtocolCarousel</div>

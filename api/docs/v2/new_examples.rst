@@ -6,7 +6,7 @@
 Protocol Examples
 *****************
 
-This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial`. Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
+This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the :ref:`tutorial <tutorial>`. Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
 
 Using These Protocols
 =====================
@@ -54,6 +54,75 @@ They also use the labware listed below:
       - Opentrons 96 Tip Rack 300 µL
       - ``opentrons_96_tiprack_300ul``
 
+.. _protocol-template:
+      
+Protocol Template
+=================
+
+This code only loads the instruments and labware listed above, and performs no other actions. Many code snippets from elsewhere in the documentation will run without modification when added at the bottom of this template. You can also use it to start writing and testing your own code.
+
+.. tabs::
+
+    .. tab:: Flex 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load tip rack in deck slot D3
+                tiprack = protocol.load_labware(
+                    load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="flex_1channel_1000",
+                    mount="left",
+                    tip_racks=[tiprack]
+                )
+                # load well plate in deck slot D2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location="D2"
+                )
+                # load reservoir in deck slot D1
+                reservoir = protocol.load_labware(
+                    load_name="usascientific_12_reservoir_22ml", location="D1"
+                )
+                # Put protocol commands here
+    
+    .. tab:: OT-2 
+
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '2.14'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # load tip rack in deck slot 3
+                tiprack = protocol.load_labware(
+                    load_name="opentrons_96_tiprack_300ul", location=3
+                )
+                # attach pipette to left mount
+                pipette = protocol.load_instrument(
+                    instrument_name="p300_single_gen2",
+                    mount="left",
+                    tip_racks=[tiprack]
+                )  
+                # load well plate in deck slot 2
+                plate = protocol.load_labware(
+                    load_name="corning_96_wellplate_360ul_flat", location=2
+                )
+                # load reservoir in deck slot 1
+                reservoir = protocol.load_labware(
+                    load_name="usascientific_12_reservoir_22ml", location=1
+                )
+                # Put protocol commands here
+
 Transferring Liquids
 ====================
 
@@ -62,7 +131,7 @@ These protocols demonstrate how to move 100 µL of liquid from one well to anoth
 Basic Method
 ------------
 
-This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, and :py:meth:`~.InstrumentContext.dispense` methods.
+This protocol uses some :ref:`building block commands <v2-atomic-commands>` to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the :py:meth:`~.InstrumentContext.pick_up_tip`, :py:meth:`~.InstrumentContext.aspirate`, and :py:meth:`~.InstrumentContext.dispense` methods.
 
 .. tabs::
 
@@ -99,7 +168,7 @@ This protocol uses some :ref:`basic commands <v2-atomic-commands>` to tell the r
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.15'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -155,7 +224,7 @@ This protocol accomplishes the same thing as the previous example, but does it a
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.15'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -219,7 +288,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -259,7 +328,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel':'2.15'}
+            requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -294,7 +363,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -338,7 +407,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
 
             from opentrons import protocol_api
 
-            requirements = {'robotType':'Flex', 'apiLevel': '2.15'}
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -381,7 +450,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.15'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -478,7 +547,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             :substitutions:
 
             from opentrons import protocol_api
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
                 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(

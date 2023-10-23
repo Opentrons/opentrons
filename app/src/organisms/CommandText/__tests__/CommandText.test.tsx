@@ -5,12 +5,20 @@ import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
 
 import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/gantry'
-import type { BlowoutRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type {
+  BlowoutRunTimeCommand,
+  DispenseRunTimeCommand,
+  ConfigureForVolumeRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import {
+  LabwareDefinition2,
+  RunTimeCommand,
+  DropTipRunTimeCommand,
+} from '@opentrons/shared-data'
 
 describe('CommandText', () => {
   it('renders correct text for aspirate', () => {
@@ -31,7 +39,7 @@ describe('CommandText', () => {
       )
     }
   })
-  it('renders correct text for dispense', () => {
+  it('renders correct text for dispense without pushOut', () => {
     const command = mockRobotSideAnalysis.commands.find(
       c => c.commandType === 'dispense'
     )
@@ -46,6 +54,31 @@ describe('CommandText', () => {
       )[0]
       getByText(
         'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec'
+      )
+    }
+  })
+  it('renders correct text for dispense with pushOut', () => {
+    const command = mockRobotSideAnalysis.commands.find(
+      c => c.commandType === 'dispense'
+    )
+    const pushOutDispenseCommand = {
+      ...command,
+      params: {
+        ...command?.params,
+        pushOut: 10,
+      },
+    } as DispenseRunTimeCommand
+    expect(pushOutDispenseCommand).not.toBeUndefined()
+    if (pushOutDispenseCommand != null) {
+      const { getByText } = renderWithProviders(
+        <CommandText
+          robotSideAnalysis={mockRobotSideAnalysis}
+          command={pushOutDispenseCommand}
+        />,
+        { i18nInstance: i18n }
+      )[0]
+      getByText(
+        'Dispensing 100 µL into well A1 of NEST 96 Well Plate 100 µL PCR Full Skirt (1) in Magnetic Module GEN2 in Slot 1 at 300 µL/sec and pushing out 10 µL'
       )
     }
   })
@@ -91,6 +124,24 @@ describe('CommandText', () => {
       getByText('Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5')
     }
   })
+  it('renders correct text for configureForVolume', () => {
+    const command = {
+      commandType: 'configureForVolume',
+      params: {
+        volume: 1,
+        pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+      },
+    } as ConfigureForVolumeRunTimeCommand
+
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        command={command}
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Configure P300 Single-Channel GEN1 to aspirate 1 µL')
+  })
   it('renders correct text for dropTip', () => {
     const command = mockRobotSideAnalysis.commands.find(
       c => c.commandType === 'dropTip'
@@ -106,6 +157,26 @@ describe('CommandText', () => {
       )[0]
       getByText('Dropping tip in A1 of Fixed Trash')
     }
+  })
+  it('renders correct text for dropTip into a labware', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        command={
+          {
+            commandType: 'dropTip',
+            params: {
+              labwareId: 'b2a40c9d-31b0-4f27-ad4a-c92ced91204d',
+              wellName: 'A1',
+              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 0 } },
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+            },
+          } as DropTipRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9')
   })
   it('renders correct text for pickUpTip', () => {
     const command = mockRobotSideAnalysis.commands.find(
@@ -322,7 +393,7 @@ describe('CommandText', () => {
     )[0]
     getByText('Setting Temperature Module to 20°C (rounded to nearest integer)')
   })
-  it('renders correct text for temperatureModule/waitForTemperature', () => {
+  it('renders correct text for temperatureModule/waitForTemperature with target temp', () => {
     const mockTemp = 20
     const { getByText } = renderWithProviders(
       <CommandText
@@ -343,9 +414,29 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )[0]
-    getByText(
-      'Waiting for Temperature Module to reach 20°C (rounded to nearest integer)'
-    )
+    getByText('Waiting for Temperature Module to reach 20°C')
+  })
+  it('renders correct text for temperatureModule/waitForTemperature with no specified temp', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'temperatureModule/waitForTemperature',
+          params: { moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText('Waiting for Temperature Module to reach target temperature')
   })
   it('renders correct text for thermocycler/setTargetBlockTemperature', () => {
     const mockTemp = 20
@@ -855,7 +946,7 @@ describe('CommandText', () => {
           params: {
             strategy: 'manualMoveWithPause',
             labwareId: mockRobotSideAnalysis.labware[3].id,
-            newLocation: { moduleId: mockRobotSideAnalysis.modules[0].id },
+            newLocation: { slotName: 'A3' },
           },
           id: 'def456',
           result: { offsetId: 'fake_offset_id' },
@@ -872,7 +963,7 @@ describe('CommandText', () => {
       }
     )[0]
     getByText(
-      'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Magnetic Module GEN2 in Slot 1'
+      'Manually move NEST 96 Well Plate 100 µL PCR Full Skirt (1) from Magnetic Module GEN2 in Slot 1 to Slot A3'
     )
   })
   it('renders correct text for move labware with gripper off deck', () => {

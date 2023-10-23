@@ -70,7 +70,8 @@ def test_map_before_command() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            private_result=None,
+            command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
@@ -80,7 +81,7 @@ def test_map_before_command() -> None:
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="hello world",
                 ),
-            )
+            ),
         )
     ]
 
@@ -109,7 +110,8 @@ def test_map_after_command() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            private_result=None,
+            command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
@@ -121,7 +123,7 @@ def test_map_after_command() -> None:
                     legacyCommandText="hello world",
                 ),
                 result=pe_commands.CustomResult(),
-            )
+            ),
         )
     ]
 
@@ -201,7 +203,8 @@ def test_command_stack() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            private_result=None,
+            command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.RUNNING,
@@ -211,10 +214,11 @@ def test_command_stack() -> None:
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="hello",
                 ),
-            )
+            ),
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            private_result=None,
+            command=pe_commands.Custom.construct(
                 id="command.COMMENT-1",
                 key="command.COMMENT-1",
                 status=pe_commands.CommandStatus.RUNNING,
@@ -224,10 +228,11 @@ def test_command_stack() -> None:
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="goodbye",
                 ),
-            )
+            ),
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Custom.construct(
+            private_result=None,
+            command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
                 key="command.COMMENT-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
@@ -239,7 +244,7 @@ def test_command_stack() -> None:
                     legacyCommandText="hello",
                 ),
                 result=pe_commands.CustomResult(),
-            )
+            ),
         ),
         pe_actions.FailCommandAction(
             command_id="command.COMMENT-1",
@@ -319,8 +324,8 @@ def test_map_instrument_load(decoy: Decoy) -> None:
         ),
         result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id_captor),
     )
-    assert result[1] == pe_actions.AddPipetteConfigAction(
-        pipette_id=pipette_id_captor.value,
+    assert result[1] == pe_commands.LoadPipettePrivateResult(
+        pipette_id="pipette-0",
         serial_number="fizzbuzz",
         config=pipette_config,
     )
@@ -437,17 +442,19 @@ def test_map_pause() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.WaitForResume.construct(
+            private_result=None,
+            command=pe_commands.WaitForResume.construct(
                 id="command.PAUSE-0",
                 key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
                 params=pe_commands.WaitForResumeParams(message="hello world"),
-            )
+            ),
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.WaitForResume.construct(
+            private_result=None,
+            command=pe_commands.WaitForResume.construct(
                 id="command.PAUSE-0",
                 key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
@@ -455,7 +462,7 @@ def test_map_pause() -> None:
                 startedAt=matchers.IsA(datetime),
                 completedAt=matchers.IsA(datetime),
                 params=pe_commands.WaitForResumeParams(message="hello world"),
-            )
+            ),
         ),
         pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL),
     ]

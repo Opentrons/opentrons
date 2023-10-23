@@ -1,4 +1,5 @@
 """Tests for reading the current status of the tip presence photointerrupter."""
+import pytest
 from mock import AsyncMock
 
 from typing import List, Tuple, cast
@@ -15,6 +16,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import SensorIdField
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_shared_data.errors.exceptions import CommandTimedOutError
 from tests.conftest import CanLoopback
 
 
@@ -46,7 +48,9 @@ async def test_get_tip_ejector_state(
     message_send_loopback.add_responder(responder)
 
     res = await get_tip_ejector_state(
-        mock_messenger, cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node)
+        mock_messenger,
+        cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node),
+        1,
     )
 
     # We should have sent a request
@@ -61,7 +65,10 @@ async def test_tip_ejector_state_times_out(mock_messenger: AsyncMock) -> None:
     """Test that a timeout is handled."""
     node = NodeId.pipette_left
 
-    res = await get_tip_ejector_state(
-        mock_messenger, cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node)
-    )
-    assert not res
+    with pytest.raises(CommandTimedOutError):
+        res = await get_tip_ejector_state(
+            mock_messenger,
+            cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node),
+            1,
+        )
+        assert not res

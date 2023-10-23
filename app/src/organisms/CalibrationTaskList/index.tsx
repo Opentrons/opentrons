@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
@@ -35,6 +36,7 @@ interface CalibrationTaskListProps {
   pipOffsetCalLauncher: DashboardCalOffsetInvoker
   tipLengthCalLauncher: DashboardCalTipLengthInvoker
   deckCalLauncher: DashboardCalDeckInvoker
+  exitBeforeDeckConfigCompletion: boolean
 }
 
 export function CalibrationTaskList({
@@ -42,6 +44,7 @@ export function CalibrationTaskList({
   pipOffsetCalLauncher,
   tipLengthCalLauncher,
   deckCalLauncher,
+  exitBeforeDeckConfigCompletion,
 }: CalibrationTaskListProps): JSX.Element {
   const prevActiveIndex = React.useRef<[number, number] | null>(null)
   const [hasLaunchedWizard, setHasLaunchedWizard] = React.useState<boolean>(
@@ -113,6 +116,10 @@ export function CalibrationTaskList({
       fullPage
       backgroundColor={COLORS.fundamentalsBackground}
       childrenPadding={`${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing4}`}
+      css={css`
+        width: 50rem;
+        height: 47.5rem;
+      `}
     >
       {showCompletionScreen ? (
         <Flex
@@ -125,9 +132,15 @@ export function CalibrationTaskList({
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
-            <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
+            {exitBeforeDeckConfigCompletion ? (
+              <Icon name="ot-alert" size="3rem" color={COLORS.warningEnabled} />
+            ) : (
+              <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
+            )}
             <StyledText as="h1" marginTop={SPACING.spacing24}>
-              {t('calibrations_complete')}
+              {exitBeforeDeckConfigCompletion
+                ? t('using_current_calibrations')
+                : t('calibrations_complete')}
             </StyledText>
             <PrimaryButton
               marginTop={SPACING.spacing24}

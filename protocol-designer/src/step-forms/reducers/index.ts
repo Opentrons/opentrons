@@ -1,5 +1,6 @@
 import assert from 'assert'
 import { handleActions } from 'redux-actions'
+import { Reducer } from 'redux'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
@@ -19,32 +20,21 @@ import {
   MAGNETIC_MODULE_V1,
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
+  LoadFixtureCreateCommand,
+  STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { uuid } from '../../utils'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  FIXED_TRASH_ID,
-  SPAN7_8_10_11_SLOT,
-} from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
   handleFormChange,
 } from '../../steplist/formLevel'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-import {
-  _getPipetteEntitiesRootState,
-  _getLabwareEntitiesRootState,
-  _getInitialDeckSetupRootState,
-} from '../selectors'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import {
-  createPresavedStepForm,
-  getDeckItemIdInSlot,
-  getIdsInRange,
-} from '../utils'
 import {
   createInitialProfileCycle,
   createInitialProfileStep,
@@ -52,28 +42,41 @@ import {
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
-import { Reducer } from 'redux'
 import {
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
-import {
-  CreateContainerAction,
-  DeleteContainerAction,
-  DuplicateLabwareAction,
-  SwapSlotContentsAction,
-} from '../../labware-ingred/actions'
+import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type {
-  FormData,
-  StepIdType,
-  StepType,
-  ProfileItem,
-  ProfileCycleItem,
-  ProfileStepItem,
-} from '../../form-types'
 import {
+  _getPipetteEntitiesRootState,
+  _getLabwareEntitiesRootState,
+  _getInitialDeckSetupRootState,
+} from '../selectors'
+import {
+  CreateDeckFixtureAction,
+  DeleteDeckFixtureAction,
+  ToggleIsGripperRequiredAction,
+} from '../actions/additionalItems'
+import {
+  createPresavedStepForm,
+  getDeckItemIdInSlot,
+  getIdsInRange,
+} from '../utils'
+import {
+  CreateModuleAction,
+  CreatePipettesAction,
+  DeleteModuleAction,
+  DeletePipettesAction,
+  EditModuleAction,
+  SubstituteStepFormPipettesAction,
+  ChangeBatchEditFieldAction,
+  ResetBatchEditFieldChangesAction,
+  SaveStepFormsMultiAction,
+} from '../actions'
+
+import type {
   CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
@@ -89,7 +92,21 @@ import {
   EditProfileStepAction,
   FormPatch,
 } from '../../steplist/actions'
-import {
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+  ProfileItem,
+  ProfileCycleItem,
+  ProfileStepItem,
+} from '../../form-types'
+import type {
+  CreateContainerAction,
+  DeleteContainerAction,
+  DuplicateLabwareAction,
+  SwapSlotContentsAction,
+} from '../../labware-ingred/actions'
+import type {
   AddStepAction,
   DuplicateStepAction,
   DuplicateMultipleStepsAction,
@@ -98,24 +115,12 @@ import {
   SelectTerminalItemAction,
   SelectMultipleStepsAction,
 } from '../../ui/steps/actions/types'
-import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import {
+import type {
   NormalizedLabware,
   NormalizedLabwareById,
   ModuleEntities,
 } from '../types'
-import {
-  CreateModuleAction,
-  CreatePipettesAction,
-  DeleteModuleAction,
-  DeletePipettesAction,
-  EditModuleAction,
-  SubstituteStepFormPipettesAction,
-  ChangeBatchEditFieldAction,
-  ResetBatchEditFieldChangesAction,
-  SaveStepFormsMultiAction,
-} from '../actions'
-import { ToggleIsGripperRequiredAction } from '../actions/additionalItems'
+
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -140,6 +145,8 @@ export type UnsavedFormActions =
   | EditProfileStepAction
   | SelectMultipleStepsAction
   | ToggleIsGripperRequiredAction
+  | CreateDeckFixtureAction
+  | DeleteDeckFixtureAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -200,6 +207,8 @@ export const unsavedForm = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
+    case 'CREATE_DECK_FIXTURE':
+    case 'DELETE_DECK_FIXTURE':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -487,6 +496,8 @@ export type SavedStepFormsActions =
   | ReplaceCustomLabwareDef
   | EditModuleAction
   | ToggleIsGripperRequiredAction
+  | CreateDeckFixtureAction
+  | DeleteDeckFixtureAction
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
@@ -590,7 +601,6 @@ export const savedStepForms = (
         ...stepForm,
       }))
     }
-
     case 'DUPLICATE_LABWARE':
     case 'CREATE_CONTAINER': {
       // auto-update initial deck setup state.
@@ -1094,11 +1104,7 @@ export const batchEditFormChanges = (
     }
   }
 }
-const initialLabwareState: NormalizedLabwareById = {
-  [FIXED_TRASH_ID]: {
-    labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
-  },
-}
+const initialLabwareState: NormalizedLabwareById = {}
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
 export const labwareInvariantProperties: Reducer<
   NormalizedLabwareById,
@@ -1144,7 +1150,6 @@ export const labwareInvariantProperties: Reducer<
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
-      const FIXED_TRASH_ID = 'fixedTrash'
       const labware = {
         ...loadLabwareCommands.reduce(
           (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
@@ -1160,9 +1165,6 @@ export const labwareInvariantProperties: Reducer<
           },
           {}
         ),
-        [FIXED_TRASH_ID]: {
-          labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
-        },
       }
 
       return Object.keys(labware).length > 0 ? labware : state
@@ -1227,7 +1229,13 @@ export const moduleInvariantProperties: Reducer<
       )
       const modules = loadModuleCommands.reduce(
         (acc: ModuleEntities, command: LoadModuleCreateCommand) => {
-          const { moduleId, model } = command.params
+          const { moduleId, model, location } = command.params
+          if (moduleId == null) {
+            console.error(
+              `expected module ${model} in location ${location.slotName} to have an id, but id does not`
+            )
+            return acc
+          }
           return {
             ...acc,
             [moduleId]: {
@@ -1306,22 +1314,54 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       action: LoadFileAction
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
-      const gripper = Object.values(file.commands).filter(
+      const gripperCommands = Object.values(file.commands).filter(
         (command): command is MoveLabwareCreateCommand =>
           command.commandType === 'moveLabware' &&
           command.params.strategy === 'usingGripper'
       )
-      const hasGripper = gripper.length > 0
-      const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
-      const additionalEquipmentId = uuid()
-      const updatedEquipment = {
-        [additionalEquipmentId]: {
+      const fixtureCommands = Object.values(file.commands).filter(
+        (command): command is LoadFixtureCreateCommand =>
+          command.commandType === 'loadFixture'
+      )
+      const fixtures = fixtureCommands.reduce(
+        (
+          acc: NormalizedAdditionalEquipmentById,
+          command: LoadFixtureCreateCommand
+        ) => {
+          const { fixtureId, loadName, location } = command.params
+          const id = fixtureId ?? ''
+          if (
+            loadName === STANDARD_SLOT_LOAD_NAME ||
+            loadName === TRASH_BIN_LOAD_NAME
+          ) {
+            return acc
+          }
+          return {
+            ...acc,
+            [id]: {
+              id: id,
+              name: loadName,
+              location: location.cutout,
+            },
+          }
+        },
+        {}
+      )
+      const hasGripper = gripperCommands.length > 0
+      const isFlex = file.robot.model === FLEX_ROBOT_TYPE
+      const gripperId = `${uuid()}:gripper`
+      const gripper = {
+        [gripperId]: {
           name: 'gripper' as const,
-          id: additionalEquipmentId,
+          id: gripperId,
         },
       }
-      if (hasGripper && isOt3) {
-        return { ...state, ...updatedEquipment }
+      if (isFlex) {
+        if (hasGripper) {
+          return { ...state, ...gripper, ...fixtures }
+        } else {
+          return { ...state, ...fixtures }
+        }
       } else {
         return { ...state }
       }
@@ -1329,25 +1369,45 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     TOGGLE_IS_GRIPPER_REQUIRED: (
       state: NormalizedAdditionalEquipmentById
     ): NormalizedAdditionalEquipmentById => {
-      const additionalEquipmentId = Object.keys(state)[0]
-      const existingEquipment = state[additionalEquipmentId]
+      let updatedEquipment = { ...state }
+      const gripperId = `${uuid()}:gripper`
+      const gripperKey = Object.keys(updatedEquipment).find(
+        key => updatedEquipment[key].name === 'gripper'
+      )
 
-      let updatedEquipment
-
-      if (existingEquipment && existingEquipment.name === 'gripper') {
-        updatedEquipment = {}
+      if (gripperKey != null) {
+        updatedEquipment = omit(updatedEquipment, [gripperKey])
       } else {
-        const newAdditionalEquipmentId = uuid()
         updatedEquipment = {
-          [newAdditionalEquipmentId]: {
+          ...updatedEquipment,
+          [gripperId]: {
             name: 'gripper' as const,
-            id: newAdditionalEquipmentId,
+            id: gripperId,
           },
         }
       }
-
       return updatedEquipment
     },
+    //  @ts-expect-error
+    CREATE_DECK_FIXTURE: (
+      state: NormalizedAdditionalEquipmentById,
+      action: CreateDeckFixtureAction
+    ): NormalizedAdditionalEquipmentById => {
+      const { location, id, name } = action.payload
+      return {
+        ...state,
+        [id]: {
+          name,
+          id,
+          location,
+        },
+      }
+    },
+    //  @ts-expect-error
+    DELETE_DECK_FIXTURE: (
+      state: NormalizedAdditionalEquipmentById,
+      action: DeleteDeckFixtureAction
+    ): NormalizedAdditionalEquipmentById => omit(state, action.payload.id),
     DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
   },
   initialAdditionalEquipmentState

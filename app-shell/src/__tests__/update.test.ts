@@ -1,5 +1,6 @@
 // app-shell self-update tests
 import * as ElectronUpdater from 'electron-updater'
+import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 import { registerUpdate } from '../update'
 import * as Cfg from '../config'
 
@@ -62,14 +63,34 @@ describe('update', () => {
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
-      payload: { error: { name: 'Error', message: 'AH' } },
+      payload: {
+        error: { name: 'Error', message: 'AH' },
+        available: false,
+        info: null,
+      },
     })
   })
 
   it('handles shell:DOWNLOAD_UPDATE', () => {
-    handleAction({ type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } })
+    handleAction({
+      type: 'shell:DOWNLOAD_UPDATE',
+      meta: { shell: true },
+    })
 
     expect(autoUpdater.downloadUpdate).toHaveBeenCalledTimes(1)
+
+    const progress = {
+      percent: 20,
+    }
+
+    autoUpdater.emit('download-progress', progress)
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'shell:DOWNLOAD_PERCENTAGE',
+      payload: {
+        percent: 20,
+      },
+    })
 
     autoUpdater.emit('update-downloaded', { version: '1.0.0' })
 
@@ -77,10 +98,18 @@ describe('update', () => {
       type: 'shell:DOWNLOAD_UPDATE_RESULT',
       payload: {},
     })
+    expect(dispatch).toHaveBeenCalledWith({
+      type: UPDATE_VALUE,
+      payload: { path: 'update.hasJustUpdated', value: true },
+      meta: { shell: true },
+    })
   })
 
   it('handles shell:DOWNLOAD_UPDATE with error', () => {
-    handleAction({ type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } })
+    handleAction({
+      type: 'shell:DOWNLOAD_UPDATE',
+      meta: { shell: true },
+    })
     autoUpdater.emit('error', new Error('AH'))
 
     expect(dispatch).toHaveBeenCalledWith({

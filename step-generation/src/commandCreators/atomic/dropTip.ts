@@ -1,8 +1,8 @@
 import { uuid } from '../../utils'
-import { FIXED_TRASH_ID } from '../../constants'
 import type { CommandCreator } from '../../types'
 interface DropTipArgs {
   pipette: string
+  dropTipLocation: string
 }
 
 /** Drop tip if given pipette has a tip. If it has no tip, do nothing. */
@@ -11,8 +11,7 @@ export const dropTip: CommandCreator<DropTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette } = args
-
+  const { pipette, dropTipLocation } = args
   // No-op if there is no tip
   if (!prevRobotState.tipState.pipettes[pipette]) {
     return {
@@ -26,7 +25,9 @@ export const dropTip: CommandCreator<DropTipArgs> = (
       key: uuid(),
       params: {
         pipetteId: pipette,
-        labwareId: FIXED_TRASH_ID,
+        //  TODO(jr, 10/02/23): this param will probably be slightly changed in order to drop tip to waste chute
+        //  since there is no labwareId or wellName for it
+        labwareId: dropTipLocation,
         wellName: 'A1',
       },
       //  TODO(jr, 7/17/23): add WellLocation params!

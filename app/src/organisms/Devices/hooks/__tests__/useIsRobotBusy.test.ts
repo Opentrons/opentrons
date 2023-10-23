@@ -8,15 +8,16 @@ import {
   DISENGAGED,
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,
-  ENGAGED,
 } from '../../../EmergencyStop'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
+import { useIsFlex } from '../useIsFlex'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../useIsFlex')
 
 const mockEstopStatus = {
   data: {
@@ -35,6 +36,7 @@ const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 describe('useIsRobotBusy', () => {
   beforeEach(() => {
@@ -49,6 +51,7 @@ describe('useIsRobotBusy', () => {
       },
     } as UseQueryResult<Runs, Error>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
+    mockUseIsFlex.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -113,7 +116,8 @@ describe('useIsRobotBusy', () => {
     expect(result).toBe(false)
   })
 
-  it('returns true when Estop status is not disengaged', () => {
+  it('returns true when robot is a Flex and Estop status is engaged', () => {
+    mockUseIsFlex.mockReturnValue(true)
     mockUseAllRunsQuery.mockReturnValue({
       data: {
         links: {
@@ -134,9 +138,41 @@ describe('useIsRobotBusy', () => {
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
     const mockEngagedStatus = {
-      ...mockEstopStatus,
-      status: PHYSICALLY_ENGAGED,
-      leftEstopPhysicalStatus: ENGAGED,
+      data: {
+        ...mockEstopStatus.data,
+        status: PHYSICALLY_ENGAGED,
+      },
+    }
+    mockUseEstopQuery.mockReturnValue({ data: mockEngagedStatus } as any)
+    const result = useIsRobotBusy()
+    expect(result).toBe(true)
+  })
+  it('returns false when robot is NOT a Flex and Estop status is engaged', () => {
+    mockUseIsFlex.mockReturnValue(false)
+    mockUseAllRunsQuery.mockReturnValue({
+      data: {
+        links: {
+          current: null,
+        },
+      },
+    } as any)
+    mockUseAllSessionsQuery.mockReturnValue(({
+      data: [
+        {
+          id: 'test',
+          createdAt: '2019-08-24T14:15:22Z',
+          details: {},
+          sessionType: 'calibrationCheck',
+          createParams: {},
+        },
+      ],
+      links: {},
+    } as unknown) as UseQueryResult<Sessions, Error>)
+    const mockEngagedStatus = {
+      data: {
+        ...mockEstopStatus.data,
+        status: PHYSICALLY_ENGAGED,
+      },
     }
     mockUseEstopQuery.mockReturnValue({ data: mockEngagedStatus } as any)
     const result = useIsRobotBusy()

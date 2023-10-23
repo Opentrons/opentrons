@@ -1,7 +1,9 @@
 """In-memory storage of ProtocolEngine instances."""
 from typing import List, NamedTuple, Optional
 
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -162,7 +164,9 @@ class EngineStore:
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,
-                block_on_door_open=feature_flags.enable_door_safety_switch(),
+                block_on_door_open=feature_flags.enable_door_safety_switch(
+                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+                ),
             ),
         )
         runner = create_protocol_runner(
@@ -219,7 +223,11 @@ class EngineStore:
         state_view = engine.state_view
 
         if state_view.commands.get_is_okay_to_clear():
-            await engine.finish(drop_tips_and_home=False, set_run_status=False)
+            await engine.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 

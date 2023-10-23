@@ -9,23 +9,27 @@ import {
   useInstrumentsQuery,
   useRunQuery,
   useProtocolQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../../i18n'
+import { useToaster } from '../../../../organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
   useLPCDisabledReason,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
 } from '../../../../organisms/Devices/hooks'
+import { getLocalRobot } from '../../../../redux/discovery'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupModules } from '../../../../organisms/ProtocolSetupModules'
-import { getUnmatchedModulesForProtocol } from '../../../../organisms/ProtocolSetupModules/utils'
+import { ProtocolSetupModulesAndDeck } from '../../../../organisms/ProtocolSetupModulesAndDeck'
+import { getUnmatchedModulesForProtocol } from '../../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { useLaunchLPC } from '../../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '../../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockProtocolModuleInfo } from '../../../../organisms/ProtocolSetupInstruments/__fixtures__'
@@ -35,6 +39,7 @@ import {
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
+import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -62,14 +67,16 @@ jest.mock(
 jest.mock(
   '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 )
-jest.mock('../../../../organisms/ProtocolSetupModules')
-jest.mock('../../../../organisms/ProtocolSetupModules/utils')
+jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck')
+jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck/utils')
 jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
+jest.mock('../../../../organisms/ToasterOven')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -83,8 +90,8 @@ const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunc
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
 >
-const mockProtocolSetupModules = ProtocolSetupModules as jest.MockedFunction<
-  typeof ProtocolSetupModules
+const mockProtocolSetupModulesAndDeck = ProtocolSetupModulesAndDeck as jest.MockedFunction<
+  typeof ProtocolSetupModulesAndDeck
 >
 const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof getUnmatchedModulesForProtocol
@@ -125,6 +132,19 @@ const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.Mock
 >
 const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
   typeof ConfirmAttachedModal
+>
+const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
+  typeof useDoorQuery
+>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
+>
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
 >
 
 const render = (path = '/') => {
@@ -185,14 +205,22 @@ const mockOffset = {
   vector: { x: 1, y: 2, z: 3 },
 }
 
+const mockDoorStatus = {
+  data: {
+    status: 'closed',
+    doorRequiredClosedForProtocol: true,
+  },
+}
+const MOCK_MAKE_SNACKBAR = jest.fn()
+
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
   beforeEach(() => {
     mockLaunchLPC = jest.fn()
     mockUseLPCDisabledReason.mockReturnValue(null)
     mockUseAttachedModules.mockReturnValue([])
-    mockProtocolSetupModules.mockReturnValue(
-      <div>Mock ProtocolSetupModules</div>
+    mockProtocolSetupModulesAndDeck.mockReturnValue(
+      <div>Mock ProtocolSetupModulesAndDeck</div>
     )
     mockProtocolSetupLiquids.mockReturnValue(
       <div>Mock ProtocolSetupLiquids</div>
@@ -200,6 +228,8 @@ describe('ProtocolSetup', () => {
     mockConfirmCancelRunModal.mockReturnValue(
       <div>Mock ConfirmCancelRunModal</div>
     )
+    mockUseModuleCalibrationStatus.mockReturnValue({ complete: true })
+    mockGetLocalRobot.mockReturnValue({ name: '123' } as any)
     when(mockUseRunControls)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -254,7 +284,7 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, PROTOCOL_NAME)
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
@@ -263,6 +293,15 @@ describe('ProtocolSetup', () => {
     mockConfirmAttachedModal.mockReturnValue(
       <div>mock ConfirmAttachedModal</div>
     )
+    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
+    when(mockUseToaster)
+      .calledWith()
+      .mockReturnValue(({
+        makeSnackbar: MOCK_MAKE_SNACKBAR,
+      } as unknown) as any)
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -307,9 +346,9 @@ describe('ProtocolSetup', () => {
       .calledWith([], mockProtocolModuleInfo)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
+    expect(queryByText('Mock ProtocolSetupModulesAndDeck')).toBeNull()
     queryByText('Modules')?.click()
-    getByText('Mock ProtocolSetupModules')
+    getByText('Mock ProtocolSetupModulesAndDeck')
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
@@ -352,5 +391,28 @@ describe('ProtocolSetup', () => {
     mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
     const [{ getAllByTestId }] = render(`/runs/${RUN_ID}/setup/`)
     expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+  })
+
+  it('should render toast and make a button disabled when a robot door is open', () => {
+    const mockOpenDoorStatus = {
+      data: {
+        status: 'open',
+        doorRequiredClosedForProtocol: true,
+      },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
+    getByRole('button', { name: 'play' }).click()
+    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
+      'Close the robot door before starting the run.'
+    )
+  })
+
+  it('should render modules & deck when enableDeckConfiguration is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(true)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('Modules & deck')
   })
 })

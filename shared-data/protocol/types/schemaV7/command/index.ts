@@ -7,6 +7,10 @@ import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
 import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
 import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
 import type {
+  IncidentalCreateCommand,
+  IncidentalRunTimeCommand,
+} from './incidental'
+import type {
   AnnotationRunTimeCommand,
   AnnotationCreateCommand,
 } from './annotation'
@@ -51,6 +55,7 @@ export type CreateCommand =
   | TimingCreateCommand // effecting the timing of command execution
   | CalibrationCreateCommand // for automatic pipette calibration
   | AnnotationCreateCommand // annotating command execution
+  | IncidentalCreateCommand // command with only incidental effects (status bar animations)
 
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
@@ -61,6 +66,7 @@ export type RunTimeCommand =
   | TimingRunTimeCommand // effecting the timing of command execution
   | CalibrationRunTimeCommand // for automatic pipette calibration
   | AnnotationRunTimeCommand // annotating command execution
+  | IncidentalRunTimeCommand // command with only incidental effects (status bar animations)
 
 interface RunCommandError {
   id: string

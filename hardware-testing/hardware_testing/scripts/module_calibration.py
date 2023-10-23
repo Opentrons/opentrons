@@ -12,8 +12,6 @@ PROBE_OFFSET = Point(x=0, y=0, z=44.5)
 MODELS = [
     "temperatureModuleV1",
     "temperatureModuleV2",
-    "magneticModuleV1",
-    "magneticModuleV2",
     "thermocyclerModuleV1",
     "thermocyclerModuleV2",
     "heaterShakerModuleV1",

@@ -55,7 +55,7 @@ describe('SetupDeckCalibration', () => {
     getByText('Not calibrated yet')
     expect(
       getByRole('link', {
-        name: 'Calibrate Now',
+        name: 'Calibrate now',
       }).getAttribute('href')
     ).toBe('/devices/otie/robot-settings/calibration/dashboard')
   })

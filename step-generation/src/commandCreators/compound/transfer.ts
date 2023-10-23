@@ -19,6 +19,7 @@ import {
   touchTip,
   moveToWell,
 } from '../atomic'
+import { configureForVolume } from '../atomic/configureForVolume'
 import { mixUtil } from './mix'
 import type {
   TransferArgs,
@@ -76,6 +77,13 @@ export const transfer: CommandCreator<TransferArgs> = (
         labware: args.sourceLabware,
       })
     )
+  }
+
+  if (
+    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
   if (errors.length > 0)
@@ -163,10 +171,24 @@ export const transfer: CommandCreator<TransferArgs> = (
             changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
           }
 
+          const configureForVolumeCommand: CurriedCommandCreator[] =
+            invariantContext.pipetteEntities[args.pipette].name ===
+              'p50_single_flex' ||
+            invariantContext.pipetteEntities[args.pipette].name ===
+              'p50_multi_flex'
+              ? [
+                  curryCommandCreator(configureForVolume, {
+                    pipetteId: args.pipette,
+                    volume: args.volume,
+                  }),
+                ]
+              : []
+
           const tipCommands: CurriedCommandCreator[] = changeTipNow
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette: args.pipette,
+                  dropTipLocation: args.dropTipLocation,
                 }),
               ]
             : []
@@ -388,6 +410,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               ? [
                   curryCommandCreator(dropTip, {
                     pipette: args.pipette,
+                    dropTipLocation: args.dropTipLocation,
                   }),
                 ]
               : []
@@ -406,6 +429,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...tipCommands,
             ...preWetTipCommands,
             ...mixBeforeAspirateCommands,
+            ...configureForVolumeCommand,
             curryCommandCreator(aspirate, {
               pipette: args.pipette,
               volume: subTransferVol,

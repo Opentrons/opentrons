@@ -9,9 +9,15 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api.core.common import ProtocolCore, LabwareCore
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocol_api.core.common import ProtocolCore, LabwareCore, ModuleCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api import Deck, Labware, validation as mock_validation
+from opentrons.protocol_api import (
+    Deck,
+    Labware,
+    OFF_DECK,
+    validation as mock_validation,
+)
 from opentrons.protocol_api.deck import CalibrationPosition
 from opentrons.types import DeckSlotName, Point
 
@@ -133,6 +139,89 @@ def test_get_slot_item(
     decoy.when(mock_core_map.get(mock_labware_core)).then_return(mock_labware)
 
     assert subject[42] is mock_labware
+
+
+def test_delitem_aliases_to_move_labware(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should be equivalent to a manual labware move to off-deck, without pausing."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
+    decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(
+        mock_labware_core
+    )
+
+    del subject[42]
+
+    decoy.verify(
+        mock_protocol_core.move_labware(
+            mock_labware_core,
+            OFF_DECK,
+            use_gripper=False,
+            pause_for_manual_move=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_delitem_raises_on_api_2_14(
+    subject: Deck,
+) -> None:
+    """It should raise on apiLevel 2.14."""
+    with pytest.raises(APIVersionError):
+        del subject[1]
+
+
+def test_delitem_noops_if_slot_is_empty(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should do nothing, and not raise anything, if you try to delete from an empty slot."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(1, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_1)).then_return(None)
+
+    del subject[1]
+
+
+def test_delitem_raises_if_slot_has_module(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should raise a descriptive error if you try to delete a module."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    mock_module_core = decoy.mock(cls=ModuleCore)
+    decoy.when(mock_module_core.get_display_name()).then_return("<module display name>")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(2, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
+    decoy.when(mock_protocol_core.get_slot_item(DeckSlotName.SLOT_2)).then_return(
+        mock_module_core
+    )
+
+    with pytest.raises(
+        TypeError,
+        match=(
+            "Slot 2 contains a module, <module display name>."
+            " You can only delete labware, not modules."
+        ),
+    ):
+        del subject[2]
 
 
 @pytest.mark.parametrize(

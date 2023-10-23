@@ -155,4 +155,22 @@ describe('ProtocolList', () => {
     const { getByText } = render(props)
     getByText('Oldest updates')
   })
+
+  it('renders Flex as the sort key when flex was selected last time', () => {
+    when(mockUseSortedProtocols)
+      .calledWith('flex', [storedProtocolData, storedProtocolDataTwo])
+      .mockReturnValue([storedProtocolData, storedProtocolDataTwo])
+    when(mockGetProtocolsDesktopSortKey).mockReturnValue('flex')
+    const { getByText } = render(props)
+    getByText('Flex protocols first')
+  })
+
+  it('renders ot2 as the sort key when ot2 was selected last time', () => {
+    when(mockUseSortedProtocols)
+      .calledWith('ot2', [storedProtocolData, storedProtocolDataTwo])
+      .mockReturnValue([storedProtocolData, storedProtocolDataTwo])
+    when(mockGetProtocolsDesktopSortKey).mockReturnValue('ot2')
+    const { getByText } = render(props)
+    getByText('OT-2 protocols first')
+  })
 })

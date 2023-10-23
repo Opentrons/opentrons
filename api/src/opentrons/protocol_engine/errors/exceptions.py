@@ -398,7 +398,7 @@ class MustHomeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a MustHomeError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(ErrorCodes.POSITION_UNKNOWN, message, details, wrapping)
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):
@@ -676,6 +676,19 @@ class GripperNotAttachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, details, wrapping)
 
 
+class CannotPerformGripperAction(ProtocolEngineError):
+    """Raised when trying to perform an illegal gripper action."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CannotPerformGripperAction."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LabwareMovementNotAllowedError(ProtocolEngineError):
     """Raised when attempting an illegal labware movement."""
 
@@ -725,7 +738,9 @@ class FirmwareUpdateRequired(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LocationIsOccupiedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, details, wrapping
+        )
 
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
@@ -751,6 +766,32 @@ class InvalidPipettingVolumeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InvalidPipettingVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidPushOutVolumeError(ProtocolEngineError):
+    """Raised when attempting to use an invalid volume for dispense push_out."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidPushOutVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidDispenseVolumeError(ProtocolEngineError):
+    """Raised when attempting to dispense a volume that was not aspirated."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidDispenseVolumeError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

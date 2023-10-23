@@ -39,6 +39,7 @@ describe('BeforeBeginning', () => {
       isRobotMoving: false,
       setErrorMessage: jest.fn(),
       errorMessage: null,
+      createdMaintenanceRunId: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -47,10 +48,10 @@ describe('BeforeBeginning', () => {
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+      'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
-      'The calibration pin is included with the gripper and should be stored on the exposed panel of the gripper.'
+      'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )
     getByText('You will need:')
     // getByText('mock need help link')
@@ -59,7 +60,7 @@ describe('BeforeBeginning', () => {
     getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
-    getByText('Gripper')
+    getByText('Flex Gripper')
 
     getByRole('button', { name: 'Move gantry to front' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
@@ -84,7 +85,7 @@ describe('BeforeBeginning', () => {
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+      'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
     )
     getByText('You will need:')
     getByText('2.5 mm Hex Screwdriver')
@@ -113,14 +114,14 @@ describe('BeforeBeginning', () => {
     const { getByText, getByRole } = render(props)
     getByText('Before you begin')
     getByText(
-      'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
+      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
     getByText(
-      'The calibration pin is included with the gripper and should be stored on the exposed panel of the gripper.'
+      'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )
     getByText('You will need:')
     getByText('Calibration Pin')
-    getByText('Gripper')
+    getByText('Flex Gripper')
     // getByText('mock need help link')
 
     getByRole('button', { name: 'Move gantry to front' }).click()

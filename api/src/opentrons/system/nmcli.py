@@ -318,17 +318,20 @@ def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:
     return scan_out
 
 
-async def available_ssids() -> List[Dict[str, Any]]:
+async def available_ssids(rescan: Optional[bool] = False) -> List[Dict[str, Any]]:
     """List the visible (broadcasting SSID) wireless networks.
+
+    rescan: Forces a rescan instead of using the cached results.
 
     Returns a list of the SSIDs. They may contain spaces and should be escaped
     if later passed to a shell.
     """
-    # Force nmcli to actually scan rather than reuse cached results. We ignore
-    # errors here because NetworkManager yells at you if you do it twice in a
+    # Force nmcli to actually scan if rescan is true rather than reuse cached results.
+    # We ignore errors here because NetworkManager yells at you if you do it twice in a
     # row without another operation in between
-    cmd = ["device", "wifi", "rescan"]
-    _1, _2 = await _call(cmd, suppress_err=True)
+    if rescan:
+        cmd = ["device", "wifi", "rescan"]
+        _1, _2 = await _call(cmd, suppress_err=True)
 
     fields = ["ssid", "signal", "active", "security"]
     cmd = ["--terse", "--fields", ",".join(fields), "device", "wifi", "list"]

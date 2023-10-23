@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
@@ -11,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -20,13 +18,20 @@ import {
 import { StyledText } from '../../../atoms/text'
 
 interface SetupStepProps {
+  /** whether or not to show the full contents of the step */
   expanded: boolean
+  /** always shown text name of the step */
   title: React.ReactNode
+  /** always shown text that provides a one sentence explanation of the contents */
   description: string
+  /** always shown text that sits above title of step (used for step number) */
   label: string
+  /** callback that should toggle the expanded state (managed by parent) */
   toggleExpanded: () => void
+  /** contents to be shown only when expanded */
   children: React.ReactNode
-  calibrationStatusComplete: boolean | null
+  /** element to be shown (right aligned) regardless of expanded state */
+  rightElement: React.ReactNode
 }
 
 const EXPANDED_STYLE = css`
@@ -57,10 +62,8 @@ export function SetupStep({
   label,
   toggleExpanded,
   children,
-  calibrationStatusComplete,
+  rightElement,
 }: SetupStepProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Btn textAlign={TYPOGRAPHY.textAlignLeft}>
@@ -100,34 +103,7 @@ export function SetupStep({
               </StyledText>
             </Flex>
             <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
-              {calibrationStatusComplete !== null ? (
-                <Flex flexDirection={DIRECTION_ROW}>
-                  <Icon
-                    size={SIZE_1}
-                    color={
-                      calibrationStatusComplete
-                        ? COLORS.successEnabled
-                        : COLORS.warningEnabled
-                    }
-                    marginRight={SPACING.spacing8}
-                    name={
-                      calibrationStatusComplete ? 'ot-check' : 'alert-circle'
-                    }
-                    id="RunSetupCard_calibrationIcon"
-                  />
-                  <StyledText
-                    color={COLORS.black}
-                    css={TYPOGRAPHY.pSemiBold}
-                    marginRight={SPACING.spacing16}
-                    textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    id="RunSetupCard_calibrationText"
-                  >
-                    {calibrationStatusComplete
-                      ? t('calibration_ready')
-                      : t('calibration_needed')}
-                  </StyledText>
-                </Flex>
-              ) : null}
+              {rightElement}
               <Icon
                 color={COLORS.darkBlackEnabled}
                 size="1.5rem"

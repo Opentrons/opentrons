@@ -33,7 +33,7 @@ import type {
 } from '@opentrons/discovery-client'
 
 import type { Action, Dispatch } from './types'
-import type { Config } from './config'
+import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
 
 const log = createLogger('discovery')
 
@@ -47,7 +47,7 @@ interface DiscoveryStore {
   services?: LegacyService[]
 }
 
-let config: Config['discovery']
+let config: ConfigV1['discovery']
 let store: Store<DiscoveryStore>
 let client: DiscoveryClient
 

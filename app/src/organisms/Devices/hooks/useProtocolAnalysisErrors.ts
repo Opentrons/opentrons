@@ -1,6 +1,7 @@
 import last from 'lodash/last'
 import {
-  useProtocolAnalysesQuery,
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
 
@@ -15,15 +16,18 @@ export function useProtocolAnalysisErrors(
 ): ProtocolAnalysisErrors {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
 
   if (protocolId === null || runRecord?.data?.current === false) {
     return { analysisErrors: null }
   }
-
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
   if (mostRecentAnalysis?.status !== 'completed') {
     return { analysisErrors: null }

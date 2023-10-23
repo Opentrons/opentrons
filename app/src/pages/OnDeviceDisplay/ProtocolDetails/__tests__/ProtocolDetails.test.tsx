@@ -2,7 +2,6 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
-import { format } from 'date-fns'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import {
@@ -15,12 +14,13 @@ import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
-  useProtocolAnalysesQuery,
+  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useHardwareStatusText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
+import { formatTimeWithUtcLabel } from '../../../../resources/runs/utils'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
@@ -67,8 +67,8 @@ const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
-const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
-  typeof useProtocolAnalysesQuery
+const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
+  typeof useProtocolAnalysisAsDocumentQuery
 >
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
@@ -77,8 +77,8 @@ const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jes
   typeof useOffsetCandidatesForAnalysis
 >
 
-const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
-  typeof useMissingHardwareText
+const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
+  typeof useHardwareStatusText
 >
 
 const MOCK_DATA = {
@@ -118,26 +118,21 @@ describe('ODDProtocolDetails', () => {
     mockUseCreateRunMutation.mockReturnValue({
       createRun: mockCreateRun,
     } as any)
-    mockUseMissingHardwareText.mockReturnValue(
-      'mock missing hardware chip text'
-    )
+    mockUseHardwareStatusText.mockReturnValue('mock missing hardware chip text')
     mockUseOffsetCandidatesForAnalysis.mockReturnValue([])
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
+      conflictedSlots: [],
     })
     mockUseProtocolQuery.mockReturnValue({
       data: MOCK_DATA,
       isLoading: false,
     } as any)
-    mockUseProtocolAnalysesQuery.mockReturnValue({
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
       data: {
-        data: [
-          {
-            id: 'mockAnalysisId',
-            status: 'completed',
-          },
-        ],
+        id: 'mockAnalysisId',
+        status: 'completed',
       },
     } as any)
     when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
@@ -171,9 +166,8 @@ describe('ODDProtocolDetails', () => {
   it('renders the protocol date added', () => {
     const [{ getByText }] = render()
     getByText(
-      `Date Added: ${format(
-        new Date('2022-05-03T21:36:12.494778+00:00'),
-        'MM/dd/yy k:mm'
+      `Date Added: ${formatTimeWithUtcLabel(
+        '2022-05-03T21:36:12.494778+00:00'
       )}`
     )
   })

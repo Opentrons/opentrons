@@ -8,6 +8,7 @@ import {
 } from 'styled-components'
 
 import {
+  Btn,
   Flex,
   Icon,
   Link,
@@ -50,6 +51,8 @@ export interface ToastProps extends StyleProps {
   heading?: string
   displayType?: 'desktop' | 'odd'
   exitNow?: boolean
+  linkText?: string
+  onLinkClick?: () => void
 }
 
 // TODO: (jh: 08/10/23) refactor toast component and render logic.
@@ -69,6 +72,8 @@ export function Toast(props: ToastProps): JSX.Element {
     heading,
     displayType,
     exitNow = false,
+    linkText,
+    onLinkClick = () => null,
     ...styleProps
   } = props
   const { t } = useTranslation('shared')
@@ -84,12 +89,13 @@ export function Toast(props: ToastProps): JSX.Element {
     showODDStyle = true
   }
 
-  const closeText =
-    buttonText !== undefined && buttonText.length > 0
-      ? buttonText
-      : closeButton === true
-      ? t('close')
-      : ''
+  let closeText: string | null = null
+  if (buttonText != null) {
+    closeText = buttonText
+  } else if (closeButton) {
+    if (displayType === 'odd') closeText = t('close')
+    else closeText = ''
+  }
 
   const ANIMATION_OVERFLOW = `
   overflow: hidden;
@@ -97,7 +103,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_OPTIMIZATIONS = `
   backface-visibility: hidden;
   perspective: 1000;
-  will-change: opacity, transform3d;
+  will-change: opacity, transform;
   `
   const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
@@ -157,11 +163,9 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes slidedown {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, 50%, 0);
         filter: opacity(0);
       }
     }
@@ -174,17 +178,29 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes fadeUpAndOut {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, -10%, 0);
         filter: opacity(0%);
       }
     }
   `
 
   const ODD_ANIMATION_NONE = css``
+
+  const TEXT_STYLE = css`
+    color: ${COLORS.darkBlackEnabled};
+    font-size: ${showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP};
+    font-weight: ${showODDStyle
+      ? TYPOGRAPHY.fontWeightSemiBold
+      : TYPOGRAPHY.fontWeightRegular};
+    line-height: ${showODDStyle
+      ? TYPOGRAPHY.lineHeight28
+      : TYPOGRAPHY.lineHeight20};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `
 
   let oddAnimation: FlattenSimpleInterpolation | ThemedCssFunction<DefaultTheme>
 
@@ -284,6 +300,11 @@ export function Toast(props: ToastProps): JSX.Element {
     }, calculatedDuration(message, headingText, duration))
   }
 
+  // Require intentional clicking if links and close button present on toast.
+  const toastClose = (): void => {
+    if (closeButton == null || linkText == null) onCloseHandler()
+  }
+
   return (
     <Flex
       css={showODDStyle ? oddAnimation : desktopAnimation}
@@ -297,7 +318,7 @@ export function Toast(props: ToastProps): JSX.Element {
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      onClick={isAutomaticAnimationExit ? onClose : onCloseHandler}
+      onClick={toastClose}
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
@@ -358,29 +379,28 @@ export function Toast(props: ToastProps): JSX.Element {
               {headingText}
             </StyledText>
           ) : null}
-          <StyledText
-            color={COLORS.darkBlackEnabled}
-            fontSize={
-              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
-            }
-            fontWeight={
-              showODDStyle
-                ? TYPOGRAPHY.fontWeightSemiBold
-                : TYPOGRAPHY.fontWeightRegular
-            }
-            lineHeight={
-              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-            }
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
-          >
-            {message}
-          </StyledText>
+          <Flex alignItems={ALIGN_CENTER}>
+            <StyledText css={TEXT_STYLE}>{message}</StyledText>
+            {linkText ? (
+              <Link
+                role="button"
+                onClick={() => {
+                  onLinkClick()
+                  onCloseHandler()
+                }}
+                css={TEXT_STYLE}
+                marginLeft={SPACING.spacing4}
+                marginRight={SPACING.spacing8}
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              >
+                {linkText}
+              </Link>
+            ) : null}
+          </Flex>
         </Flex>
       </Flex>
-      {closeText.length > 0 && (
-        <Link role="button">
+      {closeText ? (
+        <Link role="button" onClick={() => onCloseHandler()}>
           <StyledText
             color={COLORS.darkBlackEnabled}
             fontSize={
@@ -403,7 +423,18 @@ export function Toast(props: ToastProps): JSX.Element {
             {closeText}
           </StyledText>
         </Link>
-      )}
+      ) : null}
+      {!closeText && closeButton ? (
+        <Btn onClick={() => onCloseHandler()}>
+          <Icon
+            width={SPACING.spacing24}
+            height={SPACING.spacing24}
+            marginTop={SPACING.spacing6}
+            name="close"
+            aria-label="close_icon"
+          />
+        </Btn>
+      ) : null}
     </Flex>
   )
 }

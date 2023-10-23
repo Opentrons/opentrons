@@ -13,6 +13,7 @@ except (OSError, ModuleNotFoundError):
 from opentrons import types, config
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 
 LEFT_PIPETTE_PREFIX = "p10_single"
@@ -32,7 +33,7 @@ def dummy_instruments_attached():
             "id": None,
             "name": None,
         },
-    }
+    }, 10
 
 
 @pytest.fixture
@@ -45,11 +46,11 @@ def dummy_instruments_attached_ot3():
         types.Mount.LEFT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "p1000_single_gen3",
+            "name": "flex_1channel_1000",
         },
         types.Mount.RIGHT: {"model": None, "id": None, "name": None},
         OT3Mount.GRIPPER: None,
-    }
+    }, 200
 
 
 @pytest.fixture
@@ -123,7 +124,7 @@ def get_plunger_speed(api):
 
 
 async def test_cache_instruments(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, _) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -137,7 +138,7 @@ async def test_cache_instruments(sim_and_instr):
 
 
 async def test_mismatch_fails(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, _) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -149,10 +150,8 @@ async def test_mismatch_fails(sim_and_instr):
         await hw_api.cache_instruments(requested_instr)
 
 
-@pytest.mark.ot2_only
-async def test_backwards_compatibility(dummy_backwards_compatibility, sim_and_instr):
-    sim_builder, _ = sim_and_instr
-    hw_api = await sim_builder(
+async def test_backwards_compatibility(dummy_backwards_compatibility):
+    hw_api = await API.build_hardware_simulator(
         attached_instruments=dummy_backwards_compatibility,
         loop=asyncio.get_running_loop(),
     )
@@ -217,7 +216,7 @@ async def test_cache_instruments_hc(
 
 @pytest.mark.ot2_only
 async def test_cache_instruments_sim(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, _) = sim_and_instr
 
     def fake_func1(value):
         return value
@@ -305,7 +304,7 @@ async def test_cache_instruments_sim(sim_and_instr):
 
 
 async def test_prep_aspirate(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, dummy_tip_vol) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -314,6 +313,7 @@ async def test_prep_aspirate(sim_and_instr):
 
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, dummy_tip_vol)
     # If we just picked up a new tip, we should be fine
     await hw_api.aspirate(mount, 1)
 
@@ -330,19 +330,20 @@ async def test_prep_aspirate(sim_and_instr):
     # If we don't prep_after, we should still be fine
     await hw_api.drop_tip(mount)
     await hw_api.pick_up_tip(mount, 20.0, prep_after=False)
+    hw_api.set_working_volume(mount, dummy_tip_vol)
     await hw_api.aspirate(mount, 1, 1.0)
 
 
 async def test_aspirate_new(dummy_instruments):
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
     )
     await hw_api.home()
     await hw_api.cache_instruments()
 
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
-
+    hw_api.set_working_volume(mount, 10)
     aspirate_ul = 3.0
     aspirate_rate = 2
     await hw_api.prepare_for_aspirate(mount)
@@ -356,14 +357,14 @@ async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instru
     decoy.when(config.feature_flags.use_old_aspiration_functions()).then_return(True)
 
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
     )
     await hw_api.home()
     await hw_api.cache_instruments()
 
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
-
+    hw_api.set_working_volume(mount, 10)
     aspirate_ul = 3.0
     aspirate_rate = 2
     await hw_api.prepare_for_aspirate(mount)
@@ -373,28 +374,83 @@ async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instru
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
-async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
+async def test_aspirate_ot3_50(dummy_instruments_ot3, ot3_api_obj):
     hw_api = await ot3_api_obj(
-        attached_instruments=dummy_instruments_ot3, loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
     )
     await hw_api.home()
     await hw_api.cache_instruments()
 
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
-
+    hw_api.set_working_volume(mount, 50)
     aspirate_ul = 3.0
     aspirate_rate = 2
     await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
-    new_plunger_pos = 71.212208
+    new_plunger_pos = 71.1968
     pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
+async def test_aspirate_ot3_1000(dummy_instruments_ot3, ot3_api_obj):
+    hw_api = await ot3_api_obj(
+        attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
+    )
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+
+    hw_api.set_working_volume(mount, 1000)
+    aspirate_ul = 3.0
+    aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
+    new_plunger_pos = 71.2122
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(new_plunger_pos)
+
+
+async def test_configure_ot3(ot3_api_obj):
+    instrs = {
+        types.Mount.LEFT: {
+            "model": "p50_multi_v3.3",
+            "id": "testy",
+            "name": "p50_multi_gen3",
+        },
+        types.Mount.RIGHT: {"model": None, "id": None, "name": None},
+        OT3Mount.GRIPPER: None,
+    }
+    hw_api = await ot3_api_obj(attached_instruments=instrs)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, 50)
+    await hw_api.configure_for_volume(mount, 26)
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(71.5)
+    assert hw_api._pipette_handler.get_pipette(OT3Mount.LEFT).push_out_volume == 2
+
+    await hw_api.set_liquid_class(mount, "lowVolumeDefault")
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(61.5)
+    assert hw_api._pipette_handler.get_pipette(OT3Mount.LEFT).push_out_volume == 7
+
+    await hw_api.set_liquid_class(mount, "default")
+    await hw_api.prepare_for_aspirate(mount)
+    pos = await hw_api.current_position(mount)
+    assert pos[Axis.B] == pytest.approx(71.5)
+
+
 async def test_dispense_ot2(dummy_instruments):
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
     )
     await hw_api.home()
 
@@ -402,6 +458,7 @@ async def test_dispense_ot2(dummy_instruments):
 
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, 10)
 
     aspirate_ul = 10.0
     aspirate_rate = 2
@@ -420,7 +477,7 @@ async def test_dispense_ot2(dummy_instruments):
 
 async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj):
     hw_api = await ot3_api_obj(
-        attached_instruments=dummy_instruments_ot3, loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments_ot3[0], loop=asyncio.get_running_loop()
     )
     await hw_api.home()
 
@@ -428,28 +485,30 @@ async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj):
 
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
-
-    aspirate_ul = 10.0
+    hw_api.set_working_volume(mount, 50)
+    aspirate_ul = 50
     aspirate_rate = 2
     await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
-
-    dispense_1 = 3.0
+    dispense_1 = 25
     await hw_api.dispense(mount, dispense_1)
-    plunger_pos_1 = 70.92099
+    plunger_pos_1 = 69.705
     assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
-        plunger_pos_1
+        plunger_pos_1, 0.1
     )
 
-    await hw_api.dispense(mount, rate=2)
-    plunger_pos_2 = 71.5
+    with pytest.raises(CommandPreconditionViolated):
+        await hw_api.dispense(mount, 5, push_out=10)
+
+    await hw_api.dispense(mount, rate=2, push_out=10)
+    plunger_pos_2 = 72.2715
     assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
-        plunger_pos_2
+        plunger_pos_2, 0.1
     )
 
 
 async def test_no_pipette(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, _) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -462,7 +521,7 @@ async def test_no_pipette(sim_and_instr):
 
 
 async def test_pick_up_tip(is_robot, sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, _) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -483,7 +542,7 @@ async def test_pick_up_tip(is_robot, sim_and_instr):
 
 async def test_pick_up_tip_pos_ot2(is_robot, dummy_instruments):
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
     )
     mount = types.Mount.LEFT
     await hw_api.home()
@@ -520,7 +579,7 @@ def assert_move_called(mock_move, speed, lock=None):
 
 
 async def test_aspirate_flow_rate(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, tip_vol) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -529,6 +588,7 @@ async def test_aspirate_flow_rate(sim_and_instr):
     await hw_api.cache_instruments()
 
     await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, tip_vol)
 
     pip = hw_api.hardware_instruments[mount]
     with mock.patch.object(hw_api, "_move") as mock_move:
@@ -577,7 +637,7 @@ async def test_aspirate_flow_rate(sim_and_instr):
 
 
 async def test_dispense_flow_rate(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, tip_vol) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -586,6 +646,7 @@ async def test_dispense_flow_rate(sim_and_instr):
     await hw_api.cache_instruments()
 
     await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, tip_vol)
 
     await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(mount, 10)
@@ -632,7 +693,7 @@ async def test_dispense_flow_rate(sim_and_instr):
 
 
 async def test_blowout_flow_rate(sim_and_instr):
-    sim_builder, dummy_instruments = sim_and_instr
+    sim_builder, (dummy_instruments, tip_vol) = sim_and_instr
     hw_api = await sim_builder(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
@@ -641,6 +702,7 @@ async def test_blowout_flow_rate(sim_and_instr):
     await hw_api.cache_instruments()
 
     await hw_api.pick_up_tip(mount, 20.0)
+    hw_api.set_working_volume(mount, tip_vol)
 
     pip = hw_api.hardware_instruments[mount]
 
@@ -676,12 +738,10 @@ async def test_reset_instruments(monkeypatch, sim_and_instr):
         types.Mount.LEFT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "p1000_single_gen3",
         },
         types.Mount.RIGHT: {
             "model": "p1000_single_v3.3",
             "id": "testy",
-            "name": "p1000_single_gen3",
         },
     }
     sim_builder, _ = sim_and_instr

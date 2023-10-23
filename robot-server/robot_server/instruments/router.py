@@ -4,7 +4,7 @@ from typing import Optional, Dict, List, TYPE_CHECKING, cast
 from fastapi import APIRouter, status, Depends
 
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
 )
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
@@ -42,6 +42,7 @@ from .instrument_models import (
     BadGripper,
     BadPipette,
     PipetteState,
+    InconsistentCalibrationFailure,
 )
 
 from robot_server.subsystems.models import SubSystem
@@ -55,7 +56,7 @@ instruments_router = APIRouter()
 
 def _pipette_dict_to_pipette_res(
     pipette_dict: PipetteDict,
-    pipette_offset: Optional[PipetteOffsetByPipetteMount],
+    pipette_offset: Optional[PipetteOffsetSummary],
     mount: Mount,
     fw_version: Optional[int],
     pipette_state: Optional[PipetteStateDict],
@@ -83,6 +84,16 @@ def _pipette_dict_to_pipette_res(
                     ),
                     source=calibration_data.source,
                     last_modified=calibration_data.last_modified,
+                    reasonability_check_failures=[
+                        InconsistentCalibrationFailure.construct(
+                            offsets={
+                                k.name: Vec3f.construct(x=v.x, y=v.y, z=v.z)
+                                for k, v in failure.offsets.items()
+                            },
+                            limit=failure.limit,
+                        )
+                        for failure in calibration_data.reasonability_check_failures
+                    ],
                 )
                 if calibration_data
                 else None,
@@ -113,6 +124,7 @@ def _gripper_dict_to_gripper_res(
                 ),
                 source=calibration_data.source,
                 last_modified=calibration_data.last_modified,
+                reasonability_check_failures=[],
             ),
         ),
     )
@@ -166,7 +178,7 @@ async def _get_pipette_instrument_data(
         return _bad_pipette_response(SubSystem.from_hw(subsys))
     if pipette_dict:
         offset = cast(
-            Optional[PipetteOffsetByPipetteMount],
+            Optional[PipetteOffsetSummary],
             hardware.get_instrument_offset(OT3Mount.from_mount(mount)),
         )
         pipette_state = await hardware.get_instrument_state(mount)

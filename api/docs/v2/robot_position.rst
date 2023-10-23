@@ -58,7 +58,11 @@ This is a good position for :ref:`aspirating liquid <new-aspirate>` or an activi
 
 .. warning::
 
-    Negative ``z`` arguments to ``Well.bottom()`` can cause a pipette tip to collide with the bottom of the well. While Flex can detect collisions, the OT-2 has no sensors to detect an impact with a well bottom. For both robot types, a collision with a well bottom may bend the pipette's tip (affecting liquid handling) and the pipette may be higher on the z-axis than expected until it picks up another tip.
+    Negative ``z`` arguments to ``Well.bottom()`` will cause the pipette tip to collide with the bottom of the well. Collisions may bend the tip (affecting liquid handling) and the pipette may be higher than expected on the z-axis until it picks up another tip.
+    
+    Flex can detect collisions, and even gentle contact may trigger an overpressure error and cause the protocol to fail. Avoid ``z`` values less than 1, if possible.
+    
+    The OT-2 has no sensors to detect contact with a well bottom. The protocol will continue even after a collision.
 
 .. versionadded:: 2.0
 
@@ -129,6 +133,7 @@ Independent Movement
 
 For convenience, many methods have location arguments and incorporate movement automatically. This section will focus on moving the pipette independently, without performing other actions like ``aspirate()`` or ``dispense()``.
 
+.. _move-to:
 
 Move To
 -------
@@ -164,6 +169,8 @@ Small, direct movements can be useful for working inside of a well, without havi
 
 .. versionadded:: 2.0
 
+
+.. _points-locations:
 
 Points and Locations
 --------------------

@@ -10,6 +10,8 @@ import { migrateFile as migrateFileFiveOne } from './5_1_0'
 import { migrateFile as migrateFileFiveTwo } from './5_2_0'
 import { migrateFile as migrateFileSix } from './6_0_0'
 import { migrateFile as migrateFileSeven } from './7_0_0'
+import { migrateFile as migrateFileSevenOne } from './7_1_0'
+
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string
 type MigrationsByVersion = Record<
@@ -40,6 +42,8 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '6.0.0': migrateFileSix,
   // @ts-expect-error
   '7.0.0': migrateFileSeven,
+  // @ts-expect-error
+  '7.1.0': migrateFileSevenOne,
 }
 export const migration = (
   file: any

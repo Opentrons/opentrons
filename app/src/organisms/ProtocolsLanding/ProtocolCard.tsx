@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   getModuleType,
@@ -55,7 +56,6 @@ interface ProtocolCardProps {
   handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
-
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
@@ -78,6 +78,17 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
     mostRecentAnalysis
   )
 
+  const UNKNOWN_ATTACHMENT_ERROR = `${protocolDisplayName} protocol uses 
+  instruments or modules from a future version of Opentrons software. Please update 
+  the app to the most recent version to run this protocol.`
+
+  const UnknownAttachmentError = (
+    <ProtocolAnalysisFailure
+      protocolKey={protocolKey}
+      errors={[UNKNOWN_ATTACHMENT_ERROR]}
+    />
+  )
+
   return (
     <Box
       backgroundColor={COLORS.white}
@@ -89,13 +100,15 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       onClick={() => history.push(`/protocols/${protocolKey}`)}
       css={BORDERS.cardOutlineBorder}
     >
-      <AnalysisInfo
-        protocolKey={protocolKey}
-        mostRecentAnalysis={mostRecentAnalysis}
-        protocolDisplayName={protocolDisplayName}
-        isAnalyzing={isAnalyzing}
-        modified={modified}
-      />
+      <ErrorBoundary fallback={UnknownAttachmentError}>
+        <AnalysisInfo
+          protocolKey={protocolKey}
+          mostRecentAnalysis={mostRecentAnalysis}
+          protocolDisplayName={protocolDisplayName}
+          isAnalyzing={isAnalyzing}
+          modified={modified}
+        />
+      </ErrorBoundary>
       <Box
         position={POSITION_ABSOLUTE}
         top={SPACING.spacing4}
@@ -287,7 +300,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <StyledText as="label" color={COLORS.darkGreyEnabled}>
                 {`${t('updated')} ${format(
                   new Date(modified),
-                  'MMM dd yy HH:mm'
+                  'M/d/yy HH:mm'
                 )}`}
               </StyledText>
             </Flex>

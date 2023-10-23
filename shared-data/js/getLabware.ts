@@ -35,6 +35,7 @@ export const LABWAREV2_DO_NOT_LIST = [
   // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
   // (https://opentrons.atlassian.net/browse/RLAB-230):
   'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
   // Special labware that users probably shouldn't know about or load:
   // these all should eventually be given a new namespace like "opentrons-internal"
   // so that they can be filtered out by namespace rather than a block list like this
@@ -44,17 +45,12 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
   'opentrons_calibration_adapter_heatershaker_module',
-  'opentrons_calibration_adapter_magnetic_module',
   'opentrons_calibration_adapter_temperature_module',
   'opentrons_calibration_adapter_thermocycler_module',
-  // TODO(lc 8-24-2022) We are temporarily filtering
-  // out ot-3 labware definitions right now. We should
-  // have a way to filter these in the future to display
-  // the definitions. See RLIQ-117 for details.
-  'opentrons_flex_96_tiprack_20ul',
-  'opentrons_flex_96_tiprack_200ul',
-  'opentrons_flex_96_tiprack_1000ul',
-  'opentrons_flex_96_tiprack_50ul',
+  'opentrons_ot3_96_tiprack_20ul',
+  'opentrons_ot3_96_tiprack_200ul',
+  'opentrons_ot3_96_tiprack_1000ul',
+  'opentrons_ot3_96_tiprack_50ul',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST

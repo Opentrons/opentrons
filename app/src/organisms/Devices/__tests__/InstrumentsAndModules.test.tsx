@@ -10,12 +10,16 @@ import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsOT3, useIsRobotViewable, useRunStatuses } from '../hooks'
+import { useIsFlex, useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
 import { GripperCard } from '../../GripperCard'
 import { PipetteCard } from '../PipetteCard'
-import { getIs96ChannelPipetteAttached } from '../utils'
+import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
+import {
+  getIs96ChannelPipetteAttached,
+  getShowPipetteCalibrationWarning,
+} from '../utils'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -34,6 +38,7 @@ jest.mock('../hooks')
 jest.mock('../../GripperCard')
 jest.mock('../../ModuleCard')
 jest.mock('../PipetteCard')
+jest.mock('../PipetteCard/PipetteRecalibrationWarning')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../atoms/Banner')
 jest.mock('../utils', () => {
@@ -41,6 +46,7 @@ jest.mock('../utils', () => {
   return {
     ...actualUtils,
     getIs96ChannelPipetteAttached: jest.fn(),
+    getShowPipetteCalibrationWarning: jest.fn(),
   }
 })
 jest.mock('../../RunTimeControl/hooks')
@@ -60,6 +66,9 @@ const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrations
 const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
 const mockPipetteCard = PipetteCard as jest.MockedFunction<typeof PipetteCard>
 const mockGripperCard = GripperCard as jest.MockedFunction<typeof GripperCard>
+const mockPipetteRecalibrationWarning = PipetteRecalibrationWarning as jest.MockedFunction<
+  typeof PipetteRecalibrationWarning
+>
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
@@ -73,7 +82,10 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockGetIs96ChannelPipetteAttached = getIs96ChannelPipetteAttached as jest.MockedFunction<
   typeof getIs96ChannelPipetteAttached
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockGetShowPipetteCalibrationWarning = getShowPipetteCalibrationWarning as jest.MockedFunction<
+  typeof getShowPipetteCalibrationWarning
+>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = () => {
   return renderWithProviders(<InstrumentsAndModules robotName="otie" />, {
@@ -91,13 +103,17 @@ describe('InstrumentsAndModules', () => {
       isRunTerminal: false,
     })
     mockGetIs96ChannelPipetteAttached.mockReturnValue(false)
+    mockGetShowPipetteCalibrationWarning.mockReturnValue(false)
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [] },
     } as any)
     mockPipetteCard.mockReturnValue(<div>Mock PipetteCard</div>)
     mockGripperCard.mockReturnValue(<div>Mock GripperCard</div>)
     mockModuleCard.mockReturnValue(<div>Mock ModuleCard</div>)
-    mockUseIsOT3.mockReturnValue(false)
+    mockUseIsFlex.mockReturnValue(false)
+    mockPipetteRecalibrationWarning.mockReturnValue(
+      <div>Mock PipetteRecalibrationWarning</div>
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -142,7 +158,7 @@ describe('InstrumentsAndModules', () => {
     getAllByText('Mock PipetteCard')
   })
   it('renders gripper cards when a robot is Flex', () => {
-    mockUseIsOT3.mockReturnValue(true)
+    mockUseIsFlex.mockReturnValue(true)
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({ data: { data: [] } } as any)
     mockUsePipettesQuery.mockReturnValue({
@@ -166,6 +182,12 @@ describe('InstrumentsAndModules', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('Mock PipetteCard')
+  })
+  it('renders pipette recalibration recommendation banner when offsets fail reasonability checks', () => {
+    mockGetShowPipetteCalibrationWarning.mockReturnValue(true)
+    mockUseIsRobotViewable.mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock PipetteRecalibrationWarning')
   })
   it('fetches offset calibrations on long poll and pipettes, instruments, and modules on short poll', () => {
     const { pipette: pipette1 } = mockPipetteOffsetCalibration1

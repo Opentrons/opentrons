@@ -8,10 +8,21 @@
     "presses": 0.0,
     "speed": 5.5,
     "increment": 0.0,
-    "distance": 19.0
+    "distance": 10.0,
+    "prep_move_distance": 9.0,
+    "prep_move_speed": 10.0
   },
-  "dropTipConfigurations": { "current": 1.5, "speed": 5.5, "distance": 26.5 },
-  "plungerMotorConfigurations": { "idle": 0.3, "run": 2.0 },
+  "dropTipConfigurations": {
+    "current": 1.5,
+    "speed": 5.5,
+    "distance": 10.5,
+    "prep_move_distance": 16.0,
+    "prep_move_speed": 10.0
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 2.0
+  },
   "plungerPositionsConfigurations": {
     "default": {
       "top": 0,
@@ -22,9 +33,15 @@
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": { "count": 2 },
-    "capacitive": { "count": 2 },
-    "environment": { "count": 1 }
+    "pressure": {
+      "count": 2
+    },
+    "capacitive": {
+      "count": 2
+    },
+    "environment": {
+      "count": 1
+    }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -35,5 +52,12 @@
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904,
   "backlashDistance": 0.3,
-  "quirks": []
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 2.0,
+    "speed": 5
+  },
+  "tipPresenceCheckDistanceMM": "8.0",
+  "connectTiprackDistanceMM": "7.0",
+  "endTipActionRetractDistanceMM": "2.0"
 }

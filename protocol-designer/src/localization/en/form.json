@@ -29,7 +29,8 @@
   "step_edit_form": {
     "section": {
       "sterility": "sterility",
-      "sterility&motion": "sterility & motion"
+      "sterility&motion": "sterility & motion",
+      "dropTip": "drop tip"
     },
     "labwareLabel": {
       "aspirate": "source",
@@ -37,7 +38,7 @@
       "mixLabware": "labware",
       "movedLabware": "labware",
       "errors": {
-        "labwareSlotIncompatible": "The selected labware and new location are incompatible"
+        "labwareSlotIncompatible": "The {{labwareName}} in {{slot}} is incompatible"
       }
     },
     "mixVolumeLabel": "mix volume",
@@ -50,6 +51,9 @@
     "field": {
       "airGap": { "label": "air gap" },
       "blowout": { "label": "blowout" },
+      "location": {
+        "label": "location"
+      },
       "change_tip": {
         "label": "change tip",
         "option": {

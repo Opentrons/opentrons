@@ -11,17 +11,19 @@ import {
 } from '@opentrons/shared-data'
 import {
   useHost,
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+import {
+  useCreateTargetedMaintenanceRunMutation,
+  useChainMaintenanceCommands,
+} from '../../resources/runs/hooks'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
@@ -62,17 +64,26 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
+  const requiresFirmwareUpdate = !attachedPipette?.ok
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = React.useMemo(
     () =>
       memoizedPipetteInfo == null
-        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
+        ? getPipetteWizardSteps(
+            flowType,
+            mount,
+            selectedPipette,
+            isGantryEmpty,
+            requiresFirmwareUpdate
+          )
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
-            mount
+            mount,
+            requiresFirmwareUpdate
           ),
     []
   )
@@ -86,9 +97,10 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const hasCalData =
-    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
+  const hasCalData =
+    memoizedAttachedPipettes[mount]?.data.calibratedOffset?.last_modified !=
+    null
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
@@ -98,6 +110,15 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+    string | null
+  >(null)
+  // we should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = React.useState<boolean>(false)
 
   const goBack = (): void => {
     setCurrentStepIndex(
@@ -106,31 +127,47 @@ export const PipetteWizardFlows = (
   }
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: createdMaintenanceRunId != null,
   })
-  const prevMaintenanceRunId = React.useRef<string | undefined>(
-    maintenanceRunData?.data.id
-  )
 
-  React.useEffect(() => {
-    prevMaintenanceRunId.current = maintenanceRunData?.data.id
-  }, [maintenanceRunData?.data.id])
   const {
     chainRunCommands,
     isCommandMutationLoading,
   } = useChainMaintenanceCommands()
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation({}, host)
+  } = useCreateTargetedMaintenanceRunMutation(
+    {
+      onSuccess: response => {
+        setCreatedMaintenanceRunId(response.data.id)
+      },
+    },
+    host
+  )
 
   // this will close the modal in case the run was deleted by the terminate
   // activity modal on the ODD
   React.useEffect(() => {
-    if (maintenanceRunData?.data.id == null && prevMaintenanceRunId != null) {
+    if (
+      createdMaintenanceRunId !== null &&
+      maintenanceRunData?.data.id === createdMaintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    }
+    if (
+      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
       closeFlow()
     }
-  }, [maintenanceRunData, closeFlow])
+  }, [
+    maintenanceRunData?.data.id,
+    createdMaintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    closeFlow,
+  ])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
@@ -191,7 +228,6 @@ export const PipetteWizardFlows = (
   }, [isCommandMutationLoading, isExiting])
 
   let chainMaintenanceRunCommands
-
   if (maintenanceRunData?.data.id != null) {
     chainMaintenanceRunCommands = (
       commands: CreateCommand[],
@@ -204,11 +240,16 @@ export const PipetteWizardFlows = (
       )
   }
 
+  const maintenanceRunId =
+    maintenanceRunData?.data.id != null &&
+    maintenanceRunData?.data.id === createdMaintenanceRunId
+      ? createdMaintenanceRunId
+      : undefined
   const calibrateBaseProps = {
     chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
-    maintenanceRunId: maintenanceRunData?.data.id,
+    maintenanceRunId,
     goBack,
     attachedPipettes,
     setShowErrorMessage,
@@ -247,7 +288,8 @@ export const PipetteWizardFlows = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createMaintenanceRun={createMaintenanceRun}
+        createMaintenanceRun={createTargetedMaintenanceRun}
+        createdMaintenanceRunId={createdMaintenanceRunId}
         isCreateLoading={isCreateLoading}
         requiredPipette={requiredPipette}
       />

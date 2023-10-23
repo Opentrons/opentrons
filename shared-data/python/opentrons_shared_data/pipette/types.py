@@ -140,6 +140,8 @@ class MutableConfig:
         max: float,
         name: str,
     ) -> "MutableConfig":
+        if units == "mm/sec":
+            units = "mm/s"
         return cls(
             value=value,
             default=default,

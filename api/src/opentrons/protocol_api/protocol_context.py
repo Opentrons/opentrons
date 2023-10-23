@@ -14,9 +14,10 @@ from typing import (
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -41,7 +42,6 @@ from .core.module import (
     AbstractMagneticBlockCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
-from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
@@ -101,7 +101,7 @@ class ProtocolContext(CommandPublisher):
         self,
         api_version: APIVersion,
         core: ProtocolCore,
-        broker: Optional[Broker] = None,
+        broker: Optional[LegacyBroker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
         bundled_data: Optional[Dict[str, bytes]] = None,
@@ -605,6 +605,7 @@ class ProtocolContext(CommandPublisher):
             labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
+            pause_for_manual_move=True,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
@@ -763,16 +764,22 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
+        # TODO (spp: 2023-08-30): disallow loading Flex pipettes on OT-2 by checking robotType
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        is_96_channel = instrument_name in ("p1000_96", "flex_96channel_1000")
-        if is_96_channel and isinstance(self._core, ProtocolEngineCore):
-            checked_instrument_name = instrument_name
-            checked_mount = Mount.LEFT
-        else:
-            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-            checked_mount = validation.ensure_mount(mount)
+        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
+
+        checked_mount = Mount.LEFT if is_96_channel else validation.ensure_mount(mount)
 
         tip_racks = tip_racks or []
+
+        # TODO (tz, 9-12-23): move validation into PE
+        on_right_mount = self._instruments[Mount.RIGHT]
+        if is_96_channel and on_right_mount is not None:
+            raise RuntimeError(
+                f"Instrument already present on right:"
+                f" {on_right_mount.name}. In order to load a 96 channel pipette both mounts need to be available."
+            )
 
         existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
@@ -786,10 +793,8 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
-        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._core.load_instrument(
-            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
+            instrument_name=checked_instrument_name,
             mount=checked_mount,
         )
 
@@ -1021,7 +1026,7 @@ def _create_module_context(
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,
-    broker: Broker,
+    broker: LegacyBroker,
 ) -> ModuleTypes:
     module_cls: Optional[Type[ModuleTypes]] = None
     if isinstance(module_core, AbstractTemperatureModuleCore):

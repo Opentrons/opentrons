@@ -21,6 +21,7 @@ export interface CheckTipRacksStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  adapterId?: string
 }
 export interface AttachProbeStep {
   section: typeof SECTIONS.ATTACH_PROBE
@@ -31,6 +32,7 @@ export interface PickUpTipStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  adapterId?: string
 }
 export interface CheckPositionsStep {
   section: typeof SECTIONS.CHECK_POSITIONS
@@ -52,6 +54,7 @@ export interface ReturnTipStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  adapterId?: string
 }
 export interface DetachProbeStep {
   section: typeof SECTIONS.DETACH_PROBE

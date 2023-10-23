@@ -4,7 +4,6 @@ import {
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   DEFAULT_DELAY_SECONDS,
-  FIXED_TRASH_ID,
 } from '../../constants'
 import { StepType, StepFieldName } from '../../form-types'
 export function getDefaultsForStepType(
@@ -19,7 +18,7 @@ export function getDefaultsForStepType(
         mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
+        blowout_location: null,
         // NOTE(IL, 2021-03-12): mix uses dispense for both asp + disp, unless its falsey.
         // For now, unlike the other mmFromBottom fields, it's initializing to a constant instead of
         // using null to represent default (because null becomes 1mm asp, 0.5mm dispense -- see #7470.)
@@ -35,6 +34,7 @@ export function getDefaultsForStepType(
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         mix_touchTip_checkbox: false,
         mix_touchTip_mmFromBottom: null,
+        dropTip_location: null,
       }
 
     case 'moveLiquid':
@@ -69,7 +69,7 @@ export function getDefaultsForStepType(
         disposalVolume_checkbox: false,
         disposalVolume_volume: null,
         blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
+        blowout_location: null,
         preWetTip: false,
         aspirate_airGap_checkbox: false,
         aspirate_airGap_volume: null,
@@ -81,6 +81,7 @@ export function getDefaultsForStepType(
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_mmFromBottom: null,
+        dropTip_location: null,
       }
 
     case 'moveLabware':

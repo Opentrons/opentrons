@@ -119,6 +119,7 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+    LoadPipettePrivateResult,
 )
 
 from .move_labware import (
@@ -225,6 +226,15 @@ from .retract_axis import (
     RetractAxisCommandType,
 )
 
+from .configure_for_volume import (
+    ConfigureForVolume,
+    ConfigureForVolumeParams,
+    ConfigureForVolumeCreate,
+    ConfigureForVolumeResult,
+    ConfigureForVolumeCommandType,
+    ConfigureForVolumePrivateResult,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -234,6 +244,7 @@ Command = Union[
     DispenseInPlace,
     BlowOut,
     BlowOutInPlace,
+    ConfigureForVolume,
     DropTip,
     DropTipInPlace,
     Home,
@@ -284,6 +295,7 @@ CommandParams = Union[
     AspirateParams,
     AspirateInPlaceParams,
     CommentParams,
+    ConfigureForVolumeParams,
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
@@ -340,6 +352,7 @@ CommandType = Union[
     AspirateCommandType,
     AspirateInPlaceCommandType,
     CommentCommandType,
+    ConfigureForVolumeCommandType,
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
@@ -395,6 +408,7 @@ CommandCreate = Union[
     AspirateCreate,
     AspirateInPlaceCreate,
     CommentCreate,
+    ConfigureForVolumeCreate,
     CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
@@ -450,6 +464,7 @@ CommandResult = Union[
     AspirateResult,
     AspirateInPlaceResult,
     CommentResult,
+    ConfigureForVolumeResult,
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,
@@ -499,4 +514,8 @@ CommandResult = Union[
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
     calibration.MoveToMaintenancePositionResult,
+]
+
+CommandPrivateResult = Union[
+    None, LoadPipettePrivateResult, ConfigureForVolumePrivateResult
 ]

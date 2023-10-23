@@ -19,6 +19,15 @@ class RobotTypeEnum(enum.Enum):
     OT2 = enum.auto()
     FLEX = enum.auto()
 
+    @classmethod
+    def robot_literal_to_enum(cls, robot_type: RobotType) -> "RobotTypeEnum":
+        """Convert Robot Type Literal to Robot Type Enum."""
+        if robot_type == "OT-2 Standard":
+            return cls.OT2
+        elif robot_type == "OT-3 Standard":
+            return cls.FLEX
+        # No final `else` statement, depend on mypy exhaustiveness checking
+
 
 class RobotDefinition(TypedDict):
     """A python version of the robot definition type."""

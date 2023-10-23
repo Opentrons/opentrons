@@ -81,10 +81,10 @@ export function AvailableRobotOption(
   )
 
   let iconName: IconName | null = null
-  if (wifi?.ipAddress != null) {
-    iconName = 'wifi'
-  } else if (ethernet?.ipAddress != null) {
+  if (ethernet?.ipAddress != null) {
     iconName = 'ethernet'
+  } else if (wifi?.ipAddress != null) {
+    iconName = 'wifi'
   } else if (local != null && local) {
     iconName = 'usb'
   }
@@ -160,7 +160,7 @@ export function AvailableRobotOption(
         >
           <Trans
             t={t}
-            i18nKey="a_software_update_is_available_please_update"
+            i18nKey="a_robot_software_update_is_available"
             components={{
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}

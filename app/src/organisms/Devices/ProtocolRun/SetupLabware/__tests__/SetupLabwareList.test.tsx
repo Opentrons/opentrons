@@ -178,12 +178,13 @@ describe('SetupLabwareList', () => {
         attachedModuleMatch: null,
         moduleId: 'moduleId',
       } as any,
-      isOt3: false,
+      isFlex: false,
     })
 
     getAllByText('mock labware list item')
-    getByText('Labware Name')
-    getByText('Initial Location')
+    getByText('Labware name')
+    getByText('Location')
+    getByText('Placement')
   })
   it('renders null for the offdeck labware list when there are none', () => {
     const { queryByText } = render({
@@ -196,7 +197,7 @@ describe('SetupLabwareList', () => {
         attachedModuleMatch: null,
         moduleId: 'moduleId',
       } as any,
-      isOt3: false,
+      isFlex: false,
     })
     expect(queryByText('Additional Off-Deck Labware')).not.toBeInTheDocument()
   })
@@ -206,7 +207,7 @@ describe('SetupLabwareList', () => {
       commands: mockOffDeckCommands,
       extraAttentionModules: [],
       attachedModuleInfo: {} as any,
-      isOt3: false,
+      isFlex: false,
     })
     getByText('Additional Off-Deck Labware')
     getAllByText('mock labware list item')

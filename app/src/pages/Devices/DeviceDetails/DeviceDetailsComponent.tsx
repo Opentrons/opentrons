@@ -9,12 +9,14 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { DeviceDetailsDeckConfiguration } from '../../../organisms/DeviceDetailsDeckConfiguration'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
-import { useIsOT3 } from '../../../organisms/Devices/hooks'
+import { useIsFlex } from '../../../organisms/Devices/hooks'
+import { useFeatureFlag } from '../../../redux/config'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -23,9 +25,12 @@ interface DeviceDetailsComponentProps {
 export function DeviceDetailsComponent({
   robotName,
 }: DeviceDetailsComponentProps): JSX.Element {
-  const { data: estopStatus, error: estopError } = useEstopQuery()
+  const isFlex = useIsFlex(robotName)
+  const { data: estopStatus, error: estopError } = useEstopQuery({
+    enabled: isFlex,
+  })
   const { isEmergencyStopModalDismissed } = useEstopContext()
-  const isOT3 = useIsOT3(robotName)
+  const enableDeckConfiguration = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <Box
@@ -35,9 +40,9 @@ export function DeviceDetailsComponent({
       paddingTop={SPACING.spacing16}
       paddingBottom={SPACING.spacing48}
     >
-      {estopStatus?.data.status !== DISENGAGED &&
+      {isFlex &&
+      estopStatus?.data.status !== DISENGAGED &&
       estopError == null &&
-      isOT3 &&
       isEmergencyStopModalDismissed ? (
         <Flex marginBottom={SPACING.spacing16}>
           <EstopBanner status={estopStatus?.data.status} />
@@ -57,6 +62,9 @@ export function DeviceDetailsComponent({
         <RobotOverview robotName={robotName} />
         <InstrumentsAndModules robotName={robotName} />
       </Flex>
+      {isFlex && enableDeckConfiguration ? (
+        <DeviceDetailsDeckConfiguration robotName={robotName} />
+      ) : null}
       <RecentProtocolRuns robotName={robotName} />
     </Box>
   )

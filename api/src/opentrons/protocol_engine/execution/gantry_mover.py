@@ -6,7 +6,7 @@ from opentrons.types import Point, Mount
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis as HardwareAxis
-from opentrons.hardware_control.errors import MustHomeError as HardwareMustHomeError
+from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.motion_planning import Waypoint
 
@@ -30,8 +30,8 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
 # We rely on this being the same for every OT-3 pipette.
 #
 # We found this number by peeking at the height that OT3Simulator returns for these pipettes:
-#   * Single- and 8-Channel P50 GEN3
-#   * Single-, 8-, and 96-channel P1000 GEN3
+#   * Flex Single- and 8-Channel P50
+#   * Flex Single-, 8-, and 96-channel P1000
 #
 # That OT3Simulator return value is what Protocol Engine uses for simulation when Protocol Engine
 # is configured to not virtualize pipettes, so this number should match it.
@@ -95,7 +95,7 @@ class HardwareGantryMover(GantryMover):
         Args:
             pipette_id: Pipette ID to get location data for.
             current_well: Optional parameter for getting pipette location data, effects critical point.
-            fail_on_not_homed: Raise HardwareMustHomeError if gantry position is not known.
+            fail_on_not_homed: Raise PositionUnknownError if gantry position is not known.
         """
         pipette_location = self._state_view.motion.get_pipette_location(
             pipette_id=pipette_id,
@@ -107,8 +107,8 @@ class HardwareGantryMover(GantryMover):
                 critical_point=pipette_location.critical_point,
                 fail_on_not_homed=fail_on_not_homed,
             )
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+        except PositionUnknownError as e:
+            raise MustHomeError(message=str(e), wrapping=[e])
 
     def get_max_travel_z(self, pipette_id: str) -> float:
         """Get the maximum allowed z-height for pipette movement.
@@ -167,8 +167,8 @@ class HardwareGantryMover(GantryMover):
                 critical_point=critical_point,
                 fail_on_not_homed=True,
             )
-        except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+        except PositionUnknownError as e:
+            raise MustHomeError(message=str(e), wrapping=[e])
 
         return point
 

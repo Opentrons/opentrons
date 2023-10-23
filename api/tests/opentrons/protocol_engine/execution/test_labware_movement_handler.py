@@ -8,7 +8,6 @@ from decoy import Decoy, matchers
 from typing import TYPE_CHECKING, Union
 
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
-from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import DeckSlotName, Point
 
@@ -167,6 +166,9 @@ async def test_move_labware_with_gripper(
 
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
+    decoy.when(ot3_hardware_api._gripper_handler.is_ready_for_jaw_home()).then_return(
+        True
+    )
 
     decoy.when(
         await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
@@ -257,9 +259,7 @@ async def test_move_labware_with_gripper(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
-        await ot3_hardware_api.grip(
-            force_newtons=IDLE_STATE_GRIP_FORCE, stay_engaged=False
-        ),
+        await ot3_hardware_api.idle_gripper(),
     )
 
 

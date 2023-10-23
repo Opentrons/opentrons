@@ -215,6 +215,7 @@ export interface HydratedMoveLiquidFormData {
     disposalVolume_volume: number | null | undefined
     blowout_checkbox: boolean
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
+    dropTip_location: string
   }
 }
 
@@ -253,6 +254,7 @@ export interface HydratedMixFormDataLegacy {
   aspirate_delay_seconds: number | null | undefined
   dispense_delay_checkbox: boolean
   dispense_delay_seconds: number | null | undefined
+  dropTip_location: string
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

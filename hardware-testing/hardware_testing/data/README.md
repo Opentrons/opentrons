@@ -14,10 +14,12 @@ file_name = data.create_file_name(test_name=test_name,
                                   tag=tag)
 # write entire file contents at once
 data.dump_data_to_file(test_name=test_name,
+                       run_id=run_id,
                        file_name=file_name,
                        data="some,data,to,record\ncan,be,entire,file,at,once\n")
 # optionally, continue to append to that same file
 data.append_data_to_file(test_name=test_name,
+                         run_id=run_id,
                          file_name=file_name,
                          data="or,you,can,continue,appending,new,data\n")
 ```

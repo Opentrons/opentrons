@@ -72,6 +72,9 @@ export const FirmwareUpdateModal = (
       setUpdateId(data.data.id)
     },
   })
+  const instrumentToUpdate = attachedInstruments?.data?.find(
+    i => i.subsystem === subsystem
+  )
   const updateNeeded =
     attachedInstruments?.data?.some(
       (i): i is BadGripper | BadPipette => !i.ok && i.subsystem === subsystem
@@ -88,21 +91,24 @@ export const FirmwareUpdateModal = (
   const percentComplete = updateData?.data.updateProgress ?? 0
 
   React.useEffect(() => {
-    if (status === 'done' && updateNeeded) {
+    if (status === 'done') {
       refetchInstruments()
         .then(() => {
-          if (!updateNeeded) proceed()
+          if (instrumentToUpdate?.ok === true) proceed()
           else {
+            // if the instrument doesn't appear ok when the update is done, wait 10sec and try again
             setTimeout(() => {
               proceed()
             }, 10000)
           }
         })
-        .catch(error => console.error(error.message))
-    } else if (status === 'done' && !updateNeeded) {
-      proceed()
+        .catch(error => {
+          console.error(error.message)
+          // even if the refetch fails, we should proceed as the next screen will handle the error
+          proceed()
+        })
     }
-  }, [status, proceed, refetchInstruments, updateNeeded])
+  }, [status, proceed, refetchInstruments, instrumentToUpdate])
 
   return (
     <Flex css={MODAL_STYLE}>

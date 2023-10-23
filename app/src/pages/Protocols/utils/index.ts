@@ -18,6 +18,7 @@ export interface LabwareSetupItem {
   initialLocation: LabwareLocation
   moduleModel: ModuleModel | null
   moduleLocation: ModuleLocation | null
+  labwareId?: string
 }
 
 export interface GroupedLabwareSetupItems {
@@ -88,6 +89,7 @@ export function getLabwareSetupItemGroups(
             moduleModel,
             moduleLocation,
             nickName,
+            labwareId: c.result?.labwareId,
           },
         ]
       } else if (

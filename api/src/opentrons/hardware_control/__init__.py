@@ -14,7 +14,6 @@ from .api import API
 from .pause_manager import PauseManager
 from .backends import Controller, Simulator
 from .types import CriticalPoint, ExecutionState
-from .errors import ExecutionCancelledError, NoTipAttachedError, TipAttachedError
 from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
@@ -48,13 +47,10 @@ __all__ = [
     "SynchronousAdapter",
     "HardwareControlAPI",
     "CriticalPoint",
-    "NoTipAttachedError",
-    "TipAttachedError",
     "DROP_TIP_RELEASE_DISTANCE",
     "ThreadManager",
     "ExecutionManager",
     "ExecutionState",
-    "ExecutionCancelledError",
     "ThreadedAsyncLock",
     "ThreadedAsyncForbidden",
     "ThreadManagedHardware",

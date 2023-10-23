@@ -44,6 +44,14 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
 const LoadingText = styled.h1`
   ${TYPOGRAPHY.h1Default}
 
+  p {
+    text-transform: lowercase;
+  }
+
+  p::first-letter {
+    text-transform: uppercase;
+  }
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }

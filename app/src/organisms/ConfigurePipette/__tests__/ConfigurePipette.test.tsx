@@ -4,7 +4,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as RobotApi from '../../../redux/robot-api'
 import { ConfigurePipette } from '../../ConfigurePipette'
-import { getAttachedPipetteSettingsFieldsById } from '../../../redux/pipettes'
 import { mockPipetteSettingsFieldsMap } from '../../../redux/pipettes/__fixtures__'
 import { getConfig } from '../../../redux/config'
 
@@ -13,7 +12,6 @@ import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/config')
-jest.mock('../../../redux/pipettes')
 
 const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 const mockUseDispatchApiRequest = RobotApi.useDispatchApiRequest as jest.MockedFunction<
@@ -21,9 +19,6 @@ const mockUseDispatchApiRequest = RobotApi.useDispatchApiRequest as jest.MockedF
 >
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
->
-const mockGetAttachedPipetteSettingsFieldsById = getAttachedPipetteSettingsFieldsById as jest.MockedFunction<
-  typeof getAttachedPipetteSettingsFieldsById
 >
 
 const render = (props: React.ComponentProps<typeof ConfigurePipette>) => {
@@ -40,9 +35,10 @@ describe('ConfigurePipette', () => {
 
   beforeEach(() => {
     props = {
-      pipetteId: 'id',
+      isUpdateLoading: false,
+      updateError: null,
+      settings: mockPipetteSettingsFieldsMap,
       robotName: mockRobotName,
-      updateRequest: { status: 'pending' },
       updateSettings: jest.fn(),
       closeModal: jest.fn(),
       formId: 'id',
@@ -59,9 +55,6 @@ describe('ConfigurePipette', () => {
         },
       })
     mockGetConfig.mockReturnValue({} as any)
-    when(mockGetAttachedPipetteSettingsFieldsById)
-      .calledWith({} as State, mockRobotName, 'id')
-      .mockReturnValue(mockPipetteSettingsFieldsMap)
     dispatchApiRequest = jest.fn()
     when(mockUseDispatchApiRequest)
       .calledWith()

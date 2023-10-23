@@ -15,6 +15,7 @@ import {
   TouchScreenSleep,
   TouchscreenBrightness,
   NetworkSettings,
+  Privacy,
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../../organisms/RobotSettingsDashboard'
@@ -33,6 +34,7 @@ jest.mock('../../../../organisms/Navigation')
 jest.mock('../../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
 jest.mock('../../../../organisms/RobotSettingsDashboard/NetworkSettings')
 jest.mock('../../../../organisms/RobotSettingsDashboard/DeviceReset')
+jest.mock('../../../../organisms/RobotSettingsDashboard/Privacy')
 jest.mock('../../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
 jest.mock('../../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
 jest.mock('../../../../organisms/RobotSettingsDashboard/UpdateChannel')
@@ -60,6 +62,7 @@ const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
   typeof NetworkSettings
 >
 const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
+const mockPrivacy = Privacy as jest.MockedFunction<typeof Privacy>
 const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
   typeof RobotSystemVersion
 >
@@ -98,6 +101,7 @@ describe('RobotSettingsDashboard', () => {
     mockTouchScreenSleep.mockReturnValue(<div>Mock Touchscreen Sleep</div>)
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
+    mockPrivacy.mockReturnValue(<div>Mock Privacy</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
     mockGetRobotSettings.mockReturnValue([
       {
@@ -125,7 +129,7 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render setting buttons', () => {
-    const [{ getByText, getAllByText }] = render()
+    const [{ getByText }] = render()
     getByText('Robot Name')
     getByText('opentrons-robot-name')
     getByText('Robot System Version')
@@ -134,16 +138,16 @@ describe('RobotSettingsDashboard', () => {
     getByText('Control the strip of color lights on the front of the robot.')
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
+    getByText('Privacy')
+    getByText('Choose what data to share with Opentrons.')
     getByText('Device Reset')
     getByText('Update Channel')
-    getByText('Apply labware offsets')
+    getByText('Apply Labware Offsets')
     getByText('Use stored data when setting up a protocol.')
     getByText('Developer Tools')
     getByText('Access additional logging and feature flags.')
-    expect(getAllByText('Off').length).toBe(3) // LED & DEV tools & historic offsets
   })
 
-  // Note(kj: 02/03/2023) This case will be changed in a following PR
   it('should render component when tapping robot name button', () => {
     const [{ getByText }] = render()
     const button = getByText('Robot Name')
@@ -171,7 +175,9 @@ describe('RobotSettingsDashboard', () => {
       toggleLights: mockToggleLights,
     })
     const [{ getByTestId }] = render()
-    expect(getByTestId('RobotSettingButton_LED_Lights')).toHaveTextContent('On')
+    expect(
+      getByTestId('RobotSettingButton_display_led_lights')
+    ).toHaveTextContent('On')
   })
 
   it('should render component when tapping network settings', () => {
@@ -195,6 +201,13 @@ describe('RobotSettingsDashboard', () => {
     getByText('Mock Touchscreen Brightness')
   })
 
+  it('should render component when tapping privacy', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Privacy')
+    fireEvent.click(button)
+    getByText('Mock Privacy')
+  })
+
   it('should render component when tapping device rest', () => {
     const [{ getByText }] = render()
     const button = getByText('Device Reset')
@@ -209,16 +222,7 @@ describe('RobotSettingsDashboard', () => {
     getByText('Mock Update Channel')
   })
 
-  it('should call a mock function when tapping home gantry on restart', () => {
-    const [{ getByText, getByTestId }] = render()
-    getByText('Home gantry on restart')
-    getByText('By default, this setting is turned on.')
-    expect(getByTestId('RobotSettingButton_Home_Gantry')).toHaveTextContent(
-      'On'
-    )
-  })
-
-  it('should render text with home gantry  off', () => {
+  it('should render text with home gantry off', () => {
     mockGetRobotSettings.mockReturnValue([
       {
         id: 'disableHomeOnBoot',
@@ -229,14 +233,14 @@ describe('RobotSettingsDashboard', () => {
       },
     ])
     const [{ getByTestId }] = render()
-    expect(getByTestId('RobotSettingButton_LED_Lights')).toHaveTextContent(
-      'Off'
-    )
+    expect(
+      getByTestId('RobotSettingButton_home_gantry_on_restart')
+    ).toHaveTextContent('On')
   })
 
   it('should call a mock function when tapping enable historic offset', () => {
     const [{ getByText }] = render()
-    const button = getByText('Apply labware offsets')
+    const button = getByText('Apply Labware Offsets')
     fireEvent.click(button)
     expect(mockToggleHistoricOffsets).toHaveBeenCalled()
   })
@@ -253,12 +257,4 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     getByText('Update available')
   })
-
-  // The following cases will be activate when RobotSettings PRs are ready
-  it.todo('should render connection status - only wifi')
-  it.todo('should render connection status - wifi + ethernet')
-  it.todo('should render connection status - wifi + usb')
-  it.todo('should render connection status - ethernet + usb')
-  it.todo('should render connection status - all connected')
-  it.todo('should render connection status - all not connected')
 })

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { SmallButton } from './'
 
 import type { Story, Meta } from '@storybook/react'
@@ -7,6 +8,7 @@ export default {
   title: 'ODD/Atoms/Buttons/SmallButton',
   argTypes: { onClick: { action: 'clicked' } },
   component: SmallButton,
+  parameters: touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof SmallButton>> = args => (

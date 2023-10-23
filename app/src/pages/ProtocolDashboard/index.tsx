@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_CENTER,
   SPACING,
   POSITION_STICKY,
   POSITION_STATIC,
@@ -50,10 +49,7 @@ export function ProtocolDashboard(): JSX.Element {
     showDeleteConfirmationModal,
     setShowDeleteConfirmationModal,
   ] = React.useState<boolean>(false)
-  const [
-    targetProtocol,
-    setTargetProtocol,
-  ] = React.useState<ProtocolResource | null>(null)
+  const [targetProtocolId, setTargetProtocolId] = React.useState<string>('')
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
   const protocolsData = protocols.data?.data ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
@@ -135,12 +131,7 @@ export function ProtocolDashboard(): JSX.Element {
     <>
       {showDeleteConfirmationModal ? (
         <DeleteProtocolConfirmationModal
-          protocolId={targetProtocol?.id}
-          protocolName={
-            targetProtocol?.metadata.protocolName != null
-              ? targetProtocol.metadata.protocolName
-              : targetProtocol?.files[0].name
-          }
+          protocolId={targetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
         />
       ) : null}
@@ -171,6 +162,7 @@ export function ProtocolDashboard(): JSX.Element {
                 pinnedProtocols={pinnedProtocols}
                 longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+                setTargetProtocolId={setTargetProtocolId}
               />
             </Flex>
           )}
@@ -210,7 +202,7 @@ export function ProtocolDashboard(): JSX.Element {
                     onClick={handleSortByName}
                   />
                 </Flex>
-                <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
+                <Flex width="12rem">
                   <SmallButton
                     buttonText={t('last_run')}
                     buttonType={
@@ -229,7 +221,7 @@ export function ProtocolDashboard(): JSX.Element {
                     onClick={handleSortByLastRun}
                   />
                 </Flex>
-                <Flex justifyContent={JUSTIFY_CENTER} width="14.625rem">
+                <Flex width="14.625rem">
                   <SmallButton
                     buttonText={t('date_added')}
                     buttonType={
@@ -264,7 +256,7 @@ export function ProtocolDashboard(): JSX.Element {
                       setShowDeleteConfirmationModal={
                         setShowDeleteConfirmationModal
                       }
-                      setTargetProtocol={setTargetProtocol}
+                      setTargetProtocolId={setTargetProtocolId}
                     />
                   )
                 })}

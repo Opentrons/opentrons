@@ -16,6 +16,7 @@ import {
 } from '../../../redux/discovery'
 import { getNetworkInterfaces } from '../../../redux/networking'
 
+import { useIsFlex } from '../hooks'
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
@@ -45,6 +46,7 @@ const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
 const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
   typeof getRobotAddressesByName
 >
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const MOCK_OTIE = {
   name: 'otie',
@@ -118,6 +120,7 @@ describe('RobotStatusHeader', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -169,7 +172,7 @@ describe('RobotStatusHeader', () => {
 
     const [{ getByRole, getByText }] = render(props)
 
-    getByText('fake protocol name; Running')
+    getByText('fake protocol name; running')
 
     const runLink = getByRole('link', { name: 'Go to Run' })
     expect(runLink.getAttribute('href')).toEqual(
@@ -201,6 +204,19 @@ describe('RobotStatusHeader', () => {
     const [{ getByLabelText }] = render(props)
 
     getByLabelText('wifi')
+  })
+
+  it('renders a usb icon when OT-2 connected locally via USB-ethernet adapter', () => {
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, 'otie')
+      .mockReturnValue({
+        wifi: null,
+        ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
+      })
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
+    const [{ getByLabelText }] = render(props)
+
+    getByLabelText('usb')
   })
 
   it('renders a usb icon when only connected locally', () => {

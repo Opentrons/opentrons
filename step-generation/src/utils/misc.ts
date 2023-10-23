@@ -8,6 +8,7 @@ import {
   getLabwareDefURI,
   getWellsDepth,
   getWellNamePerMultiTip,
+  WASTE_CHUTE_SLOT,
 } from '@opentrons/shared-data'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -22,6 +23,7 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
+import { AdditionalEquipmentEntities } from '..'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -334,4 +336,36 @@ export function makeInitialRobotState(args: {
       ),
     },
   }
+}
+
+export const getHasWasteChute = (
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+): boolean => {
+  return Object.values(additionalEquipmentEntities).some(
+    additionalEquipmentEntity =>
+      additionalEquipmentEntity.location === WASTE_CHUTE_SLOT &&
+      additionalEquipmentEntity.name === 'wasteChute'
+  )
+}
+
+export const getTiprackHasTips = (
+  tipState: RobotState['tipState'],
+  labwareId: string
+): boolean => {
+  return tipState.tipracks[labwareId] != null
+    ? Object.values(tipState.tipracks[labwareId]).some(
+        tipState => tipState === true
+      )
+    : false
+}
+
+export const getLabwareHasLiquid = (
+  liquidState: RobotState['liquidState'],
+  labwareId: string
+): boolean => {
+  return liquidState.labware[labwareId] != null
+    ? Object.values(liquidState.labware[labwareId]).some(liquidState =>
+        Object.values(liquidState).some(volume => volume.volume > 0)
+      )
+    : false
 }

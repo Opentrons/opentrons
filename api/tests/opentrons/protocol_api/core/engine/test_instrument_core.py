@@ -533,6 +533,7 @@ def test_dispense_to_well(
         rate=5.6,
         flow_rate=6.0,
         in_place=False,
+        push_out=7,
     )
 
     decoy.verify(
@@ -545,6 +546,7 @@ def test_dispense_to_well(
             ),
             volume=12.34,
             flow_rate=6.0,
+            push_out=7,
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
     )
@@ -565,13 +567,12 @@ def test_dispense_in_place(
         well_core=None,
         location=location,
         in_place=True,
+        push_out=None,
     )
 
     decoy.verify(
         mock_engine_client.dispense_in_place(
-            pipette_id="abc123",
-            volume=12.34,
-            flow_rate=7.8,
+            pipette_id="abc123", volume=12.34, flow_rate=7.8, push_out=None
         ),
     )
 
@@ -591,6 +592,7 @@ def test_dispense_to_coordinates(
         well_core=None,
         location=location,
         in_place=False,
+        push_out=None,
     )
 
     decoy.verify(
@@ -602,9 +604,7 @@ def test_dispense_to_coordinates(
             speed=None,
         ),
         mock_engine_client.dispense_in_place(
-            pipette_id="abc123",
-            volume=12.34,
-            flow_rate=7.8,
+            pipette_id="abc123", volume=12.34, flow_rate=7.8, push_out=None
         ),
     )
 

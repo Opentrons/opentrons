@@ -3,17 +3,23 @@ import asyncio
 import logging
 
 from typing_extensions import Literal
+from typing import Union, Dict
+
+from opentrons_shared_data.errors.exceptions import CommandTimedOutError
 
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    MultipleMessagesWaitableCallback,
+    WaitableCallback,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipStatusQueryRequest,
     PushTipPresenceNotification,
 )
 
-from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId, SensorId
 
 log = logging.getLogger(__name__)
 
@@ -21,21 +27,14 @@ log = logging.getLogger(__name__)
 async def get_tip_ejector_state(
     can_messenger: CanMessenger,
     node: Literal[NodeId.pipette_left, NodeId.pipette_right],
-) -> int:
+    expected_responses: Union[Literal[1], Literal[2]],
+    timeout: float = 1.0,
+) -> Dict[SensorId, int]:
     """Get the state of the tip presence interrupter.
 
     When the tip ejector flag is occuluded, then we
     know that there is a tip on the pipette.
     """
-    tip_ejector_state = 0
-
-    event = asyncio.Event()
-
-    def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
-        nonlocal tip_ejector_state
-        if isinstance(message, PushTipPresenceNotification):
-            event.set()
-            tip_ejector_state = message.payload.ejector_flag_status.value
 
     def _filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) == node) and (
@@ -43,13 +42,30 @@ async def get_tip_ejector_state(
             == MessageId.tip_presence_notification
         )
 
-    can_messenger.add_listener(_listener, _filter)
-    await can_messenger.send(node_id=node, message=TipStatusQueryRequest())
+    async def gather_responses(
+        reader: WaitableCallback,
+    ) -> Dict[SensorId, int]:
+        data: Dict[SensorId, int] = {}
+        async for response, _ in reader:
+            assert isinstance(response, PushTipPresenceNotification)
+            tip_ejector_state = response.payload.ejector_flag_status.value
+            data[SensorId(response.payload.sensor_id.value)] = tip_ejector_state
+        return data
 
-    try:
-        await asyncio.wait_for(event.wait(), 1.0)
-    except asyncio.TimeoutError:
-        log.error("tip ejector state request timed out before expected nodes responded")
-    finally:
-        can_messenger.remove_listener(_listener)
-        return tip_ejector_state
+    with MultipleMessagesWaitableCallback(
+        can_messenger,
+        _filter,
+        number_of_messages=expected_responses,
+    ) as _reader:
+        await can_messenger.send(node_id=node, message=TipStatusQueryRequest())
+        try:
+
+            data_dict = await asyncio.wait_for(
+                gather_responses(_reader),
+                timeout,
+            )
+        except asyncio.TimeoutError as te:
+            msg = f"Tip presence poll of {node} timed out"
+            log.warning(msg)
+            raise CommandTimedOutError(message=msg) from te
+        return data_dict

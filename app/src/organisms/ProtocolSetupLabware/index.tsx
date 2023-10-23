@@ -7,6 +7,7 @@ import {
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -49,8 +50,12 @@ import { Modal } from '../../molecules/Modal'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
+import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModulesAndDeck/utils'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import {
+  getNestedLabwareInfo,
+  NestedLabwareInfo,
+} from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -63,7 +68,7 @@ import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
+import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -184,7 +189,6 @@ export function ProtocolSetupLabware({
     typeof selectedLabware.location === 'object' &&
     'labwareId' in selectedLabware?.location
   ) {
-    //  TODO(jr, 8/14/23): add adapter location icon when we have one
     const adapterId = selectedLabware.location.labwareId
     const adapterLocation = mostRecentAnalysis?.commands.find(
       (command): command is LoadLabwareRunTimeCommand =>
@@ -396,13 +400,23 @@ export function ProtocolSetupLabware({
           </Flex>
         </Flex>
         {[...onDeckItems, ...offDeckItems].map((labware, i) => {
-          return mostRecentAnalysis != null ? (
+          const labwareOnAdapter = onDeckItems.find(
+            item =>
+              labware.initialLocation !== 'offDeck' &&
+              'labwareId' in labware.initialLocation &&
+              item.labwareId === labware.initialLocation.labwareId
+          )
+          return mostRecentAnalysis != null && labwareOnAdapter == null ? (
             <RowLabware
               key={i}
               labware={labware}
               attachedProtocolModules={attachedProtocolModuleMatches}
               refetchModules={moduleQuery.refetch}
               commands={mostRecentAnalysis?.commands}
+              nestedLabwareInfo={getNestedLabwareInfo(
+                labware,
+                mostRecentAnalysis.commands
+              )}
             />
           ) : null
         })}
@@ -515,6 +529,8 @@ function LabwareLatch({
           ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
           : COLORS.darkBlackEnabled
       }
+      height="6.5rem"
+      alignSelf={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
       fontSize={TYPOGRAPHY.fontSize22}
       gridGap={SPACING.spacing8}
@@ -557,6 +573,7 @@ interface RowLabwareProps {
   labware: LabwareSetupItem
   attachedProtocolModules: AttachedProtocolModuleMatch[]
   refetchModules: UseQueryResult<Modules>['refetch']
+  nestedLabwareInfo: NestedLabwareInfo | null
   commands?: RunTimeCommand[]
 }
 
@@ -564,11 +581,11 @@ function RowLabware({
   labware,
   attachedProtocolModules,
   refetchModules,
+  nestedLabwareInfo,
   commands,
 }: RowLabwareProps): JSX.Element | null {
   const { definition, initialLocation, nickName } = labware
-  const { t: commandTextTranslator } = useTranslation('protocol_command_text')
-  const { t: setupTextTranslator } = useTranslation('protocol_setup')
+  const { t } = useTranslation('protocol_command_text')
 
   const matchedModule =
     initialLocation !== 'offDeck' &&
@@ -584,20 +601,17 @@ function RowLabware({
       ? matchedModule.attachedModuleMatch
       : null
 
-  const moduleInstructions = (
-    <StyledText color={COLORS.darkBlack70} as="label">
-      {setupTextTranslator('labware_latch_instructions')}
-    </StyledText>
-  )
-
   const matchedModuleType = matchedModule?.attachedModuleMatch?.moduleType
 
+  let slotName: string = ''
   let location: JSX.Element | string | null = null
   if (initialLocation === 'offDeck') {
-    location = commandTextTranslator('off_deck')
+    location = t('off_deck')
   } else if ('slotName' in initialLocation) {
+    slotName = initialLocation.slotName
     location = <LocationIcon slotName={initialLocation.slotName} />
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
+    slotName = matchedModule.slotName
     location = (
       <>
         <LocationIcon slotName={matchedModule?.slotName} />
@@ -605,7 +619,6 @@ function RowLabware({
       </>
     )
   } else if ('labwareId' in initialLocation) {
-    //  TODO(jr, 8/14/23): add adapter location icon when we have one
     const adapterId = initialLocation.labwareId
     const adapterLocation = commands?.find(
       (command): command is LoadLabwareRunTimeCommand =>
@@ -615,12 +628,14 @@ function RowLabware({
 
     if (adapterLocation != null && adapterLocation !== 'offDeck') {
       if ('slotName' in adapterLocation) {
+        slotName = adapterLocation.slotName
         location = <LocationIcon slotName={adapterLocation.slotName} />
       } else if ('moduleId' in adapterLocation) {
         const moduleUnderAdapter = attachedProtocolModules.find(
           module => module.moduleId === adapterLocation.moduleId
         )
         if (moduleUnderAdapter != null) {
+          slotName = moduleUnderAdapter.slotName
           location = (
             <>
               <LocationIcon slotName={moduleUnderAdapter.slotName} />
@@ -637,7 +652,6 @@ function RowLabware({
       }
     }
   }
-
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -653,20 +667,39 @@ function RowLabware({
         alignSelf={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing4}
         width="86%"
       >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_EVENLY}
-        >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {getLabwareDisplayName(definition)}
-          </StyledText>
-          <StyledText color={COLORS.darkBlack70} as="p">
-            {nickName}
-          </StyledText>
-          {matchingHeaterShaker != null ? moduleInstructions : null}
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_SPACE_EVENLY}
+            gridGap={SPACING.spacing4}
+          >
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {getLabwareDisplayName(definition)}
+            </StyledText>
+            <StyledText color={COLORS.darkBlack70} as="p">
+              {nickName}
+            </StyledText>
+          </Flex>
+          {nestedLabwareInfo != null ? (
+            <Box
+              borderBottom={`1px solid ${COLORS.darkBlack70}`}
+              marginY={SPACING.spacing16}
+              width="33rem"
+            />
+          ) : null}
+          {nestedLabwareInfo != null &&
+          nestedLabwareInfo?.sharedSlotId === slotName ? (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                {nestedLabwareInfo.nestedLabwareDisplayName}
+              </StyledText>
+              <StyledText as="p" color={COLORS.darkBlack70}>
+                {nestedLabwareInfo.nestedLabwareNickName}
+              </StyledText>
+            </Flex>
+          ) : null}
         </Flex>
         {matchingHeaterShaker != null ? (
           <LabwareLatch

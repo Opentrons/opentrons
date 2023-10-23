@@ -8,11 +8,17 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
-import { useRunPipetteInfoByMount, useStoredProtocolAnalysis } from '../hooks'
+import { getShowPipetteCalibrationWarning } from '../utils'
+import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
+import {
+  useRunPipetteInfoByMount,
+  useStoredProtocolAnalysis,
+  useIsFlex,
+} from '../hooks'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
+import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
@@ -22,6 +28,7 @@ import type { GripperData } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
 const EQUIPMENT_POLL_MS = 5000
+
 interface SetupInstrumentCalibrationProps {
   robotName: string
   runId: string
@@ -33,8 +40,10 @@ export function SetupInstrumentCalibration({
 }: SetupInstrumentCalibrationProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
+  const isFlex = useIsFlex(robotName)
 
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    enabled: isFlex,
     refetchInterval: EQUIPMENT_POLL_MS,
   })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -47,8 +56,12 @@ export function SetupInstrumentCalibration({
         (i): i is GripperData => i.instrumentType === 'gripper'
       ) ?? null
     : null
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
+        <PipetteRecalibrationWarning />
+      )}
       <StyledText
         color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}
@@ -58,16 +71,29 @@ export function SetupInstrumentCalibration({
       </StyledText>
       {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
         const pipetteInfo = runPipetteInfoByMount[mount]
-        return pipetteInfo != null ? (
-          <SetupPipetteCalibrationItem
-            key={index}
-            pipetteInfo={pipetteInfo}
-            mount={mount}
-            robotName={robotName}
-            runId={runId}
-            instrumentsRefetch={refetch}
-          />
-        ) : null
+        if (pipetteInfo != null && !isFlex) {
+          return (
+            <SetupPipetteCalibrationItem
+              key={index}
+              pipetteInfo={pipetteInfo}
+              mount={mount}
+              robotName={robotName}
+              runId={runId}
+              instrumentsRefetch={refetch}
+            />
+          )
+        } else if (isFlex) {
+          return (
+            <SetupFlexPipetteCalibrationItem
+              key={index}
+              mount={mount}
+              runId={runId}
+              instrumentsRefetch={refetch}
+            />
+          )
+        } else {
+          return null
+        }
       })}
       {usesGripper ? (
         <SetupGripperCalibrationItem

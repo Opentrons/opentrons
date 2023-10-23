@@ -15,6 +15,7 @@ import {
   ModuleEntity,
   PipetteEntity,
   LabwareEntity,
+  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 export interface FormPipette {
   pipetteName: string | null | undefined
@@ -93,6 +94,7 @@ export interface PipetteTemporalProperties {
 // which may change across time (eg moving a labware to another slot)
 export type LabwareOnDeck = LabwareEntity & LabwareTemporalProperties
 export type PipetteOnDeck = PipetteEntity & PipetteTemporalProperties
+export type AdditionalEquipmentOnDeck = AdditionalEquipmentEntity
 // TODO: Ian 2019-11-08 make all values Maybe typed
 
 export type InitialDeckSetup = AllTemporalPropertiesForTimelineFrame
@@ -106,5 +108,8 @@ export interface AllTemporalPropertiesForTimelineFrame {
   }
   modules: {
     [moduleId: string]: ModuleOnDeck
+  }
+  additionalEquipmentOnDeck: {
+    [additionalEquipmentId: string]: AdditionalEquipmentOnDeck
   }
 }

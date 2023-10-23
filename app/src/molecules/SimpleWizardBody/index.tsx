@@ -16,10 +16,12 @@ import {
   POSITION_ABSOLUTE,
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import SuccessIcon from '../../assets/images/icon_success.png'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
+import type { RobotType } from '@opentrons/shared-data'
 
 interface Props extends StyleProps {
   iconColor: string
@@ -28,6 +30,7 @@ interface Props extends StyleProps {
   children?: React.ReactNode
   subHeader?: string | JSX.Element
   isPending?: boolean
+  robotType?: RobotType
   /**
    *  this prop is to change justifyContent of OnDeviceDisplay buttons
    *  TODO(jr, 8/9/23): this SHOULD be refactored so the
@@ -87,6 +90,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
     subHeader,
     isSuccess,
     isPending,
+    robotType = FLEX_ROBOT_TYPE,
     ...styleProps
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
@@ -144,8 +148,8 @@ export function SimpleWizardBody(props: Props): JSX.Element {
           <>
             {isSuccess ? (
               <img
-                width="250px"
-                height="208px"
+                width={robotType === FLEX_ROBOT_TYPE ? '250px' : '160px'}
+                height={robotType === FLEX_ROBOT_TYPE ? '208px' : '120px'}
                 src={SuccessIcon}
                 alt="Success Icon"
               />

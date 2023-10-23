@@ -146,6 +146,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
+        push_out: Optional[float],
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -155,6 +156,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to dispense at.
             in_place: whether this is a in-place command.
+            push_out: The amount to push the plunger below bottom position.
         """
         if well_core is None:
             if not in_place:
@@ -169,7 +171,10 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 )
 
             self._engine_client.dispense_in_place(
-                pipette_id=self._pipette_id, volume=volume, flow_rate=flow_rate
+                pipette_id=self._pipette_id,
+                volume=volume,
+                flow_rate=flow_rate,
+                push_out=push_out,
             )
         else:
             well_name = well_core.get_name()
@@ -190,6 +195,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 well_location=well_location,
                 volume=volume,
                 flow_rate=flow_rate,
+                push_out=push_out,
             )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
@@ -520,3 +526,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if blow_out is not None:
             assert blow_out > 0
             self._blow_out_flow_rate = blow_out
+
+    def configure_for_volume(self, volume: float) -> None:
+        self._engine_client.configure_for_volume(
+            pipette_id=self._pipette_id, volume=volume
+        )

@@ -7,10 +7,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag =
-  | 'enableExtendedHardware'
-  | 'lpcWithProbe'
-  | 'enableModuleCalibration'
+export type DevInternalFlag = 'enableDeckConfiguration' | 'protocolStats'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -99,7 +96,7 @@ export interface ConfigV0 {
   devInternal?: FeatureFlags
 }
 
-export interface ConfigV1 extends Omit<ConfigV0, 'version' | 'discovery'> {
+export type ConfigV1 = Omit<ConfigV0, 'version' | 'discovery'> & {
   version: 1
   discovery: {
     candidates: DiscoveryCandidates
@@ -107,15 +104,14 @@ export interface ConfigV1 extends Omit<ConfigV0, 'version' | 'discovery'> {
   }
 }
 
-export interface ConfigV2 extends Omit<ConfigV1, 'version'> {
+export type ConfigV2 = Omit<ConfigV1, 'version'> & {
   version: 2
   calibration: {
     useTrashSurfaceForTipCal: boolean | null
   }
 }
 
-// v3 config changes default values but does not change schema
-export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
+export type ConfigV3 = Omit<ConfigV2, 'version' | 'support'> & {
   version: 3
   support: ConfigV2['support'] & {
     name: string | null
@@ -123,77 +119,77 @@ export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
   }
 }
 
-export interface ConfigV4 extends Omit<ConfigV3, 'version' | 'labware'> {
+export type ConfigV4 = Omit<ConfigV3, 'version' | 'labware'> & {
   version: 4
   labware: ConfigV3['labware'] & {
     showLabwareOffsetCodeSnippets: boolean
   }
 }
 
-export interface ConfigV5 extends Omit<ConfigV4, 'version'> {
+export type ConfigV5 = Omit<ConfigV4, 'version'> & {
   version: 5
   python: {
     pathToPythonOverride: string | null
   }
 }
 
-export interface ConfigV6 extends Omit<ConfigV5, 'version'> {
+export type ConfigV6 = Omit<ConfigV5, 'version'> & {
   version: 6
   modules: {
     heaterShaker: { isAttached: boolean }
   }
 }
 
-export interface ConfigV7 extends Omit<ConfigV6, 'version'> {
+export type ConfigV7 = Omit<ConfigV6, 'version'> & {
   version: 7
   ui: ConfigV6['ui'] & {
     minWidth: number
   }
 }
 
-export interface ConfigV8 extends Omit<ConfigV7, 'version'> {
+export type ConfigV8 = Omit<ConfigV7, 'version'> & {
   version: 8
 }
 
-export interface ConfigV9 extends Omit<ConfigV8, 'version'> {
+export type ConfigV9 = Omit<ConfigV8, 'version'> & {
   version: 9
   isOnDevice: boolean
 }
 
-export interface ConfigV10 extends Omit<ConfigV9, 'version'> {
+export type ConfigV10 = Omit<ConfigV9, 'version'> & {
   version: 10
   protocols: { sendAllProtocolsToOT3: boolean }
 }
 
-export interface ConfigV11 extends Omit<ConfigV10, 'version'> {
+export type ConfigV11 = Omit<ConfigV10, 'version'> & {
   version: 11
   protocols: ConfigV10['protocols'] & {
     protocolsStoredSortKey: ProtocolSort | null
   }
 }
 
-export interface ConfigV12 extends Omit<ConfigV11, 'version' | 'buildroot'> {
+export type ConfigV12 = Omit<ConfigV11, 'version' | 'buildroot'> & {
   version: 12
   robotSystemUpdate: {
     manifestUrls: { OT2: string; OT3: string }
   }
 }
 
-export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
+export type ConfigV13 = Omit<ConfigV12, 'version'> & {
   version: 13
   protocols: ConfigV12['protocols'] & {
     protocolsOnDeviceSortKey: ProtocolsOnDeviceSortKey | null
   }
 }
 
-export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
+export type ConfigV14 = Omit<ConfigV13, 'version'> & {
   version: 14
   protocols: ConfigV13['protocols'] & {
     pinnedProtocolIds: string[]
   }
 }
 
-export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
+export type ConfigV15 = Omit<ConfigV14, 'version'> & {
   version: 15
   onDeviceDisplaySettings: {
     sleepMs: number
@@ -202,23 +198,41 @@ export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
   }
 }
 
-export interface ConfigV16 extends Omit<ConfigV15, 'version'> {
+export type ConfigV16 = Omit<ConfigV15, 'version'> & {
   version: 16
   onDeviceDisplaySettings: ConfigV15['onDeviceDisplaySettings'] & {
     unfinishedUnboxingFlowRoute: string | null
   }
 }
 
-export interface ConfigV17 extends Omit<ConfigV16, 'version'> {
+export type ConfigV17 = Omit<ConfigV16, 'version'> & {
   version: 17
   protocols: ConfigV15['protocols'] & {
     applyHistoricOffsets: boolean
   }
 }
 
-export interface ConfigV18
-  extends Omit<ConfigV17, 'version' | 'robotSystemUpdate'> {
+export type ConfigV18 = Omit<ConfigV17, 'version' | 'robotSystemUpdate'> & {
   version: 18
 }
 
-export type Config = ConfigV18
+export type ConfigV19 = Omit<ConfigV18, 'version' | 'update'> & {
+  version: 19
+  devtools: boolean
+  reinstallDevtools: boolean
+  update: {
+    channel: UpdateChannel
+    hasJustUpdated: boolean
+  }
+}
+
+export type ConfigV20 = Omit<ConfigV19, 'version'> & {
+  version: 20
+  robotSystemUpdate: {
+    manifestUrls: {
+      OT2: string
+    }
+  }
+}
+
+export type Config = ConfigV20

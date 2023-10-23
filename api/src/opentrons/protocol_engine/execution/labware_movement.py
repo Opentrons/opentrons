@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
-from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
@@ -20,6 +19,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
+    CannotPerformGripperAction,
 )
 
 from ..types import (
@@ -97,6 +97,10 @@ class LabwareMovementHandler:
             raise GripperNotAttachedError(
                 "No gripper found for performing labware movements."
             )
+        if not ot3api._gripper_handler.is_ready_for_jaw_home():
+            raise CannotPerformGripperAction(
+                "Cannot pick up labware when gripper is already gripping."
+            )
 
         gripper_mount = OT3Mount.GRIPPER
 
@@ -137,9 +141,8 @@ class LabwareMovementHandler:
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )
 
-            # Keep the gripper in idly gripped position to avoid colliding with
-            # things like the thermocycler latches
-            await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE, stay_engaged=False)
+            # this makes sure gripper jaw is closed between two move labware calls
+            await ot3api.idle_gripper()
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation

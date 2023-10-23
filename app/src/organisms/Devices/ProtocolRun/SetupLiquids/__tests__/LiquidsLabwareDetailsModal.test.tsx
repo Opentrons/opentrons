@@ -12,7 +12,7 @@ import { getIsOnDevice } from '../../../../../redux/config'
 import { useLabwareRenderInfoForRunById } from '../../../../Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
-import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
+import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { getSlotLabwareDefinition } from '../../utils/getSlotLabwareDefinition'
 import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
@@ -31,7 +31,7 @@ jest.mock('@opentrons/api-client')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../../../../Devices/hooks')
-jest.mock('../../utils/getSlotLabwareName')
+jest.mock('../../utils/getLocationInfoNames')
 jest.mock('../../utils/getSlotLabwareDefinition')
 jest.mock('../utils')
 jest.mock('../LiquidDetailCard')
@@ -39,8 +39,8 @@ jest.mock('../LiquidDetailCard')
 const mockLiquidDetailCard = LiquidDetailCard as jest.MockedFunction<
   typeof LiquidDetailCard
 >
-const mockGetSlotLabwareName = getSlotLabwareName as jest.MockedFunction<
-  typeof getSlotLabwareName
+const mockGetLocationInfoNames = getLocationInfoNames as jest.MockedFunction<
+  typeof getLocationInfoNames
 >
 const mockGetSlotLabwareDefinition = getSlotLabwareDefinition as jest.MockedFunction<
   typeof getSlotLabwareDefinition
@@ -84,7 +84,7 @@ describe('LiquidsLabwareDetailsModal', () => {
       runId: '456',
       closeModal: jest.fn(),
     }
-    mockGetSlotLabwareName.mockReturnValue({
+    mockGetLocationInfoNames.mockReturnValue({
       labwareName: 'mock labware name',
       slotName: '5',
     })
@@ -142,7 +142,7 @@ describe('LiquidsLabwareDetailsModal', () => {
     const [{ getByText, getAllByText, getByRole }] = render(props)
     getByRole('heading', { name: 'Slot Number' })
     getByText('5')
-    getByRole('heading', { name: 'Labware Name' })
+    getByRole('heading', { name: 'Labware name' })
     getAllByText('mock labware name')
   })
   it('should render LiquidDetailCard when correct props are passed', () => {

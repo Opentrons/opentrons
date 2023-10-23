@@ -4,8 +4,8 @@ import type {
   MoveLabwareRunTimeCommand,
 } from '@opentrons/shared-data/'
 import { getLabwareName } from './utils'
-import { getLoadedLabware } from './utils/accessors'
 import { getLabwareDisplayLocation } from './utils/getLabwareDisplayLocation'
+import { getFinalLabwareLocation } from './utils/getFinalLabwareLocation'
 
 interface MoveLabwareCommandTextProps {
   command: MoveLabwareRunTimeCommand
@@ -17,7 +17,12 @@ export function MoveLabwareCommandText(
   const { t } = useTranslation('protocol_command_text')
   const { command, robotSideAnalysis } = props
   const { labwareId, newLocation, strategy } = command.params
-  const oldLocation = getLoadedLabware(robotSideAnalysis, labwareId)?.location
+
+  const allPreviousCommands = robotSideAnalysis.commands.slice(
+    0,
+    robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+  )
+  const oldLocation = getFinalLabwareLocation(labwareId, allPreviousCommands)
   const newDisplayLocation = getLabwareDisplayLocation(
     robotSideAnalysis,
     newLocation,

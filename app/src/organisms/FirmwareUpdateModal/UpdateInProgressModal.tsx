@@ -13,9 +13,11 @@ import {
 import { ProgressBar } from '../../atoms/ProgressBar'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
+import { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
   percentComplete: number
+  subsystem: Subsystem
 }
 
 const OUTER_STYLES = css`
@@ -26,8 +28,8 @@ const OUTER_STYLES = css`
 export function UpdateInProgressModal(
   props: UpdateInProgressModalProps
 ): JSX.Element {
-  const { percentComplete } = props
-  const { i18n, t } = useTranslation('firmware_update')
+  const { percentComplete, subsystem } = props
+  const { t } = useTranslation('firmware_update')
 
   return (
     <Modal>
@@ -47,7 +49,7 @@ export function UpdateInProgressModal(
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
-          {i18n.format(t('updating_firmware'), 'capitalize')}
+          {t('updating_firmware', { subsystem: t(subsystem) })}
         </StyledText>
         <ProgressBar
           percentComplete={percentComplete}

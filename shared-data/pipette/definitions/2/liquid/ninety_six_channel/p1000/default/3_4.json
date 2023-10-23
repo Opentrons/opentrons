@@ -4,26 +4,19 @@
     "t50": {
       "defaultAspirateFlowRate": {
         "default": 6,
-        "valuesByApiLevel": {
-          "2.14": 6
-        }
+        "valuesByApiLevel": { "2.14": 6 }
       },
       "defaultDispenseFlowRate": {
         "default": 6,
-        "valuesByApiLevel": {
-          "2.14": 6
-        }
+        "valuesByApiLevel": { "2.14": 6 }
       },
       "defaultBlowOutFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultFlowAcceleration": 16000.0,
       "defaultTipLength": 57.9,
       "defaultReturnTipHeight": 0.2,
-      "defaultBlowoutVolume": 3.2,
       "aspirate": {
         "default": {
           "1": [
@@ -119,31 +112,25 @@
             [51.4512, 0.0064, 13.9651]
           ]
         }
-      }
+      },
+      "defaultPushOutVolume": 7
     },
     "t200": {
       "defaultAspirateFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultDispenseFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultBlowOutFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultFlowAcceleration": 16000.0,
       "defaultTipLength": 58.35,
       "defaultReturnTipHeight": 0.2,
-      "defaultBlowoutVolume": 3.2,
       "aspirate": {
         "default": {
           "1": [
@@ -237,31 +224,25 @@
             [214.0264, 0.0008, 15.123]
           ]
         }
-      }
+      },
+      "defaultPushOutVolume": 5
     },
     "t1000": {
       "defaultAspirateFlowRate": {
         "default": 160,
-        "valuesByApiLevel": {
-          "2.14": 160
-        }
+        "valuesByApiLevel": { "2.14": 160 }
       },
       "defaultDispenseFlowRate": {
         "default": 160,
-        "valuesByApiLevel": {
-          "2.14": 160
-        }
+        "valuesByApiLevel": { "2.14": 160 }
       },
       "defaultBlowOutFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultFlowAcceleration": 16000.0,
       "defaultTipLength": 95.6,
       "defaultReturnTipHeight": 0.2,
-      "defaultBlowoutVolume": 3.2,
       "aspirate": {
         "default": {
           "1": [
@@ -355,7 +336,8 @@
             [1051.4648, 0.0001, 15.391]
           ]
         }
-      }
+      },
+      "defaultPushOutVolume": 20
     }
   },
   "defaultTipOverlapDictionary": {

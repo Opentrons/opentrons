@@ -5,11 +5,13 @@ import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import {
+  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
   RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  useAllCommandsQuery,
   useProtocolAnalysesQuery,
   useProtocolQuery,
   useRunQuery,
@@ -22,6 +24,7 @@ import {
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { mockUseAllCommandsResponseNonDeterministic } from '../../../organisms/RunProgressMeter/__fixtures__'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -29,6 +32,7 @@ import {
 import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '../RunningProtocol'
 
 import type { ProtocolAnalyses } from '@opentrons/api-client'
@@ -46,6 +50,7 @@ jest.mock('../../../redux/discovery')
 jest.mock(
   '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 )
+jest.mock('../../../organisms/OpenDoorAlertModal')
 
 const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
   typeof useProtocolAnalysesQuery
@@ -80,6 +85,12 @@ const mockRunningProtocolSkeleton = RunningProtocolSkeleton as jest.MockedFuncti
 >
 const mockCancelingRunModal = CancelingRunModal as jest.MockedFunction<
   typeof CancelingRunModal
+>
+const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
+  typeof useAllCommandsQuery
+>
+const mockOpenDoorAlertModal = OpenDoorAlertModal as jest.MockedFunction<
+  typeof OpenDoorAlertModal
 >
 
 const RUN_ID = 'run_id'
@@ -165,6 +176,10 @@ describe('RunningProtocol', () => {
       <div>mock RunningProtocolSkeleton</div>
     )
     mockCancelingRunModal.mockReturnValue(<div>mock CancelingRunModal</div>)
+    when(mockUseAllCommandsQuery)
+      .calledWith(RUN_ID, { cursor: null, pageLength: 1 })
+      .mockReturnValue(mockUseAllCommandsResponseNonDeterministic)
+    mockOpenDoorAlertModal.mockReturnValue(<div>mock OpenDoorAlertModal</div>)
   })
 
   afterEach(() => {
@@ -189,6 +204,14 @@ describe('RunningProtocol', () => {
   it('should render CurrentRunningProtocolCommand when loaded the data', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock CurrentRunningProtocolCommand')
+  })
+
+  it('should render open door alert modal, when run staus is blocked by open door', () => {
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
+    getByText('mock OpenDoorAlertModal')
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

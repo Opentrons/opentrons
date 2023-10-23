@@ -20,7 +20,21 @@ import {
   RESPONSIVENESS,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-
+import {
+  CompletedProtocolAnalysis,
+  LabwareDefinitionsByUri,
+  LabwareLocation,
+  MoveLabwareRunTimeCommand,
+  OT2_ROBOT_TYPE,
+  RobotType,
+  getDeckDefFromRobotType,
+  getLabwareDisplayName,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleDisplayName,
+  getModuleType,
+  getOccludedSlotCountForModule,
+  getRobotTypeFromLoadedLabware,
+} from '@opentrons/shared-data'
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
@@ -30,21 +44,11 @@ import {
 } from './utils'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
-
 import {
-  CompletedProtocolAnalysis,
-  LabwareLocation,
-  MoveLabwareRunTimeCommand,
-  RobotType,
-  getDeckDefFromRobotType,
-  getLoadedLabwareDefinitionsByUri,
-  getModuleDisplayName,
-  getModuleType,
-  getOccludedSlotCountForModule,
-  getRobotTypeFromLoadedLabware,
-} from '@opentrons/shared-data'
+  getLoadedLabware,
+  getLoadedModule,
+} from '../CommandText/utils/accessors'
 import type { RunData } from '@opentrons/api-client'
-import { getLoadedLabware } from '../CommandText/utils/accessors'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -140,7 +144,6 @@ export function MoveLabwareInterventionContent({
     movedLabwareDefUri != null
       ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
       : null
-
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
     <Flex
@@ -169,6 +172,7 @@ export function MoveLabwareInterventionContent({
                 protocolData={run}
                 location={oldLabwareLocation}
                 robotType={robotType}
+                labwareDefsByUri={labwareDefsByUri}
               />
 
               <Icon name="arrow-right" css={ICON_STYLE} />
@@ -176,6 +180,7 @@ export function MoveLabwareInterventionContent({
                 protocolData={run}
                 location={command.params.newLocation}
                 robotType={robotType}
+                labwareDefsByUri={labwareDefsByUri}
               />
             </Flex>
           </Flex>
@@ -192,13 +197,21 @@ export function MoveLabwareInterventionContent({
               loadedModules={run.modules}
               loadedLabware={run.labware}
               // TODO(bh, 2023-07-19): read trash slot name from protocol
-              trashSlotName={robotType === 'OT-3 Standard' ? 'A3' : undefined}
+              trashLocation={robotType === 'OT-3 Standard' ? 'A3' : undefined}
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(
-                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                    ({
+                      x,
+                      y,
+                      moduleId,
+                      moduleDef,
+                      nestedLabwareDef,
+                      nestedLabwareId,
+                    }) => (
                       <Module key={moduleId} def={moduleDef} x={x} y={y}>
-                        {nestedLabwareDef != null ? (
+                        {nestedLabwareDef != null &&
+                        nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />
                         ) : null}
                       </Module>
@@ -225,17 +238,17 @@ interface LabwareDisplayLocationProps {
   protocolData: RunData
   location: LabwareLocation
   robotType: RobotType
+  labwareDefsByUri: LabwareDefinitionsByUri
 }
 function LabwareDisplayLocation(
   props: LabwareDisplayLocationProps
 ): JSX.Element {
   const { t } = useTranslation('protocol_command_text')
-  const { protocolData, location, robotType } = props
+  const { protocolData, location, robotType, labwareDefsByUri } = props
   let displayLocation: React.ReactNode = ''
   if (location === 'offDeck') {
-    // typecheck thinks t() can return undefined
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    displayLocation = <LocationIcon slotName={t('offdeck') as string} />
+    // TODO(BC, 08/28/23): remove this string cast after update i18next to >23 (see https://www.i18next.com/overview/typescript#argument-of-type-defaulttfuncreturn-is-not-assignable-to-parameter-of-type-xyz)
+    displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
   } else if ('moduleId' in location) {
@@ -258,8 +271,48 @@ function LabwareDisplayLocation(
         ),
       })
     }
-  } else {
-    console.warn('display location could not be established: ', location)
+  } else if ('labwareId' in location) {
+    const adapter = protocolData.labware.find(
+      lw => lw.id === location.labwareId
+    )
+    const adapterDef =
+      adapter != null ? labwareDefsByUri[adapter.definitionUri] : null
+    const adapterDisplayName =
+      adapterDef != null ? getLabwareDisplayName(adapterDef) : ''
+
+    if (adapter == null) {
+      console.warn('labware is located on an unknown adapter')
+    } else if (adapter.location === 'offDeck') {
+      displayLocation = t('off_deck')
+    } else if ('slotName' in adapter.location) {
+      displayLocation = t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot_name: adapter.location.slotName,
+      })
+    } else if ('moduleId' in adapter.location) {
+      const moduleIdUnderAdapter = adapter.location.moduleId
+      const moduleModel = protocolData.modules.find(
+        module => module.id === moduleIdUnderAdapter
+      )?.model
+      if (moduleModel == null) {
+        console.warn('labware is located on an adapter on an unknown module')
+      } else {
+        const slotName =
+          getLoadedModule(protocolData, adapter.location.moduleId)?.location
+            ?.slotName ?? ''
+        displayLocation = t('adapter_in_module_in_slot', {
+          count: getOccludedSlotCountForModule(
+            getModuleType(moduleModel),
+            robotType ?? OT2_ROBOT_TYPE
+          ),
+          module: getModuleDisplayName(moduleModel),
+          adapter: adapterDisplayName,
+          slot_name: slotName,
+        })
+      }
+    } else {
+      console.warn('display location could not be established: ', location)
+    }
   }
   return <>{displayLocation}</>
 }

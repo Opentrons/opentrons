@@ -13,6 +13,7 @@ from typing import (
     Callable,
     AsyncIterator,
     Union,
+    List,
 )
 
 from opentrons_hardware.hardware_control import network, tools
@@ -144,6 +145,10 @@ class SubsystemManager:
     def update_required(self) -> bool:
         return bool(self._updates_required)
 
+    @property
+    def subsystems_to_update(self) -> List[SubSystem]:
+        return [target_to_subsystem(t) for t in self._updates_required.keys()]
+
     async def start(self) -> None:
         await self._probe_network_and_cache_fw_updates(
             self._expected_core_targets, True
@@ -265,7 +270,7 @@ class SubsystemManager:
                 can_messenger=self._can_messenger,
                 usb_messenger=self._usb_messenger,
                 update_details=update_details,
-                retry_count=60,
+                retry_count=3,
                 timeout_seconds=5,
                 erase=True,
             )

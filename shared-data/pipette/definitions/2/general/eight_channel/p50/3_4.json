@@ -10,8 +10,14 @@
     "increment": 0.0,
     "distance": 13.0
   },
-  "dropTipConfigurations": { "current": 1.0, "speed": 10 },
-  "plungerMotorConfigurations": { "idle": 0.3, "run": 1.0 },
+  "dropTipConfigurations": {
+    "current": 1.0,
+    "speed": 10
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 1.0
+  },
   "plungerPositionsConfigurations": {
     "default": {
       "top": 0.0,
@@ -21,16 +27,22 @@
     },
     "lowVolumeDefault": {
       "top": 0.0,
-      "bottom": 57.0,
+      "bottom": 61.5,
       "blowout": 76.5,
       "drop": 91.5
     }
   },
   "availableSensors": {
     "sensors": ["pressure", "capacitive", "environment"],
-    "pressure": { "count": 2 },
-    "capacitive": { "count": 2 },
-    "environment": { "count": 1 }
+    "pressure": {
+      "count": 2
+    },
+    "capacitive": {
+      "count": 2
+    },
+    "environment": {
+      "count": 1
+    }
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
@@ -41,5 +53,10 @@
   "shaftDiameter": 1.0,
   "shaftULperMM": 0.785,
   "backlashDistance": 0.1,
-  "quirks": []
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 1.0,
+    "speed": 30
+  },
+  "tipPresenceCheckDistanceMM": "0.0"
 }

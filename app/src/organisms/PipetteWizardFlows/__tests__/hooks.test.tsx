@@ -344,7 +344,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual(
-      'Detach Right Pipette and Attach 96-Channel Pipette'
+      'Detach Left Pipette and Attach 96-Channel Pipette'
     )
   })
   it('should return correct title for detaching pipette and attaching 96 channel from pipette info from right mount', () => {
@@ -371,7 +371,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual(
-      'Detach Left Pipette and Attach 96-Channel Pipette'
+      'Detach Right Pipette and Attach 96-Channel Pipette'
     )
   })
   it('should return correct title for detaching 2 pipettes and attaching 96 channel from pipette info', () => {

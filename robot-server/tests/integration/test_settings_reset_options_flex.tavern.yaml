@@ -27,6 +27,12 @@ stages:
           - id: onDeviceDisplay
             name: On-Device Display Configuration
             description: !re_search 'on-device display'
+          - id: moduleCalibration
+            name: Module Calibrations
+            description: !re_search 'Clear module offset calibrations'
+          - id: authorizedKeys
+            name: SSH Authorized Keys
+            description: !re_search 'Clear the ssh authorized keys'
 
   - name: POST Reset gripperOffsetCalibrations true on OT-3
     request:

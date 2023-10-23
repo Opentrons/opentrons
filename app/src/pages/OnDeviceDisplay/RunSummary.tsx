@@ -21,6 +21,7 @@ import {
   OVERFLOW_HIDDEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  WRAP,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -51,11 +52,12 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
+import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
-import { getLocalRobot } from '../../redux/discovery'
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -204,10 +206,10 @@ export function RunSummary(): JSX.Element {
               <SummaryHeader>{headerText}</SummaryHeader>
             </Flex>
             <ProtocolName>{protocolName}</ProtocolName>
-            <Flex gridGap={SPACING.spacing8}>
-              <SummaryDatum>{`${t(
-                'run'
-              )}: ${createdAtTimestamp}`}</SummaryDatum>
+            <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
+              <SummaryDatum>
+                {`${t('run')}: ${formatTimeWithUtcLabel(createdAtTimestamp)}`}
+              </SummaryDatum>
               <SummaryDatum>
                 {`${t('duration')}: `}
                 <RunTimer
@@ -220,12 +222,12 @@ export function RunSummary(): JSX.Element {
                   style={DURATION_TEXT_STYLE}
                 />
               </SummaryDatum>
-              <SummaryDatum>{`${t(
-                'start'
-              )}: ${startedAtTimestamp}`}</SummaryDatum>
-              <SummaryDatum>{`${t(
-                'end'
-              )}: ${completedAtTimestamp}`}</SummaryDatum>
+              <SummaryDatum>
+                {`${t('start')}: ${formatTimeWithUtcLabel(startedAtTimestamp)}`}
+              </SummaryDatum>
+              <SummaryDatum>
+                {`${t('end')}: ${formatTimeWithUtcLabel(completedAtTimestamp)}`}
+              </SummaryDatum>
             </Flex>
           </Flex>
           <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
@@ -268,7 +270,6 @@ export function RunSummary(): JSX.Element {
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: 80px;
   line-height: 94px;
   color: ${COLORS.white};
@@ -309,7 +310,6 @@ const SplashFrame = styled(Flex)`
 const ProtocolName = styled.h4`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   color: ${COLORS.darkBlack70};

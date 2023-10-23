@@ -92,6 +92,11 @@ class MoveLabwareImplementation(
         )
         definition_uri = current_labware.definitionUri
 
+        if self._state_view.labware.is_fixed_trash(params.labwareId):
+            raise LabwareMovementNotAllowedError(
+                f"Cannot move fixed trash labware '{current_labware_definition.parameters.loadName}'."
+            )
+
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
         )
@@ -125,11 +130,19 @@ class MoveLabwareImplementation(
                     message="Labware movement using a gripper is not supported on the OT-2",
                     details={"strategy": params.strategy},
                 )
+            if not labware_validation.validate_gripper_compatible(
+                current_labware_definition
+            ):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move labware '{current_labware_definition.parameters.loadName}' with gripper."
+                    f" If trying to move a labware on an adapter, load the adapter separately to allow"
+                    f" gripper movement."
+                )
             if labware_validation.validate_definition_is_adapter(
                 current_labware_definition
             ):
                 raise LabwareMovementNotAllowedError(
-                    f"Cannot move adapter {params.labwareId} with gripper."
+                    f"Cannot move adapter '{current_labware_definition.parameters.loadName}' with gripper."
                 )
 
             validated_current_loc = (

@@ -2,13 +2,16 @@ import * as React from 'react'
 import difference from 'lodash/difference'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
+import { useRouteMatch } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { useInterval } from '@opentrons/components'
+
+import { useInterval, truncateString } from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
   useAllRunsQuery,
   useHost,
   useRunQuery,
+  useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import {
   getProtocol,
@@ -19,9 +22,11 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
+
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
 
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 import type { Dispatch } from '../redux/types'
 
 const CURRENT_RUN_POLL = 5000
@@ -50,6 +55,11 @@ export function useProtocolReceiptToast(): void {
   const protocolIds = protocolIdsQuery.data?.data ?? []
   const protocolIdsRef = React.useRef(protocolIds)
   const hasRefetched = React.useRef(true)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const animationCommand: SetStatusBarCreateCommand = {
+    commandType: 'setStatusBar',
+    params: { animation: 'confirm' },
+  }
 
   if (protocolIdsQuery.isRefetching) {
     hasRefetched.current = false
@@ -81,12 +91,13 @@ export function useProtocolReceiptToast(): void {
           protocolNames.forEach(name => {
             makeToast(
               t('protocol_added', {
-                protocol_name: name,
+                protocol_name: truncateString(name, 30),
               }),
               'success',
               {
                 closeButton: true,
                 disableTimeout: true,
+                displayType: 'odd',
               }
             )
           })
@@ -97,6 +108,13 @@ export function useProtocolReceiptToast(): void {
             .catch((e: Error) =>
               console.error(`error invalidating protocols query: ${e.message}`)
             )
+        })
+        .then(() => {
+          createLiveCommand({
+            command: animationCommand,
+          }).catch((e: Error) =>
+            console.warn(`cannot run status bar animation: ${e.message}`)
+          )
         })
         .catch((e: Error) => {
           console.error(e)
@@ -122,40 +140,38 @@ export function useCurrentRunRoute(): string | null {
           run => run.id === currentRunLink.href.replace('/runs/', '')
         ) // trim link path down to only runId
       : null
-
   const currentRunId = currentRun?.id ?? null
-
   const { data: runRecord } = useRunQuery(currentRunId, {
     staleTime: Infinity,
     enabled: currentRunId != null,
   })
 
+  const isRunSetupRoute = useRouteMatch('/runs/:runId/setup')
+  if (isRunSetupRoute != null && runRecord == null) return '/protocols'
+
   const runStatus = runRecord?.data.status
   const runActions = runRecord?.data.actions
-
   if (runRecord == null || runStatus == null || runActions == null) return null
   // grabbing run id off of the run query to have all routing info come from one source of truth
   const runId = runRecord.data.id
-
-  const hasBeenStarted = runActions?.some(
+  const hasRunStarted = runActions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
   if (
     runStatus === RUN_STATUS_SUCCEEDED ||
-    // don't want to route to the run summary page if the run has been cancelled before starting
-    (runStatus === RUN_STATUS_STOPPED && hasBeenStarted) ||
+    (runStatus === RUN_STATUS_STOPPED && hasRunStarted) ||
     runStatus === RUN_STATUS_FAILED
   ) {
     return `/runs/${runId}/summary`
   } else if (
     runStatus === RUN_STATUS_IDLE ||
-    (!hasBeenStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    (!hasRunStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
   ) {
     return `/runs/${runId}/setup`
-    // don't want to route to the run page if the run hasn't started
-  } else if (hasBeenStarted) {
+  } else if (hasRunStarted) {
     return `/runs/${runId}/run`
   } else {
+    // includes runs cancelled before starting and runs not yet started
     return null
   }
 }

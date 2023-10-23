@@ -1,5 +1,5 @@
 import logging
-from mock import patch, call
+from mock import patch, call, MagicMock
 from dataclasses import make_dataclass
 from typing import Generator
 from pathlib import Path
@@ -10,7 +10,11 @@ from decoy import Decoy
 
 from opentrons.config.reset import ResetOptionId
 from opentrons.config import advanced_settings
-from opentrons_shared_data.pipette import types as pip_types
+from opentrons_shared_data.pipette import (
+    types as pip_types,
+    pipette_definition as pip_def,
+)
+from opentrons.types import Mount
 
 
 from robot_server import app
@@ -125,6 +129,15 @@ def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
 
 
 @pytest.fixture
+def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
+    with patch(
+        "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults",
+        new=decoy.mock(),
+    ) as m:
+        yield m
+
+
+@pytest.fixture
 def mock_save_overrides(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.save_overrides",
@@ -140,6 +153,70 @@ def mock_get_opentrons_dir(decoy: Decoy) -> Decoy:
         new=decoy.mock(),
     ) as m:
         yield m
+
+
+def test_receive_attached_pipette_settings(
+    decoy: Decoy,
+    api_client,
+    mock_known_pipettes: Decoy,
+    mock_get_opentrons_dir: Decoy,
+    mock_list_mutable_configs_with_defaults: Decoy,
+    hardware: MagicMock,
+) -> None:
+    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
+        "nope"
+    )
+    decoy.when(mock_known_pipettes("nope")).then_return([])
+    hardware.attached_pipettes = {
+        Mount.LEFT: {"pipette_id": "P12345", "model": "p20_multi_v3.5"}
+    }
+    decoy.when(
+        mock_list_mutable_configs_with_defaults(
+            pipette_model=pip_def.PipetteModelVersionType(
+                pip_types.PipetteModelType.p20,
+                pip_types.PipetteChannelType.EIGHT_CHANNEL,
+                pip_types.PipetteVersionType(3, 5),
+            ),
+            pipette_serial_number="P12345",
+            pipette_override_path="nope",
+        )
+    ).then_return(
+        {
+            "pickUpCurrent": pip_types.MutableConfig.build(
+                **{
+                    "units": "mm",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 3.0,
+                    "default": 1.5,
+                    "value": 1.2,
+                },
+                name="pickUpCurrent",
+            ),
+            "quirks": {
+                "dropTipShake": pip_types.QuirkConfig(name="dropTipShake", value=True)
+            },
+            "model": "p20_multi_v3.5",
+        }
+    )
+    resp = api_client.get("/settings/pipettes")
+    assert resp.status_code == 200
+    assert resp.json() == {
+        "P12345": {
+            "info": {"model": "p20_multi_v3.5", "name": ""},
+            "fields": {
+                "pickUpCurrent": {
+                    "units": "mm",
+                    "type": "float",
+                    "min": 1.0,
+                    "max": 3.0,
+                    "default": 1.5,
+                    "value": 1.2,
+                },
+                "quirks": {"dropTipShake": True},
+            },
+        },
+    }
 
 
 def test_receive_pipette_settings(
@@ -437,6 +514,7 @@ def test_available_resets(api_client):
             "bootScripts",
             "tipLengthCalibrations",
             "runsHistory",
+            "authorizedKeys",
         ]
     ) == sorted([item["id"] for item in options_list])
 
@@ -474,6 +552,7 @@ def mock_persistence_resetter(
                 "pipetteOffsetCalibrations": False,
                 "tipLengthCalibrations": False,
                 "runsHistory": False,
+                "authorizedKeys": False,
             },
             set(),
         ],
@@ -485,6 +564,7 @@ def mock_persistence_resetter(
                 "tipLengthCalibrations": True,
                 "deckCalibration": True,
                 "runsHistory": True,
+                "authorizedKeys": True,
                 # TODO(mm, 2023-08-04): Figure out how to test Flex-only options,
                 # then add gripperOffsetCalibrations and onDeviceDisplay.
             },
@@ -498,8 +578,10 @@ def mock_persistence_resetter(
                 # mark_directory_reset() being an async method, and api_client having
                 # its own event loop that interferes with making this test async.
                 ResetOptionId.runs_history,
+                ResetOptionId.authorized_keys,
             },
         ],
+        [{"authorizedKeys": True}, {ResetOptionId.authorized_keys}],
         [{"bootScripts": True}, {ResetOptionId.boot_scripts}],
         [{"pipetteOffsetCalibrations": True}, {ResetOptionId.pipette_offset}],
         [{"tipLengthCalibrations": True}, {ResetOptionId.tip_length_calibrations}],

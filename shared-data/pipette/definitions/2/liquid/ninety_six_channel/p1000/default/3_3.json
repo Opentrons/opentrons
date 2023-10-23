@@ -4,21 +4,15 @@
     "t50": {
       "defaultAspirateFlowRate": {
         "default": 6,
-        "valuesByApiLevel": {
-          "2.14": 6
-        }
+        "valuesByApiLevel": { "2.14": 6 }
       },
       "defaultDispenseFlowRate": {
         "default": 6,
-        "valuesByApiLevel": {
-          "2.14": 6
-        }
+        "valuesByApiLevel": { "2.14": 6 }
       },
       "defaultBlowOutFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultFlowAcceleration": 16000.0,
       "defaultTipLength": 57.9,
@@ -119,26 +113,20 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 3.2
+      "defaultPushOutVolume": 7
     },
     "t200": {
       "defaultAspirateFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultDispenseFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultBlowOutFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultFlowAcceleration": 16000.0,
       "defaultTipLength": 58.35,
@@ -237,26 +225,20 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 16
+      "defaultPushOutVolume": 5
     },
     "t1000": {
       "defaultAspirateFlowRate": {
         "default": 160,
-        "valuesByApiLevel": {
-          "2.14": 160
-        }
+        "valuesByApiLevel": { "2.14": 160 }
       },
       "defaultDispenseFlowRate": {
         "default": 160,
-        "valuesByApiLevel": {
-          "2.14": 160
-        }
+        "valuesByApiLevel": { "2.14": 160 }
       },
       "defaultBlowOutFlowRate": {
         "default": 80,
-        "valuesByApiLevel": {
-          "2.14": 80
-        }
+        "valuesByApiLevel": { "2.14": 80 }
       },
       "defaultFlowAcceleration": 16000.0,
       "defaultTipLength": 95.6,
@@ -355,7 +337,7 @@
           ]
         }
       },
-      "defaultBlowoutVolume": 16
+      "defaultPushOutVolume": 20
     }
   },
   "defaultTipOverlapDictionary": {

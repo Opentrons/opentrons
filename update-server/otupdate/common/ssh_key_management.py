@@ -7,20 +7,16 @@ import hashlib
 import ipaddress
 import logging
 import os
-from typing import (
-    Any,
-    Generator,
-    IO,
-    List,
-    Tuple,
-)
-
 from aiohttp import web
+from pathlib import Path
+from typing import Any, Generator, IO, List, Tuple
 
 from .handler_type import Handler
 
 
 LOG = logging.getLogger(__name__)
+SSH_DIR = Path(os.path.expanduser("~/.ssh"))
+AUTHORIZED_KEYS = SSH_DIR / "authorized_keys"
 
 
 def require_linklocal(handler: Handler) -> Handler:
@@ -68,7 +64,7 @@ def authorized_keys(mode: str = "r") -> Generator[IO[Any], None, None]:
 
     :param mode: As :py:meth:`open`
     """
-    path = "/var/home/.ssh/authorized_keys"
+    path = os.path.expanduser("~/.ssh/authorized_keys")
     if not os.path.exists(path):
         os.makedirs(os.path.dirname(path))
         open(path, "w").close()
@@ -109,6 +105,12 @@ def key_present(hashval: str) -> bool:
     return hashval in [keyhash for keyhash, _ in get_keys()]
 
 
+def key_error(error: str, message: str, status: int = 400) -> web.Response:
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+        data={"error": error, "message": message}, status=status
+    )
+
+
 @require_linklocal
 async def list_keys(request: web.Request) -> web.Response:
     """List keys in the authorized_keys file.
@@ -137,11 +139,6 @@ async def add(request: web.Request) -> web.Response:
 
     If the key string doesn't look like an openssh public key, rejects with 400
     """
-
-    def key_error(error: str, message: str) -> web.Response:
-        return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-            data={"error": error, "message": message}, status=400
-        )
 
     body = await request.json()
 
@@ -237,4 +234,54 @@ async def remove(request: web.Request) -> web.Response:
             "restart_url": "/server/restart",
         },
         status=200,
+    )
+
+
+async def add_from_local(request: web.Request) -> web.Response:
+    """Add a public keys from usb device to the authorized_keys file.
+
+    POST /server/ssh_keys/from_local
+    -> 201 Created
+    -> 404 Not Found otherwise
+
+    """
+
+    LOG.info("Searching for public keys in /media")
+    pub_keys = [
+        Path(root, file)
+        for root, _, files in os.walk("/media")
+        for file in files
+        # skip hidden files
+        if not file.startswith(".") and file.endswith(".pub")
+    ]
+    if not pub_keys:
+        LOG.warning("No keys found")
+        return key_error("no-key", "No valid keys found", 404)
+
+    # Create the .ssh folder if it does not exist
+    if not os.path.exists(SSH_DIR):
+        os.mkdir(SSH_DIR, mode=0o700)
+
+    # Update the existing keys if the ssh public key is valid
+    new_keys = list()
+    with open(AUTHORIZED_KEYS, "a") as fh:
+        for key in pub_keys:
+            try:
+                with open(key, "r") as gh:
+                    ssh_key = gh.read().strip()
+                    if "ssh-rsa" not in ssh_key and "ecdsa" not in ssh_key:
+                        LOG.warning(f"Invalid ssh public key: {key}")
+                        continue
+                    key_hash = hashlib.new("md5", ssh_key.encode()).hexdigest()
+                    if not key_present(key_hash):
+                        fh.write(f"{ssh_key}\n")
+                        LOG.info(f"Added new rsa key: {key}")
+                    new_keys.append(key_hash)
+            except Exception as e:
+                LOG.error(f"Could not process ssh public key: {key} {e}")
+                continue
+
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+        data={"message": f"Added {len(new_keys)} new keys", "key_md5": new_keys},
+        status=201,
     )

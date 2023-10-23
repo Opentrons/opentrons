@@ -12,6 +12,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
   TYPOGRAPHY,
@@ -20,6 +21,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
+import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: 2.125rem;
@@ -31,6 +33,7 @@ const SSID_INPUT_FIELD_STYLE = css`
   color: ${COLORS.darkBlack100};
   padding-left: ${SPACING.spacing24};
   box-sizing: border-box;
+  width: 42.625rem;
 
   &:focus {
     border: 3px solid ${COLORS.blueEnabled};
@@ -51,15 +54,24 @@ export function SetWifiCred({
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = React.useRef(null)
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   return (
     <>
-      <Flex width="100%" flexDirection={DIRECTION_COLUMN} paddingLeft="6.25rem">
+      <Flex
+        width="100%"
+        flexDirection={DIRECTION_COLUMN}
+        padding={`0 6.25rem ${SPACING.spacing40}`}
+        marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
+      >
         <StyledText as="p" marginBottom={SPACING.spacing12}>
           {t('enter_password')}
         </StyledText>
-        <Flex flexDirection={DIRECTION_ROW}>
-          <Box width="36.375rem">
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <Box width="100%">
             <InputField
               aria-label="wifi_password"
               value={password}

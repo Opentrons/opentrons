@@ -1,18 +1,29 @@
 import * as React from 'react'
 import { DeckDefinition, DeckSlot, ModuleType } from '@opentrons/shared-data'
 
+// TODO(BC, 8/2/2023): as soon as the deck definitions have a concept of base locations, use their
+// identity to key this mapping instead of slotNames
 interface DeckSlotLocationProps extends React.SVGProps<SVGGElement> {
   slotName: DeckSlot['id']
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   slotBaseColor?: React.SVGProps<SVGPathElement>['fill']
   slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
+  showExtensions?: boolean
 }
 
+// TODO(bh, 2023-10-11): replace usage of this component with base deck fixtures
 export function DeckSlotLocation(
   props: DeckSlotLocationProps
 ): JSX.Element | null {
-  const { slotName, deckDefinition, slotBaseColor, slotClipColor } = props
+  const {
+    slotName,
+    deckDefinition,
+    slotBaseColor,
+    slotClipColor,
+    showExtensions = false,
+    ...restProps
+  } = props
 
   const slotDef = deckDefinition?.locations.orderedSlots.find(
     s => s.id === slotName
@@ -27,10 +38,12 @@ export function DeckSlotLocation(
   const contentsBySlotName: { [slotName: string]: JSX.Element } = {
     A1: (
       <>
-        <SlotBase
-          fill={slotBaseColor}
-          d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"
-        />
+        {showExtensions ? (
+          <SlotBase
+            fill={slotBaseColor}
+            d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"
+          />
+        ) : null}
         <SlotBase
           fill={slotBaseColor}
           d="M-97.7,417.1h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4 C-102,415.1-100.1,417.1-97.7,417.1z"
@@ -44,7 +57,7 @@ export function DeckSlotLocation(
     A2: (
       <>
         <SlotBase
-          d="M150.8,417.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC146.5,415.1,148.4,417.1,150.8,417.1z"
+          d="M150.8,417.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,415.1,148.4,417.1,150.8,417.1z"
           fill={slotBaseColor}
         />
         <SlotClip d="M162.1,398.9V409h10.8" stroke={slotClipColor} />,
@@ -56,7 +69,7 @@ export function DeckSlotLocation(
     A3: (
       <>
         <SlotBase
-          d="M314.8,417.1h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC310.5,415.1,312.4,417.1,314.8,417.1z"
+          d="M314.8,417.1h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,415.1,312.4,417.1,314.8,417.1z"
           fill={slotBaseColor}
         />
         <SlotClip d="M326,398.9V409h10.8" stroke={slotClipColor} />,
@@ -68,7 +81,7 @@ export function DeckSlotLocation(
     B1: (
       <>
         <SlotBase
-          d="M-97.7,310h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.2\nC-102,308.1-100.1,310-97.7,310z"
+          d="M-97.7,310h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.2C-102,308.1-100.1,310-97.7,310z"
           fill={slotBaseColor}
         />
         <SlotClip d="M-1.9,291.9V302H8.9" stroke={slotClipColor} />,
@@ -80,7 +93,7 @@ export function DeckSlotLocation(
     B2: (
       <>
         <SlotBase
-          d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2\nC146.5,308.1,148.4,310,150.8,310z"
+          d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
           fill={slotBaseColor}
         />
         <SlotClip d="M162.1,291.9V302h10.8" stroke={slotClipColor} />,
@@ -92,7 +105,7 @@ export function DeckSlotLocation(
     B3: (
       <>
         <SlotBase
-          d="M314.8,310h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.2\nC310.5,308.1,312.4,310,314.8,310z"
+          d="M314.8,310h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C310.5,308.1,312.4,310,314.8,310z"
           fill={slotBaseColor}
         />
         <SlotClip d="M326,291.9V302h10.8" stroke={slotClipColor} />,
@@ -104,7 +117,7 @@ export function DeckSlotLocation(
     C1: (
       <>
         <SlotBase
-          d="M-97.7,203.1h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC-102,201.2-100.1,203.1-97.7,203.1z"
+          d="M-97.7,203.1h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4C-102,201.2-100.1,203.1-97.7,203.1z"
           fill={slotBaseColor}
         />
         <SlotClip d="M-1.9,185v10.1H8.9" stroke={slotClipColor} />
@@ -116,7 +129,7 @@ export function DeckSlotLocation(
     C2: (
       <>
         <SlotBase
-          d="M150.8,203.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC146.5,201.2,148.4,203.1,150.8,203.1z"
+          d="M150.8,203.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,201.2,148.4,203.1,150.8,203.1z"
           fill={slotBaseColor}
         />
         <SlotClip d="M162.1,185v10.1h10.8" stroke={slotClipColor} />,
@@ -128,7 +141,7 @@ export function DeckSlotLocation(
     C3: (
       <>
         <SlotBase
-          d="M314.8,203.1h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC310.5,201.2,312.4,203.1,314.8,203.1z"
+          d="M314.8,203.1h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,201.2,312.4,203.1,314.8,203.1z"
           fill={slotBaseColor}
         />
         <SlotClip d="M326,185v10.1h10.8" stroke={slotClipColor} />,
@@ -141,7 +154,7 @@ export function DeckSlotLocation(
       <>
         <SlotBase
           fill={slotBaseColor}
-          d="M-97.7,96.1h238.8c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC-102,94.2-100.1,96.1-97.7,96.1z"
+          d="M-97.7,96.1h238.8c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4C-102,94.2-100.1,96.1-97.7,96.1z"
         />
         <SlotClip d="M-1.9,77.9V88H8.9" stroke={slotClipColor} />
         <SlotClip d="M-1.9,8.8V-1.7H8.7" stroke={slotClipColor} />
@@ -153,7 +166,7 @@ export function DeckSlotLocation(
       <>
         <SlotBase
           fill={slotBaseColor}
-          d="M150.8,96.1h154.3c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC146.5,94.2,148.4,96.1,150.8,96.1z"
+          d="M150.8,96.1h154.3c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,94.2,148.4,96.1,150.8,96.1z"
         />
         <SlotClip d="M162.1,77.9V88h10.8" stroke={slotClipColor} />
         <SlotClip d="M162.1,8.8V-1.7h10.6" stroke={slotClipColor} />
@@ -164,7 +177,7 @@ export function DeckSlotLocation(
     D3: (
       <>
         <SlotBase
-          d="M314.8,96.1h238.9c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4\nC310.5,94.2,312.4,96.1,314.8,96.1z"
+          d="M314.8,96.1h238.9c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,94.2,312.4,96.1,314.8,96.1z"
           fill={slotBaseColor}
         />
         <SlotClip d="M326,77.9V88h10.8" stroke={slotClipColor} />
@@ -175,7 +188,7 @@ export function DeckSlotLocation(
     ),
   }
 
-  return <g>{contentsBySlotName[slotName]}</g>
+  return <g {...restProps}>{contentsBySlotName[slotName]}</g>
 }
 
 function SlotBase(props: React.SVGProps<SVGPathElement>): JSX.Element {

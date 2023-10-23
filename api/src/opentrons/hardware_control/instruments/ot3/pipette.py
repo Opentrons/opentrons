@@ -13,9 +13,16 @@ from opentrons_shared_data.pipette.pipette_definition import (
     MotorConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
+    PlungerHomingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
     PipetteLiquidPropertiesDefinition,
+    default_tip_for_liquid_class,
+)
+from opentrons_shared_data.errors.exceptions import (
+    InvalidLiquidClassName,
+    CommandPreconditionViolated,
+    PythonException,
 )
 from ..instrument_abc import AbstractInstrument
 from ..instrument_helpers import (
@@ -38,7 +45,7 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons.hardware_control.types import CriticalPoint, OT3Mount
-from opentrons.hardware_control.errors import InvalidMoveError
+from opentrons.hardware_control.errors import InvalidCriticalPoint
 
 mod_log = logging.getLogger(__name__)
 
@@ -66,6 +73,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._config_as_dict = config.dict()
         self._plunger_motor_current = config.plunger_motor_configurations
         self._pick_up_configurations = config.pick_up_tip_configurations
+        self._plunger_homing_configurations = config.plunger_homing_configurations
         self._drop_configurations = config.drop_tip_configurations
         self._pipette_offset = pipette_offset_cal
         self._pipette_type = self._config.pipette_type
@@ -105,21 +113,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self.ready_to_aspirate = False
 
-        #: True if ready to aspirate
+        self._active_tip_setting_name = default_tip_for_liquid_class(self._liquid_class)
         self._active_tip_settings = self._liquid_class.supported_tips[
-            pip_types.PipetteTipType(self._liquid_class.max_volume)
+            self._active_tip_setting_name
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-
-        self._aspirate_flow_rates_lookup = (
-            self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
-        )
-        self._dispense_flow_rates_lookup = (
-            self._active_tip_settings.default_dispense_flowrate.values_by_api_level
-        )
-        self._blowout_flow_rates_lookup = (
-            self._active_tip_settings.default_blowout_flowrate.values_by_api_level
-        )
 
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
@@ -146,6 +144,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def liquid_class(self) -> PipetteLiquidPropertiesDefinition:
         return self._liquid_class
+
+    @property
+    def liquid_class_name(self) -> pip_types.LiquidClasses:
+        return self._liquid_class_name
 
     @property
     def channels(self) -> pip_types.PipetteChannelType:
@@ -186,12 +188,20 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pick_up_configurations = pick_up_configs
 
     @property
+    def plunger_homing_configurations(self) -> PlungerHomingConfigurations:
+        return self._plunger_homing_configurations
+
+    @property
     def drop_configurations(self) -> TipHandlingConfigurations:
         return self._drop_configurations
 
     @property
     def active_tip_settings(self) -> SupportedTipsDefinition:
         return self._active_tip_settings
+
+    @property
+    def push_out_volume(self) -> float:
+        return self._active_tip_settings.default_push_out_volume
 
     def act_as(self, name: PipetteName) -> None:
         """Reconfigure to act as ``name``. ``name`` must be either the
@@ -225,10 +235,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._has_tip = False
         self.ready_to_aspirate = False
         #: True if ready to aspirate
-        self._active_tip_settings = self.liquid_class.supported_tips[
-            pip_types.PipetteTipType(self.liquid_class.max_volume)
-        ]
-        self._fallback_tip_length = self._active_tip_settings.default_tip_length
+        self.set_liquid_class_by_name("default")
+        self.set_tip_type(default_tip_for_liquid_class(self._liquid_class))
 
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
@@ -313,9 +321,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
             CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
-            raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a pipette"
-            )
+            raise InvalidCriticalPoint(cp_override.name, "pipette")
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
@@ -424,15 +430,15 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._aspirate_flow_rates_lookup
+        return self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
 
     @property
     def dispense_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._dispense_flow_rates_lookup
+        return self._active_tip_settings.default_dispense_flowrate.values_by_api_level
 
     @property
     def blow_out_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._blowout_flow_rates_lookup
+        return self._active_tip_settings.default_blowout_flowrate.values_by_api_level
 
     @property
     def working_volume(self) -> float:
@@ -442,13 +448,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @working_volume.setter
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
-        self._working_volume = min(self.liquid_class.max_volume, tip_volume)
-        tip_size_type = pip_types.PipetteTipType.check_and_return_type(
-            int(self._working_volume), self.liquid_class.max_volume
-        )
-        self._active_tip_settings = self.liquid_class.supported_tips[tip_size_type]
-        self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self.set_tip_type_by_volume(tip_volume)
+        self._working_volume = min(tip_volume, self.liquid_class.max_volume)
+
+    @property
+    def minimum_volume(self) -> float:
+        """The smallest controllable volume the pipette can handle in this liquid class."""
+        return self.liquid_class.min_volume
 
     @property
     def available_volume(self) -> float:
@@ -470,6 +476,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def ok_to_add_volume(self, volume_incr: float) -> bool:
         return self.current_volume + volume_incr <= self.working_volume
+
+    def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
+        return push_out_dist_mm <= (
+            self.plunger_positions.blow_out - self.plunger_positions.bottom
+        )
 
     def add_tip(self, tip_length: float) -> None:
         """
@@ -497,6 +508,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def has_tip(self) -> bool:
         return self._has_tip
+
+    @property
+    def tip_presence_check_dist_mm(self) -> float:
+        return self._config.tip_presence_check_distance_mm
+
+    @property
+    def connect_tiprack_distance_mm(self) -> float:
+        return self._config.connect_tiprack_distance_mm
+
+    @property
+    def end_tip_action_retract_distance_mm(self) -> float:
+        return self._config.end_tip_action_retract_distance_mm
 
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
@@ -548,9 +571,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
                 "flow_acceleration": self.flow_acceleration,
-                "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate.values_by_api_level,
-                "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate.values_by_api_level,
-                "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate.values_by_api_level,
+                "default_aspirate_flow_rates": self.aspirate_flow_rates_lookup,
+                "default_blow_out_flow_rates": self.blow_out_flow_rates_lookup,
+                "default_dispense_flow_rates": self.dispense_flow_rates_lookup,
                 "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
@@ -560,6 +583,97 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             }
         )
         return self._config_as_dict
+
+    def set_liquid_class_by_name(self, class_name: str) -> None:
+        """Change the currently active liquid class."""
+        if self.current_volume > 0:
+            raise CommandPreconditionViolated(
+                "Cannot switch liquid classes when liquid is in the tip"
+            )
+        try:
+            new_name = pip_types.LiquidClasses[class_name]
+            if new_name == self._liquid_class_name:
+                return
+            new_class = self._config.liquid_properties[new_name]
+        except KeyError:
+            raise InvalidLiquidClassName(
+                message=f"Liquid class {class_name} is not valid for {self._config.display_name}",
+                detail={
+                    "requested-class-name": class_name,
+                    "pipette-model": self._pipette_model,
+                },
+            )
+        if (
+            self.has_tip
+            and self._active_tip_setting_name not in new_class.supported_tips
+        ):
+            raise CommandPreconditionViolated(
+                message=f"Requested liquid class {class_name} does not support the currently attached tip",
+                detail={
+                    "requested-class-name": class_name,
+                    "current-tip": str(self._active_tip_setting_name),
+                },
+            )
+        self._liquid_class_name = new_name
+        self._liquid_class = new_class
+        if not self.has_tip:
+            new_tip_class = sorted(
+                [tip for tip in self._liquid_class.supported_tips.keys()],
+                key=lambda tt: tt.value,
+            )[0]
+        else:
+            new_tip_class = self._active_tip_setting_name
+        self.set_tip_type(new_tip_class)
+
+        self.ready_to_aspirate = False
+
+    def set_tip_type_by_volume(self, tip_volume: float) -> None:
+        """Change the currently active tip type."""
+        intified = float(int(tip_volume))
+        try:
+            new_name = pip_types.PipetteTipType(int(intified))
+        except (ValueError, KeyError) as e:
+            raise InvalidLiquidClassName(
+                message=f"There is no configuration for tips of volume {intified} in liquid class {str(self._liquid_class_name)}",
+                detail={
+                    "current-liquid-class": str(self._liquid_class_name),
+                    "requested-volume": str(intified),
+                },
+                wrapping=[PythonException(e)],
+            ) from e
+        self.set_tip_type(new_name)
+
+    def set_tip_type(self, tip_type: pip_types.PipetteTipType) -> None:
+        """Change the currently active tip by its exact type."""
+        try:
+            new_tips = self._liquid_class.supported_tips[tip_type]
+        except KeyError as e:
+            raise InvalidLiquidClassName(
+                message=f"There is no configuration for {tip_type.name} in liquid class {str(self._liquid_class_name)} on a {self._config.display_name}",
+                detail={
+                    "current-liquid-class": str(self._liquid_class_name),
+                    "requested-type": tip_type.name,
+                },
+                wrapping=[PythonException(e)],
+            ) from e
+
+        self._active_tip_setting_name = tip_type
+        self._active_tip_settings = new_tips
+
+        self._aspirate_flow_rate = (
+            self._active_tip_settings.default_aspirate_flowrate.default
+        )
+        self._dispense_flow_rate = (
+            self._active_tip_settings.default_dispense_flowrate.default
+        )
+        self._blow_out_flow_rate = (
+            self._active_tip_settings.default_blowout_flowrate.default
+        )
+        self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
+
+        self._fallback_tip_length = self._active_tip_settings.default_tip_length
+        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._working_volume = min(tip_type.value, self.liquid_class.max_volume)
 
 
 def _reload_and_check_skip(

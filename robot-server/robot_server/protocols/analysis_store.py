@@ -52,7 +52,10 @@ _log = getLogger(__name__)
 #
 # This does not necessarily have any correspondence with the user-facing
 # robot software version.
-_CURRENT_ANALYZER_VERSION: Final = "initial"
+#
+# Version History
+#     * Changed to "2" for version 7.0 from "initial"
+_CURRENT_ANALYZER_VERSION: Final = "2"
 # We have a reasonable limit for a memory cache of analyses.
 _CACHE_MAX_SIZE: Final = 32
 
@@ -176,7 +179,7 @@ class AnalysisStore:
         """Get a single protocol analysis by its ID.
 
         Raises:
-            AnalysisNotFoundError
+            AnalysisNotFoundError: If there is no analysis with the given ID.
         """
         pending_analysis = self._pending_store.get(analysis_id=analysis_id)
         completed_analysis_resource = await self._completed_store.get_by_id(
@@ -187,6 +190,21 @@ class AnalysisStore:
             return pending_analysis
         elif completed_analysis_resource is not None:
             return completed_analysis_resource.completed_analysis
+        else:
+            raise AnalysisNotFoundError(analysis_id=analysis_id)
+
+    async def get_as_document(self, analysis_id: str) -> str:
+        """Get a single completed protocol analysis by its ID, as a pre-serialized JSON document.
+
+        Raises:
+            AnalysisNotFoundError: If there is no completed analysis with the given ID.
+                Unlike `get()`, this is raised if the analysis exists, but is pending.
+        """
+        completed_analysis_document = await self._completed_store.get_by_id_as_document(
+            analysis_id=analysis_id
+        )
+        if completed_analysis_document is not None:
+            return completed_analysis_document
         else:
             raise AnalysisNotFoundError(analysis_id=analysis_id)
 

@@ -158,7 +158,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
-            <SmallButton buttonText={proceedButtonText} onClick={proceed} />
+            <SmallButton
+              disabled={proceedIsDisabled}
+              buttonText={proceedButtonText}
+              onClick={proceed}
+            />
           ) : (
             <PrimaryButton
               disabled={proceedIsDisabled}

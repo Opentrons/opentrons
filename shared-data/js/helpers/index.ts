@@ -4,8 +4,14 @@ import uniq from 'lodash/uniq'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
 import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
-import type { DeckDefinition, LabwareDefinition2 } from '../types'
-import type { LoadedLabware, RobotType, ThermalAdapterName } from '..'
+import type {
+  DeckDefinition,
+  LabwareDefinition2,
+  LoadedLabware,
+  ModuleModel,
+  RobotType,
+  ThermalAdapterName,
+} from '../types'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { getWellTotalVolume } from './getWellTotalVolume'
@@ -308,6 +314,24 @@ export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
   }
 
   return adapterName
+}
+
+export const getCalibrationAdapterLoadName = (
+  moduleModel: ModuleModel
+): string | null => {
+  switch (moduleModel) {
+    case 'heaterShakerModuleV1':
+      return 'opentrons_calibration_adapter_heatershaker_module'
+    case 'temperatureModuleV2':
+      return 'opentrons_calibration_adapter_temperature_module'
+    case 'thermocyclerModuleV2':
+      return 'opentrons_calibration_adapter_thermocycler_module'
+    default:
+      console.error(
+        `${moduleModel} does not have an associated calibration adapter`
+      )
+      return null
+  }
 }
 
 export const getRobotTypeFromLoadedLabware = (

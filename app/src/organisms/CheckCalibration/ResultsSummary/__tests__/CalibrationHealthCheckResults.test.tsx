@@ -15,7 +15,7 @@ describe('CalibrationHealthCheckResults', () => {
   let props: React.ComponentProps<typeof CalibrationHealthCheckResults>
   beforeEach(() => {
     props = {
-      isCalibrationCompleted: true,
+      isCalibrationRecommended: false,
     }
   })
 
@@ -35,7 +35,7 @@ describe('CalibrationHealthCheckResults', () => {
   })
 
   it('should render title and warning StatusLabel when calibration results includes bad', () => {
-    props.isCalibrationCompleted = false
+    props.isCalibrationRecommended = true
     const { getByText, getByTestId } = render(props)
     getByText('Calibration recommended')
     expect(getByTestId('status_circle')).toHaveStyle(

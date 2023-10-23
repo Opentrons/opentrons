@@ -8,10 +8,13 @@ import {
 import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
+import { useFeatureFlag } from '../../../../redux/config'
 import { InstrumentsAndModules } from '../../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../../organisms/Devices/RobotOverview'
 import { DISENGAGED, NOT_PRESENT } from '../../../../organisms/EmergencyStop'
+import { DeviceDetailsDeckConfiguration } from '../../../../organisms/DeviceDetailsDeckConfiguration'
+import { useIsFlex } from '../../../../organisms/Devices/hooks'
 import { DeviceDetailsComponent } from '../DeviceDetailsComponent'
 
 jest.mock('@opentrons/react-api-client')
@@ -19,7 +22,9 @@ jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/InstrumentsAndModules')
 jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
 jest.mock('../../../../organisms/Devices/RobotOverview')
+jest.mock('../../../../organisms/DeviceDetailsDeckConfiguration')
 jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/config')
 
 const ROBOT_NAME = 'otie'
 const mockEstopStatus = {
@@ -42,6 +47,13 @@ const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
+const mockDeviceDetailsDeckConfiguration = DeviceDetailsDeckConfiguration as jest.MockedFunction<
+  typeof DeviceDetailsDeckConfiguration
+>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = () => {
   return renderWithProviders(
@@ -64,6 +76,13 @@ describe('DeviceDetailsComponent', () => {
       .calledWith(componentPropsMatcher({ robotName: ROBOT_NAME }))
       .mockReturnValue(<div>Mock RecentProtocolRuns</div>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
+    mockDeviceDetailsDeckConfiguration.mockReturnValue(
+      <div>Mock DeviceDetailsDeckConfiguration</div>
+    )
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -83,6 +102,15 @@ describe('DeviceDetailsComponent', () => {
   it('renders RecentProtocolRuns when a robot is found', () => {
     const [{ getByText }] = render()
     getByText('Mock RecentProtocolRuns')
+  })
+
+  it('renders Deck Configuratin when a robot is flex and enableDeckConfiguration is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock DeviceDetailsDeckConfiguration')
   })
 
   it.todo('renders EstopBanner when estop is engaged')

@@ -1,31 +1,19 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link as InternalLink } from 'react-router-dom'
+import styled, { css } from 'styled-components'
+import { useHistory } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  C_BLUE,
-  C_TRANSPARENT,
-  C_WHITE,
+  COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_FLEX,
-  FONT_SIZE_BODY_1,
-  FONT_SIZE_HEADER,
-  FONT_STYLE_ITALIC,
-  FONT_WEIGHT_REGULAR,
   JUSTIFY_FLEX_END,
-  SIZE_4,
-  SIZE_6,
   SPACING,
-  useMountEffect,
-  BaseModal,
-  Btn,
-  Box,
   Flex,
-  Icon,
-  SecondaryBtn,
-  Text,
-  TYPOGRAPHY,
+  NewPrimaryBtn,
+  NewSecondaryBtn,
+  BORDERS,
 } from '@opentrons/components'
 
 import {
@@ -34,194 +22,164 @@ import {
   applyShellUpdate,
 } from '../../redux/shell'
 
-import { ErrorModal } from '../../molecules/modals'
 import { ReleaseNotes } from '../../molecules/ReleaseNotes'
+import { LegacyModal } from '../../molecules/LegacyModal'
+import { Banner } from '../../atoms/Banner'
+import { ProgressBar } from '../../atoms/ProgressBar'
+import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '../../redux/types'
+import { StyledText } from '../../atoms/text'
 
-export interface UpdateAppModalProps {
-  dismissAlert?: (remember: boolean) => unknown
-  closeModal?: () => unknown
+interface PlaceHolderErrorProps {
+  errorMessage?: string
 }
 
-// TODO(mc, 2020-10-06): i18n
-const APP_VERSION = 'App Version'
-const AVAILABLE = 'Available'
-const DOWNLOADED = 'Downloaded'
-const DOWNLOAD_IN_PROGRESS = 'Download in progress'
-const DOWNLOAD = 'Download'
-const RESTART_APP = 'Restart App'
-const NOT_NOW = 'Not Now'
-const OK = 'OK'
+const PlaceholderError = ({
+  errorMessage,
+}: PlaceHolderErrorProps): JSX.Element => {
+  const SOMETHING_WENT_WRONG = 'Something went wrong while updating your app.'
+  const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred.'
+  const FALLBACK_ERROR_MESSAGE = `If you keep getting this message, try restarting your app and/or
+  robot. If this does not resolve the issue please contact Opentrons
+  Support.`
+
+  return (
+    <>
+      {SOMETHING_WENT_WRONG}
+      <br />
+      <br />
+      {errorMessage ?? AN_UNKNOWN_ERROR_OCCURRED}
+      <br />
+      <br />
+      {FALLBACK_ERROR_MESSAGE}
+    </>
+  )
+}
+
 const UPDATE_ERROR = 'Update Error'
-const SOMETHING_WENT_WRONG = 'Something went wrong while updating your app'
-const TURN_OFF_UPDATE_NOTIFICATIONS = 'Turn off update notifications'
-const YOUVE_TURNED_OFF_NOTIFICATIONS = "You've Turned Off Update Notifications"
-const VIEW_APP_SOFTWARE_SETTINGS = 'View App Software Settings'
-const NOTIFICATIONS_DISABLED_DESCRIPTION = (
-  <>
-    You{"'"}ve chosen to not be notified when an app update is available. You
-    can change this setting under More {'>'} App {'>'}{' '}
-    App&nbsp;Software&nbsp;Settings.
-  </>
-)
+const FOOTER_BUTTON_STYLE = css`
+  text-transform: lowercase;
+  padding-left: ${SPACING.spacing16};
+  padding-right: ${SPACING.spacing16};
+  border-radius: ${BORDERS.borderRadiusSize1};
+  margin-top: ${SPACING.spacing16};
+  margin-bottom: ${SPACING.spacing16};
 
-const FINISH_UPDATE_INSTRUCTIONS = (
-  <>
-    <Text marginBottom={SPACING.spacing16}>
-      Restart your app to complete the update. Please note the following:
-    </Text>
-    <Box as="ol" paddingLeft={SPACING.spacing16}>
-      <li>
-        <Text marginBottom={SPACING.spacing8}>
-          After updating the Opentrons App, <strong>update your robot</strong>{' '}
-          to ensure the app and robot software is in sync.
-        </Text>
-      </li>
-      <li>
-        <Text>
-          You should update the Opentrons App on <strong>all computers</strong>{' '}
-          that you use with your robot.
-        </Text>
-      </li>
-    </Box>
-  </>
-)
+  &:first-letter {
+    text-transform: uppercase;
+  }
+`
+const UpdateAppBanner = styled(Banner)`
+  border: none;
+`
+const UPDATE_PROGRESS_BAR_STYLE = css`
+  margin-top: ${SPACING.spacing24};
+  border-radius: ${BORDERS.borderRadiusSize3};
+  background: ${COLORS.medGreyEnabled};
+  width: 17.12rem;
+`
+const LEGACY_MODAL_STYLE = css`
+  width: 40rem;
+  textalign: center;
+`
 
-const SPINNER = (
-  <BaseModal
-    color={C_WHITE}
-    backgroundColor={C_TRANSPARENT}
-    fontSize={TYPOGRAPHY.fontSizeH3}
-    fontStyle={FONT_STYLE_ITALIC}
-  >
-    <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-      <Icon spin name="ot-spinner" width={SIZE_4} />
-      <Text marginTop={SPACING.spacing32}>{DOWNLOAD_IN_PROGRESS}</Text>
-    </Flex>
-  </BaseModal>
-)
+const RESTART_APP_AFTER_TIME = 5000
+
+export interface UpdateAppModalProps {
+  closeModal: (arg0: boolean) => void
+}
 
 export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
-  const { dismissAlert, closeModal } = props
-  const [updatesIgnored, setUpdatesIgnored] = React.useState(false)
+  const { closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const updateState = useSelector(getShellUpdateState)
-  const { downloaded, downloading, error, info: updateInfo } = updateState
-  const version = updateInfo?.version ?? ''
+  const {
+    downloaded,
+    downloading,
+    downloadPercentage,
+    error,
+    info: updateInfo,
+  } = updateState
   const releaseNotes = updateInfo?.releaseNotes
+  const { t } = useTranslation('app_settings')
+  const history = useHistory()
+  const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
 
-  const handleUpdateClick = (): void => {
-    dispatch(downloaded ? applyShellUpdate() : downloadShellUpdate())
+  if (downloaded)
+    setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
+
+  const handleRemindMeLaterClick = (): void => {
+    history.push('/app-settings/general')
+    closeModal(true)
   }
 
-  // ensure close handlers are called on close button click or on component
-  // unmount (for safety), but not both
-  const latestHandleClose = React.useRef<(() => void) | null>(null)
+  removeActiveAppUpdateToast()
 
-  React.useEffect(() => {
-    latestHandleClose.current = () => {
-      if (typeof dismissAlert === 'function') dismissAlert(updatesIgnored)
-      if (typeof closeModal === 'function') closeModal()
-      latestHandleClose.current = null
-    }
-  })
+  const appUpdateFooter = (
+    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
+      <NewSecondaryBtn
+        onClick={handleRemindMeLaterClick}
+        marginRight={SPACING.spacing8}
+        css={FOOTER_BUTTON_STYLE}
+      >
+        {t('remind_later')}
+      </NewSecondaryBtn>
+      <NewPrimaryBtn
+        onClick={() => dispatch(downloadShellUpdate())}
+        marginRight={SPACING.spacing12}
+        css={FOOTER_BUTTON_STYLE}
+      >
+        {t('update_app_now')}
+      </NewPrimaryBtn>
+    </Flex>
+  )
 
-  const handleCloseClick = (): void => {
-    latestHandleClose.current && latestHandleClose.current()
-  }
-
-  useMountEffect(() => {
-    return () => {
-      latestHandleClose.current && latestHandleClose.current()
-    }
-  })
-
-  if (error) {
-    return (
-      <ErrorModal
-        error={error}
-        heading={UPDATE_ERROR}
-        description={SOMETHING_WENT_WRONG}
-        close={handleCloseClick}
-      />
-    )
-  }
-
-  if (downloading) return SPINNER
-
-  // TODO(mc, 2020-10-08): refactor most of this back into a new AlertModal
-  // component built with BaseModal
   return (
-    <BaseModal
-      overlayColor="#737373e6"
-      maxWidth="38rem"
-      fontSize={TYPOGRAPHY.fontSizeH3}
-      header={
-        <Text
-          as="h2"
-          display={DISPLAY_FLEX}
-          alignItems={ALIGN_CENTER}
-          fontSize={FONT_SIZE_HEADER}
-          fontWeight={FONT_WEIGHT_REGULAR}
+    <>
+      {error != null ? (
+        <LegacyModal
+          title={UPDATE_ERROR}
+          onClose={() => closeModal(true)}
+          css={LEGACY_MODAL_STYLE}
         >
-          <Icon name="alert" width="1em" marginRight={SPACING.spacing8} />
-          {updatesIgnored
-            ? YOUVE_TURNED_OFF_NOTIFICATIONS
-            : `${APP_VERSION} ${version} ${
-                downloaded ? DOWNLOADED : AVAILABLE
-              }`}
-        </Text>
-      }
-      footer={
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
-          {updatesIgnored ? (
-            <>
-              <SecondaryBtn
-                as={InternalLink}
-                to="/more/app"
-                onClick={handleCloseClick}
-                marginRight={SPACING.spacing16}
-              >
-                {VIEW_APP_SOFTWARE_SETTINGS}
-              </SecondaryBtn>
-              <SecondaryBtn onClick={handleCloseClick}>{OK}</SecondaryBtn>
-            </>
-          ) : (
-            <>
-              {dismissAlert != null && !downloaded ? (
-                <Btn
-                  color={C_BLUE}
-                  marginRight={SPACING.spacingAuto}
-                  fontSize={FONT_SIZE_BODY_1}
-                  onClick={() => setUpdatesIgnored(true)}
-                >
-                  {TURN_OFF_UPDATE_NOTIFICATIONS}
-                </Btn>
-              ) : null}
-              <SecondaryBtn
-                marginRight={SPACING.spacing16}
-                onClick={handleCloseClick}
-              >
-                {NOT_NOW}
-              </SecondaryBtn>
-              <SecondaryBtn onClick={handleUpdateClick}>
-                {downloaded ? RESTART_APP : DOWNLOAD}
-              </SecondaryBtn>
-            </>
-          )}
-        </Flex>
-      }
-    >
-      <Box maxWidth={SIZE_6}>
-        {updatesIgnored ? (
-          NOTIFICATIONS_DISABLED_DESCRIPTION
-        ) : downloaded ? (
-          FINISH_UPDATE_INSTRUCTIONS
-        ) : (
-          <ReleaseNotes source={releaseNotes} />
-        )}
-      </Box>
-    </BaseModal>
+          <PlaceholderError errorMessage={error.message} />
+        </LegacyModal>
+      ) : null}
+      {(downloading || downloaded) && error == null ? (
+        <LegacyModal title={t('opentrons_app_update')} css={LEGACY_MODAL_STYLE}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            alignItems={ALIGN_CENTER}
+            padding={SPACING.spacing48}
+          >
+            <StyledText>
+              {downloading ? t('download_update') : t('restarting_app')}
+            </StyledText>
+            <ProgressBar
+              percentComplete={downloadPercentage}
+              outerStyles={UPDATE_PROGRESS_BAR_STYLE}
+            />
+          </Flex>
+        </LegacyModal>
+      ) : null}
+      {!downloading && !downloaded && error == null ? (
+        <LegacyModal
+          title={t('opentrons_app_update_available')}
+          onClose={() => closeModal(true)}
+          closeOnOutsideClick={true}
+          footer={appUpdateFooter}
+          maxHeight="80%"
+          css={LEGACY_MODAL_STYLE}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
+              {t('update_requires_restarting')}
+            </UpdateAppBanner>
+            <ReleaseNotes source={releaseNotes} />
+          </Flex>
+        </LegacyModal>
+      ) : null}
+    </>
   )
 }

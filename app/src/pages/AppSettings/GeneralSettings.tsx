@@ -113,7 +113,7 @@ export function GeneralSettings(): JSX.Element {
               type="warning"
               onCloseClick={() => setShowUpdateBanner(false)}
             >
-              {t('update_available')}
+              {t('opentrons_app_update_available_variation')}
               <Link
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"

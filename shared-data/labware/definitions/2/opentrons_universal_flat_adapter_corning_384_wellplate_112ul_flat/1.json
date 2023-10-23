@@ -438,7 +438,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µl Flat",
+    "displayName": "Opentrons Universal Flat Heater-Shaker Adapter with Corning 384 Well Plate 112 µl Flat",
     "displayCategory": "aluminumBlock",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -4694,6 +4694,7 @@
   ],
   "parameters": {
     "format": "384Standard",
+    "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat"

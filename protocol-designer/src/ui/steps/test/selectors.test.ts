@@ -583,6 +583,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'single',
         },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -782,6 +786,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: '30',
         },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -826,6 +834,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { value: '1', isIndeterminate: false },
         mix_touchTip_checkbox: { value: false, isIndeterminate: false },
         mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })
@@ -889,6 +901,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { isIndeterminate: true },
         mix_touchTip_checkbox: { isIndeterminate: true },
         mix_touchTip_mmFromBottom: { isIndeterminate: true },
+        dropTip_location: {
+          value: 'fixedTrash',
+          isIndeterminate: false,
+        },
       })
     })
   })

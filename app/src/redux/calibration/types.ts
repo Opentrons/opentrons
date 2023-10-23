@@ -69,6 +69,7 @@ export interface ProtocolCalibrationStatus {
     | 'calibrate_tiprack_failure_reason'
     | 'calibrate_pipette_failure_reason'
     | 'calibrate_gripper_failure_reason'
+    | 'calibrate_module_failure_reason'
     | 'attach_gripper_failure_reason'
     | 'attach_pipette_failure_reason'
 }

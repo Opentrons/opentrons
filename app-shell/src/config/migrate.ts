@@ -24,6 +24,8 @@ import type {
   ConfigV16,
   ConfigV17,
   ConfigV18,
+  ConfigV19,
+  ConfigV20,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v0 defaults
@@ -41,7 +43,9 @@ export const DEFAULTS_V0: ConfigV0 = {
   },
 
   buildroot: {
-    manifestUrl: 'not-used',
+    // do not rely on this value; it is present only for back compatibility
+    manifestUrl:
+      'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
   },
 
   // logging config
@@ -257,7 +261,9 @@ const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
     version: 12 as const,
     robotSystemUpdate: {
       manifestUrls: {
-        OT2: 'not-used',
+        // do not rely on this value; it is present only for back compatibility
+        OT2:
+          'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
         OT3: 'not-used',
       },
     },
@@ -340,6 +346,34 @@ const toVersion18 = (prevConfig: ConfigV17): ConfigV18 => {
   return { ...prevConfigFields, version: 18 as const }
 }
 
+// config version 19 migration and defaults
+const toVersion19 = (prevConfig: ConfigV18): ConfigV19 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 19 as const,
+    update: {
+      ...prevConfig.update,
+      hasJustUpdated: false,
+    },
+  }
+  return nextConfig
+}
+
+const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 20 as const,
+    robotSystemUpdate: {
+      manifestUrls: {
+        // do not rely on this value; it is present only for back compatibility
+        OT2:
+          'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+      },
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -358,7 +392,9 @@ const MIGRATIONS: [
   (prevConfig: ConfigV14) => ConfigV15,
   (prevConfig: ConfigV15) => ConfigV16,
   (prevConfig: ConfigV16) => ConfigV17,
-  (prevConfig: ConfigV17) => ConfigV18
+  (prevConfig: ConfigV17) => ConfigV18,
+  (prevConfig: ConfigV18) => ConfigV19,
+  (prevConfig: ConfigV19) => ConfigV20
 ] = [
   toVersion1,
   toVersion2,
@@ -378,6 +414,8 @@ const MIGRATIONS: [
   toVersion16,
   toVersion17,
   toVersion18,
+  toVersion19,
+  toVersion20,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -403,6 +441,8 @@ export function migrate(
     | ConfigV16
     | ConfigV17
     | ConfigV18
+    | ConfigV19
+    | ConfigV20
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

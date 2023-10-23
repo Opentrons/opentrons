@@ -1,3 +1,9 @@
+"""Helper functions for use inside Tavern tests.
+
+https://tavern.readthedocs.io/en/latest/basics.html#calling-external-functions
+"""
+
+from box import Box
 from requests import Response
 
 
@@ -20,3 +26,19 @@ def verify_pipette_calibration_response(response: Response) -> None:
         assert pipette_offsets.get("source") == "user"
         return
     assert False
+
+
+def find_labware_definition(response: Response, load_name: str) -> Box:
+    """Search a `GET /protocols/:id/analyses/:id` response for the given labware definition.
+
+    Return that labware definition, making it available to the .tavern.yaml file as
+    {labware_definition}.
+    """
+    for command in response.json()["data"]["commands"]:
+        if (
+            command["commandType"] == "loadLabware"
+            and command["params"]["loadName"] == load_name
+        ):
+            return Box({"labware_definition": command["result"]["definition"]})
+
+    assert False, f"No loadLabware command found with load_name {load_name}."

@@ -37,7 +37,7 @@
     },
     "deck_setup_explanation": {
       "title": "Setting up your protocol",
-      "body1": "If you look to your left you will see the Protocol Timeline, and that the \"Starting Deck State\" step is blue. The blue means that this is the step you are currently working on.",
+      "body1": "If you look to your left you will see the Protocol Timeline, and that the \"Starting Deck State\" step is listed first.",
       "body2": "Before you can build a protocol that tells the robot how to move liquid around, you'll need to tell the Protocol Designer where all of your labware is on the deck, and which liquids start in which wells. As you add steps to your protocol the Protocol Designer will move liquid from the starting positions you defined in the Starting Deck State to new positions.",
       "body3": "Hover on empty slots in the deck to add labware. Hover on labware to add liquid to the wells."
     },
@@ -84,6 +84,10 @@
 
       "body4a": "To batch edit Transfer or Mix advanced settings:",
       "body4b": "Only include Transfer or Mix steps in your selection."
+    },
+    "waste_chute_warning": {
+      "title": "Disposing labware",
+      "body1": "Moving labware to the Waste Chute permanently discards it. You can't use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable."
     }
   },
   "timeline": {
@@ -141,12 +145,16 @@
         "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       },
       "LABWARE_OFF_DECK": {
-        "title": "Labware is off deck",
+        "title": "Labware is off-deck",
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
       },
       "HEATER_SHAKER_LATCH_CLOSED": {
         "title": "Heater-Shaker labware latch is closed",
         "body": "The Heater-Shaker’s labware latch must be open when moving labware to or from the module. Add a Heater-Shaker step that opens the latch before this step."
+      },
+      "DROP_TIP_LOCATION_DOES_NOT_EXIST": {
+        "title": "Attempting to drop tip in an unknown location",
+        "body": "The Waste Chute or Trash Bin to drop tip in does not exist."
       }
     },
     "warning": {
@@ -157,6 +165,14 @@
       "ASPIRATE_FROM_PRISTINE_WELL": {
         "title": "Source well is empty",
         "body": "The well(s) you're trying to aspirate from are empty. To add liquids, hover over labware in "
+      },
+      "LABWARE_IN_WASTE_CHUTE_HAS_LIQUID": {
+        "title": "Moving labware into waste chute",
+        "body": "This labware has remaining liquid, be advised that once you dispose of it, there is no way to get it back later in the protocol."
+      },
+      "TIPRACK_IN_WASTE_CHUTE_HAS_TIPS": {
+        "title": "Moving tiprack into waste chute",
+        "body": "This tiprack has remaining tips, be advised that once you dispose of it, there is no way to get it back later in the protocol. "
       }
     }
   },
@@ -169,7 +185,7 @@
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
-      "body": "Slot {{selectedSlot}} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue."
+      "body": "Slot {{selectedSlot}} is occupied. Clear the slot to continue."
     },
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",
@@ -182,6 +198,13 @@
     "HEATER_SHAKER_ADJACENT_TO_MODULE": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker."
+    }
+  },
+  "deck_config_placement": {
+    "SLOT_OCCUPIED": {
+      "staging_area": "Cannot place staging area",
+      "trashBin": "Cannot place trash bin",
+      "wasteChute": "Cannot place waste chute"
     }
   },
   "export_warnings": {

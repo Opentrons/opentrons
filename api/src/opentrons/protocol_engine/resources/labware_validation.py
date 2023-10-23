@@ -27,3 +27,11 @@ def validate_labware_can_be_stacked(
 ) -> bool:
     """Validate that the labware being loaded onto is in the above labware's stackingOffsetWithLabware definition."""
     return below_labware_load_name in top_labware_definition.stackingOffsetWithLabware
+
+
+def validate_gripper_compatible(definition: LabwareDefinition) -> bool:
+    """Validate that the labware definition does not have a quirk disallowing movement with gripper."""
+    return (
+        definition.parameters.quirks is None
+        or "gripperIncompatible" not in definition.parameters.quirks
+    )

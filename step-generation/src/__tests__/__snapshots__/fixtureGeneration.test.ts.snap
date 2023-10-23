@@ -544,6 +544,7 @@ Object {
 
 exports[`snapshot tests makeContext 1`] = `
 Object {
+  "additionalEquipmentEntities": Object {},
   "config": Object {
     "OT_PD_DISABLE_MODULE_RESTRICTIONS": false,
   },
@@ -1747,7 +1748,7 @@ Object {
         },
       },
       "id": "fixedTrash",
-      "labwareDefURI": "fixture/fixture_trash/1",
+      "labwareDefURI": "opentrons/opentrons_1_trash_1100ml_fixed/1",
     },
     "sourcePlateId": Object {
       "def": Object {

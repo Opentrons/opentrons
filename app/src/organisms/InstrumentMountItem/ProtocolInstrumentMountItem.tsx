@@ -23,16 +23,11 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 
-import type {
-  InstrumentData,
-  PipetteOffsetCalibration,
-  GripperData,
-} from '@opentrons/api-client'
+import type { InstrumentData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
@@ -54,10 +49,6 @@ interface ProtocolInstrumentMountItemProps {
   mount: Mount | 'extension'
   mostRecentAnalysis?: CompletedProtocolAnalysis | null
   attachedInstrument: InstrumentData | null
-  attachedCalibrationData:
-    | PipetteOffsetCalibration
-    | GripperData['data']['calibratedOffset']
-    | null
   speccedName: PipetteName | GripperModel
   instrumentsRefetch?: () => void
 }
@@ -66,7 +57,6 @@ export function ProtocolInstrumentMountItem(
 ): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const [
     showPipetteWizardFlow,
     setShowPipetteWizardFlow,
@@ -87,7 +77,6 @@ export function ProtocolInstrumentMountItem(
     speccedName === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES
 
   const handleCalibrate: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     setFlowType(FLOWS.CALIBRATE)
     if (mount === 'extension') {
       setShowGripperWizardFlow(true)
@@ -96,7 +85,6 @@ export function ProtocolInstrumentMountItem(
     }
   }
   const handleAttach: React.MouseEventHandler = () => {
-    setODDMaintenanceFlowInProgress()
     setFlowType(FLOWS.ATTACH)
     if (mount === 'extension') {
       setShowGripperWizardFlow(true)

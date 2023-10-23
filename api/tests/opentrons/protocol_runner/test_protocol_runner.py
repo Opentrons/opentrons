@@ -5,18 +5,20 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Optional, Union, Type
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
+from opentrons.util.broker import Broker
+
 from opentrons import protocol_reader
+from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -275,7 +277,11 @@ async def test_stop_when_run_never_started(
     await subject.stop()
 
     decoy.verify(
-        await protocol_engine.finish(drop_tips_and_home=False, set_run_status=False),
+        await protocol_engine.finish(
+            drop_tips_after_run=False,
+            set_run_status=False,
+            post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+        ),
         times=1,
     )
 
@@ -438,11 +444,12 @@ async def test_load_legacy_python(
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(legacy_protocol)
+    broker_captor = matchers.Captor()
     decoy.when(
         legacy_context_creator.create(
             protocol=legacy_protocol,
-            broker=matchers.IsA(Broker),
-            equipment_broker=matchers.IsA(EquipmentBroker),
+            broker=broker_captor,
+            equipment_broker=matchers.IsA(Broker),
         )
     ).then_return(legacy_context)
 
@@ -463,6 +470,7 @@ async def test_load_legacy_python(
             context=legacy_context,
         ),
     )
+    assert broker_captor.value is legacy_python_runner_subject.broker
 
 
 async def test_load_python_with_pe_papi_core(
@@ -508,9 +516,10 @@ async def test_load_python_with_pe_papi_core(
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(legacy_protocol)
+    broker_captor = matchers.Captor()
     decoy.when(
         legacy_context_creator.create(
-            protocol=legacy_protocol, broker=None, equipment_broker=None
+            protocol=legacy_protocol, broker=broker_captor, equipment_broker=None
         )
     ).then_return(legacy_context)
 
@@ -520,6 +529,7 @@ async def test_load_python_with_pe_papi_core(
     )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
+    assert broker_captor.value is legacy_python_runner_subject.broker
 
 
 async def test_load_legacy_json(
@@ -569,8 +579,8 @@ async def test_load_legacy_json(
     decoy.when(
         legacy_context_creator.create(
             legacy_protocol,
-            broker=matchers.IsA(Broker),
-            equipment_broker=matchers.IsA(EquipmentBroker),
+            broker=matchers.IsA(LegacyBroker),
+            equipment_broker=matchers.IsA(Broker),
         )
     ).then_return(legacy_context)
 

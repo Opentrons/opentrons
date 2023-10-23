@@ -1,3 +1,5 @@
+:og:description: How to control the lid, block, and temperature profile of the Thermocycler Module in a Python protocol.
+
 .. _thermocycler-module:
 
 *******************
@@ -12,9 +14,8 @@ The examples in this section will use a Thermocycler Module GEN2 loaded as follo
 
 .. code-block:: python
 
-    def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module(module_name='thermocyclerModuleV2')
-        plate = tc_mod.load_labware(name='nest_96_wellplate_100ul_pcr_full_skirt')
+    tc_mod = protocol.load_module(module_name='thermocyclerModuleV2')
+    plate = tc_mod.load_labware(name='nest_96_wellplate_100ul_pcr_full_skirt')
 
 .. versionadded:: 2.13
 

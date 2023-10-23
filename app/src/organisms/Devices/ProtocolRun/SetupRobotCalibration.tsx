@@ -16,7 +16,7 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
   ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP,
 } from '../../../redux/analytics'
-import { useIsOT3, useRunHasStarted } from '../hooks'
+import { useIsFlex, useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
@@ -48,7 +48,7 @@ export function SetupRobotCalibration({
   const trackEvent = useTrackEvent()
 
   const runHasStarted = useRunHasStarted(runId)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
 
   let tooltipText: string | null = null
   if (runHasStarted) {
@@ -65,11 +65,11 @@ export function SetupRobotCalibration({
         gridGap={SPACING.spacing16}
         marginY={SPACING.spacing16}
       >
-        {!isOT3 ? (
+        {!isFlex ? (
           <SetupDeckCalibration robotName={robotName} runId={runId} />
         ) : null}
         <SetupInstrumentCalibration robotName={robotName} runId={runId} />
-        {!isOT3 ? (
+        {!isFlex ? (
           <SetupTipLengthCalibration robotName={robotName} runId={runId} />
         ) : null}
       </Flex>

@@ -266,7 +266,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     expect(proceedButton).toBeDisabled()
     expect(
       getByText(
-        'A software update is available for this robot. Update to run protocols.'
+        'A robot software update is required to run protocols with this version of the Opentrons App.'
       )
     ).toBeInTheDocument()
     const linkToRobotDetails = getByText('Go to Robot')

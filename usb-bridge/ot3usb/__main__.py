@@ -4,7 +4,10 @@ import logging
 import time
 from typing import NoReturn
 
-from . import cli, usb_config, default_config, usb_monitor, tcp_conn, listener
+from . import cli, usb_config, usb_monitor, tcp_conn, listener
+from .default_config import get_gadget_config, PHY_NAME
+
+from .serial_thread import create_worker_thread
 
 LOG = logging.getLogger(__name__)
 
@@ -20,7 +23,7 @@ async def main() -> NoReturn:
     LOG.info("Starting USB-TCP bridge")
 
     config = usb_config.SerialGadget(
-        driver=usb_config.OSDriver(), config=default_config.default_gadget
+        driver=usb_config.OSDriver(), config=get_gadget_config()
     )
 
     try:
@@ -43,7 +46,7 @@ async def main() -> NoReturn:
     ser = None
 
     monitor = usb_monitor.USBConnectionMonitorFactory.create(
-        phy_udev_name=default_config.PHY_NAME, udc_folder=config.udc_folder()
+        phy_udev_name=PHY_NAME, udc_folder=config.udc_folder()
     )
 
     # Create a tcp connection that will be managed by `listen`
@@ -54,12 +57,16 @@ async def main() -> NoReturn:
 
     monitor.begin()
 
+    thread, queue = create_worker_thread()
+
+    thread.start()
+
     if monitor.host_connected():
         LOG.debug("USB connected on startup")
         ser = listener.update_ser_handle(config, ser, True, tcp)
 
     while True:
-        ser = listener.listen(monitor, config, ser, tcp)
+        ser = listener.listen(monitor, config, ser, tcp, queue)
 
 
 if __name__ == "__main__":

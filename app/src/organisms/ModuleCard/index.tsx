@@ -2,6 +2,8 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
+import { useHistory } from 'react-router-dom'
+
 import {
   Box,
   Flex,
@@ -20,13 +22,12 @@ import {
 import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import { useHistory } from 'react-router-dom'
+
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { updateModule } from '../../redux/modules'
 import {
@@ -44,8 +45,9 @@ import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
+import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
-import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
@@ -59,9 +61,11 @@ import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ModuleWizardFlows } from '../ModuleWizardFlows'
+import { getModulePrepCommands } from '../Devices/getModulePrepCommands'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { ErrorInfo } from './ErrorInfo'
+import { ModuleSetupModal } from './ModuleSetupModal'
 
 import type {
   AttachedModule,
@@ -74,8 +78,8 @@ interface ModuleCardProps {
   module: AttachedModule
   robotName: string
   isLoadedInRun: boolean
-  attachPipetteRequired?: boolean
-  updatePipetteFWRequired?: boolean
+  attachPipetteRequired: boolean
+  updatePipetteFWRequired: boolean
   runId?: string
   slotName?: string
 }
@@ -106,8 +110,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
   const [showHSWizard, setShowHSWizard] = React.useState<boolean>(false)
-  const [showFWBanner, setshowFWBanner] = React.useState<boolean>(true)
-  const [showCalModal, setshowCalModal] = React.useState<boolean>(false)
+  const [showFWBanner, setShowFWBanner] = React.useState<boolean>(true)
+  const [showCalModal, setShowCalModal] = React.useState<boolean>(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
@@ -119,11 +123,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset == null
+  const requireModuleCalibration = module.moduleOffset?.last_modified == null
+  const isPipetteReady =
+    (!attachPipetteRequired ?? false) && (!updatePipetteFWRequired ?? false)
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
   )
+
   const handleCloseErrorModal = (): void => {
     if (latestRequestId != null) {
       dispatch(dismissRequest(latestRequestId))
@@ -148,19 +155,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isOverflowBtnDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
-  const heaterShakerTooHot =
-    module.moduleModel === 'heaterShakerModuleV1' &&
-    module.data.currentTemperature != null &&
-    module.data.currentTemperature > TOO_HOT_TEMP
-
-  const ThermoTooHot =
-    module.moduleType === THERMOCYCLER_MODULE_TYPE &&
-    ((module.data.currentTemperature != null &&
-      module.data.currentTemperature > TOO_HOT_TEMP) ||
-      (module.data.lidTemperature != null &&
-        module.data.lidTemperature > TOO_HOT_TEMP))
-
-  const isTooHot = heaterShakerTooHot || ThermoTooHot
+  const isTooHot = getModuleTooHot(module)
 
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
@@ -222,8 +217,20 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowHSWizard(true)
   }
 
+  const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
+  const [
+    prepCommandErrorMessage,
+    setPrepCommandErrorMessage,
+  ] = React.useState<string>('')
   const handleCalibrateClick = (): void => {
-    setshowCalModal(true)
+    if (getModulePrepCommands(module).length > 0) {
+      chainLiveCommands(getModulePrepCommands(module), false).catch(
+        (e: Error) => {
+          setPrepCommandErrorMessage(e.message)
+        }
+      )
+    }
+    setShowCalModal(true)
   }
 
   return (
@@ -236,13 +243,17 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       {showCalModal ? (
         <ModuleWizardFlows
           attachedModule={module}
-          closeFlow={() => setshowCalModal(false)}
+          closeFlow={() => setShowCalModal(false)}
+          isPrepCommandLoading={isCommandMutationLoading}
+          prepCommandErrorMessage={
+            prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
+          }
         />
       ) : null}
       {showHSWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
-        <HeaterShakerWizard
-          onCloseClick={() => setShowHSWizard(false)}
-          attachedModule={module}
+        <ModuleSetupModal
+          close={() => setShowHSWizard(false)}
+          moduleDisplayName={getModuleDisplayName(module.moduleModel)}
         />
       )}
       {showSlideout && (
@@ -268,7 +279,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           onCloseClick={() => setShowTestShake(false)}
         />
       )}
-      <Box padding={`${SPACING.spacing16} ${SPACING.spacing8}`} width="100%">
+      <Box padding={SPACING.spacing16} width="100%">
         <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
@@ -296,12 +307,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             requireModuleCalibration &&
             !isPending ? (
               <UpdateBanner
+                robotName={robotName}
                 updateType="calibration"
                 serialNumber={module.serialNumber}
                 setShowBanner={() => null}
-                handleUpdateClick={() => setshowCalModal(true)}
+                handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
+                isTooHot={isTooHot}
               />
             ) : null}
             {/* Calibration performs firmware updates, so only show calibration if both true. */}
@@ -310,9 +323,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             showFWBanner &&
             !isPending ? (
               <UpdateBanner
+                robotName={robotName}
                 updateType="firmware"
                 serialNumber={module.serialNumber}
-                setShowBanner={setshowFWBanner}
+                setShowBanner={setShowFWBanner}
                 handleUpdateClick={handleFirmwareUpdateClick}
               />
             ) : null}
@@ -430,6 +444,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               robotName={robotName}
               runId={runId}
               isLoadedInRun={isLoadedInRun}
+              isPipetteReady={isPipetteReady}
+              isTooHot={isTooHot}
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleInstructionsClick={handleInstructionsClick}

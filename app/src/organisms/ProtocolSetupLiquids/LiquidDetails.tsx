@@ -15,7 +15,7 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
-import { getSlotLabwareName } from '../Devices/ProtocolRun/utils/getSlotLabwareName'
+import { getLocationInfoNames } from '../Devices/ProtocolRun/utils/getLocationInfoNames'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
@@ -89,7 +89,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
         </thead>
         <tbody>
           {labwareByLiquidId[liquid.id].map(labware => {
-            const { slotName, labwareName } = getSlotLabwareName(
+            const { slotName, labwareName } = getLocationInfoNames(
               labware.labwareId,
               commands
             )

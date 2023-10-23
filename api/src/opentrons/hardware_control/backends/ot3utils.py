@@ -15,6 +15,7 @@ from opentrons.hardware_control.types import (
     PipetteSubType,
     UpdateState,
     UpdateStatus,
+    GripperJawState,
 )
 import numpy as np
 
@@ -25,6 +26,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorId,
     PipetteTipActionType,
     USBTarget,
+    GripperJawState as FirmwareGripperjawState,
 )
 from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control import network
@@ -435,7 +437,7 @@ def create_tip_action_group(
     return move_group
 
 
-def create_gear_motor_home_group(
+def create_tip_motor_home_group(
     distance: float,
     velocity: float,
     backoff: Optional[bool] = False,
@@ -631,3 +633,15 @@ class UpdateProgress:
         progress = int(progress * 100)
         self._tracker[target] = UpdateStatus(subsystem, state, progress)
         return set(self._tracker.values())
+
+
+_gripper_jaw_state_lookup: Dict[FirmwareGripperjawState, GripperJawState] = {
+    FirmwareGripperjawState.unhomed: GripperJawState.UNHOMED,
+    FirmwareGripperjawState.force_controlling_home: GripperJawState.HOMED_READY,
+    FirmwareGripperjawState.force_controlling: GripperJawState.GRIPPING,
+    FirmwareGripperjawState.position_controlling: GripperJawState.HOLDING,
+}
+
+
+def gripper_jaw_state_from_fw(state: FirmwareGripperjawState) -> GripperJawState:
+    return _gripper_jaw_state_lookup[state]

@@ -134,6 +134,8 @@ def _clean_server_state(base_url: str) -> None:
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
 
+            await _delete_all_sessions(robot_client)
+
     asyncio.run(_clean_server_state_async())
 
 
@@ -151,3 +153,10 @@ async def _delete_all_protocols(robot_client: RobotClient) -> None:
     protocol_ids = [p["id"] for p in response.json()["data"]]
     for protocol_id in protocol_ids:
         await robot_client.delete_protocol(protocol_id)
+
+
+async def _delete_all_sessions(robot_client: RobotClient) -> None:
+    all_sessions_response = await robot_client.get_sessions()
+    session_ids = [s["id"] for s in all_sessions_response.json()["data"]]
+    for session_id in session_ids:
+        await robot_client.delete_session(session_id)

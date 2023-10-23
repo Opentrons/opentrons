@@ -96,13 +96,13 @@ describe('ApplyHistoricOffsets', () => {
 
   it('renders correct copy when shouldApplyOffsets is true', () => {
     const [{ getByText }] = render()
-    getByText('Apply Labware Offset data')
+    getByText('Apply labware offset data')
     getByText('View data')
   })
 
   it('renders correct copy when shouldApplyOffsets is false', () => {
     const [{ getByText }] = render({ shouldApplyOffsets: false })
-    getByText('Apply Labware Offset data')
+    getByText('Apply labware offset data')
     getByText('View data')
   })
 
@@ -114,7 +114,7 @@ describe('ApplyHistoricOffsets', () => {
     const [{ getByText, getByRole, queryByText, getByTestId }] = render()
     getByText('View data').click()
 
-    getByRole('heading', { name: 'Stored Labware Offset data' })
+    getByRole('heading', { name: 'Apply Stored Labware Offset Data?' })
     getByText(
       'This robot has offsets for labware used in this protocol. If you apply these offsets, you can still adjust them with Labware Position Check.'
     )
@@ -130,11 +130,15 @@ describe('ApplyHistoricOffsets', () => {
     // second candidate table row
     getByText('Slot 2')
     //  4th candidate a labware on adapter on module
-    getByText('Opentrons 96 PCR Adapter in Heater-Shaker Module GEN1 in Slot 3')
+    getByText(
+      'Opentrons 96 PCR Heater-Shaker Adapter in Heater-Shaker Module GEN1 in Slot 3'
+    )
     // third candidate on module table row
     getByText('Heater-Shaker Module GEN1 in Slot 3')
-    getByTestId('ModalHeader_icon_close_Stored Labware Offset data').click()
-    expect(queryByText('Stored Labware Offset data')).toBeNull()
+    getByTestId(
+      'ModalHeader_icon_close_Apply Stored Labware Offset Data?'
+    ).click()
+    expect(queryByText('Apply Stored Labware Offset Data?')).toBeNull()
   })
 
   it('renders view data modal when link clicked, with correct empty state if no candidates', () => {

@@ -291,7 +291,7 @@ async def _probe_labware_corners(
     for corner in nominal_corners:
         current_pos = await api.gantry_position(PROBE_MOUNT)
         await api.move_to(PROBE_MOUNT, corner._replace(z=current_pos.z))
-        found_z = await api.capacitive_probe(
+        found_z, _ = await api.capacitive_probe(
             PROBE_MOUNT,
             types.Axis.by_mount(PROBE_MOUNT),
             corner.z,

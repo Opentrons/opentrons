@@ -1,4 +1,7 @@
+export * from './BaseDeck'
 export * from './Deck'
+export * from './DeckConfigurator'
 export * from './Labware'
 export * from './Module'
 export * from './Pipette'
+export * from './RobotCoordinateSpace'

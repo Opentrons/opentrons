@@ -34,16 +34,16 @@ def run(protocol: protocol_api.ProtocolContext):
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "1")
     sample_plate_1 = protocol.load_labware("nest_96_wellplate_100ul_pcr_full_skirt", "3")
     # ========== SECOND ROW ==========
-    tiprack_200_1 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "4")
-    tiprack_200_2 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "5")
+    tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "4")
+    tiprack_200_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "5")
     sample_plate_2 = protocol.load_labware("nest_96_wellplate_100ul_pcr_full_skirt", "6")
     # ========== THIRD ROW ===========
-    tiprack_200_3 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "7")
-    tiprack_200_4 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "8")
+    tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "7")
+    tiprack_200_4 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "8")
     sample_plate_3 = protocol.load_labware("nest_96_wellplate_100ul_pcr_full_skirt", "9")
     # ========== FOURTH ROW ==========
-    tiprack_200_5 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "10")
-    tiprack_200_6 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "11")
+    tiprack_200_5 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "10")
+    tiprack_200_6 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "11")
 
     # reagent
     Dye_1 = reservoir["A1"]
@@ -55,7 +55,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # pipette
     p1000 = protocol.load_instrument(
-        "p1000_single_gen3",
+        "flex_1channel_1000",
         "right",
         tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3, tiprack_200_4, tiprack_200_5, tiprack_200_6],
     )

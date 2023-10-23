@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Flex, POSITION_RELATIVE } from '@opentrons/components'
+import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 
 import { MenuList } from '../../atoms/MenuList'
+import { Tooltip } from '../../atoms/Tooltip'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { useFeatureFlag } from '../../redux/config'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import {
-  useIsOT3,
+  useIsFlex,
   useRunStatuses,
   useIsLegacySessionInProgress,
 } from '../Devices/hooks'
@@ -24,6 +24,8 @@ interface ModuleOverflowMenuProps {
   handleInstructionsClick: () => void
   handleCalibrateClick: () => void
   isLoadedInRun: boolean
+  isPipetteReady: boolean
+  isTooHot: boolean
   robotName: string
   runId?: string
 }
@@ -41,18 +43,19 @@ export const ModuleOverflowMenu = (
     handleInstructionsClick,
     handleCalibrateClick,
     isLoadedInRun,
+    isPipetteReady,
+    isTooHot,
   } = props
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const currentRunId = useCurrentRunId()
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const { isRunTerminal, isRunStill } = useRunStatuses()
   const isLegacySessionInProgress = useIsLegacySessionInProgress()
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const isIncompatibleWithOT3 =
-    isOT3 && module.moduleModel === 'thermocyclerModuleV1'
-
-  const enableModuleCalibration = useFeatureFlag('enableModuleCalibration')
+    isFlex && module.moduleModel === 'thermocyclerModuleV1'
 
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -78,8 +81,26 @@ export const ModuleOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <MenuList>
-        {enableModuleCalibration ? (
-          <MenuItem onClick={handleCalibrateClick}>{t('calibrate')}</MenuItem>
+        {isFlex ? (
+          <>
+            <MenuItem
+              onClick={handleCalibrateClick}
+              disabled={!isPipetteReady || isTooHot}
+              {...targetProps}
+            >
+              {i18n.format(
+                module.moduleOffset?.last_modified != null
+                  ? t('recalibrate')
+                  : t('calibrate'),
+                'capitalize'
+              )}
+            </MenuItem>
+            {!isPipetteReady || isTooHot ? (
+              <Tooltip tooltipProps={tooltipProps}>
+                {t(!isPipetteReady ? 'calibrate_pipette' : 'module_too_hot')}
+              </Tooltip>
+            ) : null}
+          </>
         ) : null}
         {menuOverflowItemsByModuleType[module.moduleType].map(
           (item: any, index: number) => {

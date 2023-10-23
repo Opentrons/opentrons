@@ -48,7 +48,7 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist
+	shx rm -rf lib dist opentrons-robot-app.tar.gz
 
 # artifacts
 #####################################################################
@@ -72,10 +72,10 @@ dist-ot3: package-deps
 .PHONY: push-ot3
 push-ot3: dist-ot3
 	tar -zcvf opentrons-robot-app.tar.gz -C ./dist/linux-arm64-unpacked/ ./
-	scp -r $(ssh_opts) ./opentrons-robot-app.tar.gz root@$(host):
-	ssh $(ssh_opts) root@$(host) "mount -o remount,rw / && systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
-	ssh $(ssh_opts) root@$(host) "tar -xvf opentrons-robot-app.tar.gz -C /opt/opentrons-app/ &&  mount -o remount,ro / && systemctl start opentrons-robot-app && rm -rf opentrons-robot-app.tar.gz"
-	rm -rf opentrons-robot-app.tar.gz
+	scp $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) -r ./opentrons-robot-app.tar.gz root@$(host):
+	ssh $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) root@$(host) "mount -o remount,rw / && systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
+	ssh $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts) root@$(host) "tar -xvf opentrons-robot-app.tar.gz -C /opt/opentrons-app/ &&  mount -o remount,ro / && systemctl start opentrons-robot-app && rm -rf opentrons-robot-app.tar.gz"
+
 
 # development
 #####################################################################

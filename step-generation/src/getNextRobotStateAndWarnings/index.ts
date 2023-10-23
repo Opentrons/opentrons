@@ -97,6 +97,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'waitForResume':
     case 'moveToWell':
     case 'delay':
+    case 'configureForVolume':
       // these commands don't have any effects on the state
       break
 

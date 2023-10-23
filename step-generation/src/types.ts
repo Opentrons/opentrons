@@ -112,9 +112,15 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper'
+    name: 'gripper' | 'wasteChute' | 'stagingArea'
     id: string
+    location?: string
   }
+}
+
+export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export interface AdditionalEquipmentEntities {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
@@ -164,7 +170,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   destLabware: string
   /** volume is interpreted differently by different Step types */
   volume: number
-
+  /** drop tip location entity id */
+  dropTipLocation: string
   // ===== ASPIRATE SETTINGS =====
   /** Pre-wet tip with ??? uL liquid from the first source well. */
   preWetTip: boolean
@@ -264,7 +271,8 @@ export type MixArgs = CommonArgs & {
   touchTipMmFromBottom: number
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions
-
+  /** drop tip location entity id */
+  dropTipLocation: string
   /** If given, blow out in the specified destination after mixing each well */
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
@@ -439,6 +447,7 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
+  additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }
 
@@ -502,6 +511,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
   | 'HEATER_SHAKER_LATCH_CLOSED'
   | 'LABWARE_OFF_DECK'
+  | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
 
 export interface CommandCreatorError {
   message: string
@@ -511,6 +521,8 @@ export interface CommandCreatorError {
 export type WarningType =
   | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
   | 'ASPIRATE_FROM_PRISTINE_WELL'
+  | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
+  | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
 
 export interface CommandCreatorWarning {
   message: string

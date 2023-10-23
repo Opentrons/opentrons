@@ -21,10 +21,10 @@ wheel_file = $(call python_get_wheelname,update-server,$(project_rs_default),otu
 sdist_file = $(call python_get_sdistname,update-server,$(project_ot3_default),otupdate)
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,update-server,$(project_ot3_default),update-server)
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Other SSH args for buildroot robots
-br_ssh_opts ?= $(default_ssh_opts)
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
+# Other SSH args for robot
+ssh_opts ?= $(default_ssh_opts)
 
 
 .PHONY: setup
@@ -93,12 +93,12 @@ restart:
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(br_ssh_opts),dist/$(wheel_file))
-	$(call push-systemd-unit,$(host),$(br_ssh_key),$(br_ssh_opts),./opentrons-update-server.service)
-	$(call restart-service,$(host),$(br_ssh_key),$(br_ssh_opts),opentrons-update-server)
+	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),dist/$(wheel_file))
+	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-update-server.service)
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-update-server)
 
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-update-server,"otupdate",,,$(version_file))
-	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-update-server)
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),dist/$(sdist_file),/opt/opentrons-update-server,"otupdate",,,$(version_file))
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-update-server)

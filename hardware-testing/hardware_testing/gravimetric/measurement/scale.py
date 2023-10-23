@@ -12,6 +12,7 @@ from hardware_testing.drivers.radwag.commands import (
     RadwagWorkingMode,
     RadwagFilter,
     RadwagValueRelease,
+    RadwagAmbiant,
 )
 
 
@@ -25,6 +26,7 @@ class ScaleConfig:
     filter: RadwagFilter
     value_release: RadwagValueRelease
     tare: float
+    ambiant: RadwagAmbiant
 
 
 DEFAULT_SCALE_CONFIG = ScaleConfig(
@@ -34,6 +36,7 @@ DEFAULT_SCALE_CONFIG = ScaleConfig(
     filter=RadwagFilter.very_fast,
     value_release=RadwagValueRelease.fast,
     tare=0.0,
+    ambiant=RadwagAmbiant.stable,
 )
 
 
@@ -102,6 +105,7 @@ class Scale:
         self._scale.working_mode(mode=cfg.working_mode)
         self._scale.filter(cfg.filter)
         self._scale.value_release(cfg.value_release)
+        self._scale.ambiant(cfg.ambiant)
         self.tare(cfg.tare)
 
     def tare(self, grams: float) -> None:

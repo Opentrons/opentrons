@@ -8,7 +8,7 @@ from ..types import Axis, CriticalPoint, MotionChecks
 class MotionController(Protocol):
     """Protocol specifying fundamental motion controls."""
 
-    async def halt(self) -> None:
+    async def halt(self, disengage_before_stopping: bool = False) -> None:
         """Immediately stop motion.
 
         Calls to stop through the synch adapter while other calls
@@ -17,8 +17,9 @@ class MotionController(Protocol):
         smoothie. To provide actual immediate halting, call this method which
         does not require use of the loop.
 
-        After this call, the hardware will be in a bad state until a call to
-        stop
+        If disengage_before_stopping is True, the motors will disengage first and then
+        stop in place. Disengaging creates a smoother halt but requires homing after
+        in order to resume movement.
         """
         ...
 
@@ -89,7 +90,7 @@ class MotionController(Protocol):
         specified mount but `CriticalPoint.TIP` was specified, the position of
         the nozzle will be returned.
 
-        If `fail_on_not_homed` is `True`, this method will raise a `MustHomeError`
+        If `fail_on_not_homed` is `True`, this method will raise a `PositionUnknownError`
         if any of the relavent axes are not homed, regardless of `refresh`.
         """
         ...
@@ -185,7 +186,7 @@ class MotionController(Protocol):
         axes are to be moved, they will do so at the same speed.
 
         If fail_on_not_homed is True (default False), if an axis that is not
-        homed moves it will raise a MustHomeError. Otherwise, it will home the axis.
+        homed moves it will raise a PositionUnknownError. Otherwise, it will home the axis.
         """
         ...
 
@@ -211,4 +212,16 @@ class MotionController(Protocol):
 
     async def retract_axis(self, axis: Axis) -> None:
         """Retract the specified axis to its home position."""
+        ...
+
+    def is_movement_execution_taskified(self) -> bool:
+        """Get whether move functions are being executed inside cancellable tasks."""
+        ...
+
+    def should_taskify_movement_execution(self, taskify: bool) -> None:
+        """Specify whether move functions should be executed inside cancellable tasks."""
+        ...
+
+    async def cancel_execution_and_running_tasks(self) -> None:
+        """Cancel all tasks and set execution manager state to Cancelled."""
         ...
