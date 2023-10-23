@@ -2,7 +2,7 @@
 from typing import Dict, Optional, Type, Union, List, Tuple
 
 from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -474,11 +474,12 @@ class ProtocolCore(
         self._last_location = location
         self._last_mount = mount
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
 
     def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+        """Get the slot definition from the robot's deck."""
         return self._engine_client.state.labware.get_slot_definition(slot)
 
     def _ensure_module_location(

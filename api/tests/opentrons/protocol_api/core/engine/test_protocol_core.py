@@ -7,7 +7,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
@@ -83,15 +83,15 @@ from opentrons.protocols.api_support.deck_type import (
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV3:
+def ot2_standard_deck_def() -> DeckDefinitionV4:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 3)
+    return load_deck(STANDARD_OT2_DECK, 4)
 
 
 @pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV3:
+def ot3_standard_deck_def() -> DeckDefinitionV4:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 3)
+    return load_deck(STANDARD_OT3_DECK, 4)
 
 
 @pytest.fixture(autouse=True)
@@ -165,16 +165,6 @@ def subject(
         api_version=api_version,
         sync_hardware=mock_sync_hardware_api,
     )
-
-
-def _get_slot_def(
-    deck_def: DeckDefinitionV3, slot_name: DeckSlotName
-) -> Optional[SlotDefV3]:
-    slots_def = deck_def["locations"]["orderedSlots"]
-    for slot in slots_def:
-        if slot["id"] == slot_name.id:
-            return slot
-    return None
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
@@ -887,7 +877,7 @@ def test_load_module(
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV3,
+    deck_def: DeckDefinitionV4,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -903,8 +893,9 @@ def test_load_module(
         [mock_hw_mod_1, mock_hw_mod_2]
     )
 
+    # _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
     decoy.when(subject.get_slot_definition(slot_name)).then_return(
-        _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
+        cast(SlotDefV3, {'compatibleModuleTypes': [ModuleType.from_model(requested_model)]})
     )
 
     decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
@@ -1019,7 +1010,7 @@ def test_load_module_raises_wrong_location(
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV3,
+    deck_def: DeckDefinitionV4,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -1036,7 +1027,7 @@ def test_load_module_raises_wrong_location(
     decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
 
     decoy.when(subject.get_slot_definition(slot_name)).then_return(
-        _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
+        cast(SlotDefV3, {'compatibleModuleTypes': []})
     )
 
     with pytest.raises(
@@ -1055,7 +1046,7 @@ def test_load_mag_block(
     mock_engine_client: EngineClient,
     mock_sync_hardware_api: SyncHardwareAPI,
     subject: ProtocolCore,
-    ot3_standard_deck_def: DeckDefinitionV3,
+    ot3_standard_deck_def: DeckDefinitionV4,
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
@@ -1063,7 +1054,7 @@ def test_load_mag_block(
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
 
     decoy.when(subject.get_slot_definition(DeckSlotName.SLOT_A2)).then_return(
-        _get_slot_def(deck_def=ot3_standard_deck_def, slot_name=DeckSlotName.SLOT_A2)  # type: ignore[arg-type]
+        cast(SlotDefV3, {'compatibleModuleTypes': [ModuleType.from_model(MagneticBlockModel.MAGNETIC_BLOCK_V1)]})
     )
 
     decoy.when(
@@ -1140,7 +1131,7 @@ def test_load_module_thermocycler_with_no_location(
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV3,
+    deck_def: DeckDefinitionV4,
     expected_slot: DeckSlotName,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
@@ -1151,7 +1142,7 @@ def test_load_module_thermocycler_with_no_location(
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
     decoy.when(subject.get_slot_definition(expected_slot)).then_return(
-        _get_slot_def(deck_def=deck_def, slot_name=expected_slot)  # type: ignore[arg-type]
+        cast(SlotDefV3, {'compatibleModuleTypes': [ModuleType.from_model(requested_model)]})
     )
 
     decoy.when(
@@ -1286,7 +1277,7 @@ def test_get_deck_definition(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
     """It should return the loaded deck definition from engine state."""
-    deck_definition = cast(DeckDefinitionV3, {"schemaVersion": "3"})
+    deck_definition = cast(DeckDefinitionV4, {"schemaVersion": "4"})
 
     decoy.when(mock_engine_client.state.labware.get_deck_definition()).then_return(
         deck_definition

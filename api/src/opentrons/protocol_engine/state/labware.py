@@ -325,18 +325,35 @@ class LabwareView(HasState[LabwareState]):
                 f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
             )
 
+        slot_def: SlotDefV3
+        # Slot 12/fixed trash for ot2 is a little weird so if its that just return some hardcoded stuff
+        if slot.id == '12':
+            slot_def = {
+                "id": '12',
+                "position": base_position,
+                "boundingBox": {
+                    "xDimension": 128.0,
+                    "yDimension": 86.0,
+                    "zDimension": 0
+                },
+                "displayName": "Slot 12",
+                "compatibleModuleTypes": [],
+            }
+            return slot_def
+
         for area in deck_def["locations"]["addressableAreas"]:
             if area["id"] == slot.id:
                 offset = area["offsetFromCutoutFixture"]
                 position = [offset[0] + base_position[0], offset[1] + base_position[1], offset[2] + base_position[2]]
-                slot_def: SlotDefV3 = {
+                slot_def = {
                     "id": area["id"],
                     "position": position,
                     "boundingBox": area["boundingBox"],
                     "displayName": area["displayName"],
                     "compatibleModuleTypes": area["compatibleModuleTypes"],
-                    "matingSurfaceUnitVector": area["matingSurfaceUnitVector"]
                 }
+                if area.get("matingSurfaceUnitVector"):
+                    slot_def["matingSurfaceUnitVector"] = area["matingSurfaceUnitVector"]
                 return slot_def
 
         raise errors.SlotDoesNotExistError(
