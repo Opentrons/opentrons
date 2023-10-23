@@ -80,6 +80,7 @@
   "something_seems_wrong": "There may be a problem with your pipette. Exit setup and contact Opentrons Support for assistance.",
   "stand_back": "Stand back, robot is in motion",
   "try_again": "try again",
+  "unable_to_detect_probe": "Unable to detect calibration probe",
   "unscrew_and_detach": "Loosen Screws and Detach Mounting Plate",
   "unscrew_at_top": "<block>Loosen the captive screw on the top right of the  carriage. This releases the right pipette mount, which should then freely move up and down.</block>",
   "unscrew_carriage": "unscrew z-axis carriage",

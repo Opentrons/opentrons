@@ -57,6 +57,9 @@ export interface PipetteData {
   instrumentType: 'pipette'
   mount: 'left' | 'right'
   serialNumber: string
+  state?: {
+    tipDetected: boolean
+  }
   subsystem: 'pipette_left' | 'pipette_right'
   ok: true
 }
