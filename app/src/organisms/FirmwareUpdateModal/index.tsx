@@ -6,6 +6,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   Flex,
+  Icon,
   RESPONSIVENESS,
   JUSTIFY_CENTER,
   BORDERS,
@@ -25,6 +26,7 @@ interface FirmwareUpdateModalProps {
   proceedDescription: string
   proceed: () => void
   subsystem: Subsystem
+  isODD: boolean
 }
 
 const DESCRIPTION_STYLE = css`
@@ -59,10 +61,19 @@ const OUTER_STYLES = css`
   width: 13.374rem;
 `
 
+const SPINNER_STYLE = css`
+  color: ${COLORS.darkGreyEnabled};
+  opacity: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    color: ${COLORS.darkBlackEnabled};
+    opacity: 70%;
+  }
+`
+
 export const FirmwareUpdateModal = (
   props: FirmwareUpdateModalProps
 ): JSX.Element => {
-  const { proceed, proceedDescription, subsystem, description } = props
+  const { proceed, proceedDescription, subsystem, description, isODD } = props
   const [updateId, setUpdateId] = React.useState('')
   const [firmwareText, setFirmwareText] = React.useState('')
   const {
@@ -83,14 +94,16 @@ export const FirmwareUpdateModal = (
     ) ?? false
 
   React.useEffect(() => {
-    if (!updateNeeded) {
-      setFirmwareText(proceedDescription)
-      setTimeout(() => {
-        proceed()
-      }, 2000)
-    } else {
-      updateSubsystem(subsystem)
-    }
+    setTimeout(() => {
+      if (!updateNeeded) {
+        setFirmwareText(proceedDescription)
+        setTimeout(() => {
+          proceed()
+        }, 2000)
+      } else {
+        updateSubsystem(subsystem)
+      }
+    }, 2000)
   }, [])
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
@@ -121,13 +134,24 @@ export const FirmwareUpdateModal = (
 
   return (
     <Flex css={MODAL_STYLE}>
-      <StyledText css={DESCRIPTION_STYLE}>{firmwareText}</StyledText>
+      <StyledText css={DESCRIPTION_STYLE}>
+        {firmwareText.length ? firmwareText : 'Checking for updates...'}
+      </StyledText>
       {status != null || updateNeeded ? (
         <ProgressBar
           percentComplete={percentComplete}
           outerStyles={OUTER_STYLES}
         />
       ) : null}
+      {firmwareText.length ? null : (
+        <Icon
+          name="ot-spinner"
+          aria-label="spinner"
+          size={isODD ? '6.25rem' : '5.125rem'}
+          css={SPINNER_STYLE}
+          spin
+        />
+      )}
     </Flex>
   )
 }

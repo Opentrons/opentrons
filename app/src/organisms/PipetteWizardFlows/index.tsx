@@ -343,6 +343,7 @@ export const PipetteWizardFlows = (
         subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
         description={t('firmware_updating')}
         proceedDescription={t('firmware_up_to_date')}
+        isODD={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {

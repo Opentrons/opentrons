@@ -42,6 +42,7 @@ describe('FirmwareUpdateModal', () => {
       description: 'A firmware update is required, instrument is updating',
       subsystem: 'pipette_left',
       proceedDescription: 'Firmware is up to date.',
+      isODD: true,
     }
     mockUseInstrumentQuery.mockReturnValue({
       data: {
@@ -73,6 +74,31 @@ describe('FirmwareUpdateModal', () => {
       updateSubsystem,
     } as any)
   })
+  it('initially renders a spinner and text', () => {
+    mockUseInstrumentQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            subsystem: 'pipette_left',
+            ok: true,
+          } as PipetteData,
+        ],
+      },
+      refetch,
+    } as any)
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: {
+          id: 'update id',
+          updateStatus: null,
+        } as any,
+      } as SubsystemUpdateProgressData,
+    } as any)
+    jest.useFakeTimers()
+    const { getByText, getByLabelText } = render(props)
+    getByLabelText('spinner')
+    getByText('Checking for updates...')
+  })
   it('calls proceed if no update is needed', async () => {
     mockUseInstrumentQuery.mockReturnValue({
       data: {
@@ -95,10 +121,10 @@ describe('FirmwareUpdateModal', () => {
     } as any)
     jest.useFakeTimers()
     const { getByText } = render(props)
-    getByText('Firmware is up to date.')
     act(() => {
       jest.advanceTimersByTime(3000)
     })
+    getByText('Firmware is up to date.')
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
   it('does not render text or a progress bar until instrument update status is known', () => {
@@ -128,7 +154,11 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
+    jest.useFakeTimers()
     const { getByText } = render(props)
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
     getByText('A firmware update is required, instrument is updating')
     expect(updateSubsystem).toHaveBeenCalled()
   })
