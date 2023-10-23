@@ -427,7 +427,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18'
       - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
