@@ -58,7 +58,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run step generation unit tests'
-        run: make -C react-api-client test --collectCoverage --ci=true
+        run: make -C step-generation test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:

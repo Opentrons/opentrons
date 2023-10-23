@@ -69,8 +69,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run labware library unit tests'
-        run: |
-          make -C labware-library test --collectCoverage --ci=true
+        run: make -C labware-library test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:

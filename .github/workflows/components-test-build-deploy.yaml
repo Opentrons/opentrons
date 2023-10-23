@@ -62,7 +62,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run components unit tests'
-        run: make -C components test
+        run: make -C components test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
