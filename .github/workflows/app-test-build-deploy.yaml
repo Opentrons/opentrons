@@ -142,7 +142,7 @@ jobs:
           make setup-js
       - name: 'test native(er) packages'
         run: |
-          make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
+          make -C app test tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
