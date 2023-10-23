@@ -335,7 +335,6 @@ export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
   setFixtureLocation,
-  providedFixtureOptions,
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')

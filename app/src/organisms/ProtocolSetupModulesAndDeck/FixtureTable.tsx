@@ -81,10 +81,6 @@ export function FixtureTable({
 
   const configurations = useLoadedFixturesConfigStatus(requiredFixtureDetails)
 
-  const pickedFixtureOptions = requiredFixtureDetails.map(
-    fixture => fixture.params.loadName
-  )
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
@@ -131,7 +127,7 @@ export function FixtureTable({
               ? () => setShowLocationConflictModal(true)
               : () => {
                   setFixtureLocation(fixture.params.location.cutout)
-                  setProvidedFixtureOptions(pickedFixtureOptions)
+                  setProvidedFixtureOptions([fixture.params.loadName])
                   setSetupScreen('deck configuration')
                 }
         } else if (configurationStatus === CONFIGURED) {

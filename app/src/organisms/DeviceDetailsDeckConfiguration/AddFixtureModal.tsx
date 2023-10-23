@@ -48,8 +48,6 @@ export function AddFixtureModal({
   const { t } = useTranslation('device_details')
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
-  if (fixtureLocation == null) return null
-
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', { slotName: fixtureLocation }),
     hasExitIcon: true,
