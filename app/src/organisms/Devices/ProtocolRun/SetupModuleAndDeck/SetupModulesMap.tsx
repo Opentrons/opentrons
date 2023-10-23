@@ -70,19 +70,18 @@ export const SetupModulesMap = ({
     protocolModulesInfo
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module =>
-    // TODO: innerProps?
-    ({
-      moduleModel: module.moduleDef.model,
-      moduleLocation: { slotName: module.slotName },
-      // no labware this page
-      // nestedLabwareDef: module.nestedLabwareDef,
-      moduleInformation: {
-        isAttached: module.attachedModuleMatch != null,
-        port: module.attachedModuleMatch?.usbPort.port,
-      },
-    })
-  )
+  const moduleLocations = attachedProtocolModuleMatches.map(module => ({
+    moduleModel: module.moduleDef.model,
+    moduleLocation: { slotName: module.slotName },
+    moduleChildren: (
+      <ModuleInfo
+        moduleModel={module.moduleDef.model}
+        isAttached={module.attachedModuleMatch != null}
+        physicalPort={module.attachedModuleMatch?.usbPort ?? null}
+        runId={runId}
+      />
+    ),
+  }))
 
   const deckConfig = getDeckConfigFromProtocolCommands(
     protocolAnalysis.commands

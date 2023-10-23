@@ -102,16 +102,24 @@ export function SetupLabwareMap({
     return {
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.slotName },
+      innerProps:
+        module.moduleDef.model === THERMOCYCLER_MODULE_V1
+          ? { lidMotorState: 'open' }
+          : {},
+
       nestedLabwareDef: topLabwareDefinition,
-      labwareInformation: {
-        labwareId: topLabwareId,
-        displayName: topLabwareDisplayName,
-        // TODO: offsets
-      },
-      moduleInformation: {
-        isAttached: module.attachedModuleMatch != null,
-        port: module.attachedModuleMatch?.usbPort.port,
-      },
+      moduleChildren: (
+        <>
+          {topLabwareDefinition != null && topLabwareId != null ? (
+            <LabwareInfoOverlay
+              definition={topLabwareDefinition}
+              labwareId={topLabwareId}
+              displayName={topLabwareDisplayName}
+              runId={runId}
+            />
+          ) : null}
+        </>
+      ),
     }
   })
 
@@ -142,6 +150,14 @@ export function SetupLabwareMap({
         definition: topLabwareDefinition,
         topLabwareId,
         topLabwareDisplayName,
+        labwareChildren: (
+          <LabwareInfoOverlay
+            definition={topLabwareDefinition}
+            labwareId={topLabwareId}
+            displayName={topLabwareDisplayName}
+            runId={runId}
+          />
+        ),
       }
     }
   )
@@ -191,6 +207,10 @@ export function SetupLabwareMap({
                         labwareInAdapterInMod?.result?.labwareId ??
                         nestedLabwareId
                       const topLabwareDisplayName =
+                        // TODO: is this coming from def? (yes)
+                        // from load labware function
+                        // "user-specified" display
+                        // rename, maybe elsewhere
                         labwareInAdapterInMod?.params.displayName ??
                         nestedLabwareDisplayName
 

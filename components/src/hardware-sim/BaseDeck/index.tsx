@@ -15,9 +15,8 @@ import {
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { ModuleInformation } from '../Module/ModuleInformation'
 import { Module } from '../Module'
-import { LabwareInformation, LabwareRender } from '../Labware'
+import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
 import { DeckFromData } from '../Deck/DeckFromData'
 import { SlotLabels } from '../Deck'
@@ -32,7 +31,7 @@ import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 // import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
 
-import type { DeckConfiguration, VectorOffset } from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { TrashLocation } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 import type { WasteChuteLocation } from './WasteChuteFixture'
@@ -42,25 +41,16 @@ interface BaseDeckProps {
   labwareLocations: Array<{
     labwareLocation: LabwareLocation
     definition: LabwareDefinition2
-    topLabwareId: string
-    topLabwareDisplayName: string | null
-    offsetVector?: VectorOffset
+    // generic prop to render self-positioned children for each labware
+    labwareChildren?: React.ReactNode
   }>
   moduleLocations: Array<{
     moduleModel: ModuleModel
     moduleLocation: ModuleLocation
     nestedLabwareDef?: LabwareDefinition2 | null
     innerProps?: React.ComponentProps<typeof Module>['innerProps']
-    // props for labware information, subject to change as design refines deck map
-    labwareInformation?: Omit<
-      React.ComponentProps<typeof LabwareInformation>,
-      'definition'
-    >
-    // props for module info/connection, subject to change as design refines deck map
-    moduleInformation?: Omit<
-      React.ComponentProps<typeof ModuleInformation>,
-      'moduleDef'
-    >
+    // generic prop to render self-positioned children for each module
+    moduleChildren?: React.ReactNode
   }>
   deckConfig?: DeckConfiguration
   lightFill?: string
@@ -101,6 +91,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {robotType === OT2_ROBOT_TYPE ? (
+        // module/labware overlay children, reuse the labwareLocations map and moduleLocations map
         <DeckFromData def={deckDef} layerBlocklist={[]} />
       ) : (
         <>
@@ -158,8 +149,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           moduleLocation,
           nestedLabwareDef,
           innerProps,
-          labwareInformation,
-          moduleInformation,
+          moduleChildren,
         }) => {
           const slotDef = deckDef.locations.orderedSlots.find(
             s => s.id === moduleLocation.slotName
@@ -176,37 +166,16 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               )}
               innerProps={innerProps}
             >
-              {moduleInformation != null ? (
-                <ModuleInformation
-                  moduleDef={moduleDef}
-                  {...moduleInformation}
-                />
-              ) : null}
               {nestedLabwareDef != null ? (
-                <>
-                  <LabwareRender definition={nestedLabwareDef} />
-                  {labwareInformation?.labwareId != null ? (
-                    <LabwareInformation
-                      definition={nestedLabwareDef}
-                      labwareId={labwareInformation.labwareId}
-                      displayName={labwareInformation.displayName}
-                      offsetVector={labwareInformation.offsetVector}
-                    />
-                  ) : null}
-                </>
+                <LabwareRender definition={nestedLabwareDef} />
               ) : null}
+              {moduleChildren}
             </Module>
           ) : null
         }
       )}
       {labwareLocations.map(
-        ({
-          labwareLocation,
-          definition,
-          offsetVector,
-          topLabwareId,
-          topLabwareDisplayName,
-        }) => {
+        ({ labwareLocation, definition, labwareChildren }) => {
           const slotDef = deckDef.locations.orderedSlots.find(
             s =>
               labwareLocation !== 'offDeck' &&
@@ -219,12 +188,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
             >
               <LabwareRender definition={definition} />
-              <LabwareInformation
-                definition={definition}
-                labwareId={topLabwareId}
-                displayName={topLabwareDisplayName}
-                offsetVector={offsetVector}
-              />
+              {labwareChildren}
             </g>
           ) : null
         }
