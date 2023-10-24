@@ -133,8 +133,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run shared-data JS unit tests'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="shared-data/js/**/*.(js|ts|tsx)" shared-data/js
+        run: make -C shared-data test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
