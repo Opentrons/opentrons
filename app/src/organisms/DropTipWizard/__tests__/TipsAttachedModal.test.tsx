@@ -3,8 +3,8 @@ import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
-
 import { i18n } from '../../../i18n'
+
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'

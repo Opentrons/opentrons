@@ -9,7 +9,6 @@ import {
   ALIGN_START,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
@@ -30,7 +29,7 @@ export function ProtocolDropTipBanner(props: {
       paddingRight={SPACING.spacing16}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" fontWeight={FONT_WEIGHT_SEMIBOLD}>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('tips_may_be_attached')}
         </StyledText>
 
@@ -40,7 +39,6 @@ export function ProtocolDropTipBanner(props: {
           </StyledText>
           <Btn
             textAlign={ALIGN_START}
-            fontSize={TYPOGRAPHY.fontSizeP}
             onClick={() => onLaunchWizardClick(true)}
             aria-label="remove-tips"
           >

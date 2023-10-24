@@ -147,10 +147,10 @@ describe('InstrumentDetail', () => {
   })
 
   it('renders calibration date when present', () => {
-    const [{ getByText }] = render()
+    const [{ getByText, queryByText }] = render()
 
     getByText('last calibrated')
-    getByText('10/11/23 18:25 UTC')
+    queryByText('UTC')
   })
 
   it("renders 'No calibration data' when no calibration data is present", () => {

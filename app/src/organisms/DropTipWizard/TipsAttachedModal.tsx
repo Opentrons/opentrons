@@ -11,9 +11,9 @@ import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { DropTipWizard } from '.'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface TipsAttachedModalProps {
   mount: PipetteData['mount']
@@ -80,7 +80,6 @@ const TipsAttachedModal = NiceModal.create(
               />
               <SmallButton
                 flex="1"
-                buttonType="primary"
                 buttonText={t('begin_removal')}
                 onClick={() => {
                   setShowWizard(true)
@@ -93,7 +92,7 @@ const TipsAttachedModal = NiceModal.create(
           <DropTipWizard
             {...props}
             closeFlow={() => {
-              onCloseClick?.((pipettesWithTip: any[]) => {
+              onCloseClick?.((pipettesWithTip: PipetteData[]) => {
                 const newPipettesWithTip = pipettesWithTip.slice(1)
                 if (newPipettesWithTip.length === 0) closeCurrentRun()
                 return newPipettesWithTip
