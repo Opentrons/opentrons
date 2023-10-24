@@ -8,11 +8,20 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api.core.legacy.deck import Deck
-from opentrons.calibration_storage import (
-    helpers,
-    create_tip_length_data,
-    save_tip_length_calibration as cal_storage_save_tip_length,
-)
+from opentrons.calibration_storage import helpers
+from opentrons.config.feature_flags import enable_ot3_hardware_controller as is_ot3
+
+if is_ot3():
+    from opentrons.calibration_storage.ot3 import (
+        create_tip_length_data,
+        save_tip_length_calibration as cal_storage_save_tip_length,
+    )
+else:
+    from opentrons.calibration_storage.ot2 import (
+        create_tip_length_data,
+        save_tip_length_calibration as cal_storage_save_tip_length,
+    )
+
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
