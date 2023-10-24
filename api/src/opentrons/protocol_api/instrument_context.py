@@ -30,6 +30,13 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
+from ._nozzle_layout import (
+    NozzleLayoutBase,
+    SingleNozzleLayout,
+    RowNozzleLayout,
+    ColumnNozzleLayout,
+    QuadrantNozzleLayout,
+)
 from . import labware, validation
 
 
@@ -1626,3 +1633,100 @@ class InstrumentContext(publisher.CommandPublisher):
         if last_location and isinstance(last_location.labware, labware.Well):
             self.move_to(last_location.labware.top())
         self._core.configure_for_volume(volume)
+
+    @requires_version(2, 16)
+    def configure_nozzle_layout(
+        self, requested_nozzle_layout: Optional[NozzleLayoutBase]
+    ) -> None:
+        """Configure a pipette to pick up less than the maximum tip capacity. The pipette
+        will remain in its partial state until this function is called again without any inputs. All subsequent
+        pipetting calls will execute with the new nozzle layout meaning that the pipette will perform
+        robot moves in the set nozzle layout.
+
+        :param requested_nozzle_layout: The requested nozzle layout should specify the shape that you
+        wish to configure your pipette to. Certain pipettes are restricted to a subset of `nozzle_layout`
+        types. See the note below on the different `nozzle_layout` types.
+        :type requested_nozzle_layout: `NozzleLayoutBase` or None.
+
+        .. note ::
+
+            Unlike many other API function calls, you will need to import specialized
+            objects to utilize this function. All of the specialized objects will
+            require at least one parameter - the primary nozzle. A primary nozzle
+            signifies the point in space that the robot will use to determine how to
+            perform moves to different locations on the deck.
+
+            The current available nozzle layouts are:
+
+            `SingleNozzleLayout` and `ColumnNozzleLayout`
+
+            `SingleNozzleLayout` will set the pipette to single pick up mode using
+            the specified primary nozzle. **Note** that only the outer nozzles of Opentrons
+            pipettes are available for this configuration.
+
+            `ColumnNozzleLayout` will set the pipette to full column pick up mode using
+            the specified primary nozzle. The full column will only
+
+        .. code-block:: python
+
+            from opentrons.protocol_api import SingleNozzleLayout, ColumnNozzleLayout
+
+            # Sets a pipette to single tip pick up mode using "A1" as the primary nozzle.
+            instr.configure_nozzle_layout(SingleNozzleLayout(primary_nozzle="A1")
+
+            # Sets a pipette to a full column pickup using "A1" as the primary nozzle.
+            instr.configure_nozzle_layout(ColumnNozzleLayout(primary_nozzle="A1"))
+
+            # Resets the pipette configuration to default
+            instr.configure_nozzle_layout()
+        """
+        if self._core.has_tip():
+            raise CommandPreconditionViolated(
+                message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
+            )
+
+        primary_nozzle = requested_nozzle_layout.primary_nozzle
+        if isinstance(requested_nozzle_layout, RowNozzleLayout):
+            if self.channels <= 8:
+                raise CommandParameterLimitViolated(
+                        command_name="configure_nozzle_layout",
+                        parameter_name="RowNozzleLayout",
+                        limit_statement="RowNozzleLayout is incompatible with {self.channels} physical channels.",
+                        actual_value=str(primary_nozzle),
+                )
+            # Not sure where to store these constants
+            if primary_nozzle not in ["A1", "H12"]:
+                raise CommandParameterLimitViolated(
+                        command_name="configure_nozzle_layout",
+                        parameter_name="RowNozzleLayout.primary_nozzle",
+                        limit_statement="The primary nozzle can only be 'A1' or 'H12.",
+                        actual_value=str(primary_nozzle),
+                )
+            # TODO need to switch ending nozzle based on primary nozzle
+            self._core.configure_nozzle_layout(
+                primary_nozzle=primary_nozzle, front_right_nozzle="A12"
+            )
+        elif isinstance(requested_nozzle_layout, ColumnNozzleLayout):
+            # TODO need to add additional primary nozzles for 96 channel
+            if primary_nozzle not in ["A1", "H1"]:
+                raise CommandParameterLimitViolated(
+                        command_name="configure_nozzle_layout",
+                        parameter_name="ColumnNozzleLayout.primary_nozzle",
+                        limit_statement="The primary nozzle can only be 'A1' or 'H1.",
+                        actual_value=str(primary_nozzle),
+                )
+            # TODO need to switch ending nozzle based on primary nozzle
+            self._core.configure_nozzle_layout(
+                primary_nozzle=primary_nozzle, front_right_nozzle="H1"
+            )
+        elif isinstance(requested_nozzle_layout, QuadrantNozzleLayout):
+            self._core.configure_nozzle_layout(
+                primary_nozzle=primary_nozzle,
+                back_left_nozzle=requested_nozzle_layout.back_left_nozzle,
+                front_right_nozzle=requested_nozzle_layout.front_right_nozzle,
+            )
+        elif isinstance(requested_nozzle_layout, SingleNozzleLayout):
+            self._core.configure_nozzle_layout(requested_nozzle_layout.primary_nozzle)
+        else:
+            # Default to a normal pickup
+            self._core.configure_nozzle_layout()

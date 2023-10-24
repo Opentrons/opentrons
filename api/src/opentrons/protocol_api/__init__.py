@@ -24,6 +24,13 @@ from .module_contexts import (
     MagneticBlockContext,
 )
 from ._liquid import Liquid
+from ._nozzle_layout import (
+    NozzleLayoutBase,
+    SingleNozzleLayout,
+    RowNozzleLayout,
+    ColumnNozzleLayout,
+    QuadrantNozzleLayout,
+)
 
 from .create_protocol_context import (
     create_protocol_context,
@@ -46,6 +53,8 @@ __all__ = [
     "Labware",
     "Well",
     "Liquid",
+    "SingleNozzleLayout",
+    "ColumnNozzleLayout",
     "OFF_DECK",
     # For internal Opentrons use only:
     "create_protocol_context",

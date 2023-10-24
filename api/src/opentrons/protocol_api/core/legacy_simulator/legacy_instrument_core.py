@@ -421,3 +421,12 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def configure_for_volume(self, volume: float) -> None:
         """This will never be called because it was added in API 2.15."""
         pass
+
+    def configure_nozzle_layout(
+        self,
+        primary_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass

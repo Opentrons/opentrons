@@ -531,3 +531,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._engine_client.configure_for_volume(
             pipette_id=self._pipette_id, volume=volume
         )
+
+    def configure_nozzle_layout(
+        self,
+        primary_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+        self._engine_client.configure_nozzle_layout(
+            pipette_id=self._pipette_id,
+            primary_nozzle=primary_nozzle,
+            back_left_nozzle=back_left_nozzle,
+            front_right_nozzle=front_right_nozzle,
+        )

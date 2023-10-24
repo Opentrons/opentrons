@@ -8,6 +8,7 @@ from typing import Any, Generic, Optional, TypeVar
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
+from opentrons.protocol_api._nozzle_layout import NozzleLayoutBase
 
 from .well import WellCoreType
 
@@ -233,6 +234,21 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
         Args:
             volume: The volume to preppare to handle.
+        """
+        ...
+
+    def configure_nozzle_layout(
+        self,
+        primary_nozzle: Optional[str],
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+        """Configure the pipette to a specific nozzle layout.
+
+        Args:
+            primary_nozzle: The nozzle that will determine a pipettes critical point.
+            back_left_nozzle: The back left most nozzle in the requested layout.
+            front_right_nozzle: The front right most nozzle in the requested layout.
         """
         ...
 

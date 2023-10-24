@@ -26,6 +26,16 @@ from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+from opentrons.protocol_api._nozzle_layout import (
+    SingleNozzleLayout,
+    RowNozzleLayout,
+    ColumnNozzleLayout,
+    QuadrantNozzleLayout,
+)
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    CommandParameterLimitViolated,
+)
 from opentrons.types import Location, Mount, Point
 
 
@@ -912,3 +922,35 @@ def test_plunger_speed_removed(subject: InstrumentContext) -> None:
     """It should raise an error on PAPI >= v2.14."""
     with pytest.raises(APIVersionError):
         subject.speed
+
+
+@pytest.mark.parametrize("channels", [8, 96, 1])
+def test_configure_nozzle_layout(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels: int,
+) -> None:
+    """Test configure nozzle layout API function"""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels)
+
+    decoy.when(
+        mock_instrument_core.configure_nozzle_layout(primary_nozzle="A1", front_right_nozzle="A12")
+    ).then_return(None)
+    if channels == 8 or channels == 1:
+        with pytest.raises(CommandParameterLimitViolated):
+            subject.configure_nozzle_layout(RowNozzleLayout(primary_nozzle="A1"))
+    else:
+        subject.configure_nozzle_layout(RowNozzleLayout(primary_nozzle="A1"))
+
+    decoy.when(
+        mock_instrument_core.configure_nozzle_layout(primary_nozzle="A1")
+    ).then_return(None)
+    subject.configure_nozzle_layout(SingleNozzleLayout(primary_nozzle="A1"))
+
+
+    subject.configure_nozzle_layout(
+        QuadrantNozzleLayout(
+            primary_nozzle="A1", back_left_nozzle="A1", front_right_nozzle="H12"
+        )
+    )
