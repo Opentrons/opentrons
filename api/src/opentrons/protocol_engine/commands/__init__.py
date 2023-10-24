@@ -268,6 +268,7 @@ from .configure_for_volume import (
 
 from .configure_nozzle_layout import (
     ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
     ConfigureNozzleLayoutParams,
     ConfigureNozzleLayoutResult,
     ConfigureNozzleLayoutCommandType,
@@ -472,6 +473,7 @@ __all__ = [
     "ConfigureForVolumeCommandType",
     # configure nozzle layout command bundle
     "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutCreate",
     "ConfigureNozzleLayoutParams",
     "ConfigureNozzleLayoutResult",
     "ConfigureNozzleLayoutCommandType",

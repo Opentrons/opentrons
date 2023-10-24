@@ -4,9 +4,6 @@ from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type, Tuple, Union
 from typing_extensions import Literal
 
-from opentrons.hardware_control.instruments.nozzle_manager import (
-    NozzleConfigurationType,
-)
 from .pipetting_common import (
     PipetteIdMixin,
 )
@@ -16,9 +13,11 @@ from .command import (
     BaseCommandCreate,
 )
 from .configuring_common import (
+    EmptyNozzleLayoutConfiguration,
     BaseNozzleLayoutConfiguration,
     RowColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
+    PipetteNozzleLayoutResultMixin,
 )
 
 if TYPE_CHECKING:
@@ -31,26 +30,22 @@ ConfigureNozzleLayoutCommandType = Literal["configureNozzleLayout"]
 class ConfigureNozzleLayoutParams(PipetteIdMixin):
     """Parameters required to configure the nozzle layout for a specific pipette."""
 
-    configuration_type: NozzleConfigurationType
     configuration_params: Union[
+        EmptyNozzleLayoutConfiguration,
         BaseNozzleLayoutConfiguration,
         RowColumnNozzleLayoutConfiguration,
         QuadrantNozzleLayoutConfiguration,
     ]
 
 
-class ConfigureNozzleLayoutPrivateResult(BaseModel):
+class ConfigureNozzleLayoutPrivateResult(PipetteNozzleLayoutResultMixin):
     """Result sent to the store but not serialized."""
 
-    configuration_params: Union[
-        BaseNozzleLayoutConfiguration,
-        RowColumnNozzleLayoutConfiguration,
-        QuadrantNozzleLayoutConfiguration,
-    ]
+    pass
 
 
 class ConfigureNozzleLayoutResult(BaseModel):
-    """Result data from execution of an ConfigureForVolume command."""
+    """Result data from execution of an configureNozzleLayout command."""
 
     pass
 
@@ -71,15 +66,15 @@ class ConfigureNozzleLayoutImplementation(
         self, params: ConfigureNozzleLayoutParams
     ) -> Tuple[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult]:
         """Check that requested pipette can support the requested nozzle layout."""
-        pipette_result = await self._equipment.configure_nozzle_layout(
+
+        nozzle_map = await self._equipment.configure_nozzle_layout(
             pipette_id=params.pipetteId,
-            volume=params.volume,
+            *params.configuration_params,
         )
 
         return ConfigureNozzleLayoutResult(), ConfigureNozzleLayoutPrivateResult(
-            pipette_id=pipette_result.pipette_id,
-            serial_number=pipette_result.serial_number,
-            config=pipette_result.static_config,
+            pipette_id=params.pipetteId,
+            nozzle_map=nozzle_map,
         )
 
 
@@ -97,7 +92,7 @@ class ConfigureNozzleLayout(
     ] = ConfigureNozzleLayoutImplementation
 
 
-class ConfigureForVolumeCreate(BaseCommandCreate[ConfigureNozzleLayoutParams]):
+class ConfigureNozzleLayoutCreate(BaseCommandCreate[ConfigureNozzleLayoutParams]):
     """Configure nozzle layout creation request model."""
 
     commandType: ConfigureNozzleLayoutCommandType = "configureNozzleLayout"

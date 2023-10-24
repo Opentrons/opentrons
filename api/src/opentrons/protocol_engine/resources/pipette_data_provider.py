@@ -14,6 +14,7 @@ from opentrons_shared_data.pipette import (
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.instruments.nozzle_manager import (
     NozzleConfigurationManager,
+    NozzleMap
 )
 
 from ..types import FlowRates
@@ -52,7 +53,7 @@ class VirtualPipetteDataProvider:
         back_left_nozzle: str,
         front_right_nozzle: str,
         starting_nozzle: str,
-    ) -> None:
+    ) -> NozzleMap:
         """Emulate update_nozzle_configuration_for_mount."""
         if pipette_id not in self._nozzle_manager_layout_by_id:
             config = self.get_virtual_pipette_static_config_by_model_string(

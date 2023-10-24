@@ -236,12 +236,12 @@ from .configure_for_volume import (
 )
 
 from .configure_nozzle_layout import (
-    ConfigureForVolume,
-    ConfigureForVolumeParams,
-    ConfigureForVolumeCreate,
-    ConfigureForVolumeResult,
-    ConfigureForVolumeCommandType,
-    ConfigureForVolumePrivateResult,
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutCommandType,
+    ConfigureNozzleLayoutPrivateResult,
 )
 
 Command = Union[
@@ -254,6 +254,7 @@ Command = Union[
     BlowOut,
     BlowOutInPlace,
     ConfigureForVolume,
+    ConfigureNozzleLayout,
     DropTip,
     DropTipInPlace,
     Home,
@@ -305,6 +306,7 @@ CommandParams = Union[
     AspirateInPlaceParams,
     CommentParams,
     ConfigureForVolumeParams,
+    ConfigureNozzleLayoutParams,
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
@@ -362,6 +364,7 @@ CommandType = Union[
     AspirateInPlaceCommandType,
     CommentCommandType,
     ConfigureForVolumeCommandType,
+    ConfigureNozzleLayoutCommandType,
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
@@ -418,6 +421,7 @@ CommandCreate = Union[
     AspirateInPlaceCreate,
     CommentCreate,
     ConfigureForVolumeCreate,
+    ConfigureNozzleLayoutCreate,
     CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
@@ -474,6 +478,7 @@ CommandResult = Union[
     AspirateInPlaceResult,
     CommentResult,
     ConfigureForVolumeResult,
+    ConfigureNozzleLayoutResult,
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,
@@ -526,5 +531,8 @@ CommandResult = Union[
 ]
 
 CommandPrivateResult = Union[
-    None, LoadPipettePrivateResult, ConfigureForVolumePrivateResult
+    None,
+    LoadPipettePrivateResult,
+    ConfigureForVolumePrivateResult,
+    ConfigureNozzleLayoutPrivateResult,
 ]

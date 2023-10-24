@@ -2,6 +2,9 @@
 
 from pydantic import BaseModel, Field
 from dataclasses import dataclass
+from opentrons.hardware_control.instruments.nozzle_manager import (
+    NozzleMap,
+)
 from ..resources import pipette_data_provider
 
 NOZZLE_NAME_REGEX = "[A-Z][0-100]"
@@ -16,8 +19,22 @@ class PipetteConfigUpdateResultMixin:
     config: pipette_data_provider.LoadedStaticPipetteData
 
 
+class PipetteNozzleLayoutResultMixin(BaseModel):
+    pipette_id: str
+    nozzle_map: NozzleMap = Field(
+        default=None,
+        description="A dataclass object holding information about the current nozzle configuration.",
+    )
+
+
+class EmptyNozzleLayoutConfiguration(BaseModel):
+    """Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
+
+    pass
+
+
 class BaseNozzleLayoutConfiguration(BaseModel):
-    """Minimum information required for a nozzle configuration."""
+    """Minimum information required for a new nozzle configuration."""
 
     primary_nozzle: str = Field(
         ...,
@@ -29,23 +46,18 @@ class BaseNozzleLayoutConfiguration(BaseModel):
 class RowColumnNozzleLayoutConfiguration(BaseNozzleLayoutConfiguration):
     """Information required for nozzle configurations of type ROW and COLUMN."""
 
-    ending_nozzle: str = Field(
+    front_right_nozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
-        description="The ending nozzle of your configuration. It should be different than the primary nozzle and form either a full ROW/COLUMN.",
+        description="The front right nozzle in your configuration. It should be different than the primary nozzle and form either a full ROW/COLUMN.",
     )
 
 
-class QuadrantNozzleLayoutConfiguration(BaseNozzleLayoutConfiguration):
+class QuadrantNozzleLayoutConfiguration(RowColumnNozzleLayoutConfiguration):
     """Information required for nozzle configurations of type QUADRANT."""
 
     back_left_nozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The back left nozzle in your configuration, which is not necessarily the primary nozzle.",
-    )
-    front_right_nozzle: str = Field(
-        ...,
-        regex=NOZZLE_NAME_REGEX,
-        description="The front right nozzle in your configuration, which is not necessarily the primary nozzle.",
     )
