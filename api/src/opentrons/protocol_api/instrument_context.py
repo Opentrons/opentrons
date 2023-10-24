@@ -1641,6 +1641,7 @@ class InstrumentContext(publisher.CommandPublisher):
              pipette.move_to(well.top(z=-5))
              pipette.delay(5)
              pipette.mix(10, 10)
+             pipette.move_to(well.top(z=5))
              pipette.blow_out()
              pipette.prepare_for_aspirate()
              pipette.move_to(well.top(z=-5))
