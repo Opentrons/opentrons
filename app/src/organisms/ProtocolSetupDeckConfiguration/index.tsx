@@ -148,7 +148,6 @@ export function ProtocolSetupDeckConfiguration({
         <Flex
           marginTop="7.75rem"
           paddingX={SPACING.spacing40}
-          paddingBottom={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
         >
           {/* DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready */}
