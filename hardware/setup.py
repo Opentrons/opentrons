@@ -47,7 +47,7 @@ KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Hardware control for Opentrons Robots."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    "pyserial==3.5",
+    "pyserial==4.2.2",
     f"opentrons_shared_data=={VERSION}",
 ]
 

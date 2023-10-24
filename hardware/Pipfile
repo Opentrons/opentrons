@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-python-can = "==3.3.4"
+python-can = "==4.2.2"
 pyserial = "==3.5"
 typing-extensions = ">=4.0.0,<5"
 numpy = "==1.21.2"
