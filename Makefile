@@ -6,6 +6,7 @@ include ./scripts/python.mk
 
 API_DIR := api
 API_CLIENT_DIR := api-client
+APP_DIR := app
 APP_SHELL_DIR := app-shell
 APP_SHELL_ODD_DIR := app-shell-odd
 COMPONENTS_DIR := components
@@ -26,7 +27,6 @@ USB_BRIDGE_DIR := usb-bridge
 NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
 PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
-JS_PACKAGES := $(API_CLIENT_DIR) $(APP_SHELL_DIR) $(APP_SHELL_ODD_DIR) $(COMPONENTS_DIR) $(DISCOVERY_CLIENT_DIR) $(LABWARE_LIBRARY_DIR) $(PROTOCOL_DESIGNER_DIR) $(SHARED_DATA_DIR) $(REACT_API_CLIENT_DIR) $(STEP_GENERATION_DIR) $(NODE_USB_BRIDGE_CLIENT_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -199,7 +199,6 @@ test-py: test-py-windows
 	$(MAKE) -C $(USB_BRIDGE_DIR) test
 
 .PHONY: test-js
-test-js: tests?=$(JS_PACKAGES)
 test-js: test-js-internal
 
 # lints and typechecks
