@@ -34,7 +34,7 @@ interface PipettingCommandTextProps {
 export const PipettingCommandText = ({
   command,
   robotSideAnalysis,
-  robotType
+  robotType,
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
@@ -49,7 +49,12 @@ export const PipettingCommandText = ({
   )
   const displayLocation =
     labwareLocation != null
-      ? getLabwareDisplayLocation(robotSideAnalysis, labwareLocation, t, robotType)
+      ? getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareLocation,
+          t,
+          robotType
+        )
       : ''
   switch (command.commandType) {
     case 'aspirate': {

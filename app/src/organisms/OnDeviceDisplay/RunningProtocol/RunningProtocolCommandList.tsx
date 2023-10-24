@@ -30,7 +30,10 @@ import {
   ANALYTICS_PROTOCOL_RUN_PAUSE,
 } from '../../../redux/analytics'
 
-import type { CompletedProtocolAnalysis, RobotType } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'

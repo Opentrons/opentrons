@@ -66,7 +66,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     workingOffsets,
     setFatalError,
     adapterId,
-    robotType
+    robotType,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
   const isOnDevice = useSelector(getIsOnDevice)

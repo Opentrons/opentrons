@@ -20,7 +20,7 @@ import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
-  useRobotType
+  useRobotType,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -167,7 +167,9 @@ describe('SetupLabware', () => {
       } as any)
     when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
     when(mockUseLPCDisabledReason).mockReturnValue(null)
-    when(mockUseRobotType).calledWith(ROBOT_NAME).mockReturnValue(FLEX_ROBOT_TYPE)
+    when(mockUseRobotType)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockUseLaunchLPC)
       .calledWith(RUN_ID, FLEX_ROBOT_TYPE, 'test protocol')
       .mockReturnValue({

@@ -37,7 +37,12 @@ export function MoveLabwareCommandText(
         labware: getLabwareName(robotSideAnalysis, labwareId),
         old_location:
           oldLocation != null
-            ? getLabwareDisplayLocation(robotSideAnalysis, oldLocation, t, robotType)
+            ? getLabwareDisplayLocation(
+                robotSideAnalysis,
+                oldLocation,
+                t,
+                robotType
+              )
             : '',
         new_location: newDisplayLocation,
       })
@@ -45,7 +50,12 @@ export function MoveLabwareCommandText(
         labware: getLabwareName(robotSideAnalysis, labwareId),
         old_location:
           oldLocation != null
-            ? getLabwareDisplayLocation(robotSideAnalysis, oldLocation, t, robotType)
+            ? getLabwareDisplayLocation(
+                robotSideAnalysis,
+                oldLocation,
+                t,
+                robotType
+              )
             : '',
         new_location: newDisplayLocation,
       })

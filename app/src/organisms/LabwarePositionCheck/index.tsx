@@ -3,14 +3,17 @@ import { useLogger } from '../../logger'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
 import { FatalErrorModal } from './FatalErrorModal'
 
-import type { CompletedProtocolAnalysis, RobotType } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => void
   runId: string
   maintenanceRunId: string
-  robotType: RobotType 
+  robotType: RobotType
   existingOffsets: LabwareOffset[]
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   protocolName: string

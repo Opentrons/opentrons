@@ -5,9 +5,7 @@ import {
   getOccludedSlotCountForModule,
   LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
-import {
-  getPipetteNameSpecs,
-} from '@opentrons/shared-data/js'
+import { getPipetteNameSpecs } from '@opentrons/shared-data/js'
 
 import type {
   RunTimeCommand,
@@ -31,7 +29,7 @@ interface LoadCommandTextProps {
 export const LoadCommandText = ({
   command,
   robotSideAnalysis,
-  robotType
+  robotType,
 }: LoadCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('run_details')
 
@@ -50,7 +48,10 @@ export const LoadCommandText = ({
       })
     }
     case 'loadModule': {
-      const occludedSlotCount = getOccludedSlotCountForModule( getModuleType(command.params.model), robotType)
+      const occludedSlotCount = getOccludedSlotCountForModule(
+        getModuleType(command.params.model),
+        robotType
+      )
       return t('load_module_protocol_setup', {
         count: occludedSlotCount,
         module: getModuleDisplayName(command.params.model),
@@ -72,7 +73,10 @@ export const LoadCommandText = ({
         return t('load_labware_info_protocol_setup', {
           count:
             moduleModel != null
-              ? getOccludedSlotCountForModule(getModuleType(moduleModel), robotType)
+              ? getOccludedSlotCountForModule(
+                  getModuleType(moduleModel),
+                  robotType
+                )
               : 1,
           labware: command.result?.definition.metadata.displayName,
           slot_name: getModuleDisplayLocation(

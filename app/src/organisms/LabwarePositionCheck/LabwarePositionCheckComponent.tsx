@@ -43,7 +43,7 @@ const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   runId: string
   maintenanceRunId: string
-  robotType: RobotType 
+  robotType: RobotType
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
   onCloseClick: () => unknown
@@ -194,18 +194,17 @@ export const LabwarePositionCheckComponent = (
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    const dropTipToBeSafeCommands: DropTipCreateCommand[] =
-      shouldUseMetalProbe 
-        ? []
-        : (protocolData?.pipettes ?? []).map(pip => ({
-            commandType: 'dropTip' as const,
-            params: {
-              pipetteId: pip.id,
-              labwareId: FIXED_TRASH_ID,
-              wellName: 'A1',
-              wellLocation: { origin: 'default' as const },
-            },
-          }))
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] = shouldUseMetalProbe
+      ? []
+      : (protocolData?.pipettes ?? []).map(pip => ({
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pip.id,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'default' as const },
+          },
+        }))
     chainRunCommands(
       maintenanceRunId,
       [
@@ -251,7 +250,10 @@ export const LabwarePositionCheckComponent = (
     )
   }
   if (protocolData == null) return null
-  const LPCSteps = getLabwarePositionCheckSteps(protocolData, shouldUseMetalProbe)
+  const LPCSteps = getLabwarePositionCheckSteps(
+    protocolData,
+    shouldUseMetalProbe
+  )
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
@@ -300,7 +302,7 @@ export const LabwarePositionCheckComponent = (
     isRobotMoving: isCommandChainLoading,
     workingOffsets,
     existingOffsets,
-    robotType
+    robotType,
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
@@ -348,9 +350,7 @@ export const LabwarePositionCheckComponent = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = (
-      <CheckItem {...currentStep} {...movementStepProps} />
-    )
+    modalContent = <CheckItem {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'ATTACH_PROBE') {
     modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'DETACH_PROBE') {

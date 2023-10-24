@@ -9,7 +9,10 @@ import { PipettingCommandText } from './PipettingCommandText'
 import { TemperatureCommandText } from './TemperatureCommandText'
 import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
-import type { CompletedProtocolAnalysis, RobotType } from '@opentrons/shared-data/js'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data/js'
 import type { StyleProps } from '@opentrons/components'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
@@ -53,7 +56,9 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
-          <PipettingCommandText {...{ command, robotSideAnalysis, robotType }} />
+          <PipettingCommandText
+            {...{ command, robotSideAnalysis, robotType }}
+          />
         </StyledText>
       )
     }
@@ -136,7 +141,9 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
-          <MoveLabwareCommandText {...{ command, robotSideAnalysis, robotType }} />
+          <MoveLabwareCommandText
+            {...{ command, robotSideAnalysis, robotType }}
+          />
         </StyledText>
       )
     }

@@ -1,14 +1,12 @@
 import { getPrimaryPipetteId } from './utils/getPrimaryPipetteId'
-import {
-  CompletedProtocolAnalysis,
-} from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import { getTipBasedLPCSteps } from './utils/getTipBasedLPCSteps'
 import { getProbeBasedLPCSteps } from './utils/getProbeBasedLPCSteps'
 import type { LabwarePositionCheckStep } from './types'
 
 export const getLabwarePositionCheckSteps = (
   protocolData: CompletedProtocolAnalysis,
-  shouldUseMetalProbe:boolean 
+  shouldUseMetalProbe: boolean
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     if (protocolData.pipettes.length === 0) {
@@ -16,8 +14,7 @@ export const getLabwarePositionCheckSteps = (
         'no pipettes loaded within protocol, labware position check cannot be performed'
       )
     }
-    if (shouldUseMetalProbe)
-      return getProbeBasedLPCSteps(protocolData)
+    if (shouldUseMetalProbe) return getProbeBasedLPCSteps(protocolData)
 
     // filter out any pipettes that are not being used in the protocol
     const pipettesUsedInProtocol: CompletedProtocolAnalysis['pipettes'] = protocolData.pipettes.filter(

@@ -78,7 +78,7 @@ export function useLaunchLPC(
           maintenanceRunId={maintenanceRunId}
           setMaintenanceRunId={setMaintenanceRunId}
           protocolName={protocolName ?? ''}
-          robotType={robotType} 
+          robotType={robotType}
           isDeletingMaintenanceRun={isDeletingMaintenanceRun}
         />
       ) : null,

@@ -31,7 +31,10 @@ import {
   useInstrumentsQuery,
   useDoorQuery,
 } from '@opentrons/react-api-client'
-import { getDeckDefFromRobotType, getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getDeckDefFromRobotType,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
 import {
@@ -260,29 +263,29 @@ function PlayButton({
     -webkit-tap-highlight-color: transparent;
     &:focus {
       background-color: ${ready && !isDoorOpen
-      ? COLORS.bluePressed
-      : COLORS.darkBlack40};
+        ? COLORS.bluePressed
+        : COLORS.darkBlack40};
       color: ${COLORS.white};
     }
 
     &:hover {
       background-color: ${ready && !isDoorOpen
-      ? COLORS.blueEnabled
-      : COLORS.darkBlack20};
+        ? COLORS.blueEnabled
+        : COLORS.darkBlack20};
       color: ${COLORS.white};
     }
 
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
-      ? COLORS.blueEnabled
-      : COLORS.darkBlack20};
+        ? COLORS.blueEnabled
+        : COLORS.darkBlack20};
     }
 
     &:active {
       background-color: ${ready && !isDoorOpen
-      ? COLORS.bluePressed
-      : COLORS.darkBlack40};
+        ? COLORS.bluePressed
+        : COLORS.darkBlack40};
       color: ${COLORS.white};
     }
 
@@ -420,7 +423,7 @@ function PrepareToRun({
   const speccedInstrumentCount =
     mostRecentAnalysis !== null
       ? mostRecentAnalysis.pipettes.length +
-      (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+        (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
       : 0
 
   const instrumentsDetail = t('instruments_connected', {
@@ -472,8 +475,8 @@ function PrepareToRun({
     protocolModulesInfo.length === 0
       ? t('no_modules_used_in_this_protocol')
       : t('modules_connected', {
-        count: attachedModules.length,
-      })
+          count: attachedModules.length,
+        })
   const missingModulesText =
     missingModuleIds.length === 1
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
@@ -634,8 +637,8 @@ function PrepareToRun({
               detail={
                 liquidsInProtocol.length > 0
                   ? t('initial_liquids_num', {
-                    count: liquidsInProtocol.length,
-                  })
+                      count: liquidsInProtocol.length,
+                    })
                   : t('liquids_not_in_setup')
               }
               disabled={liquidsInProtocol.length === 0}

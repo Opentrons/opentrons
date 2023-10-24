@@ -46,7 +46,7 @@ describe('CurrentRunningProtocolCommand', () => {
       currentRunCommandIndex: 0,
       lastAnimatedCommand: null,
       updateLastAnimatedCommand: mockUpdateLastAnimatedCommand,
-      robotType: FLEX_ROBOT_TYPE
+      robotType: FLEX_ROBOT_TYPE,
     }
   })
 

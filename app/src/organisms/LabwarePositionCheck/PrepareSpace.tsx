@@ -81,12 +81,20 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
-  const { location, moduleId, labwareDef, protocolData, header, body, robotType } = props
+  const {
+    location,
+    moduleId,
+    labwareDef,
+    protocolData,
+    header,
+    body,
+    robotType,
+  } = props
 
   const isOnDevice = useSelector(getIsOnDevice)
 
   if (protocolData == null || robotType == null) return null
-  
+
   const deckDef = getDeckDefFromRobotType(robotType)
   return (
     <Flex css={TILE_CONTAINER_STYLE}>

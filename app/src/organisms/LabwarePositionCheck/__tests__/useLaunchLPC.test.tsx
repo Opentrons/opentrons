@@ -156,12 +156,18 @@ describe('useLaunchLPC hook', () => {
   })
 
   it('returns and no wizard by default', () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE), { wrapper })
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
     expect(result.current.LPCWizard).toEqual(null)
   })
 
   it('returns creates maintenance run with current offsets and definitions when create callback is called, closes and deletes when exit is clicked', async () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE), { wrapper })
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
     await result.current.launchLPC()
     await expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
       maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,

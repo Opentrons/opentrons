@@ -1,4 +1,4 @@
-import { FLEX_ROBOT_TYPE, getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { mockTipRackDef } from './mockTipRackDef'
 import { mockLabwareDef } from './mockLabwareDef'
 

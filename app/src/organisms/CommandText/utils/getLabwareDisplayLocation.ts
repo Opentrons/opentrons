@@ -9,7 +9,10 @@ import {
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
-import type { CompletedProtocolAnalysis, RobotType } from '@opentrons/shared-data/'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data/'
 import type { TFunction } from 'react-i18next'
 
 export function getLabwareDisplayLocation(
@@ -38,13 +41,13 @@ export function getLabwareDisplayLocation(
       return isOnDevice
         ? `${getModuleDisplayName(moduleModel)}, ${slotName}`
         : t('module_in_slot', {
-          count: getOccludedSlotCountForModule(
-            getModuleType(moduleModel),
-            robotType
-          ),
-          module: getModuleDisplayName(moduleModel),
-          slot_name: slotName,
-        })
+            count: getOccludedSlotCountForModule(
+              getModuleType(moduleModel),
+              robotType
+            ),
+            module: getModuleDisplayName(moduleModel),
+            slot_name: slotName,
+          })
     }
   } else if ('labwareId' in location) {
     const adapter = robotSideAnalysis.labware.find(
@@ -83,7 +86,10 @@ export function getLabwareDisplayLocation(
         adapter.location.moduleId
       )
       return t('adapter_in_mod_in_slot', {
-        count: getOccludedSlotCountForModule(getModuleType(moduleModel), robotType),
+        count: getOccludedSlotCountForModule(
+          getModuleType(moduleModel),
+          robotType
+        ),
         module: getModuleDisplayName(moduleModel),
         adapter: adapterDisplayName,
         slot: slotName,

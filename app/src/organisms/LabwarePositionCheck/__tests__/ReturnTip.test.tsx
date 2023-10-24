@@ -48,7 +48,7 @@ describe('ReturnTip', () => {
       chainRunCommands: mockChainRunCommands,
       tipPickUpOffset: null,
       isRobotMoving: false,
-      robotType: FLEX_ROBOT_TYPE
+      robotType: FLEX_ROBOT_TYPE,
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })

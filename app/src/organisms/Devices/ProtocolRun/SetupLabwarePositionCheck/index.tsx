@@ -17,7 +17,11 @@ import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useRobotType, useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
+import {
+  useRobotType,
+  useLPCDisabledReason,
+  useStoredProtocolAnalysis,
+} from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
