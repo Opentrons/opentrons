@@ -665,21 +665,3 @@ class ProtocolCore(
             return OFF_DECK_LOCATION
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
-
-
-def _waste_chute_fixture_id(
-    with_staging_area_slot_d4: bool, orifice: Literal["wide_open", "columnar_slit"]
-) -> str:
-    if orifice not in {"wide_open", "columnar_slit"}:
-        raise ValueError(
-            f"orifice must be 'wide_open' or 'columnar_slit', not {repr(orifice)}."
-        )
-
-    ids: Dict[Tuple[bool, Literal["wide_open", "columnar_slit"]], str] = {
-        (False, "wide_open"): "wasteChuteRightAdapterNoCover",
-        (False, "columnar_slit"): "wasteChuteRightAdapterCovered",
-        (True, "wide_open"): "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
-        (True, "columnar_slit"): "stagingAreaSlotWithWasteChuteRightAdapterCovered",
-    }
-
-    return ids[with_staging_area_slot_d4, orifice]
