@@ -26,7 +26,6 @@ import { Jog, JogControls } from '../../molecules/JogControls'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { PipetteModelSpecs } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
