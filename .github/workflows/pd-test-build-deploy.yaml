@@ -71,8 +71,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run PD unit tests'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="protocol-designer/src/**/*.(js|ts|tsx)" protocol-designer/src
+        run: make -C protocol-designer test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:

@@ -6,6 +6,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   Flex,
+  Icon,
   RESPONSIVENESS,
   JUSTIFY_CENTER,
   BORDERS,
@@ -22,8 +23,10 @@ import { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {
   description: string
+  proceedDescription: string
   proceed: () => void
   subsystem: Subsystem
+  isOnDevice: boolean
 }
 
 const DESCRIPTION_STYLE = css`
@@ -58,11 +61,27 @@ const OUTER_STYLES = css`
   width: 13.374rem;
 `
 
+const SPINNER_STYLE = css`
+  color: ${COLORS.darkGreyEnabled};
+  opacity: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    color: ${COLORS.darkBlackEnabled};
+    opacity: 70%;
+  }
+`
+
 export const FirmwareUpdateModal = (
   props: FirmwareUpdateModalProps
 ): JSX.Element => {
-  const { proceed, subsystem, description } = props
+  const {
+    proceed,
+    proceedDescription,
+    subsystem,
+    description,
+    isOnDevice,
+  } = props
   const [updateId, setUpdateId] = React.useState('')
+  const [firmwareText, setFirmwareText] = React.useState('')
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
@@ -79,18 +98,27 @@ export const FirmwareUpdateModal = (
     attachedInstruments?.data?.some(
       (i): i is BadGripper | BadPipette => !i.ok && i.subsystem === subsystem
     ) ?? false
+
   React.useEffect(() => {
-    if (!updateNeeded) {
-      proceed()
-    } else {
-      updateSubsystem(subsystem)
-    }
+    setTimeout(() => {
+      if (!updateNeeded) {
+        setFirmwareText(proceedDescription)
+        setTimeout(() => {
+          proceed()
+        }, 2000)
+      } else {
+        updateSubsystem(subsystem)
+      }
+    }, 2000)
   }, [])
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
   const percentComplete = updateData?.data.updateProgress ?? 0
 
   React.useEffect(() => {
+    if ((status != null || updateNeeded) && firmwareText !== description) {
+      setFirmwareText(description)
+    }
     if (status === 'done') {
       refetchInstruments()
         .then(() => {
@@ -108,15 +136,28 @@ export const FirmwareUpdateModal = (
           proceed()
         })
     }
-  }, [status, proceed, refetchInstruments, instrumentToUpdate])
+  }, [status, proceed, refetchInstruments, instrumentToUpdate, updateNeeded])
 
   return (
     <Flex css={MODAL_STYLE}>
-      <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>
-      <ProgressBar
-        percentComplete={percentComplete}
-        outerStyles={OUTER_STYLES}
-      />
+      <StyledText css={DESCRIPTION_STYLE}>
+        {firmwareText.length ? firmwareText : 'Checking for updates...'}
+      </StyledText>
+      {status != null || updateNeeded ? (
+        <ProgressBar
+          percentComplete={percentComplete}
+          outerStyles={OUTER_STYLES}
+        />
+      ) : null}
+      {firmwareText.length ? null : (
+        <Icon
+          name="ot-spinner"
+          aria-label="spinner"
+          size={isOnDevice ? '6.25rem' : '5.125rem'}
+          css={SPINNER_STYLE}
+          spin
+        />
+      )}
     </Flex>
   )
 }

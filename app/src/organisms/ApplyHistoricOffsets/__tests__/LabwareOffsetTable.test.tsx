@@ -109,7 +109,9 @@ describe('LabwareOffsetTable', () => {
     getByText('8.00')
     getByText('9.00')
     //  fourth candidate is labware on adapter on module
-    getByText('Opentrons 96 PCR Adapter in Heater-Shaker Module GEN1 in Slot 3')
+    getByText(
+      'Opentrons 96 PCR Heater-Shaker Adapter in Heater-Shaker Module GEN1 in Slot 3'
+    )
     getByText('Fourth Fake Labware Display Name')
     getByText('7.20')
     getByText('8.10')
