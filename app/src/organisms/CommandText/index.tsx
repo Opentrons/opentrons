@@ -41,7 +41,7 @@ interface Props extends StyleProps {
   robotType: RobotType
 }
 export function CommandText(props: Props): JSX.Element | null {
-  const { command, robotSideAnalysis, ...styleProps } = props
+  const { command, robotSideAnalysis, robotType, ...styleProps } = props
   const { t } = useTranslation('protocol_command_text')
 
   switch (command.commandType) {
@@ -53,7 +53,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
-          <PipettingCommandText {...{ command, robotSideAnalysis }} />
+          <PipettingCommandText {...{ command, robotSideAnalysis, robotType }} />
         </StyledText>
       )
     }
@@ -63,7 +63,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadLiquid': {
       return (
         <StyledText as="p" {...styleProps}>
-          <LoadCommandText {...{ command, robotSideAnalysis }} />
+          <LoadCommandText {...{ command, robotSideAnalysis, robotType }} />
         </StyledText>
       )
     }
@@ -136,7 +136,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
-          <MoveLabwareCommandText {...{ command, robotSideAnalysis }} />
+          <MoveLabwareCommandText {...{ command, robotSideAnalysis, robotType }} />
         </StyledText>
       )
     }

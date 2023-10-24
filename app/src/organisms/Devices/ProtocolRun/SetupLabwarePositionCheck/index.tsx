@@ -17,13 +17,12 @@ import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useIsFlex, useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
+import { useRobotType, useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
 import type { LabwareOffset } from '@opentrons/api-client'
 import { getLatestCurrentOffsets } from './utils'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 interface SetupLabwarePositionCheckProps {
   expandLabwareStep: () => void
@@ -37,9 +36,7 @@ export function SetupLabwarePositionCheck(
   const { robotName, runId, expandLabwareStep } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
-  const isFlex = useIsFlex(robotName)
-  // TODO: for brian immediately make a useRobotType hook and replace all instances of analysis.robotType with a prop drilled reference to that return value
-  const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const robotType = useRobotType(robotName)
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,

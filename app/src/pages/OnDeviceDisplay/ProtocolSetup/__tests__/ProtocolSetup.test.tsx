@@ -12,7 +12,7 @@ import {
   useDoorQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../../i18n'
@@ -284,7 +284,7 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID, PROTOCOL_NAME)
+      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, PROTOCOL_NAME)
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,

@@ -43,6 +43,7 @@ import {
 import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
+  useRobotType,
 } from '../../organisms/Devices/hooks'
 import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
@@ -108,6 +109,7 @@ export function RunningProtocol(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
+  const robotType = useRobotType(robotName)
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
@@ -201,6 +203,7 @@ export function RunningProtocol(): JSX.Element {
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
                 trackProtocolRunEvent={trackProtocolRunEvent}
+                robotType={robotType}
                 robotAnalyticsData={robotAnalyticsData}
                 protocolName={protocolName}
                 runStatus={runStatus}
@@ -216,6 +219,7 @@ export function RunningProtocol(): JSX.Element {
               <RunningProtocolCommandList
                 protocolName={protocolName}
                 runStatus={runStatus}
+                robotType={robotType}
                 playRun={playRun}
                 pauseRun={pauseRun}
                 setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -33,6 +34,7 @@ describe('RunningProtocolCommandList', () => {
       robotAnalyticsData: {} as any,
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
+      robotType: FLEX_ROBOT_TYPE
     }
   })
   it('should render text and buttons', () => {

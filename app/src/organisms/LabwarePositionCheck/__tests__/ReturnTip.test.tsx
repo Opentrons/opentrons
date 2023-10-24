@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { MatcherFunction } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { ReturnTip } from '../ReturnTip'
 import { SECTIONS } from '../constants'
@@ -48,6 +48,7 @@ describe('ReturnTip', () => {
       chainRunCommands: mockChainRunCommands,
       tipPickUpOffset: null,
       isRobotMoving: false,
+      robotType: FLEX_ROBOT_TYPE
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })

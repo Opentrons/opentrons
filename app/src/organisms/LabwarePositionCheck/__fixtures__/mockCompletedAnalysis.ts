@@ -32,7 +32,6 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
   ],
   modules: [],
   liquids: [],
-  robotType: FLEX_ROBOT_TYPE,
   commands: [
     {
       commandType: 'loadLabware',

@@ -31,12 +31,7 @@ import {
   useInstrumentsQuery,
   useDoorQuery,
 } from '@opentrons/react-api-client'
-import {
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-  getDeckDefFromRobotType,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+import { getDeckDefFromRobotType, getModuleDisplayName } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
 import {
@@ -46,9 +41,9 @@ import {
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   useAttachedModules,
-  useIsFlex,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useRobotType,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -70,7 +65,7 @@ import {
 import { useToaster } from '../../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
 import { getLabwareSetupItemGroups } from '../../Protocols/utils'
-import { ROBOT_MODEL_OT3, getLocalRobot } from '../../../redux/discovery'
+import { getLocalRobot } from '../../../redux/discovery'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -265,29 +260,29 @@ function PlayButton({
     -webkit-tap-highlight-color: transparent;
     &:focus {
       background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
+      ? COLORS.bluePressed
+      : COLORS.darkBlack40};
       color: ${COLORS.white};
     }
 
     &:hover {
       background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
+      ? COLORS.blueEnabled
+      : COLORS.darkBlack20};
       color: ${COLORS.white};
     }
 
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
+      ? COLORS.blueEnabled
+      : COLORS.darkBlack20};
     }
 
     &:active {
       background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
+      ? COLORS.bluePressed
+      : COLORS.darkBlack40};
       color: ${COLORS.white};
     }
 
@@ -368,8 +363,7 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const isFlex = useIsFlex(robotName)
-  const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const robotType = useRobotType(robotName)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
   const onConfirmCancelClose = (): void => {
@@ -388,7 +382,7 @@ function PrepareToRun({
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo =
     mostRecentAnalysis != null
@@ -426,7 +420,7 @@ function PrepareToRun({
   const speccedInstrumentCount =
     mostRecentAnalysis !== null
       ? mostRecentAnalysis.pipettes.length +
-        (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+      (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
       : 0
 
   const instrumentsDetail = t('instruments_connected', {
@@ -478,8 +472,8 @@ function PrepareToRun({
     protocolModulesInfo.length === 0
       ? t('no_modules_used_in_this_protocol')
       : t('modules_connected', {
-          count: attachedModules.length,
-        })
+        count: attachedModules.length,
+      })
   const missingModulesText =
     missingModuleIds.length === 1
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
@@ -640,8 +634,8 @@ function PrepareToRun({
               detail={
                 liquidsInProtocol.length > 0
                   ? t('initial_liquids_num', {
-                      count: liquidsInProtocol.length,
-                    })
+                    count: liquidsInProtocol.length,
+                  })
                   : t('liquids_not_in_setup')
               }
               disabled={liquidsInProtocol.length === 0}

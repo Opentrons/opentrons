@@ -20,8 +20,10 @@ import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
+  useRobotType
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 jest.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
@@ -57,6 +59,9 @@ const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
 >
 const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
   typeof useLaunchLPC
+>
+const mockUseRobotType = useRobotType as jest.MockedFunction<
+  typeof useRobotType
 >
 const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
@@ -162,8 +167,9 @@ describe('SetupLabware', () => {
       } as any)
     when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
     when(mockUseLPCDisabledReason).mockReturnValue(null)
+    when(mockUseRobotType).calledWith(ROBOT_NAME).mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID, 'test protocol')
+      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, 'test protocol')
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,

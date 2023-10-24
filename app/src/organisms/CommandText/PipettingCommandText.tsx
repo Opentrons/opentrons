@@ -8,6 +8,7 @@ import {
   DropTipRunTimeCommand,
   PickUpTipRunTimeCommand,
   getLabwareDefURI,
+  RobotType,
 } from '@opentrons/shared-data'
 import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { getLoadedLabware } from './utils/accessors'
@@ -27,11 +28,13 @@ type PipettingRunTimeCommmand =
 interface PipettingCommandTextProps {
   command: PipettingRunTimeCommmand
   robotSideAnalysis: CompletedProtocolAnalysis
+  robotType: RobotType
 }
 
 export const PipettingCommandText = ({
   command,
   robotSideAnalysis,
+  robotType
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
@@ -46,7 +49,7 @@ export const PipettingCommandText = ({
   )
   const displayLocation =
     labwareLocation != null
-      ? getLabwareDisplayLocation(robotSideAnalysis, labwareLocation, t)
+      ? getLabwareDisplayLocation(robotSideAnalysis, labwareLocation, t, robotType)
       : ''
   switch (command.commandType) {
     case 'aspirate': {
