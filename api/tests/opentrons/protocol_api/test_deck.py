@@ -26,7 +26,11 @@ from opentrons.types import DeckSlotName, Point
 def deck_definition() -> DeckDefinitionV4:
     """Get a deck definition value object."""
     return cast(
-        DeckDefinitionV4, {"locations": {"addressableAreas": [], "calibrationPoints": []}, "cutoutFixtures": {}}
+        DeckDefinitionV4,
+        {
+            "locations": {"addressableAreas": [], "calibrationPoints": []},
+            "cutoutFixtures": {},
+        },
     )
 
 

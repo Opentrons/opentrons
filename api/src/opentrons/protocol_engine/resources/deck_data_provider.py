@@ -43,8 +43,6 @@ class DeckDataProvider:
         """Get a labware definition given the labware's identification."""
 
         def sync() -> DeckDefinitionV4:
-            return load_deck(
-                name=self._deck_type.value, version=4
-            )
+            return load_deck(name=self._deck_type.value, version=4)
 
         return await anyio.to_thread.run_sync(sync)

@@ -895,7 +895,10 @@ def test_load_module(
 
     # _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
     decoy.when(subject.get_slot_definition(slot_name)).then_return(
-        cast(SlotDefV3, {'compatibleModuleTypes': [ModuleType.from_model(requested_model)]})
+        cast(
+            SlotDefV3,
+            {"compatibleModuleTypes": [ModuleType.from_model(requested_model)]},
+        )
     )
 
     decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
@@ -1027,7 +1030,7 @@ def test_load_module_raises_wrong_location(
     decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
 
     decoy.when(subject.get_slot_definition(slot_name)).then_return(
-        cast(SlotDefV3, {'compatibleModuleTypes': []})
+        cast(SlotDefV3, {"compatibleModuleTypes": []})
     )
 
     with pytest.raises(
@@ -1054,7 +1057,14 @@ def test_load_mag_block(
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
 
     decoy.when(subject.get_slot_definition(DeckSlotName.SLOT_A2)).then_return(
-        cast(SlotDefV3, {'compatibleModuleTypes': [ModuleType.from_model(MagneticBlockModel.MAGNETIC_BLOCK_V1)]})
+        cast(
+            SlotDefV3,
+            {
+                "compatibleModuleTypes": [
+                    ModuleType.from_model(MagneticBlockModel.MAGNETIC_BLOCK_V1)
+                ]
+            },
+        )
     )
 
     decoy.when(
@@ -1142,7 +1152,10 @@ def test_load_module_thermocycler_with_no_location(
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
     decoy.when(subject.get_slot_definition(expected_slot)).then_return(
-        cast(SlotDefV3, {'compatibleModuleTypes': [ModuleType.from_model(requested_model)]})
+        cast(
+            SlotDefV3,
+            {"compatibleModuleTypes": [ModuleType.from_model(requested_model)]},
+        )
     )
 
     decoy.when(
