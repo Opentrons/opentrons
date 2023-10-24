@@ -37,11 +37,12 @@ def validate_module_is_compatible_with_fixture(
     module_name = ModuleType.from_model(module).name
     for key in fixture.providesAddressableAreas.keys():
         for area in fixture.providesAddressableAreas[key]:
-            addressableArea = locations.find_addressableArea(area)
-            if addressableArea.compatibleModuleTypes is None:
-                return False
-            elif module_name in addressableArea.compatibleModuleTypes:
-                return True
+            for l_area in locations.addressableAreas:
+                if l_area.id == area:
+                    if l_area.compatibleModuleTypes is None:
+                        return False
+                    elif module_name in l_area.compatibleModuleTypes:
+                        return True
     return False
 
 
@@ -51,9 +52,9 @@ def validate_fixture_allows_drop_tip(
     """Validate that the fixture allows tips to be dropped in it's addressable areas."""
     for key in fixture.providesAddressableAreas.keys():
         for area in fixture.providesAddressableAreas[key]:
-            addressableArea = locations.find_addressableArea(area)
-            if addressableArea.ableToDropTips:
-                return True
+            for l_area in locations.addressableAreas:
+                if l_area.id == area and l_area.ableToDropTips:
+                    return True
     return False
 
 
@@ -63,7 +64,7 @@ def validate_fixture_allows_drop_labware(
     """Validate that the fixture allows labware to be dropped in it's addressable areas."""
     for key in fixture.providesAddressableAreas.keys():
         for area in fixture.providesAddressableAreas[key]:
-            addressableArea = locations.find_addressableArea(area)
-            if addressableArea.ableToDropLabware:
-                return True
+            for l_area in locations.addressableAreas:
+                if l_area.id == area and l_area.ableToDropLabware:
+                    return True
     return False

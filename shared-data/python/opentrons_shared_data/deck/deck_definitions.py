@@ -8,7 +8,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Extra, Field, confloat
+from pydantic import BaseModel, Extra, Field, PositiveFloat
 
 
 class SchemaVersion(Enum):
@@ -55,7 +55,7 @@ class CutoutFixture(BaseModel):
 
 
 class PositiveNumber(BaseModel):
-    __root__: confloat(ge=0.0)
+    __root__: PositiveFloat
 
 
 class XyzArray(BaseModel):
@@ -164,13 +164,6 @@ class Locations(BaseModel):
     cutouts: List[Cutout] = Field(
         ..., description="The machined cutout slots on the deck surface."
     )
-
-    @classmethod
-    def find_addressableArea(cls, id: str) -> AddressableArea:
-        for area in cls.addressableAreas:
-            if id == area.id:
-                return area
-        return None
 
 
 class Default(BaseModel):
