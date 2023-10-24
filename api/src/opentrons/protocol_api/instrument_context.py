@@ -612,17 +612,16 @@ class InstrumentContext(publisher.CommandPublisher):
         self, volume: Optional[float] = None, height: Optional[float] = None
     ) -> InstrumentContext:
         """
-        Pull air into the pipette current tip at the current location.
-        See :ref:`air-gap`.
+        Draw air into the pipette's tip at the current location. See :ref:`air-gap`.
 
-        :param volume: The amount of air to aspirate, measured in µL.
+        :param volume: The amount of air to draw, measured in µL.
                        Calling ``air_gap()`` with no arguments uses
                        the entire remaining volume in the pipette.
         :type volume: float
 
 
         :param height: The height, in mm, to move above the current well
-                       before aspirating air. The default is 5 mm above current well.
+                       before creating the air gap. The default is 5 mm above current well.
 
         :type height: float
 
@@ -882,7 +881,7 @@ class InstrumentContext(publisher.CommandPublisher):
         If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop the
         attached tip into its default :py:attr:`trash_container`. For the Flex and OT-2 the
         default slots for their in-deck trash containers are A3 and 12, respectively.
-        
+
         Starting with API version 2.15, if the trash container is the default fixed trash,
         the API will instruct the pipettes to drop their tips in different locations within
         the trash container. Varying the tip drop location helps prevent tips from piling up
@@ -918,7 +917,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
                 * You're using a GEN2 pipette, not a GEN1 pipette.
                 * You've tested this parameter with your pipette and tips.
-                * You understand the risks described below. 
+                * You understand the risks described below.
 
             The ejector that pushes the tip off the end of the pipette is
             driven by the plunger's stepper motor. Sometimes, the strain of
@@ -1490,7 +1489,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def min_volume(self) -> float:
         """
-        The minimum volume, in µL, that the pipette can hold.   
+        The minimum volume, in µL, that the pipette can hold.
         """
         return self._core.get_min_volume()
 
