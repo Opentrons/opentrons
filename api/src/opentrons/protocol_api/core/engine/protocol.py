@@ -279,7 +279,6 @@ class ProtocolCore(
             if pick_up_offset
             else None
         )
-
         _drop_offset = (
             LabwareOffsetVector(x=drop_offset[0], y=drop_offset[1], z=drop_offset[2])
             if drop_offset
