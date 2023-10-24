@@ -1,6 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing import Dict, Optional, Type, Union, List, Tuple
-from typing_extensions import Literal
 
 from opentrons.protocol_api import _waste_chute_dimensions
 
