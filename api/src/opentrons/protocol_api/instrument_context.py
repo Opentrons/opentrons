@@ -534,8 +534,8 @@ class InstrumentContext(publisher.CommandPublisher):
                          touch tip at current well's edges.
         :type location: :py:class:`.Well` or None
         :param radius: Describes the proportion of the target well's
-                       radius. When `radius=1.0`, the pipette tip will move to
-                       the edge of the target well. When `radius=0.5`, it will
+                       radius. When ``radius=1.0``, the pipette tip will move to
+                       the edge of the target well. When ``radius=0.5``, it will
                        move to 50% of the well's radius. Default: 1.0 (100%)
         :type radius: float
         :param v_offset: How far above or below the well to touch the tip, measured in mm.
@@ -551,7 +551,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :type speed: float
         :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
         :raises RuntimeError: If no location is specified and location cache is
-                              None. This should happen if `touch_tip` is called
+                              None. This should happen if ``touch_tip`` is called
                               without first calling a method that takes a
                               location (e.g., :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
