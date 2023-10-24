@@ -325,6 +325,11 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
             if (key_index >= 12):
                 break
             rack += 1
+            print("home zxy")
+            await api.home()
+            print("home plunger")
+            await api.home_plunger(mount)
+            print("home axis")
             await api.home([AXIS])
             await api.move_to(mount, Point(calibrated_slot_loc[key][0],
                         calibrated_slot_loc[key][1], 250.0))
@@ -366,7 +371,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         print("Picking up tip...\n")
                         await api.pick_up_tip(mount, tip_len)
                         total_pick_ups += 1
-
+                        print(f"Total Tip Pick Up Nums #{total_pick_ups}\n")
+                        print("= = = = = = = = = = = = = = = = =\n")
                         ### check tip presence after tip pick up
                         
 
