@@ -23,48 +23,6 @@ from .ot2.deck_attitude import (
 
 from . import ot2, ot3, helpers
 
-"""
-if config.feature_flags.enable_ot3_hardware_controller():
-    from .ot3.pipette_offset import (
-        save_pipette_calibration,
-        clear_pipette_offset_calibrations,
-        get_pipette_offset,
-        delete_pipette_offset_file,
-    )
-    from .ot3.tip_length import (
-        clear_tip_length_calibration,
-        create_tip_length_data,
-        save_tip_length_calibration,
-        tip_lengths_for_pipette,
-        load_tip_length_calibration,
-        delete_tip_length_calibration,
-    )
-    from .ot3 import models
-    from .ot3.module_offset import (
-        save_module_calibration,
-        clear_module_offset_calibrations,
-        get_module_offset,
-        delete_module_offset_file,
-        load_all_module_offsets,
-    )
-else:
-    from .ot2.pipette_offset import (
-        save_pipette_calibration,
-        clear_pipette_offset_calibrations,
-        get_pipette_offset,
-        delete_pipette_offset_file,
-    )
-    from .ot2.tip_length import (
-        clear_tip_length_calibration,
-        create_tip_length_data,
-        save_tip_length_calibration,
-        tip_lengths_for_pipette,
-        load_tip_length_calibration,
-        delete_tip_length_calibration,
-    )
-    from .ot2 import models  # type: ignore[no-redef]
-"""
-
 __all__ = [
     "helpers",
     # deck calibration functions
