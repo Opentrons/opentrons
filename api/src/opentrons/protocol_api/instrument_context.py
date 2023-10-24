@@ -941,8 +941,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
-            # FIXME: Handle the case where .trash_container is a waste chute.
-            well = self.trash_container.wells()[0]  # type: ignore[union-attr]
+            well = self.trash_container.wells()[0]
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
 
@@ -966,7 +965,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         elif isinstance(location, WasteChute):
             # TODO: Publish to run log.
-            self._core.drop_tip_in_waste_chute(location._core, home_after=home_after)
+            self._core.drop_tip_in_waste_chute(location, home_after=home_after)
             self._last_tip_picked_up_from = None
             return self
 

@@ -44,6 +44,7 @@ from opentrons.protocol_engine.errors import (
 from ... import validation
 from ..._types import OffDeckType
 from ..._liquid import Liquid
+from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -148,7 +149,6 @@ class ProtocolCore(
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         load_location = self._convert_labware_location(location=location)
-        assert not isinstance(load_location, WasteChuteLocation)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -208,7 +208,6 @@ class ProtocolCore(
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
         load_location = self._get_non_stacked_location(location=location)
-        assert not isinstance(load_location, WasteChuteLocation)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -258,7 +257,7 @@ class ProtocolCore(
             ModuleCore,
             NonConnectedModuleCore,
             OffDeckType,
-            WasteChuteCore,
+            WasteChute,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,
@@ -281,43 +280,65 @@ class ProtocolCore(
             else None
         )
 
-        if isinstance(new_location, WasteChuteCore):
-            # lol
-            to_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
-            slot_width = 128
-            slot_height = 86
-            drop_offset_point = (
-                _waste_chute_dimensions.SLOT_ORIGIN_TO_GRIPPER_JAW_CENTER
-                - Point(x=slot_width / 2, y=slot_height / 2)
-            )
-            _drop_offset = LabwareOffsetVector(
-                x=drop_offset_point.x, y=drop_offset_point.y, z=drop_offset_point.z
-            )
+        _drop_offset = (
+            LabwareOffsetVector(x=drop_offset[0], y=drop_offset[1], z=drop_offset[2])
+            if drop_offset
+            else None
+        )
 
+        if isinstance(new_location, WasteChute):
+            self._move_labware_to_waste_chute(
+                labware_core, strategy, _pick_up_offset, _drop_offset
+            )
         else:
             to_location = self._convert_labware_location(location=new_location)
-            _drop_offset = (
-                LabwareOffsetVector(
-                    x=drop_offset[0], y=drop_offset[1], z=drop_offset[2]
-                )
-                if drop_offset
-                else None
+
+            # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
+            # when move_labware() support is no longer experimental.
+
+            self._engine_client.move_labware(
+                labware_id=labware_core.labware_id,
+                new_location=to_location,
+                strategy=strategy,
+                pick_up_offset=_pick_up_offset,
+                drop_offset=_drop_offset,
             )
 
-        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
-        # when move_labware() support is no longer experimental.
-
-        self._engine_client.move_labware(
-            labware_id=labware_core.labware_id,
-            new_location=to_location,
-            strategy=strategy,
-            pick_up_offset=_pick_up_offset,
-            drop_offset=_drop_offset,
-        )
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
             # Clear out last location since it is not relevant to pipetting
             # and we only use last location for in-place pipetting commands
             self.set_last_location(location=None, mount=Mount.EXTENSION)
+
+    def _move_labware_to_waste_chute(
+        self,
+        labware_core: LabwareCore,
+        strategy: LabwareMovementStrategy,
+        pick_up_offset: Optional[LabwareOffsetVector],
+        drop_offset: Optional[LabwareOffsetVector],
+    ) -> None:
+        slot = DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
+        slot_width = 128
+        slot_height = 86
+        drop_offset_from_slot = (
+            _waste_chute_dimensions.SLOT_ORIGIN_TO_GRIPPER_JAW_CENTER
+            - Point(x=slot_width / 2, y=slot_height / 2)
+        )
+        if drop_offset is not None:
+            drop_offset_from_slot += Point(
+                x=drop_offset.x, y=drop_offset.y, z=drop_offset.z
+            )
+
+        self._engine_client.move_labware(
+            labware_id=labware_core.labware_id,
+            new_location=slot,
+            strategy=strategy,
+            pick_up_offset=pick_up_offset,
+            drop_offset=LabwareOffsetVector(
+                x=drop_offset_from_slot.x,
+                y=drop_offset_from_slot.y,
+                z=drop_offset_from_slot.z,
+            ),
+        )
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel

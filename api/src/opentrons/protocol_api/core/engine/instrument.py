@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
-from opentrons.motion_planning.waypoints import DEFAULT_GENERAL_ARC_Z_MARGIN
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
@@ -26,6 +25,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
+from ..._waste_chute import WasteChute
 from ... import _waste_chute_dimensions
 
 if TYPE_CHECKING:
@@ -384,14 +384,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         )
 
     def drop_tip_in_waste_chute(
-        self, waste_chute_core: WasteChuteCore, home_after: Optional[bool]
+        self, waste_chute: WasteChute, home_after: Optional[bool]
     ) -> None:
         # TODO: Can we get away with implementing this in two steps like this,
         # or does drop_tip() need to take the waste chute location because the z-height
         # depends on the intent of dropping tip? How would Protocol Designer want to implement
         # this?
         self._move_to_waste_chute(
-            waste_chute_load_name=waste_chute_core.load_name,
+            waste_chute,
             force_direct=False,
             speed=None,
         )
@@ -399,18 +399,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def _move_to_waste_chute(
         self,
-        waste_chute_load_name: str,
+        waste_chute: WasteChute,
         force_direct: bool,
         speed: Optional[float],
     ) -> None:
         if self.get_channels() == 96:
-            if waste_chute_load_name not in {
-                "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
-                "WasteChuteRightAdapterNoCover",
-            }:
-                # TODO: Instead of hard-coding load names, we should see whether the addressable area "96ChannelWasteChute" has
-                # been provided by any loaded fixture."
-                raise ValueError("Wrong waste chute, you silly goose.")
+            if waste_chute._orifice != "wide_open":
+                raise ValueError(
+                    "Wrong waste chute, you silly goose."
+                    " You're using a 96-channel pipette, but the waste chute has a lid."
+                )
             slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_96_TIP_A1
         else:
             slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
@@ -425,18 +423,18 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         )
         slot_d3_origin = Point(*slot_d3["position"])
         destination_point = slot_d3_origin + slot_origin_to_tip_a1
-        minimum_z = (
-            # TODO: Why isn't DEFAULT_GENERAL_ARC_Z_MARGIN valid?
-            _waste_chute_dimensions.ENVELOPE_HEIGHT
-            + 7.5
-        )
+
+        # Normally, we use a 10 mm margin. (DEFAULT_GENERAL_ARC_Z_MARGIN.) Unfortunately, with
+        # 1000µL tips, we have slightly not enough room to meet that margin. We can make the margin
+        # as big as 7.5 mm before the motion planner raises an error. So, use that reduced margin,
+        # with a little more subtracted in order to leave wiggle room for pipette calibration.
+        minimum_z = _waste_chute_dimensions.ENVELOPE_HEIGHT + 5.0
 
         self.move_to(
             Location(destination_point, labware=None),
             well_core=None,
             force_direct=force_direct,
             minimum_z_height=minimum_z,
-            # minimum_z_height=minimum_z,
             speed=speed,
         )
 
