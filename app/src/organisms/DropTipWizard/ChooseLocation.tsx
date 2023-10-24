@@ -87,10 +87,11 @@ export const ChooseLocation = (
         padding={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        flex="1"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing48}
+          gridGap={SPACING.spacing24}
           flex="1"
         >
           <Flex
@@ -104,7 +105,11 @@ export const ChooseLocation = (
             </StyledText>
             <StyledText as="p">{body}</StyledText>
           </Flex>
-          <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
+          <Flex
+            flex="1"
+            justifyContent={JUSTIFY_CENTER}
+            paddingLeft={SPACING.spacing24}
+          >
             {DeckLocationSelect}
           </Flex>
         </Flex>
