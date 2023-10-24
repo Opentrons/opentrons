@@ -38,7 +38,7 @@ class OT3Mount(enum.Enum):
         return top_types.Mount[self.name]
 
     @classmethod
-    def pipette_mounts(cls) -> List["OT3Mount"]:
+    def pipette_mounts(cls) -> List["Literal[OT3Mount.LEFT, OT3Mount.RIGHT]"]:
         return [cls.LEFT, cls.RIGHT]
 
 

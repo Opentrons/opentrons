@@ -63,7 +63,7 @@ async def subject(
 ) -> AsyncIterator[TipPresenceManager]:
     """Build a test subject using decoyed can messenger and tip detector."""
     manager = TipPresenceManager(can_messenger)
-    manager._detectors[OT3Mount.LEFT] = tip_detector
+    manager.set_detector(OT3Mount.LEFT, tip_detector)
     try:
         yield manager
     finally:

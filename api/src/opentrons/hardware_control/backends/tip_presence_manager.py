@@ -1,7 +1,7 @@
 import logging
 from functools import partial
-from typing import Callable, Optional, List, Dict
-
+from typing import cast, Callable, Optional, List, Set
+from typing_extensions import TypedDict, Literal, Final
 
 from opentrons.hardware_control.types import TipStateType, OT3Mount
 
@@ -11,17 +11,25 @@ from opentrons_hardware.hardware_control.tip_presence import (
     TipDetector,
     types as tip_types,
 )
-from opentrons_shared_data.errors.exceptions import UnmatchedTipPresenceStates
+from opentrons_shared_data.errors.exceptions import (
+    TipDetectorNotFound,
+    UnmatchedTipPresenceStates,
+)
 
 log = logging.getLogger(__name__)
 
 TipListener = Callable[[OT3Mount, bool], None]
-TipDetectorByMount = Dict[OT3Mount, Optional[TipDetector]]
-TipUpdateByMount = Dict[OT3Mount, Optional[bool]]
+PipetteMountKeys = Literal["left", "right"]
 
 
-class TipDetectorNotFoundError(Exception):
-    pass
+class TipDetectorByMount(TypedDict):
+    left: Optional[TipDetector]
+    right: Optional[TipDetector]
+
+
+class TipUpdateByMount(TypedDict):
+    left: Optional[bool]
+    right: Optional[bool]
 
 
 def _mount_to_node(mount: OT3Mount) -> NodeId:
@@ -34,39 +42,48 @@ def _mount_to_node(mount: OT3Mount) -> NodeId:
 class TipPresenceManager:
     """Handle tip change notification coming from CAN."""
 
-    _listeners: List[TipListener]
+    _listeners: Set[TipListener]
     _detectors: TipDetectorByMount
     _last_state: TipUpdateByMount
 
-    def __init__(self, can_messenger: CanMessenger) -> None:
+    def __init__(
+        self,
+        can_messenger: CanMessenger,
+        listeners: Set[TipListener] = set(),
+    ) -> None:
         self._messenger = can_messenger
-        self._listeners = []
-        self._detectors = {m: None for m in OT3Mount}
-        self._last_state = {m: None for m in OT3Mount}
+        self._listeners = listeners
+        self._detectors = TipDetectorByMount(left=None, right=None)
+        self._last_state = TipUpdateByMount(left=None, right=None)
+
+    @staticmethod
+    def _get_key(mount: OT3Mount) -> PipetteMountKeys:
+        assert mount != OT3Mount.GRIPPER
+        return cast(PipetteMountKeys, mount.name.lower())
 
     async def build_detector(self, mount: OT3Mount, sensor_count: int) -> None:
         # clear detector if pipette does not exist
-        if not sensor_count > 0:
-            self._detectors[mount] = None
+        if sensor_count <= 0:
+            self.set_detector(mount, None)
         else:
             # set up and subscribe to the detector
             d = TipDetector(self._messenger, _mount_to_node(mount), sensor_count)
             # listens to the detector so we can immediately notify listeners
             # the most up-to-date tip state
             d.add_subscriber(partial(self._handle_tip_update, mount))
-            self._detectors[mount] = d
+            self.set_detector(mount, d)
 
     def _handle_tip_update(
         self, mount: OT3Mount, update: tip_types.TipNotification
     ) -> None:
         """Callback for detector."""
-        self._last_state[mount] = update.presence
+        self._last_state[self._get_key(mount)] = update.presence
 
         for listener in self._listeners:
             listener(mount, update.presence)
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
-        state = self._last_state[mount]
+        state = self._last_state[self._get_key(mount)]
         if state is None:
             log.warning("Tip state for {mount} is unknown")
         return state
@@ -85,11 +102,21 @@ class TipPresenceManager:
         return self._get_tip_presence(await detector.request_tip_status())
 
     def get_detector(self, mount: OT3Mount) -> TipDetector:
-        detector = self._detectors[mount]
+        detector = self._detectors[self._get_key(mount)]
         if not detector:
-            raise TipDetectorNotFoundError(f"Tip detector not set up for {mount} mount")
+            raise TipDetectorNotFound(
+                message=f"Tip detector not set up for {mount} mount",
+                detail={"mount": str(mount)},
+            )
         return detector
 
-    def add_listener(self, listener: TipListener) -> None:
-        if listener not in self._listeners:
-            self._listeners.append(listener)
+    def set_detector(self, mount: OT3Mount, detector: Optional[TipDetector]) -> None:
+        self._detectors[self._get_key(mount)] = detector
+
+    def add_listener(self, listener: TipListener) -> Callable[[], None]:
+        self._listeners.add(listener)
+
+        def remove() -> None:
+            self._listeners.discard(listener)
+
+        return remove
