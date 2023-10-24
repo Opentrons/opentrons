@@ -273,7 +273,6 @@ class OT3PipetteHandler:
             result[
                 "default_push_out_volume"
             ] = instr.active_tip_settings.default_push_out_volume
-            result["tip_presence_responses"] = instr.tip_presence_responses
         return cast(PipetteDict, result)
 
     @property

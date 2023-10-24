@@ -100,6 +100,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
         self._current_tip_length = 0.0
+        self._has_tip_length: Optional[bool] = None
         self._current_tiprack_diameter = 0.0
         self._pipette_id = pipette_id
         self._log = mod_log.getChild(
@@ -230,6 +231,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._current_volume = 0.0
         self._working_volume = float(self.liquid_class.max_volume)
         self._current_tip_length = 0.0
+        self._has_tip_length = None
         self._current_tiprack_diameter = 0.0
         self.ready_to_aspirate = False
         #: True if ready to aspirate
@@ -376,6 +378,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @current_tip_length.setter
     def current_tip_length(self, tip_length: float) -> None:
         self._current_tip_length = tip_length
+        self._has_tip_length = True
 
     @property
     def current_tiprack_diameter(self) -> float:
@@ -492,6 +495,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         assert tip_length > 0.0, "tip_length must be greater than 0"
         assert not self.has_tip_length
         self._current_tip_length = tip_length
+        self._has_tip_length = True
 
     def remove_tip(self) -> None:
         """
@@ -500,6 +504,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         """
         assert self.has_tip_length
         self._current_tip_length = 0.0
+        self._has_tip_length = False
 
     @property
     def has_tip(self) -> bool:
