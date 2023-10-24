@@ -8,9 +8,13 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useUpdateDeckConfigurationMutation,
+  useCreateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 import {
   STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 
@@ -28,6 +32,7 @@ import type {
   LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { DeckConfigData } from '../../pages/DeckConfiguration'
 
 interface ProtocolSetupDeckConfigurationProps {
   fixtureLocation: Cutout
@@ -72,11 +77,21 @@ export function ProtocolSetupDeckConfiguration({
     status: 'succeeded',
   }
 
+  const STUBBED_LOAD_FIXTURE_C3: LoadFixtureRunTimeCommand = {
+    ...STUBBED_LOAD_FIXTURE,
+    params: {
+      fixtureId: 'stubbedFixtureIdC3',
+      loadName: TRASH_BIN_LOAD_NAME,
+      location: { cutout: 'C3' },
+    },
+  }
+
   const requiredFixtureDetails =
     mostRecentAnalysis?.commands != null
       ? [
           // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
           STUBBED_LOAD_FIXTURE,
+          STUBBED_LOAD_FIXTURE_C3,
         ]
       : []
 
@@ -90,7 +105,13 @@ export function ProtocolSetupDeckConfiguration({
         }
     ) as DeckConfiguration) ?? []
 
+  const [deckConfigData, setDeckConfigData] = React.useState<DeckConfigData>({
+    addedFixture: null,
+    currentDeckConfig: deckConfig,
+  })
+
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const { createDeckConfiguration } = useCreateDeckConfigurationMutation()
 
   const handleClickAdd = (fixtureLocation: Cutout): void => {
     setTargetFixtureLocation(fixtureLocation)
@@ -105,7 +126,7 @@ export function ProtocolSetupDeckConfiguration({
   }
 
   const handleClickConfirm = (): void => {
-    // ToDo (kk:10/17/2023) add a function for the confirmation in a following PR for RAUT-804
+    createDeckConfiguration(deckConfigData.currentDeckConfig)
   }
 
   return (
@@ -122,6 +143,8 @@ export function ProtocolSetupDeckConfiguration({
             fixtureLocation={targetFixtureLocation}
             setShowAddFixtureModal={setShowConfigurationModal}
             providedFixtureOptions={providedFixtureOptions}
+            deckConfigData={deckConfigData}
+            setDeckConfigData={setDeckConfigData}
             isOnDevice
           />
         ) : null}
@@ -139,7 +162,7 @@ export function ProtocolSetupDeckConfiguration({
           paddingBottom={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
         >
-          DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready
+          {/* DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready */}
           <DeckConfigurator
             deckConfig={deckConfig}
             handleClickAdd={handleClickAdd}
