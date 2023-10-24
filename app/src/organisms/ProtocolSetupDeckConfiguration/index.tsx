@@ -139,7 +139,7 @@ export function ProtocolSetupDeckConfiguration({
           paddingBottom={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
         >
-          DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready
+          {/* DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready */}
           <DeckConfigurator
             deckConfig={deckConfig}
             handleClickAdd={handleClickAdd}
