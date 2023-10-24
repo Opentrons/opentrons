@@ -11,6 +11,7 @@ import {
   mockReachableRobot,
 } from '../../../../../redux/discovery/__fixtures__'
 import {
+  clearWifiStatus,
   getNetworkInterfaces,
   INTERFACE_WIFI,
   postWifiDisconnect,
@@ -52,6 +53,9 @@ const mockDismissRequest = dismissRequest as jest.MockedFunction<
   typeof dismissRequest
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+const mockClearWifiStatus = clearWifiStatus as jest.MockedFunction<
+  typeof clearWifiStatus
+>
 
 const ROBOT_NAME = 'otie'
 const LAST_ID = 'a request id'
@@ -117,6 +121,7 @@ describe('DisconnectModal', () => {
     getByText('Disconnect from foo')
     getByText('Disconnecting from Wi-Fi network foo')
     getByRole('button', { name: 'cancel' })
+    expect(mockClearWifiStatus).not.toHaveBeenCalled()
   })
 
   it('renders success body when request is pending and robot is not connectable', () => {
@@ -133,6 +138,7 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     getByRole('button', { name: 'Done' })
+    expect(mockClearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders success body when request is successful', () => {
@@ -146,6 +152,7 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     getByRole('button', { name: 'Done' })
+    expect(mockClearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders success body when wifi is not connected', () => {
@@ -162,6 +169,7 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     getByRole('button', { name: 'Done' })
+    expect(mockClearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders error body when request is unsuccessful', () => {
@@ -181,6 +189,7 @@ describe('DisconnectModal', () => {
     )
     getByRole('button', { name: 'cancel' })
     getByRole('button', { name: 'Disconnect' })
+    expect(mockClearWifiStatus).not.toHaveBeenCalled()
   })
 
   it('dispatches postWifiDisconnect on click Disconnect', () => {

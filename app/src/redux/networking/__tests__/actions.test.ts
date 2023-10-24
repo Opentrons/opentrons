@@ -265,6 +265,15 @@ describe('networking actions', () => {
         meta: mockRequestMeta,
       },
     },
+    {
+      name: 'can create networking:CLEAR_WIFI_STATUS',
+      creator: Actions.clearWifiStatus,
+      args: [mockRobot.name],
+      expected: {
+        type: 'networking:CLEAR_WIFI_STATUS',
+        payload: { robotName: mockRobot.name },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

@@ -20,6 +20,7 @@ export interface HealthResponse {
   minimum_protocol_api_version?: [number, number]
   maximum_protocol_api_version?: [number, number]
   robot_model?: string
+  robot_serial?: string | null
 }
 
 export type Capability =

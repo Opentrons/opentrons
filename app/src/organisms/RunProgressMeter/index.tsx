@@ -151,10 +151,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         command={runCommandDetails.data}
       />
     )
-  } else if (runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)) {
-    currentStepContents = (
-      <StyledText as="h2">{t('protocol_completed')}</StyledText>
-    )
   }
 
   React.useEffect(() => {
@@ -203,10 +199,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex gridGap={SPACING.spacing8}>
-            <StyledText
-              as="h2"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >{`${t('current_step')}${
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${
+              runStatus != null && TERMINAL_RUN_STATUSES.includes(runStatus)
+                ? t('final_step')
+                : t('current_step')
+            }${
               runStatus === RUN_STATUS_IDLE
                 ? ':'
                 : ` ${countOfTotalText}${

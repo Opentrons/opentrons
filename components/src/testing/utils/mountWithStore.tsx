@@ -1,6 +1,7 @@
 import assert from 'assert'
 import * as React from 'react'
 import { Provider } from 'react-redux'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { mount } from 'enzyme'
 
 import type { ReactWrapper } from 'enzyme'
@@ -35,9 +36,27 @@ export function mountWithStore<Props, State = {}, Action = {}>(
     dispatch: jest.fn(),
   }
 
+  const queryClient = new QueryClient()
+
+  const BaseProviders = ({
+    children,
+    store,
+    queryClient,
+  }: {
+    children: React.ReactNode
+    store: any
+    queryClient: any
+  }): JSX.Element => {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store as any}>{children}</Provider>
+      </QueryClientProvider>
+    )
+  }
+
   const wrapper = mount<Props>(node, {
-    wrappingComponent: Provider,
-    wrappingComponentProps: { store },
+    wrappingComponent: BaseProviders,
+    wrappingComponentProps: { store, queryClient },
   })
 
   // force a re-render by returning a new state to recalculate selectors

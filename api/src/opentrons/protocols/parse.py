@@ -217,11 +217,16 @@ def _parse_python(
     extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
 ) -> PythonProtocol:
     """Parse a protocol known or at least suspected to be python"""
-    filename_checked = filename or "<protocol>"
-    if filename_checked.endswith(".zip"):
+    if filename is None:
+        # The fallback "<protocol>" needs to match what opentrons.protocols.execution.execute_python
+        # looks for when it extracts tracebacks.
+        ast_filename = "<protocol>"
+    elif filename.endswith(".zip"):
+        # The extension ".zip" and the fallback "protocol.ot2.py" need to match what
+        # opentrons.protocols.execution.execute_python looks for when it extracts tracebacks.
         ast_filename = "protocol.ot2.py"
     else:
-        ast_filename = filename_checked
+        ast_filename = filename
 
     # todo(mm, 2021-09-13): By default, ast.parse will inherit compiler options
     # and future features from this module. This may not be appropriate.
@@ -244,7 +249,7 @@ def _parse_python(
 
     static_info = _extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
-    version = _get_version(static_info, parsed, filename_checked)
+    version = _get_version(static_info, parsed, ast_filename)
     robot_type = _robot_type_from_static_python_info(static_info)
 
     if version >= APIVersion(2, 0):
@@ -257,7 +262,7 @@ def _parse_python(
 
     result = PythonProtocol(
         text=protocol_contents,
-        filename=getattr(protocol, "co_filename", "<protocol>"),
+        filename=filename,
         contents=protocol,
         metadata=static_info.metadata,
         api_level=version,

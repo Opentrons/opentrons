@@ -96,7 +96,7 @@ export function ConfigInput(props: ConfigInputProps): JSX.Element {
   const { field } = props
   const { name, units, displayName } = field
   const id = makeId(field.name)
-  const _default = field.default.toString()
+  const _default = field.default?.toString()
   return (
     <ConfigFormRow label={displayName} labelFor={id}>
       <Field name={name}>

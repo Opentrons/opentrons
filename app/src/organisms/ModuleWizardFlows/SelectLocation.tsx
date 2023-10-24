@@ -6,6 +6,7 @@ import {
   ModuleLocation,
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   RESPONSIVENESS,
@@ -72,6 +73,9 @@ export const SelectLocation = (
               return acc
             return [...acc, { slotName: slot.id }]
           }, [])}
+          isThermocycler={
+            attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE
+          }
         />
       }
       bodyText={bodyText}

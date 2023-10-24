@@ -44,7 +44,7 @@ describe('StagingAreasModal', () => {
   it('renders the deck, header, and buttons work as expected', () => {
     const { getByText, getByRole } = render(props)
     getByText('mock deck config')
-    getByText('Staging Areas')
+    getByText('Staging Area Slots')
     getByRole('button', { name: 'cancel' }).click()
     expect(props.onCloseClick).toHaveBeenCalled()
   })
