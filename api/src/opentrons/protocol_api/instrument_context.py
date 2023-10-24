@@ -1627,7 +1627,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         You rarely need to call this function. The API automatically prepares the
         pipette for aspiration as part of other commands:
-        
+
             - After picking up a tip with :py:meth:`.pick_up_tip`.
             - When calling :py:meth:`.aspirate`, if the pipette isn't already prepared.
               If the pipette is in a well, it will move out of the well, move the plunger,
