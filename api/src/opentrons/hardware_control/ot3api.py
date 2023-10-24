@@ -1929,7 +1929,7 @@ class OT3API(
             blowout_spec.instr.ready_to_aspirate = False
 
     @contextlib.asynccontextmanager
-    async def _high_throughput_tip_action(self) -> AsyncIterator[None]:
+    async def _high_throughput_check_tip(self) -> AsyncIterator[None]:
         """Tip action required for high throughput pipettes to get tip status."""
         instrument = self._pipette_handler.get_pipette(OT3Mount.LEFT)
         tip_presence_check_target = instrument.tip_presence_check_dist_mm
@@ -1966,7 +1966,7 @@ class OT3API(
                 mount == OT3Mount.LEFT
                 and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
             ):
-                await stack.enter_async_context(self._high_throughput_tip_action())
+                await stack.enter_async_context(self._high_throughput_check_tip())
             result = await self._backend.get_tip_status(mount)
         return result
 
@@ -2066,10 +2066,6 @@ class OT3API(
                 realmount, top_types.Point(spec.ending_z_retract_distance)
             )
 
-        # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
-        #       but not with DVT pipettes because those can only detect drops
-        await self.verify_tip_presence(realmount, TipStateType.PRESENT)
-
         add_tip_to_instr()
 
         if prep_after:
@@ -2127,8 +2123,6 @@ class OT3API(
 
         for shake in spec.shake_off_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
-
-        await self.verify_tip_presence(realmount, TipStateType.ABSENT)
 
         # home mount axis
         if home_after:
