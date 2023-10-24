@@ -26,7 +26,7 @@ describe('v7.1 migration', () => {
         commandType: 'loadLabware',
         key: expect.any(String),
         params: {
-          displayName: 'Opentrons 96 Flat Bottom Adapter',
+          displayName: 'Opentrons 96 Flat Bottom Heater-Shaker Adapter',
           labwareId:
             'd95bb3be-b453-457c-a947-bd03dc8e56b9:opentrons/opentrons_96_flat_bottom_adapter/1',
           loadName: 'opentrons_96_flat_bottom_adapter',
