@@ -17,7 +17,7 @@ import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { AddDeckConfigurationModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddDeckConfigurationModal'
+import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { Portal } from '../../App/portal'
@@ -96,7 +96,7 @@ export function DeckConfiguration(): JSX.Element {
           />
         ) : null}
         {showConfigurationModal && targetFixtureLocation != null ? (
-          <AddDeckConfigurationModal
+          <AddFixtureModal
             fixtureLocation={targetFixtureLocation}
             setShowAddFixtureModal={setShowConfigurationModal}
             isOnDevice
