@@ -1,13 +1,13 @@
 import * as React from 'react'
 
-import { i18n } from '../../../i18n'
-
 import { renderWithProviders } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
+
+import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { DeckConfigData } from '../../../pages/DeckConfiguration'
@@ -43,7 +43,7 @@ const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
   })
 }
 
-describe('Touchscreen AddFixtureModalProps', () => {
+describe('Touchscreen AddFixtureModal', () => {
   let props: React.ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
@@ -78,7 +78,7 @@ describe('Touchscreen AddFixtureModalProps', () => {
   })
 })
 
-describe('Desktop AddDeckConfigurationModal', () => {
+describe('Desktop AddFixtureModal', () => {
   let props: React.ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {

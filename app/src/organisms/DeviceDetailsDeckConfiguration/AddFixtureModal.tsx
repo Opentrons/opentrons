@@ -38,6 +38,7 @@ interface AddFixtureModalProps {
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
   deckConfigData?: DeckConfigData
   setDeckConfigData?: (deckConfigData: DeckConfigData) => void
+  providedFixtureOptions?: FixtureLoadName[]
   isOnDevice?: boolean
 }
 
@@ -46,9 +47,11 @@ export function AddFixtureModal({
   setShowAddFixtureModal,
   deckConfigData,
   setDeckConfigData,
+  providedFixtureOptions,
   isOnDevice = false,
-}: AddFixtureModalProps): JSX.Element {
+}: AddFixtureModalProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', { slotName: fixtureLocation }),
@@ -63,8 +66,6 @@ export function AddFixtureModal({
     childrenPadding: SPACING.spacing24,
     width: '23.125rem',
   }
-
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
   if (
@@ -97,6 +98,8 @@ export function AddFixtureModal({
   }
 
   // For Desktop app
+  const fixtureOptions = providedFixtureOptions ?? availableFixtures
+
   const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
     updateDeckConfiguration({
       fixtureLocation,
@@ -115,7 +118,7 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableFixtures.map(fixture => (
+              {fixtureOptions.map(fixture => (
                 <React.Fragment key={fixture}>
                   <AddFixtureButton
                     fixtureLoadName={fixture}
@@ -131,7 +134,7 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableFixtures.map(fixture => (
+              {fixtureOptions.map(fixture => (
                 <React.Fragment key={fixture}>
                   <Flex
                     flexDirection={DIRECTION_ROW}
