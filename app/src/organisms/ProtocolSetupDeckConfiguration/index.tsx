@@ -14,7 +14,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 
@@ -77,21 +76,11 @@ export function ProtocolSetupDeckConfiguration({
     status: 'succeeded',
   }
 
-  const STUBBED_LOAD_FIXTURE_C3: LoadFixtureRunTimeCommand = {
-    ...STUBBED_LOAD_FIXTURE,
-    params: {
-      fixtureId: 'stubbedFixtureIdC3',
-      loadName: TRASH_BIN_LOAD_NAME,
-      location: { cutout: 'C3' },
-    },
-  }
-
   const requiredFixtureDetails =
     mostRecentAnalysis?.commands != null
       ? [
           // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
           STUBBED_LOAD_FIXTURE,
-          STUBBED_LOAD_FIXTURE_C3,
         ]
       : []
 
