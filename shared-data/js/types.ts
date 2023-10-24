@@ -458,7 +458,6 @@ export interface CompletedProtocolAnalysis {
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
-  robotType?: RobotType
 }
 
 export interface ResourceFile {

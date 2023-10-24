@@ -26,6 +26,7 @@ import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
   useRobot,
+  useRobotType,
   useRunStatuses,
   useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
@@ -175,6 +176,7 @@ interface PageContentsProps {
 }
 function PageContents(props: PageContentsProps): JSX.Element {
   const { runId, robotName, protocolRunDetailsTab } = props
+  const robotType = useRobotType(robotName)
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
@@ -207,6 +209,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
     'run-preview': (
       <RunPreview
         runId={runId}
+        robotType={robotType}
         ref={listRef}
         jumpedIndex={jumpedIndex}
         makeHandleScrollToStep={makeHandleScrollToStep}

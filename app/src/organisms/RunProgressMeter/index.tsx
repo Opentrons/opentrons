@@ -39,7 +39,7 @@ import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
-import { useDownloadRunLog } from '../Devices/hooks'
+import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
 
@@ -65,6 +65,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     setInterventionModalCommandKey,
   ] = React.useState<string | null>(null)
   const { t } = useTranslation('run_details')
+  const robotType = useRobotType(robotName)
   const runStatus = useRunStatus(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -138,6 +139,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <CommandText
         robotSideAnalysis={analysis}
         command={analysisCommands[lastRunAnalysisCommandIndex]}
+        robotType={robotType}
       />
     )
   } else if (
@@ -149,6 +151,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       <CommandText
         robotSideAnalysis={analysis}
         command={runCommandDetails.data}
+        robotType={robotType}
       />
     )
   }

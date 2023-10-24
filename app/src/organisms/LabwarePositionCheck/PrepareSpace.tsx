@@ -24,10 +24,9 @@ import {
   LabwareDefinition2,
   THERMOCYCLER_MODULE_TYPE,
   getModuleType,
-  FLEX_ROBOT_TYPE,
+  RobotType,
+  getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
-import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import flexDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
@@ -78,16 +77,25 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
   confirmPlacement: () => void
   header: React.ReactNode
   body: React.ReactNode
+  robotType: RobotType
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
-  const { location, moduleId, labwareDef, protocolData, header, body } = props
+  const {
+    location,
+    moduleId,
+    labwareDef,
+    protocolData,
+    header,
+    body,
+    robotType,
+  } = props
 
-  const robotType = protocolData.robotType
   const isOnDevice = useSelector(getIsOnDevice)
 
   if (protocolData == null || robotType == null) return null
-  const deckDef = robotType === FLEX_ROBOT_TYPE ? flexDeckDef : ot2DeckDef
+
+  const deckDef = getDeckDefFromRobotType(robotType)
   return (
     <Flex css={TILE_CONTAINER_STYLE}>
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
