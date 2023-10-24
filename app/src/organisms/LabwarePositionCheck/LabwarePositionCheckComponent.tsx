@@ -257,8 +257,6 @@ export const LabwarePositionCheckComponent = (
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
-  console.log('currentStep', currentStep)
-  console.log('protocolData in top', protocolData)
 
   const handleJog = (
     axis: Axis,
