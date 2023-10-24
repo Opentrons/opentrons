@@ -491,7 +491,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(target, validation.WellTarget):
             if target.well.parent.is_tiprack:
                 _log.warning(
-                    "Blow_out being performed on a tiprack. "
+                    "Blow_out being performed on a tip rack. "
                     "Please re-check your code"
                 )
             move_to_location = target.location or target.well.top()
@@ -589,7 +589,7 @@ class InstrumentContext(publisher.CommandPublisher):
             return self
         if parent_labware.is_tiprack:
             _log.warning(
-                "Touch_tip being performed on a tiprack. Please re-check your code"
+                "Touch_tip being performed on a tip rack. Please re-check your code"
             )
 
         if self.api_version < APIVersion(2, 4):
@@ -708,7 +708,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         * If the only thing to specify is which well from which to pick
           up a tip, ``location`` can be a :py:class:`.Well`. For instance,
-          if you have a tip rack in a variable called `tiprack`, you can
+          if you have a tip rack in a variable called ``tiprack``, you can
           pick up a specific tip from it with
           ``instr.pick_up_tip(tiprack.wells()[0])``. This style of call can
           be used to make the robot pick up a tip from a tip rack that
@@ -721,7 +721,7 @@ class InstrumentContext(publisher.CommandPublisher):
         * If the position to move to in the well needs to be specified,
           for instance to tell the robot to run its pick up tip routine
           starting closer to or farther from the top of the tip,
-          `location` can be a :py:class:`.types.Location`; for instance,
+          ``location`` can be a :py:class:`.types.Location`; for instance,
           you can call ``instr.pick_up_tip(tiprack.wells()[0].top())``.
 
         :param location: The location from which to pick up a tip.
@@ -737,7 +737,7 @@ class InstrumentContext(publisher.CommandPublisher):
                             Use the Opentrons App to change pipette pick-up settings.
         :type presses: int
         :param increment: The additional distance to travel on each successive
-                          press (e.g.: if `presses=3` and `increment=1.0`, then
+                          press (e.g.: if ``presses=3`` and ``increment=1.0``, then
                           the first press will travel down into the tip by
                           3.5mm, the second by 4.5mm, and the third by 5.5mm).
 
@@ -879,71 +879,69 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Drop the current tip. See :ref:`pipette-drop-tip`.
 
-        If no location is passed, the pipette will drop the tip into its
-        :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.  From API version 2.15 on, if the trash container is
-        the default fixed trash in A3 (slot 12), the API will default to
-        dropping tips in different points within the trash container
-        in order to prevent tips from piling up in a single location in the trash.
+        If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop the
+        attached tip into its default :py:attr:`trash_container`. For the Flex and OT-2 the
+        default slots for their in-deck trash containers are A3 and 12, respectively.
+        
+        Starting with API version 2.15, if the trash container is the default fixed trash,
+        the API will instruct the pipettes to drop their tips in different locations within
+        the trash container. Varying the tip drop location helps prevent tips from piling up
+        in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
         the ``location`` argument. The ``location`` argument can be specified in
         several ways:
 
-            - If the only thing to specify is which well into which to drop
+            - If the only thing to specify is the well into which to drop
               a tip, ``location`` can be a :py:class:`.Well`. For instance,
               if you have a tip rack in a variable called ``tiprack``, you can
-              drop a tip into a specific well on that tiprack with the call
+              drop a tip into a specific well on that tip rack with the call
               ``instr.drop_tip(tiprack.wells()[0])``. This style of call can
-              be used to make the robot drop a tip into arbitrary labware.
-            - If the position to drop the tip from as well as the
-              :py:class:`.Well` to drop the tip into needs to be specified,
-              for instance to tell the robot to drop a tip from an unusually
-              large height above the tip rack, ``location``
-              can be a :py:class:`.types.Location`; for instance, you can call
-              ``instr.drop_tip(tiprack.wells()[0].top())``.
+              be used to make the robot drop a tip into labware like a well plate or
+              a reservoir.
+            - If the drop position and :py:class:`.Well` to drop the tip into needs to be
+              specified, for instance to tell the robot to drop a tip from an unusually
+              large height above the tip rack, ``location`` can be a :py:class:`.types.Location`.
+              For instance, you can call ``instr.drop_tip(tiprack.wells()[0].top())``.
 
         :param location:
             The location to drop the tip.
         :type location:
             :py:class:`.types.Location` or :py:class:`.Well` or ``None``
         :param home_after:
-            Whether to home this pipette's plunger after dropping the tip.
+            Whether to home the pipette's plunger after dropping the tip.
             If not specified, defaults to ``True`` on an OT-2.
 
-            Setting ``home_after=False`` saves waiting a couple of seconds
-            after the pipette drops the tip, but risks causing other problems.
-
-            .. warning::
-                Only set ``home_after=False`` if:
+            When ``home_after=False``, the pipette does not home its plunger. This can
+            save a few seconds, but may cause other problems. For example, you should only
+            set ``home_after=False`` if:
 
                 * You're using a GEN2 pipette, not a GEN1 pipette.
-                * You've tested ``home_after=False`` extensively with your
-                  pipette and tips.
-                * You understand the risks described below.
+                * You've tested this parameter with your pipette and tips.
+                * You understand the risks described below. 
 
-            The ejector that pops the tip off the end of the pipette is
+            The ejector that pushes the tip off the end of the pipette is
             driven by the plunger's stepper motor. Sometimes, the strain of
             ejecting the tip can make that motor skip and fall out of sync
             with where the robot thinks it is.
 
-            Homing the plunger fixes this, so, to be safe, we normally do it
-            after every tip drop.
+            GEN1 pipettes are especially vulnerable to this location sync problem.
+            You should never set ``home_after=False`` when using a GEN1 pipette.
+
+            GEN2 pipettes can be affected by this the location sync problem, but less
+            frequently than GEN1 pipettes. As a best practice, always test your GEN2 pipette
+            with ``home_after=False`` before running your protocol.
 
             If you set ``home_after=False`` to disable homing the plunger, and
-            the motor happens to skip, you might see problems like these until
-            the next time the plunger is homed:
+            the motor happens to skip, you might encounter problems similar to these listed
+            below:
 
             * The run might halt with a "hard limit" error message.
             * The pipette might aspirate or dispense the wrong volumes.
             * The pipette might not fully drop subsequent tips.
 
-            GEN1 pipettes are especially vulnerable to this skipping, so you
-            should never set ``home_after=False`` with a GEN1 pipette.
-
-            Even on GEN2 pipettes, the motor can still skip. So, always
-            extensively test ``home_after=False`` with your particular pipette
-            and your particular tips before relying on it.
+            Homing the plunger fixes this motor skipping/location synchronization problem.
+            As a safety procedure, the robot normally homes the plunger after every tip drop.
 
         :returns: This instance.
         """
@@ -1357,7 +1355,10 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def mount(self) -> str:
-        """Return the name of the mount this pipette is attached to."""
+        """
+        Return the name of the mount the pipette is attached to. The names are
+        ``left`` and ``right``.
+        """
         return self._core.get_mount().name.lower()
 
     @property  # type: ignore
@@ -1488,6 +1489,9 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def min_volume(self) -> float:
+        """
+        The minimum volume, in µL, that the pipette can hold.   
+        """
         return self._core.get_min_volume()
 
     @property  # type: ignore
@@ -1545,7 +1549,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 2)
     def return_height(self) -> float:
-        """The height to return a tip to its tiprack.
+        """The height to return a tip to its tip rack.
 
         :returns: A scaling factor to apply to the tip length.
                   During a drop tip, this factor will be multiplied by the tip length
@@ -1599,12 +1603,14 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 15)
     def configure_for_volume(self, volume: float) -> None:
-        """Configure a pipette to handle a specific volume of liquid, measured in µL. Depending on the volume, the pipette will enter a unique pipetting mode.
-        Changing pipette modes alters properties of the instance of
-        :py:class:`.InstrumentContext`, such as default flow rate, minimum volume,
-        and maximum volume. The pipette remains in the mode set by this function until it is called again.
+        """Configure a pipette to handle a specific volume of liquid, measured in µL.
+        The pipette enters a volume mode depending on the volume provided. Changing pipette
+        modes alters properties of the instance of :py:class:`.InstrumentContext`,
+        such as default flow rate, minimum volume, and maximum volume. The pipette remains
+        in the mode set by this function until it is called again.
 
-        The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense 1 µL of liquid. Low-volume mode can
+        The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a
+        low-volume mode to accurately dispense 1 µL of liquid. Low-volume mode can
         only be set by calling ``configure_for_volume``. See :ref:`pipette-volume-modes`.
 
         .. note ::
