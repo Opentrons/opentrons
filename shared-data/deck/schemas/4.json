@@ -109,7 +109,12 @@
     },
     "locations": {
       "type": "object",
-      "required": ["addressableAreas", "calibrationPoints", "cutouts"],
+      "required": [
+        "addressableAreas",
+        "calibrationPoints",
+        "cutouts",
+        "legacyFixtures"
+      ],
       "properties": {
         "addressableAreas": {
           "type": "array",
@@ -225,6 +230,32 @@
                 "items": {
                   "type": "string"
                 }
+              }
+            }
+          }
+        },
+        "legacyFixtures": {
+          "type": "array",
+          "description": "Fixed position objects on the deck.",
+          "items": {
+            "type": "object",
+            "required": ["id", "displayName"],
+            "properties": {
+              "id": {
+                "description": "Unique identifier for fixed object",
+                "type": "string"
+              },
+              "labware": {
+                "description": "Valid labware loadName for fixed object",
+                "type": "string"
+              },
+              "slot": {
+                "description": "Slot location of the fixed object",
+                "type": "string"
+              },
+              "displayName": {
+                "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
+                "type": "string"
               }
             }
           }

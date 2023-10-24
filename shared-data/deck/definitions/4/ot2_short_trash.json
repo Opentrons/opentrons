@@ -349,6 +349,14 @@
         "position": [248.37, 351.5, 0.0],
         "displayName": "Slot 11 Top Right Dot"
       }
+    ],
+    "legacyFixtures": [
+      {
+        "id": "fixedTrash",
+        "slot": "12",
+        "labware": "opentrons_1_trash_850ml_fixed",
+        "displayName": "Fixed Trash"
+      }
     ]
   },
   "cutoutFixtures": [
