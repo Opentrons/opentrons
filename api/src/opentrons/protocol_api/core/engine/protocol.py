@@ -42,7 +42,7 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType
+from ..._types import OffDeckType, OFF_DECK
 from ..._liquid import Liquid
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
@@ -328,6 +328,8 @@ class ProtocolCore(
                 x=drop_offset.x, y=drop_offset.y, z=drop_offset.z
             )
 
+        # To get the physical movement to happen, move the labware "into the slot" with a giant
+        # offset to dunk it in the waste chute.
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
             new_location=slot,
@@ -338,6 +340,17 @@ class ProtocolCore(
                 y=drop_offset_from_slot.y,
                 z=drop_offset_from_slot.z,
             ),
+        )
+
+        # To get the logical movement to be correct, move the labware off-deck.
+        # Otherwise, leaving the labware "in the slot" would mean you couldn't call this function
+        # again for other labware.
+        self._engine_client.move_labware(
+            labware_id=labware_core.labware_id,
+            new_location=self._convert_labware_location(OFF_DECK),
+            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+            pick_up_offset=None,
+            drop_offset=None,
         )
 
     def _resolve_module_hardware(
