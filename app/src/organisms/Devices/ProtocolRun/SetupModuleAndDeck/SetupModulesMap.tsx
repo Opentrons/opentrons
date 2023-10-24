@@ -6,12 +6,14 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
+  EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 
+import { useFeatureFlag } from '../../../../redux/config'
 import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
@@ -39,6 +41,8 @@ export const SetupModulesMap = ({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
     }) ?? []
 
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
 
@@ -64,9 +68,10 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getDeckConfigFromProtocolCommands(
-    protocolAnalysis.commands
-  )
+  // hide the extended deck behind feature flag to avoid confustion
+  const deckConfig = enableDeckConfig
+    ? EXTENDED_DECK_CONFIG_FIXTURE
+    : getDeckConfigFromProtocolCommands(protocolAnalysis.commands)
 
   return (
     <Flex

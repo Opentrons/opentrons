@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 import { parseInitialLoadedFixturesByCutout } from '@opentrons/api-client'
-import { EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
+import { STANDARD_SLOT_DECK_CONFIG_FIXTURE } from '@opentrons/components'
 
 import type { DeckConfiguration, RunTimeCommand } from '@opentrons/shared-data'
 
@@ -19,5 +19,5 @@ export function getDeckConfigFromProtocolCommands(
   }))
 
   // TODO(bh, 2023-10-18): remove stub when load fixture commands available
-  return deckConfig.length > 0 ? deckConfig : EXTENDED_DECK_CONFIG_FIXTURE
+  return deckConfig.length > 0 ? deckConfig : STANDARD_SLOT_DECK_CONFIG_FIXTURE
 }
