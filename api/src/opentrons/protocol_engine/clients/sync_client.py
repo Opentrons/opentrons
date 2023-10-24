@@ -262,7 +262,7 @@ class SyncClient:
         pipette_id: str,
         home_after: Optional[bool],
     ) -> commands.DropTipInPlaceResult:
-        """Execute a DropTip command and return the result."""
+        """Execute a DropTipInPlace command and return the result."""
         request = commands.DropTipInPlaceCreate(
             params=commands.DropTipInPlaceParams(
                 pipetteId=pipette_id,
