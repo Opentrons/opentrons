@@ -50,93 +50,73 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const flowTitle = t('drop_tips')
 
-  return isOnDevice ? (
-    <Flex
-      padding={SPACING.spacing32}
-      gridGap={SPACING.spacing24}
-      flexDirection={DIRECTION_COLUMN}
-      height="100%"
-    >
+  if (isOnDevice) {
+    return (
       <Flex
-        paddingRight={SPACING.spacing40}
-        paddingLeft={SPACING.spacing40}
+        padding={SPACING.spacing32}
         gridGap={SPACING.spacing24}
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        textAlign={TEXT_ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        width="100%"
-        height="20.25rem"
+        height="100%"
       >
-        <Flex gridGap={SPACING.spacing24}>
-          <Icon
-            name="ot-alert"
-            size={isOnDevice ? '3.75rem' : '2.5rem'}
-            color={COLORS.warningEnabled}
-            aria-label="ot-alert"
-          />
-        </Flex>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize32}
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
-          {currentStep === POSITION_AND_BLOWOUT
-            ? t('confirm_blowout_location', { flow: flowTitle })
-            : t('confirm_drop_tip_location', { flow: flowTitle })}
-        </StyledText>
-      </Flex>
-      <Flex
-        justifyContent={JUSTIFY_FLEX_END}
-        gridGap={SPACING.spacing8}
-        alignItems={ALIGN_FLEX_END}
-      >
-        <SmallButton
-          buttonType="secondary"
-          buttonText={t('shared:go_back')}
-          onClick={handleGoBack}
-        />
-        <SmallButton
-          buttonText={
-            currentStep === POSITION_AND_BLOWOUT
-              ? i18n.format(t('blowout_liquid'), 'capitalize')
-              : i18n.format(t('drop_tips'), 'capitalize')
-          }
-          onClick={handlePipetteAction}
-        />
-      </Flex>
-    </Flex>
-  ) : (
-    <SimpleWizardBody
-      iconColor={COLORS.warningEnabled}
-      header={
-        currentStep === POSITION_AND_BLOWOUT
-          ? t('confirm_blowout_location', { flow: flowTitle })
-          : t('confirm_drop_tip_location', { flow: flowTitle })
-      }
-      isSuccess={false}
-    >
-      {isOnDevice ? (
         <Flex
-          padding={SPACING.spacing32}
-          gridGap={SPACING.spacing4}
+          paddingX={SPACING.spacing40}
+          gridGap={SPACING.spacing24}
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          textAlign={TEXT_ALIGN_CENTER}
           flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          height="20.25rem"
+        >
+          <Flex gridGap={SPACING.spacing24}>
+            <Icon
+              name="ot-alert"
+              size={isOnDevice ? '3.75rem' : '2.5rem'}
+              color={COLORS.warningEnabled}
+              aria-label="ot-alert"
+            />
+          </Flex>
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize32}
+            fontWeight={TYPOGRAPHY.fontWeightBold}
+          >
+            {currentStep === POSITION_AND_BLOWOUT
+              ? t('confirm_blowout_location', { flow: flowTitle })
+              : t('confirm_drop_tip_location', { flow: flowTitle })}
+          </StyledText>
+        </Flex>
+        <Flex
+          justifyContent={JUSTIFY_FLEX_END}
+          gridGap={SPACING.spacing8}
+          alignItems={ALIGN_FLEX_END}
         >
           <SmallButton
-            buttonType="alert"
+            buttonType="secondary"
+            buttonText={t('shared:go_back')}
+            onClick={handleGoBack}
+          />
+          <SmallButton
             buttonText={
               currentStep === POSITION_AND_BLOWOUT
                 ? i18n.format(t('blowout_liquid'), 'capitalize')
                 : i18n.format(t('drop_tips'), 'capitalize')
             }
             onClick={handlePipetteAction}
-            marginRight={SPACING.spacing4}
-          />
-          <SmallButton
-            buttonText={t('shared:go_back')}
-            onClick={handleGoBack}
           />
         </Flex>
-      ) : (
+      </Flex>
+    )
+  } else {
+    return (
+      <SimpleWizardBody
+        iconColor={COLORS.warningEnabled}
+        header={
+          currentStep === POSITION_AND_BLOWOUT
+            ? t('confirm_blowout_location', { flow: flowTitle })
+            : t('confirm_drop_tip_location', { flow: flowTitle })
+        }
+        isSuccess={false}
+      >
         <Flex
           width="100%"
           marginTop={SPACING.spacing32}
@@ -159,9 +139,9 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
             </PrimaryButton>
           </Flex>
         </Flex>
-      )}
-    </SimpleWizardBody>
-  )
+      </SimpleWizardBody>
+    )
+  }
 }
 
 interface JogToPositionProps {
@@ -170,11 +150,7 @@ interface JogToPositionProps {
   handleProceed: () => void
   body: string
   isRobotMoving: boolean
-  chainRunCommands: any
   currentStep: string
-  createdMaintenanceRunId: string | null
-  pipetteId: string
-  instrumentModelSpecs: PipetteModelSpecs
   isOnDevice: boolean
 }
 
@@ -216,75 +192,79 @@ export const JogToPosition = (
     )
   }
 
-  return isOnDevice ? (
-    <Flex
-      width="100%"
-      alignItems={ALIGN_CENTER}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing24}
-      padding={SPACING.spacing32}
-    >
-      <JogControls jog={handleJog} isOnDevice={true} />
-      <Flex width="100%" gridGap={SPACING.spacing10}>
-        <Flex width="100%">
-          <SmallButton
-            buttonType="tertiaryLowLight"
-            buttonText={t('shared:go_back')}
-            onClick={handleGoBack}
-          />
-        </Flex>
-        <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
-          <SmallButton
-            buttonText={t('shared:confirm_position')}
-            onClick={() => setShowPositionConfirmation(true)}
-          />
-        </Flex>
-      </Flex>
-    </Flex>
-  ) : (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing32}
-      minHeight="29.5rem"
-    >
-      <Flex gridGap={SPACING.spacing24}>
-        <Flex
-          flex="1"
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          alignItems={ALIGN_FLEX_START}
-        >
-          <Header>
-            {i18n.format(t('position_the_pipette'), 'capitalize')}
-          </Header>
-          <StyledText as="p">{body}</StyledText>
-        </Flex>
-        {/* no animations */}
-        <Flex
-          flex="1"
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing20}
-        ></Flex>
-      </Flex>
-      <>
-        <JogControls jog={handleJog} />
-        <Flex
-          width="100%"
-          marginTop={SPACING.spacing32}
-          justifyContent={JUSTIFY_FLEX_END}
-        >
-          {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          <Flex gridGap={SPACING.spacing8}>
-            <SecondaryButton onClick={handleGoBack}>
-              {t('shared:go_back')}
-            </SecondaryButton>
-            <PrimaryButton onClick={() => setShowPositionConfirmation(true)}>
-              {t('shared:confirm_position')}
-            </PrimaryButton>
+  if (isOnDevice) {
+    return (
+      <Flex
+        width="100%"
+        alignItems={ALIGN_CENTER}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing24}
+        padding={SPACING.spacing32}
+      >
+        <JogControls jog={handleJog} isOnDevice={true} />
+        <Flex width="100%" gridGap={SPACING.spacing10}>
+          <Flex width="100%">
+            <SmallButton
+              buttonType="tertiaryLowLight"
+              buttonText={t('shared:go_back')}
+              onClick={handleGoBack}
+            />
+          </Flex>
+          <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
+            <SmallButton
+              buttonText={t('shared:confirm_position')}
+              onClick={() => setShowPositionConfirmation(true)}
+            />
           </Flex>
         </Flex>
-      </>
-    </Flex>
-  )
+      </Flex>
+    )
+  } else {
+    return (
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        padding={SPACING.spacing32}
+        minHeight="29.5rem"
+      >
+        <Flex gridGap={SPACING.spacing24}>
+          <Flex
+            flex="1"
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            alignItems={ALIGN_FLEX_START}
+          >
+            <Header>
+              {i18n.format(t('position_the_pipette'), 'capitalize')}
+            </Header>
+            <StyledText as="p">{body}</StyledText>
+          </Flex>
+          {/* no animations */}
+          <Flex
+            flex="1"
+            alignItems={ALIGN_CENTER}
+            gridGap={SPACING.spacing20}
+          ></Flex>
+        </Flex>
+        <>
+          <JogControls jog={handleJog} />
+          <Flex
+            width="100%"
+            marginTop={SPACING.spacing32}
+            justifyContent={JUSTIFY_FLEX_END}
+          >
+            {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
+            <Flex gridGap={SPACING.spacing8}>
+              <SecondaryButton onClick={handleGoBack}>
+                {t('shared:go_back')}
+              </SecondaryButton>
+              <PrimaryButton onClick={() => setShowPositionConfirmation(true)}>
+                {t('shared:confirm_position')}
+              </PrimaryButton>
+            </Flex>
+          </Flex>
+        </>
+      </Flex>
+    )
+  }
 }

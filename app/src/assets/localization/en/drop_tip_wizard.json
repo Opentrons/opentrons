@@ -1,7 +1,7 @@
 {
   "before_you_begin_do_you_want_to_blowout": "Before you begin, do you need to preserve aspirated liquid?",
-  "blowout_liquid": "Blow out liquid",
   "blowout_complete": "blowout complete",
+  "blowout_liquid": "Blow out liquid",
   "choose_blowout_location": "choose blowout location",
   "choose_drop_tip_location": "choose tip-drop location",
   "confirm_blowout_location": "Is the pipette positioned where the liquids should be blown out?",

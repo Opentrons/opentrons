@@ -249,7 +249,7 @@ export const DropTipWizardComponent = (
       })
         .then(data => {})
         .catch((e: Error) =>
-          setErrorMessage(`error issuing jog command: ${e.message}`)
+          setErrorMessage(`Error issuing jog command: ${e.message}`)
         )
     }
   }
@@ -266,7 +266,7 @@ export const DropTipWizardComponent = (
         setShouldDispenseLiquid(shouldDispenseLiquid)
       })
       .catch(e =>
-        setErrorMessage(`error setting up blowout/droptip: ${e.message}`)
+        setErrorMessage(`Error setting up blowout/droptip: ${e.message}`)
       )
   }
 
@@ -307,7 +307,7 @@ export const DropTipWizardComponent = (
       .then(responses => {
         if (responses.length !== commands.length) {
           return Promise.reject(
-            new Error('not all commands executed successfully')
+            new Error('Not all commands executed successfully')
           )
         }
         const currentPosition = (responses[responses.length - 1]
@@ -316,13 +316,13 @@ export const DropTipWizardComponent = (
           return Promise.resolve(currentPosition)
         } else {
           return Promise.reject(
-            new Error('current position could not be saved')
+            new Error('Current position could not be saved')
           )
         }
       })
       .catch(e => {
         setErrorMessage(
-          `error retracting x and y axes or saving position: ${e.message}`
+          `Error retracting x and y axes or saving position: ${e.message}`
         )
         return null
       })
@@ -407,6 +407,16 @@ export const DropTipWizardComponent = (
     currentStep === CHOOSE_BLOWOUT_LOCATION ||
     currentStep === CHOOSE_DROP_TIP_LOCATION
   ) {
+    let bodyTextKey
+    if (currentStep === CHOOSE_BLOWOUT_LOCATION) {
+      bodyTextKey = isOnDevice
+        ? 'select_blowout_slot_odd'
+        : 'select_blowout_slot'
+    } else {
+      bodyTextKey = isOnDevice
+        ? 'select_drop_tip_slot_odd'
+        : 'select_drop_tip_slot'
+    }
     modalContent = (
       <ChooseLocation
         robotType={robotType}
@@ -419,15 +429,7 @@ export const DropTipWizardComponent = (
         body={
           <Trans
             t={t}
-            i18nKey={
-              currentStep === CHOOSE_BLOWOUT_LOCATION
-                ? isOnDevice
-                  ? i18n.format(t('select_blowout_slot_odd'))
-                  : i18n.format(t('select_blowout_slot'))
-                : isOnDevice
-                ? i18n.format(t('select_drop_tip_slot_odd'))
-                : i18n.format(t('select_drop_tip_slot'))
-            }
+            i18nKey={i18n.format(t(bodyTextKey))}
             components={{ block: <StyledText as="p" /> }}
           />
         }
@@ -469,12 +471,12 @@ export const DropTipWizardComponent = (
                 retractAllAxesAndSavePosition()
                   .then(() => proceed())
                   .catch(e =>
-                    setErrorMessage(`error moving to position: ${e.message}`)
+                    setErrorMessage(`Error moving to position: ${e.message}`)
                   )
               })
               .catch(e =>
                 setErrorMessage(
-                  `error issuing ${
+                  `Error issuing ${
                     currentStep === POSITION_AND_BLOWOUT
                       ? 'blowout'
                       : 'drop tip'
@@ -490,10 +492,6 @@ export const DropTipWizardComponent = (
             ? t('position_and_blowout')
             : t('position_and_drop_tip')
         }
-        createdMaintenanceRunId={createdMaintenanceRunId}
-        pipetteId={MANAGED_PIPETTE_ID}
-        instrumentModelSpecs={instrumentModelSpecs}
-        chainRunCommands={chainRunCommands}
         currentStep={currentStep}
         isOnDevice={isOnDevice}
       />
@@ -524,9 +522,9 @@ export const DropTipWizardComponent = (
     )
   }
 
-  let handleExit: (() => void) | undefined = confirmExit
+  let handleExit: (() => void) | null = confirmExit
   if (isRobotMoving || showConfirmExit) {
-    handleExit = undefined
+    handleExit = null
   } else if (errorMessage != null) {
     handleExit = handleCleanUpAndClose
   }

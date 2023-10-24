@@ -71,12 +71,6 @@ export const ChooseLocation = (
     ) {
       const targetX = slotX + xDimension / 2
       const targetY = slotY + yDimension / 2
-      console.log(
-        'MOVE TO selected location: ',
-        selectedLocation,
-        targetX,
-        targetY
-      )
       moveToXYCoordinate(targetX, targetY)
         .then(() => handleProceed())
         .catch(e => setErrorMessage(`${e.message}`))
@@ -84,60 +78,66 @@ export const ChooseLocation = (
   }
 
   if (isRobotMoving) {
-    return (
-      <InProgressModal
-        alternativeSpinner={null}
-        description={t('stand_back_exiting')}
-      />
-    )
+    return <InProgressModal description={t('stand_back_exiting')} />
   }
 
-  return isOnDevice ? (
-    <Flex
-      padding={SPACING.spacing32}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-    >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing48} flex="1">
+  if (isOnDevice) {
+    return (
+      <Flex
+        padding={SPACING.spacing32}
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
         <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          width="100%"
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing48}
           flex="1"
         >
-          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {title}
-          </StyledText>
-          <StyledText as="p">{body}</StyledText>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            width="100%"
+            flex="1"
+          >
+            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {title}
+            </StyledText>
+            <StyledText as="p">{body}</StyledText>
+          </Flex>
+          <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
+            {DeckLocationSelect}
+          </Flex>
         </Flex>
-        <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
-          {DeckLocationSelect}
+        <Flex justifyContent={JUSTIFY_FLEX_END}>
+          <SmallButton
+            buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
+            onClick={handleConfirmPosition}
+          />
         </Flex>
       </Flex>
-      <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <SmallButton
-          buttonText={i18n.format(t('move_to_slot'), 'capitalize')}
-          onClick={handleConfirmPosition}
+    )
+  } else {
+    return (
+      <Flex css={TILE_CONTAINER_STYLE}>
+        <TwoUpTileLayout
+          title={title}
+          body={body}
+          rightElement={DeckLocationSelect}
+          footer={
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_FLEX_END}
+            >
+              {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
+              <PrimaryButton onClick={handleConfirmPosition}>
+                {i18n.format(t('move_to_slot'), 'capitalize')}
+              </PrimaryButton>
+            </Flex>
+          }
         />
       </Flex>
-    </Flex>
-  ) : (
-    <Flex css={TILE_CONTAINER_STYLE}>
-      <TwoUpTileLayout
-        title={title}
-        body={body}
-        rightElement={DeckLocationSelect}
-        footer={
-          <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
-            {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-            <PrimaryButton onClick={handleConfirmPosition}>
-              {i18n.format(t('move_to_slot'), 'capitalize')}
-            </PrimaryButton>
-          </Flex>
-        }
-      />
-    </Flex>
-  )
+    )
+  }
 }
 
 const TILE_CONTAINER_STYLE = css`

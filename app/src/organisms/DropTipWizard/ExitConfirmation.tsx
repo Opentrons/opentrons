@@ -28,10 +28,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
   return isRobotMoving ? (
-    <InProgressModal
-      alternativeSpinner={null}
-      description={t('stand_back_exiting')}
-    />
+    <InProgressModal description={t('stand_back_exiting')} />
   ) : (
     <SimpleWizardBody
       iconColor={COLORS.warningEnabled}

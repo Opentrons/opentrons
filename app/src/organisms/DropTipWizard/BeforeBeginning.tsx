@@ -47,118 +47,125 @@ export const BeforeBeginning = (
     handleCreateAndSetup(flowType === 'liquid_and_tips')
   }
 
-  return isOnDevice ? (
-    <Flex
-      padding={SPACING.spacing32}
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      height="100%"
-    >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex css={TitleODD}>
-          {t('before_you_begin_do_you_want_to_blowout')}
+  if (isOnDevice) {
+    return (
+      <Flex
+        padding={SPACING.spacing32}
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        height="100%"
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex css={ODD_TITLE_STYLE}>
+            {t('before_you_begin_do_you_want_to_blowout')}
+          </Flex>
+          <Flex paddingBottom={SPACING.spacing8}>
+            <MediumButton
+              buttonType={
+                flowType === 'liquid_and_tips' ? 'primary' : 'secondary'
+              }
+              flex="1"
+              onClick={() => setFlowType('liquid_and_tips')}
+              buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
+              justifyContent={JUSTIFY_FLEX_START}
+              paddingLeft={SPACING.spacing24}
+            />
+          </Flex>
+          <Flex>
+            <MediumButton
+              buttonType={flowType === 'only_tips' ? 'primary' : 'secondary'}
+              flex="1"
+              onClick={() => {
+                setFlowType('only_tips')
+              }}
+              buttonText={i18n.format(
+                t('no_proceed_to_drop_tip'),
+                'capitalize'
+              )}
+              justifyContent={JUSTIFY_FLEX_START}
+              paddingLeft={SPACING.spacing24}
+            />
+          </Flex>
         </Flex>
-        <Flex paddingBottom={SPACING.spacing8}>
-          <MediumButton
-            buttonType={
-              flowType === 'liquid_and_tips' ? 'primary' : 'secondary'
-            }
-            flex="1"
-            onClick={() => setFlowType('liquid_and_tips')}
-            buttonText={i18n.format(t('yes_blow_out_liquid'), 'capitalize')}
-            justifyContent={JUSTIFY_FLEX_START}
-            paddingLeft={SPACING.spacing24}
-          />
-        </Flex>
-        <Flex>
-          <MediumButton
-            buttonType={flowType === 'only_tips' ? 'primary' : 'secondary'}
-            flex="1"
-            onClick={() => {
-              setFlowType('only_tips')
-            }}
-            buttonText={i18n.format(t('no_proceed_to_drop_tip'), 'capitalize')}
-            justifyContent={JUSTIFY_FLEX_START}
-            paddingLeft={SPACING.spacing24}
+        <Flex justifyContent={JUSTIFY_FLEX_END}>
+          <SmallButton
+            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+            onClick={handleProceed}
+            disabled={isCreateLoading || flowType == null}
           />
         </Flex>
       </Flex>
-      <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <SmallButton
-          buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-          onClick={handleProceed}
-          disabled={isCreateLoading || flowType == null}
-        />
-      </Flex>
-    </Flex>
-  ) : (
-    <Flex css={TILE_CONTAINER_STYLE}>
-      <Title>{t('before_you_begin_do_you_want_to_blowout')}</Title>
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
-        <Flex
-          flex="1 0 auto"
-          onClick={() => {
-            setFlowType('liquid_and_tips')
-          }}
-          css={
-            flowType === 'liquid_and_tips'
-              ? SELECTED_OPTIONS_STYLE
-              : UNSELECTED_OPTIONS_STYLE
-          }
-        >
+    )
+  } else {
+    return (
+      <Flex css={TILE_CONTAINER_STYLE}>
+        <Title>{t('before_you_begin_do_you_want_to_blowout')}</Title>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           <Flex
-            height="100%"
-            width="100%"
-            position={POSITION_ABSOLUTE}
-            flex="1"
-          />
-          <video
-            css={css`
-              max-width: 11rem;
-            `}
-            autoPlay={true}
-            loop={true}
-            controls={false}
-            aria-label="blowout"
+            flex="1 0 auto"
+            onClick={() => {
+              setFlowType('liquid_and_tips')
+            }}
+            css={
+              flowType === 'liquid_and_tips'
+                ? SELECTED_OPTIONS_STYLE
+                : UNSELECTED_OPTIONS_STYLE
+            }
           >
-            <source src={blowoutVideo} />
-          </video>
-          <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
+            <Flex
+              height="100%"
+              width="100%"
+              position={POSITION_ABSOLUTE}
+              flex="1"
+            />
+            <video
+              css={css`
+                max-width: 11rem;
+              `}
+              autoPlay={true}
+              loop={true}
+              controls={false}
+              aria-label="blowout"
+            >
+              <source src={blowoutVideo} />
+            </video>
+            <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
+          </Flex>
+          <Flex
+            flex="1 0 auto"
+            onClick={() => setFlowType('only_tips')}
+            css={
+              flowType === 'only_tips'
+                ? SELECTED_OPTIONS_STYLE
+                : UNSELECTED_OPTIONS_STYLE
+            }
+          >
+            <video
+              css={css`
+                max-width: 11rem;
+              `}
+              autoPlay={true}
+              loop={true}
+              controls={false}
+              aria-label="droptip"
+            >
+              <source src={droptipVideo} />
+            </video>
+            <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
+          </Flex>
         </Flex>
-        <Flex
-          flex="1 0 auto"
-          onClick={() => setFlowType('only_tips')}
-          css={
-            flowType === 'only_tips'
-              ? SELECTED_OPTIONS_STYLE
-              : UNSELECTED_OPTIONS_STYLE
-          }
-        >
-          <video
-            css={css`
-              max-width: 11rem;
-            `}
-            autoPlay={true}
-            loop={true}
-            controls={false}
-            aria-label="droptip"
+        <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
+          {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
+          <PrimaryButton
+            disabled={isCreateLoading || flowType == null}
+            onClick={handleProceed}
           >
-            <source src={droptipVideo} />
-          </video>
-          <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
+            {i18n.format(t('shared:continue'), 'capitalize')}
+          </PrimaryButton>
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
-        {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-        <PrimaryButton
-          disabled={isCreateLoading || flowType == null}
-          onClick={handleProceed}
-        >
-          {i18n.format(t('shared:continue'), 'capitalize')}
-        </PrimaryButton>
-      </Flex>
-    </Flex>
-  )
+    )
+  }
 }
 
 const UNSELECTED_OPTIONS_STYLE = css`
@@ -225,7 +232,7 @@ const Title = styled.h1`
   }
 `
 
-const TitleODD = css`
+const ODD_TITLE_STYLE = css`
   ${TYPOGRAPHY.level4HeaderSemiBold}
   margin-bottom: ${SPACING.spacing16};
 `
