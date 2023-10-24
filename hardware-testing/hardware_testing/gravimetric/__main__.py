@@ -581,6 +581,15 @@ if __name__ == "__main__":
         )
         sleep(1)
     try:
+        if not args.photometric:
+            graph_process = subprocess.Popen(
+                [
+                    "python3",
+                    "hardware_testing.tools.plot",
+                    "--test-name",
+                    f"{run_args.name}",
+                ]
+            )
         if not run_args.ctx.is_simulating() and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
@@ -591,6 +600,8 @@ if __name__ == "__main__":
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
             _main(args, run_args, tip, volumes)
     finally:
+        if not args.photometric:
+            graph_process.terminate()
         if run_args.recorder is not None:
             ui.print_info("ending recording")
             run_args.recorder.stop()
