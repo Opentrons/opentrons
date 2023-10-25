@@ -80,7 +80,7 @@ class Poller:
         try:
             waiter.set_result(None) if e is None else waiter.set_exception(e)
         except asyncio.InvalidStateError:
-            log.warn("Poller waiter was already cancelled")
+            log.warning("Poller waiter was already cancelled")
 
     async def _poll_once(self) -> None:
         """Trigger a single read, notifying listeners of success or error."""
