@@ -27,10 +27,8 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
 )
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
-    PickUpTipSpec,
-    TipMotorPickUpTipSpec,
-    DropTipMove,
-    DropTipSpec,
+    TipActionSpec,
+    TipActionMoveSpec,
 )
 from opentrons.hardware_control.types import (
     OT3Mount,
@@ -1393,32 +1391,23 @@ async def test_pick_up_tip_full_tiprack(
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
 
-    def _fake_function():
-        return None
-
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
         backend._gear_motor_position = {NodeId: 0}
-        pipette_handler.plan_check_pick_up_tip.return_value = (
-            PickUpTipSpec(
-                plunger_prep_pos=0,
-                plunger_currents={
-                    Axis.of_main_tool_actuator(Mount.LEFT): 0,
-                },
-                presses=[],
-                shake_off_list=[],
-                retract_target=0,
-                pick_up_motor_actions=TipMotorPickUpTipSpec(
+        pipette_handler.plan_ht_pick_up_tip.return_value = TipActionSpec(
+            shake_off_moves=[],
+            tip_action_moves=[
+                TipActionMoveSpec(
                     # Move onto the posts
-                    tiprack_down=Point(0, 0, 0),
-                    tiprack_up=Point(0, 0, 0),
-                    pick_up_distance=10,
+                    distance=10,
                     speed=0,
-                    currents={Axis.Q: 0},
-                ),
-            ),
-            _fake_function,
+                    currents={
+                        Axis.of_main_tool_actuator(Mount.LEFT): 0,
+                        Axis.Q: 0,
+                    },
+                )
+            ],
         )
 
         def _update_gear_motor_pos(
@@ -1439,9 +1428,7 @@ async def test_pick_up_tip_full_tiprack(
         tip_action.side_effect = _update_gear_motor_pos
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
-        pipette_handler.plan_check_pick_up_tip.assert_called_once_with(
-            OT3Mount.LEFT, 40.0, None, None
-        )
+        pipette_handler.plan_ht_pick_up_tip.assert_called_once_with()
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up
@@ -1459,28 +1446,26 @@ async def test_drop_tip_full_tiprack(
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
 
-    def _fake_function():
-        return None
-
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
         backend._gear_motor_position = {NodeId.pipette_left: 0}
-        pipette_handler.plan_check_drop_tip.return_value = (
-            DropTipSpec(
-                drop_moves=[
-                    DropTipMove(
-                        target_position=10,
-                        current={Axis.P_L: 1.0},
-                        speed=1,
-                        is_ht_tip_action=True,
-                    )
-                ],
-                shake_moves=[],
-                ending_current={Axis.P_L: 1.0},
-            ),
-            _fake_function,
+        pipette_handler.plan_ht_drop_tip.return_value = TipActionSpec(
+            tip_action_moves=[
+                TipActionMoveSpec(
+                    distance=10,
+                    speed=1,
+                    currents={Axis.P_L: 1.0},
+                ),
+            ],
+            shake_off_moves=[],
         )
+
+        def set_mock_plunger_configs() -> None:
+            mock_instr = pipette_handler.get_pipette(Mount.LEFT)
+            mock_instr.backlash_distance = 0.1
+            mock_instr.config.plunger_homing_configurations.current = 1.0
+            mock_instr.plunger_positions.bottom = -18.5
 
         def _update_gear_motor_pos(
             moves: Optional[List[Move[Axis]]] = None,
@@ -1500,10 +1485,11 @@ async def test_drop_tip_full_tiprack(
                 backend._gear_motor_position[NodeId.pipette_left] += distance
 
         tip_action.side_effect = _update_gear_motor_pos
+        set_mock_plunger_configs()
 
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
-        pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
+        pipette_handler.plan_ht_drop_tip.assert_called_once_with()
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up

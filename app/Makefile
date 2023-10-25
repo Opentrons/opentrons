@@ -9,12 +9,23 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # dev server port
 PORT ?= 8090
 
+# Path of source package
+SRC_PATH = app
+
 OPENTRONS_PROJECT ?= robot-stack
 
 # dependency directories for dev
 shell_dir := ../app-shell
 shell_odd_dir := ../app-shell-odd
 discovery_client_dir := ../discovery-client
+
+# These variables can be overriden when make is invoked to customize the
+# behavior of jest. For instance,
+# make test tests=src/pages/Labware/__tests__/hooks.test.tsx would run only the
+# specified test
+tests ?=
+cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app/src/**/*.(js|ts|tsx)'
+test_opts ?=
 
 # standard targets
 #####################################################################
@@ -77,3 +88,11 @@ dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd:
 	wait-on http-get://localhost:$(PORT)
 	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
+
+.PHONY: test
+test:
+	make -C .. test-js-app tests="$(tests)" test_opts="$(test_opts)"
+
+.PHONY: test-cov
+test-cov:
+	make -C .. test-js-app tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

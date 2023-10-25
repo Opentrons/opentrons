@@ -236,11 +236,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     pipetteSpecs={pipetteModelSpecs}
                     mount={mount}
                     //  pipette images for Flex are slightly smaller so need to be scaled accordingly
-                    transform={isFlex ? 'scale(0.4)' : 'scale(0.3)'}
-                    size="3.125rem"
-                    transformOrigin={isFlex ? '-50% -10%' : '20% -10%'}
-                    width="100%"
-                    height="100%"
+                    transform="scale(0.3)"
+                    transformOrigin={isFlex ? '-10% 52%' : '20% 52%'}
                   />
                 ) : null}
               </Flex>

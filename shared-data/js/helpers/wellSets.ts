@@ -11,10 +11,10 @@
 // A 384 plate has 48 well sets, 2 for each column b/c it has staggered columns.
 //
 // If a labware has no possible well sets, then it is not compatible with multi-channel pipettes.
-import { getLabwareDefURI } from '.'
 import uniq from 'lodash/uniq'
 
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
+import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
 import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
 
 type WellSetByPrimaryWell = string[][]
@@ -27,8 +27,12 @@ function _getAllWellSetsForLabware(
 
   return allWells.reduce(
     (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
-      const wellSet = getWellNamePerMultiTip(labwareDef, well)
-      return wellSet === null ? acc : [...acc, wellSet]
+      const wellSet = getWellNamePerMultiTip(labwareDef, well, 8)
+      if (wellSet === null) {
+        return acc
+      } else {
+        return [...acc, wellSet]
+      }
     },
     []
   )
@@ -42,7 +46,8 @@ export interface WellSetHelpers {
 
   getWellSetForMultichannel: (
     labwareDef: LabwareDefinition2,
-    well: string
+    well: string,
+    channels: 8 | 96
   ) => string[] | null | undefined
 
   canPipetteUseLabware: (
@@ -82,16 +87,38 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
   const getWellSetForMultichannel = (
     labwareDef: LabwareDefinition2,
-    well: string
+    well: string,
+    channels: 8 | 96
   ): string[] | null | undefined => {
     /** Given a well for a labware, returns the well set it belongs to (or null)
      * for 8-channel access.
      * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
      * Or A1 for trough => ['A1', 'A1', 'A1', ...]
      **/
-    const allWellSets = getAllWellSetsForLabware(labwareDef)
+    const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
+    /**  getting all wells from the plate and turning into 1D array for 96-channel
+     */
+    const orderedWellsFor96Channel = orderWells(
+      labwareDef.ordering,
+      't2b',
+      'l2r'
+    )
 
-    return allWellSets.find((wellSet: string[]) => wellSet.includes(well))
+    let ninetySixChannelWells = orderedWellsFor96Channel
+    /**  special casing 384 well plates to be every other well
+     * both on the x and y ases.
+     */
+    if (orderedWellsFor96Channel.length === 384) {
+      ninetySixChannelWells = get96Channel384WellPlateWells(
+        orderedWellsFor96Channel,
+        well
+      )
+    }
+    return channels === 8
+      ? allWellSetsFor8Channel.find((wellSet: string[]) =>
+          wellSet.includes(well)
+        )
+      : ninetySixChannelWells
   }
 
   const canPipetteUseLabware = (
@@ -108,14 +135,13 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       const uniqueWells = uniq(wellSet)
       // if all wells are non-null, and there are either 1 (reservoir-like)
       // or 8 (well plate-like) unique wells in the set,
-      // then assume multi-channel will work
+      // then assume both 8 and 96 channel pipettes will work
       return (
         uniqueWells.every(well => well != null) &&
         [1, 8].includes(uniqueWells.length)
       )
     })
   }
-
   return {
     getAllWellSetsForLabware,
     getWellSetForMultichannel,
