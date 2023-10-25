@@ -13,13 +13,13 @@ from opentrons_shared_data.labware.labware_definition import (
     WellDefinition,
 )
 from opentrons_shared_data.deck.deck_definitions import (
-    CutoutFixture,
+    DeckDefinition,
 )
 from .json_protocol import Model as JsonProtocol
 
 __all__ = [
     "LabwareDefinition",
     "WellDefinition",
-    "CutoutFixture",
+    "DeckDefinition",
     "JsonProtocol",
 ]

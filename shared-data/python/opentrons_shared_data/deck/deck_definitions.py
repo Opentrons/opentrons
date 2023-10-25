@@ -181,7 +181,7 @@ class GripperOffsets(BaseModel):
     default: Default
 
 
-class Deck(BaseModel):
+class DeckDefinition(BaseModel):
     class Config:
         extra = Extra.forbid
 

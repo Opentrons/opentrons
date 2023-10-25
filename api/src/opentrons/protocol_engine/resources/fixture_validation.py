@@ -2,8 +2,7 @@
 
 from typing import List
 
-from opentrons_shared_data.deck.deck_definitions import Locations
-from opentrons.protocols.models import CutoutFixture
+from opentrons_shared_data.deck.deck_definitions import Locations, CutoutFixture
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 
 
