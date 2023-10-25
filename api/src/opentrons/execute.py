@@ -315,12 +315,33 @@ def execute(  # noqa: C901
     :param log_level: The level of logs to emit on the command line:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
-    :param emit_runlog: A callback for printing the runlog. If specified, this
-                        will be called whenever a command adds an entry to the
-                        runlog, which can be used for display and progress
-                        estimation. If specified, the callback should take a
-                        single argument (the name doesn't matter) which will
-                        be a dictionary (see below). Default: ``None``
+    :param emit_runlog: A callback for printing the run log. If specified, this
+        will be called whenever a command adds an entry to the
+        run log, which can be used for display and progress
+        estimation. If specified, the callback should take a
+        single argument (the name doesn't matter) which will
+        be a dictionary:
+
+        .. code-block:: python
+
+          {
+            'name': command_name,
+            'payload': {
+              'text': string_command_text,
+              # The rest of this struct is
+              # command-dependent; see
+              # opentrons.commands.commands.
+             }
+          }
+
+        .. note::
+          In older software versions, ``payload["text"]`` was a
+          `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
+          To get human-readable text, you had to do ``payload["text"].format(**payload)``.
+          Don't do that anymore. If ``payload["text"]`` happens to contain any
+          ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
+          ``KeyError``.
+
     :param custom_labware_paths: A list of directories to search for custom labware.
                                  Loads valid labware from these paths and makes them available
                                  to the protocol context. If this is ``None`` (the default), and
@@ -333,22 +354,6 @@ def execute(  # noqa: C901
                               non-recursive contents of specified directories
                               are presented by the protocol context in
                               ``ProtocolContext.bundled_data``.
-
-    The format of the runlog entries is as follows:
-
-    .. code-block:: python
-
-        {
-            'name': command_name,
-            'payload': {
-                 'text': string_command_text,
-                  # The rest of this struct is command-dependent; see
-                  # opentrons.commands.commands. Its keys match format
-                  # keys in 'text', so that
-                  # entry['payload']['text'].format(**entry['payload'])
-                  # will produce a string with information filled in
-             }
-        }
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs

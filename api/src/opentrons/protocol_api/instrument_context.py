@@ -1317,7 +1317,7 @@ class InstrumentContext(publisher.CommandPublisher):
                       individual axis speeds, you can use
                       :py:obj:`.ProtocolContext.max_speeds`.
         :param publish: Whether a call to this function should publish to the
-                        runlog or not.
+                        run log or not.
         """
         publish_ctx = nullcontext()
 
