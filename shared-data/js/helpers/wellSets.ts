@@ -41,8 +41,7 @@ function _getAllWellSetsForLabware(
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
 export interface WellSetHelpers {
   getAllWellSetsForLabware: (
-    labwareDef: LabwareDefinition2,
-    channels: 8 | 96
+    labwareDef: LabwareDefinition2
   ) => WellSetByPrimaryWell
 
   getWellSetForMultichannel: (

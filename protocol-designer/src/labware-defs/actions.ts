@@ -11,7 +11,6 @@ import {
   OPENTRONS_LABWARE_NAMESPACE,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { getPipetteEntities } from '../step-forms/selectors'
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
 import type { ThunkAction } from '../types'
@@ -76,15 +75,14 @@ const _labwareDefsMatchingDisplayName = (
 
 const getIsOverwriteMismatched = (
   newDef: LabwareDefinition2,
-  overwrittenDef: LabwareDefinition2,
-  channel: 8 | 96
+  overwrittenDef: LabwareDefinition2
 ): boolean => {
   const matchedWellOrdering = isEqual(newDef.ordering, overwrittenDef.ordering)
   const matchedMultiUse =
     matchedWellOrdering &&
     isEqual(
-      getAllWellSetsForLabware(newDef, channel),
-      getAllWellSetsForLabware(overwrittenDef, channel)
+      getAllWellSetsForLabware(newDef),
+      getAllWellSetsForLabware(overwrittenDef)
     )
   return !(matchedWellOrdering && matchedMultiUse)
 }
@@ -100,8 +98,6 @@ const _createCustomLabwareDef: (
   const allLabwareDefs = values(
     labwareDefSelectors.getLabwareDefsByURI(getState())
   )
-  const pipetteEntities = values(getPipetteEntities(getState()))
-  const has96Channel = pipetteEntities.some(pip => pip.spec.channels === 96)
   // @ts-expect-error(sa, 2021-6-20): null check
   const file = event.currentTarget.files[0]
   const reader = new FileReader()
@@ -202,8 +198,7 @@ const _createCustomLabwareDef: (
           isOverwriteMismatched: getIsOverwriteMismatched(
             // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
             parsedLabwareDef,
-            matchingDefs[0],
-            has96Channel ? 96 : 8
+            matchingDefs[0]
           ),
         })
       )
