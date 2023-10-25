@@ -33,6 +33,7 @@ import {
 import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
 import wasteChuteImage from '../../../images/waste_chute.png'
+import trashBinImage from '../../../images/flex_trash_bin.png'
 import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { CrashInfoBox, ModuleDiagram } from '../../modules'
@@ -300,10 +301,9 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
           <EquipmentOption
             onClick={() => handleSetEquipmentOption('trashBin')}
             isSelected={values.additionalEquipment.includes('trashBin')}
-            //  todo(jr, 9/14/23): update the asset with trash bin
             image={
               <AdditionalItemImage
-                src={gripperImage}
+                src={trashBinImage}
                 alt="Opentrons Trash Bin"
               />
             }

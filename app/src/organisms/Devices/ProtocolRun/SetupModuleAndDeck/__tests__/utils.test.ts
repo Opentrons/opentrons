@@ -51,5 +51,9 @@ describe('getFixtureImage', () => {
     const result = getFixtureImage('wasteChute')
     expect(result).toEqual('waste_chute.png')
   })
+  it('should render the trash binimage', () => {
+    const result = getFixtureImage('trashBin')
+    expect(result).toEqual('flex_trash_bin.png')
+  })
   //  TODO(jr, 10/17/23): add rest of the test cases when we add the assets
 })

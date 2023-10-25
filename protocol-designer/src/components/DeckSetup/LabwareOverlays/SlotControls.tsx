@@ -1,17 +1,16 @@
 import assert from 'assert'
 import * as React from 'react'
-import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
-import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
-import cx from 'classnames'
 import { connect } from 'react-redux'
 import noop from 'lodash/noop'
+import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import cx from 'classnames'
+import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../../utils/labwareModuleCompatibility'
-import { BlockedSlot } from './BlockedSlot'
 import {
   moveDeckItem,
   openAddLabwareModal,
@@ -21,13 +20,14 @@ import {
   selectors as labwareDefSelectors,
 } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
+import { BlockedSlot } from './BlockedSlot'
 
-import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
-import {
+import type {
   DeckSlot as DeckSlotDefinition,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 interface DNDP {

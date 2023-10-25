@@ -18,6 +18,7 @@ from opentrons.protocols import labware as labware_definition
 from ...labware import Labware
 from ..._liquid import Liquid
 from ..._types import OffDeckType
+from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -252,6 +253,7 @@ class LegacyProtocolCore(
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
+            WasteChute,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,

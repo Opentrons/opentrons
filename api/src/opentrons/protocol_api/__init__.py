@@ -14,7 +14,6 @@ from .protocol_context import ProtocolContext
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
-from ._types import OFF_DECK
 from .module_contexts import (
     ModuleContext,
     ThermocyclerContext,
@@ -24,6 +23,8 @@ from .module_contexts import (
     MagneticBlockContext,
 )
 from ._liquid import Liquid
+from ._types import OFF_DECK
+from ._waste_chute import WasteChute
 
 from .create_protocol_context import (
     create_protocol_context,
@@ -44,6 +45,7 @@ __all__ = [
     "HeaterShakerContext",
     "MagneticBlockContext",
     "Labware",
+    "WasteChute",
     "Well",
     "Liquid",
     "OFF_DECK",

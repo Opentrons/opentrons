@@ -17,7 +17,11 @@ import { useRunQuery, useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLPCSuccessToast } from '../../hooks/useLPCSuccessToast'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useLPCDisabledReason, useStoredProtocolAnalysis } from '../../hooks'
+import {
+  useRobotType,
+  useLPCDisabledReason,
+  useStoredProtocolAnalysis,
+} from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
@@ -36,6 +40,7 @@ export function SetupLabwarePositionCheck(
   const { robotName, runId, expandLabwareStep } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
+  const robotType = useRobotType(robotName)
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
@@ -73,7 +78,7 @@ export function SetupLabwarePositionCheck(
 
   const { setIsShowingLPCSuccessToast } = useLPCSuccessToast()
 
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId, protocolName)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
   const nonIdentityOffsets = getLatestCurrentOffsets(sortedOffsets)
 

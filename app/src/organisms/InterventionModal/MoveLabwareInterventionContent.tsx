@@ -221,7 +221,10 @@ export function MoveLabwareInterventionContent({
                     .filter(l => l.labwareId !== command.params.labwareId)
                     .map(({ x, y, labwareDef, labwareId }) => (
                       <g key={labwareId} transform={`translate(${x},${y})`}>
-                        <LabwareRender definition={labwareDef} />
+                        {labwareDef != null &&
+                        labwareId !== command.params.labwareId ? (
+                          <LabwareRender definition={labwareDef} />
+                        ) : null}
                       </g>
                     ))}
                 </>

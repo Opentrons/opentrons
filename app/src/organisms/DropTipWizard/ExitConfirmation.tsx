@@ -27,18 +27,12 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   const flowTitle = t('drop_tips')
   const isOnDevice = useSelector(getIsOnDevice)
 
-  if (isRobotMoving)
-    return (
-      <InProgressModal
-        description={t('shared:stand_back_robot_is_in_motion')}
-      />
-    )
-
-  return (
+  return isRobotMoving ? (
+    <InProgressModal description={t('stand_back_exiting')} />
+  ) : (
     <SimpleWizardBody
       iconColor={COLORS.warningEnabled}
-      header={t('progress_will_be_lost', { flow: flowTitle })}
-      subHeader={t('are_you_sure_exit', { flow: flowTitle })}
+      header={t('exit_screen_title', { flow: flowTitle })}
       isSuccess={false}
     >
       {isOnDevice ? (

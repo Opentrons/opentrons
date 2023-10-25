@@ -1,4 +1,4 @@
-import { FLEX_ROBOT_TYPE, getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { mockTipRackDef } from './mockTipRackDef'
 import { mockLabwareDef } from './mockLabwareDef'
 
@@ -32,7 +32,6 @@ export const mockCompletedAnalysis: CompletedProtocolAnalysis = {
   ],
   modules: [],
   liquids: [],
-  robotType: FLEX_ROBOT_TYPE,
   commands: [
     {
       commandType: 'loadLabware',
