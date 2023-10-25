@@ -55,18 +55,17 @@ _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
 
 
 class InstrumentContext(publisher.CommandPublisher):
-    """A context for a specific pipette or instrument.
+    """
+       The InstrumentContext class in the Opentrons Python API (PAPI) provides the objects,
+       attributes, and methods that allow you to use pipettes and other instruments in your
+       protocols. Similar to other class containers, InstrumentContext is temporary.
+       Class objects only exist when instantiated in your Python protocol.
 
-    This can be used to call methods related to pipettes - moves or
-    aspirates or dispenses, or higher-level methods.
+       This class also includes action methods (e.g., ``aspirate()`` and ``distribute()``).
+       We’ve included and defined many of these here for convenience.
 
-    Instances of this class bundle up state and config changes to a
-    pipette - for instance, changes to flow rates or trash containers.
-    Action methods (like :py:meth:`aspirate` or :py:meth:`distribute`) are
-    defined here for convenience.
-
-    In general, this class should not be instantiated directly; rather,
-    instances are returned from :py:meth:`ProtocolContext.load_instrument`.
+       Finally, objects in this class should not be instantiated directly. Instead,
+       instances are returned by :py:meth:`ProtocolContext.load_instrument`.
 
     .. versionadded:: 2.0
 
