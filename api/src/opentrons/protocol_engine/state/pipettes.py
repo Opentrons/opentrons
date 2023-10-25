@@ -37,6 +37,7 @@ from ..commands import (
     thermocycler,
     heater_shaker,
     CommandPrivateResult,
+    PrepareForAspirateResult,
 )
 from ..commands.configuring_common import PipetteConfigUpdateResultMixin
 from ..actions import (
@@ -220,6 +221,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         elif isinstance(command.result, BlowOutResult):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
+
+        elif isinstance(command.result, PrepareForAspirateResult):
+            pipette_id = command.params.pipetteId
+            self._state.aspirated_volume_by_id[pipette_id] = 0
 
     def _update_current_well(self, command: Command) -> None:
         # These commands leave the pipette in a new well.

@@ -46,6 +46,7 @@ from .command_fixtures import (
     create_move_labware_command,
     create_move_to_coordinates_command,
     create_move_relative_command,
+    create_prepare_for_aspirate_command,
 )
 
 
@@ -855,3 +856,40 @@ def test_homing_commands_clear_deck_point(
     assert subject.state.current_deck_point == CurrentDeckPoint(
         mount=None, deck_point=None
     )
+
+
+@pytest.mark.parametrize(
+    "previous",
+    [
+        create_blow_out_command(pipette_id="pipette-id", flow_rate=1.0),
+        create_dispense_command(pipette_id="pipette-id", volume=10, flow_rate=1.0),
+    ],
+)
+def test_prepare_for_aspirate_marks_pipette_ready(
+    subject: PipetteStore, previous: cmd.Command
+) -> None:
+    """It should mark a pipette as ready to aspirate."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P50_MULTI_FLEX,
+        mount=MountType.LEFT,
+    )
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="pipette-id", tip_volume=42, tip_length=101, tip_diameter=8.0
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=load_pipette_command)
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=pick_up_tip_command)
+    )
+
+    subject.handle_action(UpdateCommandAction(private_result=None, command=previous))
+
+    prepare_for_aspirate_command = create_prepare_for_aspirate_command(
+        pipette_id="pipette-id"
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=prepare_for_aspirate_command)
+    )
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0.0
