@@ -11,11 +11,11 @@ import {
   OPENTRONS_LABWARE_NAMESPACE,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import { getPipetteEntities } from '../step-forms/selectors'
+import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
-import { getAllWellSetsForLabware, getHas96Channel } from '../utils'
 import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
-import { getPipetteEntities } from '../step-forms/selectors'
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage
@@ -94,14 +94,14 @@ const _createCustomLabwareDef: (
 ) => (
   event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
-  const allLabwareDefs: LabwareDefinition2[] = values(
-    labwareDefSelectors.getLabwareDefsByURI(getState())
-  )
-  const pipetteEntities = getPipetteEntities(getState())
-  const has96Channel = getHas96Channel(pipetteEntities)
-  const customLabwareDefs: LabwareDefinition2[] = values(
+  const customLabwareDefs = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
   )
+  const allLabwareDefs = values(
+    labwareDefSelectors.getLabwareDefsByURI(getState())
+  )
+  const pipetteEntities = values(getPipetteEntities(getState()))
+  const has96Channel = pipetteEntities.some(pip => pip.spec.channels === 96)
   // @ts-expect-error(sa, 2021-6-20): null check
   const file = event.currentTarget.files[0]
   const reader = new FileReader()

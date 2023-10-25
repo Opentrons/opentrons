@@ -21,8 +21,7 @@ type WellSetByPrimaryWell = string[][]
 
 // Compute all well sets for a labware def (non-memoized)
 function _getAllWellSetsForLabware(
-  labwareDef: LabwareDefinition2,
-  channels: 8 | 96
+  labwareDef: LabwareDefinition2
 ): WellSetByPrimaryWell {
   const allWells: string[] = Object.keys(labwareDef.wells)
 
@@ -67,8 +66,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
   }> = {}
 
   const getAllWellSetsForLabware = (
-    labwareDef: LabwareDefinition2,
-    channels: 8 | 96
+    labwareDef: LabwareDefinition2
   ): WellSetByPrimaryWell => {
     const labwareDefURI = getLabwareDefURI(labwareDef)
     const c = cache[labwareDefURI]
@@ -79,7 +77,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       return c.wellSetByPrimaryWell
     }
 
-    const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef, channels)
+    const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
 
     cache[labwareDefURI] = {
       labwareDef,
@@ -98,10 +96,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
      * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
      * Or A1 for trough => ['A1', 'A1', 'A1', ...]
      **/
-    const allWellSetsFor8Channel = getAllWellSetsForLabware(
-      labwareDef,
-      channels
-    )
+    const allWellSetsFor8Channel = getAllWellSetsForLabware(labwareDef)
     /**  getting all wells from the plate and turning into 1D array for 96-channel
      */
     const orderedWellsFor96Channel = orderWells(
@@ -136,7 +131,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
       return true
     }
 
-    const allWellSets = getAllWellSetsForLabware(labwareDef, 8)
+    const allWellSets = getAllWellSetsForLabware(labwareDef)
     return allWellSets.some(wellSet => {
       const uniqueWells = uniq(wellSet)
       // if all wells are non-null, and there are either 1 (reservoir-like)
