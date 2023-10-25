@@ -155,7 +155,7 @@ async def create_run(
         run_data_manager: Current run data management.
         run_id: Generated ID to assign to the run.
         created_at: Timestamp to attach to created run.
-        protocol_run_is_terminal: Whether a protocol run is in a terminal state.
+        is_ok_to_create_maintenance_run: Verify if a maintenance run may be created if a protocol run exists.
         check_estop: Dependency to verify the estop is in a valid state.
     """
     if not is_ok_to_create_maintenance_run:
