@@ -52,7 +52,6 @@ export interface VectorOffset {
   y: number
   z: number
 }
-
 export interface LabwareOffset {
   id: string
   createdAt: string
