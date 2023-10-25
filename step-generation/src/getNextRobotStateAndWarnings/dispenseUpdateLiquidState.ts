@@ -49,7 +49,6 @@ export function dispenseUpdateLiquidState(
     'in dispenseUpdateLiquidState, either volume or useFullVolume are required'
   )
   const { wellsForTips, allWellsShared } = getWellsForTips(
-    // @ts-expect-error 96 channels not yet supported
     pipetteSpec.channels,
     labwareDef,
     wellName

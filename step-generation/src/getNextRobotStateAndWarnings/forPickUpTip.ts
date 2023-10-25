@@ -32,5 +32,13 @@ export function forPickUpTip(
     allWells.forEach(function (wellName) {
       tipState.tipracks[labwareId][wellName] = false
     })
+  } else if (pipetteSpec.channels === 96) {
+    const allTips: string[] = tiprackDef.ordering.reduce(
+      (acc, wells) => acc.concat(wells),
+      []
+    )
+    allTips.forEach(function (wellName) {
+      tipState.tipracks[labwareId][wellName] = false
+    })
   }
 }

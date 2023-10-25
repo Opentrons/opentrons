@@ -1,11 +1,11 @@
 import assert from 'assert'
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
-import { orderWells } from './utils/orderWells'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import {
   getTiprackVolume,
   THERMOCYCLER_MODULE_TYPE,
+  orderWells,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -36,18 +36,20 @@ export function _getNextTip(args: {
   const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
-
   if (pipetteChannels === 1) {
     const well = orderedWells.find(hasTip)
     return well || null
   }
 
   if (pipetteChannels === 8) {
-    // Otherwise, pipetteChannels === 8.
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
     const fullColumn = tiprackColumns.find(col => col.every(hasTip))
     return fullColumn != null ? fullColumn[0] : null
+  }
+  if (pipetteChannels === 96) {
+    const allWellsHaveTip = orderedWells.every(hasTip)
+    return allWellsHaveTip ? orderedWells[0] : null
   }
 
   assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
