@@ -19,6 +19,8 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
+from ..._waste_chute import WasteChute
+
 from ..instrument import AbstractInstrument
 
 from ..legacy.legacy_well_core import LegacyWellCore
@@ -247,6 +249,11 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                 _log.warning(
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
+
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        raise APIVersionError("Waste chutes are not supported in this PAPI version.")
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)

@@ -46,6 +46,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -436,6 +437,20 @@ class ProtocolContext(CommandPublisher):
             location=location,
         )
 
+    @requires_version(2, 16)
+    # TODO: Confirm official naming of "waste chute".
+    def load_waste_chute(
+        self,
+        *,
+        # TODO: Confirm official naming of "staging area slot".
+        with_staging_area_slot_d4: bool = False,
+    ) -> WasteChute:
+        if with_staging_area_slot_d4:
+            raise NotImplementedError(
+                "The waste chute staging area slot is not currently implemented."
+            )
+        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+
     @requires_version(2, 15)
     def load_adapter(
         self,
@@ -539,7 +554,9 @@ class ProtocolContext(CommandPublisher):
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, Labware, ModuleTypes, OffDeckType],
+        new_location: Union[
+            DeckLocation, Labware, ModuleTypes, OffDeckType, WasteChute
+        ],
         use_gripper: bool = False,
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
@@ -581,10 +598,10 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[ModuleCore, LabwareCore, OffDeckType, DeckSlotName]
+        location: Union[ModuleCore, LabwareCore, WasteChute, OffDeckType, DeckSlotName]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
-        elif isinstance(new_location, OffDeckType):
+        elif isinstance(new_location, (OffDeckType, WasteChute)):
             location = new_location
         else:
             location = validation.ensure_and_convert_deck_slot(
