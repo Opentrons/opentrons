@@ -2027,7 +2027,7 @@ class OT3API(
         # can verify if a tip is properly attached
         if spec.ending_z_retract_distance:
             await self.move_rel(
-                realmount, top_types.Point(spec.ending_z_retract_distance)
+                realmount, top_types.Point(z=spec.ending_z_retract_distance)
             )
 
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
@@ -2378,7 +2378,7 @@ class OT3API(
 
         if not probe_settings:
             probe_settings = self.config.liquid_sense
-        mount_axis = OT3Axis.by_mount(mount)
+        mount_axis = Axis.by_mount(mount)
 
         # homes plunger then moves it to bottom of axis
         if probe_settings.aspirate_while_sensing:
