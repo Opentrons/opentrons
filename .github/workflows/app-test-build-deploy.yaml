@@ -85,7 +85,7 @@ jobs:
           make setup-js
       - name: 'test frontend packages'
         run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="app/src/**/*.(js|ts|tsx)" app/src components/src shared-data/js
+          make -C app test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
@@ -141,8 +141,7 @@ jobs:
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src app-shell-odd/src discovery-client/src
+        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
@@ -315,7 +314,8 @@ jobs:
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
+    needs:
+      ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     steps:
       - name: 'download run app builds'
@@ -401,7 +401,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         with:
-          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ needs.determine-build-type.outputs.type }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}\"}"
+          payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}"}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
@@ -409,7 +409,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         with:
-          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ needs.determine-build-type.outputs.type }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}\"}"
+          payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}"}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}

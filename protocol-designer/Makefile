@@ -11,6 +11,12 @@ export NODE_OPTIONS := --openssl-legacy-provider
 
 benchmark_output := $(shell node -e 'console.log(new Date());')
 
+# These variables can be overriden when make is invoked to customize the
+# behavior of jest
+tests ?=
+cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='protocol-designer/src/**/*.(js|ts|tsx)'
+test_opts ?=
+
 # standard targets
 #####################################################################
 
@@ -60,3 +66,11 @@ test-e2e:
 	concurrently --no-color --kill-others --success first --names "protocol-designer-server,protocol-designer-tests" \
 	"$(MAKE) dev CYPRESS=1" \
 	"wait-on http://localhost:8080/ && cypress run --browser chrome --headless --record false"
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-protocol-designer tests="$(tests)" test_opts="$(test_opts)"
+
+.PHONY: test-cov
+test-cov:
+	make -C .. test-js-protocol-designer tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

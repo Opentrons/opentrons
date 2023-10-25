@@ -15,8 +15,10 @@ export const determineMultiChannelSupport = (
 
   // allow multichannel pipette options only if
   // all 8 channels fit into the first column correctly
+  // TODO(Jr, 9/25/23): support 96-channel in labware creator then plug in
+  // channels below in getWellNamePerMultiTip
   const multiChannelTipsFirstColumn =
-    def !== null ? getWellNamePerMultiTip(def, 'A1') : null
+    def !== null ? getWellNamePerMultiTip(def, 'A1', 8) : null
 
   const allowMultiChannel =
     multiChannelTipsFirstColumn !== null &&

@@ -94,6 +94,8 @@ const WIZARD_STEPS_OT2: WizardStep[] = [
   'second_pipette_tips',
   'modulesAndOther',
 ]
+export const adapter96ChannelDefUri =
+  'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 export function CreateFileWizard(): JSX.Element | null {
   const { t } = useTranslation()
@@ -265,6 +267,10 @@ export function CreateFileWizard(): JSX.Element | null {
         dispatch(
           labwareIngredActions.createContainer({
             labwareDefURI: tiprackDefURI,
+            adapterUnderLabwareDefURI:
+              values.pipettesByMount.left.pipetteName === 'p1000_96'
+                ? adapter96ChannelDefUri
+                : undefined,
           })
         )
       })

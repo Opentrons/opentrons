@@ -8,6 +8,7 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MoveLabwareCreateCommand,
+  RobotType,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -30,6 +31,7 @@ interface ReturnTipProps extends ReturnTipStep {
   setFatalError: (errorMessage: string) => void
   tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
+  robotType: RobotType
 }
 export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])

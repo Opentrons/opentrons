@@ -5,7 +5,7 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
-import { AddDeckConfigurationModal } from '../AddDeckConfigurationModal'
+import { AddFixtureModal } from '../AddFixtureModal'
 
 jest.mock('@opentrons/react-api-client')
 const mockSetShowAddFixtureModal = jest.fn()
@@ -15,16 +15,14 @@ const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutatio
   typeof useUpdateDeckConfigurationMutation
 >
 
-const render = (
-  props: React.ComponentProps<typeof AddDeckConfigurationModal>
-) => {
-  return renderWithProviders(<AddDeckConfigurationModal {...props} />, {
+const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
+  return renderWithProviders(<AddFixtureModal {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('Touchscreen AddDeckConfigurationModal', () => {
-  let props: React.ComponentProps<typeof AddDeckConfigurationModal>
+describe('Touchscreen AddFixtureModal', () => {
+  let props: React.ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
     props = {
@@ -52,8 +50,8 @@ describe('Touchscreen AddDeckConfigurationModal', () => {
   it.todo('should a mock function when tapping a button')
 })
 
-describe('Desktop AddDeckConfigurationModal', () => {
-  let props: React.ComponentProps<typeof AddDeckConfigurationModal>
+describe('Desktop AddFixtureModal', () => {
+  let props: React.ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
     props = {

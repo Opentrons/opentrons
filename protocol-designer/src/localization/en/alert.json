@@ -173,6 +173,10 @@
       "TIPRACK_IN_WASTE_CHUTE_HAS_TIPS": {
         "title": "Moving tiprack into waste chute",
         "body": "This tiprack has remaining tips, be advised that once you dispose of it, there is no way to get it back later in the protocol. "
+      },
+      "MISSING_96_CHANNEL_TIPRACK_ADAPTER": {
+        "title": "Missing tiprack adapter for 96-channel",
+        "body": "A 96-channel cannot pick up a full tiprack without an adapter underneath"
       }
     }
   },

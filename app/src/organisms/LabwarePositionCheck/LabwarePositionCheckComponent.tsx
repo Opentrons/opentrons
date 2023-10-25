@@ -14,7 +14,6 @@ import {
   Coordinates,
   FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
@@ -35,7 +34,7 @@ import { RobotMotionLoader } from './RobotMotionLoader'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import type { LabwareOffset, CommandData } from '@opentrons/api-client'
 import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
-import type { CreateCommand } from '@opentrons/shared-data'
+import type { CreateCommand, RobotType } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
@@ -44,6 +43,7 @@ const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
   runId: string
   maintenanceRunId: string
+  robotType: RobotType
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
   onCloseClick: () => unknown
@@ -59,6 +59,7 @@ export const LabwarePositionCheckComponent = (
   const {
     mostRecentAnalysis,
     existingOffsets,
+    robotType,
     runId,
     maintenanceRunId,
     onCloseClick,
@@ -69,7 +70,7 @@ export const LabwarePositionCheckComponent = (
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
-  const robotType = mostRecentAnalysis?.robotType ?? OT2_ROBOT_TYPE
+  const shouldUseMetalProbe = robotType === FLEX_ROBOT_TYPE
 
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
@@ -193,18 +194,17 @@ export const LabwarePositionCheckComponent = (
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    const dropTipToBeSafeCommands: DropTipCreateCommand[] =
-      robotType === FLEX_ROBOT_TYPE
-        ? []
-        : (protocolData?.pipettes ?? []).map(pip => ({
-            commandType: 'dropTip' as const,
-            params: {
-              pipetteId: pip.id,
-              labwareId: FIXED_TRASH_ID,
-              wellName: 'A1',
-              wellLocation: { origin: 'default' as const },
-            },
-          }))
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] = shouldUseMetalProbe
+      ? []
+      : (protocolData?.pipettes ?? []).map(pip => ({
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pip.id,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'default' as const },
+          },
+        }))
     chainRunCommands(
       maintenanceRunId,
       [
@@ -250,7 +250,10 @@ export const LabwarePositionCheckComponent = (
     )
   }
   if (protocolData == null) return null
-  const LPCSteps = getLabwarePositionCheckSteps(protocolData, robotType)
+  const LPCSteps = getLabwarePositionCheckSteps(
+    protocolData,
+    shouldUseMetalProbe
+  )
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
@@ -297,6 +300,7 @@ export const LabwarePositionCheckComponent = (
     isRobotMoving: isCommandChainLoading,
     workingOffsets,
     existingOffsets,
+    robotType,
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
@@ -344,9 +348,7 @@ export const LabwarePositionCheckComponent = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = (
-      <CheckItem {...currentStep} {...movementStepProps} {...{ robotType }} />
-    )
+    modalContent = <CheckItem {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'ATTACH_PROBE') {
     modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'DETACH_PROBE') {

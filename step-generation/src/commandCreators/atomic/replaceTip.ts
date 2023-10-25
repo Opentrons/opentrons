@@ -55,12 +55,16 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
 ) => {
   const { pipette, dropTipLocation } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
+
+  // TODO(jr, 10/16/23): plug in missingAdapter() error creator, need to get current tiprackId
+
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
       errors: [errorCreators.insufficientTips()],
     }
   }
+
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??

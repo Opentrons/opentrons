@@ -14,11 +14,11 @@ import styles from './LabwareOverlays.css'
 
 interface LabwareControlsProps {
   labwareOnDeck: LabwareOnDeck
-  selectedTerminalItemId?: TerminalItemId | null
   slot: DeckSlot
   setHoveredLabware: (labware?: LabwareOnDeck | null) => unknown
   setDraggedLabware: (labware?: LabwareOnDeck | null) => unknown
   swapBlocked: boolean
+  selectedTerminalItemId?: TerminalItemId | null
 }
 
 export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
@@ -30,6 +30,7 @@ export const LabwareControls = (props: LabwareControlsProps): JSX.Element => {
     setDraggedLabware,
     swapBlocked,
   } = props
+
   const canEdit = selectedTerminalItemId === START_TERMINAL_ITEM_ID
   const [x, y] = slot.position
   const width = labwareOnDeck.def.dimensions.xDimension

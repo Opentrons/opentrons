@@ -58,8 +58,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run step generation unit tests'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="step-generation/src/**/*.(js|ts|tsx)" step-generation/src
+        run: make -C step-generation test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:

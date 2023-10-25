@@ -57,8 +57,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run react-api-client unit tests'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="react-api-client/src/**/*.(js|ts|tsx)" react-api-client/src
+        run: make -C react-api-client test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
