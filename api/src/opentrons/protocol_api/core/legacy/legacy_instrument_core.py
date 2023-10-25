@@ -18,6 +18,7 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons.protocols.geometry import planning
 
+from ..._waste_chute import WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
 from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
@@ -281,6 +282,13 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                 _log.warning(
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
+
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        raise APIVersionError(
+            "Dropping tips in a waste chute is not supported in this API Version."
+        )
 
     def home(self) -> None:
         """Home the mount"""
