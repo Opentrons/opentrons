@@ -305,6 +305,15 @@ def test_get_is_started() -> None:
     assert subject.has_been_played() is True
 
 
+def test_get_is_terminal() -> None:
+    """It should return true if run is in a terminal state."""
+    subject = get_command_view(run_result=None)
+    assert subject.get_is_terminal() is False
+
+    subject = get_command_view(run_result=RunResult.SUCCEEDED)
+    assert subject.get_is_terminal() is True
+
+
 class ActionAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 

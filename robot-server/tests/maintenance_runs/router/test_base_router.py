@@ -102,7 +102,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
             created_at=created_at,
             request_body=None,
             run_data_manager=mock_maintenance_run_data_manager,
-            protocol_run_has_been_played=True,
+            protocol_run_is_terminal=False,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"
