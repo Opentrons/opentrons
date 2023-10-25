@@ -1,4 +1,7 @@
 import { useTranslation } from 'react-i18next'
+
+import { useFeatureFlag } from '../../../../redux/config'
+
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
 export function useHardwareStatusText(
@@ -6,6 +9,8 @@ export function useHardwareStatusText(
   conflictedSlots: string[]
 ): string {
   const { t, i18n } = useTranslation('device_details')
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+
   const missingProtocolHardwareType = missingProtocolHardware.map(
     hardware => hardware.hardwareType
   )
@@ -17,7 +22,7 @@ export function useHardwareStatusText(
   const countMissingPipettes = countMissingHardwareType('pipette')
   const countMissingModules = countMissingHardwareType('module')
   let chipText: string = t('ready_to_run')
-  if (conflictedSlots.length > 0) {
+  if (enableDeckConfig && conflictedSlots.length > 0) {
     chipText = t('location_conflicts')
   } else if (countMissingPipettes === 0 && countMissingModules > 0) {
     if (countMissingModules === 1) {
