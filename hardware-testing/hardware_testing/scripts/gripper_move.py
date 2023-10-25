@@ -47,11 +47,13 @@ async def _main() -> None:
                                     Point(x_home, y_home, z_home - 190))
             count += 1
             print(f"cycle: {count}")
+        await hw_api.home()
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.G])
     finally:
         await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.G])
         await hw_api.clean_up()
+    
 
 
 if __name__ == "__main__":
