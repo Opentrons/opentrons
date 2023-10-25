@@ -12,7 +12,6 @@ from typing import (
     Mapping,
     cast,
 )
-from typing_extensions import Literal
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -445,14 +444,12 @@ class ProtocolContext(CommandPublisher):
         *,
         # TODO: Confirm official naming of "staging area slot".
         with_staging_area_slot_d4: bool = False,
-        # TODO: Confirm official naming of the "lids". Probably do not call this an "orifice."
-        # TODO: Is there a reasonable default for this?
-        orifice: Literal["wide_open", "columnar_slit"],
     ) -> WasteChute:
         if with_staging_area_slot_d4:
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."
             )
+        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
 
     @requires_version(2, 15)
     def load_adapter(

@@ -404,11 +404,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         speed: Optional[float],
     ) -> None:
         if self.get_channels() == 96:
-            if waste_chute._orifice != "wide_open":
-                raise ValueError(
-                    "Wrong waste chute, you silly goose."
-                    " You're using a 96-channel pipette, but the waste chute has a lid."
-                )
             slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_96_TIP_A1
         else:
             slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
