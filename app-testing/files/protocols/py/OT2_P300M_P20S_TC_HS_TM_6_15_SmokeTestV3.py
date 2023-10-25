@@ -60,11 +60,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # modules https://docs.opentrons.com/v2/new_modules.html#available-modules
     hs_module = ctx.load_module("heaterShakerModuleV1", hs_position)
     temperature_module = ctx.load_module("temperature module gen2", temperature_position)
-    thermocycler_module = ctx.load_module("thermocyclerModuleV1")
+    thermocycler_module = ctx.load_module("thermocycler module gen2")
 
     # module labware
-    _ = temperature_module.load_adapter("opentrons_96_well_aluminum_block")
-    temp_plate = temperature_module.load_labware(
+    temp_adapter = temperature_module.load_adapter("opentrons_96_well_aluminum_block")
+    temp_plate = temp_adapter.load_labware(
         "nest_96_wellplate_100ul_pcr_full_skirt",
         label="Temperature-Controlled plate",
     )
@@ -141,14 +141,20 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # The test flow is as follows:
     #   1. Remove the existing PCR plate from slot 2
     #   2. Move the reservoir from slot 3 to slot 2
-    #   3. Pickup P20 tip, touch tip to reservoir A1 in slot 2
+    #   3. Pickup P20 tip, move pipette to reservoir A1 in slot 2
     #   4. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 2
     #   5. Move the reservoir back to slot 3 from slot 2
-    #   6. Touch tip to reservoir A1 in slot 3
+    #   6. Move pipette to reservoir A1 in slot 3
     #   7. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 3
-    #   8. Move the offdeck PCR plate back to slot 2
-    #   9. Touch tip to well A1 in slot 2
+    #   8. Move custom labware from slot 6 to slot 2
+    #   9. Move pipette to well A1 in slot 2
     #   10. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
+    #   11. Move the custom labware back to slot 6 from slot 2
+    #   12. Move pipette to well A1 in slot 6
+    #   13. Pause and ask user to validate that the tip is in the middle of well A1 in slot 6
+    #   14. Move the offdeck PCR plate back to slot 2
+    #   15. Move pipette to well A1 in slot 2
+    #   16. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
 
     # In effect, nothing will actually change to the protocol, 
     # but we will be able to test that the UI responds appropriately.
@@ -189,14 +195,38 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     # Step 8
     ctx.move_labware(
-        labware=logo_destination_plate,
+        labware=custom_labware,
         new_location="2"
     )
 
     # Step 9
-    pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top(z=5.0))
+    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top(z=5.0))
 
     # Step 10
+    ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 2?")
+
+    # Step 11
+    ctx.move_labware(
+        labware=custom_labware,
+        new_location="6"
+    )
+
+    # Step 12
+    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top(z=5.0))
+
+    # Step 13
+    ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 6?")
+
+    #Step 14
+    ctx.move_labware(
+        labware=logo_destination_plate,
+        new_location="2"
+    )
+
+    # Step 15
+    pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top(z=5.0))
+
+    # Step 16
     ctx.pause("Is the pipette tip in the middle of well A1 in slot 2?")
 
     ######################################

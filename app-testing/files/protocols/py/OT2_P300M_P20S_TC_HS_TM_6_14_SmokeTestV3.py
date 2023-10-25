@@ -59,7 +59,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # modules https://docs.opentrons.com/v2/new_modules.html#available-modules
     hs_module = ctx.load_module("heaterShakerModuleV1", hs_position)
     temperature_module = ctx.load_module("temperature module gen2", temperature_position)
-    thermocycler_module = ctx.load_module("thermocyclerModuleV1")
+    thermocycler_module = ctx.load_module("thermocycler module gen2")
 
     # module labware
     temp_plate = temperature_module.load_labware(
