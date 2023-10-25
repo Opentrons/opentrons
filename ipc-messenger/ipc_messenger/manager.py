@@ -4,10 +4,7 @@ import json
 from asyncio import wait_for
 from typing import Any, Union, Optional, Iterator
 
-from jsonrpc.jsonrpc import JSONRPCRequest
-from jsonrpc.jsonrpc1 import JSONRPC10Response
-from jsonrpc.jsonrpc2 import JSONRPC20Request, JSONRPC20BatchRequest, JSONRPC20Response
-from jsonrpc.dispatcher import Dispatcher
+from jsonrpc.jsonrpc2 import JSONRPC20BatchRequest, JSONRPC20BatchResponse
 from jsonrpc.utils import is_invalid_params
 from jsonrpc.exceptions import (
     JSONRPCError,
@@ -18,6 +15,9 @@ from jsonrpc.exceptions import (
     JSONRPCServerError,
     JSONRPCMethodNotFound,
 )
+
+from .constants import JSONRPCRequest, JSONRPCResponse
+from .dispatcher import JSONRPCDispatcher
 
 class JSONRPCVersionNotSupported(JSONRPCError):
     """ json-rpc version is not supported error. """
@@ -30,24 +30,20 @@ class JSONRPCVersionNotSupported(JSONRPCError):
 SUPPORTED_JSON_RPC_VERSION = ["2.0"]
 
 class JSONRPCResponseManager:
-    def __init__(self, dispatcher: Dispatcher) -> None:
+    def __init__(self, dispatcher: JSONRPCDispatcher) -> None:
         self._dispatcher = dispatcher
 
-    async def handle(self, request_str: str, context: Optional[Any] = None) -> JSONRPC20Response:
+    async def handle(self, request_str: str, context: Optional[Any] = None) -> JSONRPCResponse:
         try:
             data = json.loads(request_str)
         except (TypeError, ValueError, json.JSONDecodeError):
-            return JSONRPC20Response(error=JSONRPCParseError()._data)
+            return JSONRPCResponse(error=JSONRPCParseError()._data)
 
-        # for testing
-        print("Handle")
-        print(data)
-        #del data['jsonrpc']
-        print(data)
+        # Validate the data request
         try:
             request = JSONRPCRequest.from_data(data)
         except JSONRPCInvalidRequestException:
-            return JSONRPC20Response(error=JSONRPCInvalidRequest()._data)
+            return JSONRPCResponse(error=JSONRPCInvalidRequest()._data)
 
         print(request)
         return await self._handle_request(request, context)
@@ -56,7 +52,7 @@ class JSONRPCResponseManager:
         self,
         request: JSONRPCRequest,
         context: Optional[Any] = None
-    ) -> JSONRPC20Response:
+    ) -> JSONRPCResponse:
         """Execute a valid json-rpc request and return a response."""
         rs = request if isinstance(request, JSONRPC20BatchRequest) \
             else [request]
@@ -77,17 +73,16 @@ class JSONRPCResponseManager:
             return responses[0]
 
     async def _get_responses(self, requests, context=None
-    ) -> Iterator[JSONRPC20Response]:
+    ) -> Iterator[JSONRPCResponse]:
         """ Response to each single JSON-RPC Request."""
 
         def _make_response(**kwargs):
-            response = JSONRPC20Response(_id=request._id, **kwargs)
+            response = JSONRPCResponse(_id=request._id, **kwargs)
             response.request = request
             # only respond if this is not a notify message
             return response if not request.is_notification else None
 
         for request in requests:
-            output = None
             if request.JSONRPC_VERSION not in SUPPORTED_JSON_RPC_VERSION:
                 yield _make_response(error=JSONRPCVersionNotSupported()._data)
 

@@ -8,16 +8,23 @@ from jsonrpc.exceptions import (
     JSONRPCInvalidRequestException,
 )
 
-class Destination(Enum):
+class JSONRPCRequest(JSONRPC20Request):
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: id={self._id} method={self.method} params={self.params}>"
+
+class JSONRPCResponse(JSONRPC20Response):
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: id={self._id} result={self.result}>"
+
+class Process(Enum):
     HARDWARE = "hardware"
     ROBOT_SERVER = "robot_server"
     SYSTEM_SERVER = "system_server"
 
-
 DESTINATION_PORT = {
-    Destination.HARDWARE: 4000,
-    Destination.ROBOT_SERVER: 4001,
-    Destination.SYSTEM_SERVER: 4002,
+    Process.HARDWARE: 4000,
+    Process.ROBOT_SERVER: 4001,
+    Process.SYSTEM_SERVER: 4002,
 }
 
-Destinations = List[Destination]
+Destinations = List[Process]

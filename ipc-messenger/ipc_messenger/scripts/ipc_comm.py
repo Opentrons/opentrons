@@ -3,44 +3,66 @@ import json
 import argparse
 import asyncio
 
-from enum import Enum
-from typing import Any, Dict, List, Optional
-
-from jsonrpc import JSONRPCResponseManager, dispatcher
-from jsonrpc.jsonrpc2 import JSONRPC20Request, JSONRPC20Response
-from jsonrpc.exceptions import (
-    JSONRPCInvalidRequest,
-    JSONRPCInvalidRequestException,
-)
-
+from ipc_messenger.dispatcher import ipc_dispatcher
 from ipc_messenger import IPCMessenger
 from ipc_messenger.constants import (
-    Destination,
+    Process,
     Destinations,
     DESTINATION_PORT,
+    JSONRPCRequest,
 )
 
+class OT3Controller:
+    def __init__(self):
+        pass
+
+    async def home():
+        pass
+
+
+class OT3API:
+    def __init__(self, controller, source, host, port, destination, ipc_messenger = None, destinations = None):
+        self._controller = controller
+        self._ipc_messenger = ipc_messenger or IPCMessenger(source, host, port, ipc_dispatcher)
+        self._online_process: Process = dict()
+
+    @ipc_dispatcher.add_method
+    async def home():
+        print("Homing Gantry")
+        await asyncio.sleep(1)
+        return "ok"
+
+    @ipc_dispatcher.add_method
+    async def health(online: bool):
+        print(f"Im online: {online}")
+
+
 def main(args):
-    source = Destination(args.source)
-    destination = [Destination(dest) for dest in args.destination] if args.destination else list(Destination)
-    destination = [dest for dest in destination if dest != source]
-    print(f"Starting {args.source} on {args.host}:{args.port}")
-    ipc_messenger = IPCMessenger(source, args.host, args.port, destination)
-    #ot3_controller = OT3Controller()
-    #ot3_api = OT3API(ipc_messenger, ot3_controller)
+    source = Process(args.process)
+    target = [Process(dest) for dest in args.target] if args.target else list(Process)
+    destination = [dest for dest in target if dest != source]
+    print(f"Starting {args.process} on {args.host}:{args.port}")
+    #ipc_messenger = IPCMessenger(source, args.host, args.port, destination)
+    ot3_controller = OT3Controller()
+    ot3_api = OT3API(ot3_controller, source, args.host, args.port, destination)
+    ipc_messenger = ot3_api._ipc_messenger
+
     if args.message:
-        print(f"notify: {args.notify}")
-        resp = asyncio.run(ipc_messenger.send(args.message, destination, notify=args.notify))
-        print(f"resp: {resp}")
+        req = JSONRPCRequest(
+            **args.message,
+            is_notification=args.notify,
+        )
+        resp = asyncio.run(ipc_messenger.send(req, destination, notify=args.notify))
+        print(f"Resp: {resp}")
     else:
         asyncio.run(ipc_messenger.start())
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("source", type=str)
+    parser.add_argument("process", type=str)
     parser.add_argument("--host", default='localhost')
-    parser.add_argument("--port", default=4000)
-    parser.add_argument("--destination", nargs="*")
+    parser.add_argument("--port", default=3999)
+    parser.add_argument("--target", nargs="*")
     parser.add_argument("--message", type=json.loads)
     parser.add_argument("--notify", action='store_true')
 
