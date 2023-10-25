@@ -338,7 +338,7 @@ def execute(  # noqa: C901
           In older software versions, ``payload["text"]`` was a
           `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
           To get human-readable text, you had to do ``payload["text"].format(**payload)``.
-          That usage is deprecated now. If ``payload["text"]`` happens to contain any
+          Don't do that anymore. If ``payload["text"]`` happens to contain any
           ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
           ``KeyError``.
 
