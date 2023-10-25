@@ -122,7 +122,11 @@ export function SetupFlexPipetteCalibrationItem({
         button={button}
         calibratedDate={pipetteCalDate}
         subText={subText}
-        label={t(`devices_landing:${mount}_mount`)}
+        label={
+          requestedPipetteSpecs?.channels === 96
+            ? t('devices_landing:ninety_six_mount')
+            : t(`devices_landing:${mount}_mount`)
+        }
         title={requestedPipetteSpecs?.displayName}
         id={`PipetteCalibration_${mount}MountTitle`}
         runId={runId}

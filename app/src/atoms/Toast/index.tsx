@@ -103,7 +103,7 @@ export function Toast(props: ToastProps): JSX.Element {
   const ODD_ANIMATION_OPTIMIZATIONS = `
   backface-visibility: hidden;
   perspective: 1000;
-  will-change: opacity, transform3d;
+  will-change: opacity, transform;
   `
   const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
@@ -163,11 +163,9 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes slidedown {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, 50%, 0);
         filter: opacity(0);
       }
     }
@@ -180,11 +178,9 @@ export function Toast(props: ToastProps): JSX.Element {
 
     @keyframes fadeUpAndOut {
       from {
-        transform: translate3d(0%, 0%, 0);
         filter: opacity(100%);
       }
       to {
-        transform: translate3d(0%, -10%, 0);
         filter: opacity(0%);
       }
     }

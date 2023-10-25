@@ -20,7 +20,7 @@ type OP = FieldProps & {
   pipetteId?: string | null
 }
 interface SP {
-  isMulti: Props['isMulti']
+  is8Channel: Props['is8Channel']
   primaryWellCount: Props['primaryWellCount']
 }
 
@@ -29,12 +29,12 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const selectedWells = ownProps.value
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
-  const isMulti = pipette ? pipette.spec.channels > 1 : false
+  const is8Channel = pipette ? pipette.spec.channels === 8 : false
   return {
     primaryWellCount: Array.isArray(selectedWells)
       ? selectedWells.length
       : undefined,
-    isMulti,
+    is8Channel,
   }
 }
 
@@ -53,7 +53,7 @@ function mergeProps(stateProps: SP, _dispatchProps: null, ownProps: OP): Props {
   return {
     disabled,
     errorToShow,
-    isMulti: stateProps.isMulti,
+    is8Channel: stateProps.is8Channel,
     labwareId,
     name,
     onFieldBlur,

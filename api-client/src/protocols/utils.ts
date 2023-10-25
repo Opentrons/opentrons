@@ -17,6 +17,7 @@ import type {
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
   LoadLiquidRunTimeCommand,
+  LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 interface PipetteNamesByMount {
@@ -210,18 +211,37 @@ interface LoadedModulesBySlot {
 export function parseInitialLoadedModulesBySlot(
   commands: RunTimeCommand[]
 ): LoadedModulesBySlot {
-  const loadLabwareCommandsReversed = commands
+  const loadModuleCommandsReversed = commands
     .filter(
       (command): command is LoadModuleRunTimeCommand =>
         command.commandType === 'loadModule'
     )
     .reverse()
   return reduce<LoadModuleRunTimeCommand, LoadedModulesBySlot>(
-    loadLabwareCommandsReversed,
+    loadModuleCommandsReversed,
     (acc, command) =>
       'slotName' in command.params.location
         ? { ...acc, [command.params.location.slotName]: command }
         : acc,
+    {}
+  )
+}
+
+export interface LoadedFixturesBySlot {
+  [slotName: string]: LoadFixtureRunTimeCommand
+}
+export function parseInitialLoadedFixturesByCutout(
+  commands: RunTimeCommand[]
+): LoadedFixturesBySlot {
+  const loadFixtureCommandsReversed = commands
+    .filter(
+      (command): command is LoadFixtureRunTimeCommand =>
+        command.commandType === 'loadFixture'
+    )
+    .reverse()
+  return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
+    loadFixtureCommandsReversed,
+    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
     {}
   )
 }

@@ -75,7 +75,7 @@ class LegacyWellCore(AbstractWellCore):
         self._has_tip = value
 
     def get_display_name(self) -> str:
-        """Get the well's full display name."""
+        """Get the full display name of the well (e.g. "A1 of Some Labware on 5")."""
         return self._display_name
 
     def get_name(self) -> str:

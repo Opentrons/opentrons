@@ -4,6 +4,7 @@
   "firmware_version": "firmware version",
   "last_calibrated": "last calibrated",
   "no_cal_data": "no calibration data",
+  "pipette_calibrations_differ": "<bold>Pipette recalibration recommended</bold> The attached pipettes have very different calibration values. When properly calibrated, the values should be similar.",
   "recalibrate": "recalibrate",
   "serial_number": "serial number"
 }

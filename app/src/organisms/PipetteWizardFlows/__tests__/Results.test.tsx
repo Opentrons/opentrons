@@ -61,6 +61,8 @@ describe('Results', () => {
   it('renders the correct information when pipette cal is a success for calibrate flow', () => {
     props = {
       ...props,
+      currentStepIndex: 6,
+      totalStepCount: 6,
       hasCalData: true,
     }
     const { getByText, getByRole } = render(props)
@@ -71,7 +73,7 @@ describe('Results', () => {
     getByText('Exit')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.handleCleanUpAndClose).toHaveBeenCalled()
   })
 
   it('renders the correct information when pipette wizard is a success for attach flow', async () => {
@@ -84,9 +86,8 @@ describe('Results', () => {
     const image = getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
-    getByText('Calibrate pipette')
-    const exit = getByRole('button', { name: 'Results_exit' })
-    fireEvent.click(exit)
+    getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(getByText('Calibrate pipette'))
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {

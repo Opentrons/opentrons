@@ -1,5 +1,4 @@
 import * as React from 'react'
-import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -95,11 +94,6 @@ export function RunFailedModal({
           <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {highestPriorityError.detail}
           </StyledText>
-          {!isEmpty(highestPriorityError.errorInfo) && (
-            <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
-              {JSON.stringify(highestPriorityError.errorInfo)}
-            </StyledText>
-          )}
         </Flex>
         <StyledText as="p">
           {t('run_failed_modal_description_desktop')}

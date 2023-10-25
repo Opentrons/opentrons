@@ -223,6 +223,5 @@ def supported_tip_fixture() -> pipette_definition.SupportedTipsDefinition:
         defaultReturnTipHeight=0.5,
         aspirate=pipette_definition.ulPerMMDefinition(default={"1": [(0, 0, 0)]}),
         dispense=pipette_definition.ulPerMMDefinition(default={"1": [(0, 0, 0)]}),
-        defaultBlowoutVolume=5,
         defaultPushOutVolume=3,
     )

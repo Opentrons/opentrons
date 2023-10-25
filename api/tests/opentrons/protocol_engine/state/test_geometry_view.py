@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     ModuleOffsetVector,
+    ModuleOffsetData,
     LoadedLabware,
     LoadedModule,
     ModuleModel,
@@ -162,7 +163,10 @@ def test_get_labware_parent_position_on_module(
         )
     ).then_return(OverlapOffset(x=1, y=2, z=3))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetVector(x=2, y=3, z=4)
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=2, y=3, z=4),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
 
     result = subject.get_labware_parent_position("labware-id")
@@ -199,9 +203,6 @@ def test_get_labware_parent_position_on_labware(
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
         Point(1, 2, 3)
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
-    )
     decoy.when(labware_view.get("adapter-id")).then_return(adapter_data)
     decoy.when(labware_view.get_dimensions("adapter-id")).then_return(
         Dimensions(x=123, y=456, z=5)
@@ -227,12 +228,71 @@ def test_get_labware_parent_position_on_labware(
     ).then_return(OverlapOffset(x=-3, y=-2, z=-1))
 
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetVector(x=3, y=4, z=5)
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=3, y=4, z=5),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
 
     result = subject.get_labware_parent_position("labware-id")
 
     assert result == Point(9, 12, 15)
+
+
+def test_module_calibration_offset_rotation(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    subject: GeometryView,
+) -> None:
+    """Return the rotated module calibration offset if the module was moved from one side of the deck to the other."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="b",
+        definitionUri=uri_from_details(namespace="a", load_name="b", version=1),
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId=None,
+    )
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_D1)
+    )
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.TEMPERATURE_MODULE_V2
+    )
+    decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=2, y=3, z=4),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
+        )
+    )
+
+    # the module has not changed location after calibration, so there is no rotation
+    result = subject._get_calibrated_module_offset(ModuleLocation(moduleId="module-id"))
+    assert result == ModuleOffsetVector(x=2, y=3, z=4)
+
+    # the module has changed from slot D1 to D3, so we should rotate the calibration offset 180 degrees along the z axis
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
+    )
+    result = subject._get_calibrated_module_offset(ModuleLocation(moduleId="module-id"))
+    assert result == ModuleOffsetVector(x=-2, y=-3, z=4)
+
+    # attempting to load the module calibration offset from an invalid slot in the middle of the deck (A2, B2, C2, D2)
+    # is not be allowed since you can't even load a module in the middle to perform a module calibration in the
+    # first place. So if someone manually edits the stored module calibration offset we will throw an assert error.
+    decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=2, y=3, z=4),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D2),
+        )
+    )
+    with pytest.raises(AssertionError):
+        result = subject._get_calibrated_module_offset(
+            ModuleLocation(moduleId="module-id")
+        )
 
 
 def test_get_labware_origin_position(
@@ -338,7 +398,10 @@ def test_get_module_labware_highest_z(
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetVector(x=0, y=0, z=0)
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2
@@ -642,7 +705,10 @@ def test_get_module_labware_well_position(
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetVector(x=0, y=0, z=0)
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        )
     )
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2
@@ -944,8 +1010,11 @@ def test_get_tip_drop_location(
     labware_view: LabwareView,
     mock_pipette_view: PipetteView,
     subject: GeometryView,
+    tip_rack_def: LabwareDefinition,
 ) -> None:
     """It should get relative drop tip location for a pipette/labware combo."""
+    decoy.when(labware_view.get_definition("tip-rack-id")).then_return(tip_rack_def)
+
     decoy.when(mock_pipette_view.get_return_tip_scale("pipette-id")).then_return(0.5)
 
     decoy.when(
@@ -966,15 +1035,14 @@ def test_get_tip_drop_location(
     assert location == WellLocation(offset=WellOffset(x=1, y=2, z=1337))
 
 
-def test_get_tip_drop_location_with_trash(
+def test_get_tip_drop_location_with_non_tiprack(
     decoy: Decoy,
     labware_view: LabwareView,
     subject: GeometryView,
+    reservoir_def: LabwareDefinition,
 ) -> None:
-    """It should get relative drop tip location for a the fixed trash."""
-    decoy.when(
-        labware_view.get_has_quirk(labware_id="labware-id", quirk="fixedTrash")
-    ).then_return(True)
+    """It should get relative drop tip location for a labware that is not a tiprack."""
+    decoy.when(labware_view.get_definition("labware-id")).then_return(reservoir_def)
 
     location = subject.get_checked_tip_drop_location(
         pipette_id="pipette-id",
@@ -1172,7 +1240,10 @@ def test_get_labware_grip_point_for_labware_on_module(
         )
     ).then_return(OverlapOffset(x=10, y=20, z=30))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetVector(x=100, y=200, z=300)
+        ModuleOffsetData(
+            moduleOffsetVector=ModuleOffsetVector(x=100, y=200, z=300),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
     )
     decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_4)).then_return(
         Point(100, 200, 300)

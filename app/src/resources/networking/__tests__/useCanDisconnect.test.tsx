@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { getRobotApiVersionByName } from '../../../redux/discovery'
 
-import { useIsOT3 } from '../../../organisms/Devices/hooks'
+import { useIsFlex } from '../../../organisms/Devices/hooks'
 import { useCanDisconnect } from '../hooks/useCanDisconnect'
 import { useWifiList } from '../hooks/useWifiList'
 
@@ -20,7 +20,7 @@ jest.mock('../../../redux/discovery')
 const mockGetRobotApiVersionByName = getRobotApiVersionByName as jest.MockedFunction<
   typeof getRobotApiVersionByName
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const store: Store<State> = createStore(state => state, {})
 
@@ -39,7 +39,7 @@ const mockWifiNetwork: WifiNetwork = {
 describe('useCanDisconnect', () => {
   beforeEach(() => {
     when(useWifiList).calledWith('otie').mockReturnValue([])
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
   })
   afterEach(() => resetAllWhenMocks())
 
@@ -102,7 +102,7 @@ describe('useCanDisconnect', () => {
       .calledWith({} as any, 'otie')
       .mockReturnValue('0.22.999-gamma.1')
 
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
 
     const { result } = renderHook(() => useCanDisconnect('otie'), { wrapper })
     expect(result.current).toBe(true)

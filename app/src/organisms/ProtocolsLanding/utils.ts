@@ -36,7 +36,7 @@ export function getRobotTypeDisplayName(
   }
 }
 
-export function getIsOT3Protocol(
+export function getisFlexProtocol(
   protocolAnalysis?: ProtocolAnalysisOutput | null
 ): boolean {
   if (protocolAnalysis?.robotType === FLEX_STANDARD_MODEL) {

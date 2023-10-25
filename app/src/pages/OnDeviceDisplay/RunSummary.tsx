@@ -310,7 +310,6 @@ const SplashFrame = styled(Flex)`
 const ProtocolName = styled.h4`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   color: ${COLORS.darkBlack70};

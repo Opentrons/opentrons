@@ -42,11 +42,75 @@ export const getProtocolSrcFilePaths = (
     })
 }
 
+// Revert a v7.0.0 pre-parity stop-gap solution.
+const migrateProtocolsFromTempDirectory = preParityMigrateProtocolsFrom(
+  FileSystem.PRE_V7_PARITY_DIRECTORY_PATH,
+  FileSystem.PROTOCOLS_DIRECTORY_PATH
+)
+export function preParityMigrateProtocolsFrom(
+  src: string,
+  dest: string
+): () => Promise<void> {
+  let hasCheckedForMigration = false
+
+  return function (): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (hasCheckedForMigration) resolve()
+      hasCheckedForMigration = true
+
+      fse
+        .stat(src)
+        .then(doesSrcExist => {
+          if (!doesSrcExist.isDirectory()) resolve()
+
+          console.log(
+            `Performing protocol migration to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}...`
+          )
+
+          return migrateProtocols(src, dest).then(() => {
+            console.log('Protocol migration complete.')
+            resolve()
+          })
+        })
+        .catch(e => {
+          console.log(
+            `Error migrating protocols to ${FileSystem.PROTOCOLS_DIRECTORY_NAME}: ${e}`
+          )
+          resolve()
+        })
+    })
+  }
+
+  function migrateProtocols(src: string, dest: string): Promise<void> {
+    return fse
+      .readdir(src)
+      .then(items => {
+        const protocols = items.map(item => {
+          const srcItem = path.join(src, item)
+          const destItem = path.join(dest, item)
+
+          return fse.copy(srcItem, destItem, {
+            overwrite: false,
+          })
+        })
+        // Delete the tmp directory.
+        return Promise.all(protocols).then(() =>
+          fse.rm(src, {
+            recursive: true,
+            force: true,
+          })
+        )
+      })
+      .catch(e => Promise.reject(e))
+  }
+}
+
 export const fetchProtocols = (
   dispatch: Dispatch,
   source: ListSource
 ): Promise<void> => {
   return ensureDir(FileSystem.PROTOCOLS_DIRECTORY_PATH)
+    .then(() => migrateProtocolsFromTempDirectory())
     .then(() =>
       FileSystem.readDirectoriesWithinDirectory(
         FileSystem.PROTOCOLS_DIRECTORY_PATH

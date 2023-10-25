@@ -16,6 +16,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
   MoveLabwareCreateCommand,
+  RobotType,
 } from '@opentrons/shared-data'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -34,6 +35,8 @@ import type {
   WorkingOffset,
 } from './types'
 import type { LabwareOffset } from '@opentrons/api-client'
+import { useSelector } from 'react-redux'
+import { getIsOnDevice } from '../../redux/config'
 
 interface PickUpTipProps extends PickUpTipStep {
   protocolData: CompletedProtocolAnalysis
@@ -45,6 +48,7 @@ interface PickUpTipProps extends PickUpTipStep {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
+  robotType: RobotType
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -62,9 +66,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     workingOffsets,
     setFatalError,
     adapterId,
+    robotType,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
-
+  const isOnDevice = useSelector(getIsOnDevice)
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
@@ -391,7 +396,15 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             location: displayLocation,
           })}
           body={
-            <StyledText as="p">{t('ensure_nozzle_is_above_tip')}</StyledText>
+            <Trans
+              t={t}
+              i18nKey={
+                isOnDevice
+                  ? 'ensure_nozzle_is_above_tip_odd'
+                  : 'ensure_nozzle_is_above_tip_desktop'
+              }
+              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+            />
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
@@ -411,6 +424,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           body={<UnorderedList items={instructions} />}
           labwareDef={labwareDef}
           confirmPlacement={handleConfirmPlacement}
+          robotType={robotType}
         />
       )}
     </Flex>

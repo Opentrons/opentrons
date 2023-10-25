@@ -174,3 +174,10 @@ export const postWifiDisconnectFailure = (
   payload: { robotName, error },
   meta,
 })
+
+export const clearWifiStatus = (
+  robotName: string
+): Types.ClearWifiStatusAction => ({
+  type: Constants.CLEAR_WIFI_STATUS,
+  payload: { robotName },
+})

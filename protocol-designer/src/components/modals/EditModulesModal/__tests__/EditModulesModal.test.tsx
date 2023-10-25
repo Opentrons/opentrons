@@ -162,7 +162,7 @@ describe('Edit Modules Modal', () => {
       getLabwareIsCompatibleMock.mockReturnValue(false)
       const wrapper = render(props)
       expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
-        'labware incompatible'
+        'Slot 1 is occupied. Clear the slot to continue.'
       )
     })
 
@@ -171,7 +171,7 @@ describe('Edit Modules Modal', () => {
       getSlotIdsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
       const wrapper = render(props)
       expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
-        'labware incompatible'
+        'Slot 1 is occupied. Clear the slot to continue.'
       )
     })
 

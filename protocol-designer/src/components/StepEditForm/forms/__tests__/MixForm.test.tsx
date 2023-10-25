@@ -1,20 +1,23 @@
 import * as React from 'react'
 import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
+import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { DropTipField } from '../../fields/DropTipField/index'
+import { WellOrderField } from '../../fields'
 import { MixForm } from '../MixForm'
 import { AspDispSection } from '../AspDispSection'
-import * as stepFormSelectors from '../../../../step-forms/selectors'
-import { FormData } from '../../../../form-types'
-import { WellOrderField } from '../../fields'
+import type { FormData } from '../../../../form-types'
 
 const { DelayFields } = jest.requireActual('../../fields')
 
 jest.mock('../../../../step-forms/selectors')
-
+jest.mock('../../fields/DropTipField/index')
 const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
   typeof stepFormSelectors.getUnsavedForm
 >
-
+const mockDropTipField = DropTipField as jest.MockedFunction<
+  typeof DropTipField
+>
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
 
@@ -56,6 +59,7 @@ describe('MixForm', () => {
     getUnsavedFormMock.mockReturnValue({
       stepType: 'mix',
     } as FormData)
+    mockDropTipField.mockReturnValue(<div>mock drop tip field</div>)
 
     props = {
       formData: {
@@ -94,6 +98,15 @@ describe('MixForm', () => {
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_second',
+          updateValue: jest.fn() as any,
+          value: null,
+        },
+        dropTip_location: {
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
+          errorToShow: null,
+          disabled: false,
+          name: 'dropTip_location',
           updateValue: jest.fn() as any,
           value: null,
         },

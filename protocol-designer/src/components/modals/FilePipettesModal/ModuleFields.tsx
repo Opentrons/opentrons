@@ -58,7 +58,6 @@ export interface ModuleFieldsProps {
       }
   values: FormModulesByType
   onFieldChange: (event: React.ChangeEvent) => unknown
-  onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
   onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
 }
@@ -66,7 +65,6 @@ export interface ModuleFieldsProps {
 export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   const {
     onFieldChange,
-    onSetFieldValue,
     onSetFieldTouched,
     onBlur,
     values,
@@ -81,15 +79,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   )
   const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
     const targetToClear = `modulesByType.${type}.model`
-
     onFieldChange(e)
-
-    if (
-      targetToClear !== 'modulesByType.thermocyclerModuleType.model' &&
-      targetToClear !== 'modulesByType.heaterShakerModuleType.model'
-    ) {
-      onSetFieldValue(targetToClear, null)
-    }
     onSetFieldTouched(targetToClear, false)
   }
 

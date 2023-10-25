@@ -3,9 +3,13 @@ from __future__ import annotations
 import logging
 from contextlib import nullcontext
 from typing import Any, List, Optional, Sequence, Union, cast
-from opentrons.broker import Broker
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    CommandParameterLimitViolated,
+)
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons import types, hardware_control as hc
+from opentrons import types
 from opentrons.commands import commands as cmds
 
 from opentrons.commands import publisher
@@ -21,11 +25,13 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
+from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
+from ._waste_chute import WasteChute
 from . import labware, validation
 
 
@@ -71,13 +77,12 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         core: InstrumentCore,
         protocol_core: ProtocolCore,
-        broker: Broker,
+        broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
         trash: labware.Labware,
         requested_as: str,
     ) -> None:
-
         super().__init__(broker)
         self._api_version = api_version
         self._core = core
@@ -390,7 +395,7 @@ class InstrumentContext(publisher.CommandPublisher):
                      `rate` * :py:attr:`flow_rate.aspirate <flow_rate>`,
                      and when dispensing, it will be
                      `rate` * :py:attr:`flow_rate.dispense <flow_rate>`.
-        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette.
+        :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette.
         :returns: This instance
 
         .. note::
@@ -414,7 +419,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
         if not self._core.has_tip():
-            raise hc.NoTipAttachedError("Pipette has no tip. Aborting mix()")
+            raise UnexpectedTipRemovalError("mix", self.name, self.mount)
 
         c_vol = self._core.get_available_volume() if not volume else volume
 
@@ -535,7 +540,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param speed: The speed for touch tip motion, in mm/s.
                       Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
         :type speed: float
-        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
+        :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
         :raises RuntimeError: If no location is specified and location cache is
                               None. This should happen if `touch_tip` is called
                               without first calling a method that takes a
@@ -550,7 +555,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         """
         if not self._core.has_tip():
-            raise hc.NoTipAttachedError("Pipette has no tip to touch_tip()")
+            raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
 
         checked_speed = self._determine_speed(speed)
 
@@ -604,11 +609,11 @@ class InstrumentContext(publisher.CommandPublisher):
                        (Default will use all remaining volume in tip)
         :type volume: float
 
-        :param height: The number of millimiters to move above the current Well
-                       to air-gap aspirate. (Default: 5mm above current Well)
+        :param height: The number of millimeters to move above the current Well
+                       to air-gap aspirate. (Default: 5 mm above current Well)
         :type height: float
 
-        :raises: ``NoTipAttachedError`` -- if no tip is attached to the pipette
+        :raises: ``UnexpectedTipRemovalError`` -- if no tip is attached to the pipette
 
         :raises RuntimeError: If location cache is None.
                               This should happen if `touch_tip` is called
@@ -629,7 +634,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         """
         if not self._core.has_tip():
-            raise hc.NoTipAttachedError("Pipette has no tip. Aborting air_gap")
+            raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
 
         if height is None:
             height = 5
@@ -854,7 +859,13 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def drop_tip(
         self,
-        location: Optional[Union[types.Location, labware.Well]] = None,
+        location: Optional[
+            Union[
+                types.Location,
+                labware.Well,
+                WasteChute,
+            ]
+        ] = None,
         home_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
@@ -862,8 +873,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.  From API version 2.15 on, the API will default to
-        alternating between two different drop tip locations within the trash container
+        the fixed trash in slot 12.  From API version 2.15 on, if the trash container is
+        the default fixed trash in A3 (slot 12), the API will default to
+        dropping tips in different points within the trash container
         in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
@@ -951,6 +963,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
             well = maybe_well
 
+        elif isinstance(location, WasteChute):
+            # TODO: Publish to run log.
+            self._core.drop_tip_in_waste_chute(location, home_after=home_after)
+            self._last_tip_picked_up_from = None
+            return self
+
         else:
             raise TypeError(
                 "If specified, location should be an instance of"
@@ -1011,14 +1029,17 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Move a volume of liquid from one source to multiple destinations.
 
-        :param volume: The amount of volume to distribute to each destination
-                       well.
-        :param source: A single well from where liquid will be aspirated.
-        :param dest: List of Wells where liquid will be dispensed to.
-        :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
-                       Specifically, ``mix_after``, if specified, is ignored
-                       and ``disposal_volume``, if not specified, is set to the
-                       minimum volume of the pipette
+        :param volume: The amount, in µL, to dispense into each destination well.
+        :param source: A single well to aspirate liquid from.
+        :param dest: A list of wells to dispense liquid into.
+        :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
+            Some parameters behave differently than when transferring.
+
+              - ``disposal_volume`` aspirates additional liquid to improve the accuracy of each dispense. Defaults to the minimum volume of the pipette. See :ref:`param-disposal-volume` for details.
+
+              - ``mix_after`` is ignored.
+
+
         :returns: This instance
         """
         _log.debug("Distributing {} from {} to {}".format(volume, source, dest))
@@ -1043,15 +1064,14 @@ class InstrumentContext(publisher.CommandPublisher):
         **kwargs: Any,
     ) -> InstrumentContext:
         """
-        Move liquid from multiple wells (sources) to a single well(destination)
+        Move liquid from multiple source wells to a single destination well.
 
-        :param volume: The amount of volume to consolidate from each source
-                       well.
-        :param source: List of wells from where liquid will be aspirated.
-        :param dest: The single well into which liquid will be dispensed.
-        :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
-                       Specifically, ``mix_before``, if specified, is ignored
-                       and ``disposal_volume`` is ignored and set to 0.
+        :param volume: The amount, in µL, to aspirate from each source well.
+        :param source: A list of wells to aspirate liquid from.
+        :param dest: A single well to dispense liquid into.
+        :param kwargs: See :py:meth:`transfer` and the :ref:`complex_params` page.
+                       Some parameters behave differently than when transferring.
+                       ``disposal_volume`` and ``mix_before`` are ignored.
         :returns: This instance
         """
         _log.debug("Consolidate {} from {} to {}".format(volume, source, dest))
@@ -1084,91 +1104,87 @@ class InstrumentContext(publisher.CommandPublisher):
         # TODO: What should happen if the user passes a non-first-row well
         # TODO: ..as src/dest *while using multichannel pipette?
         """
-        Transfer will move a volume of liquid from a source location(s)
-        to a dest location(s). It is a higher-level command, incorporating
-        other :py:class:`InstrumentContext` commands, like :py:meth:`aspirate`
-        and :py:meth:`dispense`, designed to make protocol writing easier at
-        the cost of specificity.
+        Transfer moves liquid from one well or group of wells to another. It is a
+        higher-level command, incorporating other :py:class:`InstrumentContext`
+        commands, like :py:meth:`aspirate` and :py:meth:`dispense`. It makes writing a
+        protocol easier at the cost of specificity. See :ref:`v2-complex-commands` for
+        details on how transfer and other complex commands perform their component steps.
 
-        :param volume: The amount of volume to aspirate from each source and
+        :param volume: The amount, in µL, to aspirate from each source and
                        dispense to each destination.
-                       If volume is a list, each volume will be used for the
-                       sources/targets at the matching index. If volumes is a
-                       tuple with two elements, like `(20, 100)`, then a list
-                       of volumes will be generated with a linear gradient
-                       between the two volumes in the tuple.
-        :param source: A single well or a list of wells from where liquid
-                       will be aspirated.
-        :param dest: A single well or a list of wells where liquid
-                     will be dispensed to.
-        :param \\**kwargs: See below
+                       If ``volume`` is a list, each amount will be used for the source
+                       and destination at the matching index. A list item of ``0`` will
+                       skip the corresponding wells entirely. See
+                       :ref:`complex-list-volumes` for details and examples.
+        :param source: A single well or a list of wells to aspirate liquid from.
+        :param dest: A single well or a list of wells to dispense liquid into.
 
-        :Keyword Arguments:
+        :Keyword Arguments: Transfer accepts a number of optional parameters that give
+            you greater control over the exact steps it performs. See :ref:`complex_params`
+            or the links under each argument's entry below for additional details and
+            examples.
 
-            * *new_tip* (``string``) --
+            * **new_tip** (*string*) --
+              When to pick up and drop tips during the command. Defaults to ``"once"``.
 
-                - 'never': no tips will be picked up or dropped during transfer
-                - 'once': (default) a single tip will be used for all commands.
-                - 'always': use a new tip for each transfer.
+                - ``"once"``: Use one tip for the entire command.
+                - ``"always"``: Use a new tip for each set of aspirate and dispense steps.
+                - ``"never"``: Do not pick up or drop tips at all.
 
-            * *trash* (``boolean``) --
-              If `True` (default behavior), tips will be
-              dropped in the trash container attached this `Pipette`.
-              If `False` tips will be returned to tiprack.
+              See :ref:`param-tip-handling` for details.
 
-            * *touch_tip* (``boolean``) --
-              If `True`, a :py:meth:`touch_tip` will occur following each
-              :py:meth:`aspirate` and :py:meth:`dispense`. If set to `False`
-              (default behavior), no :py:meth:`touch_tip` will occur.
+            * **trash** (*boolean*) --
+              If ``True`` (default), the pipette will drop tips in its
+              :py:meth:`~.InstrumentContext.trash_container`.
+              If ``False``, the pipette will return tips to their tip rack.
 
-            * *blow_out* (``boolean``) --
-              If `True`, a :py:meth:`blow_out` will occur following each
+              See :ref:`param-trash` for details.
+
+            * **touch_tip** (*boolean*) --
+              If ``True``, perform a :py:meth:`touch_tip` following each
+              :py:meth:`aspirate` and :py:meth:`dispense`. Defaults to ``False``.
+
+              See :ref:`param-touch-tip` for details.
+
+            * **blow_out** (*boolean*) --
+              If ``True``, a :py:meth:`blow_out` will occur following each
               :py:meth:`dispense`, but only if the pipette has no liquid left
-              in it. If set to `False` (default), no :py:meth:`blow_out` will
-              occur.
+              in it. If ``False`` (default), the pipette will not blow out liquid.
 
-            * *blowout_location* (``string``) --
-                - 'source well': blowout excess liquid into source well
-                - 'destination well': blowout excess liquid into destination
-                   well
-                - 'trash': blowout excess liquid into the trash
+              See :ref:`param-blow-out` for details.
 
-                If no ``blowout_location`` specified, no ``disposal_volume``
-                specified, and the pipette contains liquid,
-                a :py:meth:`blow_out` will occur into the source well.
+            * **blowout_location** (*string*) --
+              Accepts one of three string values: ``"trash"``, ``"source well"``, or
+              ``"destination well"``.
 
-                If no ``blowout_location`` specified and either
-                ``disposal_volume`` is specified or the pipette is empty,
-                a :py:meth:`blow_out` will occur into the trash.
+              If ``blow_out`` is ``False`` (its default), this parameter is ignored.
 
-                If ``blow_out`` is set to ``False``, this parameter will be ignored.
+              If ``blow_out`` is ``True`` and this parameter is not set:
 
-            * *mix_before* (``tuple``) --
-              The tuple, if specified, gives the amount of volume to
-              :py:meth:`mix` preceding each :py:meth:`aspirate` during the
-              transfer. The tuple is interpreted as (repetitions, volume).
+                - Blow out into the trash, if the pipette is empty or only contains the disposal volume.
 
-            * *mix_after* (``tuple``) --
-              The tuple, if specified, gives the amount of volume to
-              :py:meth:`mix` after each :py:meth:`dispense` during the
-              transfer. The tuple is interpreted as (repetitions, volume).
+                - Blow out into the source well, if the pipette otherwise contains liquid.
 
-            * *disposal_volume* (``float``) --
-              (:py:meth:`distribute` only) Volume of liquid to be disposed off
-              after distributing. When dispensing multiple times from the same
-              tip, it is recommended to aspirate an extra amount of liquid to
-              be disposed off after distributing.
+            * **mix_before** (*tuple*) --
+              Perform a :py:meth:`mix` before each :py:meth:`aspirate` during the
+              transfer. The first value of the tuple is the number of repetitions, and
+              the second value is the amount of liquid to mix in µL.
 
-            * *carryover* (``boolean``) --
-              If `True` (default), any `volume` that exceeds the maximum volume
-              of this Pipette will be split into multiple smaller volumes.
+              See :ref:`param-mix-before` for details.
 
-            * *gradient* (``lambda``) --
-              Function for calculating the curve used for gradient volumes.
-              When `volume` is a tuple of length 2, its values are used to
-              create a list of gradient volumes. The default curve for this
-              gradient is linear (lambda x: x), however a method can be passed
-              with the `gradient` keyword argument to create a custom curve.
+            * **mix_after** (*tuple*) --
+              Perform a :py:meth:`mix` after each :py:meth:`dispense` during the
+              transfer. The first value of the tuple is the number of repetitions, and
+              the second value is the amount of liquid to mix in µL.
+
+              See :ref:`param-mix-after` for details.
+
+            * **disposal_volume** (*float*) --
+              Transfer ignores the numeric value of this parameter. If set, the pipette
+              will not aspirate additional liquid, but it will perform a very small blow
+              out after each dispense.
+
+              See :ref:`param-disposal-volume` for details.
 
         :returns: This instance
         """
@@ -1314,7 +1330,7 @@ class InstrumentContext(publisher.CommandPublisher):
                       individual axis speeds, you can use
                       :py:obj:`.ProtocolContext.max_speeds`.
         :param publish: Whether a call to this function should publish to the
-                        runlog or not.
+                        run log or not.
         """
         publish_ctx = nullcontext()
 
@@ -1578,3 +1594,46 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __str__(self) -> str:
         return "{} on {} mount".format(self._core.get_display_name(), self.mount)
+
+    @requires_version(2, 15)
+    def configure_for_volume(self, volume: float) -> None:
+        """Configure a pipette to handle a specific volume of liquid, specified in µL. Depending on the
+        volume, the pipette will enter a certain pipetting mode. Changing pipette modes alters properties
+        of the instance of :py:class:`.InstrumentContext`, such as default flow rate, minimum volume, and
+        maximum volume. The pipette will remain in the mode set by this function until it is called again.
+
+        The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode
+        to accurately dispense 1 µL of liquid. Low-volume mode can only be set by calling this function.
+
+        For more information on available modes for certain pipettes, see :ref:`pipette-volume-modes`.
+
+        .. note ::
+
+            Changing a pipette's mode will reset its :ref:`flow rates <new-plunger-flow-rates>`.
+
+        This function will raise an error if called when the pipette's tip contains liquid. It won't
+        raise an error if no tip is attached, but changing modes may affect which tips the pipette can
+        subsequently pick up without raising an error.
+
+        This function will also raise an error if ``volume`` is outside the :ref:`overall minimum and
+        maximum capacities <new-pipette-models>` of the pipette (e.g., setting ``volume=1`` for a Flex
+        1000 µL pipette).
+
+        :param volume: The volume, in µL, that the pipette will prepare to handle.
+        :type volume: float
+        """
+        if self._core.get_current_volume():
+            raise CommandPreconditionViolated(
+                message=f"Cannot switch modes of {str(self)} while it contains liquid"
+            )
+        if volume < 0:
+            raise CommandParameterLimitViolated(
+                command_name="configure_for_volume",
+                parameter_name="volume",
+                limit_statement="must be greater than 0",
+                actual_value=str(volume),
+            )
+        last_location = self._get_last_location_by_api_version()
+        if last_location and isinstance(last_location.labware, labware.Well):
+            self.move_to(last_location.labware.top())
+        self._core.configure_for_volume(volume)

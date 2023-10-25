@@ -26,7 +26,7 @@ import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
-import { useIsOT3 } from '../../../hooks'
+import { useIsFlex } from '../../../hooks'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
@@ -56,7 +56,7 @@ export function RenameRobotSlideout({
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
-  const isOt3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const trackEvent = useTrackEvent()
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
@@ -146,7 +146,7 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        {isOt3 ? null : (
+        {isFlex ? null : (
           <Banner type="informing" marginBottom={SPACING.spacing16}>
             {t('rename_robot_prefer_usb_connection')}
           </Banner>

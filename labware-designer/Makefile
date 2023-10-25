@@ -35,3 +35,7 @@ dist:
 dev: export NODE_ENV := development
 dev:
 	webpack-dev-server --hot
+
+.PHONY: test
+test:
+	$(MAKE) -C .. test-js-labware-designer

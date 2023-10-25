@@ -17,6 +17,12 @@ export const customViewports = {
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   viewport: { viewports: customViewports },
+  options: {
+    storySort: {
+      method: 'alphabetical',
+      order: ['Design Tokens', 'Library', 'App', 'ODD'],
+    },
+  },
 }
 
 // Global decorator to apply the styles to all stories

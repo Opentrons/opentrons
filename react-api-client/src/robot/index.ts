@@ -1,3 +1,4 @@
+export { useDoorQuery } from './useDoorQuery'
 export { useEstopQuery } from './useEstopQuery'
 export { useLightsQuery } from './useLightsQuery'
 export { useAcknowledgeEstopDisengageMutation } from './useAcknowledgeEstopDisengageMutation'

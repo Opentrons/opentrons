@@ -95,6 +95,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     // the following commands currently don't effect tracked robot state
     case 'touchTip': // pipetting
+    case 'configureForVolume':
     case 'loadPipette': // setup VVV
     case 'loadLabware':
     case 'loadModule':

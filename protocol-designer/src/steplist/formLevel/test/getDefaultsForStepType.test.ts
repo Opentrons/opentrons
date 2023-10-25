@@ -4,7 +4,6 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
-  FIXED_TRASH_ID,
 } from '../../../constants'
 import { getDefaultsForStepType } from '..'
 
@@ -19,6 +18,7 @@ describe('getDefaultsForStepType', () => {
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
+        dropTip_location: null,
         aspirate_wells_grouped: false,
 
         aspirate_flowRate: null,
@@ -49,7 +49,7 @@ describe('getDefaultsForStepType', () => {
         disposalVolume_volume: null,
 
         blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
+        blowout_location: null,
         preWetTip: false,
 
         aspirate_airGap_checkbox: false,
@@ -71,6 +71,7 @@ describe('getDefaultsForStepType', () => {
       expect(getDefaultsForStepType('mix')).toEqual({
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         labware: null,
+        dropTip_location: null,
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_checkbox: false,
@@ -78,7 +79,7 @@ describe('getDefaultsForStepType', () => {
         mix_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
-        blowout_location: FIXED_TRASH_ID,
+        blowout_location: null,
         mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         mix_touchTip_mmFromBottom: null,
         mix_touchTip_checkbox: false,

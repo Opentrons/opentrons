@@ -22,7 +22,7 @@ import { Divider } from '../../atoms/structure'
 import { Tooltip } from '../../atoms/Tooltip'
 import { ChooseProtocolSlideout } from '../../organisms/ChooseProtocolSlideout'
 import { DisconnectModal } from '../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
-import { UpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
+import { handleUpdateBuildroot } from '../../organisms/Devices/RobotSettings/UpdateBuildroot'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { UNREACHABLE, CONNECTABLE, REACHABLE } from '../../redux/discovery'
@@ -66,10 +66,6 @@ export const RobotOverviewOverflowMenu = (
   }
 
   const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(false)
-  const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
   ] = React.useState<boolean>(false)
@@ -87,10 +83,6 @@ export const RobotOverviewOverflowMenu = (
     dispatch(checkShellUpdate())
   })
 
-  const handleClickUpdateBuildroot: React.MouseEventHandler = () => {
-    setShowSoftwareUpdateModal(true)
-  }
-
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowChooseProtocolSlideout(true)
   }
@@ -105,14 +97,6 @@ export const RobotOverviewOverflowMenu = (
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
       <Portal level="top">
-        {showSoftwareUpdateModal &&
-        robot != null &&
-        robot.status !== UNREACHABLE ? (
-          <UpdateBuildroot
-            robot={robot}
-            close={() => setShowSoftwareUpdateModal(false)}
-          />
-        ) : null}
         {showDisconnectModal ? (
           <DisconnectModal
             onCancel={() => setShowDisconnectModal(false)}
@@ -140,7 +124,7 @@ export const RobotOverviewOverflowMenu = (
         >
           {isRobotOnWrongVersionOfSoftware && !isRobotUnavailable ? (
             <MenuItem
-              onClick={handleClickUpdateBuildroot}
+              onClick={() => handleUpdateBuildroot(robot)}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(
                 robot.name
               )}`}

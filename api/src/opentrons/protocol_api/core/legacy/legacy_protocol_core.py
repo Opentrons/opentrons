@@ -7,7 +7,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
-from opentrons.equipment_broker import EquipmentBroker
+from opentrons.util.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState, PauseType
@@ -18,6 +18,7 @@ from opentrons.protocols import labware as labware_definition
 from ...labware import Labware
 from ..._liquid import Liquid
 from ..._types import OffDeckType
+from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -44,7 +45,7 @@ class LegacyProtocolCore(
         api_version: APIVersion,
         labware_offset_provider: AbstractLabwareOffsetProvider,
         deck_layout: Deck,
-        equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
+        equipment_broker: Optional[Broker[LoadInfo]] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
@@ -73,7 +74,7 @@ class LegacyProtocolCore(
         self._api_version = api_version
         self._labware_offset_provider = labware_offset_provider
         self._deck_layout = deck_layout
-        self._equipment_broker = equipment_broker or EquipmentBroker()
+        self._equipment_broker = equipment_broker or Broker()
 
         self._instruments: Dict[Mount, Optional[LegacyInstrumentCore]] = {
             mount: None for mount in Mount.ot2_mounts()  # Legacy core works only on OT2
@@ -97,7 +98,7 @@ class LegacyProtocolCore(
         return "OT-2 Standard"
 
     @property
-    def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
+    def equipment_broker(self) -> Broker[LoadInfo]:
         """A message broker to to publish equipment load events.
 
         Subscribers to this broker will be notified with information about every
@@ -252,6 +253,7 @@ class LegacyProtocolCore(
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
+            WasteChute,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,

@@ -19,7 +19,7 @@ import { CheckCalibration } from '../../organisms/CheckCalibration'
 import {
   useRobot,
   useRunStatuses,
-  useIsOT3,
+  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../organisms/Devices/hooks'
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
@@ -84,7 +84,7 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const dispatch = useDispatch<Dispatch>()
 
   React.useEffect(() => {
@@ -158,9 +158,6 @@ export function RobotSettingsCalibration({
       : null
   )
 
-  console.log('pipetteOffsetCalibrations', pipetteOffsetCalibrations)
-  // console.log('attachedInstruments', attachedInstruments)
-
   const createStatus = createRequest?.status
 
   const isJogging =
@@ -202,7 +199,7 @@ export function RobotSettingsCalibration({
 
   const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 
-  if (!isOT3 && attachedPipettes != null) {
+  if (!isFlex && attachedPipettes != null) {
     formattedPipetteOffsetCalibrations.push({
       modelName: attachedPipettes.left?.displayName,
       serialNumber: attachedPipettes.left?.serialNumber,
@@ -313,7 +310,7 @@ export function RobotSettingsCalibration({
           onCloseClick={() => setShowHowCalibrationWorksModal(false)}
         />
       ) : null}
-      {isOT3 ? (
+      {isFlex ? (
         <>
           <CalibrationDataDownload
             {...{ robotName, setShowHowCalibrationWorksModal }}

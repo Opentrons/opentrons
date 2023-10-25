@@ -20,20 +20,15 @@ from opentrons.hardware_control.dev_types import (
     GripperDict,
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
-from opentrons.hardware_control.instruments.ot3.gripper_handler import (
-    GripError,
-    GripperHandler,
-)
+from opentrons.hardware_control.instruments.ot3.gripper_handler import GripperHandler
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetByPipetteMount,
 )
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
-    PickUpTipSpec,
-    TipMotorPickUpTipSpec,
-    DropTipMove,
-    DropTipSpec,
+    TipActionSpec,
+    TipActionMoveSpec,
 )
 from opentrons.hardware_control.types import (
     OT3Mount,
@@ -48,10 +43,7 @@ from opentrons.hardware_control.types import (
     EstopState,
     EstopStateNotification,
 )
-from opentrons.hardware_control.errors import (
-    GripperNotAttachedError,
-    InvalidMoveError,
-)
+from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import (
@@ -64,6 +56,11 @@ from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motion_planning.types import Move
 
 from opentrons.config import gripper_config as gc
+from opentrons_shared_data.errors.exceptions import (
+    GripperNotPresentError,
+    CommandPreconditionViolated,
+    CommandParameterLimitViolated,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.types import (
     PipetteModelType,
@@ -219,6 +216,19 @@ def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
+def mock_home_gear_motors(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "home_gear_motors",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.home_gear_motors,
+            wraps=ot3_hardware.managed_obj.home_gear_motors,
+        ),
+    ) as mock_home_gear:
+        yield mock_home_gear
+
+
+@pytest.fixture
 def mock_hold_jaw_width(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
         ot3_hardware.managed_obj,
@@ -272,6 +282,16 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
         ),
     ) as mock_refresh:
         yield mock_refresh
+
+
+@pytest.fixture
+async def mock_reset(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "reset",
+        AsyncMock(),
+    ) as mock_reset:
+        yield mock_reset
 
 
 @pytest.fixture
@@ -549,7 +569,7 @@ async def test_blow_out_error(
         assume(blowout_volume > max_input_vol)
 
         # check that blowout does not allow input values that would blow out too far
-        with pytest.raises(ValueError):
+        with pytest.raises(CommandParameterLimitViolated):
             await ot3_hardware.blow_out(mount, blowout_volume)
 
 
@@ -647,6 +667,7 @@ async def test_liquid_probe(
             fake_settings_aspirate.log_pressure,
             fake_settings_aspirate.auto_zero_sensor,
             fake_settings_aspirate.num_baseline_reads,
+            probe=InstrumentProbeType.PRIMARY,
         )
 
         return_dict[head_node], return_dict[pipette_node] = 142, 142
@@ -677,7 +698,7 @@ async def test_capacitive_probe(
 ) -> None:
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(mount)
-    res = await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
+    res, _ = await ot3_hardware.capacitive_probe(mount, moving, 2, fake_settings)
     # in reality, this value would be the previous position + the value
     # updated in ot3controller.capacitive_probe, and it kind of is here, but that
     # previous position is always 0. This is a test of ot3api though and checking
@@ -899,13 +920,13 @@ async def test_gripper_action_fails_with_no_gripper(
     mock_ungrip: AsyncMock,
 ) -> None:
     with pytest.raises(
-        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+        GripperNotPresentError, match="Cannot perform action without gripper attached"
     ):
         await ot3_hardware.grip(5.0)
     mock_grip.assert_not_called()
 
     with pytest.raises(
-        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+        GripperNotPresentError, match="Cannot perform action without gripper attached"
     ):
         await ot3_hardware.ungrip()
     mock_ungrip.assert_not_called()
@@ -927,7 +948,9 @@ async def test_gripper_action_works_with_gripper(
     }
     await ot3_hardware.cache_gripper(instr_data)
 
-    with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
+    with pytest.raises(
+        CommandPreconditionViolated, match="Cannot grip gripper jaw before homing"
+    ):
         await ot3_hardware.grip(5.0)
     await ot3_hardware.home_gripper_jaw()
     mock_ungrip.assert_called_once()
@@ -956,7 +979,7 @@ async def test_gripper_move_fails_with_no_gripper(
     ot3_hardware: ThreadManager[OT3API],
 ) -> None:
     assert not ot3_hardware._gripper_handler.gripper
-    with pytest.raises(GripperNotAttachedError):
+    with pytest.raises(GripperNotPresentError):
         await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
 
 
@@ -967,7 +990,7 @@ async def test_gripper_mount_not_movable(
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
     assert ot3_hardware._gripper_handler.gripper
-    with pytest.raises(InvalidMoveError):
+    with pytest.raises(InvalidCriticalPoint):
         await ot3_hardware.move_to(
             OT3Mount.GRIPPER, Point(0, 0, 0), critical_point=CriticalPoint.MOUNT
         )
@@ -988,7 +1011,7 @@ async def test_gripper_fails_for_pipette_cps(
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
     assert ot3_hardware._gripper_handler.gripper
-    with pytest.raises(InvalidMoveError):
+    with pytest.raises(InvalidCriticalPoint):
         await ot3_hardware.move_to(
             OT3Mount.GRIPPER, Point(0, 0, 0), critical_point=critical_point
         )
@@ -1066,6 +1089,47 @@ async def test_prepare_for_aspirate(
     await ot3_hardware.add_tip(mount, 100)
     await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
     mock_move_to_plunger_bottom.assert_called_once_with(OT3Mount.LEFT, 1.0)
+
+
+@pytest.mark.parametrize(
+    "asp_vol,disp_vol,push_out,is_ready",
+    (
+        [5, 1, None, True],  # Partial Dispense
+        [5, 5, None, False],  # Full dispense (default push_out)
+        [5, 5, 0.0, True],  # explicit no push out
+        [5, 5, 1.0, False],  # explicit push out
+    ),
+)
+async def test_plunger_ready_to_aspirate_after_dispense(
+    ot3_hardware: ThreadManager[OT3API],
+    asp_vol: float,
+    disp_vol: float,
+    push_out: Optional[float],
+    is_ready: bool,
+):
+    mount = OT3Mount.LEFT
+
+    instr_data = AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 4),
+        ),
+        id="fakepip",
+    )
+
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()]
+
+    await ot3_hardware.add_tip(mount, 100)
+    await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate
+
+    await ot3_hardware.aspirate(OT3Mount.LEFT, asp_vol)
+    await ot3_hardware.dispense(OT3Mount.LEFT, disp_vol, push_out=push_out)
+    assert (
+        ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate == is_ready
+    )
 
 
 async def test_move_to_plunger_bottom(
@@ -1320,45 +1384,35 @@ async def test_pick_up_tip_full_tiprack(
     mock_instrument_handlers: Tuple[Mock],
     mock_ungrip: AsyncMock,
     mock_move_to_plunger_bottom: AsyncMock,
+    mock_home_gear_motors: AsyncMock,
 ) -> None:
     mock_ungrip.return_value = None
     await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
 
-    def _fake_function():
-        return None
-
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
         backend._gear_motor_position = {NodeId: 0}
-        pipette_handler.plan_check_pick_up_tip.return_value = (
-            PickUpTipSpec(
-                plunger_prep_pos=0,
-                plunger_currents={
-                    Axis.of_main_tool_actuator(Mount.LEFT): 0,
-                },
-                presses=[],
-                shake_off_list=[],
-                retract_target=0,
-                pick_up_motor_actions=TipMotorPickUpTipSpec(
+        pipette_handler.plan_ht_pick_up_tip.return_value = TipActionSpec(
+            shake_off_moves=[],
+            tip_action_moves=[
+                TipActionMoveSpec(
                     # Move onto the posts
-                    tiprack_down=Point(0, 0, 0),
-                    tiprack_up=Point(0, 0, 0),
-                    pick_up_distance=10,
+                    distance=10,
                     speed=0,
-                    currents={Axis.Q: 0},
-                ),
-            ),
-            _fake_function,
+                    currents={
+                        Axis.of_main_tool_actuator(Mount.LEFT): 0,
+                        Axis.Q: 0,
+                    },
+                )
+            ],
         )
 
         def _update_gear_motor_pos(
             moves: Optional[List[Move[Axis]]] = None,
             distance: Optional[float] = None,
-            velocity: Optional[float] = None,
-            tip_action: str = "home",
         ) -> None:
             if NodeId.pipette_left not in backend._gear_motor_position:
                 backend._gear_motor_position = {NodeId.pipette_left: 0.0}
@@ -1374,49 +1428,44 @@ async def test_pick_up_tip_full_tiprack(
         tip_action.side_effect = _update_gear_motor_pos
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
-        pipette_handler.plan_check_pick_up_tip.assert_called_once_with(
-            OT3Mount.LEFT, 40.0, None, None
-        )
+        pipette_handler.plan_ht_pick_up_tip.assert_called_once_with()
         # first call should be "clamp", moving down
-        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up
-        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
-        # last call should be "home"
-        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
-        assert len(tip_action.call_args_list) == 3
+        assert len(tip_action.call_args_list) == 2
+        # home should be called after tip_action is done
+        assert len(mock_home_gear_motors.call_args_list) == 1
 
 
 async def test_drop_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
+    mock_home_gear_motors: AsyncMock,
 ) -> None:
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
-
-    def _fake_function():
-        return None
 
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
         backend._gear_motor_position = {NodeId.pipette_left: 0}
-        pipette_handler.plan_check_drop_tip.return_value = (
-            DropTipSpec(
-                drop_moves=[
-                    DropTipMove(
-                        target_position=10,
-                        current={Axis.P_L: 1.0},
-                        speed=1,
-                        is_ht_tip_action=True,
-                    )
-                ],
-                shake_moves=[],
-                ending_current={Axis.P_L: 1.0},
-            ),
-            _fake_function,
+        pipette_handler.plan_ht_drop_tip.return_value = TipActionSpec(
+            tip_action_moves=[
+                TipActionMoveSpec(
+                    distance=10,
+                    speed=1,
+                    currents={Axis.P_L: 1.0},
+                ),
+            ],
+            shake_off_moves=[],
         )
+
+        def set_mock_plunger_configs() -> None:
+            mock_instr = pipette_handler.get_pipette(Mount.LEFT)
+            mock_instr.backlash_distance = 0.1
+            mock_instr.config.plunger_homing_configurations.current = 1.0
+            mock_instr.plunger_positions.bottom = -18.5
 
         def _update_gear_motor_pos(
             moves: Optional[List[Move[Axis]]] = None,
@@ -1436,19 +1485,18 @@ async def test_drop_tip_full_tiprack(
                 backend._gear_motor_position[NodeId.pipette_left] += distance
 
         tip_action.side_effect = _update_gear_motor_pos
+        set_mock_plunger_configs()
 
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
-        pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
+        pipette_handler.plan_ht_drop_tip.assert_called_once_with()
         # first call should be "clamp", moving down
-        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up
-        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
-        # last call should be "home"
-        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
-        assert len(tip_action.call_args_list) == 3
+        assert len(tip_action.call_args_list) == 2
+        # home should be called after tip_action is done
+        assert len(mock_home_gear_motors.call_args_list) == 1
 
 
 @pytest.mark.parametrize(
@@ -1521,6 +1569,14 @@ async def test_home_axis(
     stepper_ok: bool,
     encoder_ok: bool,
 ) -> None:
+    if axis in Axis.pipette_axes():
+        pipette_config = load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 3),
+        )
+        instr_data = AttachedPipette(config=pipette_config, id="fakepip")
+        await ot3_hardware.cache_pipette(Axis.to_ot3_mount(axis), instr_data, None)
 
     backend = ot3_hardware.managed_obj._backend
     origin_pos = {ax: 100 for ax in Axis}
@@ -1677,8 +1733,8 @@ async def test_tip_presence_disabled_ninety_six_channel(
     # TODO remove this check once we enable tip presence for 96 chan.
     with patch.object(
         ot3_hardware.managed_obj._backend,
-        "get_tip_present",
-        AsyncMock(spec=ot3_hardware.managed_obj._backend.get_tip_present),
+        "check_for_tip_presence",
+        AsyncMock(spec=ot3_hardware.managed_obj._backend.check_for_tip_presence),
     ) as tip_present:
         pipette_config = load_pipette_data.load_definition(
             PipetteModelType("p1000"),
@@ -1744,3 +1800,29 @@ async def test_estop_event_deactivate_module(
         )
     else:
         assert len(futures) == 0
+
+
+@pytest.mark.parametrize(
+    "jaw_state",
+    [
+        GripperJawState.UNHOMED,
+        GripperJawState.HOMED_READY,
+        GripperJawState.GRIPPING,
+        GripperJawState.HOLDING,
+    ],
+)
+async def test_stop_only_home_necessary_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_home: AsyncMock,
+    mock_reset: AsyncMock,
+    jaw_state: GripperJawState,
+):
+    gripper_config = gc.load(GripperModel.v1)
+    instr_data = AttachedGripper(config=gripper_config, id="test")
+    await ot3_hardware.cache_gripper(instr_data)
+    ot3_hardware._gripper_handler.get_gripper().current_jaw_displacement = 0
+    ot3_hardware._gripper_handler.get_gripper().state = jaw_state
+
+    await ot3_hardware.stop(home_after=True)
+    if jaw_state == GripperJawState.GRIPPING:
+        mock_home.assert_called_once_with(skip=[Axis.G])

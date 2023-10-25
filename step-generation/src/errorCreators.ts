@@ -12,6 +12,13 @@ export function insufficientTips(): CommandCreatorError {
   }
 }
 
+export function missingAdapter(): CommandCreatorError {
+  return {
+    type: 'MISSING_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips fully without an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
@@ -186,5 +193,12 @@ export const labwareOffDeck = (): CommandCreatorError => {
   return {
     type: 'LABWARE_OFF_DECK',
     message: 'Attempted to interact with labware off deck',
+  }
+}
+
+export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
+  return {
+    type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',
+    message: 'The destination for dropping tip does not exist',
   }
 }

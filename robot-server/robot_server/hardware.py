@@ -26,7 +26,7 @@ from opentrons.config import (
     feature_flags as ff,
 )
 from opentrons.util.helpers import utc_now
-from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI
+from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI, API
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import (
     HardwareEvent,
@@ -50,6 +50,7 @@ from server_utils.fastapi_utils.app_state import (
 )
 from .errors.robot_errors import (
     NotSupportedOnOT2,
+    NotSupportedOnFlex,
     HardwareNotYetInitialized,
     HardwareFailedToInitialize,
 )
@@ -224,6 +225,17 @@ def get_ot3_hardware(
             detail="This route is only available on a Flex."
         ).as_error(status.HTTP_403_FORBIDDEN)
     return cast(OT3API, thread_manager.wrapped())
+
+
+def get_ot2_hardware(
+    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+) -> "API":
+    """Get an OT2 hardware controller."""
+    if not thread_manager.wraps_instance(API):
+        raise NotSupportedOnFlex(
+            detail="This route is only available on an OT-2."
+        ).as_error(status.HTTP_403_FORBIDDEN)
+    return cast(API, thread_manager.wrapped())
 
 
 async def get_firmware_update_manager(

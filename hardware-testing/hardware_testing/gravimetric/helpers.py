@@ -97,13 +97,29 @@ def get_list_of_wells_affected(
     channels: int,
 ) -> List[Well]:
     """Get list of wells affected."""
-    if channels > 1 and not well_is_reservoir(well):
-        well_col = well.well_name[1:]  # the "1" in "A1"
-        wells_list = [w for w in well.parent.columns_by_name()[well_col]]
-        assert well in wells_list, "Well is not inside column"
-    else:
-        wells_list = [well]
-    return wells_list
+    labware = well.parent
+    num_rows = len(labware.rows())
+    num_cols = len(labware.columns())
+    if num_rows == 1 and num_cols == 1:
+        return [well]  # aka: 1-well reservoir
+    if channels == 1:
+        return [well]  # 1ch pipette
+    if channels == 8:
+        if num_rows == 1:
+            return [well]  # aka: 12-well reservoir
+        else:
+            assert (
+                num_rows == 8
+            ), f"8ch pipette cannot go to labware with {num_rows} rows"
+            well_col = well.well_name[1:]  # the "1" in "A1"
+            wells_list = [w for w in well.parent.columns_by_name()[well_col]]
+            assert well in wells_list, "Well is not inside column"
+            return wells_list
+    if channels == 96:
+        return labware.wells()
+    raise ValueError(
+        f"unable to find affected wells for {channels}ch pipette (well={well})"
+    )
 
 
 def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
@@ -141,19 +157,39 @@ def _jog_to_find_liquid_height(
     return _liquid_height
 
 
+def _sense_liquid_height(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    well: Well,
+    cfg: config.VolumetricConfig,
+) -> float:
+    hwapi = get_sync_hw_api(ctx)
+    pipette.move_to(well.top())
+    lps = config._get_liquid_probe_settings(cfg, well)
+    # NOTE: very important that probing is done only 1x time,
+    #       with a DRY tip, for reliability
+    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, lps)
+    if ctx.is_simulating():
+        probed_z = well.top().point.z - 1
+    liq_height = probed_z - well.bottom().point.z
+    if abs(liq_height - lps.max_z_distance) < 0.01:
+        raise RuntimeError("unable to probe liquid, reach max travel distance")
+    return liq_height
+
+
 def _calculate_average(volume_list: List[float]) -> float:
     return sum(volume_list) / len(volume_list)
 
 
 def _reduce_volumes_to_not_exceed_software_limit(
     test_volumes: List[float],
-    cfg: config.VolumetricConfig,
+    pipette_volume: int,
+    pipette_channels: int,
+    tip_volume: int,
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(
-            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
-        )
-        max_vol = cfg.tip_volume - liq_cls.aspirate.trailing_air_gap
+        liq_cls = get_liquid_class(pipette_volume, pipette_channels, tip_volume, int(v))
+        max_vol = tip_volume - liq_cls.aspirate.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
 
@@ -208,9 +244,9 @@ def _calculate_stats(
     return average, cv, d
 
 
-def _get_tip_batch(is_simulating: bool) -> str:
+def _get_tip_batch(is_simulating: bool, tip: int) -> str:
     if not is_simulating:
-        return input("TIP BATCH:").strip()
+        return input(f"TIP BATCH for {tip}ul tips:").strip()
     else:
         return "simulation-tip-batch"
 
@@ -243,6 +279,8 @@ def _pick_up_tip(
         f"from slot #{location.labware.parent.parent}"
     )
     pipette.pick_up_tip(location)
+    if pipette.channels == 96:
+        get_sync_hw_api(ctx).retract(OT3Mount.LEFT)
     # NOTE: the accuracy-adjust function gets set on the Pipette
     #       each time we pick-up a new tip.
     if cfg.increment:
@@ -266,71 +304,85 @@ def _drop_tip(
             pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
 
 
-def _get_volumes(ctx: ProtocolContext, cfg: config.VolumetricConfig) -> List[float]:
-    if cfg.increment:
-        test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
-    elif cfg.user_volumes and not ctx.is_simulating():
-        _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
+def _get_volumes(
+    ctx: ProtocolContext,
+    increment: bool,
+    pipette_channels: int,
+    pipette_volume: int,
+    tip_volume: int,
+    user_volumes: bool,
+    kind: config.ConfigType,
+    extra: bool,
+    channels: int,
+    mode: str = "",
+) -> List[float]:
+    if increment:
+        test_volumes = get_volume_increments(
+            pipette_channels, pipette_volume, tip_volume, mode=mode
+        )
+    elif user_volumes and not ctx.is_simulating():
+        _inp = input(
+            f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
+        )
         test_volumes = [
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        test_volumes = get_test_volumes(cfg)
-    if not test_volumes:
-        raise ValueError("no volumes to test, check the configuration")
+        test_volumes = get_test_volumes(
+            kind, channels, pipette_volume, tip_volume, extra
+        )
     if not _check_if_software_supports_high_volumes():
         if ctx.is_simulating():
             test_volumes = _reduce_volumes_to_not_exceed_software_limit(
-                test_volumes, cfg
+                test_volumes, pipette_volume, channels, tip_volume
             )
         else:
             raise RuntimeError("you are not the correct branch")
-    return sorted(test_volumes, reverse=False)  # lowest volumes first
+    return test_volumes
 
 
 def _load_pipette(
-    ctx: ProtocolContext, cfg: config.VolumetricConfig
+    ctx: ProtocolContext,
+    pipette_channels: int,
+    pipette_volume: int,
+    pipette_mount: str,
+    increment: bool,
+    gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
-    load_str_channels = {1: "single_gen3", 8: "multi_gen3", 96: "96"}
-    pip_channels = cfg.pipette_channels
-    if pip_channels not in load_str_channels:
-        raise ValueError(f"unexpected number of channels: {pip_channels}")
-    chnl_str = load_str_channels[pip_channels]
-    pip_name = f"p{cfg.pipette_volume}_{chnl_str}"
-    ui.print_info(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
+    pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
+    ui.print_info(f'pipette "{pip_name}" on mount "{pipette_mount}"')
 
     # if we're doing multiple tests in one run, the pipette may already be loaded
     loaded_pipettes = ctx.loaded_instruments
-    if cfg.pipette_mount in loaded_pipettes.keys():
-        return loaded_pipettes[cfg.pipette_mount]
+    if pipette_mount in loaded_pipettes.keys():
+        return loaded_pipettes[pipette_mount]
 
-    pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
-    assert pipette.max_volume == cfg.pipette_volume, (
-        f"expected {cfg.pipette_volume} uL pipette, "
+    pipette = ctx.load_instrument(pip_name, pipette_mount)
+    assert pipette.max_volume == pipette_volume, (
+        f"expected {pipette_volume} uL pipette, "
         f"but got a {pipette.max_volume} uL pipette"
     )
-    if hasattr(cfg, "gantry_speed"):
-        pipette.default_speed = getattr(cfg, "gantry_speed")
+    if gantry_speed is not None:
+        pipette.default_speed = gantry_speed
 
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
-    if pipette.channels == 8 and not cfg.increment:
+    if pipette.channels == 8 and not increment:
         hwapi = get_sync_hw_api(ctx)
-        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        mnt = OT3Mount.LEFT if pipette_mount == "left" else OT3Mount.RIGHT
         hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
         hwpipette.pick_up_configurations.current = 0.2
     return pipette
 
 
 def _get_tag_from_pipette(
-    pipette: InstrumentContext,
-    cfg: config.VolumetricConfig,
+    pipette: InstrumentContext, increment: bool, user_volumes: bool
 ) -> str:
     pipette_tag = get_pipette_unique_name(pipette)
     ui.print_info(f'found pipette "{pipette_tag}"')
-    if cfg.increment:
+    if increment:
         pipette_tag += "-increment"
-    elif cfg.user_volumes:
+    elif user_volumes:
         pipette_tag += "-user-volume"
     else:
         pipette_tag += "-qc"
@@ -361,8 +413,16 @@ def _load_tipracks(
     loaded_labwares = ctx.loaded_labwares
     pre_loaded_tips: List[Labware] = []
     for ls in tiprack_load_settings:
-        if ls[0] in loaded_labwares.keys() and loaded_labwares[ls[0]].name == ls[1]:
-            pre_loaded_tips.append(loaded_labwares[ls[0]])
+        if ls[0] in loaded_labwares.keys():
+            if loaded_labwares[ls[0]].name == ls[1]:
+                pre_loaded_tips.append(loaded_labwares[ls[0]])
+            else:
+                # If something is in the slot that's not what we want, remove it
+                # we use this only for the 96 channel
+                ui.print_info(
+                    f"Removing {loaded_labwares[ls[0]].name} from slot {ls[0]}"
+                )
+                del ctx._core.get_deck()[ls[0]]  # type: ignore[attr-defined]
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
@@ -374,26 +434,35 @@ def _load_tipracks(
     return tipracks
 
 
-def get_test_volumes(cfg: config.VolumetricConfig) -> List[float]:
+def get_test_volumes(
+    kind: config.ConfigType, pipette: int, volume: int, tip: int, extra: bool
+) -> List[float]:
     """Get test volumes."""
-    if cfg.kind is config.ConfigType.photometric:
-        return config.QC_VOLUMES_P[cfg.pipette_channels][cfg.pipette_volume][
-            cfg.tip_volume
-        ]
+    volumes: List[float] = []
+    print(f"Finding volumes for p {pipette} {volume} with tip {tip}, extra: {extra}")
+    if kind is config.ConfigType.photometric:
+        for t, vls in config.QC_VOLUMES_P[pipette][volume]:
+            if t == tip:
+                volumes = vls
+                break
     else:
-        if cfg.extra:
-            return config.QC_VOLUMES_EXTRA_G[cfg.pipette_channels][cfg.pipette_volume][
-                cfg.tip_volume
-            ]
+        if extra:
+            cfg = config.QC_VOLUMES_EXTRA_G
         else:
-            return config.QC_VOLUMES_G[cfg.pipette_channels][cfg.pipette_volume][
-                cfg.tip_volume
-            ]
+            cfg = config.QC_VOLUMES_G
+
+        for t, vls in cfg[pipette][volume]:
+            print(f"tip {t} volumes {vls}")
+            if t == tip:
+                volumes = vls
+                break
+    print(f"final volumes: {volumes}")
+    return volumes
 
 
-def get_default_trials(cfg: config.VolumetricConfig) -> int:
+def get_default_trials(increment: bool, kind: config.ConfigType, channels: int) -> int:
     """Return the default number of trials for QC tests."""
-    if cfg.increment:
+    if increment:
         return 3
     else:
-        return config.QC_DEFAULT_TRIALS[cfg.kind][cfg.pipette_channels]
+        return config.QC_DEFAULT_TRIALS[kind][channels]

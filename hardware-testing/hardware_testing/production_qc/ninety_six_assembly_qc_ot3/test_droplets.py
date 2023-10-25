@@ -152,8 +152,7 @@ async def _drop_tip(api: OT3API, trash: Point) -> None:
 async def _partial_pick_up_z_motion(
     api: OT3API, current: float, distance: float, speed: float
 ) -> None:
-    async with api._backend.restore_current():
-        await api._backend.set_active_current({Axis.Z_L: current})
+    async with api._backend.motor_current(run_currents={Axis.Z_L: current}):
         target_down = target_position_from_relative(
             OT3Mount.LEFT, Point(z=-distance), api._current_position
         )

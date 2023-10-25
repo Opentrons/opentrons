@@ -3,8 +3,8 @@ import type { DevInternalFlag } from './types'
 export const CONFIG_VERSION_LATEST: 1 = 1
 
 export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
-  'enableExtendedHardware',
-  'lpcWithProbe',
+  'enableDeckConfiguration',
+  'protocolStats',
 ]
 
 // action type constants

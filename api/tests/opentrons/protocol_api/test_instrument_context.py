@@ -5,7 +5,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -72,9 +72,9 @@ def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
 
 
 @pytest.fixture
-def mock_broker(decoy: Decoy) -> Broker:
+def mock_broker(decoy: Decoy) -> LegacyBroker:
     """Get a mock command message broker."""
-    return decoy.mock(cls=Broker)
+    return decoy.mock(cls=LegacyBroker)
 
 
 @pytest.fixture
@@ -93,7 +93,7 @@ def api_version() -> APIVersion:
 def subject(
     mock_instrument_core: InstrumentCore,
     mock_protocol_core: ProtocolCore,
-    mock_broker: Broker,
+    mock_broker: LegacyBroker,
     mock_trash: Labware,
     api_version: APIVersion,
 ) -> InstrumentContext:

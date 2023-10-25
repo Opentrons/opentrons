@@ -169,6 +169,9 @@ class Simulator:
         # to the hardware api controller.
         self._module_controls: Optional[AttachedModulesControl] = None
 
+    async def get_serial_number(self) -> Optional[str]:
+        return "simulator"
+
     @property
     def gpio_chardev(self) -> GPIODriverLike:
         return self._gpio_chardev
@@ -187,11 +190,15 @@ class Simulator:
     async def update_position(self) -> Dict[str, float]:
         return self._position
 
+    def _unhomed_axes(self, axes: Sequence[str]) -> List[str]:
+        return list(
+            axis
+            for axis in axes
+            if not self._smoothie_driver.homed_flags.get(axis, False)
+        )
+
     def is_homed(self, axes: Sequence[str]) -> bool:
-        for axis in axes:
-            if not self._smoothie_driver.homed_flags.get(axis, False):
-                return False
-        return True
+        return not any(self._unhomed_axes(axes))
 
     @ensure_yield
     async def move(

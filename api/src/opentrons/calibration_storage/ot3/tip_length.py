@@ -37,19 +37,22 @@ def tip_lengths_for_pipette(
 ) -> typing.Dict[str, v1.TipLengthModel]:
     tip_lengths = {}
     try:
+        # While you technically could drop some data in for tip length calibration on the flex,
+        # it is not necessary and there is no UI frontend for it, so this code will mostly be
+        # taking the FileNotFoundError path.
         tip_length_filepath = config.get_tip_length_cal_path() / f"{pipette_id}.json"
         all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
         for tiprack, data in all_tip_lengths_for_pipette.items():
             try:
                 tip_lengths[tiprack] = v1.TipLengthModel(**data)
             except (json.JSONDecodeError, ValidationError):
-                log.warning(
+                log.debug(
                     f"Tip length calibration is malformed for {tiprack} on {pipette_id}"
                 )
                 pass
         return tip_lengths
     except FileNotFoundError:
-        log.warning(f"Tip length calibrations not found for {pipette_id}")
+        # this is the overwhelmingly common case
         return tip_lengths
 
 

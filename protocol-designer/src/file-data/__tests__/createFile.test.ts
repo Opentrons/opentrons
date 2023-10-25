@@ -83,7 +83,10 @@ describe('createFile selector', () => {
       v7Fixture.moduleEntities,
       pipetteEntities,
       labwareNicknamesById,
-      labwareDefsByURI
+      labwareDefsByURI,
+      //  TODO(jr, 10/3/23): add additionalEquipmentEntities when the schemaV7 supports
+      //  loadFixture
+      {}
     )
     expectResultToMatchSchema(result)
 

@@ -7,7 +7,7 @@ import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../../../hooks'
-import { UpdateBuildroot } from '../../UpdateBuildroot'
+import { handleUpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
 jest.mock('../../../hooks')
@@ -24,8 +24,8 @@ const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.Mock
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
-const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
-  typeof UpdateBuildroot
+const mockUpdateBuildroot = handleUpdateBuildroot as jest.MockedFunction<
+  typeof handleUpdateBuildroot
 >
 
 const MOCK_ROBOT_VERSION = '7.7.7'
@@ -40,7 +40,6 @@ const render = () => {
 
 describe('RobotSettings RobotServerVersion', () => {
   beforeEach(() => {
-    mockUpdateBuildroot.mockReturnValue(<div>mock update buildroot</div>)
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
@@ -66,7 +65,7 @@ describe('RobotSettings RobotServerVersion', () => {
     getByText('up to date')
     const reinstall = getByRole('button', { name: 'reinstall' })
     fireEvent.click(reinstall)
-    getByText('mock update buildroot')
+    expect(mockUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render the warning message if the robot server version needs to upgrade', () => {
@@ -81,7 +80,7 @@ describe('RobotSettings RobotServerVersion', () => {
     )
     const btn = getByText('View update')
     fireEvent.click(btn)
-    getByText('mock update buildroot')
+    expect(mockUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render the warning message if the robot server version needs to downgrade', () => {
@@ -96,7 +95,7 @@ describe('RobotSettings RobotServerVersion', () => {
     )
     const btn = getByText('View update')
     fireEvent.click(btn)
-    getByText('mock update buildroot')
+    expect(mockUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('the link should have the correct href', () => {

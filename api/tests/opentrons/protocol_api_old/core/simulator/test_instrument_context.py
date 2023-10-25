@@ -4,12 +4,12 @@ from typing import Callable
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from opentrons.hardware_control import (
-    NoTipAttachedError,
-    TipAttachedError,
-)
 from opentrons.protocol_api.core.common import InstrumentCore, LabwareCore
 from opentrons.types import Location, Point
+from opentrons_shared_data.errors.exceptions import (
+    UnexpectedTipRemovalError,
+    UnexpectedTipAttachError,
+)
 
 # TODO (lc 12-8-2022) Not sure if we plan to keep these tests, but if we do
 # we should re-write them to be agnostic to the underlying hardware. Otherwise
@@ -40,7 +40,9 @@ def test_same_pipette(
 
 def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
-    with pytest.raises(NoTipAttachedError, match="Cannot perform PREPARE_ASPIRATE"):
+    with pytest.raises(
+        UnexpectedTipRemovalError, match="Cannot perform PREPARE_ASPIRATE"
+    ):
         subject.prepare_for_aspirate()  # type: ignore[attr-defined]
 
 
@@ -48,7 +50,7 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
     """It should raise an error if a tip is not attached."""
     subject.home()
     location = Location(point=Point(1, 2, 3), labware=None)
-    with pytest.raises(NoTipAttachedError, match="Cannot perform DISPENSE"):
+    with pytest.raises(UnexpectedTipRemovalError, match="Cannot perform DISPENSE"):
         subject.dispense(
             volume=1,
             rate=1,
@@ -57,25 +59,6 @@ def test_dispense_no_tip(subject: InstrumentCore) -> None:
             well_core=None,
             in_place=False,
             push_out=None,
-        )
-
-
-def test_drop_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
-    """It should raise an error if a tip is not attached."""
-    tip_core = tip_rack.get_well_core("A1")
-
-    subject.home()
-    with pytest.raises(NoTipAttachedError, match="Cannot perform DROPTIP"):
-        subject.drop_tip(location=None, well_core=tip_core, home_after=False)
-
-
-def test_blow_out_no_tip(subject: InstrumentCore, labware: LabwareCore) -> None:
-    """It should raise an error if a tip is not attached."""
-    with pytest.raises(NoTipAttachedError, match="Cannot perform BLOWOUT"):
-        subject.blow_out(
-            location=Location(point=Point(1, 2, 3), labware=None),
-            well_core=labware.get_well_core("A1"),
-            in_place=True,
         )
 
 
@@ -91,7 +74,7 @@ def test_pick_up_tip_no_tip(subject: InstrumentCore, tip_rack: LabwareCore) -> N
         increment=None,
         prep_after=False,
     )
-    with pytest.raises(TipAttachedError):
+    with pytest.raises(UnexpectedTipAttachError):
         subject.pick_up_tip(
             location=Location(point=tip_core.get_top(z_offset=0), labware=None),
             well_core=tip_core,

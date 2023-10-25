@@ -54,7 +54,6 @@ class Params(BaseModel):
     newLocation: Optional[Union[Location, Literal["offDeck"]]]
     strategy: Optional[str]
     # schema v7 add-ons
-    adapterId: Optional[str]
     homeAfter: Optional[bool]
     alternateDropLocation: Optional[bool]
     holdTimeSeconds: Optional[float]
@@ -64,6 +63,7 @@ class Params(BaseModel):
     loadName: Optional[str]
     namespace: Optional[str]
     version: Optional[int]
+    pushOut: Optional[float]
 
 
 class Command(BaseModel):

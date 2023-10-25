@@ -26,7 +26,7 @@ import { Navbar } from './Navbar'
 import { EstopTakeover, EmergencyStopContext } from '../organisms/EmergencyStop'
 import { OPENTRONS_USB } from '../redux/discovery'
 import { appShellRequestor } from '../redux/shell/remote'
-import { useRobot, useIsOT3 } from '../organisms/Devices/hooks'
+import { useRobot, useIsFlex } from '../organisms/Devices/hooks'
 import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
@@ -114,28 +114,29 @@ export const DesktopApp = (): JSX.Element => {
           }}
         >
           <Box width="100%">
-            <Switch>
-              {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
-                return (
-                  <Route key={path} exact={exact} path={path}>
-                    <Breadcrumbs />
-                    <Box
-                      position={POSITION_RELATIVE}
-                      width="100%"
-                      height="100%"
-                      backgroundColor={COLORS.fundamentalsBackground}
-                      overflow={OVERFLOW_AUTO}
-                    >
-                      <ModalPortalRoot />
-                      <Component />
-                    </Box>
-                  </Route>
-                )
-              })}
-              <Redirect exact from="/" to="/protocols" />
-            </Switch>
-            <RobotControlTakeover />
-            <Alerts />
+            <Alerts>
+              <Switch>
+                {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
+                  return (
+                    <Route key={path} exact={exact} path={path}>
+                      <Breadcrumbs />
+                      <Box
+                        position={POSITION_RELATIVE}
+                        width="100%"
+                        height="100%"
+                        backgroundColor={COLORS.fundamentalsBackground}
+                        overflow={OVERFLOW_AUTO}
+                      >
+                        <ModalPortalRoot />
+                        <Component />
+                      </Box>
+                    </Route>
+                  )
+                })}
+                <Redirect exact from="/" to="/protocols" />
+              </Switch>
+              <RobotControlTakeover />
+            </Alerts>
           </Box>
         </EmergencyStopContext.Provider>
       </ToasterOven>
@@ -148,10 +149,10 @@ function RobotControlTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
 
   // E-stop is not supported on OT2
-  if (!isOT3) return null
+  if (!isFlex) return null
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null

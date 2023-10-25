@@ -58,7 +58,7 @@ describe('LiquidDetails', () => {
     getByText('4')
     getByText('mock labware name')
     getByText('Location')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Volume')
     getByText('50 µL')
     getByLabelText('LiquidDetails_0').click()

@@ -1,17 +1,16 @@
 import assert from 'assert'
 import * as React from 'react'
-import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
-import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
-import cx from 'classnames'
 import { connect } from 'react-redux'
 import noop from 'lodash/noop'
+import { DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import cx from 'classnames'
+import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { DND_TYPES } from '../../../constants'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
 } from '../../../utils/labwareModuleCompatibility'
-import { BlockedSlot } from './BlockedSlot'
 import {
   moveDeckItem,
   openAddLabwareModal,
@@ -21,13 +20,14 @@ import {
   selectors as labwareDefSelectors,
 } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
+import { BlockedSlot } from './BlockedSlot'
 
-import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
-import { LabwareOnDeck } from '../../../step-forms'
-import {
+import type {
   DeckSlot as DeckSlotDefinition,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 interface DNDP {
@@ -91,6 +91,18 @@ export const SlotControlsComponent = (
     slotBlocked = 'Labware incompatible with this module'
   }
 
+  const isOnHeaterShaker = moduleType === 'heaterShakerModuleType'
+  const isNoAdapterOption =
+    moduleType === 'magneticBlockType' ||
+    moduleType === 'magneticModuleType' ||
+    moduleType === 'thermocyclerModuleType'
+  let overlayText: string = 'add_adapter_or_labware'
+  if (isOnHeaterShaker) {
+    overlayText = 'add_adapter'
+  } else if (isNoAdapterOption) {
+    overlayText = 'add_labware'
+  }
+
   return connectDropTarget(
     <g>
       {slotBlocked ? (
@@ -116,9 +128,7 @@ export const SlotControlsComponent = (
         >
           <a className={styles.overlay_button} onClick={addLabware}>
             {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
-            {i18n.t(
-              `deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`
-            )}
+            {i18n.t(`deck.overlay.slot.${isOver ? 'place_here' : overlayText}`)}
           </a>
         </RobotCoordsForeignDiv>
       )}

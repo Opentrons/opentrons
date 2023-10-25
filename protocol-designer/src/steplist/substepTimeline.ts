@@ -147,7 +147,6 @@ export const substepTimelineMultiChannel = (
         const wellsForTips =
           channels &&
           labwareDef &&
-          // @ts-expect-error 96 channels not yet supported
           getWellsForTips(channels, labwareDef, wellName).wellsForTips
         const wellInfo = {
           labwareId,

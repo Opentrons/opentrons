@@ -64,6 +64,11 @@ def print_error(message: str) -> None:
     print(f"ERROR: {message}")
 
 
+def print_warning(message: str) -> None:
+    """Print warning."""
+    print(f"WARNING: {message}")
+
+
 def print_info(message: str) -> None:
     """Print information."""
     print(message)

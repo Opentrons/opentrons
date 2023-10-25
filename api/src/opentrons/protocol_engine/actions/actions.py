@@ -14,8 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from opentrons_shared_data.errors import EnumeratedError
 
-from ..resources import pipette_data_provider
-from ..commands import Command, CommandCreate
+from ..commands import Command, CommandCreate, CommandPrivateResult
 from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
 
 
@@ -111,6 +110,7 @@ class UpdateCommandAction:
     """Update a given command."""
 
     command: Command
+    private_result: CommandPrivateResult
 
 
 @dataclass(frozen=True)
@@ -180,15 +180,6 @@ class SetPipetteMovementSpeedAction:
     speed: Optional[float]
 
 
-@dataclass(frozen=True)
-class AddPipetteConfigAction:
-    """Adds a pipette's static config to the state store."""
-
-    pipette_id: str
-    serial_number: str
-    config: pipette_data_provider.LoadedStaticPipetteData
-
-
 Action = Union[
     PlayAction,
     PauseAction,
@@ -205,5 +196,4 @@ Action = Union[
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    AddPipetteConfigAction,
 ]

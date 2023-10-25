@@ -37,17 +37,55 @@ class ErrorOccurrence(BaseModel):
         )
 
     id: str = Field(..., description="Unique identifier of this error occurrence.")
-    errorType: str = Field(..., description="Specific error type that occurred.")
     createdAt: datetime = Field(..., description="When the error occurred.")
-    detail: str = Field(..., description="A human-readable message about the error.")
+
     errorCode: str = Field(
         default=ErrorCodes.GENERAL_ERROR.value.code,
-        description="An enumerated error code for the error type.",
+        description=(
+            "An enumerated error code for the error type."
+            " This is intended to be shown to the robot operator to direct them to the"
+            " correct rough area for troubleshooting."
+        ),
     )
+
+    # TODO(mm, 2023-09-07):
+    # The Opentrons App and Flex ODD use `errorType` in the title of error modals, but it's unclear
+    # if they should. Is this field redundant now that we have `errorCode` and `detail`?
+    #
+    # In practice, this is often the source code name of our Python exception type.
+    # Should we derive this from `errorCode` instead? Like how HTTP code 404 is always "not found."
+    errorType: str = Field(
+        ...,
+        description=(
+            "A short name for the error type that occurred, like `PipetteOverpressure`."
+            " This can be a bit more specific than `errorCode`."
+        ),
+    )
+
+    detail: str = Field(
+        ...,
+        description=(
+            "A short human-readable message about the error."
+            "\n\n"
+            "This is intended to provide the robot operator with more specific details than"
+            " `errorCode` alone. It should be no longer than a couple of sentences,"
+            " and it should not contain internal newlines or indentation."
+            "\n\n"
+            " It should not internally repeat `errorCode`, but it may internally repeat `errorType`"
+            " if it helps the message make sense when it's displayed in its own separate block."
+        ),
+    )
+
     errorInfo: Dict[str, str] = Field(
         default={},
-        description="Specific details about the error that may be useful for determining cause.",
+        description=(
+            "Specific details about the error that may be useful for determining cause."
+            " This might contain the same information as `detail`, but in a more structured form."
+            " It might also contain additional information that was too verbose or technical"
+            " to put in `detail`."
+        ),
     )
+
     wrappedErrors: List["ErrorOccurrence"] = Field(
         default=[], description="Errors that may have caused this one."
     )

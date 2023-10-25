@@ -3,6 +3,16 @@ export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 // pipettes module already exports type `Mount`
 type Mount = 'left' | 'right' | 'extension'
 
+export const INCONSISTENT_PIPETTE_OFFSET = 'inconsistent-pipette-offset'
+
+export interface InconsistentCalibrationFailure {
+  kind: 'inconsistent-pipette-offset'
+  offsets: Map<'left' | 'right', { x: number; y: number; z: number }>
+  limit: number
+}
+
+export type CalibrationReasonabilityCheckFailure = InconsistentCalibrationFailure
+
 export interface SharedInstrumentData {
   mount: Mount
 }
@@ -13,6 +23,7 @@ export interface GripperData {
       offset: { x: number; y: number; z: number }
       source: string
       last_modified?: string
+      reasonability_check_failures?: null[]
     }
   }
   firmwareVersion?: string
@@ -32,6 +43,7 @@ export interface PipetteData {
       offset: { x: number; y: number; z: number }
       source: string
       last_modified?: string
+      reasonability_check_failures?: CalibrationReasonabilityCheckFailure[]
     }
   }
   firmwareVersion?: string

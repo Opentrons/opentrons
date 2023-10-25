@@ -45,10 +45,10 @@ describe('InterventionModal', () => {
     }
   })
 
-  it('renders an InterventionModal with the robot name in the header, learn more link, and confirm button', () => {
+  it('renders an InterventionModal with the robot name in the header and confirm button', () => {
     const { getByText, getByRole } = render(props)
     getByText('Pause on Otie')
-    getByText('Learn more about manual steps')
+    // getByText('Learn more about manual steps')
     getByRole('button', { name: 'Confirm and resume' })
   })
 
@@ -95,7 +95,7 @@ describe('InterventionModal', () => {
     }
     const { getByText, queryAllByText } = render(props)
     getByText('Move labware on Otie')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('mockLabware')
     queryAllByText('A1')
     queryAllByText('D3')
@@ -130,7 +130,7 @@ describe('InterventionModal', () => {
     }
     const { getByText, queryAllByText } = render(props)
     getByText('Move labware on Otie')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('mockLabware')
     queryAllByText('A1')
     queryAllByText('C1')

@@ -380,10 +380,10 @@ ssh-keygen # note the path you save the key to
 make -C robot-server install-key br_ssh_pubkey=/path/to/pubkey host=${some_other_ip_address}
 ```
 
-and subsequently, when you do `make term`, add the `br_ssh_key=/path/to/key` option:
+and subsequently, when you do `make term`, add the `ssh_key=/path/to/key` option:
 
 ```shell
-make term br_ssh_key=/path/to/privkey
+make term ssh_key=/path/to/privkey
 ```
 
 If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `make term` and `make install-key` will work without arguments.

@@ -207,7 +207,7 @@ describe('robot update epics', () => {
 
         expectObservable(output$).toBe('-a', {
           a: actions.unexpectedRobotUpdateError(
-            'This robot must be updated by the system before a custom update can occur.'
+            'This robot must be updated by the system before a custom update can occur'
           ),
         })
       })

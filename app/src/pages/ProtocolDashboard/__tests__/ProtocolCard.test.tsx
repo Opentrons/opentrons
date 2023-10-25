@@ -50,6 +50,7 @@ const props = {
   longPress: jest.fn(),
   setTargetProtocol: jest.fn(),
   setShowDeleteConfirmationModal: jest.fn(),
+  setTargetProtocolId: jest.fn(),
 }
 
 const render = () => {

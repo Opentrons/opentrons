@@ -15,9 +15,15 @@ from typing import (
     TypeVar,
     overload,
 )
+import numpy
 
+from opentrons_shared_data.errors.exceptions import (
+    UnexpectedTipRemovalError,
+    UnexpectedTipAttachError,
+)
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
 from opentrons_shared_data.pipette.types import Quirks
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 from opentrons import types as top_types
 from opentrons.hardware_control.types import (
@@ -25,10 +31,6 @@ from opentrons.hardware_control.types import (
     HardwareAction,
     Axis,
     OT3Mount,
-)
-from opentrons.hardware_control.errors import (
-    TipAttachedError,
-    NoTipAttachedError,
 )
 from opentrons.hardware_control.constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -261,6 +263,14 @@ class PipetteHandlerProvider(Generic[MountType]):
         return self.get_attached_instruments()
 
     @property
+    def attached_pipettes(self) -> Dict[MountType, PipetteDict]:
+        return self.get_attached_instruments()
+
+    @property
+    def get_attached_pipettes(self) -> Dict[MountType, PipetteDict]:
+        return self.get_attached_instruments()
+
+    @property
     def hardware_instruments(self) -> InstrumentsByMount[MountType]:
         """Do not write new code that uses this."""
         return self._attached_instruments
@@ -430,9 +440,11 @@ class PipetteHandlerProvider(Generic[MountType]):
             # configured such that the end of a p300 single gen1's tip is 0.
             return top_types.Point(0, 0, 30)
 
-    def ready_for_tip_action(self, target: Pipette, action: HardwareAction) -> None:
+    def ready_for_tip_action(
+        self, target: Pipette, action: HardwareAction, mount: MountType
+    ) -> None:
         if not target.has_tip:
-            raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
+            raise UnexpectedTipRemovalError(action.name, target.name, mount.name)
         if (
             action == HardwareAction.ASPIRATE
             and target.current_volume == 0
@@ -495,7 +507,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         - Plunger distances (possibly calling an overridden plunger_volume)
         """
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.ASPIRATE)
+        self.ready_for_tip_action(instrument, HardwareAction.ASPIRATE, mount)
         if volume is None:
             self._ihp_log.debug(
                 "No aspirate volume defined. Aspirating up to "
@@ -539,22 +551,27 @@ class PipetteHandlerProvider(Generic[MountType]):
 
     @overload
     def plan_check_dispense(
-        self, mount: top_types.Mount, volume: Optional[float], rate: float
+        self,
+        mount: top_types.Mount,
+        volume: Optional[float],
+        rate: float,
+        push_out: Optional[float],
     ) -> Optional[LiquidActionSpec]:
         ...
 
     @overload
     def plan_check_dispense(
-        self, mount: OT3Mount, volume: Optional[float], rate: float
+        self,
+        mount: OT3Mount,
+        volume: Optional[float],
+        rate: float,
+        push_out: Optional[float],
     ) -> Optional[LiquidActionSpec]:
         ...
 
     def plan_check_dispense(  # type: ignore[no-untyped-def]
-        self,
-        mount,
-        volume,
-        rate,
-    ):
+        self, mount, volume, rate, push_out
+    ) -> Optional[LiquidActionSpec]:
         """Check preconditions for dispense, parse args, and calculate positions.
 
         While the mechanics of issuing a dispense move itself are left to child
@@ -572,7 +589,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         """
 
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DISPENSE)
+        self.ready_for_tip_action(instrument, HardwareAction.DISPENSE, mount)
 
         if volume is None:
             disp_vol = instrument.current_volume
@@ -589,6 +606,34 @@ class PipetteHandlerProvider(Generic[MountType]):
         if disp_vol == 0:
             return None
 
+        is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
+
+        if is_full_dispense:
+            if push_out is None:
+                push_out_ul = instrument.push_out_volume
+            else:
+                push_out_ul = push_out
+        else:
+            if push_out is not None and push_out != 0:
+                raise CommandPreconditionViolated(
+                    message="Cannot push_out on a dispense that does not leave the pipette empty",
+                    detail={
+                        "command": "dispense",
+                        "remaining-volume": instrument.current_volume - disp_vol,
+                    },
+                )
+            push_out_ul = 0
+
+        push_out_dist_mm = push_out_ul / instrument.ul_per_mm(push_out_ul, "blowout")
+
+        if not instrument.ok_to_push_out(push_out_dist_mm):
+            raise CommandPreconditionViolated(
+                message="Cannot push_out more than pipette max blowout volume.",
+                detail={
+                    "command": "dispense",
+                },
+            )
+
         dist = self.plunger_position(
             instrument, instrument.current_volume - disp_vol, "dispense"
         )
@@ -599,7 +644,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             return LiquidActionSpec(
                 axis=Axis.of_plunger(mount),
                 volume=disp_vol,
-                plunger_distance=dist,
+                plunger_distance=dist + push_out_dist_mm,
                 speed=speed,
                 instr=instrument,
                 current=instrument.plunger_motor_current.run,
@@ -625,7 +670,6 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
@@ -701,7 +745,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
-            raise TipAttachedError("Cannot pick up tip with a tip attached")
+            raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
         if presses is None or presses < 0:
@@ -859,7 +903,6 @@ class PipetteHandlerProvider(Generic[MountType]):
         home_after,
     ):
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
 
         bottom = instrument.plunger_positions.bottom
         droptip = instrument.plunger_positions.drop_tip
@@ -939,6 +982,10 @@ class PipetteHandlerProvider(Generic[MountType]):
                 f"No pipette attached to {mount.name} mount"
             )
         return pip
+
+    async def set_liquid_class(self, mount: MountType, liquid_class: str) -> None:
+        pip = self.get_pipette(mount)
+        pip.set_liquid_class_by_name(liquid_class)
 
 
 class OT3PipetteHandler(PipetteHandlerProvider[OT3Mount]):

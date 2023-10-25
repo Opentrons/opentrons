@@ -9,6 +9,7 @@ import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import {
   CreateCommand,
+  FLEX_ROBOT_TYPE,
   getIsTiprack,
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -17,8 +18,10 @@ import {
   IDENTITY_VECTOR,
   LabwareLocation,
   MoveLabwareCreateCommand,
+  RobotType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { useSelector } from 'react-redux'
 import {
   getLabwareDef,
   getLabwareDefinitionsFromCommands,
@@ -26,7 +29,7 @@ import {
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { useChainRunCommands } from '../../resources/runs/hooks'
-import { useFeatureFlag } from '../../redux/config'
+import { getIsOnDevice } from '../../redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -51,6 +54,7 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
+  robotType: RobotType
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
@@ -68,9 +72,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     isRobotMoving,
     existingOffsets,
     setFatalError,
+    robotType,
   } = props
-  const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
@@ -257,9 +262,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             wellName: 'A1',
             wellLocation: {
               origin: 'top' as const,
-              offset: goldenLPC
-                ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
-                : IDENTITY_VECTOR,
+              offset:
+                robotType === FLEX_ROBOT_TYPE
+                  ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
+                  : IDENTITY_VECTOR,
             },
           },
         },
@@ -321,7 +327,18 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         ]
 
   const handleConfirmPosition = (): void => {
-    let confirmPositionCommands: CreateCommand[] = [
+    const heaterShakerPrepCommands: CreateCommand[] =
+      moduleId != null &&
+      moduleType != null &&
+      moduleType === HEATERSHAKER_MODULE_TYPE
+        ? [
+            {
+              commandType: 'heaterShaker/openLabwareLatch',
+              params: { moduleId },
+            },
+          ]
+        : []
+    const confirmPositionCommands: CreateCommand[] = [
       {
         commandType: 'retractAxis' as const,
         params: {
@@ -336,23 +353,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         commandType: 'retractAxis' as const,
         params: { axis: 'y' },
       },
+      ...heaterShakerPrepCommands,
       ...moveLabwareOffDeck,
     ]
 
-    if (
-      moduleId != null &&
-      moduleType != null &&
-      moduleType === HEATERSHAKER_MODULE_TYPE
-    ) {
-      confirmPositionCommands = [
-        confirmPositionCommands[0],
-        {
-          commandType: 'heaterShaker/openLabwareLatch',
-          params: { moduleId },
-        },
-        confirmPositionCommands[1],
-      ]
-    }
     chainRunCommands(
       [
         { commandType: 'savePosition', params: { pipetteId } },
@@ -423,11 +427,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             location: displayLocation,
           })}
           body={
-            <StyledText as="p">
-              {isTiprack
-                ? t('ensure_nozzle_is_above_tip')
-                : t('ensure_tip_is_above_well')}
-            </StyledText>
+            <Trans
+              t={t}
+              i18nKey={
+                isOnDevice
+                  ? 'ensure_nozzle_is_above_tip_odd'
+                  : 'ensure_nozzle_is_above_tip_desktop'
+              }
+              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+            />
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
@@ -451,6 +459,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           }
           labwareDef={labwareDef}
           confirmPlacement={handleConfirmPlacement}
+          robotType={robotType}
         />
       )}
     </Flex>

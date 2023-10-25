@@ -151,6 +151,16 @@
   text-transform: uppercase;
 }
 
+.section_header_text_column {
+  flex: 1;
+  max-width: 20rem;
+  color: #666;
+  letter-spacing: 1px;
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+}
+
 .path_option {
   width: 2.275rem;
   height: 1.55rem;
@@ -235,7 +245,7 @@
   margin-top: 0.5rem;
   font-size: var(--fs-body-1);
   overflow: hidden;
-  white-space: nowrap;
+  white-space: pre-wrap;
   text-overflow: ellipsis;
 }
 

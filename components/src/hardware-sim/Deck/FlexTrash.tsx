@@ -1,9 +1,9 @@
 import * as React from 'react'
 
 import { Icon } from '../../icons'
-import { Flex } from '../../primitives'
+import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS } from '../../ui-style-constants'
+import { BORDERS, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
@@ -11,8 +11,8 @@ import trashDef from '@opentrons/shared-data/labware/definitions/2/opentrons_1_t
 
 import type { RobotType } from '@opentrons/shared-data'
 
-// only allow edge slots (columns 1 and 3)
-export type TrashSlotName =
+// only allow edge cutout locations (columns 1 and 3)
+export type TrashLocation =
   | 'A1'
   | 'B1'
   | 'C1'
@@ -26,7 +26,7 @@ interface FlexTrashProps {
   robotType: RobotType
   trashIconColor: string
   backgroundColor: string
-  trashSlotName?: TrashSlotName
+  trashLocation?: TrashLocation
 }
 
 /**
@@ -37,18 +37,19 @@ export const FlexTrash = ({
   robotType,
   trashIconColor,
   backgroundColor,
-  // default Flex trash slot position A3
-  trashSlotName = 'A3',
+  trashLocation,
 }: FlexTrashProps): JSX.Element | null => {
   // be sure we don't try to render for an OT-2
   if (robotType !== 'OT-3 Standard') return null
 
   const deckDef = getDeckDefFromRobotType(robotType)
+  // TODO(bh, 2023-10-09): migrate from "orderedSlots" to v4 "cutouts" key
   const trashSlot = deckDef.locations.orderedSlots.find(
-    slot => slot.id === trashSlotName
+    slot => slot.id === trashLocation
   )
 
   // retrieve slot x,y positions and dimensions from deck definition for the given trash slot
+  // TODO(bh, 2023-10-09): refactor position, offsets, and rotation after v4 migration
   const [x = 0, y = 0] = trashSlot?.position ?? []
   const { xDimension: slotXDimension = 0, yDimension: slotYDimension = 0 } =
     trashSlot?.boundingBox ?? {}
@@ -59,10 +60,10 @@ export const FlexTrash = ({
 
   // rotate trash 180 degrees in column 1
   const rotateDegrees =
-    trashSlotName === 'A1' ||
-    trashSlotName === 'B1' ||
-    trashSlotName === 'C1' ||
-    trashSlotName === 'D1'
+    trashLocation === 'A1' ||
+    trashLocation === 'B1' ||
+    trashLocation === 'C1' ||
+    trashLocation === 'D1'
       ? '180'
       : '0'
 
@@ -87,6 +88,17 @@ export const FlexTrash = ({
           justifyContent={JUSTIFY_CENTER}
           width="100%"
         >
+          {rotateDegrees === '180' ? (
+            <Text
+              color={trashIconColor}
+              // rotate text back 180 degrees
+              transform={`rotate(${rotateDegrees}deg)`}
+              transformOrigin="center"
+              css={TYPOGRAPHY.bodyTextSemiBold}
+            >
+              Trash
+            </Text>
+          ) : null}
           <Icon
             name="trash"
             color={trashIconColor}
@@ -95,6 +107,11 @@ export const FlexTrash = ({
             transform={`rotate(${rotateDegrees}deg)`}
             transformOrigin="center"
           />
+          {rotateDegrees === '0' ? (
+            <Text color={trashIconColor} css={TYPOGRAPHY.bodyTextSemiBold}>
+              Trash
+            </Text>
+          ) : null}
         </Flex>
       </RobotCoordsForeignObject>
     </g>

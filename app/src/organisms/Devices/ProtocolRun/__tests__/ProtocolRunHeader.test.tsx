@@ -21,6 +21,7 @@ import {
   usePipettesQuery,
   useDismissCurrentRunMutation,
   useEstopQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
@@ -57,6 +58,7 @@ import {
 } from '../../../../redux/analytics'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
+import { getRobotSettings } from '../../../../redux/robot-settings'
 
 import {
   useProtocolDetailsForRun,
@@ -64,9 +66,10 @@ import {
   useTrackProtocolRunEvent,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
-  useIsOT3,
+  useIsFlex,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
@@ -110,6 +113,7 @@ jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../RunFailedModal')
 jest.mock('../../../../redux/robot-update/selectors')
+jest.mock('../../../../redux/robot-settings/selectors')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -144,6 +148,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 >
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunction<
   typeof useRunCreatedAtTimestamp
@@ -187,7 +194,13 @@ const mockRunFailedModal = RunFailedModal as jest.MockedFunction<
 const mockUseEstopQuery = useEstopQuery as jest.MockedFunction<
   typeof useEstopQuery
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
+const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
+  typeof useDoorQuery
+>
+const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
+  typeof getRobotSettings
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -195,6 +208,13 @@ const CREATED_AT = '03/03/2022 19:08:49'
 const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
 const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
 const PROTOCOL_NAME = 'A Protocol for Otie'
+const mockSettings = {
+  id: 'enableDoorSafetySwitch',
+  title: 'Enable Door Safety Switch',
+  description: '',
+  value: true,
+  restart_required: false,
+}
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
 
@@ -233,6 +253,12 @@ const mockEstopStatus = {
     status: DISENGAGED,
     leftEstopPhysicalStatus: DISENGAGED,
     rightEstopPhysicalStatus: NOT_PRESENT,
+  },
+}
+const mockDoorStatus = {
+  data: {
+    status: 'closed',
+    doorRequiredClosedForProtocol: true,
   },
 }
 
@@ -341,9 +367,14 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
-    mockUseIsOT3.mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseModuleCalibrationStatus)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ complete: true })
     mockRunFailedModal.mockReturnValue(<div>mock RunFailedModal</div>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
+    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
+    mockGetRobotSettings.mockReturnValue([mockSettings])
   })
 
   afterEach(() => {
@@ -569,6 +600,28 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Canceling Run' })
     expect(button).toBeDisabled()
     getByText('Stop requested')
+  })
+
+  it('renders a disabled button and when the robot door is open', () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: { data: mockRunningRun },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+
+    const [{ getByText, getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Resume run' })
+    expect(button).toBeDisabled()
+    getByText('Close robot door')
   })
 
   it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -836,5 +889,38 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText, getByLabelText }] = render()
     getByText('Run completed.')
     getByLabelText('ot-spinner')
+  })
+
+  it('renders door close banner when the robot door is open', () => {
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Close the robot door before starting the run.')
+  })
+
+  it('should render door close banner when door is open and enabled safety door switch is on - OT-2', () => {
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ getByText }] = render()
+    getByText('Close the robot door before starting the run.')
+  })
+
+  it('should not render door close banner when door is open and enabled safety door switch is off - OT-2', () => {
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+    const mockOffSettings = { ...mockSettings, value: false }
+    mockGetRobotSettings.mockReturnValue([mockOffSettings])
+    const mockOpenDoorStatus = {
+      data: { status: 'open', doorRequiredClosedForProtocol: true },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ queryByText }] = render()
+    expect(
+      queryByText('Close the robot door before starting the run.')
+    ).not.toBeInTheDocument()
   })
 })

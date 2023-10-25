@@ -272,12 +272,6 @@ def test_load_labware(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        load_labware_params.resolve_loadname(
-            "some_labware",
-        )
-    ).then_return("some_labware")
-
-    decoy.when(
         mock_engine_client.load_labware(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             load_name="some_labware",
@@ -345,14 +339,8 @@ def test_load_labware_on_labware(
     ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
 
     decoy.when(
-        load_labware_params.resolve_loadname(
-            "some_labware",
-        )
-    ).then_return("labware_some")
-
-    decoy.when(
         load_labware_params.resolve(
-            "labware_some",
+            "some_labware",
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
@@ -362,7 +350,7 @@ def test_load_labware_on_labware(
     decoy.when(
         mock_engine_client.load_labware(
             location=OnLabwareLocation(labwareId="labware-id"),
-            load_name="labware_some",
+            load_name="some_labware",
             display_name="some_display_name",
             namespace="some_namespace",
             version=9001,
@@ -425,12 +413,6 @@ def test_load_labware_off_deck(
             [EngineLabwareLoadParams("hello", "world", 654)],
         )
     ).then_return(("some_namespace", 9001))
-
-    decoy.when(
-        load_labware_params.resolve_loadname(
-            "some_labware",
-        )
-    ).then_return("some_labware")
 
     decoy.when(
         mock_engine_client.load_labware(
@@ -693,12 +675,6 @@ def test_load_labware_on_module(
     ).then_return(("some_namespace", 9001))
 
     decoy.when(
-        load_labware_params.resolve_loadname(
-            "some_labware",
-        )
-    ).then_return("some_labware")
-
-    decoy.when(
         mock_engine_client.load_labware(
             location=ModuleLocation(moduleId="module-id"),
             load_name="some_labware",
@@ -771,12 +747,6 @@ def test_load_labware_on_non_connected_module(
             [EngineLabwareLoadParams("hello", "world", 654)],
         )
     ).then_return(("some_namespace", 9001))
-
-    decoy.when(
-        load_labware_params.resolve_loadname(
-            "some_labware",
-        )
-    ).then_return("some_labware")
 
     decoy.when(
         mock_engine_client.load_labware(

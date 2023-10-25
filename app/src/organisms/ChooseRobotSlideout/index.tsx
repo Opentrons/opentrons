@@ -223,26 +223,24 @@ export function ChooseRobotSlideout(
               selectedRobot != null && selectedRobot.ip === robot.ip
             return (
               <>
-                <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
-                  <AvailableRobotOption
-                    key={robot.ip}
-                    robot={robot}
-                    // TODO: generalize to a disabled/reset prop
-                    onClick={() => {
-                      if (!isCreatingRun) {
-                        resetCreateRun?.()
-                        setSelectedRobot(robot)
-                      }
-                    }}
-                    isError={runCreationError != null}
-                    isSelected={isSelected}
-                    isOnDifferentSoftwareVersion={
-                      isSelectedRobotOnWrongVersionOfSoftware
+                <AvailableRobotOption
+                  key={robot.ip}
+                  robot={robot}
+                  // TODO: generalize to a disabled/reset prop
+                  onClick={() => {
+                    if (!isCreatingRun) {
+                      resetCreateRun?.()
+                      setSelectedRobot(robot)
                     }
-                    showIdleOnly={showIdleOnly}
-                    registerRobotBusyStatus={registerRobotBusyStatus}
-                  />
-                </Flex>
+                  }}
+                  isError={runCreationError != null}
+                  isSelected={isSelected}
+                  isOnDifferentSoftwareVersion={
+                    isSelectedRobotOnWrongVersionOfSoftware
+                  }
+                  showIdleOnly={showIdleOnly}
+                  registerRobotBusyStatus={registerRobotBusyStatus}
+                />
                 {runCreationError != null && isSelected && (
                   <StyledText
                     as="label"

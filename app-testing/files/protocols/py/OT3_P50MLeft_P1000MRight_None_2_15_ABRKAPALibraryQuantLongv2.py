@@ -65,9 +65,9 @@ def run(protocol: protocol_api.ProtocolContext):
     reservoir = protocol.load_labware("nest_12_reservoir_15ml", "2")
     dilution_plate_1 = protocol.load_labware("opentrons_96_aluminumblock_biorad_wellplate_200ul", "3")
 
-    tiprack_50_1 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul", "4")
-    tiprack_200_1 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "5")
-    tiprack_50_2 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul", "6")
+    tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "4")
+    tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "5")
+    tiprack_50_2 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "6")
 
     reagent_plate = protocol.load_labware("nest_96_wellplate_100ul_pcr_full_skirt", "7")  # <--- NEST Strip Tubes
     dilution_plate_2 = protocol.load_labware("opentrons_96_aluminumblock_biorad_wellplate_200ul", "8")
@@ -96,8 +96,8 @@ def run(protocol: protocol_api.ProtocolContext):
     DIL = reservoir["A5"]
 
     # pipette
-    p50 = protocol.load_instrument("p50_multi_gen3", "left", tip_racks=[tiprack_50_1, tiprack_50_2])
-    p1000 = protocol.load_instrument("p1000_multi_gen3", "right", tip_racks=[tiprack_200_1])
+    p50 = protocol.load_instrument("flex_8channel_50", "left", tip_racks=[tiprack_50_1, tiprack_50_2])
+    p1000 = protocol.load_instrument("flex_8channel_1000", "right", tip_racks=[tiprack_200_1])
 
     # samples
     src_file_path = inspect.getfile(lambda: None)

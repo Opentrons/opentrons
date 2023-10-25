@@ -40,6 +40,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 
 interface ReplaceTipArgs {
   pipette: string
+  dropTipLocation: string
 }
 
 /**
@@ -52,14 +53,18 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette } = args
+  const { pipette, dropTipLocation } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
+
+  // TODO(jr, 10/16/23): plug in missingAdapter() error creator, need to get current tiprackId
+
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
       errors: [errorCreators.insufficientTips()],
     }
   }
+
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
@@ -86,6 +91,12 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         }),
       ],
     }
+  }
+  if (
+    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
   if (
     modulePipetteCollision({
@@ -134,6 +145,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(dropTip, {
       pipette,
+      dropTipLocation,
     }),
     curryCommandCreator(_pickUpTip, {
       pipette,

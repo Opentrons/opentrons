@@ -27,11 +27,7 @@ import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 
-import type {
-  InstrumentData,
-  PipetteOffsetCalibration,
-  GripperData,
-} from '@opentrons/api-client'
+import type { InstrumentData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
@@ -53,10 +49,6 @@ interface ProtocolInstrumentMountItemProps {
   mount: Mount | 'extension'
   mostRecentAnalysis?: CompletedProtocolAnalysis | null
   attachedInstrument: InstrumentData | null
-  attachedCalibrationData:
-    | PipetteOffsetCalibration
-    | GripperData['data']['calibratedOffset']
-    | null
   speccedName: PipetteName | GripperModel
   instrumentsRefetch?: () => void
 }

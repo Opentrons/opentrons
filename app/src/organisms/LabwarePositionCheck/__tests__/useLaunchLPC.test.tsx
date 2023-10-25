@@ -18,7 +18,7 @@ import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('../')
 jest.mock('@opentrons/react-api-client')
@@ -80,7 +80,7 @@ describe('useLaunchLPC hook', () => {
       Promise.resolve({ data: { definitionUri: 'fakeDefUri' } })
     )
     mockDeleteMaintenanceRun = jest.fn((_data, opts) => {
-      opts?.onSuccess()
+      opts?.onSettled()
     })
     const store = mockStore({ isOnDevice: false })
     wrapper = ({ children }) => (
@@ -156,12 +156,18 @@ describe('useLaunchLPC hook', () => {
   })
 
   it('returns and no wizard by default', () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID), { wrapper })
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
     expect(result.current.LPCWizard).toEqual(null)
   })
 
   it('returns creates maintenance run with current offsets and definitions when create callback is called, closes and deletes when exit is clicked', async () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID), { wrapper })
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
     await result.current.launchLPC()
     await expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
       maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
@@ -184,7 +190,7 @@ describe('useLaunchLPC hook', () => {
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(
       MOCK_MAINTENANCE_RUN_ID,
       {
-        onSuccess: expect.any(Function),
+        onSettled: expect.any(Function),
       }
     )
     expect(result.current.LPCWizard).toBeNull()

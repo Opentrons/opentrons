@@ -88,9 +88,10 @@ export const PipetteWizardFlows = (
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const hasCalData =
-    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
+  const hasCalData =
+    memoizedAttachedPipettes[mount]?.data.calibratedOffset?.last_modified !=
+    null
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
@@ -341,6 +342,8 @@ export const PipetteWizardFlows = (
         proceed={proceed}
         subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
         description={t('firmware_updating')}
+        proceedDescription={t('firmware_up_to_date')}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {

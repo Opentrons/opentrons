@@ -24,6 +24,7 @@ import {
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from '../types'
+import { AdditionalEquipmentOnDeck } from '..'
 export { createPresavedStepForm } from './createPresavedStepForm'
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
@@ -101,7 +102,10 @@ export const getSlotIdsBlockedBySpanning = (
 }
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
-  slot: string
+  slot: string,
+  /* we don't always want to count the slot as full if there is a staging area present
+     since labware/wasteChute can still go on top of staging areas  **/
+  includeStagingAreas?: boolean
 ): boolean => {
   if (
     slot === SPAN7_8_10_11_SLOT &&
@@ -113,9 +117,22 @@ export const getSlotIsEmpty = (
   } else if (getSlotIdsBlockedBySpanning(initialDeckSetup).includes(slot)) {
     // if a slot is being blocked by a spanning labware/module (eg thermocycler), it's not empty
     return false
+    //  don't allow duplicating into the trash slot.
+  } else if (slot === '12') {
+    return false
   }
 
-  // NOTE: should work for both deck slots and module slots
+  const filteredAdditionalEquipmentOnDeck = includeStagingAreas
+    ? values(initialDeckSetup.additionalEquipmentOnDeck).filter(
+        (additionalEquipment: AdditionalEquipmentOnDeck) =>
+          additionalEquipment.location === slot
+      )
+    : values(initialDeckSetup.additionalEquipmentOnDeck).filter(
+        (additionalEquipment: AdditionalEquipmentOnDeck) =>
+          additionalEquipment.location === slot &&
+          additionalEquipment.name !== 'stagingArea'
+      )
+
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -124,6 +141,7 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
+      ...filteredAdditionalEquipmentOnDeck,
     ].length === 0
   )
 }

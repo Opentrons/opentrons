@@ -7,7 +7,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag = 'enableExtendedHardware' | 'lpcWithProbe'
+export type DevInternalFlag = 'enableDeckConfiguration' | 'protocolStats'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -226,4 +226,13 @@ export type ConfigV19 = Omit<ConfigV18, 'version' | 'update'> & {
   }
 }
 
-export type Config = ConfigV19
+export type ConfigV20 = Omit<ConfigV19, 'version'> & {
+  version: 20
+  robotSystemUpdate: {
+    manifestUrls: {
+      OT2: string
+    }
+  }
+}
+
+export type Config = ConfigV20

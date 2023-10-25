@@ -9,7 +9,7 @@ import {
   HostConfig,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
@@ -18,14 +18,17 @@ jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 
 const mockFunc = jest.fn()
-
+const PROTOCOL_ID = 'mockProtocolId'
 const MOCK_HOST_CONFIG = {} as HostConfig
-const mockuseHost = useHost as jest.MockedFunction<typeof useHost>
+const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
 const mockDeleteProtocol = deleteProtocol as jest.MockedFunction<
   typeof deleteProtocol
 >
 const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
+const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
+  typeof useProtocolQuery
+>
 
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -46,12 +49,20 @@ describe('DeleteProtocolConfirmationModal', () => {
   let props: React.ComponentProps<typeof DeleteProtocolConfirmationModal>
 
   beforeEach(() => {
-    when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
     props = {
-      protocolId: 'mockProtocol1',
-      protocolName: 'mockProtocol1',
+      protocolId: PROTOCOL_ID,
       setShowDeleteConfirmationModal: mockFunc,
     }
+    when(mockUseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
+    when(mockUseProtocolQuery)
+      .calledWith(PROTOCOL_ID)
+      .mockReturnValue({
+        data: {
+          data: {
+            metadata: { protocolName: 'mockProtocol1' },
+          },
+        },
+      } as any)
   })
 
   afterEach(() => {
@@ -75,7 +86,7 @@ describe('DeleteProtocolConfirmationModal', () => {
 
   it('should call a mock function when tapping delete button', async () => {
     when(mockGetProtocol)
-      .calledWith(MOCK_HOST_CONFIG, 'mockProtocol1')
+      .calledWith(MOCK_HOST_CONFIG, PROTOCOL_ID)
       .mockResolvedValue({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
       } as any)
@@ -91,7 +102,7 @@ describe('DeleteProtocolConfirmationModal', () => {
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
     expect(mockDeleteProtocol).toHaveBeenCalledWith(
       MOCK_HOST_CONFIG,
-      'mockProtocol1'
+      PROTOCOL_ID
     )
   })
 })

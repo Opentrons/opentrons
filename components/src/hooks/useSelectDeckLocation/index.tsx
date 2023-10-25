@@ -11,9 +11,15 @@ import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { DeckSlotLocation } from '../../hardware-sim/DeckSlotLocation'
 
-const X_CROP_MM = 60
+export type DeckLocationSelectThemes = 'default' | 'grey'
+
+const X_CROP_MM = 0
+const X_ADJUSTMENT_FOR_TC = '-50'
+const Y_ADJUSTMENT_FOR_TC = '214'
+
 export function useDeckLocationSelect(
-  robotType: RobotType
+  robotType: RobotType,
+  theme?: DeckLocationSelectThemes
 ): { DeckLocationSelect: JSX.Element; selectedLocation: ModuleLocation } {
   const deckDef = getDeckDefFromRobotType(robotType)
   const [
@@ -25,7 +31,7 @@ export function useDeckLocationSelect(
   return {
     DeckLocationSelect: (
       <DeckLocationSelect
-        {...{ deckDef, selectedLocation, setSelectedLocation }}
+        {...{ deckDef, selectedLocation, setSelectedLocation, theme }}
       />
     ),
     selectedLocation,
@@ -35,14 +41,18 @@ export function useDeckLocationSelect(
 interface DeckLocationSelectProps {
   deckDef: DeckDefinition
   selectedLocation: ModuleLocation
-  setSelectedLocation: (loc: ModuleLocation) => void
+  theme?: DeckLocationSelectThemes
+  setSelectedLocation?: (loc: ModuleLocation) => void
   disabledLocations?: ModuleLocation[]
+  isThermocycler?: boolean
 }
 export function DeckLocationSelect({
   deckDef,
   selectedLocation,
   setSelectedLocation,
   disabledLocations = [],
+  theme = 'default',
+  isThermocycler = false,
 }: DeckLocationSelectProps): JSX.Element {
   return (
     <RobotCoordinateSpace
@@ -57,17 +67,56 @@ export function DeckLocationSelect({
             typeof l === 'object' && 'slotName' in l && l.slotName === slot.id
         )
         const isSelected = isEqual(selectedLocation, slotLocation)
-        let fill = COLORS.highlightPurple2
-        if (isSelected) fill = COLORS.highlightPurple1
+        let fill =
+          theme === 'default'
+            ? COLORS.highlightPurple2
+            : COLORS.lightGreyPressed
+        if (isSelected)
+          fill =
+            theme === 'default'
+              ? COLORS.highlightPurple1
+              : COLORS.darkGreyEnabled
         if (isDisabled) fill = COLORS.darkGreyDisabled
+        if (isSelected && slot.id === 'B1' && isThermocycler) {
+          return (
+            <g key="thermocyclerSelectionArea">
+              <path
+                fill={fill}
+                d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-282c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v282 C-102,494.7-100.1,496.6-97.8,496.6z"
+              />
+              <RobotCoordsForeignDiv
+                x={X_ADJUSTMENT_FOR_TC}
+                y={Y_ADJUSTMENT_FOR_TC}
+                width={slot.boundingBox.xDimension}
+                height="282"
+                innerDivProps={INNER_DIV_PROPS}
+              >
+                <Icon name="check-circle" size="1.5rem" color={COLORS.white} />
+                <Text color={COLORS.white} fontSize="1.5rem">
+                  Selected
+                </Text>
+              </RobotCoordsForeignDiv>
+            </g>
+          )
+        } else if (slot.id === 'A1' && isThermocycler) {
+          return null
+        }
         return (
           <React.Fragment key={slot.id}>
             <DeckSlotLocation
               slotName={slot.id}
               slotBaseColor={fill}
               slotClipColor={COLORS.white}
-              onClick={() => !isDisabled && setSelectedLocation(slotLocation)}
-              cursor={isDisabled || isSelected ? 'default' : 'pointer'}
+              onClick={() =>
+                !isDisabled &&
+                setSelectedLocation != null &&
+                setSelectedLocation(slotLocation)
+              }
+              cursor={
+                setSelectedLocation == null || isDisabled || isSelected
+                  ? 'default'
+                  : 'pointer'
+              }
               deckDefinition={deckDef}
             />
             {isSelected ? (
@@ -76,13 +125,7 @@ export function DeckLocationSelect({
                 y={slot.position[1]}
                 width={slot.boundingBox.xDimension}
                 height={slot.boundingBox.yDimension}
-                innerDivProps={{
-                  display: 'flex',
-                  alignItems: ALIGN_CENTER,
-                  justifyContent: JUSTIFY_CENTER,
-                  height: '100%',
-                  gridGap: SPACING.spacing4,
-                }}
+                innerDivProps={INNER_DIV_PROPS}
               >
                 <Icon name="check-circle" size="1.5rem" color={COLORS.white} />
                 <Text color={COLORS.white} fontSize="1.5rem">
@@ -99,4 +142,12 @@ export function DeckLocationSelect({
       />
     </RobotCoordinateSpace>
   )
+}
+
+const INNER_DIV_PROPS = {
+  display: 'flex',
+  alignItems: ALIGN_CENTER,
+  justifyContent: JUSTIFY_CENTER,
+  height: '100%',
+  gridGap: SPACING.spacing4,
 }

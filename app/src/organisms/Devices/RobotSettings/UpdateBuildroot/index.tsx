@@ -1,70 +1,69 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
+
 import {
   setRobotUpdateSeen,
   robotUpdateIgnored,
   getRobotUpdateSession,
-  getRobotSystemType,
-  getRobotUpdateAvailable,
 } from '../../../../redux/robot-update'
 import { ViewUpdateModal } from './ViewUpdateModal'
 import { RobotUpdateProgressModal } from './RobotUpdateProgressModal'
+import { UNREACHABLE } from '../../../../redux/discovery'
 
-import type { State, Dispatch } from '../../../../redux/types'
-import type { ViewableRobot } from '../../../../redux/discovery/types'
+import type { Dispatch } from '../../../../redux/types'
+import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 
-export type UpdateStep = 'download' | 'install' | 'restart' | 'finished'
-
-export interface UpdateBuildrootProps {
-  robot: ViewableRobot
-  close: () => void
+interface UpdateBuildrootProps {
+  robot: DiscoveredRobot | null
 }
 
-export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
-  const { robot, close } = props
-  const robotName = robot.name
-  const session = useSelector(getRobotUpdateSession)
-  const robotUpdateType = useSelector((state: State) =>
-    getRobotUpdateAvailable(state, robot)
-  )
-  const dispatch = useDispatch<Dispatch>()
-  const { step, error: installError } = session || {
-    step: null,
-    installError: null,
+export const handleUpdateBuildroot = (
+  robot: UpdateBuildrootProps['robot']
+): void => {
+  NiceModal.show(UpdateBuildroot, { robot })
+}
+
+const UpdateBuildroot = NiceModal.create(
+  (props: UpdateBuildrootProps): JSX.Element | null => {
+    const { robot } = props
+    const hasSeenSessionOnce = React.useRef<boolean>(false)
+    const modal = useModal()
+    const robotName = React.useRef<string>(robot?.name ?? '')
+    const dispatch = useDispatch<Dispatch>()
+    const session = useSelector(getRobotUpdateSession)
+    if (!hasSeenSessionOnce.current && session)
+      hasSeenSessionOnce.current = true
+
+    React.useEffect(() => {
+      if (robotName.current) {
+        dispatch(setRobotUpdateSeen(robotName.current))
+      }
+    }, [robotName])
+
+    const ignoreUpdate = React.useCallback(() => {
+      if (robotName.current) {
+        dispatch(robotUpdateIgnored(robotName.current))
+      }
+      modal.remove()
+    }, [robotName, close])
+
+    if (hasSeenSessionOnce.current)
+      return (
+        <RobotUpdateProgressModal
+          robotName={robotName.current}
+          session={session}
+          closeUpdateBuildroot={modal.remove}
+        />
+      )
+    else if (robot != null && robot.status !== UNREACHABLE)
+      return (
+        <ViewUpdateModal
+          robotName={robotName.current}
+          robot={robot}
+          closeModal={ignoreUpdate}
+        />
+      )
+    else return null
   }
-
-  // set update seen on component mount
-  React.useEffect(() => {
-    dispatch(setRobotUpdateSeen(robotName))
-  }, [robotName])
-
-  const ignoreUpdate = React.useCallback(() => {
-    dispatch(robotUpdateIgnored(robotName))
-    close()
-  }, [robotName, close])
-
-  const robotSystemType = getRobotSystemType(robot)
-
-  let updateStep: UpdateStep
-  if (step == null) updateStep = 'download'
-  else if (step === 'finished') updateStep = 'finished'
-  else if (step === 'restart' || step === 'restarting') updateStep = 'restart'
-  else updateStep = 'install'
-
-  return session ? (
-    <RobotUpdateProgressModal
-      robotName={robotName}
-      updateStep={updateStep}
-      stepProgress={session.progress}
-      error={installError}
-      closeUpdateBuildroot={close}
-    />
-  ) : (
-    <ViewUpdateModal
-      robotName={robotName}
-      robotUpdateType={robotUpdateType}
-      robotSystemType={robotSystemType}
-      closeModal={ignoreUpdate}
-    />
-  )
-}
+)

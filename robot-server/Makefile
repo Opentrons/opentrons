@@ -36,11 +36,11 @@ tests ?= tests
 cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 test_opts ?=
 
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Pubkey location for buildroot robot to install with install-key
-br_ssh_pubkey ?= $(br_ssh_key).pub
-# Other SSH args for buildroot robots
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
+# Pubkey location for robot to install with install-key
+ssh_pubkey ?= $(ssh_key).pub
+# Other SSH args for robot
 ssh_opts ?= $(default_ssh_opts)
 
 # Source discovery
@@ -82,7 +82,7 @@ setup:
 .PHONY: setup-ot2
 setup-ot2:
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip uninstall -y python-can
 	$(pipenv) run pip freeze
 
 .PHONY: clean
@@ -150,19 +150,19 @@ local-shell:
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
-	$(call push-systemd-unit,$(host),$(br_ssh_key),$(ssh_opts),./opentrons-robot-server.service)
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
+	$(call push-python-package,$(host),$(ssh_key),$(ssh_opts),$(wheel_file))
+	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-robot-server.service)
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server",,,$(version_file))
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server",,,$(version_file))
 
 .PHONY: install-key
 install-key:
 	curl -X POST $(host):31950/server/ssh_keys\
 		-H "Content-Type: application/json"\
-		-d "{\"key\":\"$(shell cat $(br_ssh_pubkey))\"}"
+		-d "{\"key\":\"$(shell cat $(ssh_pubkey))\"}"
 
 .PHONY: restart
 restart:
@@ -194,7 +194,7 @@ change-left:
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term
 term:
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+	ssh -i $(ssh_key) $(ssh_opts) root@$(host)
 
 
 .PHONY: docs

@@ -8,8 +8,6 @@ from opentrons_shared_data.pipette.types import PipetteChannelType
 
 MODULE_LOG = logging.getLogger(__name__)
 
-MachineType = Literal["ot2", "ot3"]
-
 
 class MotionChecks(enum.Enum):
     NONE = 0
@@ -575,11 +573,8 @@ class GripperJawState(enum.Enum):
     #: the gripper has been homed and is at its fully-open homed position
     GRIPPING = enum.auto()
     #: the gripper is actively force-control gripping something
-    HOLDING_CLOSED = enum.auto()
-    #: the gripper is in position-control mode somewhere other than its
-    #: open position and probably should be opened before gripping something
-    HOLDING_OPENED = enum.auto()
-    #: the gripper is holding itself open but not quite at its homed position
+    HOLDING = enum.auto()
+    #: the gripper is in position-control mode
 
 
 class InstrumentProbeType(enum.Enum):
@@ -637,7 +632,7 @@ class FailedTipStateCheck(RuntimeError):
     """Error raised if the tip ejector state does not match the expected value."""
 
     def __init__(self, tip_state_type: TipStateType, actual_state: int) -> None:
-        """Iniitialize FailedTipStateCheck error."""
+        """Initialize FailedTipStateCheck error."""
         super().__init__(
             f"Failed to correctly determine tip state for tip {str(tip_state_type)} "
             f"received {bool(actual_state)} but expected {bool(tip_state_type.value)}"

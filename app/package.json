@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
+    "@ebay/nice-modal-react": "1.2.13",
     "@fontsource/dejavu-sans": "5.0.3",
     "@fontsource/public-sans": "5.0.3",
     "@hot-loader/react-dom": "17.0.1",

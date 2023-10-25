@@ -3,7 +3,6 @@ import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
-import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   SingleLabwareLiquidState,
@@ -108,11 +107,7 @@ const selectedLiquidGroup = handleActions(
   },
   unselectedLiquidGroupState
 )
-const initialLabwareState: ContainersState = {
-  [FIXED_TRASH_ID]: {
-    nickname: 'Trash',
-  },
-}
+const initialLabwareState: ContainersState = {}
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const containers: Reducer<ContainersState, any> = handleActions(
@@ -185,7 +180,6 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       )
     },
   },
-
   initialLabwareState
 )
 type SavedLabwareState = Record<string, boolean>

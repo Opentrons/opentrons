@@ -6,10 +6,9 @@ from abc import ABC, abstractmethod
 
 import anyio
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -22,6 +21,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.util.broker import Broker
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -59,6 +59,21 @@ class AbstractRunner(ABC):
 
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
+        self._broker = LegacyBroker()
+
+    # TODO(mm, 2023-10-03): `LegacyBroker` is specific to Python protocols and JSON protocols ≤v5.
+    # We'll need to extend this in order to report progress from newer JSON protocols.
+    #
+    # TODO(mm, 2023-10-04): When we switch this to return a new `Broker` instead of a
+    # `LegacyBroker`, we should annotate the return type as a `ReadOnlyBroker`.
+    @property
+    def broker(self) -> LegacyBroker:
+        """Return a broker that you can subscribe to in order to monitor protocol progress.
+
+        Currently, this only returns messages for `PythonAndLegacyRunner`.
+        Otherwise, it's a no-op.
+        """
+        return self._broker
 
     def was_started(self) -> bool:
         """Whether the run has been started.
@@ -136,25 +151,28 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._legacy_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
-        broker = None
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            broker = Broker()
-            equipment_broker = EquipmentBroker[LegacyLoadInfo]()
-
+            equipment_broker = Broker[LegacyLoadInfo]()
             self._protocol_engine.add_plugin(
-                LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
+                LegacyContextPlugin(
+                    broker=self._broker, equipment_broker=equipment_broker
+                )
             )
+            self._hardware_api.should_taskify_movement_execution(taskify=True)
+        else:
+            self._hardware_api.should_taskify_movement_execution(taskify=False)
 
         context = self._legacy_context_creator.create(
             protocol=protocol,
-            broker=broker,
+            broker=self._broker,
             equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         self._task_queue.set_run_func(
@@ -204,6 +222,7 @@ class JsonRunner(AbstractRunner):
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -248,6 +267,7 @@ class JsonRunner(AbstractRunner):
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         for command in commands:
@@ -290,6 +310,7 @@ class LiveRunner(AbstractRunner):
         # of runner interface
         self._hardware_api = hardware_api
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     def prepare(self) -> None:
         """Set the task queue to wait until all commands are executed."""

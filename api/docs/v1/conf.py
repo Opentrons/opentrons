@@ -85,7 +85,7 @@ release = _vers
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -150,7 +150,7 @@ html_theme_options = {
     'font_family': "'Open Sans', sans-serif",
     'head_font_family': "'AkkoPro-Regular', 'Open Sans'",
     'sidebar_collapse': 'True',
-    'fixed_sidebar': 'False',
+    'fixed_sidebar': 'True',
     'github_user': 'opentrons',
     'github_repo': 'opentrons',
     'github_button': True,

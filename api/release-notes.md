@@ -6,34 +6,63 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.0.1
+
+Welcome to the v7.0.1 release of the Opentrons robot software! This release builds on the major release that added support for Opentrons Flex.
+
+This update may take longer than usual if you are updating from v6.x. Allow **approximately 15 minutes** for your robot to restart. This delay will only happen once.
+
+### Known Issues
+
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool.
+
+---
+
 ## Opentrons Robot Software Changes in 7.0.0
 
 Welcome to the v7.0.0 release of the Opentrons robot software! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
 
+This update may take longer than usual. Allow **approximately 15 minutes** for your robot to restart. This delay will only happen once.
+
 ### New Features
 
-- Flex touchscreen
-  - Robot dashboard: Quickly access recently run protocols.
-  - Manage protocols: Organize, view details, set up, and run protocols directly from the touchscreen.
-  - Manage instruments: View information about connected pipettes and the gripper. Attach, detach, or recalibrate instruments.
-  - Robot settings: Customize the behavior of your Flex, including the LED and touchscreen displays.
-- Flex features 
-  - Analyze and run protocols that use the Flex robot, Flex pipettes, and Flex tip racks.
-  - Move labware around the deck automatically with the Flex Gripper.
-  - Use the Flex Gripper to move labware onto or off of the Magnetic Block.
-- Python API features
-  - Manually move labware around, off of, or onto the deck without ending your protocol.
-  - Load adapters separately from labware (to allow moving labware onto or off of the adapter).
-  - Use coordinate or numeric deck slot names interchangeably.
+Flex touchscreen
+
+- Robot dashboard: Quickly access recently run protocols.
+- Manage protocols: Organize, view details, set up, and run protocols directly from the touchscreen.
+- Manage instruments: View information about connected pipettes and the gripper. Attach, detach, or recalibrate instruments.
+- Robot settings: Customize the behavior of your Flex, including the LED and touchscreen displays.
+
+Flex features
+
+- Analyze and run protocols that use the Flex robot, Flex pipettes, and Flex tip racks.
+- Move labware around the deck automatically with the Flex Gripper.
+- Use the Flex Gripper to move labware onto or off of the Magnetic Block.
+
+Python API features
+
+- Manually move labware around, off of, or onto the deck without ending your protocol.
+- Load adapters separately from labware (to allow moving labware onto or off of the adapter).
+- Use coordinate or numeric deck slot names interchangeably.
+- Set 50 µL pipettes to a low-volume mode for handling very small quantities of liquid.
 
 ### Improved Features
 
 - The API relaxes placement restrictions for the Heater-Shaker Module on Flex.
-- Pipettes drop tips in multiple locations above the trash bin to prevent tips from stacking up.
+- Pipettes drop tips in multiple locations above the fixed trash, to prevent tips from stacking up.
+
+### Bug Fixes
+
+- Fixed a problem with empty files being stored in the robot's database if the robot is power cycled at the wrong time.
+- The API no longer raises an error when dropping tips into labware other than the fixed trash.
+- All API versions now properly track tips, including starting at a well other than A1.
 
 ### Known Issues
 
-- Tip tracking starting at a well other than A1 will not pick up tips from the intended locations.
+Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
+
+- JSON protocols created or modified with Protocol Designer v6.0.0 or higher.
+- Python protocols specifying an `apiLevel` of 2.14 or higher.
 
 ---
 
@@ -67,9 +96,10 @@ Welcome to the v6.3.0 release of the OT-2 software!
 
 ### Known Issues
 
-- Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
-    - JSON protocols created or modified with Protocol Designer v6.0.0 or higher
-    - Python protocols specifying an `apiLevel` of 2.14
+Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
+
+- JSON protocols created or modified with Protocol Designer v6.0.0 or higher
+- Python protocols specifying an `apiLevel` of 2.14
 
 ---
 ## OT-2 Software Changes in 6.2.1
@@ -91,9 +121,10 @@ Welcome to the v6.2.0 release of the OT-2 software! This release focuses on addi
 
 ### New Features
 
-- Thermocycler GEN2 support
-    - Lid temperature is now available when querying module status
-    - Pipettes properly move to avoid the GEN2 module
+Thermocycler GEN2 support
+
+- Lid temperature is now available when querying module status
+- Pipettes properly move to avoid the GEN2 module
 
 ### Bug Fixes
 
@@ -107,11 +138,12 @@ Welcome to the v6.1.0 release of the OT-2 software! This release adds support fo
 
 ### New Features
 
-- Heater-Shaker support
-  - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module
-  - Implements restrictions on module and labware placement around the Heater-Shaker
-  - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes
-  - The OT-2 can update the firmware on an attached Heater-Shaker
+Heater-Shaker support
+
+- The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module
+- Implements restrictions on module and labware placement around the Heater-Shaker
+- When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes
+- The OT-2 can update the firmware on an attached Heater-Shaker
 
 ### Bug Fixes
 
@@ -240,10 +272,11 @@ The 4.5.0 release of the OT-2 Software improves the speed of protocol uploads an
 
 ### New Features
 
-- The OT-2 now uses a faster analysis method on protocol upload
-  - Thanks to everyone who beta tested this feature over the last few months!
-  - You may revert to the old analysis method with the **Use Older Protocol Analysis Method** in your OT-2's advanced settings
-  - If you encounter any issues (e.g. protocol run errors not caught during upload) please reach out to Opentrons Support or [open an issue][] in GitHub so we can continue to improve this feature
+The OT-2 now uses a faster analysis method on protocol upload
+
+- Thanks to everyone who beta tested this feature over the last few months!
+- You may revert to the old analysis method with the **Use Older Protocol Analysis Method** in your OT-2's advanced settings
+- If you encounter any issues (e.g. protocol run errors not caught during upload) please reach out to Opentrons Support or [open an issue][] in GitHub so we can continue to improve this feature
 
 ### Bug Fixes
 
@@ -320,8 +353,7 @@ experiencing this issue.
 
 ### Bugfixes
 
-- Fixed an issue where tip length calibration was not being accessed correctly during a protocol run, and labware calibration.
-  - If you performed pipette calibration in 4.2.0, you will need to re-do that calibration upon this update.
+- Fixed an issue where tip length calibration was not being accessed correctly during a protocol run, and labware calibration. If you performed pipette calibration in 4.2.0, you will need to re-do that calibration upon this update.
 
 ### Known Issues
 
@@ -334,8 +366,7 @@ In 4.2.1 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterpri
 ### Bugfixes
 
 - Fixed an issue where the pipette or pipette mount would not descend far enough to access the mounting screws when changing the pipette
-- Fixed an issue that would cause the left and right pipettes to be at different heights, even after executing pipette calibration
-  - If you are experiencing this issue, you should recalibrate your pipettes after updating.
+- Fixed an issue that would cause the left and right pipettes to be at different heights, even after executing pipette calibration. If you are experiencing this issue, you should recalibrate your pipettes after updating.
 - Fixed an issue where the OT-2 would be unable to connect to Wi-Fi networks using 802.1x Fast Migration.
 
 ### Known Issues
@@ -400,10 +431,11 @@ We consider the HTTP API a core part of the OT-2's API, and changes to it will b
 
 ### Other Changes
 
-- New Python Protocol API version: 2.8
-  - You can now specify blow out locations in `transfer`, `consolidate`, and `distribute` to be the source well, destination well, or trash
-  - `Well` now has the method `from_center_cartesian`, which allows you to calculate positions relative to the well center in X, Y, and Z
-  - For more information, see [the Python Protocol API documentation](https://docs.opentrons.com/v2/versioning.html#version-2-8)
-- Protocol Designer protocols will now always be executed with API Version 2.8 behaviors
-  - Future changes to the behavior executed in Protocol Designer protocols will be communicated here
+New Python Protocol API version: 2.8
+
+- You can now specify blow out locations in `transfer`, `consolidate`, and `distribute` to be the source well, destination well, or trash
 - `transfer`, `consolidate`, and `distribute` will now do nothing if passed a 0 transfer volume.
+- `Well` now has the method `from_center_cartesian`, which allows you to calculate positions relative to the well center in X, Y, and Z
+- For more information, see [the Python Protocol API documentation](https://docs.opentrons.com/v2/versioning.html#version-2-8)
+
+Protocol Designer protocols will now always be executed with API Version 2.8 behaviors. Future changes to the behavior executed in Protocol Designer protocols will be communicated here

@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Optional, TypeVar, cast
 from uuid import uuid4
 
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 
 from .types import (
     COMMAND as COMMAND_TOPIC,
@@ -17,17 +17,17 @@ from .types import (
 class CommandPublisher:
     """An object with a `Broker` dependency used to publish commands."""
 
-    def __init__(self, broker: Optional[Broker]) -> None:
+    def __init__(self, broker: Optional[LegacyBroker]) -> None:
         """Initialize the publisher with a Broker."""
-        self._broker = broker or Broker()
+        self._broker = broker or LegacyBroker()
 
     @property
-    def broker(self) -> Broker:
+    def broker(self) -> LegacyBroker:
         """Get the publisher's Broker."""
         return self._broker
 
     @broker.setter
-    def broker(self, broker: Broker) -> None:
+    def broker(self, broker: LegacyBroker) -> None:
         """Set the publisher's Broker."""
         self._broker = broker
 
@@ -60,7 +60,7 @@ def publish(command: CommandPayloadCreator) -> Callable[[FuncT], FuncT]:
             broker = getattr(args[0], "broker", None)
 
             assert isinstance(
-                broker, Broker
+                broker, LegacyBroker
             ), "Only methods of CommandPublisher classes should be decorated."
 
             func_sig = _inspect_signature(func)
@@ -100,7 +100,7 @@ def publish(command: CommandPayloadCreator) -> Callable[[FuncT], FuncT]:
 
 
 @contextmanager
-def publish_context(broker: Broker, command: CommandPayload) -> Iterator[None]:
+def publish_context(broker: LegacyBroker, command: CommandPayload) -> Iterator[None]:
     """Publish messages before and after the `with` block has run.
 
     If an `error` is raised in the `with` block, it will be published in the "after"
@@ -131,7 +131,7 @@ def _inspect_signature(func: Callable[..., Any]) -> inspect.Signature:
 
 
 def _do_publish(
-    broker: Broker,
+    broker: LegacyBroker,
     message_id: str,
     command: CommandPayload,
     when: MessageSequenceId,

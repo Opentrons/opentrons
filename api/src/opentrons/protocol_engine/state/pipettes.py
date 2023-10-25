@@ -36,12 +36,13 @@ from ..commands import (
     TouchTipResult,
     thermocycler,
     heater_shaker,
+    CommandPrivateResult,
 )
+from ..commands.configuring_common import PipetteConfigUpdateResultMixin
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
-    AddPipetteConfigAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -115,13 +116,22 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
-            self._handle_command(action.command)
+            self._handle_command(action.command, action.private_result)
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
-        elif isinstance(action, AddPipetteConfigAction):
-            config = action.config
-            self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
-                serial_number=action.serial_number,
+
+    def _handle_command(  # noqa: C901
+        self, command: Command, private_result: CommandPrivateResult
+    ) -> None:
+        self._update_current_well(command)
+        self._update_deck_point(command)
+
+        if isinstance(private_result, PipetteConfigUpdateResultMixin):
+            config = private_result.config
+            self._state.static_config_by_id[
+                private_result.pipette_id
+            ] = StaticPipetteConfig(
+                serial_number=private_result.serial_number,
                 model=config.model,
                 display_name=config.display_name,
                 min_volume=config.min_volume,
@@ -132,11 +142,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
             )
-            self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
-
-    def _handle_command(self, command: Command) -> None:  # noqa: ANN101, C901
-        self._update_current_well(command)
-        self._update_deck_point(command)
+            self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
 
         if isinstance(command.result, LoadPipetteResult):
             pipette_id = command.result.pipetteId
@@ -181,9 +187,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         attached_tip.volume
                     ]
                 except KeyError:
-                    tip_configuration = static_config.tip_configuration_lookup_table[
-                        static_config.max_volume
-                    ]
+                    # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
+                    # we used to look up a default tip config via the pipette max volume, but if that isn't
+                    # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
+                    # the first entry in the table is ok I guess but we really need to generally rethink how
+                    # we identify tip classes - looking things up by volume is not enough.
+                    tip_configuration = list(
+                        static_config.tip_configuration_lookup_table.values()
+                    )[0]
                 self._state.flow_rates_by_id[pipette_id] = FlowRates(
                     default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -197,9 +208,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             static_config = self._state.static_config_by_id.get(pipette_id)
             if static_config:
-                tip_configuration = static_config.tip_configuration_lookup_table[
-                    static_config.max_volume
-                ]
+                # TODO(seth,9/11/2023): bad way to do defaulting, see above.
+                tip_configuration = list(
+                    static_config.tip_configuration_lookup_table.values()
+                )[0]
                 self._state.flow_rates_by_id[pipette_id] = FlowRates(
                     default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -535,8 +547,9 @@ class PipetteView(HasState[PipetteState]):
         """Return the given pipette's return tip height scale."""
         max_volume = self.get_maximum_volume(pipette_id)
         working_volume = max_volume
-        if self.get_attached_tip(pipette_id):
-            working_volume = self.get_working_volume(pipette_id)
+        tip = self.get_attached_tip(pipette_id)
+        if tip:
+            working_volume = tip.volume
 
         if working_volume in self.get_config(pipette_id).tip_configuration_lookup_table:
             tip_lookup = self.get_config(pipette_id).tip_configuration_lookup_table[

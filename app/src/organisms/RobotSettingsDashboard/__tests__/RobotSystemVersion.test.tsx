@@ -50,7 +50,7 @@ describe('RobotSystemVersion', () => {
     getByText(
       'View latest release notes at https://github.com/Opentrons/opentrons/releases'
     )
-    getByText('Current Version:')
+    getByText('Current Version')
     getByText('mock7.0.0')
   })
 

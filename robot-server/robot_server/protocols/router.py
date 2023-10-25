@@ -224,9 +224,9 @@ async def create_protocol(
     if source.robot_type != robot_type:
         raise ProtocolRobotTypeMismatch(
             detail=(
-                f"This protocol is for {source.robot_type} robots."
+                f"This protocol is for {_user_facing_robot_type(source.robot_type)} robots."
                 f" It can't be analyzed or run on this robot,"
-                f" which is an {robot_type}."
+                f" which is {_user_facing_robot_type(robot_type, include_article=True)}."
             )
         ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
@@ -557,3 +557,12 @@ async def get_protocol_analysis_as_document(
         ) from error
 
     return PlainTextResponse(content=analysis, media_type="application/json")
+
+
+def _user_facing_robot_type(
+    robot_type: RobotType, include_article: bool = False
+) -> str:
+    if robot_type == "OT-2 Standard":
+        return "an OT-2" if include_article else "OT-2"
+    elif robot_type == "OT-3 Standard":
+        return "a Flex" if include_article else "Flex"

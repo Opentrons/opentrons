@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,6 +17,7 @@ import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useLights } from '../Devices/hooks'
+import { useFeatureFlag } from '../../redux/config'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
 import type { Dispatch } from '../../redux/types'
@@ -35,6 +38,9 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowRestartRobotConfirmationModal,
   ] = React.useState<boolean>(false)
 
+  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+  const history = useHistory()
+
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
   }
@@ -44,6 +50,8 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
     setShowNavMenu(false)
   }
 
+  // ToDo (kk:10/02/2023)
+  // Need to update a function for onClick
   return (
     <>
       {showRestartRobotConfirmationModal ? (
@@ -88,6 +96,23 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             </StyledText>
           </Flex>
         </MenuItem>
+        {enableDeckConfig ? (
+          <MenuItem
+            key="deck-configuration"
+            onClick={() => history.push('/deck-configuration')}
+          >
+            <Flex alignItems={ALIGN_CENTER}>
+              <Icon name="deck-map" aria-label="deck-map_icon" size="2.5rem" />
+              <StyledText
+                as="h4"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                marginLeft={SPACING.spacing12}
+              >
+                {t('deck_configuration')}
+              </StyledText>
+            </Flex>
+          </MenuItem>
+        ) : null}
         <MenuItem key="light" onClick={toggleLights}>
           <Flex alignItems={ALIGN_CENTER}>
             <Icon

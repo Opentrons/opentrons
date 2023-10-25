@@ -21,6 +21,8 @@ Default Labware
 
 Default labware is everything listed in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. When used in a protocol, your Flex or OT-2 knows how to work with default labware. However, you must first inform the API about the labware you will place on the robot’s deck. Search the library when you’re looking for the API load names of the labware you want to use. You can copy the load names from the library and pass them to the :py:meth:`~.ProtocolContext.load_labware` method in your protocol.
 
+.. _v2-custom-labware:
+
 Custom Labware
 ==============
 
@@ -98,7 +100,7 @@ The ``load_adapter()`` method is available on ``ProtocolContext`` and module con
 
     hs_mod = protocol.load_module('heaterShakerModuleV1', 'D1')
     hs_adapter = hs_mod.load_adapter('opentrons_96_flat_bottom_adapter')
-    hs_plate = hs_mod.load_labware('nest_96_wellplate_200ul_flat')
+    hs_plate = hs_adapter.load_labware('nest_96_wellplate_200ul_flat')
     
 .. versionadded:: 2.15
     The ``load_adapter()`` method.
@@ -109,9 +111,9 @@ Loading Together
 Use the ``adapter`` argument of ``load_labware()`` to load an adapter at the same time as labware. For example, to load the same 96-well plate and adapter from the previous section at once::
     
     hs_plate = hs_mod.load_labware(
-        load_name='nest_96_wellplate_200ul_flat',
-        location='D1',
-        adapter='opentrons_96_flat_bottom_adapter')
+        name='nest_96_wellplate_200ul_flat',
+        adapter='opentrons_96_flat_bottom_adapter'
+    )
 
 .. versionadded:: 2.15
     The ``adapter`` parameter.
@@ -148,6 +150,8 @@ The code in this section assumes that ``plate`` is a 24-well plate. For example:
 .. code-block:: python
 
     plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='D1')
+
+.. _well-accessor-methods:
 
 Accessor Methods
 ================
@@ -245,6 +249,9 @@ Equivalently, using ``rows_by_name``::
 
 .. versionadded:: 2.0
 
+
+.. _labeling-liquids:
+
 *************************
 Labeling Liquids in Wells
 *************************
@@ -314,7 +321,7 @@ The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). Thi
 Well Dimensions
 ***************
 
-The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
+The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position relative to the well <position-relative-labware>`.
 
 Depth
 =====

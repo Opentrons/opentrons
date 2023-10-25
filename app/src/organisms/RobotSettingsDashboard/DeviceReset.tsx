@@ -68,9 +68,10 @@ export function DeviceReset({
   const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
     'gripperOffsetCalibrations',
-    // 'moduleCalibrations',
+    'moduleCalibration',
     'runsHistory',
   ]
+
   const availableOptions = options
     // filtering out ODD setting because this gets implicitly cleared if all settings are selected
     // filtering out boot scripts since product doesn't want this exposed to ODD users
@@ -80,6 +81,10 @@ export function DeviceReset({
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
     )
   const dispatch = useDispatch<Dispatch>()
+
+  const availableOptionsToDisplay = availableOptions.filter(
+    ({ id }) => !['authorizedKeys'].includes(id)
+  )
 
   const handleClick = (): void => {
     if (resetOptions != null) {
@@ -116,9 +121,9 @@ export function DeviceReset({
       case 'gripperOffsetCalibrations':
         optionText = t('clear_option_gripper_calibration')
         break
-      // case 'moduleCalibrations':
-      //   optionText = t('clear_option_module_calibrations')
-      //   break
+      case 'moduleCalibration':
+        optionText = t('clear_option_module_calibration')
+        break
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
         subText = t('clear_option_runs_history_subtext')
@@ -163,7 +168,7 @@ export function DeviceReset({
         marginTop="7.75rem"
       >
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          {availableOptions.map(option => {
+          {availableOptionsToDisplay.map(option => {
             const { optionText, subText } = renderText(option.id)
             return (
               <React.Fragment key={option.id}>

@@ -69,7 +69,7 @@ describe('NameRobot', () => {
   it('should render text, button and keyboard', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Name your robot')
-    getByText('Don’t worry, you can change this later in your settings.')
+    getByText('Don’t worry, you can always change this in your settings.')
     getByText('Enter up to 17 characters (letters and numbers only)')
     getByRole('textbox')
     getByText('Confirm')
@@ -90,7 +90,7 @@ describe('NameRobot', () => {
     const [{ findByText, getByLabelText }] = render()
     getByLabelText('SmallButton_primary').click()
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(error).toBeInTheDocument()
@@ -141,7 +141,7 @@ describe('NameRobot', () => {
     const [{ getByText, queryByText }] = render()
     getByText('Rename robot')
     expect(
-      queryByText('Don’t worry, you can change this later in your settings.')
+      queryByText('Don’t worry, you can always change this in your settings.')
     ).not.toBeInTheDocument()
     getByText('Enter up to 17 characters (letters and numbers only)')
     getByText('Confirm')

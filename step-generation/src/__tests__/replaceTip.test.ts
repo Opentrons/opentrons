@@ -9,6 +9,7 @@ import {
   dropTipHelper,
   DEFAULT_PIPETTE,
 } from '../fixtures'
+import { FIXED_TRASH_ID } from '..'
 import { replaceTip } from '../commandCreators/atomic/replaceTip'
 import type { InvariantContext, RobotState } from '../types'
 
@@ -28,6 +29,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         initialRobotState
@@ -39,6 +41,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         merge({}, initialRobotState, {
@@ -71,6 +74,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         initialTestRobotState
@@ -94,6 +98,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         initialTestRobotState
@@ -115,6 +120,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         initialTestRobotState
@@ -132,6 +138,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300MultiId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         initialRobotState
@@ -157,6 +164,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300MultiId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         robotStateWithTipA1Missing
@@ -181,6 +189,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300MultiId,
+          dropTipLocation: FIXED_TRASH_ID,
         },
         invariantContext,
         robotStateWithTipsOnMulti

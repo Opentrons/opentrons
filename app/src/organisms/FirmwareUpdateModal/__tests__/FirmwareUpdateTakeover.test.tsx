@@ -3,15 +3,19 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useCurrentMaintenanceRun,
+  useCurrentAllSubsystemUpdatesQuery,
+  useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
+import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../UpdateNeededModal')
+jest.mock('../UpdateInProgressModal')
 jest.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
 
 const mockUseInstrumentQuery = useInstrumentsQuery as jest.MockedFunction<
@@ -25,6 +29,15 @@ const mockUpdateNeededModal = UpdateNeededModal as jest.MockedFunction<
 >
 const mockUseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
   typeof useIsUnboxingFlowOngoing
+>
+const mockUseCurrentAllSubsystemUpdateQuery = useCurrentAllSubsystemUpdatesQuery as jest.MockedFunction<
+  typeof useCurrentAllSubsystemUpdatesQuery
+>
+const mockUseSubsystemUpdateQuery = useSubsystemUpdateQuery as jest.MockedFunction<
+  typeof useSubsystemUpdateQuery
+>
+const mockUpdateInProgressModal = UpdateInProgressModal as jest.MockedFunction<
+  typeof UpdateInProgressModal
 >
 
 const render = () => {
@@ -48,6 +61,15 @@ describe('FirmwareUpdateTakeover', () => {
     mockUpdateNeededModal.mockReturnValue(<>Mock Update Needed Modal</>)
     mockUseCurrentMaintenanceRun.mockReturnValue({ data: undefined } as any)
     mockUseIsUnboxingFlowOngoing.mockReturnValue(false)
+    mockUseCurrentAllSubsystemUpdateQuery.mockReturnValue({
+      data: undefined,
+    } as any)
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: undefined,
+    } as any)
+    mockUpdateInProgressModal.mockReturnValue(
+      <>Mock Update In Progress Modal</>
+    )
   })
 
   it('renders update needed modal when an instrument is not ok', () => {
@@ -67,7 +89,7 @@ describe('FirmwareUpdateTakeover', () => {
       },
     } as any)
     const { queryByText } = render()
-    expect(queryByText('Mock Update In Progress Modal')).not.toBeInTheDocument()
+    expect(queryByText('Mock Update Needed Modal')).not.toBeInTheDocument()
   })
 
   it('does not render modal when a maintenance run is active', () => {
@@ -77,12 +99,39 @@ describe('FirmwareUpdateTakeover', () => {
       },
     } as any)
     const { queryByText } = render()
-    expect(queryByText('Mock Update In Progress Modal')).not.toBeInTheDocument()
+    expect(queryByText('Mock Update Needed Modal')).not.toBeInTheDocument()
   })
 
-  it('should not render modal when unboxing flow is not done', () => {
+  it('does not not render modal when unboxing flow is not done', () => {
     mockUseIsUnboxingFlowOngoing.mockReturnValue(true)
     const { queryByText } = render()
-    expect(queryByText('Mock Update In Progress Modal')).not.toBeInTheDocument()
+    expect(queryByText('Mock Update Needed Modal')).not.toBeInTheDocument()
+  })
+
+  it('does not render modal when another update is in progress', () => {
+    mockUseCurrentAllSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: '123',
+            createdAt: 'today',
+            subsystem: 'pipette_right',
+            updateStatus: 'updating',
+          },
+        ],
+      },
+    } as any)
+    mockUseSubsystemUpdateQuery.mockReturnValue({
+      data: {
+        data: {
+          subsystem: 'pipette_right',
+          updateStatus: 20,
+        } as any,
+      },
+    } as any)
+
+    const { queryByText, getByText } = render()
+    expect(queryByText('Mock Update Needed Modal')).not.toBeInTheDocument()
+    getByText('Mock Update In Progress Modal')
   })
 })

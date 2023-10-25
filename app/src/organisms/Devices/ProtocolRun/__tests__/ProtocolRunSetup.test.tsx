@@ -14,12 +14,14 @@ import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simple
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
+import { useFeatureFlag } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useIsOT3,
+  useIsFlex,
   useRobot,
   useRunCalibrationStatus,
+  useModuleCalibrationStatus,
   useRunHasStarted,
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
@@ -28,20 +30,21 @@ import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
-import { SetupModules } from '../SetupModules'
+import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
 jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
-jest.mock('../SetupModules')
+jest.mock('../SetupModuleAndDeck')
 jest.mock('../SetupLiquids')
 jest.mock('../EmptySetupStep')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
+jest.mock('../../../../redux/config')
 
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -51,6 +54,9 @@ const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFu
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
@@ -67,8 +73,8 @@ const mockSetupLabware = SetupLabware as jest.MockedFunction<
 const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
   typeof SetupRobotCalibration
 >
-const mockSetupModules = SetupModules as jest.MockedFunction<
-  typeof SetupModules
+const mockSetupModuleAndDeck = SetupModuleAndDeck as jest.MockedFunction<
+  typeof SetupModuleAndDeck
 >
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
@@ -79,7 +85,9 @@ const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
 const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
   typeof EmptySetupStep
 >
-
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
@@ -98,7 +106,7 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -139,9 +147,12 @@ describe('ProtocolRunSetup', () => {
         })
       )
       .mockReturnValue(<span>Mock SetupLabware</span>)
-    when(mockSetupModules).mockReturnValue(<div>Mock SetupModules</div>)
+    when(mockSetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -189,16 +200,18 @@ describe('ProtocolRunSetup', () => {
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
-      const robotCalibrationSetup = getByText('Robot Calibration')
+      const robotCalibrationSetup = getByText('Instruments')
       robotCalibrationSetup.click()
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
     it('renders robot calibration setup for OT-3', () => {
-      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       const { getByText } = render()
 
-      getByText('Review required pipettes for this protocol.')
-      const robotCalibrationSetup = getByText('Robot Calibration')
+      getByText(
+        'Review required instruments and calibrations for this protocol.'
+      )
+      const robotCalibrationSetup = getByText('Instruments')
       robotCalibrationSetup.click()
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
@@ -206,9 +219,9 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
 
       getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
       )
-      const labwareSetup = getByText('Labware Setup')
+      const labwareSetup = getByText('Labware')
       labwareSetup.click()
       expect(getByText('Mock SetupLabware')).toBeVisible()
     })
@@ -245,7 +258,7 @@ describe('ProtocolRunSetup', () => {
 
       const { getByText } = render()
       getByText('STEP 5')
-      getByText('Initial Liquid Setup')
+      getByText('Liquids')
       getByText('View liquid starting locations and volumes')
       getByText('Mock SetupLiquids')
     })
@@ -264,14 +277,46 @@ describe('ProtocolRunSetup', () => {
           ...MOCK_ROTOCOL_LIQUID_KEY,
         } as any)
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: true })
     })
     afterEach(() => {
       resetAllWhenMocks()
     })
 
+    it('renders calibration ready if robot is Flex and modules are calibrated', () => {
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: true })
+
+      const { getAllByText } = render()
+      expect(getAllByText('Calibration ready').length).toEqual(2)
+    })
+
+    it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: false })
+
+      const { getByText } = render()
+      getByText('STEP 2')
+      getByText('Modules')
+      getByText('Calibration needed')
+    })
+
+    it('does not render calibration element if robot is OT-2', () => {
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+
+      const { getAllByText } = render()
+      expect(getAllByText('Calibration ready').length).toEqual(1)
+    })
+
     it('renders module setup and allows the user to proceed to labware setup', () => {
       const { getByText } = render()
-      const moduleSetup = getByText('Module Setup')
+      const moduleSetup = getByText('Modules')
       moduleSetup.click()
       getByText('Mock SetupModules')
     })
@@ -280,21 +325,19 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
 
       getByText('STEP 1')
-      getByText('Robot Calibration')
+      getByText('Instruments')
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
       getByText('STEP 2')
-      getByText('Module Setup')
+      getByText('Modules')
 
-      getByText(
-        "Plug in and turn on the required modules via the robot's USB Ports. Place the modules as shown in the deck map."
-      )
+      getByText('Install the required modules and power them on.')
       getByText('STEP 3')
-      getByText('Labware Setup')
+      getByText('Labware')
 
       getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
       )
     })
 
@@ -318,22 +361,51 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
 
       getByText('STEP 1')
-      getByText('Robot Calibration')
+      getByText('Instruments')
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
       getByText('STEP 2')
-      getByText('Module Setup')
+      getByText('Modules')
 
-      getByText(
-        "Plug in and turn on the required module via the robot's USB Port. Place the module as shown in the deck map."
-      )
+      getByText('Install the required modules and power them on.')
       getByText('STEP 3')
-      getByText('Labware Setup')
+      getByText('Labware')
       getByText(
-        'Position full tip racks and labware in the deck slots as shown in the deck map.'
+        'Gather the following labware and full tip racks. To run your protocol without Labware Position Check, place and secure labware in their initial locations.'
       )
     })
+
+    it('renders correct text contents for modules and fixtures', () => {
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseFeatureFlag)
+        .calledWith('enableDeckConfiguration')
+        .mockReturnValue(true)
+      when(mockUseMostRecentCompletedAnalysis)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          ...withModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+          modules: [
+            {
+              id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
+              location: { slot: '1' },
+              model: 'magneticModuleV1',
+            },
+          ],
+        } as any)
+      when(mockParseAllRequiredModuleModels).mockReturnValue([
+        'magneticModuleV1',
+      ])
+      const { getByText } = render()
+
+      getByText('STEP 2')
+      getByText('Modules & deck')
+      getByText(
+        'Install the required modules and power them on. Install the required fixtures and review the deck configuration.'
+      )
+    })
+
     it('renders view-only info message if run has started', async () => {
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 

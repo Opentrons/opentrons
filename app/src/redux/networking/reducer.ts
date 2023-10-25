@@ -17,6 +17,21 @@ const getRobotState = (
   robotName: string
 ): PerRobotNetworkingState => state[robotName] || INITIAL_ROBOT_STATE
 
+const getWifiInterfaceKey = (
+  networkingState: PerRobotNetworkingState
+): string => {
+  const networkInterfacesEntries = Object.entries(
+    networkingState.interfaces ?? {}
+  )
+  const wifiInterfaceEntry = networkInterfacesEntries.find(
+    networkInterface => networkInterface[1]?.type === Constants.INTERFACE_WIFI
+  )
+  const wifiInterfaceKey = wifiInterfaceEntry?.[0]
+
+  // default to 'mlan0' for type safety
+  return wifiInterfaceKey ?? 'mlan0'
+}
+
 export const networkingReducer: Reducer<NetworkingState, Action> = (
   state = INITIAL_STATE,
   action
@@ -68,6 +83,28 @@ export const networkingReducer: Reducer<NetworkingState, Action> = (
       return {
         ...state,
         [robotName]: { ...robotState, eapOptions },
+      }
+    }
+
+    case Constants.CLEAR_WIFI_STATUS: {
+      const { robotName } = action.payload
+      const robotState = getRobotState(state, robotName)
+      const wifiInterfaceKey = getWifiInterfaceKey(robotState)
+      return {
+        ...state,
+        [robotName]: {
+          ...robotState,
+          interfaces: {
+            ...robotState.interfaces,
+            [wifiInterfaceKey]: {
+              ipAddress: null,
+              macAddress: 'unknown',
+              gatewayAddress: null,
+              state: 'disconnected',
+              type: Constants.INTERFACE_WIFI,
+            },
+          },
+        },
       }
     }
   }

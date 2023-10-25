@@ -43,6 +43,7 @@ describe('UpdateRobotModal', () => {
       releaseNotes: 'test notes',
       systemType: 'flex',
       closeModal: jest.fn(),
+      updateType: 'upgrade',
     }
     when(mockGetRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
@@ -56,7 +57,7 @@ describe('UpdateRobotModal', () => {
     jest.resetAllMocks()
   })
 
-  it('renders an update available header if the type is not Balena', () => {
+  it('renders an update available header if the type is not Balena when upgrading', () => {
     const [{ getByText }] = render(props)
     getByText('test robot Update Available')
   })
@@ -67,10 +68,10 @@ describe('UpdateRobotModal', () => {
       systemType: 'ot2-balena',
     }
     const [{ getByText }] = render(props)
-    getByText('Robot Operating System Update')
+    getByText('Robot Operating System Update Available')
   })
 
-  it('renders release notes and a modal header close icon', () => {
+  it('renders release notes and a modal header close icon when upgrading', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('test notes')
 
@@ -81,7 +82,7 @@ describe('UpdateRobotModal', () => {
     expect(props.closeModal).toHaveBeenCalled()
   })
 
-  it('renders remind me later and and disabled update robot now buttons', () => {
+  it('renders remind me later and and disabled update robot now buttons when upgrading', () => {
     const [{ getByText }] = render(props)
     getByText('test notes')
 
@@ -90,5 +91,30 @@ describe('UpdateRobotModal', () => {
     expect(updateNow).toBeDisabled()
     fireEvent.click(remindMeLater)
     expect(props.closeModal).toHaveBeenCalled()
+  })
+
+  it('renders proper text when reinstalling', () => {
+    props = {
+      ...props,
+      updateType: 'reinstall',
+    }
+
+    const [{ getByText, queryByText }] = render(props)
+    getByText('Robot is up to date')
+    queryByText('It looks like your robot is already up to date')
+    getByText('Not now')
+    getByText('Update robot now')
+  })
+
+  it('renders proper text when downgrading', () => {
+    props = {
+      ...props,
+      updateType: 'downgrade',
+    }
+
+    const [{ getByText }] = render(props)
+    getByText('test robot Update Available')
+    getByText('Not now')
+    getByText('Update robot now')
   })
 })

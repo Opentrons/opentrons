@@ -1,9 +1,37 @@
 import * as React from 'react'
 import { i18n } from '../../../../../i18n'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  RobotUpdateProgressModal,
+  TIME_BEFORE_ALLOWING_EXIT_MS,
+} from '../RobotUpdateProgressModal'
+import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
+import { getRobotSessionIsManualFile } from '../../../../../redux/robot-update'
+import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
 
-import { RobotUpdateProgressModal } from '../RobotUpdateProgressModal'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
+import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
+
+jest.mock('@opentrons/react-api-client')
+jest.mock('@opentrons/shared-data/protocol/types/schemaV7/command/incidental')
+jest.mock('../useRobotUpdateInfo')
+jest.mock('../../../../../redux/robot-update')
+jest.mock('../../../../../redux/robot-update/hooks')
+
+const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
+>
+const mockUseRobotUpdateInfo = useRobotUpdateInfo as jest.MockedFunction<
+  typeof useRobotUpdateInfo
+>
+const mockGetRobotSessionIsManualFile = getRobotSessionIsManualFile as jest.MockedFunction<
+  typeof getRobotSessionIsManualFile
+>
+const mockUseDispatchStartRobotUpdate = useDispatchStartRobotUpdate as jest.MockedFunction<
+  typeof useDispatchStartRobotUpdate
+>
 
 const render = (
   props: React.ComponentProps<typeof RobotUpdateProgressModal>
@@ -14,16 +42,36 @@ const render = (
 }
 
 describe('DownloadUpdateModal', () => {
+  const mockRobotUpdateSession: RobotUpdateSession | null = {
+    robotName: 'testRobot',
+    fileInfo: null,
+    token: null,
+    pathPrefix: null,
+    step: 'getToken',
+    stage: 'validating',
+    progress: 50,
+    error: null,
+  }
+
   let props: React.ComponentProps<typeof RobotUpdateProgressModal>
+  const mockCreateLiveCommand = jest.fn()
 
   beforeEach(() => {
+    mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       robotName: 'testRobot',
-      updateStep: 'download',
-      error: null,
-      stepProgress: 50,
+      session: mockRobotUpdateSession,
       closeUpdateBuildroot: jest.fn(),
     }
+    mockUseCreateLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    mockUseRobotUpdateInfo.mockReturnValue({
+      updateStep: 'install',
+      progressPercent: 50,
+    })
+    mockGetRobotSessionIsManualFile.mockReturnValue(false)
+    mockUseDispatchStartRobotUpdate.mockReturnValue(jest.fn)
   })
 
   afterEach(() => {
@@ -36,59 +84,58 @@ describe('DownloadUpdateModal', () => {
     expect(getByText('Updating testRobot')).toBeInTheDocument()
   })
 
-  it('renders the correct text when downloading the robot update with no close button', () => {
-    const [{ queryByRole, getByText }] = render(props)
+  it('activates the Update animation when first rendered', () => {
+    render(props)
+    const updatingCommand: SetStatusBarCreateCommand = {
+      commandType: 'setStatusBar',
+      params: { animation: 'updating' },
+    }
 
-    expect(getByText('Downloading update...')).toBeInTheDocument()
-    expect(
-      getByText('Do not turn off the robot while updating')
-    ).toBeInTheDocument()
-    expect(queryByRole('button')).not.toBeInTheDocument()
+    expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
+    expect(mockCreateLiveCommand).toBeCalledWith({
+      command: updatingCommand,
+      waitUntilComplete: false,
+    })
   })
 
   it('renders the correct text when installing the robot update with no close button', () => {
-    props = {
-      ...props,
-      updateStep: 'install',
-    }
-
     const [{ queryByRole, getByText }] = render(props)
 
     expect(getByText('Installing update...')).toBeInTheDocument()
     expect(
-      getByText('Do not turn off the robot while updating')
+      getByText("This could take up to 15 minutes. Don't turn off the robot.")
     ).toBeInTheDocument()
     expect(queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('renders the correct text when finalizing the robot update with no close button', () => {
-    props = {
-      ...props,
+    mockUseRobotUpdateInfo.mockReturnValue({
       updateStep: 'restart',
-    }
-
+      progressPercent: 100,
+    })
     const [{ queryByRole, getByText }] = render(props)
 
     expect(
       getByText('Install complete, robot restarting...')
     ).toBeInTheDocument()
     expect(
-      getByText('Do not turn off the robot while updating')
+      getByText("This could take up to 15 minutes. Don't turn off the robot.")
     ).toBeInTheDocument()
     expect(queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('renders a success modal and exit button upon finishing the update process', () => {
-    props = {
-      ...props,
+    mockUseRobotUpdateInfo.mockReturnValue({
       updateStep: 'finished',
-    }
+      progressPercent: 100,
+    })
     const [{ getByText }] = render(props)
 
     const exitButton = getByText('exit')
 
     expect(getByText('Robot software successfully updated')).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
+    expect(mockCreateLiveCommand).toBeCalledTimes(1)
     fireEvent.click(exitButton)
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
   })
@@ -96,15 +143,40 @@ describe('DownloadUpdateModal', () => {
   it('renders an error modal and exit button if an error occurs', () => {
     props = {
       ...props,
-      error: 'test error',
+      session: {
+        ...mockRobotUpdateSession,
+        error: 'test error',
+      },
     }
-    const [{ getByText }] = render(props)
+    const idleCommand: SetStatusBarCreateCommand = {
+      commandType: 'setStatusBar',
+      params: { animation: 'idle' },
+    }
 
+    const [{ getByText }] = render(props)
     const exitButton = getByText('exit')
 
     expect(getByText('test error')).toBeInTheDocument()
     fireEvent.click(exitButton)
     expect(getByText('Try again')).toBeInTheDocument()
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
+
+    expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
+    expect(mockCreateLiveCommand).toBeCalledTimes(2)
+    expect(mockCreateLiveCommand).toBeCalledWith({
+      command: idleCommand,
+      waitUntilComplete: false,
+    })
+  })
+
+  it('renders alternative text if update takes too long', () => {
+    const [{ findByText }] = render(props)
+
+    act(() => {
+      jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_MS)
+    })
+
+    findByText('Try restarting the update.')
+    findByText('testRobot restart is taking longer than expected to restart.')
   })
 })

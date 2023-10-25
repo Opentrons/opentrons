@@ -292,6 +292,15 @@ class ProtocolEngine:
         action = self._state_store.commands.validate_action_allowed(StopAction())
         self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
+        if self._hardware_api.is_movement_execution_taskified():
+            # We 'taskify' hardware controller movement functions when running protocols
+            # that are not backed by the engine. Such runs cannot be stopped by cancelling
+            # the queue worker and hence need to be stopped via the execution manager.
+            # `cancel_execution_and_running_tasks()` sets the execution manager in a CANCELLED state
+            # and cancels the running tasks, which raises an error and gets us out of the
+            # run function execution, just like `_queue_worker.cancel()` does for
+            # engine-backed runs.
+            await self._hardware_api.cancel_execution_and_running_tasks()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
@@ -329,16 +338,38 @@ class ProtocolEngine:
                 after the run is over.
         """
         if self._state_store.commands.state.stopped_by_estop:
+            # This handles the case where the E-stop was pressed while we were *not* in the middle
+            # of some hardware interaction that would raise it as an exception. For example, imagine
+            # we were paused between two commands, or imagine we were executing a very long run of
+            # comment commands.
             drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
             if error is None:
                 error = EStopActivatedError(message="Estop was activated during a run")
+
         if error:
-            if isinstance(error, EnumeratedError) and self._code_in_exception_stack(
-                error=error, code=ErrorCodes.E_STOP_ACTIVATED
-            ):
-                drop_tips_after_run = False
-                post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
+            # If the run had an error, check if that error indicates an E-stop.
+            # This handles the case where the run was in the middle of some hardware control
+            # method and the hardware controller raised an E-stop error from it.
+            #
+            # To do this, we need to scan all the way through the error tree.
+            # By the time E-stop error has gotten to us, it may have been wrapped in other errors,
+            # so we need to unwrap them to uncover the E-stop error's inner beauty.
+            #
+            # We don't use self._hardware_api.get_estop_state() because the E-stop may have been
+            # released by the time we get here.
+            if isinstance(error, EnumeratedError):
+                if self._code_in_error_tree(
+                    root_error=error, code=ErrorCodes.E_STOP_ACTIVATED
+                ) or self._code_in_error_tree(
+                    # Request from the hardware team for the v7.0 betas: to help in-house debugging
+                    # of pipette overpressure events, leave the pipette where it was like we do
+                    # for E-stops.
+                    root_error=error,
+                    code=ErrorCodes.PIPETTE_OVERPRESSURE,
+                ):
+                    drop_tips_after_run = False
+                    post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
 
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
@@ -358,7 +389,6 @@ class ProtocolEngine:
         # order will be backwards because the stack is first-in-last-out.
         exit_stack = AsyncExitStack()
         exit_stack.push_async_callback(self._plugin_starter.stop)  # Last step.
-
         exit_stack.push_async_callback(
             # Cleanup after hardware halt and reset the hardware controller
             self._hardware_stopper.do_stop_and_recover,
@@ -378,7 +408,6 @@ class ProtocolEngine:
             disengage_before_stopping=disengage_before_stopping,
         )
         exit_stack.push_async_callback(self._queue_worker.join)  # First step.
-
         try:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()
@@ -494,34 +523,34 @@ class ProtocolEngine:
 
     # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
     @staticmethod
-    def _code_in_exception_stack(
-        error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
+    def _code_in_error_tree(
+        root_error: Union[EnumeratedError, ErrorOccurrence], code: ErrorCodes
     ) -> bool:
-        if isinstance(error, ErrorOccurrence):
+        if isinstance(root_error, ErrorOccurrence):
             # ErrorOccurrence is not the same as the enumerated error exceptions. Check the
             # code by a string value.
-            if error.errorCode == code.value.code:
+            if root_error.errorCode == code.value.code:
                 return True
             return any(
-                ProtocolEngine._code_in_exception_stack(wrapped, code)
-                for wrapped in error.wrappedErrors
+                ProtocolEngine._code_in_error_tree(wrapped, code)
+                for wrapped in root_error.wrappedErrors
             )
 
         # From here we have an exception, can just check the code + recurse to wrapped errors.
-        if error.code == code:
+        if root_error.code == code:
             return True
 
         if (
-            isinstance(error, ProtocolCommandFailedError)
-            and error.original_error is not None
+            isinstance(root_error, ProtocolCommandFailedError)
+            and root_error.original_error is not None
         ):
             # For this specific EnumeratedError child, we recurse on the original_error field
             # in favor of the general error.wrapping field.
-            return ProtocolEngine._code_in_exception_stack(error.original_error, code)
+            return ProtocolEngine._code_in_error_tree(root_error.original_error, code)
 
-        if len(error.wrapping) == 0:
+        if len(root_error.wrapping) == 0:
             return False
         return any(
-            ProtocolEngine._code_in_exception_stack(wrapped_error, code)
-            for wrapped_error in error.wrapping
+            ProtocolEngine._code_in_error_tree(wrapped_error, code)
+            for wrapped_error in root_error.wrapping
         )

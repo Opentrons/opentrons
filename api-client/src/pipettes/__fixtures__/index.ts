@@ -252,25 +252,3 @@ export const pipetteSettingsResponseFixture = {
     },
   },
 }
-
-export const pipetteDataLeftFixture = {
-  data: { channels: 1, min_volume: 1, max_volume: 50 },
-  instrumentModel: 'p1000_single_v3.0',
-  instrumentName: 'p1000_single_gen3',
-  instrumentType: 'pipette',
-  mount: 'left',
-  serialNumber: 'abc',
-  subsystem: 'pipette_left',
-  ok: true,
-}
-
-export const pipetteResponseRightFixture = {
-  data: { channels: 1, min_volume: 1, max_volume: 50 },
-  instrumentModel: 'p1000_single_v3.0',
-  instrumentName: 'p1000_single_gen3',
-  instrumentType: 'pipette',
-  mount: 'right',
-  serialNumber: 'cba',
-  subsystem: 'pipette_right',
-  ok: true,
-}

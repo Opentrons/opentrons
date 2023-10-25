@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Card } from '@opentrons/components'
+import { Box, Card, SPACING } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -17,22 +17,43 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
-import { getAdditionalEquipment } from '../../step-forms/selectors'
-import { toggleIsGripperRequired } from '../../step-forms/actions/additionalItems'
+import { getEnableDeckModification } from '../../feature-flags/selectors'
+import {
+  getAdditionalEquipment,
+  getInitialDeckSetup,
+  getLabwareEntities,
+} from '../../step-forms/selectors'
+import {
+  deleteDeckFixture,
+  toggleIsGripperRequired,
+} from '../../step-forms/actions/additionalItems'
 import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
-import { GripperRow } from './GripperRow'
+import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
+import { FLEX_TRASH_DEF_URI } from '../../constants'
+import { deleteContainer } from '../../labware-ingred/actions'
+import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import { StagingAreasRow } from './StagingAreasRow'
 
 export interface Props {
   modules: ModulesForEditModulesCard
-  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => unknown
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => void
 }
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
+  const enableDeckModification = useSelector(getEnableDeckModification)
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const labwareEntities = useSelector(getLabwareEntities)
+  //  trash bin can only  be altered for the flex
+  const trashBin = Object.values(labwareEntities).find(
+    lw => lw.labwareDefURI === FLEX_TRASH_DEF_URI
+  )
+  const trashSlot =
+    trashBin != null ? initialDeckSetup.labware[trashBin?.id].slot : null
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
@@ -40,6 +61,12 @@ export function EditModulesCard(props: Props): JSX.Element {
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
+  const wasteChute = Object.values(additionalEquipment).find(
+    equipment => equipment?.name === 'wasteChute'
+  )
+  const stagingAreas: AdditionalEquipmentEntity[] = Object.values(
+    additionalEquipment
+  ).filter(equipment => equipment?.name === 'stagingArea')
 
   const dispatch = useDispatch()
   const robotType = useSelector(getRobotType)
@@ -85,9 +112,12 @@ export function EditModulesCard(props: Props): JSX.Element {
         : moduleType !== 'magneticBlockType'
   )
 
-  const handleGripperClick = (): void => {
-    dispatch(toggleIsGripperRequired())
+  const handleDeleteStagingAreas = (): void => {
+    stagingAreas.forEach(stagingArea => {
+      dispatch(deleteDeckFixture(stagingArea.id))
+    })
   }
+
   return (
     <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
@@ -102,6 +132,15 @@ export function EditModulesCard(props: Props): JSX.Element {
             }
           />
         )}
+        {isFlex ? (
+          <Box paddingBottom={SPACING.spacing16}>
+            <AdditionalItemsRow
+              handleAttachment={() => dispatch(toggleIsGripperRequired())}
+              isEquipmentAdded={isGripperAttached}
+              name="gripper"
+            />
+          </Box>
+        ) : null}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {
@@ -125,11 +164,36 @@ export function EditModulesCard(props: Props): JSX.Element {
             )
           }
         })}
-        {isFlex ? (
-          <GripperRow
-            handleGripper={handleGripperClick}
-            isGripperAdded={isGripperAttached}
-          />
+        {enableDeckModification && isFlex ? (
+          <>
+            <StagingAreasRow
+              handleAttachment={handleDeleteStagingAreas}
+              stagingAreas={stagingAreas}
+            />
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                trashBin != null
+                  ? dispatch(deleteContainer({ labwareId: trashBin.id }))
+                  : null
+              }
+              isEquipmentAdded={trashBin != null}
+              name="trashBin"
+              hasWasteChute={wasteChute != null}
+              trashBinSlot={trashSlot ?? undefined}
+              trashBinId={trashBin?.id}
+            />
+            <AdditionalItemsRow
+              handleAttachment={() =>
+                dispatch(
+                  wasteChute != null ? deleteDeckFixture(wasteChute.id) : null
+                )
+              }
+              isEquipmentAdded={wasteChute != null}
+              name="wasteChute"
+              hasWasteChute={wasteChute != null}
+              trashBinId={trashBin?.id}
+            />
+          </>
         ) : null}
       </div>
     </Card>

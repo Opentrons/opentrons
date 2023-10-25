@@ -66,6 +66,12 @@ export function RobotSettingsGripperCalibration(
   const [showWizardFlow, setShowWizardFlow] = React.useState<boolean>(false)
   const gripperCalibrationLastModified =
     gripper?.data.calibratedOffset?.last_modified
+
+  const handleCalibrate = (): void => {
+    setShowOverflowMenu(false)
+    setShowWizardFlow(true)
+  }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -136,7 +142,7 @@ export function RobotSettingsGripperCalibration(
                       right={0}
                       flexDirection={DIRECTION_COLUMN}
                     >
-                      <MenuItem onClick={() => setShowWizardFlow(true)}>
+                      <MenuItem onClick={handleCalibrate}>
                         {t(
                           gripperCalibrationLastModified == null
                             ? 'calibrate_gripper'

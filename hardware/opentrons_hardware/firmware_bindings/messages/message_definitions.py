@@ -631,7 +631,7 @@ class GripperJawStateRequest(EmptyPayloadMessage):  # noqa: D101
 
 @dataclass
 class GripperJawStateResponse(BaseMessage):  # noqa: D101
-    payload: payloads.GripperMoveRequestPayload
+    payload: payloads.GripperJawStatePayload
     payload_type: Type[
         payloads.GripperJawStatePayload
     ] = payloads.GripperJawStatePayload

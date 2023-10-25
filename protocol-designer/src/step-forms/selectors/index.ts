@@ -16,6 +16,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import {
+  AdditionalEquipmentEntities,
   NormalizedAdditionalEquipmentById,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
@@ -151,6 +152,15 @@ export const _getPipetteEntitiesRootState: (
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
+// Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
+export const _getAdditionalEquipmentEntitiesRootState: (
+  arg: RootState
+) => AdditionalEquipmentEntities = rs =>
+  rs.additionalEquipmentInvariantProperties
+export const getAdditionalEquipmentEntities: Selector<
+  BaseState,
+  AdditionalEquipmentEntities
+> = createSelector(rootSelector, _getAdditionalEquipmentEntitiesRootState)
 
 export const getPipetteEntities: Selector<
   BaseState,
@@ -204,18 +214,32 @@ const _getInitialDeckSetup = (
   initialSetupStep: FormData,
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities,
-  moduleEntities: ModuleEntities
+  moduleEntities: ModuleEntities,
+  additionalEquipmentEntities: AdditionalEquipmentEntities
 ): InitialDeckSetup => {
   assert(
     initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
     'expected initial deck setup step to be "manualIntervention" step'
   )
+
   const labwareLocations =
     (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
   const moduleLocations =
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
+
+  // filtering only the additionalEquipmentEntities that are rendered on the deck
+  // which for now is wasteChute and stagingArea
+  const additionalEquipmentEntitiesOnDeck = Object.values(
+    additionalEquipmentEntities
+  ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
+    if (ae.name === 'wasteChute' || ae.name === 'stagingArea') {
+      aeEntities[ae.id] = ae
+    }
+    return aeEntities
+  }, {})
+
   return {
     labware: mapValues<{}, LabwareOnDeck>(
       labwareLocations,
@@ -281,6 +305,7 @@ const _getInitialDeckSetup = (
         return { mount, ...pipetteEntities[pipetteId] }
       }
     ),
+    additionalEquipmentOnDeck: additionalEquipmentEntitiesOnDeck,
   }
 }
 
@@ -292,6 +317,7 @@ export const getInitialDeckSetup: Selector<
   getLabwareEntities,
   getPipetteEntities,
   getModuleEntities,
+  getAdditionalEquipment,
   _getInitialDeckSetup
 )
 // Special version of `getLabwareEntities` selector for use in step-forms reducers
@@ -302,6 +328,7 @@ export const _getInitialDeckSetupRootState: (
   _getLabwareEntitiesRootState,
   _getPipetteEntitiesRootState,
   _getModuleEntitiesRootState,
+  _getAdditionalEquipmentRootState,
   _getInitialDeckSetup
 )
 export const getPermittedTipracks: Selector<
@@ -595,18 +622,21 @@ export const getInvariantContext: Selector<
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
+  getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     disableModuleRestrictions,
     allowAllTipracks
   ) => ({
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    additionalEquipmentEntities,
     config: {
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),

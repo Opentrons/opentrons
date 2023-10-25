@@ -11,6 +11,7 @@ import { useChainRunCommands } from '../../../resources/runs/hooks'
 import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { getIsOnDevice } from '../../../redux/config'
 import { NeedHelpLink } from '../../CalibrationPanels'
 import { useSelector } from 'react-redux'
@@ -50,6 +51,7 @@ export const IntroScreen = (props: {
   setFatalError: (errorMessage: string) => void
   isRobotMoving: boolean
   existingOffsets: LabwareOffset[]
+  protocolName: string
 }): JSX.Element | null => {
   const {
     proceed,
@@ -58,6 +60,7 @@ export const IntroScreen = (props: {
     isRobotMoving,
     setFatalError,
     existingOffsets,
+    protocolName,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -91,8 +94,12 @@ export const IntroScreen = (props: {
         <WizardRequiredEquipmentList
           equipmentList={[
             {
-              loadName: t('all_modules_and_labware_from_protocol'),
-              displayName: t('all_modules_and_labware_from_protocol'),
+              loadName: t('all_modules_and_labware_from_protocol', {
+                protocol_name: protocolName,
+              }),
+              displayName: t('all_modules_and_labware_from_protocol', {
+                protocol_name: protocolName,
+              }),
             },
           ]}
         />
@@ -144,6 +151,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
   const { existingOffsets, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
   const [showOffsetsTable, setShowOffsetsModal] = React.useState(false)
+  const latestCurrentOffsets = getLatestCurrentOffsets(existingOffsets)
   return existingOffsets.length > 0 ? (
     <>
       <Btn
@@ -184,7 +192,7 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
           >
             <Box overflowY="scroll" marginBottom={SPACING.spacing16}>
               <TerseOffsetTable
-                offsets={existingOffsets}
+                offsets={latestCurrentOffsets}
                 labwareDefinitions={labwareDefinitions}
               />
             </Box>

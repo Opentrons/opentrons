@@ -4,7 +4,6 @@ import logging
 from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
-from opentrons.hardware_control import NoTipAttachedError, TipAttachedError
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import HardwareAction
 from opentrons.protocols.api_support import instrument as instrument_support
@@ -17,6 +16,12 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 from opentrons.protocols.geometry import planning
+from opentrons_shared_data.errors.exceptions import (
+    UnexpectedTipRemovalError,
+    UnexpectedTipAttachError,
+)
+
+from ..._waste_chute import WasteChute
 
 from ..instrument import AbstractInstrument
 
@@ -247,6 +252,11 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        raise APIVersionError("Waste chutes are not supported in this PAPI version.")
+
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
 
@@ -409,11 +419,19 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         self._pipette_dict["blow_out_speed"] = p["blow_out_speed"]
 
     def _raise_if_no_tip(self, action: str) -> None:
-        """Raise NoTipAttachedError if no tip."""
+        """Raise UnexpectedTipRemovalError if no tip."""
         if not self.has_tip():
-            raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
+            raise UnexpectedTipRemovalError(
+                action, self._instrument_name, self._mount.name
+            )
 
     def _raise_if_tip(self, action: str) -> None:
-        """Raise TipAttachedError if tip."""
+        """Raise UnexpectedTipAttachError if tip."""
         if self.has_tip():
-            raise TipAttachedError(f"Cannot {action} with a tip attached")
+            raise UnexpectedTipAttachError(
+                action, self._instrument_name, self._mount.name
+            )
+
+    def configure_for_volume(self, volume: float) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass

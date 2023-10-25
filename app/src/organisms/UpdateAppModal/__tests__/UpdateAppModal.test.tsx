@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
+import { when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
-import * as Shell from '../../../redux/shell'
 import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
+import * as Shell from '../../../redux/shell'
 import { UpdateAppModal, UpdateAppModalProps } from '..'
+import { useRemoveActiveAppUpdateToast } from '../../Alerts'
 
 import type { State } from '../../../redux/types'
 import type { ShellUpdateState } from '../../../redux/shell/types'
@@ -19,9 +21,13 @@ jest.mock('react-router-dom', () => ({
     push: jest.fn(),
   }),
 }))
+jest.mock('../../Alerts')
 
 const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<
   typeof Shell.getShellUpdateState
+>
+const mockUseRemoveActiveAppUpdateToast = useRemoveActiveAppUpdateToast as jest.MockedFunction<
+  typeof useRemoveActiveAppUpdateToast
 >
 
 const render = (props: React.ComponentProps<typeof UpdateAppModal>) => {
@@ -49,6 +55,9 @@ describe('UpdateAppModal', () => {
           releaseNotes: 'this is a release',
         },
       } as ShellUpdateState
+    })
+    when(mockUseRemoveActiveAppUpdateToast).calledWith().mockReturnValue({
+      removeActiveAppUpdateToast: jest.fn(),
     })
   })
 

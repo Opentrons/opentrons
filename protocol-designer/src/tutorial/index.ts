@@ -7,6 +7,7 @@ type HintKey =  // normal hints
   | 'module_without_labware'
   | 'thermocycler_lid_passive_cooling'
   | 'protocol_can_enter_batch_edit'
+  | 'waste_chute_warning'
   // blocking hints
   | 'custom_labware_with_modules'
   | 'export_v7_protocol_7_0'

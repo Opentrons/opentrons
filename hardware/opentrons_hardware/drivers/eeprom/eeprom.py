@@ -128,6 +128,7 @@ class EEPROMDriver:
             logger.debug("Closing eeprom file descriptor")
             os.close(self._eeprom_fd)
             self._eeprom_fd = -1
+        self._gpio.__del__()
         return True
 
     def property_read(self, prop_ids: Optional[Set[PropId]] = None) -> Set[Property]:

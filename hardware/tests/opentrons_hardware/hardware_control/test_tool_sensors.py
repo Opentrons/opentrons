@@ -185,7 +185,7 @@ async def test_liquid_probe(
         num_baseline_reads=8,
         sensor_id=SensorId.S0,
     )
-    assert position[motor_node][0] == 14
+    assert position[motor_node].positions_only()[0] == 14
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
         sensor=sensor_info,
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
@@ -270,7 +270,7 @@ async def test_capacitive_probe(
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                         )
                     ),
                     motor_node,
@@ -281,11 +281,11 @@ async def test_capacitive_probe(
 
     message_send_loopback.add_responder(move_responder)
 
-    position, encoder_position = await capacitive_probe(
+    status = await capacitive_probe(
         mock_messenger, target_node, motor_node, distance, speed
     )
-    assert position == 10  # this comes from the current_position_um above
-    assert encoder_position == 10
+    assert status.motor_position == 10  # this comes from the current_position_um above
+    assert status.encoder_position == 10
     # this mock assert is annoying because something's __eq__ doesn't work
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
         sensor=sensor_info,
@@ -354,7 +354,7 @@ async def test_capacitive_sweep(
                             current_position_um=UInt32Field(10000),
                             encoder_position_um=Int32Field(10000),
                             position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(0),
+                            ack_id=UInt8Field(1),
                         )
                     ),
                     motor_node,

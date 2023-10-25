@@ -10,7 +10,11 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
 } from '../../../../redux/analytics'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useDeckCalibrationData, useIsOT3, useRunHasStarted } from '../../hooks'
+import {
+  useDeckCalibrationData,
+  useIsFlex,
+  useRunHasStarted,
+} from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
@@ -40,7 +44,7 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -86,7 +90,7 @@ describe('SetupRobotCalibration', () => {
       isDeckCalibrated: true,
     })
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -102,7 +106,7 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('renders only pipette calibration component for OT-3', () => {
-    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     const { getByText, queryByText } = render()[0]
 
     expect(queryByText('Mock SetupDeckCalibration')).toBeNull()
@@ -113,13 +117,13 @@ describe('SetupRobotCalibration', () => {
   it('changes Proceed CTA copy based on next step', () => {
     const { getByRole } = render({ nextStep: 'labware_setup_step' })[0]
 
-    getByRole('button', { name: 'Proceed to labware setup' })
+    getByRole('button', { name: 'Proceed to labware' })
   })
 
   it('calls the expandStep function and tracks the analytics event on click', () => {
     const { getByRole } = render()[0]
 
-    fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
+    fireEvent.click(getByRole('button', { name: 'Proceed to modules' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
@@ -130,7 +134,7 @@ describe('SetupRobotCalibration', () => {
   it('does not call the expandStep function on click if calibration is not complete', () => {
     const { getByRole } = render({ calibrationStatus: { complete: false } })[0]
 
-    const button = getByRole('button', { name: 'Proceed to module setup' })
+    const button = getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()
@@ -140,7 +144,7 @@ describe('SetupRobotCalibration', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const { getByRole } = render()[0]
 
-    const button = getByRole('button', { name: 'Proceed to module setup' })
+    const button = getByRole('button', { name: 'Proceed to modules' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()

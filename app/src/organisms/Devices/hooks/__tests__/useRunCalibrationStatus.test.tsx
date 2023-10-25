@@ -7,7 +7,7 @@ import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtur
 import {
   useRunCalibrationStatus,
   useDeckCalibrationStatus,
-  useIsOT3,
+  useIsFlex,
   useRunPipetteInfoByMount,
 } from '..'
 
@@ -16,13 +16,13 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 jest.mock('../useDeckCalibrationStatus')
-jest.mock('../useIsOT3')
+jest.mock('../useIsFlex')
 jest.mock('../useRunPipetteInfoByMount')
 
 const mockUseDeckCalibrationStatus = useDeckCalibrationStatus as jest.MockedFunction<
   typeof useDeckCalibrationStatus
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
   typeof useRunPipetteInfoByMount
 >
@@ -36,7 +36,7 @@ describe('useRunCalibrationStatus hook', () => {
       left: null,
       right: null,
     })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
 
     const store = createStore(jest.fn(), {})
     store.dispatch = jest.fn()
@@ -69,7 +69,7 @@ describe('useRunCalibrationStatus hook', () => {
     when(mockUseDeckCalibrationStatus)
       .calledWith('otie')
       .mockReturnValue('BAD_CALIBRATION')
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
       wrapper,
     })
@@ -181,7 +181,7 @@ describe('useRunCalibrationStatus hook', () => {
         } as PipetteInfo,
         right: null,
       })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const { result } = renderHook(() => useRunCalibrationStatus('otie', '1'), {
       wrapper,
     })

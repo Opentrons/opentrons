@@ -107,7 +107,7 @@ describe('RunFailedModal', () => {
     getByText('Error 1000: hardwareCommunicationError')
     getByText('Error with code 1000 (highest priority)')
     getByText(
-      'Download the run logs from the Opentrons App and send it to support@opentrons.com for assistance.'
+      'Download the robot logs from the Opentrons App and send it to support@opentrons.com for assistance.'
     )
     getByText('Close')
   })

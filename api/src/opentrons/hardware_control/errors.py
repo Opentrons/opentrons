@@ -1,109 +1,43 @@
-from .types import OT3Mount
+from typing import Optional, Dict, Any
+from opentrons_shared_data.errors.exceptions import (
+    MotionPlanningFailureError,
+    InvalidInstrumentData,
+    RobotInUseError,
+)
 
 
-class OutOfBoundsMove(RuntimeError):
-    def __init__(self, message: str):
-        self.message = message
-        super().__init__()
-
-    def __str__(self) -> str:
-        return f"OutOfBoundsMove: {self.message}"
-
-    def __repr__(self) -> str:
-        return f"<{str(self.__class__)}: {self.message}>"
+class OutOfBoundsMove(MotionPlanningFailureError):
+    def __init__(self, message: str, detail: Dict[str, Any]):
+        super().__init__(message=message, detail=detail)
 
 
-class ExecutionCancelledError(RuntimeError):
-    pass
+class InvalidCriticalPoint(MotionPlanningFailureError):
+    def __init__(self, cp_name: str, instr: str, message: Optional[str] = None):
+        super().__init__(
+            message=(message or f"Critical point {cp_name} is invalid for a {instr}."),
+            detail={"instrument": instr, "critical point": cp_name},
+        )
 
 
-class MustHomeError(RuntimeError):
-    pass
-
-
-class NoTipAttachedError(RuntimeError):
-    pass
-
-
-class TipAttachedError(RuntimeError):
-    pass
-
-
-class InvalidMoveError(ValueError):
-    pass
-
-
-class NotSupportedByHardware(ValueError):
-    """Error raised when attempting to use arguments and values not supported by the specific hardware."""
-
-
-class GripperNotAttachedError(Exception):
-    """An error raised if a gripper is accessed that is not attached."""
-
-    pass
-
-
-class AxisNotPresentError(Exception):
-    """An error raised if an axis that is not present."""
-
-    pass
-
-
-class FirmwareUpdateRequired(RuntimeError):
-    """An error raised when the firmware of the submodules needs to be updated."""
-
-    pass
-
-
-class FirmwareUpdateFailed(RuntimeError):
-    """An error raised when a firmware update fails."""
-
-    pass
-
-
-class OverPressureDetected(RuntimeError):
-    """An error raised when the pressure sensor max value is exceeded."""
-
-    pass
-
-
-class InvalidPipetteName(KeyError):
+class InvalidPipetteName(InvalidInstrumentData):
     """Raised for an invalid pipette."""
 
-    def __init__(self, name: int, mount: OT3Mount) -> None:
-        self.name = name
-        self.mount = mount
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: name={self.name} mount={self.mount}>"
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}: Pipette name key {self.name} on mount {self.mount.name} is not valid"
+    def __init__(self, name: int, mount: str) -> None:
+        super().__init__(
+            message=f"Invalid pipette name key {name} on mount {mount}",
+            detail={"mount": mount, "name": name},
+        )
 
 
-class InvalidPipetteModel(KeyError):
+class InvalidPipetteModel(InvalidInstrumentData):
     """Raised for a pipette with an unknown model."""
 
-    def __init__(self, name: str, model: str, mount: OT3Mount) -> None:
-        self.name = name
-        self.model = model
-        self.mount = mount
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: name={self.name}, model={self.model}, mount={self.mount}>"
-
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
+    def __init__(self, name: str, model: str, mount: str) -> None:
+        super().__init__(detail={"mount": mount, "name": name, "model": model})
 
 
-class UpdateOngoingError(RuntimeError):
+class UpdateOngoingError(RobotInUseError):
     """Error when an update is already happening."""
 
-    def __init__(self, msg: str) -> None:
-        self.msg = msg
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: msg={self.msg}>"
-
-    def __str__(self) -> str:
-        return self.msg
+    def __init__(self, message: str) -> None:
+        super().__init__(message=message)

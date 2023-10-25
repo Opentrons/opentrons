@@ -560,10 +560,25 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's overlap with requested module model."""
         definition = self.get_definition(labware_id)
         stacking_overlap = definition.stackingOffsetWithModule.get(
-            str(module_model.value), OverlapOffset(x=0, y=0, z=0)
+            str(module_model.value)
         )
+        if not stacking_overlap:
+            if self._is_thermocycler_on_ot2(module_model):
+                return OverlapOffset(x=0, y=0, z=10.7)
+            else:
+                return OverlapOffset(x=0, y=0, z=0)
+
         return OverlapOffset(
             x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
+        )
+
+    def _is_thermocycler_on_ot2(self, module_model: ModuleModel) -> bool:
+        """Whether the given module is a thermocycler with the current deck being an OT2 deck."""
+        robot_model = self.get_deck_definition()["robot"]["model"]
+        return (
+            module_model
+            in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
+            and robot_model == "OT-2 Standard"
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
@@ -748,9 +763,18 @@ class LabwareView(HasState[LabwareState]):
         labware_id: str,
         slot_name: Optional[DeckSlotName],
     ) -> Optional[LabwareMovementOffsetData]:
-        """Get the labware's gripper offsets of the specified type."""
+        """Get the labware's gripper offsets of the specified type.
+
+        Returns:
+            If `slot_name` is provided, returns the gripper offsets that the labware definition
+            specifies just for that slot, or `None` if the labware definition doesn't have an
+            exact match.
+
+            If `slot_name` is `None`, returns the gripper offsets that the labware
+            definition designates as "default," or `None` if it doesn't designate any as such.
+        """
         parsed_offsets = self.get_definition(labware_id).gripperOffsets
-        offset_key = slot_name.name if slot_name else "default"
+        offset_key = slot_name.id if slot_name else "default"
 
         if parsed_offsets is None or offset_key not in parsed_offsets:
             return None

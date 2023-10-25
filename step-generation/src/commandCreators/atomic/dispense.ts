@@ -170,6 +170,8 @@ export const dispense: CommandCreator<DispenseParams> = (
           },
         },
         flowRate,
+        //  pushOut will always be undefined in step-generation for now
+        //  since there is no easy way to allow users to select a volume for it in PD
       },
       ...(isAirGap && { meta: { isAirGap } }),
     },

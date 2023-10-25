@@ -1,5 +1,6 @@
 """Geometry state getters."""
 import enum
+from numpy import array, dot
 from typing import Optional, List, Set, Tuple, Union, cast
 
 from opentrons.types import Point, DeckSlotName, MountType
@@ -18,9 +19,10 @@ from ..types import (
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
-    ModuleOffsetVector,
     LabwareLocation,
     LabwareOffsetVector,
+    ModuleOffsetVector,
+    ModuleOffsetData,
     DeckType,
     CurrentWell,
     TipGeometry,
@@ -186,13 +188,45 @@ class GeometryView:
                 f"Either it has been loaded off-deck or its been moved off-deck."
             )
 
+    def _normalize_module_calibration_offset(
+        self,
+        module_location: DeckSlotLocation,
+        offset_data: Optional[ModuleOffsetData],
+    ) -> ModuleOffsetVector:
+        """Normalize the module calibration offset depending on the module location."""
+        if not offset_data:
+            return ModuleOffsetVector(x=0, y=0, z=0)
+        offset = offset_data.moduleOffsetVector
+        calibrated_slot = offset_data.location.slotName
+        calibrated_slot_column = self.get_slot_column(calibrated_slot)
+        current_slot_column = self.get_slot_column(module_location.slotName)
+        # make sure that we have valid colums since we cant have modules in the middle of the deck
+        assert set([calibrated_slot_column, current_slot_column]).issubset(
+            {1, 3}
+        ), f"Module calibration offset is an invalid slot {calibrated_slot}"
+
+        # Check if the module has moved from one side of the deck to the other
+        if calibrated_slot_column != current_slot_column:
+            # Since the module was rotated, the calibration offset vector needs to be rotated by 180 degrees along the z axis
+            saved_offset = array([offset.x, offset.y, offset.z])
+            rotation_matrix = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
+            new_offset = dot(saved_offset, rotation_matrix)  # type: ignore[no-untyped-call]
+            offset = ModuleOffsetVector(
+                x=new_offset[0], y=new_offset[1], z=new_offset[2]
+            )
+        return offset
+
     def _get_calibrated_module_offset(
         self, location: LabwareLocation
     ) -> ModuleOffsetVector:
         """Get a labware location's underlying calibrated module offset, if it is on a module."""
         if isinstance(location, ModuleLocation):
             module_id = location.moduleId
-            return self._modules.get_module_calibration_offset(module_id)
+            module_location = self._modules.get_location(module_id)
+            offset_data = self._modules.get_module_calibration_offset(module_id)
+            return self._normalize_module_calibration_offset(
+                module_location, offset_data
+            )
         elif isinstance(location, DeckSlotLocation):
             return ModuleOffsetVector(x=0, y=0, z=0)
         elif isinstance(location, OnLabwareLocation):
@@ -379,15 +413,15 @@ class GeometryView:
                 offset=well_location.offset,
             )
 
-        # return to top if labware is fixed trash
-        if self._labware.get_has_quirk(labware_id=labware_id, quirk="fixedTrash"):
-            z_offset = well_location.offset.z
-        else:
+        if self._labware.get_definition(labware_id).parameters.isTiprack:
             z_offset = self._labware.get_tip_drop_z_offset(
                 labware_id=labware_id,
                 length_scale=self._pipettes.get_return_tip_scale(pipette_id),
                 additional_offset=well_location.offset.z,
             )
+        else:
+            # return to top if labware is not tip rack
+            z_offset = well_location.offset.z
 
         return WellLocation(
             origin=WellOrigin.TOP,
@@ -552,6 +586,8 @@ class GeometryView:
             # In order to avoid the complexity of finding tip drop locations for
             # variety of labware with different well configs, we will allow
             # location cycling only for fixed trash labware right now.
+            # TODO (spp, 2023-09-12): update this to possibly a labware-width based check,
+            #  or a 'trash' quirk check, once movable trash is implemented.
             return DropTipWellLocation(
                 origin=DropTipWellOrigin.DEFAULT,
                 offset=WellOffset(x=0, y=0, z=0),

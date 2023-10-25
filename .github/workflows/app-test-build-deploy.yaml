@@ -85,7 +85,7 @@ jobs:
           make setup-js
       - name: 'test frontend packages'
         run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="app/src/**/*.(js|ts|tsx)" app/src components/src shared-data/js
+          make -C app test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
@@ -141,8 +141,7 @@ jobs:
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src app-shell-odd/src discovery-client/src
+        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
@@ -315,7 +314,8 @@ jobs:
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
+    needs:
+      ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
     steps:
       - name: 'download run app builds'
@@ -348,6 +348,7 @@ jobs:
       - name: 'deploy internal-release release builds to s3'
         run: |
           aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+
       - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
         if: needs.determine-build-type.outputs.type == 'release'
@@ -400,7 +401,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         with:
-          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ needs.determine-build-type.outputs.type }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}\"}"
+          payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}"}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
@@ -408,7 +409,57 @@ jobs:
         uses: slackapi/slack-github-action@v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         with:
-          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ needs.determine-build-type.outputs.type }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}\"}"
+          payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}"}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}
+
+      - name: 'pull repo for scripts'
+        uses: 'actions/checkout@v3'
+        with:
+          path: ./monorepo
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          cd ./monorepo
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - name: 'install udev'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'set complex environment variables'
+        id: 'set-vars'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/monorepo/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: 'setup-js'
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          cd monorepo
+          make setup-js
+      - name: 'update internal-releases releases.json'
+        if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+        run: |
+          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
+          node ./monorepo/scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
+          aws --profile=deploy s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
+
+      - name: 'update release releases.json'
+        if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
+        run: |
+          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
+          node ./monorepo/scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
+          aws --profile=deploy s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json

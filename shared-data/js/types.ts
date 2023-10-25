@@ -24,6 +24,10 @@ import {
   GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
+  STAGING_AREA_LOAD_NAME,
+  STANDARD_SLOT_LOAD_NAME,
+  TRASH_BIN_LOAD_NAME,
+  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
@@ -227,6 +231,12 @@ export type ModuleModelWithLegacy =
   | typeof THERMOCYCLER
   | typeof MAGDECK
   | typeof TEMPDECK
+
+export type FixtureLoadName =
+  | typeof STAGING_AREA_LOAD_NAME
+  | typeof STANDARD_SLOT_LOAD_NAME
+  | typeof TRASH_BIN_LOAD_NAME
+  | typeof WASTE_CHUTE_LOAD_NAME
 
 export interface DeckOffset {
   x: number
@@ -448,7 +458,6 @@ export interface CompletedProtocolAnalysis {
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
-  robotType?: RobotType
 }
 
 export interface ResourceFile {
@@ -499,6 +508,7 @@ export interface GripperDefinition {
     polynomial: [[number, number], [number, number]]
     defaultGripForce: number
     defaultHomeForce: number
+    defaultIdleForce: number
     min: number
     max: number
   }
@@ -519,3 +529,26 @@ export type StatusBarAnimation =
   | 'off'
 
 export type StatusBarAnimations = StatusBarAnimation[]
+
+// TODO(bh, 2023-09-28): refine types when settled
+export type Cutout =
+  | 'A1'
+  | 'B1'
+  | 'C1'
+  | 'D1'
+  | 'A2'
+  | 'B2'
+  | 'C2'
+  | 'D2'
+  | 'A3'
+  | 'B3'
+  | 'C3'
+  | 'D3'
+
+export interface Fixture {
+  fixtureId: string
+  fixtureLocation: Cutout
+  loadName: FixtureLoadName
+}
+
+export type DeckConfiguration = Fixture[]

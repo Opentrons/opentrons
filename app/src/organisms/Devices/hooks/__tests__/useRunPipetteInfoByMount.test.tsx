@@ -108,7 +108,7 @@ const modifiedSimpleV6Protocol = ({
     },
     {
       id: 'tipRackId',
-      displayName: 'Opentrons 96 Tip Rack 10 µL',
+      displayName: 'Opentrons OT-2 96 Tip Rack 10 µL',
       definitionUri: 'opentrons/opentrons_96_tiprack_10ul/1',
       loadName: 'opentrons_96_tiprack_10ul',
     },
@@ -200,7 +200,7 @@ describe('useRunPipetteInfoByMount hook', () => {
         },
         tipRacksForPipette: [
           {
-            displayName: 'Opentrons 96 Tip Rack 10 µL',
+            displayName: 'Opentrons OT-2 96 Tip Rack 10 µL',
             lastModifiedDate: null,
             tipRackDef: tiprack10ul,
           },

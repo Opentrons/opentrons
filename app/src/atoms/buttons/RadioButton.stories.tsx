@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { touchScreenViewport } from '../../DesignTokens/constants'
+
 import { RadioButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
@@ -14,6 +16,7 @@ export default {
     },
     onClick: { action: 'clicked' },
   },
+  parameters: touchScreenViewport,
 } as Meta
 
 const RadioButtonTemplate: Story<
