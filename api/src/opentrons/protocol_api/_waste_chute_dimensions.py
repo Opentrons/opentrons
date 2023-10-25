@@ -1,8 +1,6 @@
 """Constants for the dimensions of the Flex waste chute.
 
-https://docs.google.com/spreadsheets/d/1yGRN-5QOa45p-jLsi4tL_PbHmKSK-QsXqHws6oBK7do/edit#gid=258725851
-
-These should be moved into shared-data and interpreted by Protocol Engine.
+TODO: These should be moved into shared-data and interpreted by Protocol Engine.
 """
 
 
