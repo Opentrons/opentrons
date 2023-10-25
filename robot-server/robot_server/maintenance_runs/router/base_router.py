@@ -24,7 +24,7 @@ from robot_server.service.json_api import (
     Body,
 )
 
-from robot_server.runs.dependencies import get_protocol_run_is_terminal
+from robot_server.runs.dependencies import get_is_okay_to_create_maintenance_run
 
 from ..maintenance_run_models import (
     MaintenanceRun,
@@ -143,7 +143,9 @@ async def create_run(
     ),
     run_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
-    protocol_run_is_terminal: bool = Depends(get_protocol_run_is_terminal),
+    is_ok_to_create_maintenance_run: bool = Depends(
+        get_is_okay_to_create_maintenance_run
+    ),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
@@ -156,7 +158,7 @@ async def create_run(
         protocol_run_is_terminal: Whether a protocol run is in a terminal state.
         check_estop: Dependency to verify the estop is in a valid state.
     """
-    if not protocol_run_is_terminal:
+    if not is_ok_to_create_maintenance_run:
         raise ProtocolRunIsActive(
             detail="Cannot create maintenance run when " "a protocol run is active."
         ).as_error(status.HTTP_409_CONFLICT)

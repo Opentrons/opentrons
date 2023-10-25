@@ -644,14 +644,7 @@ class CommandView(HasState[CommandState]):
 
     def get_is_terminal(self) -> bool:
         """Get whether engine is in a terminal state."""
-        if (
-            self._state.run_result == RunResult.SUCCEEDED
-            or self._state.run_result == RunResult.STOPPED
-            or self._state.run_result == RunResult.FAILED
-        ):
-            return True
-        else:
-            return False
+        return self._state.run_result is not None
 
     def validate_action_allowed(
         self,

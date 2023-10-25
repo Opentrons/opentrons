@@ -57,12 +57,12 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
-import { getLocalRobot, ROBOT_MODEL_OT3 } from '../../redux/discovery'
+import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -134,7 +134,7 @@ export function RunSummary(): JSX.Element {
       handleTipsAttachedModal(
         mount,
         specs,
-        ROBOT_MODEL_OT3,
+        FLEX_ROBOT_TYPE,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
@@ -149,7 +149,7 @@ export function RunSummary(): JSX.Element {
       handleTipsAttachedModal(
         mount,
         specs,
-        ROBOT_MODEL_OT3,
+        FLEX_ROBOT_TYPE,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {

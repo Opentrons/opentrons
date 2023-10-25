@@ -82,7 +82,7 @@ async def test_create_run(
         run_data_manager=mock_maintenance_run_data_manager,
         run_id=run_id,
         created_at=run_created_at,
-        protocol_run_has_been_played=False,
+        is_ok_to_create_maintenance_run=True,
     )
 
     assert result.content.data == expected_response
@@ -102,7 +102,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
             created_at=created_at,
             request_body=None,
             run_data_manager=mock_maintenance_run_data_manager,
-            protocol_run_is_terminal=False,
+            get_is_okay_to_create_maintenance_run=False,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"
