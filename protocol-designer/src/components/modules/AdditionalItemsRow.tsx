@@ -17,6 +17,7 @@ import {
 import { i18n } from '../../localization'
 import gripperImage from '../../images/flex_gripper.png'
 import wasteChuteImage from '../../images/waste_chute.png'
+import trashBinImage from '../../images/flex_trash_bin.png'
 import { Portal } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
@@ -53,6 +54,8 @@ export function AdditionalItemsRow(
   let imageSrc: string = gripperImage
   if (name === 'wasteChute') {
     imageSrc = wasteChuteImage
+  } else if (name === 'trashBin') {
+    imageSrc = trashBinImage
   }
 
   return (
