@@ -142,6 +142,12 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         const modSlot =
           modIdWithAdapter != null ? modules[modIdWithAdapter].slot : null
         const isAdapter = getIsAdapter(labwareId, labwareEntities)
+        const moduleUnderAdapter =
+          modIdWithAdapter != null
+            ? getModuleDisplayName(moduleEntities[modIdWithAdapter].model)
+            : 'unknown module'
+        const moduleSlotInfo = modSlot ?? 'unknown slot'
+        const adapterSlotInfo = adapterSlot ?? 'unknown adapter'
 
         return labwareOnAdapter == null && isAdapter
           ? [
@@ -149,16 +155,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
               {
                 name:
                   modIdWithAdapter != null
-                    ? `${adapterDisplayName} on top of ${
-                        modIdWithAdapter != null
-                          ? getModuleDisplayName(
-                              moduleEntities[modIdWithAdapter].model
-                            )
-                          : 'unknown module'
-                      } in slot ${modSlot ?? 'unknown slot'}`
-                    : `${adapterDisplayName} on slot ${
-                        adapterSlot ?? 'unknown'
-                      }`,
+                    ? `${adapterDisplayName} on top of ${moduleUnderAdapter} in slot ${moduleSlotInfo}`
+                    : `${adapterDisplayName} on slot ${adapterSlotInfo}`,
                 value: labwareId,
               },
             ]
