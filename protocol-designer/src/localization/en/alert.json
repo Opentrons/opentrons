@@ -157,8 +157,8 @@
         "body": "The Waste Chute or Trash Bin to drop tip in does not exist."
       },
       "MISSING_96_CHANNEL_TIPRACK_ADAPTER": {
-        "title": "Missing tiprack adapter for 96-channel",
-        "body": "A 96-channel cannot pick up a full tiprack without an adapter underneath."
+        "title": "Missing 96-channel tip rack adapter",
+        "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
       }
     },
     "warning": {
