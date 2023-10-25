@@ -148,14 +148,14 @@
       "items": { "$ref": "#/properties/commandSchemaRef" }
     },
 
-    "commandAnnotationsSchemaRef": {
+    "commandAnnotationSchemaRef": {
       "description": "The schema to which the command annotations adhere. The value will be looked up as a schema-id under shared-data/commandAnnotation/schemas/",
       "type": "string"
     },
 
     "commandAnnotations": {
       "type": "array",
-      "items": {"$ref": "#/properties/commandAnnotationSchemaRef"}
+      "items": { "$ref": "#/properties/commandAnnotationSchemaRef" }
     }
   }
 }

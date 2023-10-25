@@ -6,5 +6,11 @@
     "rootDir": ".",
     "outDir": "lib"
   },
-  "include": ["js", "protocol"]
+  "include": [
+    "js",
+    "protocol/types",
+    "command/types",
+    "liquid/types",
+    "commandAnnotation/types"
+  ]
 }
