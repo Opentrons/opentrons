@@ -11,6 +11,7 @@ metadata = {
 
 requirements = {"robotType": "OT-2", "apiLevel": "2.14"}
 
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """This method is run by the protocol engine."""
 
@@ -137,7 +138,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         logo_destination_plate.wells_by_name()["C11"],
     ]
     pipette_right.pick_up_tip()
-    
+
     pipette_right.transfer(
         volume=60,
         source=dye_container.wells_by_name()["A2"],

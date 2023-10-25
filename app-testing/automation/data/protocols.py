@@ -248,7 +248,6 @@ class Protocols:
         custom_labware=["cpx_4_tuberack_100ul"],
     )
 
-
     OT2_P300M_P20S_TC_HS_TM_6_14_SmokeTestV3: Protocol = Protocol(
         file_name="OT2_P300M_P20S_TC_HS_TM_6_14_SmokeTestV3",
         file_extension="py",
@@ -258,7 +257,6 @@ class Protocols:
         robot_error=False,
         custom_labware=["cpx_4_tuberack_100ul"],
     )
-
 
     OT2_P300M_P20S_TC_HS_TM_6_15_SmokeTestV3: Protocol = Protocol(
         file_name="OT2_P300M_P20S_TC_HS_TM_6_15_SmokeTestV3",
@@ -365,4 +363,3 @@ class Protocols:
         robot_error=False,
         custom_labware=["opentrons_ot3_96_tiprack_1000ul_rss"],
     )
-

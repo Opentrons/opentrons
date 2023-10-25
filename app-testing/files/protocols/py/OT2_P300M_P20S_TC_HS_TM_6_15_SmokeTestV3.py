@@ -6,7 +6,7 @@ metadata = {
     "protocolName": "🛠️ 2.15 Smoke Test V3 🪄",
     "author": "Opentrons Engineering <engineering@opentrons.com>",
     "source": "Software Testing Team",
-    "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ ") 
+    "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ "),
 }
 
 requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
@@ -68,10 +68,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         "nest_96_wellplate_100ul_pcr_full_skirt",
         label="Temperature-Controlled plate",
     )
-    hs_plate = hs_module.load_labware(
-        name="nest_96_wellplate_100ul_pcr_full_skirt",
-        adapter="opentrons_96_pcr_adapter"
-    )
+    hs_plate = hs_module.load_labware(name="nest_96_wellplate_100ul_pcr_full_skirt", adapter="opentrons_96_pcr_adapter")
     tc_plate = thermocycler_module.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
 
     # A 2.14 difference, no params specified, still should find it.
@@ -126,13 +123,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     hs_module.close_labware_latch()
 
     pipette_right.pick_up_tip()
-    
+
     ########################################
     # Manual Deck State Modification Start #
     ########################################
 
     # -------------------------- #
-    # Added in API version: 2.15 # 
+    # Added in API version: 2.15 #
     # -------------------------- #
 
     # Putting steps for this at beginning of protocol so you can do the manual stuff
@@ -156,10 +153,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     #   15. Move pipette to well A1 in slot 2
     #   16. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
 
-    # In effect, nothing will actually change to the protocol, 
+    # In effect, nothing will actually change to the protocol,
     # but we will be able to test that the UI responds appropriately.
 
-    # Note: 
+    # Note:
     #   logo_destination_plate is a nest_96_wellplate_100ul_pcr_full_skirt - starting position is slot 2
     #   dye_container is a nest_12_reservoir_15ml - starting position is slot 3
 
@@ -170,10 +167,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     )
 
     # Step 2
-    ctx.move_labware(
-        labware=dye_container,
-        new_location="2"
-    )
+    ctx.move_labware(labware=dye_container, new_location="2")
 
     # Step 3
     pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top(z=5.0))
@@ -182,10 +176,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2?")
 
     # Step 5
-    ctx.move_labware(
-        labware=dye_container,
-        new_location="3"
-    )
+    ctx.move_labware(labware=dye_container, new_location="3")
 
     # Step 6
     pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top(z=5.0))
@@ -194,10 +185,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3?")
 
     # Step 8
-    ctx.move_labware(
-        labware=custom_labware,
-        new_location="2"
-    )
+    ctx.move_labware(labware=custom_labware, new_location="2")
 
     # Step 9
     pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top(z=5.0))
@@ -206,10 +194,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 2?")
 
     # Step 11
-    ctx.move_labware(
-        labware=custom_labware,
-        new_location="6"
-    )
+    ctx.move_labware(labware=custom_labware, new_location="6")
 
     # Step 12
     pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top(z=5.0))
@@ -217,11 +202,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Step 13
     ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 6?")
 
-    #Step 14
-    ctx.move_labware(
-        labware=logo_destination_plate,
-        new_location="2"
-    )
+    # Step 14
+    ctx.move_labware(labware=logo_destination_plate, new_location="2")
 
     # Step 15
     pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top(z=5.0))
