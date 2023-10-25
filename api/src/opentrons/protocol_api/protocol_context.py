@@ -449,9 +449,10 @@ class ProtocolContext(CommandPublisher):
         # TODO: Is there a reasonable default for this?
         orifice: Literal["wide_open", "columnar_slit"],
     ) -> WasteChute:
-        return WasteChute(
-            with_staging_area_slot_d4=with_staging_area_slot_d4, orifice=orifice
-        )
+        if with_staging_area_slot_d4:
+            raise NotImplementedError(
+                "The waste chute staging area slot is not currently implemented."
+            )
 
     @requires_version(2, 15)
     def load_adapter(
