@@ -2035,7 +2035,7 @@ class OT3API(
         # can verify if a tip is properly attached
         if spec.ending_z_retract_distance:
             await self.move_rel(
-                realmount, top_types.Point(spec.ending_z_retract_distance)
+                realmount, top_types.Point(z=spec.ending_z_retract_distance)
             )
 
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
