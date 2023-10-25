@@ -9,6 +9,7 @@ import { createDeckConfiguration } from '@opentrons/api-client'
 //   WASTE_CHUTE_LOAD_NAME,
 //   WASTE_CHUTE_SLOT,
 // } from '@opentrons/shared-data'
+
 import { useHost } from '../../api'
 import { useCreateDeckConfigurationMutation } from '..'
 
@@ -25,13 +26,8 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 // const mockDeckConfiguration = [
 //   {
-//     fixtureId: 'mockFixtureTrashBinId',
-//     fixtureLocation: 'C3',
-//     loadName: TRASH_BIN_LOAD_NAME,
-//   },
-//   {
 //     fixtureId: 'mockFixtureWasteChuteId',
-//     fixtureLocation: WASTE_CHUTE_SLOT,
+//     fixtureLocation: 'D3',
 //     loadName: WASTE_CHUTE_LOAD_NAME,
 //   },
 // ] as DeckConfiguration
@@ -73,6 +69,7 @@ describe('useCreateDeckConfigurationMutation hook', () => {
     })
     expect(result.current.data).toBeUndefined()
   })
+  // ToDo (kk:10/25/2023) this part will be update when backend is ready
   // it('should create a run when calling createDeckConfiguration callback with DeckConfiguration', async () => {
   //   when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
   //   when(mockCreateDeckConfiguration)
@@ -80,6 +77,13 @@ describe('useCreateDeckConfigurationMutation hook', () => {
   //     .mockResolvedValue({
   //       data: mockCreateDeckConfiguration,
   //     } as Response<DeckConfiguration>)
+
+  //   const { result, waitFor } = renderHook(useCreateDeckConfigurationMutation, {
+  //     wrapper,
+  //   })
+  //   act(() => result.current.createDeckConfiguration(mockDeckConfiguration))
+
+  //   await waitFor(() => result.current.data != null)
+  //   expect(result.current.data).toEqual(mockDeckConfiguration)
   // })
-  // it('', () => {})
 })
