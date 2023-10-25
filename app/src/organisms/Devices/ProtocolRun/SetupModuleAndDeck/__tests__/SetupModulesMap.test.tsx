@@ -7,26 +7,23 @@ import {
   renderWithProviders,
   partialComponentPropsMatcher,
   componentPropsMatcher,
-  RobotWorkSpace,
 } from '@opentrons/components'
-import {
-  inferModuleOrientationFromXCoordinate,
-  ModuleModel,
-  ModuleType,
-} from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../../i18n'
 import {
   mockThermocycler as mockThermocyclerFixture,
   mockMagneticModule as mockMagneticModuleFixture,
 } from '../../../../../redux/modules/__fixtures__/index'
-import {
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../../hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../../ModuleInfo'
 import { SetupModulesMap } from '../SetupModulesMap'
+
+import type {
+  CompletedProtocolAnalysis,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -42,26 +39,18 @@ jest.mock('@opentrons/shared-data', () => {
     inferModuleOrientationFromXCoordinate: jest.fn(),
   }
 })
+jest.mock('../../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+jest.mock('../../../../ProtocolSetupModulesAndDeck/utils')
 jest.mock('../../../ModuleInfo')
 jest.mock('../../../hooks')
 
-const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
-  typeof useModuleRenderInfoForProtocolById
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as jest.MockedFunction<
+  typeof getAttachedProtocolModuleMatches
 >
 const mockModuleInfo = ModuleInfo as jest.MockedFunction<typeof ModuleInfo>
-const mockInferModuleOrientationFromXCoordinate = inferModuleOrientationFromXCoordinate as jest.MockedFunction<
-  typeof inferModuleOrientationFromXCoordinate
->
-const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
-  typeof RobotWorkSpace
->
-const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
-  (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
-  {}
-)
 
 const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   return renderWithProviders(
@@ -74,11 +63,9 @@ const render = (props: React.ComponentProps<typeof SetupModulesMap>) => {
   )[0]
 }
 
-const STUBBED_ORIENTATION_VALUE = 'left'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_SECOND_MAGNETIC_MODULE_COORDS = [100, 200, 0]
 const MOCK_TC_COORDS = [20, 30, 0]
-const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'
 
 const mockMagneticModule = {
@@ -121,30 +108,13 @@ describe('SetupModulesMap', () => {
     props = {
       runId: MOCK_RUN_ID,
     }
-    when(mockUseProtocolDetailsForRun)
+    when(mockUseMostRecentCompletedAnalysis)
       .calledWith(MOCK_RUN_ID)
-      .mockReturnValue({ protocolData: {} } as any)
-    when(mockInferModuleOrientationFromXCoordinate)
-      .calledWith(expect.anything())
-      .mockReturnValue(STUBBED_ORIENTATION_VALUE)
-
-    when(mockRobotWorkSpace)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when RobotWorkSpace isn't called with expected props
-      .calledWith(
-        partialComponentPropsMatcher({
-          deckDef: standardDeckDef,
-          children: expect.anything(),
-        })
-      )
-      .mockImplementation(({ children }) => (
-        <div>
-          {/* @ts-expect-error children won't be null since we checked for expect.anything() above */}
-          {children({
-            deckSlotsById,
-            getRobotCoordsFromDOMCoords: {} as any,
-          })}
-        </div>
-      ))
+      .mockReturnValue(({
+        commands: [],
+        labware: [],
+      } as unknown) as CompletedProtocolAnalysis)
+    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([])
   })
 
   afterEach(() => {
@@ -152,40 +122,38 @@ describe('SetupModulesMap', () => {
   })
 
   it('should render a deck WITHOUT modules if none passed (component will never be rendered in this circumstance)', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({})
-
     render(props)
     expect(mockModuleInfo).not.toHaveBeenCalled()
   })
   it('should render a deck WITH MoaM', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        [mockMagneticModule.moduleId]: {
-          moduleId: mockMagneticModule.moduleId,
-          x: MOCK_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          protocolLoadOrder: 1,
-          attachedModuleMatch: null,
-        },
-        [mockMagneticModule.moduleId]: {
-          moduleId: mockMagneticModule.moduleId,
-          x: MOCK_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          protocolLoadOrder: 0,
-          attachedModuleMatch: null,
-        },
-      } as any)
+    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([
+      {
+        moduleId: mockMagneticModule.moduleId,
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: mockMagneticModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareDisplayName: null,
+        nestedLabwareId: null,
+        slotName: '1',
+        protocolLoadOrder: 1,
+        attachedModuleMatch: null,
+      },
+      {
+        moduleId: mockMagneticModule.moduleId,
+        x: MOCK_SECOND_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_SECOND_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_SECOND_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: mockMagneticModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareDisplayName: null,
+        nestedLabwareId: null,
+        slotName: '2',
+        protocolLoadOrder: 0,
+        attachedModuleMatch: null,
+      },
+    ])
 
     when(mockModuleInfo)
       .calledWith(
@@ -198,47 +166,45 @@ describe('SetupModulesMap', () => {
       )
       .mockReturnValue(<div>mock module info {mockMagneticModule.model}</div>)
 
-    const { getByText } = render(props)
-    getByText('mock module info magneticModuleV2')
+    const { getAllByText } = render(props)
+    expect(getAllByText('mock module info magneticModuleV2')).toHaveLength(2)
   })
 
   it('should render a deck WITH modules', () => {
-    when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        [mockMagneticModule.moduleId]: {
-          moduleId: mockMagneticModule.moduleId,
-          x: MOCK_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          nestedLabwareDisplayName: null,
-          protocolLoadOrder: 1,
-          attachedModuleMatch: {
-            ...mockMagneticModuleFixture,
-            model: mockMagneticModule.model,
-          } as any,
-          slotName: '1',
-        },
-        [mockTCModule.moduleId]: {
-          moduleId: mockTCModule.moduleId,
-          x: MOCK_TC_COORDS[0],
-          y: MOCK_TC_COORDS[1],
-          z: MOCK_TC_COORDS[2],
-          moduleDef: mockTCModule,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          nestedLabwareDisplayName: null,
-          protocolLoadOrder: 0,
-          attachedModuleMatch: {
-            ...mockThermocyclerFixture,
-            model: mockTCModule.model,
-          } as any,
-          slotName: '7',
-        },
-      })
+    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([
+      {
+        moduleId: mockMagneticModule.moduleId,
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: mockMagneticModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareDisplayName: null,
+        nestedLabwareId: null,
+        slotName: '1',
+        protocolLoadOrder: 1,
+        attachedModuleMatch: {
+          ...mockMagneticModuleFixture,
+          model: mockMagneticModule.model,
+        } as any,
+      },
+      {
+        moduleId: mockTCModule.moduleId,
+        x: MOCK_TC_COORDS[0],
+        y: MOCK_TC_COORDS[1],
+        z: MOCK_TC_COORDS[2],
+        moduleDef: mockTCModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        nestedLabwareDisplayName: null,
+        protocolLoadOrder: 0,
+        attachedModuleMatch: {
+          ...mockThermocyclerFixture,
+          model: mockTCModule.model,
+        } as any,
+        slotName: '7',
+      },
+    ])
 
     when(mockModuleInfo)
       .calledWith(
@@ -264,53 +230,53 @@ describe('SetupModulesMap', () => {
 
     const { getByText } = render(props)
     getByText('mock module info magneticModuleV2')
+    getByText('mock module info thermocyclerModuleV1')
   })
 
   it('renders Moam with the correct module in the correct slot', () => {
     const dupModId = `${mockMagneticModule.moduleId}duplicate`
     const dupModPort = 10
-    when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
-        [mockMagneticModule.moduleId]: {
-          moduleId: mockMagneticModule.moduleId,
-          x: MOCK_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          nestedLabwareDisplayName: null,
-          protocolLoadOrder: 1,
-          attachedModuleMatch: {
-            ...mockMagneticModuleFixture,
-            model: mockMagneticModule.model,
-          } as any,
-          slotName: '1',
-        },
-        [dupModId]: {
-          moduleId: dupModId,
-          x: MOCK_SECOND_MAGNETIC_MODULE_COORDS[0],
-          y: MOCK_SECOND_MAGNETIC_MODULE_COORDS[1],
-          z: MOCK_SECOND_MAGNETIC_MODULE_COORDS[2],
-          moduleDef: mockMagneticModule as any,
-          nestedLabwareDef: null,
-          nestedLabwareId: null,
-          nestedLabwareDisplayName: null,
-          protocolLoadOrder: 0,
-          attachedModuleMatch: {
-            ...mockMagneticModuleFixture,
-            model: mockMagneticModule.model,
-            usbPort: {
-              port: dupModPort,
-              hub: false,
-              portGroup: 'unknown',
-              path: '',
-            },
-          } as any,
-          slotName: '3',
-        },
-      })
+
+    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([
+      {
+        moduleId: mockMagneticModule.moduleId,
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: mockMagneticModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        nestedLabwareDisplayName: null,
+        protocolLoadOrder: 1,
+        attachedModuleMatch: {
+          ...mockMagneticModuleFixture,
+          model: mockMagneticModule.model,
+        } as any,
+        slotName: '1',
+      },
+      {
+        moduleId: dupModId,
+        x: MOCK_SECOND_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_SECOND_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_SECOND_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: mockMagneticModule as any,
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        nestedLabwareDisplayName: null,
+        protocolLoadOrder: 0,
+        attachedModuleMatch: {
+          ...mockMagneticModuleFixture,
+          model: mockMagneticModule.model,
+          usbPort: {
+            port: dupModPort,
+            hub: false,
+            portGroup: 'unknown',
+            path: '',
+          },
+        } as any,
+        slotName: '3',
+      },
+    ])
 
     when(mockModuleInfo)
       .calledWith(
