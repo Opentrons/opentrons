@@ -43,7 +43,7 @@ def test_prepare_to_aspirate_no_tip(subject: InstrumentCore) -> None:
     with pytest.raises(
         UnexpectedTipRemovalError, match="Cannot perform PREPARE_ASPIRATE"
     ):
-        subject.prepare_for_aspirate()
+        subject.prepare_to_aspirate()
 
 
 def test_dispense_no_tip(subject: InstrumentCore) -> None:
@@ -161,7 +161,7 @@ def test_aspirate_too_much(
         increment=None,
         prep_after=False,
     )
-    subject.prepare_for_aspirate()
+    subject.prepare_to_aspirate()
     with pytest.raises(
         AssertionError, match="Cannot aspirate more than pipette max volume"
     ):
@@ -215,7 +215,7 @@ def test_pipette_dict(
 
 def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
-    i.prepare_for_aspirate()
+    i.prepare_to_aspirate()
     i.aspirate(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),
@@ -228,7 +228,7 @@ def _aspirate(i: InstrumentCore, labware: LabwareCore) -> None:
 
 def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
-    i.prepare_for_aspirate()
+    i.prepare_to_aspirate()
     i.aspirate(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),
@@ -250,7 +250,7 @@ def _aspirate_dispense(i: InstrumentCore, labware: LabwareCore) -> None:
 
 def _aspirate_blowout(i: InstrumentCore, labware: LabwareCore) -> None:
     """pipette dict with tip fixture."""
-    i.prepare_for_aspirate()
+    i.prepare_to_aspirate()
     i.aspirate(
         location=Location(point=Point(1, 2, 3), labware=None),
         well_core=labware.get_well_core("A1"),

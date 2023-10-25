@@ -235,12 +235,12 @@ from .configure_for_volume import (
     ConfigureForVolumePrivateResult,
 )
 
-from .prepare_for_aspirate import (
-    PrepareForAspirate,
-    PrepareForAspirateParams,
-    PrepareForAspirateCreate,
-    PrepareForAspirateResult,
-    PrepareForAspirateCommandType,
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateParams,
+    PrepareToAspirateCreate,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
 )
 
 Command = Union[
@@ -265,7 +265,7 @@ Command = Union[
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
-    PrepareForAspirate,
+    PrepareToAspirate,
     WaitForResume,
     WaitForDuration,
     PickUpTip,
@@ -322,7 +322,7 @@ CommandParams = Union[
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
-    PrepareForAspirateParams,
+    PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
     PickUpTipParams,
@@ -380,7 +380,7 @@ CommandType = Union[
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
-    PrepareForAspirateCommandType,
+    PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
     PickUpTipCommandType,
@@ -437,7 +437,7 @@ CommandCreate = Union[
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
-    PrepareForAspirateCreate,
+    PrepareToAspirateCreate,
     WaitForResumeCreate,
     WaitForDurationCreate,
     PickUpTipCreate,
@@ -494,7 +494,7 @@ CommandResult = Union[
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
-    PrepareForAspirateResult,
+    PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,
     PickUpTipResult,

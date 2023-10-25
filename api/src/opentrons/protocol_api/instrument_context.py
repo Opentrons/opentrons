@@ -1616,7 +1616,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.configure_for_volume(volume)
 
     @requires_version(2, 16)
-    def prepare_for_aspirate(self) -> None:
+    def prepare_to_aspirate(self) -> None:
         """Prepare a pipette for aspiration.
 
         Before a pipette can aspirate into an empty tip, the plunger must be in its
@@ -1643,12 +1643,12 @@ class InstrumentContext(publisher.CommandPublisher):
              pipette.mix(10, 10)
              pipette.move_to(well.top(z=5))
              pipette.blow_out()
-             pipette.prepare_for_aspirate()
+             pipette.prepare_to_aspirate()
              pipette.move_to(well.top(z=-5))
              pipette.delay(5)
              pipette.aspirate(10, well.top(z=-5))
 
-        The call to ``prepare_for_aspirate()`` means that the plunger will be in the
+        The call to ``prepare_to_aspirate()`` means that the plunger will be in the
         bottom position before the call to ``aspirate()``. Since it doesn't need to
         prepare again, it will not move up out of the well to move the plunger. It will
         aspirate in place.
@@ -1657,4 +1657,4 @@ class InstrumentContext(publisher.CommandPublisher):
             raise CommandPreconditionViolated(
                 message=f"Cannot prepare {str(self)} for aspirate while it contains liquid."
             )
-        self._core.prepare_for_aspirate()
+        self._core.prepare_to_aspirate()

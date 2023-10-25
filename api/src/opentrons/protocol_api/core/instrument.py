@@ -243,7 +243,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         """
         ...
 
-    def prepare_for_aspirate(self) -> None:
+    def prepare_to_aspirate(self) -> None:
         """Prepare the pipette to aspirate."""
         ...
 

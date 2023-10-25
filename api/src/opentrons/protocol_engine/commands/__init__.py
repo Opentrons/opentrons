@@ -266,12 +266,12 @@ from .configure_for_volume import (
     ConfigureForVolumeCommandType,
 )
 
-from .prepare_for_aspirate import (
-    PrepareForAspirate,
-    PrepareForAspirateCreate,
-    PrepareForAspirateParams,
-    PrepareForAspirateResult,
-    PrepareForAspirateCommandType,
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateCreate,
+    PrepareToAspirateParams,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
 )
 
 __all__ = [
@@ -472,9 +472,9 @@ __all__ = [
     "ConfigureForVolumeResult",
     "ConfigureForVolumeCommandType",
     # prepare pipette for aspirate command bundle
-    "PrepareForAspirate",
-    "PrepareForAspirateCreate",
-    "PrepareForAspirateParams",
-    "PrepareForAspirateResult",
-    "PrepareForAspirateCommandType",
+    "PrepareToAspirate",
+    "PrepareToAspirateCreate",
+    "PrepareToAspirateParams",
+    "PrepareToAspirateResult",
+    "PrepareToAspirateCommandType",
 ]

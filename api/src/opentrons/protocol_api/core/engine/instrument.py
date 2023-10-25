@@ -585,5 +585,5 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             pipette_id=self._pipette_id, volume=volume
         )
 
-    def prepare_for_aspirate(self) -> None:
-        self._engine_client.prepare_for_aspirate(pipette_id=self._pipette_id)
+    def prepare_to_aspirate(self) -> None:
+        self._engine_client.prepare_to_aspirate(pipette_id=self._pipette_id)

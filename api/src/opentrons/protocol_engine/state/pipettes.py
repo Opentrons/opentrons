@@ -37,7 +37,7 @@ from ..commands import (
     thermocycler,
     heater_shaker,
     CommandPrivateResult,
-    PrepareForAspirateResult,
+    PrepareToAspirateResult,
 )
 from ..commands.configuring_common import PipetteConfigUpdateResultMixin
 from ..actions import (
@@ -222,7 +222,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
 
-        elif isinstance(command.result, PrepareForAspirateResult):
+        elif isinstance(command.result, PrepareToAspirateResult):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = 0
 

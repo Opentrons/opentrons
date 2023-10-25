@@ -918,19 +918,19 @@ def test_plunger_speed_removed(subject: InstrumentContext) -> None:
         subject.speed
 
 
-def test_prepare_for_aspirate(
+def test_prepare_to_aspirate(
     subject: InstrumentContext, decoy: Decoy, mock_instrument_core: InstrumentCore
 ) -> None:
     """It should call the core function."""
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
-    subject.prepare_for_aspirate()
-    decoy.verify(mock_instrument_core.prepare_for_aspirate(), times=1)
+    subject.prepare_to_aspirate()
+    decoy.verify(mock_instrument_core.prepare_to_aspirate(), times=1)
 
 
-def test_prepare_for_aspirate_checks_volume(
+def test_prepare_to_aspirate_checks_volume(
     subject: InstrumentContext, decoy: Decoy, mock_instrument_core: InstrumentCore
 ) -> None:
     """It should raise an error if you prepare for aspirate with liquid in the pipette."""
     decoy.when(mock_instrument_core.get_current_volume()).then_return(10)
     with pytest.raises(CommandPreconditionViolated):
-        subject.prepare_for_aspirate()
+        subject.prepare_to_aspirate()

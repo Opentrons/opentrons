@@ -468,11 +468,11 @@ def create_move_labware_command(
     )
 
 
-def create_prepare_for_aspirate_command(pipette_id: str) -> cmd.PrepareForAspirate:
-    """Get a completed PrepareForAspirate command."""
-    params = cmd.PrepareForAspirateParams(pipetteId=pipette_id)
-    result = cmd.PrepareForAspirateResult()
-    return cmd.PrepareForAspirate(
+def create_prepare_to_aspirate_command(pipette_id: str) -> cmd.PrepareToAspirate:
+    """Get a completed PrepareToAspirate command."""
+    params = cmd.PrepareToAspirateParams(pipetteId=pipette_id)
+    result = cmd.PrepareToAspirateResult()
+    return cmd.PrepareToAspirate(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
