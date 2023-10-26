@@ -65,7 +65,7 @@ from opentrons.protocols.types import (
 from opentrons.protocols.api_support.deck_type import (
     for_simulation as deck_type_for_simulation,
     should_load_fixed_trash,
-    LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
+    LOAD_FIXED_TRASH_GATE_VERSION_PYTHON,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition

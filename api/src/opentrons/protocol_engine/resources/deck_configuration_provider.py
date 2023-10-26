@@ -1,3 +1,4 @@
+"""Deck configuration resource provider."""
 from dataclasses import dataclass
 from typing import List, Dict
 
@@ -5,19 +6,22 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, AddressableAr
 
 from opentrons.types import DeckSlotName
 
+from ..errors import FixtureDoesNotExistError
+
 
 @dataclass(frozen=True)
 class DeckCutoutFixture:
+    """Basic cutout fixture data class."""
+
     name: str
     slot_location: DeckSlotName
 
 
 class DeckConfigurationProvider:
-    """The tech for the deck (configuration). Write something better here."""
+    """Provider class to ingest deck configuration data and retrieve relevant deck definition data."""
 
-    _configuration: Dict[
-        str, DeckCutoutFixture
-    ]  # maybe the key can be the DeckSlotEnum i dunno
+    # TODO maybe make the key a DeckSlot enum?
+    _configuration: Dict[str, DeckCutoutFixture]
 
     def __init__(
         self,
@@ -39,11 +43,11 @@ class DeckConfigurationProvider:
             if cutout_fixture_id == cutout_fixture["id"]:
                 return cutout_fixture["providesAddressableAreas"].get(deck_slot_id, [])
 
-        return (
-            []
-        )  # TODO need to decide whether an invalid combo should raise an errror or just return empty list
+        # TODO need to decide whether an invalid combo should raise an error or just return empty list
+        return []
 
     def get_configured_addressable_areas(self) -> List[str]:
+        """Get a list of all addressable areas the robot is configured for."""
         configured_addressable_areas = []
         for slot_id, cutout_fixture in self._configuration.items():
             addressable_areas = self.get_addressable_areas_for_cutout_fixture(
@@ -55,8 +59,11 @@ class DeckConfigurationProvider:
     def get_addressable_area_definition(
         self, addressable_area_name: str
     ) -> AddressableArea:
+        """Get the addressable area definition from the relevant deck definition."""
         for addressable_area in self._deck_definition["locations"]["addressableAreas"]:
             if addressable_area_name == addressable_area["id"]:
                 return addressable_area
 
-        raise ValueError("TODO Put a real error here maybe")
+        raise FixtureDoesNotExistError(
+            f'Could not resolve "{addressable_area_name}" to a fixture.'
+        )

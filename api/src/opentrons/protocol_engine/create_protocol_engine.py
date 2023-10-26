@@ -16,9 +16,7 @@ from .types import PostRunHardwareState
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
 # clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
 async def create_protocol_engine(
-    hardware_api: HardwareControlAPI,
-    config: Config,
-    load_fixed_trash: bool = False
+    hardware_api: HardwareControlAPI, config: Config, load_fixed_trash: bool = False
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
@@ -29,7 +27,11 @@ async def create_protocol_engine(
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
-    deck_fixed_labware = await deck_data.get_deck_fixed_labware(deck_definition) if load_fixed_trash else []
+    deck_fixed_labware = (
+        await deck_data.get_deck_fixed_labware(deck_definition)
+        if load_fixed_trash
+        else []
+    )
     module_calibration_offsets = ModuleDataProvider.load_module_calibrations()
 
     state_store = StateStore(
@@ -72,7 +74,11 @@ def create_protocol_engine_in_thread(
     """
     with async_context_manager_in_thread(
         _protocol_engine(
-            hardware_api, config, drop_tips_after_run, post_run_hardware_state, load_fixed_trash
+            hardware_api,
+            config,
+            drop_tips_after_run,
+            post_run_hardware_state,
+            load_fixed_trash,
         )
     ) as (
         protocol_engine,

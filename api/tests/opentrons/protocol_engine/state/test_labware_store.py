@@ -8,7 +8,6 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
-from opentrons.protocol_engine.resources import DeckFixedLabware
 from opentrons.protocol_engine.types import (
     LabwareOffset,
     LabwareOffsetCreate,
