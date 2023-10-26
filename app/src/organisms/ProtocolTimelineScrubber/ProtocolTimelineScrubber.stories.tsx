@@ -4,6 +4,7 @@ import analysisOutputFixture from './analysisOutputFixture.json'
 import longerAnalysisOutputFixture from './longerAnalysisOutputFixture.json'
 
 import type { Story, Meta } from '@storybook/react'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 export default {
   title: 'App/Organisms/ProtocolTimelineScrubber',
@@ -16,10 +17,12 @@ const Template: Story<React.ComponentProps<typeof ProtocolTimelineScrubber>> = a
 
 export const Basic = Template.bind({})
 Basic.args = {
-  commands:  analysisOutputFixture.commands
+  commands:  analysisOutputFixture.commands,
+  robotType: FLEX_ROBOT_TYPE
 }
 
 export const Larger = Template.bind({})
 Larger.args = {
-  commands:  longerAnalysisOutputFixture.commands
+  commands:  longerAnalysisOutputFixture.commands,
+  robotType: FLEX_ROBOT_TYPE
 }

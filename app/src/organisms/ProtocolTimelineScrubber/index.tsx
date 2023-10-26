@@ -29,7 +29,7 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RobotType, RunTimeCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LocationLiquidState,
@@ -38,11 +38,14 @@ import type {
 } from '@opentrons/step-generation'
 import { StyledText } from '../../atoms/text'
 import ViewportList, { ViewportListRef } from 'react-viewport-list'
+import { CommandText } from '../CommandText'
 
 const COMMAND_WIDTH_PX = 160
 
 interface ProtocolTimelineScrubberProps {
   commands: RunTimeCommand[]
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
+  robotType: RobotType
 }
 
 export const DECK_LAYER_BLOCKLIST = [
@@ -62,7 +65,7 @@ export const VIEWBOX_HEIGHT = 460
 export function ProtocolTimelineScrubber(
   props: ProtocolTimelineScrubberProps
 ): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefFromRobotType(FLEX_ROBOT_TYPE), [])
+  const deckDef = React.useMemo(() => getDeckDefFromRobotType(props.robotType), [])
   const { commands } = props
   const wrapperRef = React.useRef<HTMLDivElement>(null)
   const commandListRef = React.useRef<ViewportListRef>(null)
@@ -124,10 +127,10 @@ export function ProtocolTimelineScrubber(
                   )
                   return (
                     <Module
-                      x={slot.position[0]}
-                      y={slot.position[1]}
+                      x={slot?.position[0] ?? 0}
+                      y={slot?.position[1] ?? 0}
                       orientation={inferModuleOrientationFromXCoordinate(
-                        slot.position[0]
+                        slot?.position[0] ?? 0
                       )}
                       def={getModuleDef2(
                         invariantContext.moduleEntities[moduleId].model
@@ -183,7 +186,7 @@ export function ProtocolTimelineScrubber(
                   )
                   return (
                     <g
-                      transform={`translate(${slot.position[0]},${slot.position[1]})`}
+                      transform={`translate(${slot?.position[0] ?? 0},${slot?.position[1] ?? 0})`}
                     >
                       <LabwareRender
                         definition={definition}
@@ -229,6 +232,8 @@ export function ProtocolTimelineScrubber(
               command={command}
               currentCommandIndex={currentCommandIndex}
               setCurrentCommandIndex={setCurrentCommandIndex}
+              analysis={props.analysis}
+              robotType={props.robotType}
             />
           )}
         </ViewportList>
@@ -331,7 +336,7 @@ function PipetteSideView({
   maxVolume,
   allNozzlesHaveTips,
 }: SideViewProps): JSX.Element {
-  const channelCount = Object.keys(allNozzleTipContents).length
+  const channelCount = Math.min(Object.keys(allNozzleTipContents).length, 8)
   return (
     <svg width="8rem" height="16rem" viewBox="0 0 100 200">
       {channelCount <= 1 ? (
@@ -359,7 +364,7 @@ function PipetteSideView({
           <rect x="30" y="0" height="40" width="40" stroke="#000" />
           <path d="M30,40 L10,85 H90 L70,40 H30z" stroke="#000" />
           <rect x="10" y="85" height="45" width="80" stroke="#000" />
-          {Object.values(allNozzleTipContents).map((tipContents, index) => {
+          {Object.values(allNozzleTipContents).slice(0,8).map((tipContents, index) => {
             const x = index * 10 + 10
             return allNozzlesHaveTips ? (
               <TipSideView
@@ -407,8 +412,6 @@ function TipSideView({
     }, 0)
   const yOfFirstLiquid = (emptyVolumeLeft / maxVolume) * 50
 
-  console.log('emptyVolumeLeft', emptyVolumeLeft)
-  console.log('yOfFirstLiquid', yOfFirstLiquid)
   return (
     <>
       <rect x={x} y={y} height={yOfFirstLiquid} width="10" fill="#FFF" />
@@ -446,9 +449,12 @@ interface CommandItemProps {
   index: number
   currentCommandIndex: number
   setCurrentCommandIndex: (index: number) => void
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
+  robotType: RobotType
 }
 function CommandItem(props: CommandItemProps): JSX.Element {
-  const { index, command, currentCommandIndex, setCurrentCommandIndex } = props
+  const [showDetails, setShowDetails] = React.useState(false)
+  const { index, command, currentCommandIndex, setCurrentCommandIndex, analysis, robotType } = props
   return (
     <Flex
       key={index}
@@ -474,18 +480,15 @@ function CommandItem(props: CommandItemProps): JSX.Element {
       cursor="pointer"
       onClick={() => setCurrentCommandIndex(index)}
     >
-      <Text as="p" fontSize="0.5rem" alignSelf={ALIGN_FLEX_END}>
+      <Text 
+        onClick={() => setShowDetails(!showDetails)}
+        as="p"
+        fontSize="0.5rem"
+        alignSelf={ALIGN_FLEX_END}>
         {index + 1}
       </Text>
-      <StyledText
-        as="p"
-        fontSize="0.6rem"
-        marginBottom={SPACING.spacing4}
-        fontWeight={FONT_WEIGHT_BOLD}
-      >
-        {command.commandType}
-      </StyledText>
-      {Object.entries(command.params ?? {}).map(([key, value]) => (
+      <CommandText command={command} robotSideAnalysis={analysis} robotType={robotType} />
+      {showDetails ? Object.entries(command.params ?? {}).map(([key, value]) => (
         <Flex
           key={key}
           flexDirection={DIRECTION_COLUMN}
@@ -516,7 +519,7 @@ function CommandItem(props: CommandItemProps): JSX.Element {
             </Text>
           )}
         </Flex>
-      ))}
+      )) : null}
     </Flex>
   )
 }

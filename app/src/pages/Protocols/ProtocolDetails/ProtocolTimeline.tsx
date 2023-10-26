@@ -11,6 +11,7 @@ import type { Dispatch, State } from '../../../redux/types'
 import type { NavRouteParams } from '../../../App/types'
 
 import { ProtocolTimelineScrubber } from '../../../organisms/ProtocolTimelineScrubber'
+import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
 
 export function ProtocolTimeline(): JSX.Element {
   const { protocolKey } = useParams<NavRouteParams>()
@@ -27,6 +28,8 @@ export function ProtocolTimeline(): JSX.Element {
     <Box padding={SPACING.spacing16}>
       <ProtocolTimelineScrubber
         commands={storedProtocol.mostRecentAnalysis.commands}
+        analysis={storedProtocol.mostRecentAnalysis}
+        robotType={getRobotTypeFromLoadedLabware(storedProtocol.mostRecentAnalysis.labware)}
       />
     </Box>
   ) : (
