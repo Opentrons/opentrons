@@ -43,6 +43,7 @@ import {
   InvariantContext,
   LabwareEntities,
   AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import { getStagingAreaAddressableAreas } from '../../utils'
 import type { StepFieldName } from '../../form-types'
@@ -54,11 +55,15 @@ import type {
 
 export type { StepFieldName }
 
-const getLabwareEntity = (
+const getLabwareOrFixtureEntity = (
   state: InvariantContext,
   id: string
-): LabwareEntity | null => {
-  return state.labwareEntities[id] || null
+): LabwareEntity | AdditionalEquipmentEntity | null => {
+  if (state.labwareEntities[id] != null) {
+    return state.labwareEntities[id]
+  } else if (state.additionalEquipmentEntities[id] != null) {
+    return state.additionalEquipmentEntities[id]
+  } else return null
 }
 
 const getIsAdapterLocation = (
@@ -155,7 +160,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   aspirate_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrFixtureEntity,
   },
   aspirate_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -186,7 +191,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrFixtureEntity,
   },
   dispense_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -204,7 +209,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   dispense_wells: {
-    getErrors: composeErrors(requiredField, minimumWellCount(1)),
+    // getErrors: composeErrors(requiredField, minimumWellCount(0)),
     maskValue: defaultTo([]),
   },
   disposalVolume_volume: {
@@ -217,7 +222,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrFixtureEntity,
   },
   aspirate_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),

@@ -7,6 +7,7 @@ export function getOrderedWells(
   wellOrderFirst: WellOrderOption,
   wellOrderSecond: WellOrderOption
 ): string[] {
+  console.log('ordering', labwareDef?.ordering)
   const allWellsOrdered = orderWells(
     labwareDef.ordering,
     wellOrderFirst,

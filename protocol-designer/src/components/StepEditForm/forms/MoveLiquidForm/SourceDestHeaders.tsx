@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
+import { StepFieldName } from '../../../../steplist/fieldLevel'
 import { LabwareField, WellSelectionField } from '../../fields'
 import { AspDispSection } from '../AspDispSection'
-import { StepFieldName } from '../../../../steplist/fieldLevel'
-import { FormData } from '../../../../form-types'
-import { FieldPropsByName } from '../../types'
+import type { FormData } from '../../../../form-types'
+import type { FieldPropsByName } from '../../types'
 
 import styles from '../../StepEditForm.css'
 
@@ -33,6 +33,8 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
   } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
+  //  containerId encompasses labware, trash bin and waste chute
+  const containerId = formData[addFieldNamePrefix('labware')]
 
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>
@@ -40,11 +42,13 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
         <FormGroup label={labwareLabel}>
           <LabwareField {...propsForFields[addFieldNamePrefix('labware')]} />
         </FormGroup>
-        <WellSelectionField
-          {...propsForFields[addFieldNamePrefix('wells')]}
-          labwareId={formData[addFieldNamePrefix('labware')]}
-          pipetteId={formData.pipette}
-        />
+        {containerId?.includes('wasteChute') ? null : (
+          <WellSelectionField
+            {...propsForFields[addFieldNamePrefix('wells')]}
+            labwareId={containerId}
+            pipetteId={formData.pipette}
+          />
+        )}
       </div>
     </AspDispSection>
   )

@@ -79,6 +79,10 @@ const WELL_RATIO_MOVE_LIQUID: FormError = {
   title: 'Well selection must be 1 to many, many to 1, or N to N',
   dependentFields: ['aspirate_wells', 'dispense_wells'],
 }
+const WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE: FormError = {
+  title: 'Well selection must be 1 to many, many to 1, or N to N',
+  dependentFields: ['aspirate_wells'],
+}
 const MAGNET_ACTION_TYPE_REQUIRED: FormError = {
   title: 'Action type must be either engage or disengage',
   dependentFields: ['magnetAction'],
@@ -206,10 +210,21 @@ export const pauseForTimeOrUntilTold = (
 export const wellRatioMoveLiquid = (
   fields: HydratedFormData
 ): FormError | null => {
-  const { aspirate_wells, dispense_wells } = fields
-  if (!aspirate_wells || !dispense_wells) return null
-  return getWellRatio(aspirate_wells, dispense_wells)
+  const { aspirate_wells, dispense_wells, dispense_labware } = fields
+  const dispenseLabware = dispense_labware?.name ?? null
+  const isDispensingIntoWasteChute =
+    dispenseLabware != null ? dispenseLabware === 'wasteChute' : false
+  if (!aspirate_wells || (!isDispensingIntoWasteChute && !dispense_wells))
+    return null
+  let dispenseWells = dispense_wells
+  if (isDispensingIntoWasteChute) {
+    //  stubbing in A1 well for waste chute
+    dispenseWells = ['A1']
+  }
+  return getWellRatio(aspirate_wells, dispenseWells)
     ? null
+    : isDispensingIntoWasteChute
+    ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
 }
 export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
