@@ -30,10 +30,12 @@ from .. import errors
 from ..resources import DeckFixedLabware, labware_validation
 from ..commands import (
     Command,
+    LoadAddressableAreaResult,
     LoadLabwareResult,
     MoveLabwareResult,
 )
 from ..types import (
+    AddressableAreaName,
     DeckSlotLocation,
     OnLabwareLocation,
     NonStackedLocation,
@@ -106,6 +108,12 @@ class LabwareState:
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV3
 
+    # The addressable areas that have been loaded by the protocol so far.
+    #
+    # TODO(mm, 2023-10-26): This belongs with other deck configuration stuff, probably in its own
+    # state/store/view, once all of that exists.
+    loaded_addressable_areas: Set[AddressableAreaName]
+
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
     """Labware state container."""
@@ -146,6 +154,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
+            loaded_addressable_areas=set(),
         )
 
     def handle_action(self, action: Action) -> None:
@@ -204,6 +213,12 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
             self._state.labware_by_id[labware_id].location = new_location
+
+        elif isinstance(command.result, LoadAddressableAreaResult):
+            # If the command succeeded, it must mean its addressableAreaName is valid in this
+            # ProtocolEngine's deck definition.
+            validated = AddressableAreaName(command.params.addressableAreaName)
+            self._state.loaded_addressable_areas.add(validated)
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
@@ -803,3 +818,8 @@ class LabwareView(HasState[LabwareState]):
             if recommended_height is not None
             else self.get_dimensions(labware_id).z / 2
         )
+
+    # TODO(mm, 2023-10-31 👻): We need to cover this with tests if it survives to release 7.1.0.
+    def get_loaded_addressable_areas(self) -> Set[AddressableAreaName]:
+        """Get the addressable areas that the protocol has loaded so far."""
+        return self._state.loaded_addressable_areas
