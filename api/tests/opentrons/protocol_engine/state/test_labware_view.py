@@ -825,14 +825,14 @@ def test_get_slot_definition_raises_with_bad_slot_name(
         subject.get_slot_definition(DeckSlotName.SLOT_A1)
 
 
-# def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-#     """It should get the absolute location of a deck slot's origin."""
-#     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-#
-#     slot_pos = ot2_standard_deck_def["locations"]["orderedSlots"][2]["position"]
-#     result = subject.get_slot_position(DeckSlotName.SLOT_3)
-#
-#     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
+def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
+    """It should get the absolute location of a deck slot's origin."""
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
+
+    expected_position = Point(x=132.5, y=90.5, z=0.0)
+    result = subject.get_slot_position(DeckSlotName.SLOT_5)
+
+    assert result == expected_position
 
 
 def test_get_slot_center_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:

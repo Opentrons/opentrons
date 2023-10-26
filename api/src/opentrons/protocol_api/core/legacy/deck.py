@@ -7,7 +7,7 @@ from typing import Dict, Optional, List, Union
 from typing_extensions import Protocol
 
 from opentrons_shared_data.deck import (
-    DEFAULT_DECK_DEFINITION_VERSION,
+    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
     load as load_deck,
 )
 from opentrons_shared_data.deck.dev_types import SlotDefV3
@@ -50,7 +50,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
     def __init__(self, deck_type: str) -> None:
         super().__init__()
         self._definition = load_deck(
-            name=deck_type, version=DEFAULT_DECK_DEFINITION_VERSION
+            name=deck_type, version=DEFAULT_LEGACY_DECK_DEFINITION_VERSION
         )
         self._positions = {}
         for slot in self._definition["locations"]["orderedSlots"]:

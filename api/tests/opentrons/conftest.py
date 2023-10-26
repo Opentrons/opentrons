@@ -36,10 +36,15 @@ from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import (
+    RobotModel,
+    DeckDefinitionV3,
+    DeckDefinitionV4,
+)
 from opentrons_shared_data.deck import (
     load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
+    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
 )
 
 from opentrons import config
@@ -248,8 +253,13 @@ def deck_definition_name(robot_model: RobotModel) -> str:
 
 
 @pytest.fixture
-def deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV4:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
+
+
+@pytest.fixture
+def legacy_deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+    return load_deck(deck_definition_name, DEFAULT_LEGACY_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
