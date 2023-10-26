@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field, validator
-from typing import Optional, Union, List, Dict, Any, NamedTuple
+from typing import NewType, Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -662,3 +662,14 @@ class PostRunHardwareState(Enum):
     HOME_THEN_DISENGAGE = "homeThenDisengage"
     STAY_ENGAGED_IN_PLACE = "stayEngagedInPlace"
     DISENGAGE_IN_PLACE = "disengageInPlace"
+
+
+AddressableAreaName = NewType("AddressableAreaName", str)
+"""The name/identifier of an addressable area.
+
+This is the `addressableAreaName` in a `loadAddressableArea` command,
+and `addressableAreas[*].id` in deck definitions of schema v4.
+
+This type is a guarantee that the contained value is validated as a member of the deck definition
+that a `ProtocolEngine` is configured to use.
+"""
