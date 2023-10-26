@@ -7,6 +7,7 @@ import {
   useHoverTooltip,
   UseHoverTooltipTargetProps,
 } from '@opentrons/components'
+import { WASTE_CHUTE_STUBBED_DEPTH } from '@opentrons/step-generation'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
   getIsTouchTipField,
@@ -21,7 +22,6 @@ import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
-import { WASTE_CHUTE_STUBBED_DEPTH } from '@opentrons/step-generation'
 
 interface OP extends FieldProps {
   labwareId?: string | null

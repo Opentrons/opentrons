@@ -33,8 +33,7 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
   } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
-  //  containerId encompasses labware, trash bin and waste chute
-  const containerId = formData[addFieldNamePrefix('labware')]
+  const wasteChuteOrLabwareId = formData[addFieldNamePrefix('labware')]
 
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>
@@ -42,10 +41,10 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
         <FormGroup label={labwareLabel}>
           <LabwareField {...propsForFields[addFieldNamePrefix('labware')]} />
         </FormGroup>
-        {containerId?.includes('wasteChute') ? null : (
+        {wasteChuteOrLabwareId?.includes('wasteChute') ? null : (
           <WellSelectionField
             {...propsForFields[addFieldNamePrefix('wells')]}
-            labwareId={containerId}
+            labwareId={wasteChuteOrLabwareId}
             pipetteId={formData.pipette}
           />
         )}

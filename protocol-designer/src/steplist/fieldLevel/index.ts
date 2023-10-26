@@ -209,7 +209,6 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   dispense_wells: {
-    // getErrors: composeErrors(requiredField, minimumWellCount(0)),
     maskValue: defaultTo([]),
   },
   disposalVolume_volume: {
