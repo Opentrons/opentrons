@@ -46,3 +46,33 @@ class DeckDataProvider:
             return load_deck(name=self._deck_type.value, version=4)
 
         return await anyio.to_thread.run_sync(sync)
+
+    async def get_deck_fixed_labware(
+        self,
+        deck_definition: DeckDefinitionV4,
+    ) -> List[DeckFixedLabware]:
+        """Get a list of all labware fixtures from a given deck definition."""
+        labware: List[DeckFixedLabware] = []
+
+        for fixture in deck_definition["locations"]["legacyFixtures"]:
+            labware_id = fixture["id"]
+            load_name = cast(Optional[str], fixture.get("labware"))
+            slot = cast(Optional[str], fixture.get("slot"))
+
+            if load_name is not None and slot is not None:
+                location = DeckSlotLocation(slotName=DeckSlotName.from_primitive(slot))
+                definition = await self._labware_data.get_labware_definition(
+                    load_name=load_name,
+                    namespace="opentrons",
+                    version=1,
+                )
+
+                labware.append(
+                    DeckFixedLabware(
+                        labware_id=labware_id,
+                        definition=definition,
+                        location=location,
+                    )
+                )
+
+        return labware

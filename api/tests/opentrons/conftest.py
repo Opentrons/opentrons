@@ -300,6 +300,7 @@ def _make_ot3_pe_ctx(
         ),
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+        load_fixed_trash=True,  # TODO change how this works, make a new one?
     ) as (
         engine,
         loop,

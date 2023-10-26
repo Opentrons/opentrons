@@ -39,6 +39,8 @@ from opentrons.hardware_control import (
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
+    should_load_fixed_trash,
+    LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution import execute as execute_apiv2
@@ -531,6 +533,7 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            load_fixed_trash=api_version <= LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
         )
     )
 
@@ -604,6 +607,7 @@ def _run_file_pe(
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(),
+            load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(

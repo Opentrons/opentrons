@@ -3,7 +3,6 @@ from typing import List, Dict
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, AddressableArea
 
-from .deck_data_provider import DeckDataProvider
 from opentrons.types import DeckSlotName
 
 

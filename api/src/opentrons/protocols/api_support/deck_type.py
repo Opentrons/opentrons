@@ -2,12 +2,30 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.config import feature_flags
 
+from opentrons.protocol_reader.protocol_source import ProtocolConfig, PythonProtocolConfig, JsonProtocolConfig
+from opentrons.protocols.api_support.types import APIVersion
+
 
 # TODO(mm, 2023-05-10): Deduplicate these constants with
 # opentrons.protocol_engine.types.DeckType and consider moving to shared-data.
 SHORT_TRASH_DECK = "ot2_short_trash"
 STANDARD_OT2_DECK = "ot2_standard"
 STANDARD_OT3_DECK = "ot3_standard"
+
+
+LOAD_FIXED_TRASH_GATE_VERSION_PYTHON = APIVersion(2, 15)
+LOAD_FIXED_TRASH_GATE_VERSION_JSON = 7  # TODO(jbl 2023-10-26 potentially replace this with another/new field
+
+
+def should_load_fixed_trash(protocol_config: ProtocolConfig) -> bool:
+    """Decide whether to automatically load fixed trash on the deck based on version."""
+    load_fixed_trash = False
+    if isinstance(protocol_config, PythonProtocolConfig):
+        load_fixed_trash = protocol_config.api_version <= LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
+    elif isinstance(protocol_config, JsonProtocolConfig):
+        load_fixed_trash = protocol_config.schema_version <= LOAD_FIXED_TRASH_GATE_VERSION_JSON
+
+    return load_fixed_trash
 
 
 def guess_from_global_config() -> str:
