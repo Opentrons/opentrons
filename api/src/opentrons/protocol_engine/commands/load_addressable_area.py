@@ -69,7 +69,10 @@ class LoadAddressableAreaImplementation(  # noqa: D101
         self, params: LoadAddressableAreaParams
     ) -> LoadAddressableAreaResult:
         """Execute a `loadAddressableArea` command."""
-        raise NotImplementedError
+        # TODO(mm, 2023-10-26): This needs to confirm that the requested addressable area
+        # actually exists in the deck definition, and that it's compatible with everything
+        # loaded so far.
+        return LoadAddressableAreaResult()
 
 
 class LoadAddressableArea(
