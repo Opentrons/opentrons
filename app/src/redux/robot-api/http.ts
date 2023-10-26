@@ -68,10 +68,7 @@ export function fetchRobotApi(
           body: response?.data,
           status: response?.status,
           // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
-          ok:
-            response?.statusText === 'OK' ||
-            response?.status === 200 ||
-            response?.status === 201,
+          ok: response?.status.toString().startsWith('2'),
         }))
       )
     : from(fetch(url, options)).pipe(
