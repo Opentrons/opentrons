@@ -242,7 +242,6 @@ const useMissingProtocolHardwareFromRequiredProtocolHardare = (
   isLoading: boolean
 } => {
   const { data: deckConfig } = useDeckConfigurationQuery()
-  console.log('🚀 ~ file: index.ts:252 ~ deckConfig:', deckConfig)
 
   const enableDeckConfigurationFeatureFlag = useFeatureFlag(
     'enableDeckConfiguration'

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { UseQueryResult } from 'react-query'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
@@ -10,11 +11,15 @@ import {
   useRunQuery,
   useProtocolQuery,
   useDoorQuery,
+  useModulesQuery,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  STAGING_AREA_LOAD_NAME,
 } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
@@ -46,7 +51,11 @@ import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolSetup } from '..'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  DeckConfiguration,
+  CompletedProtocolAnalysis,
+  Fixture,
+} from '@opentrons/shared-data'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
@@ -143,6 +152,12 @@ const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
 const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
+>
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
@@ -219,6 +234,12 @@ const mockDoorStatus = {
     doorRequiredClosedForProtocol: true,
   },
 }
+const mockFixture = {
+  fixtureId: 'mockId',
+  fixtureLocation: 'D1',
+  loadName: STAGING_AREA_LOAD_NAME,
+} as Fixture
+
 const MOCK_MAKE_SNACKBAR = jest.fn()
 
 describe('ProtocolSetup', () => {
@@ -305,6 +326,12 @@ describe('ProtocolSetup', () => {
       <div>mock ConfirmAttachedModal</div>
     )
     mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
+    when(mockUseDeckConfigurationQuery).mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
     when(mockUseToaster)
       .calledWith()
       .mockReturnValue(({
