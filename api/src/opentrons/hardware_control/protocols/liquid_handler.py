@@ -16,7 +16,6 @@ class LiquidHandler(
     Calibratable[CalibrationType],
     Protocol[CalibrationType],
 ):
-    
     async def update_nozzle_configuration_for_mount(
         self,
         mount: Mount,
@@ -40,7 +39,7 @@ class LiquidHandler(
         :return: None.
         """
         ...
-    
+
     async def configure_for_volume(self, mount: Mount, volume: float) -> None:
         """
         Configure a pipette to handle the specified volume.

@@ -15,7 +15,7 @@ from opentrons.hardware_control.modules import (
     TempDeck,
     Thermocycler,
 )
-from opentrons.hardware_control.instruments.nozzle_manager import NozzleMap
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleId,
     HeaterShakerModuleId,

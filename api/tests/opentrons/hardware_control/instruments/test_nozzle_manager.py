@@ -2,7 +2,7 @@ import pytest
 from typing import Dict, List, ContextManager, Tuple
 
 from contextlib import nullcontext as does_not_raise
-from opentrons.hardware_control.instruments import nozzle_manager
+from opentrons.hardware_control import nozzle_manager
 
 from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint

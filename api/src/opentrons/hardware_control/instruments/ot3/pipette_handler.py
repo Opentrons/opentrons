@@ -44,7 +44,7 @@ from opentrons.hardware_control.constants import (
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from ..nozzle_manager import NozzleConfigurationType
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from .pipette import Pipette
 from .instrument_calibration import PipetteOffsetByPipetteMount
 

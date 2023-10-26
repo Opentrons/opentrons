@@ -6,7 +6,7 @@ from typing import Dict, List, Mapping, Optional, Tuple
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control.instruments.nozzle_manager import (
+from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
     NozzleMap,
 )
