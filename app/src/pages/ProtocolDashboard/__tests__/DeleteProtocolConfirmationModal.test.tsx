@@ -12,13 +12,16 @@ import { renderWithProviders } from '@opentrons/components'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
+import { useToaster } from '../../../organisms/ToasterOven'
 import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../organisms/ToasterOven')
 
 const mockFunc = jest.fn()
 const PROTOCOL_ID = 'mockProtocolId'
+const mockMakeSnackbar = jest.fn()
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
@@ -29,6 +32,7 @@ const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -63,6 +67,11 @@ describe('DeleteProtocolConfirmationModal', () => {
           },
         },
       } as any)
+    when(mockUseToaster).calledWith().mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
+      makeToast: jest.fn(),
+      eatToast: jest.fn(),
+    })
   })
 
   afterEach(() => {
@@ -96,13 +105,12 @@ describe('DeleteProtocolConfirmationModal', () => {
       getByText('Delete').click()
     })
     await new Promise(setImmediate)
-    getByText('Delete').click()
-    await new Promise(setImmediate)
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
     expect(mockDeleteProtocol).toHaveBeenCalledWith(
       MOCK_HOST_CONFIG,
       PROTOCOL_ID
     )
+    expect(mockMakeSnackbar).toHaveBeenCalledWith('Protocol deleted')
   })
 })
