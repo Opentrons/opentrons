@@ -14,19 +14,18 @@ import {
   SPACING,
   ALIGN_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
-  FONT_WEIGHT_BOLD,
   ALIGN_FLEX_END,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_STRETCH,
+  TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
   getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RobotType, RunTimeCommand } from '@opentrons/shared-data'
@@ -39,6 +38,8 @@ import type {
 import { StyledText } from '../../atoms/text'
 import ViewportList, { ViewportListRef } from 'react-viewport-list'
 import { CommandText } from '../CommandText'
+import { AnnotatedSteps } from '../ProtocolDetails/AnnotatedSteps'
+import { spacing } from 'react-select/dist/declarations/src/theme'
 
 const COMMAND_WIDTH_PX = 160
 
@@ -66,7 +67,7 @@ export function ProtocolTimelineScrubber(
   props: ProtocolTimelineScrubberProps
 ): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(props.robotType), [])
-  const { commands } = props
+  const { commands, analysis } = props
   const wrapperRef = React.useRef<HTMLDivElement>(null)
   const commandListRef = React.useRef<ViewportListRef>(null)
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
@@ -95,9 +96,9 @@ export function ProtocolTimelineScrubber(
       : null
 
   return (
-    <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
-      <Flex>
-        <Flex size="25rem" marginRight={SPACING.spacing16}>
+    <Flex width="100%" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex gridGap={SPACING.spacing8}>
+        <Flex size="25rem">
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
@@ -214,6 +215,15 @@ export function ProtocolTimelineScrubber(
           timelineFrame={frame}
           invariantContext={invariantContext}
         />
+        <Flex
+          backgroundColor={COLORS.white}
+          paddingX={SPACING.spacing4}
+          flex="1 1 0"
+          css={BORDERS.cardOutlineBorder}>
+          <AnnotatedSteps
+            analysis={analysis}
+            currentCommandIndex={currentCommandIndex} />
+        </Flex>
       </Flex>
       <Flex
         ref={wrapperRef}
@@ -293,6 +303,7 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
     invariantContext,
   } = props
   const { robotState } = timelineFrame
+  const [showPipetteDetails, setShowPipetteDetails] = React.useState(false)
 
   const maxVolume = (Object.entries(
     invariantContext.pipetteEntities[pipetteId]?.tiprackLabwareDef?.wells ?? {}
@@ -303,13 +314,19 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
 
 
   return (
-    <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-      <StyledText as="h1" textTransform={TEXT_TRANSFORM_UPPERCASE}>
+    <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN} maxWidth="4rem">
+      <StyledText
+        as="h1"
+        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        cursor="pointer"
+        onClick={() => setShowPipetteDetails(!showPipetteDetails)}>
         {mount}
       </StyledText>
-      <StyledText as="p" fontSize="0.5rem" marginY={SPACING.spacing8}>
-        {pipetteEntity?.spec?.displayName ?? 'none'}
-      </StyledText>
+      {showPipetteDetails ?
+        <StyledText as="p" fontSize={TYPOGRAPHY.fontSizeCaption} marginY={SPACING.spacing8}>
+          {pipetteEntity?.spec?.displayName ?? 'none'}
+        </StyledText>
+        : null}
       {pipetteEntity != null && pipetteId != null ? (
         <PipetteSideView
           allNozzlesHaveTips={robotState.tipState.pipettes[pipetteId]}
@@ -318,7 +335,7 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
           maxVolume={maxVolume}
         />
       ) : (
-        <Box size="8rem" />
+        <Box size="4rem" />
       )}
     </Flex>
   )
@@ -338,7 +355,7 @@ function PipetteSideView({
 }: SideViewProps): JSX.Element {
   const channelCount = Math.min(Object.keys(allNozzleTipContents).length, 8)
   return (
-    <svg width="8rem" height="16rem" viewBox="0 0 100 200">
+    <svg width="4rem" height="16rem" viewBox="0 0 100 200">
       {channelCount <= 1 ? (
         <>
           <rect x="30" y="0" height="80" width="40" stroke="#000" />
@@ -364,7 +381,7 @@ function PipetteSideView({
           <rect x="30" y="0" height="40" width="40" stroke="#000" />
           <path d="M30,40 L10,85 H90 L70,40 H30z" stroke="#000" />
           <rect x="10" y="85" height="45" width="80" stroke="#000" />
-          {Object.values(allNozzleTipContents).slice(0,8).map((tipContents, index) => {
+          {Object.values(allNozzleTipContents).slice(0, 8).map((tipContents, index) => {
             const x = index * 10 + 10
             return allNozzlesHaveTips ? (
               <TipSideView
@@ -480,14 +497,14 @@ function CommandItem(props: CommandItemProps): JSX.Element {
       cursor="pointer"
       onClick={() => setCurrentCommandIndex(index)}
     >
-      <Text 
+      <Text
         onClick={() => setShowDetails(!showDetails)}
         as="p"
         fontSize="0.5rem"
         alignSelf={ALIGN_FLEX_END}>
         {index + 1}
       </Text>
-      <CommandText command={command} robotSideAnalysis={analysis} robotType={robotType} />
+      <CommandText command={command} analysis={analysis} robotType={robotType} />
       {showDetails ? Object.entries(command.params ?? {}).map(([key, value]) => (
         <Flex
           key={key}

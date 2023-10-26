@@ -1,32 +1,37 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { ALIGN_CENTER, ALIGN_FLEX_START, BORDERS, COLORS, DIRECTION_COLUMN, Flex, Icon, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { ProtocolAnalysisOutput, RunTimeCommand } from '@opentrons/shared-data'
+import { CompletedProtocolAnalysis, ProtocolAnalysisOutput, RunTimeCommand } from '@opentrons/shared-data'
 import { CommandText } from '../CommandText'
 import { CommandIcon } from '../RunPreview/CommandIcon'
 import { StyledText } from '../../atoms/text'
 
 interface AnnotatedStepsProps {
-  analysis: ProtocolAnalysisOutput | null
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
+  currentCommandIndex?: number
 }
 
 interface ParentNode {
   annotationIndex: number
-  subCommands: RunTimeCommand[]
+  subCommands: LeafNode[]
+  isHighlighted: boolean
+}
+interface LeafNode {
+  command: RunTimeCommand
+  isHighlighted: boolean
 }
 
 export const AnnotatedSteps = (
   props: AnnotatedStepsProps
-): JSX.Element | null => {
-  const { analysis } = props
-  if (analysis == null) return null
+): JSX.Element => {
+  const { analysis, currentCommandIndex } = props
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
     }
   `
   const annotations = analysis.commandAnnotations ?? []
-  const groupedCommands = analysis.commands.reduce<Array<RunTimeCommand | ParentNode>>((acc, c) => {
+  const groupedCommands = analysis.commands.reduce<Array<LeafNode | ParentNode>>((acc, c, i) => {
     const foundAnnotationIndex = annotations.findIndex(a => a.commandIds.includes(c.key))
     const lastAccNode = acc[acc.length - 1]
     if (
@@ -39,13 +44,14 @@ export const AnnotatedSteps = (
         ...acc.slice(0, -1),
         {
           ...acc[acc.length - 1],
-          subCommands: [...acc[acc.length - 1].subCommands, c]
+          subCommands: [...acc[acc.length - 1].subCommands, {command: c, isHighlighted: i === currentCommandIndex}],
+          isHighlighted: acc[acc.length - 1].isHighlighted || i === currentCommandIndex
         }
       ]
     } else if (foundAnnotationIndex >= 0) {
-      return [...acc, { annotationIndex: foundAnnotationIndex, subCommands: [c] }]
+      return [...acc, { annotationIndex: foundAnnotationIndex, subCommands: [{ command: c, isHighlighted: i === currentCommandIndex }], isHighlighted: i === currentCommandIndex }]
     } else {
-      return [...acc, c]
+      return [...acc, { command: c, isHighlighted: i === currentCommandIndex }]
     }
   }, [])
 
@@ -54,14 +60,26 @@ export const AnnotatedSteps = (
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
       maxHeight="25rem"
+      flex="1 1 0"
       overflowY="auto"
     >
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16} gridGap={SPACING.spacing4}>
         {groupedCommands.map((c, i) =>
           'annotationIndex' in c && c.annotationIndex != null ? (
-            <AnnotatedGroup key={i} stepNumber={(i + 1).toString()} analysis={analysis} annotationType={annotations[c.annotationIndex]?.annotationType} subCommands={c.subCommands} />
+            <AnnotatedGroup
+              key={i}
+              stepNumber={(i + 1).toString()}
+              analysis={analysis}
+              annotationType={annotations[c.annotationIndex]?.annotationType}
+              isHighlighted={c.isHighlighted}
+              subCommands={c.subCommands} />
           ) : (
-            <IndividualCommand key={i} stepNumber={(i + 1).toString()} command={c} analysis={analysis} />
+            <IndividualCommand
+              key={i}
+              stepNumber={(i + 1).toString()}
+              command={c.command}
+              isHighlighted={c.isHighlighted}
+              analysis={analysis} />
           ))}
       </Flex>
     </Flex>
@@ -70,9 +88,10 @@ export const AnnotatedSteps = (
 
 interface AnnotatedGroupProps {
   annotationType: string
-  subCommands: RunTimeCommand[]
+  subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput
   stepNumber: string
+  isHighlighted: boolean
 }
 function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
   const { subCommands, annotationType, analysis, stepNumber } = props
@@ -96,11 +115,12 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
               <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32} gridGap={SPACING.spacing4}>
                 {subCommands.map((c, i) => (
                   <IndividualCommand
-                  key={c.id}
-                  command={c}
-                  analysis={analysis}
-                  stepNumber={`${stepNumber}.${(i+1).toString()}`}
-                   />
+                    key={c.command.id}
+                    command={c.command}
+                    analysis={analysis}
+                    isHighlighted={c.isHighlighted}
+                    stepNumber={`${stepNumber}.${(i + 1).toString()}`}
+                  />
                 ))}
               </Flex>
             </>
@@ -125,9 +145,19 @@ interface IndividualCommandProps {
   command: RunTimeCommand
   analysis: ProtocolAnalysisOutput
   stepNumber: string
+  isHighlighted: boolean
 }
 function IndividualCommand(props: IndividualCommandProps): JSX.Element {
-  const { command, analysis, stepNumber } = props
+  const { command, analysis, stepNumber, isHighlighted } = props
+  const borderColor = isHighlighted
+    ? COLORS.blueEnabled
+    : COLORS.transparent
+  const backgroundColor = isHighlighted
+    ? COLORS.lightBlue
+    : COLORS.fundamentalsBackground
+  const contentColor = isHighlighted
+    ? COLORS.darkBlackEnabled
+    : COLORS.darkGreyEnabled
   return (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
       <StyledText
@@ -140,9 +170,9 @@ function IndividualCommand(props: IndividualCommandProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
         width="100%"
-        border={`solid 1px ${COLORS.transparent}`}
-        backgroundColor={COLORS.fundamentalsBackground}
-        color={COLORS.darkBlackEnabled}
+        border={`solid 1px ${borderColor}`}
+        backgroundColor={backgroundColor}
+        color={contentColor}
         borderRadius={BORDERS.radiusSoftCorners}
         padding={SPACING.spacing8}
       >
