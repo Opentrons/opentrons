@@ -104,6 +104,23 @@ def test_reset_tips(
     )
 
 
+def test_load_addressable_area(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a loadAddressableArea command."""
+    expected_request = commands.LoadAddressableAreaCreate(
+        params=commands.LoadAddressableAreaParams(addressableAreaName="dumbo")
+    )
+    expected_result = commands.LoadAddressableAreaResult()
+    decoy.when(transport.execute_command(request=expected_request)).then_return(
+        expected_result
+    )
+    result = subject.load_addressable_area("dumbo")
+    assert result == expected_result
+
+
 def test_load_labware(
     decoy: Decoy,
     transport: ChildThreadTransport,

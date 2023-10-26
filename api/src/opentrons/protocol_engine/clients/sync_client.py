@@ -95,6 +95,19 @@ class SyncClient:
             speed=speed,
         )
 
+    def load_addressable_area(
+        self, addressable_area_name: str
+    ) -> commands.LoadAddressableAreaResult:
+        """Execute a `loadAddressableArea` command."""
+        request = commands.LoadAddressableAreaCreate(
+            params=commands.LoadAddressableAreaParams(
+                addressableAreaName=addressable_area_name
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.LoadAddressableAreaResult, result)
+
     def load_labware(
         self,
         location: LabwareLocation,
