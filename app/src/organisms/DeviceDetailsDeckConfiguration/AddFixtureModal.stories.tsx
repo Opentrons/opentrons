@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { touchScreenViewport } from '../../DesignTokens/constants'
-import { AddDeckConfigurationModal } from './AddDeckConfigurationModal'
+import { AddFixtureModal } from './AddFixtureModal'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Organisms/AddDeckConfigurationModal',
+  title: 'ODD/Organisms/AddFixtureModal',
   argTypes: {
     modalSize: {
       options: ['small', 'medium', 'large'],
@@ -17,11 +17,9 @@ export default {
 } as Meta
 
 const queryClient = new QueryClient()
-const Template: Story<
-  React.ComponentProps<typeof AddDeckConfigurationModal>
-> = args => (
+const Template: Story<React.ComponentProps<typeof AddFixtureModal>> = args => (
   <QueryClientProvider client={queryClient}>
-    <AddDeckConfigurationModal {...args} />
+    <AddFixtureModal {...args} />
   </QueryClientProvider>
 )
 

@@ -4,6 +4,7 @@ import thermoModuleGen1 from '../../../../assets/images/thermocycler_closed.png'
 import heaterShakerModule from '../../../../assets/images/heater_shaker_module_transparent.png'
 import thermoModuleGen2 from '../../../../assets/images/thermocycler_gen_2_closed.png'
 import magneticBlockGen1 from '../../../../assets/images/magnetic_block_gen_1.png'
+import trashBin from '../../../../assets/images/flex_trash_bin.png'
 import stagingArea from '../../../../assets/images/staging_area_slot.png'
 import wasteChute from '../../../../assets/images/waste_chute.png'
 //  TODO(jr, 10/17/23): figure out if we need this asset, I'm stubbing it in for now
@@ -44,7 +45,7 @@ export function getFixtureImage(fixture: FixtureLoadName): string {
       return stagingArea
     }
     case 'trashBin': {
-      return stagingArea
+      return trashBin
     }
     default:
       return 'Error: unknown fixture'

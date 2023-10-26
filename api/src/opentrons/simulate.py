@@ -441,15 +441,23 @@ def simulate(
 
     Each dict element in the run log has the following keys:
 
-        - ``level``: The depth at which this command is nested - if this an
-                     aspirate inside a mix inside a transfer, for instance,
-                     it would be 3.
-        - ``payload``: The command, its arguments, and how to format its text.
-                       For more specific details see
-                       ``opentrons.commands``. To format a message from
-                       a payload do ``payload['text'].format(**payload)``.
+        - ``level``: The depth at which this command is nested. If this an
+          aspirate inside a mix inside a transfer, for instance, it would be 3.
+
+        - ``payload``: The command. The human-readable run log text is available at
+          ``payload["text"]``. The other keys of ``payload`` are command-dependent;
+          see ``opentrons.commands``.
+
+          .. note::
+            In older software versions, ``payload["text"]`` was a
+            `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
+            To get human-readable text, you had to do ``payload["text"].format(**payload)``.
+            Don't do that anymore. If ``payload["text"]`` happens to contain any
+            ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
+            ``KeyError``.
+
         - ``logs``: Any log messages that occurred during execution of this
-                    command, as a logging.LogRecord
+          command, as a standard Python :py:obj:`~logging.LogRecord`.
 
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
@@ -476,7 +484,7 @@ def simulate(
                            occur during protocol simulation are best associated
                            with the actions in the protocol that cause them.
                            Default: ``False``
-    :param log_level: The level of logs to capture in the runlog:
+    :param log_level: The level of logs to capture in the run log:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
     :returns: A tuple of a run log for user output, and possibly the required

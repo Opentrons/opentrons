@@ -30,7 +30,10 @@ import {
   ANALYTICS_PROTOCOL_RUN_PAUSE,
 } from '../../../redux/analytics'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
@@ -77,6 +80,7 @@ interface VisibleIndexRange {
 interface RunningProtocolCommandListProps {
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
+  robotType: RobotType
   playRun: () => void
   pauseRun: () => void
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
@@ -89,6 +93,7 @@ interface RunningProtocolCommandListProps {
 export function RunningProtocolCommandList({
   runStatus,
   robotSideAnalysis,
+  robotType,
   playRun,
   pauseRun,
   setShowConfirmCancelRunModal,
@@ -234,6 +239,7 @@ export function RunningProtocolCommandList({
                     <CommandText
                       command={command}
                       robotSideAnalysis={robotSideAnalysis}
+                      robotType={robotType}
                       css={COMMAND_ROW_STYLE}
                     />
                   </Flex>

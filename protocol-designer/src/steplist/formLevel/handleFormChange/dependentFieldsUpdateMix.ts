@@ -7,9 +7,12 @@ import {
   getAllWellsFromPrimaryWells,
 } from './utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
-import { LabwareEntities, PipetteEntities } from '@opentrons/step-generation'
-import { FormData, StepFieldName } from '../../../form-types'
-import { FormPatch } from '../../actions/types'
+import type {
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+import type { FormData, StepFieldName } from '../../../form-types'
+import type { FormPatch } from '../../actions/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
@@ -53,8 +56,10 @@ const updatePatchOnPipetteChannelChange = (
       ? getChannels(patch.pipette, pipetteEntities)
       : null
   const appliedPatch = { ...rawForm, ...patch }
-  const singleToMulti = prevChannels === 1 && nextChannels === 8
-  const multiToSingle = prevChannels === 8 && nextChannels === 1
+  const singleToMulti =
+    prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
+  const multiToSingle =
+    (prevChannels === 8 || prevChannels === 96) && nextChannels === 1
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
@@ -68,11 +73,19 @@ const updatePatchOnPipetteChannelChange = (
       }),
     }
   } else if (multiToSingle) {
+    let channels: 8 | 96 = 8
+    if (prevChannels === 96) {
+      channels = 96
+    }
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware
     const labwareDef = labwareEntities[labwareId].def
     update = {
-      wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareDef),
+      wells: getAllWellsFromPrimaryWells(
+        appliedPatch.wells,
+        labwareDef,
+        channels
+      ),
     }
   }
 

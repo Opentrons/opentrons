@@ -8,13 +8,14 @@ import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/ho
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { RobotType } from '@opentrons/shared-data'
 
 export function useLaunchLPC(
   runId: string,
+  robotType: RobotType,
   protocolName?: string
 ): { launchLPC: () => void; LPCWizard: JSX.Element | null } {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
-
   const {
     createTargetedMaintenanceRun,
   } = useCreateTargetedMaintenanceRunMutation()
@@ -77,6 +78,7 @@ export function useLaunchLPC(
           maintenanceRunId={maintenanceRunId}
           setMaintenanceRunId={setMaintenanceRunId}
           protocolName={protocolName ?? ''}
+          robotType={robotType}
           isDeletingMaintenanceRun={isDeletingMaintenanceRun}
         />
       ) : null,

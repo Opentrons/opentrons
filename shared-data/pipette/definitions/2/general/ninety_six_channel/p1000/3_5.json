@@ -9,7 +9,7 @@
     "speed": 5.5,
     "increment": 0.0,
     "distance": 10.0,
-    "prep_move_distance": 9.0,
+    "prep_move_distance": 8.25,
     "prep_move_speed": 10.0
   },
   "dropTipConfigurations": {

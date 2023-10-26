@@ -153,6 +153,8 @@ export function InstrumentsAndModules({
             subsystem={subsystemToUpdate}
             proceed={() => setSubsystemToUpdate(null)}
             description={t('updating_firmware')}
+            proceedDescription={t('firmware_up_to_date')}
+            isOnDevice={false}
           />
         </ModalShell>
       )}

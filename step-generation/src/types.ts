@@ -512,6 +512,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_LATCH_CLOSED'
   | 'LABWARE_OFF_DECK'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
 
 export interface CommandCreatorError {
   message: string
@@ -566,6 +567,3 @@ export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
 }
-
-// Copied from PD
-export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'

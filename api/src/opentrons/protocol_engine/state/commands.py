@@ -642,6 +642,10 @@ class CommandView(HasState[CommandState]):
         """Get whether engine has started."""
         return self._state.run_started_at is not None
 
+    def get_is_terminal(self) -> bool:
+        """Get whether engine is in a terminal state."""
+        return self._state.run_result is not None
+
     def validate_action_allowed(
         self,
         action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction],

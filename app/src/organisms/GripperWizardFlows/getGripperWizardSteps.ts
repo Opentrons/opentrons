@@ -12,8 +12,7 @@ import {
 import type { GripperWizardStep, GripperWizardFlowType } from './types'
 
 export const getGripperWizardSteps = (
-  flowType: GripperWizardFlowType,
-  requiresFirmwareUpdate: boolean
+  flowType: GripperWizardFlowType
 ): GripperWizardStep[] => {
   switch (flowType) {
     case GRIPPER_FLOW_TYPES.RECALIBRATE: {
@@ -32,7 +31,7 @@ export const getGripperWizardSteps = (
       ]
     }
     case GRIPPER_FLOW_TYPES.ATTACH: {
-      const ALL_STEPS = [
+      return [
         { section: SECTIONS.BEFORE_BEGINNING },
         { section: SECTIONS.MOUNT_GRIPPER },
         { section: SECTIONS.FIRMWARE_UPDATE },
@@ -48,10 +47,6 @@ export const getGripperWizardSteps = (
           successfulAction: SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
         },
       ]
-
-      return requiresFirmwareUpdate
-        ? ALL_STEPS
-        : ALL_STEPS.filter(step => step.section !== SECTIONS.FIRMWARE_UPDATE)
     }
     case GRIPPER_FLOW_TYPES.DETACH: {
       return [

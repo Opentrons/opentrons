@@ -62,8 +62,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run components unit tests'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="components/src/**/*.(js|ts|tsx)" components/src
+        run: make -C components test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:

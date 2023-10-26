@@ -132,6 +132,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         const labwareOnAdapter = Object.values(labware).find(
           temporalProperties => temporalProperties.slot === labwareId
         )
+
+        const adapterSlot = labwareOnDeck.slot
         const modIdWithAdapter = Object.keys(modules).find(
           modId => modId === labwareOnDeck.slot
         )
@@ -140,18 +142,21 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         const modSlot =
           modIdWithAdapter != null ? modules[modIdWithAdapter].slot : null
         const isAdapter = getIsAdapter(labwareId, labwareEntities)
+        const moduleUnderAdapter =
+          modIdWithAdapter != null
+            ? getModuleDisplayName(moduleEntities[modIdWithAdapter].model)
+            : 'unknown module'
+        const moduleSlotInfo = modSlot ?? 'unknown slot'
+        const adapterSlotInfo = adapterSlot ?? 'unknown adapter'
 
         return labwareOnAdapter == null && isAdapter
           ? [
               ...acc,
               {
-                name: `${adapterDisplayName} on top of ${
+                name:
                   modIdWithAdapter != null
-                    ? getModuleDisplayName(
-                        moduleEntities[modIdWithAdapter].model
-                      )
-                    : 'unknown module'
-                } in slot ${modSlot ?? 'unknown slot'}`,
+                    ? `${adapterDisplayName} on top of ${moduleUnderAdapter} in slot ${moduleSlotInfo}`
+                    : `${adapterDisplayName} on slot ${adapterSlotInfo}`,
                 value: labwareId,
               },
             ]

@@ -382,6 +382,7 @@ const EditModulesModalComponent = (
                 deckDef={flexDeck}
                 selectedLocation={{ slotName: field.value }}
                 theme="grey"
+                isThermocycler={moduleType === THERMOCYCLER_MODULE_TYPE}
               />
             </Flex>
           )}
