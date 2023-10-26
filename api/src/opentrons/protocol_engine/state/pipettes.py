@@ -168,7 +168,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
-            self._state.nozzle_configuration_by_id[private_result] = None
+            self._state.nozzle_configuration_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId

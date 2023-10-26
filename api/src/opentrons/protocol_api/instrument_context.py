@@ -1689,18 +1689,18 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(requested_nozzle_layout, RowNozzleLayout):
             if self.channels <= 8:
                 raise CommandParameterLimitViolated(
-                        command_name="configure_nozzle_layout",
-                        parameter_name="RowNozzleLayout",
-                        limit_statement="RowNozzleLayout is incompatible with {self.channels} physical channels.",
-                        actual_value=str(primary_nozzle),
+                    command_name="configure_nozzle_layout",
+                    parameter_name="RowNozzleLayout",
+                    limit_statement="RowNozzleLayout is incompatible with {self.channels} physical channels.",
+                    actual_value=str(primary_nozzle),
                 )
             # Not sure where to store these constants
             if primary_nozzle not in ["A1", "H12"]:
                 raise CommandParameterLimitViolated(
-                        command_name="configure_nozzle_layout",
-                        parameter_name="RowNozzleLayout.primary_nozzle",
-                        limit_statement="The primary nozzle can only be 'A1' or 'H12.",
-                        actual_value=str(primary_nozzle),
+                    command_name="configure_nozzle_layout",
+                    parameter_name="RowNozzleLayout.primary_nozzle",
+                    limit_statement="The primary nozzle can only be 'A1' or 'H12.",
+                    actual_value=str(primary_nozzle),
                 )
             # TODO need to switch ending nozzle based on primary nozzle
             self._core.configure_nozzle_layout(
@@ -1710,10 +1710,10 @@ class InstrumentContext(publisher.CommandPublisher):
             # TODO need to add additional primary nozzles for 96 channel
             if primary_nozzle not in ["A1", "H1"]:
                 raise CommandParameterLimitViolated(
-                        command_name="configure_nozzle_layout",
-                        parameter_name="ColumnNozzleLayout.primary_nozzle",
-                        limit_statement="The primary nozzle can only be 'A1' or 'H1.",
-                        actual_value=str(primary_nozzle),
+                    command_name="configure_nozzle_layout",
+                    parameter_name="ColumnNozzleLayout.primary_nozzle",
+                    limit_statement="The primary nozzle can only be 'A1' or 'H1.",
+                    actual_value=str(primary_nozzle),
                 )
             # TODO need to switch ending nozzle based on primary nozzle
             self._core.configure_nozzle_layout(

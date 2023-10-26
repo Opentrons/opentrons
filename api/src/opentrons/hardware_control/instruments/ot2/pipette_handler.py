@@ -226,6 +226,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
+            result["current_nozzle_map"] = instr.nozzle_manager.current_configuration
             result["min_volume"] = instr.liquid_class.min_volume
             result["max_volume"] = instr.liquid_class.max_volume
             result["channels"] = instr.channels
@@ -396,6 +397,11 @@ class PipetteHandlerProvider(Generic[MountType]):
             instr.update_nozzle_configuration(
                 back_left_nozzle, front_right_nozzle, starting_nozzle
             )
+
+    async def reset_nozzle_configuration(self, mount: MountType) -> None:
+        instr = self._attached_instruments[mount]
+        if instr:
+            instr.reset_nozzle_configuration()
 
     async def add_tip(self, mount: MountType, tip_length: float) -> None:
         instr = self._attached_instruments[mount]

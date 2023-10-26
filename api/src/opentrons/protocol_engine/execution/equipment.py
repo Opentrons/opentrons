@@ -395,36 +395,44 @@ class EquipmentHandler:
         front_right_nozzle: Optional[str] = None,
         back_left_nozzle: Optional[str] = None,
     ) -> Optional[NozzleMap]:
-        """Ensure the requested volume can be configured for the given pipette.
+        """Ensure the requested nozzle layout is compatible with the current pipette.
 
         Args:
             pipette_id: The identifier for the pipette.
-            volume: The volume to configure the pipette for
+            primary_nozzle: The nozzle which will be used as the
+            front_right_nozzle
+            back_left_nozzle
 
         Returns:
-            A LoadedConfiguredVolumeData object.
+            A NozzleMap object or None.
         """
         use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
-        if not (primary_nozzle and front_right_nozzle and back_left_nozzle):
-            return None
+
         if not use_virtual_pipettes:
             mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
 
-            nozzle_map = await self._hardware_api.update_nozzle_configuration_for_mount(
+            await self._hardware_api.update_nozzle_configuration_for_mount(
                 mount,
                 back_left_nozzle if back_left_nozzle else primary_nozzle,
                 front_right_nozzle if front_right_nozzle else primary_nozzle,
                 primary_nozzle if back_left_nozzle else None,
             )
+            pipette_dict = self._hardware_api.get_attached_instrument(mount)
+            nozzle_map = pipette_dict["current_nozzle_map"]
 
         else:
             model = self._state_store.pipettes.get_model_name(pipette_id)
-            nozzle_map = self._virtual_pipette_data_provider.configure_virtual_pipette_nozzle_layout(
+            self._virtual_pipette_data_provider.configure_virtual_pipette_nozzle_layout(
                 pipette_id,
                 model,
                 back_left_nozzle if back_left_nozzle else primary_nozzle,
                 front_right_nozzle if front_right_nozzle else primary_nozzle,
                 primary_nozzle if back_left_nozzle else None,
+            )
+            nozzle_map = (
+                self._virtual_pipette_data_provider.get_nozzle_layout_for_pipette(
+                    pipette_id
+                )
             )
 
         return nozzle_map

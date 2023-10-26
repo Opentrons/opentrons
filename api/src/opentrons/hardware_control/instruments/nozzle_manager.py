@@ -240,6 +240,9 @@ class NozzleConfigurationManager:
     def current_configuration(self) -> NozzleMap:
         return self._current_nozzle_configuration
 
+    def reset_to_default_configuration(self) -> None:
+        self._current_nozzle_configuration = self._physical_nozzle_map
+
     def update_nozzle_configuration(
         self,
         back_left_nozzle: str,
