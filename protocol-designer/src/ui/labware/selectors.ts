@@ -177,12 +177,15 @@ export const getWasteChuteOption: Selector<DropdownOption | null> = createSelect
     const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )
-    return wasteChuteEntity != null
-      ? ({
-          name: 'Waste Chute',
-          value: wasteChuteEntity.id,
-        } as DropdownOption)
-      : null
+    const wasteChuteOption: DropdownOption | null =
+      wasteChuteEntity != null
+        ? {
+            name: 'Waste Chute',
+            value: wasteChuteEntity.id,
+          }
+        : null
+
+    return wasteChuteOption
   }
 )
 
