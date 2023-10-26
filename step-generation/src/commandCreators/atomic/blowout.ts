@@ -3,6 +3,7 @@ import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandCreatorError, CommandCreator } from '../../types'
 
 export const blowout: CommandCreator<BlowoutParams> = (
@@ -43,14 +44,24 @@ export const blowout: CommandCreator<BlowoutParams> = (
     )
   }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  let labwareExists: boolean = false
+  if (labware != null && prevRobotState.labware[labware]) {
+    labwareExists = true
+  } else if (
+    labware != null &&
+    invariantContext.additionalEquipmentEntities[labware]
+  ) {
+    labwareExists = true
+  }
+
+  if (!labwareExists) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
         labware,
       })
     )
-  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+  } else if (prevRobotState.labware[labware]?.slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
   }
 
@@ -64,6 +75,7 @@ export const blowout: CommandCreator<BlowoutParams> = (
     }
   }
 
+  //  TODO(jr, 10/26/23): wire up params for waste chute
   const commands: CreateCommand[] = [
     {
       commandType: 'blowout',

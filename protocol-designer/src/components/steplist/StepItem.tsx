@@ -493,7 +493,10 @@ export const StepItemContents = (
       <AspirateDispenseHeader
         key="moveLiquid-header"
         sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
-        destLabwareNickname={labwareNicknamesById[destLabwareId]}
+        //  assuming that if labware isn't listed in the nicknames, it is a waste chute
+        destLabwareNickname={
+          labwareNicknamesById[destLabwareId] ?? 'Waste chute'
+        }
       />
     )
   }

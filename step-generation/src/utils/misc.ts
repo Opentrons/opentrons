@@ -249,7 +249,9 @@ export const blowoutUtil = (args: {
     well = wasteChuteOrLabware === 'labware' ? destWell : 'A1'
   } else {
     // if it's not one of the magic strings, it's a labware id
-    labware = invariantContext.labwareEntities?.[blowoutLocation]
+    labware =
+      invariantContext.labwareEntities?.[blowoutLocation] ??
+      invariantContext.additionalEquipmentEntities[blowoutLocation]
     well = 'A1'
 
     if (!labware) {

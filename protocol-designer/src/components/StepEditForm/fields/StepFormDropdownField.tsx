@@ -1,23 +1,22 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
 import { StepFieldName } from '../../../steplist/fieldLevel'
+import { getWasteChuteOption } from '../../../ui/labware/selectors'
 import styles from '../StepEditForm.css'
-import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 import type { FieldProps } from '../types'
 
 export interface StepFormDropdownProps extends FieldProps {
   options: Options
   name: StepFieldName
   className?: string
-  additionalEquipment?: AdditionalEquipmentEntities
 }
 
 export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
   const {
     options,
     name,
-    additionalEquipment,
     className,
     onFieldBlur,
     onFieldFocus,
@@ -25,14 +24,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
     updateValue,
     errorToShow,
   } = props
-  const wasteChuteEntity =
-    additionalEquipment != null
-      ? Object.values(additionalEquipment).find(aE => aE.name === 'wasteChute')
-      : null
-  const wasteChuteOption =
-    wasteChuteEntity != null
-      ? { name: 'Waste Chute', value: wasteChuteEntity.id }
-      : null
+  const wasteChuteOption = useSelector(getWasteChuteOption)
   const fullOptions =
     wasteChuteOption != null && name === 'dispense_labware'
       ? [...options, wasteChuteOption]

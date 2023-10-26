@@ -12,8 +12,8 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import { getModuleUnderLabware } from '../modules/utils'
 import { getLabwareOffDeck } from './utils'
 
-import type { Options } from '@opentrons/components'
 import type { LabwareEntity } from '@opentrons/step-generation'
+import type { DropdownOption, Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 
 const TRASH = 'Trash Bin'
@@ -170,11 +170,28 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   }
 )
 
+/** Returns waste chute option */
+export const getWasteChuteOption: Selector<DropdownOption | null> = createSelector(
+  stepFormSelectors.getAdditionalEquipmentEntities,
+  additionalEquipmentEntities => {
+    const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
+      aE => aE.name === 'wasteChute'
+    )
+    return wasteChuteEntity != null
+      ? ({
+          name: 'Waste Chute',
+          value: wasteChuteEntity.id,
+        } as DropdownOption)
+      : null
+  }
+)
+
 /** Returns options for disposal (e.g. trash) */
 export const getDisposalOptions: Selector<Options> = createSelector(
   stepFormSelectors.getAdditionalEquipment,
-  additionalEquipment =>
-    reduce(
+  getWasteChuteOption,
+  (additionalEquipment, wasteChuteOption) => {
+    const trashBins = reduce(
       additionalEquipment,
       (acc: Options, additionalEquipment: AdditionalEquipmentEntity): Options =>
         additionalEquipment.name === 'trashBin'
@@ -188,4 +205,9 @@ export const getDisposalOptions: Selector<Options> = createSelector(
           : acc,
       []
     )
+
+    return wasteChuteOption != null
+      ? ([...trashBins, wasteChuteOption] as DropdownOption[])
+      : trashBins
+  }
 )
