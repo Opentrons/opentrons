@@ -29,6 +29,7 @@ import {
 } from '../utils/misc'
 import { transfer } from '../commandCreators/compound/transfer'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
+import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
@@ -184,6 +185,59 @@ test('single transfer: 1 source & 1 dest', () => {
   expect(res.commands).toEqual([
     aspirateHelper('A1', 30),
     dispenseHelper('B2', 30),
+  ])
+})
+
+//  TODO(Jr, 10/26/23): update this when we have dispensing into waste chute
+//  params!
+test('single transfer: 1 source & 1 dest with waste chute', () => {
+  const mockWasteChuteId = 'mockWasteChuteId'
+
+  mixinArgs = {
+    ...mixinArgs,
+    destLabware: mockWasteChuteId,
+    sourceWells: ['A1'],
+    destWells: ['A1'],
+    changeTip: 'never',
+    volume: 30,
+  }
+
+  invariantContext = {
+    ...invariantContext,
+    additionalEquipmentEntities: {
+      mockWasteChuteId: {
+        name: 'wasteChute',
+        id: mockWasteChuteId,
+        location: WASTE_CHUTE_SLOT,
+      },
+    },
+  }
+
+  robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
+    '0': { volume: 200 },
+  }
+
+  const result = transfer(
+    mixinArgs as TransferArgs,
+    invariantContext,
+    robotStateWithTip
+  )
+  const res = getSuccessResult(result)
+  expect(res.commands).toEqual([
+    aspirateHelper('A1', 30),
+    {
+      commandType: 'dispense',
+      key: expect.any(String),
+      params: {
+        flowRate: 2.2,
+        labwareId: mockWasteChuteId,
+        pipetteId: 'p300SingleId',
+        volume: 30,
+        wellName: 'A1',
+
+        wellLocation: { offset: { z: 3.2 }, origin: 'bottom' },
+      },
+    },
   ])
 })
 

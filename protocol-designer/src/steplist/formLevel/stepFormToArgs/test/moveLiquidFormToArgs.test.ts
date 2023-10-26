@@ -18,6 +18,7 @@ jest.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
 const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
+const WASTE_CHUTE_WELL = 'A1'
 
 const mockGetOrderedWells = getOrderedWells as jest.MockedFunction<
   typeof getOrderedWells
@@ -109,13 +110,41 @@ describe('move liquid step form -> command creator args', () => {
     expect(mockGetOrderedWells).toHaveBeenCalledTimes(2)
     expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
-      sourceLabwareDef,
+      sourceLabwareDef.ordering,
       'l2r',
       't2b'
     )
     expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [DISPENSE_WELL],
-      destLabwareDef,
+      destLabwareDef.ordering,
+      'r2l',
+      'b2t'
+    )
+  })
+
+  it('moveLiquidFormToArgs calls getOrderedWells correctly for dispensing into a waste chute', () => {
+    moveLiquidFormToArgs({
+      ...hydratedForm,
+      fields: {
+        ...hydratedForm.fields,
+        dispense_labware: {
+          id: 'destLabwareId',
+          name: 'wasteChute',
+          location: 'D3',
+        },
+      },
+    })
+
+    expect(mockGetOrderedWells).toHaveBeenCalledTimes(2)
+    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+      [ASPIRATE_WELL],
+      sourceLabwareDef.ordering,
+      'l2r',
+      't2b'
+    )
+    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+      [WASTE_CHUTE_WELL],
+      [['A1']],
       'r2l',
       'b2t'
     )

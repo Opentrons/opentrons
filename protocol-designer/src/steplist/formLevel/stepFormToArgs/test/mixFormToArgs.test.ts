@@ -66,7 +66,7 @@ describe('mix step form -> command creator args', () => {
     expect(getOrderedWells).toHaveBeenCalledTimes(1)
     expect(getOrderedWells).toHaveBeenCalledWith(
       hydratedForm.wells,
-      labwareDef,
+      labwareDef.ordering,
       'l2r',
       't2b'
     )
