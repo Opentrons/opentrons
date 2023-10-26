@@ -89,12 +89,12 @@ from .home import (
     HomeCommandType,
 )
 
-from .load_fixture import (
-    LoadFixture,
-    LoadFixtureParams,
-    LoadFixtureCreate,
-    LoadFixtureResult,
-    LoadFixtureCommandType,
+from .load_addressable_area import (
+    LoadAddressableArea,
+    LoadAddressableAreaParams,
+    LoadAddressableAreaCreate,
+    LoadAddressableAreaResult,
+    LoadAddressableAreaCommandType,
 )
 
 from .load_labware import (
@@ -257,7 +257,7 @@ Command = Union[
     DropTipInPlace,
     Home,
     RetractAxis,
-    LoadFixture,
+    LoadAddressableArea,
     LoadLabware,
     LoadLiquid,
     LoadModule,
@@ -314,7 +314,7 @@ CommandParams = Union[
     DropTipInPlaceParams,
     HomeParams,
     RetractAxisParams,
-    LoadFixtureParams,
+    LoadAddressableAreaParams,
     LoadLabwareParams,
     LoadLiquidParams,
     LoadModuleParams,
@@ -372,7 +372,7 @@ CommandType = Union[
     DropTipInPlaceCommandType,
     HomeCommandType,
     RetractAxisCommandType,
-    LoadFixtureCommandType,
+    LoadAddressableAreaCommandType,
     LoadLabwareCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
@@ -429,7 +429,7 @@ CommandCreate = Union[
     DropTipInPlaceCreate,
     HomeCreate,
     RetractAxisCreate,
-    LoadFixtureCreate,
+    LoadAddressableAreaCreate,
     LoadLabwareCreate,
     LoadLiquidCreate,
     LoadModuleCreate,
@@ -486,7 +486,7 @@ CommandResult = Union[
     DropTipInPlaceResult,
     HomeResult,
     RetractAxisResult,
-    LoadFixtureResult,
+    LoadAddressableAreaResult,
     LoadLabwareResult,
     LoadLiquidResult,
     LoadModuleResult,

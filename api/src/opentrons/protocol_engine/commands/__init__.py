@@ -111,12 +111,12 @@ from .home import (
     HomeCommandType,
 )
 
-from .load_fixture import (
-    LoadFixture,
-    LoadFixtureParams,
-    LoadFixtureCreate,
-    LoadFixtureResult,
-    LoadFixtureCommandType,
+from .load_addressable_area import (
+    LoadAddressableArea,
+    LoadAddressableAreaParams,
+    LoadAddressableAreaCreate,
+    LoadAddressableAreaResult,
+    LoadAddressableAreaCommandType,
 )
 
 from .load_labware import (
@@ -353,12 +353,12 @@ __all__ = [
     "RetractAxisParams",
     "RetractAxisResult",
     "RetractAxisCommandType",
-    # load fixture command models
-    "LoadFixture",
-    "LoadFixtureCreate",
-    "LoadFixtureParams",
-    "LoadFixtureResult",
-    "LoadFixtureCommandType",
+    # load addressable area command models
+    "LoadAddressableArea",
+    "LoadAddressableAreaCreate",
+    "LoadAddressableAreaParams",
+    "LoadAddressableAreaResult",
+    "LoadAddressableAreaCommandType",
     # load labware command models
     "LoadLabware",
     "LoadLabwareCreate",
