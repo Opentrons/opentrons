@@ -13,6 +13,7 @@ import {
   useScrolling,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import NiceModal from '@ebay/nice-modal-react'
 
 import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../atoms/SleepScreen'
@@ -280,24 +281,26 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               <EstopTakeover />
               <MaintenanceRunTakeover>
                 <FirmwareUpdateTakeover />
-                <ToasterOven>
-                  <ProtocolReceiptToasts />
-                  <Switch>
-                    {onDeviceDisplayRoutes.map(
-                      ({ Component, exact, path }: RouteProps) => {
-                        return (
-                          <Route key={path} exact={exact} path={path}>
-                            <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                              <ModalPortalRoot />
-                              <Component />
-                            </Box>
-                          </Route>
-                        )
-                      }
-                    )}
-                    <Redirect exact from="/" to={'/loading'} />
-                  </Switch>
-                </ToasterOven>
+                <NiceModal.Provider>
+                  <ToasterOven>
+                    <ProtocolReceiptToasts />
+                    <Switch>
+                      {onDeviceDisplayRoutes.map(
+                        ({ Component, exact, path }: RouteProps) => {
+                          return (
+                            <Route key={path} exact={exact} path={path}>
+                              <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                                <ModalPortalRoot />
+                                <Component />
+                              </Box>
+                            </Route>
+                          )
+                        }
+                      )}
+                      <Redirect exact from="/" to={'/loading'} />
+                    </Switch>
+                  </ToasterOven>
+                </NiceModal.Provider>
               </MaintenanceRunTakeover>
             </>
           )}
