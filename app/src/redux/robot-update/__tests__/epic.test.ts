@@ -292,7 +292,7 @@ describe('robot update epics', () => {
 
         mockFetchRobotApi
           .mockReturnValueOnce(
-            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginConflict })
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginFailure })
           )
           .mockReturnValueOnce(
             cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateCancelSuccess })
@@ -308,6 +308,56 @@ describe('robot update epics', () => {
           method: 'POST',
           path: '/server/update/cancel',
         })
+      })
+    })
+
+    it('Issues an error if cancelling a session fails after a 409 error occurs', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
+
+        mockFetchRobotApi
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginConflict })
+          )
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateCancelFailure })
+          )
+
+        const action$ = hot<Action>('-a', { a: action })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.createSessionEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.unexpectedRobotUpdateError(
+            'Unable to cancel in-progress update session'
+          ),
+        })
+        flush()
+      })
+    })
+
+    it('Issues an error if cancelling a session fails after a non 409 error occurs', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
+
+        mockFetchRobotApi
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginFailure })
+          )
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateCancelFailure })
+          )
+
+        const action$ = hot<Action>('-a', { a: action })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.createSessionEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.unexpectedRobotUpdateError(
+            'Unable to start update session'
+          ),
+        })
+        flush()
       })
     })
 
