@@ -63,6 +63,24 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
       propsForFields={propsForFields}
     />
   )
+  const dispenseLabwareId =
+    formData[
+      getLabwareFieldForPositioningField(
+        addFieldNamePrefix('touchTip_mmFromBottom')
+      )
+    ]
+  //  special-casing touchTip disabled boolean here instead of using getDisabledFieldsMoveLiquidForm
+  //  since we need access to labware's quirks
+  const isTouchTipDisabledLabware = getTouchTipNotSupportedLabware(
+    allLabware,
+    dispenseLabwareId
+  )
+
+  let disabledTouchTip =
+    propsForFields[addFieldNamePrefix('touchTip_checkbox')].disabled
+  if (isTouchTipDisabledLabware) {
+    disabledTouchTip = true
+  }
 
   return (
     // @ts-expect-error(sa, 2021-7-2): className might be null
@@ -120,29 +138,9 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
 
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
-          tooltipContent={
-            getTouchTipNotSupportedLabware(
-              allLabware,
-              formData[
-                getLabwareFieldForPositioningField(
-                  addFieldNamePrefix('touchTip_mmFromBottom')
-                )
-              ]
-            )
-              ? i18n.t('tooltip.step_fields.touchTip.disabled')
-              : propsForFields[addFieldNamePrefix('touchTip_checkbox')]
-                  .tooltipContent
-          }
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
-          disabled={getTouchTipNotSupportedLabware(
-            allLabware,
-            formData[
-              getLabwareFieldForPositioningField(
-                addFieldNamePrefix('touchTip_mmFromBottom')
-              )
-            ]
-          )}
+          disabled={disabledTouchTip}
         >
           <TipPositionField
             {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}

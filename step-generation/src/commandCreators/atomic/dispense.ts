@@ -73,15 +73,24 @@ export const dispense: CommandCreator<DispenseParams> = (
       })
     )
   }
+  let labwareExists: boolean = false
+  if (labware != null && prevRobotState.labware[labware]) {
+    labwareExists = true
+  } else if (
+    labware != null &&
+    invariantContext.additionalEquipmentEntities[labware]
+  ) {
+    labwareExists = true
+  }
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (!labwareExists) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
         labware,
       })
     )
-  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+  } else if (prevRobotState.labware[labware]?.slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
   }
 
@@ -159,6 +168,7 @@ export const dispense: CommandCreator<DispenseParams> = (
     }
   }
 
+  //  TODO(jr, 10/26/23): update this to accommodate waste chute params
   const commands: CreateCommand[] = [
     {
       commandType: 'dispense',

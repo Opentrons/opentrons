@@ -23,10 +23,34 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
-import { AdditionalEquipmentEntities } from '..'
+import {
+  AdditionalEquipmentEntities,
+  LabwareEntities,
+  WASTE_CHUTE_STUBBED_DEPTH,
+} from '..'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
+
+type WasteChuteOrLabware = 'wasteChute' | 'labware' | null
+
+export function getWasteChuteOrLabware(
+  labwareEntities: LabwareEntities,
+  additionalEquipmentEntities: AdditionalEquipmentEntities,
+  destinationId: string
+): WasteChuteOrLabware {
+  if (labwareEntities[destinationId] != null) {
+    return 'labware'
+  } else if (additionalEquipmentEntities[destinationId] != null) {
+    return 'wasteChute'
+  } else {
+    console.error(
+      `expected to determine if dest labware is a labware or waste chute with destLabware ${destinationId} but could not`
+    )
+    return null
+  }
+}
+
 export function repeatArray<T>(array: T[], repeats: number): T[] {
   return flatMap(range(repeats), (i: number): T[] => array)
 }
@@ -205,6 +229,12 @@ export const blowoutUtil = (args: {
     invariantContext,
   } = args
   if (!blowoutLocation) return []
+
+  const wasteChuteOrLabware = getWasteChuteOrLabware(
+    invariantContext.labwareEntities,
+    invariantContext.additionalEquipmentEntities,
+    destLabwareId
+  )
   let labware
   let well
 
@@ -212,8 +242,11 @@ export const blowoutUtil = (args: {
     labware = invariantContext.labwareEntities[sourceLabwareId]
     well = sourceWell
   } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
-    labware = invariantContext.labwareEntities[destLabwareId]
-    well = destWell
+    labware =
+      wasteChuteOrLabware === 'labware'
+        ? invariantContext.labwareEntities[destLabwareId]
+        : invariantContext.additionalEquipmentEntities[destLabwareId]
+    well = wasteChuteOrLabware === 'labware' ? destWell : 'A1'
   } else {
     // if it's not one of the magic strings, it's a labware id
     labware = invariantContext.labwareEntities?.[blowoutLocation]
@@ -227,9 +260,13 @@ export const blowoutUtil = (args: {
       return []
     }
   }
+  const wellDepth =
+    'def' in labware
+      ? getWellsDepth(labware.def, [well])
+      : WASTE_CHUTE_STUBBED_DEPTH
 
-  const offsetFromBottomMm =
-    getWellsDepth(labware.def, [well]) + offsetFromTopMm
+  const offsetFromBottomMm = wellDepth + offsetFromTopMm
+  //  TODO(jr, 10/26/23): update blowOut params to support waste chute
   return [
     curryCommandCreator(blowout, {
       pipette: pipette,

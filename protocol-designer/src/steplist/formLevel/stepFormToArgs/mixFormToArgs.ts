@@ -21,7 +21,7 @@ export const mixFormToArgs = (
   const orderSecond = hydratedFormData.mix_wellOrder_second
   const orderedWells = getOrderedWells(
     unorderedWells,
-    labware.def,
+    labware.def.ordering,
     orderFirst,
     orderSecond
   )

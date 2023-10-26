@@ -8,9 +8,9 @@ import type { FieldProps } from '../types'
 
 export interface StepFormDropdownProps extends FieldProps {
   options: Options
-  additionalEquipment: AdditionalEquipmentEntities
   name: StepFieldName
   className?: string
+  additionalEquipment?: AdditionalEquipmentEntities
 }
 
 export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
@@ -25,9 +25,10 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
     updateValue,
     errorToShow,
   } = props
-  const wasteChuteEntity = Object.values(additionalEquipment).find(
-    aE => aE.name === 'wasteChute'
-  )
+  const wasteChuteEntity =
+    additionalEquipment != null
+      ? Object.values(additionalEquipment).find(aE => aE.name === 'wasteChute')
+      : null
   const wasteChuteOption =
     wasteChuteEntity != null
       ? { name: 'Waste Chute', value: wasteChuteEntity.id }

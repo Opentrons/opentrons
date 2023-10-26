@@ -83,12 +83,19 @@ export const substepTimelineSingleChannel = (
         command.commandType === 'dispense'
       ) {
         const { wellName, volume, labwareId } = command.params
+        const preIngreds =
+          acc.prevRobotState.liquidState.labware[labwareId] != null
+            ? acc.prevRobotState.liquidState.labware[labwareId][wellName]
+            : {}
+        const postIngreds =
+          nextRobotState.liquidState.labware[labwareId] != null
+            ? nextRobotState.liquidState.labware[labwareId][wellName]
+            : {}
         const wellInfo = {
           labwareId,
-          wells: [wellName],
-          preIngreds:
-            acc.prevRobotState.liquidState.labware[labwareId][wellName],
-          postIngreds: nextRobotState.liquidState.labware[labwareId][wellName],
+          wells: [wellName] ?? ['A1'],
+          preIngreds: preIngreds,
+          postIngreds: postIngreds,
         }
         return {
           ...acc,
@@ -141,9 +148,10 @@ export const substepTimelineMultiChannel = (
         command.commandType === 'dispense'
       ) {
         const { wellName, volume, labwareId } = command.params
-        const labwareDef = invariantContext.labwareEntities
-          ? invariantContext.labwareEntities[labwareId].def
-          : null
+        const labwareDef =
+          invariantContext.labwareEntities[labwareId] != null
+            ? invariantContext.labwareEntities[labwareId].def
+            : null
         const wellsForTips =
           channels &&
           labwareDef &&

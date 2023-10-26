@@ -6,6 +6,7 @@ import {
 import { IconName } from '@opentrons/components'
 import { LabwareLocation } from '@opentrons/shared-data'
 import {
+  AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
@@ -200,7 +201,7 @@ export interface HydratedMoveLiquidFormData {
     dispense_delay_checkbox: boolean
     dispense_delay_seconds: number | null | undefined
     dispense_delay_mmFromBottom: number | null | undefined
-    dispense_labware: LabwareEntity
+    dispense_labware: LabwareEntity | AdditionalEquipmentEntity
     dispense_wells: string[]
     dispense_wellOrder_first: WellOrderOption
     dispense_wellOrder_second: WellOrderOption

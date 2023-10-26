@@ -3,13 +3,12 @@ import { LabwareDefinition2, orderWells } from '@opentrons/shared-data'
 import { WellOrderOption } from '../../form-types'
 export function getOrderedWells(
   unorderedWells: string[],
-  labwareDef: LabwareDefinition2,
+  labwareDefOrdering: LabwareDefinition2['ordering'],
   wellOrderFirst: WellOrderOption,
   wellOrderSecond: WellOrderOption
 ): string[] {
-  console.log('ordering', labwareDef?.ordering)
   const allWellsOrdered = orderWells(
-    labwareDef.ordering,
+    labwareDefOrdering,
     wellOrderFirst,
     wellOrderSecond
   )

@@ -39,7 +39,25 @@ export function dispenseUpdateLiquidState(
     wellName,
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-  const labwareDef = invariantContext.labwareEntities[labwareId].def
+
+  let wasteChuteOrLabware: 'wasteChute' | 'labware' | null
+  let well: string = wellName
+  if (invariantContext.labwareEntities[labwareId] != null) {
+    wasteChuteOrLabware = 'labware'
+  } else if (invariantContext.additionalEquipmentEntities[labwareId] != null) {
+    wasteChuteOrLabware = 'wasteChute'
+    well = 'A1'
+  } else {
+    console.error(
+      `expected to determine if dest labware is a labware or waste chute with destLabware ${labwareId} but could not`
+    )
+    wasteChuteOrLabware = null
+  }
+  const labwareDef =
+    wasteChuteOrLabware === 'labware'
+      ? invariantContext.labwareEntities[labwareId].def
+      : null
+
   assert(
     !(useFullVolume && typeof volume === 'number'),
     'dispenseUpdateLiquidState takes either `volume` or `useFullVolume`, but got both'
@@ -48,12 +66,21 @@ export function dispenseUpdateLiquidState(
     typeof volume === 'number' || useFullVolume,
     'in dispenseUpdateLiquidState, either volume or useFullVolume are required'
   )
-  const { wellsForTips, allWellsShared } = getWellsForTips(
-    pipetteSpec.channels,
-    labwareDef,
-    wellName
-  )
-  const liquidLabware = prevLiquidState.labware[labwareId]
+  const { wellsForTips, allWellsShared } =
+    labwareDef != null
+      ? getWellsForTips(pipetteSpec.channels, labwareDef, wellName)
+      : //  special-casing waste chute info
+        { wellsForTips: ['A1'], allWellsShared: true }
+
+  const wasteChuteLocationLiquidState: LocationLiquidState = {
+    wasteChute: { volume: 0 },
+  }
+  const wasteChuteLiquidState = {
+    A1: wasteChuteLocationLiquidState,
+  }
+
+  const liquidLabware =
+    prevLiquidState.labware[labwareId] ?? wasteChuteLiquidState
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
   // and dests are "droplets" that need to be merged to dest well contents
@@ -74,13 +101,13 @@ export function dispenseUpdateLiquidState(
     }
   )
   const mergeLiquidtoSingleWell = {
-    [wellName]: reduce(
+    [well]: reduce(
       splitLiquidStates,
       (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
         const res = mergeLiquid(wellLiquidStateAcc, splitLiquidStateForTip.dest)
         return res
       },
-      liquidLabware[wellName]
+      liquidLabware[well]
     ),
   }
   const mergeTipLiquidToOwnWell = wellsForTips.reduce(

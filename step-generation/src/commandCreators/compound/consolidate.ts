@@ -9,6 +9,7 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   wasteChuteCommandsUtil,
+  getWasteChuteOrLabware,
 } from '../../utils'
 import { configureForVolume } from '../atomic/configureForVolume'
 import {
@@ -91,9 +92,22 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   )
   const sourceLabwareDef =
     invariantContext.labwareEntities[args.sourceLabware].def
-  const destLabwareDef = invariantContext.labwareEntities[args.destLabware].def
-  const airGapOffsetDestWell =
-    getWellDepth(destLabwareDef, args.destWell) + AIR_GAP_OFFSET_FROM_TOP
+
+  const wasteChuteOrLabware = getWasteChuteOrLabware(
+    invariantContext.labwareEntities,
+    invariantContext.additionalEquipmentEntities,
+    args.destLabware
+  )
+  const destinationWell =
+    wasteChuteOrLabware === 'labware' ? args.destWell : 'A1'
+
+  const destLabwareDef =
+    wasteChuteOrLabware === 'labware'
+      ? invariantContext.labwareEntities[args.destLabware].def
+      : null
+  const wellDepth =
+    destLabwareDef != null ? getWellDepth(destLabwareDef, args.destWell) : 0
+  const airGapOffsetDestWell = wellDepth + AIR_GAP_OFFSET_FROM_TOP
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
 
@@ -222,7 +236,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             curryCommandCreator(touchTip, {
               pipette: args.pipette,
               labware: args.destLabware,
-              well: args.destWell,
+              well: destinationWell,
               offsetFromBottomMm: args.touchTipAfterDispenseOffsetMmFromBottom,
             }),
           ]
@@ -263,7 +277,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? mixUtil({
               pipette: args.pipette,
               labware: args.destLabware,
-              well: args.destWell,
+              well: destinationWell,
               volume: mixInDestination.volume,
               times: mixInDestination.times,
               aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
@@ -280,7 +294,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               curryCommandCreator(moveToWell, {
                 pipette: args.pipette,
                 labware: args.destLabware,
-                well: args.destWell,
+                well: destinationWell,
                 offset: {
                   x: 0,
                   y: 0,
@@ -304,7 +318,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 pipette: args.pipette,
                 volume: dispenseAirGapVolume,
                 labware: args.destLabware,
-                well: args.destWell,
+                well: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
                 isAirGap: true,
@@ -330,7 +344,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         sourceLabwareId: args.sourceLabware,
         sourceWell: sourceWellChunk[0],
         destLabwareId: args.destLabware,
-        destWell: args.destWell,
+        destWell: destinationWell,
         blowoutLocation: args.blowoutLocation,
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
@@ -363,7 +377,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             args.volume * sourceWellChunk.length +
             aspirateAirGapVolume * sourceWellChunk.length,
           labware: args.destLabware,
-          well: args.destWell,
+          well: destinationWell,
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),

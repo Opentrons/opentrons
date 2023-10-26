@@ -10,6 +10,7 @@ import {
   getDispenseAirGapLocation,
   reduceCommandCreators,
   wasteChuteCommandsUtil,
+  getWasteChuteOrLabware,
 } from '../../utils'
 import {
   aspirate,
@@ -152,6 +153,12 @@ export const transfer: CommandCreator<TransferArgs> = (
       .concat(splitLastVol)
       .concat(splitLastVol)
   }
+  const wasteChuteOrLabware = getWasteChuteOrLabware(
+    invariantContext.labwareEntities,
+    invariantContext.additionalEquipmentEntities,
+    args.destLabware
+  )
+
   // @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
   const sourceDestPairs: Array<[string, string]> = zip(
     args.sourceWells,
@@ -166,14 +173,19 @@ export const transfer: CommandCreator<TransferArgs> = (
       pairIdx: number
     ): CurriedCommandCreator[] => {
       const [sourceWell, destWell] = wellPair
+      const destinationWell =
+        wasteChuteOrLabware === 'labware' ? destWell : 'A1'
       const sourceLabwareDef =
         invariantContext.labwareEntities[args.sourceLabware].def
       const destLabwareDef =
-        invariantContext.labwareEntities[args.destLabware].def
+        wasteChuteOrLabware === 'labware'
+          ? invariantContext.labwareEntities[args.destLabware].def
+          : null
+      const wellDepth =
+        destLabwareDef != null ? getWellDepth(destLabwareDef, destWell) : 0
       const airGapOffsetSourceWell =
         getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
-      const airGapOffsetDestWell =
-        getWellDepth(destLabwareDef, destWell) + AIR_GAP_OFFSET_FROM_TOP
+      const airGapOffsetDestWell = wellDepth + AIR_GAP_OFFSET_FROM_TOP
       const commands = subTransferVolumes.reduce(
         (
           innerAcc: CurriedCommandCreator[],
@@ -192,7 +204,8 @@ export const transfer: CommandCreator<TransferArgs> = (
           } else if (args.changeTip === 'perSource') {
             changeTipNow = sourceWell !== prevSourceWell
           } else if (args.changeTip === 'perDest') {
-            changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
+            changeTipNow =
+              isInitialSubtransfer || destinationWell !== prevDestWell
           }
 
           const configureForVolumeCommand: CurriedCommandCreator[] =
@@ -286,7 +299,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 curryCommandCreator(touchTip, {
                   pipette: args.pipette,
                   labware: args.destLabware,
-                  well: destWell,
+                  well: destinationWell,
                   offsetFromBottomMm:
                     args.touchTipAfterDispenseOffsetMmFromBottom,
                 }),
@@ -297,7 +310,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               ? mixUtil({
                   pipette: args.pipette,
                   labware: args.destLabware,
-                  well: destWell,
+                  well: destinationWell,
                   volume: args.mixInDestination.volume,
                   times: args.mixInDestination.times,
                   aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
@@ -314,7 +327,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   curryCommandCreator(moveToWell, {
                     pipette: args.pipette,
                     labware: args.destLabware,
-                    well: destWell,
+                    well: destinationWell,
                     offset: {
                       x: 0,
                       y: 0,
@@ -356,7 +369,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipette: args.pipette,
                   volume: aspirateAirGapVolume,
                   labware: args.destLabware,
-                  well: destWell,
+                  well: destinationWell,
                   flowRate: dispenseFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetDestWell,
                   isAirGap: true,
@@ -389,7 +402,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             willReuseTip = nextSourceWell === sourceWell
           } else if (args.changeTip === 'perDest' && !isLastPair) {
             const nextDestWell = sourceDestPairs[pairIdx + 1][1]
-            willReuseTip = nextDestWell === destWell
+            willReuseTip = nextDestWell === destinationWell
           }
 
           // TODO(IL, 2020-10-12): extract this ^ into a util to reuse in distribute/consolidate??
@@ -401,7 +414,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             sourceLabware: args.sourceLabware,
             destLabware: args.destLabware,
             sourceWell,
-            destWell,
+            destWell: destinationWell,
           })
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
@@ -438,7 +451,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             sourceLabwareId: args.sourceLabware,
             sourceWell: sourceWell,
             destLabwareId: args.destLabware,
-            destWell: destWell,
+            destWell: destinationWell,
             blowoutLocation: args.blowoutLocation,
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
@@ -464,7 +477,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               pipette: args.pipette,
               volume: subTransferVol,
               labware: args.destLabware,
-              well: destWell,
+              well: destinationWell,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
@@ -477,7 +490,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           ]
           // NOTE: side-effecting
           prevSourceWell = sourceWell
-          prevDestWell = destWell
+          prevDestWell = destinationWell
           return [...innerAcc, ...nextCommands]
         },
         []

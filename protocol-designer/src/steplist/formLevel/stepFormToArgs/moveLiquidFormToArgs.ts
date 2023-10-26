@@ -1,6 +1,9 @@
 import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
-import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  WASTE_CHUTE_STUBBED_DEPTH,
+} from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -17,6 +20,7 @@ import type {
   InnerMixArgs,
 } from '@opentrons/step-generation'
 type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
+
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(
   hydratedFormData: MoveLiquidFields,
@@ -79,13 +83,24 @@ export const moveLiquidFormToArgs = (
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
-    sourceLabware.def,
+    sourceLabware.def.ordering,
     fields.aspirate_wellOrder_first,
     fields.aspirate_wellOrder_second
   )
+
+  let ordering: string[][] = []
+  let dispWells: string[] = []
+  if ('name' in destLabware && destLabware.name === 'wasteChute') {
+    ordering = [['A1']]
+    dispWells = ['A1']
+  } else if ('def' in destLabware) {
+    ordering = destLabware.def.ordering
+    dispWells = destWellsUnordered
+  }
+
   let destWells = getOrderedWells(
-    fields.dispense_wells,
-    destLabware.def,
+    dispWells,
+    ordering,
     fields.dispense_wellOrder_first,
     fields.dispense_wellOrder_second
   )
@@ -98,6 +113,10 @@ export const moveLiquidFormToArgs = (
       destWells = Array(sourceWells.length).fill(destWells[0])
     }
   }
+  const wellDepth =
+    'def' in destLabware
+      ? getWellsDepth(destLabware.def, destWells)
+      : WASTE_CHUTE_STUBBED_DEPTH
 
   const disposalVolume = fields.disposalVolume_checkbox
     ? fields.disposalVolume_volume
@@ -110,8 +129,7 @@ export const moveLiquidFormToArgs = (
   const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
   const touchTipAfterDispenseOffsetMmFromBottom =
     fields.dispense_touchTip_mmFromBottom ||
-    getWellsDepth(fields.dispense_labware.def, destWells) +
-      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+    wellDepth + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
   const mixBeforeAspirate = getMixData(
     fields,
     'aspirate_mix_checkbox',
@@ -183,11 +201,11 @@ export const moveLiquidFormToArgs = (
     sourceWellsUnordered.length > 0,
     'expected sourceWells to have length > 0'
   )
-  assert(destWellsUnordered.length > 0, 'expected destWells to have length > 0')
+  assert(dispWells.length > 0, 'expected destWells to have length > 0')
   assert(
     sourceWellsUnordered.length === 1 ||
-      destWellsUnordered.length === 1 ||
-      sourceWellsUnordered.length === destWellsUnordered.length,
+      dispWells.length === 1 ||
+      sourceWellsUnordered.length === dispWells.length,
     `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${sourceWellsUnordered.length}) nor dest (${destWellsUnordered.length}) equal 1`
   )
   assert(

@@ -21,6 +21,7 @@ import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
+import { WASTE_CHUTE_STUBBED_DEPTH } from '@opentrons/step-generation'
 
 interface OP extends FieldProps {
   labwareId?: string | null
@@ -131,12 +132,16 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   let wellDepthMm = 0
   if (labwareId != null) {
-    const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
-      .def
+    const labwareDef =
+      stepFormSelectors.getLabwareEntities(state)[labwareId] != null
+        ? stepFormSelectors.getLabwareEntities(state)[labwareId].def
+        : null
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
-    const firstWell = labwareDef.wells.A1
-    if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
+    wellDepthMm =
+      labwareDef != null
+        ? getWellsDepth(labwareDef, ['A1'])
+        : WASTE_CHUTE_STUBBED_DEPTH
   }
 
   return {

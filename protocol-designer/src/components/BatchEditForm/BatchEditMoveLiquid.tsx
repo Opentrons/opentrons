@@ -139,12 +139,6 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
         {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
         label={i18n.t('form.step_edit_form.field.touchTip.label')}
         className={styles.small_field}
-        tooltipContent={
-          isTouchTipNotSupportedLabware
-            ? i18n.t('tooltip.step_fields.touchTip.disabled')
-            : propsForFields[addFieldNamePrefix('touchTip_checkbox')]
-                .tooltipContent
-        }
         disabled={disabledTouchTip}
       >
         <TipPositionField
