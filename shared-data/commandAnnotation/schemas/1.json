@@ -5,7 +5,7 @@
     "baseAnnotation": {
       "description": "Things all annotations have",
       "type": "object",
-      "required": ["type", "commandKeys"],
+      "required": ["annotationType", "commandKeys"],
       "properties": {
         "commandKeys": {
           "type": "array",
@@ -14,7 +14,7 @@
             "type": "string"
           }
         },
-        "type": {
+        "annotationType": {
           "description": "The type of annotation (for machine parsing)",
           "type": "string"
         }
@@ -23,9 +23,9 @@
         "description": "Annotates a group of atomic commands which were the direct result of a second order command (e.g. transfer, consolidate, mix)",
         "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
         "type": "object",
-        "required": ["type", "commandKeys", "params", "machineReadableName"],
+        "required": ["annotationType", "commandKeys", "params", "machineReadableName"],
         "properties": {
-          "type": {
+          "annotationType": {
             "type": "string",
             "enum": ["secondOrderCommand"]
           },
@@ -51,9 +51,9 @@
         "description": "Annotates a group of atomic commands in some manner that Opentrons software does not anticipate or originate",
         "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
         "type": "object",
-        "required": ["type", "commandKeys"],
+        "required": ["annotationType", "commandKeys"],
         "properties": {
-          "type": {
+          "annotationType": {
             "type": "string",
             "enum": ["custom"]
           }

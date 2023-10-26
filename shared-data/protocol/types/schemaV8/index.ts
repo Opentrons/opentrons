@@ -27,9 +27,11 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
     model: 'OT-2 Standard' | 'OT-3 Standard'
     deckId: 'ot2_standard' | 'ot2_short_trash' | 'ot3_standard'
   }
+  labwareDefinitionSchemaId: string
   labwareDefinitions: {
     [definitionId: string]: LabwareDefinition2
   }
+  liquidSchemaId: string
   liquids: {
     [liquidId: string]: {
       displayName: string
@@ -37,8 +39,8 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
       displayColor?: string
     }
   }
-  commandSchemaRef: string
+  commandSchemaId: string
   commands: CreateCommand[]
-  commandAnnotationSchemaRef: string
+  commandAnnotationSchemaId: string
   commandAnnotations: CommandAnnotation[]
 }

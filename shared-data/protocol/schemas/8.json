@@ -12,13 +12,13 @@
     "metadata",
     "robot",
     "labwareDefinitions",
-    "labwareDefinitionsSchema",
+    "labwareDefinitionSchemaId",
     "commands",
-    "commandsSchema",
+    "commandsSchemaId",
     "commandAnnotations",
-    "commandAnnotationsSchema",
+    "commandAnnotationsSchemaId",
     "liquids",
-    "liquidSchemaRef"
+    "liquidSchemaId"
   ],
   "properties": {
     "$otSharedSchema": {
@@ -110,8 +110,8 @@
       }
     },
 
-    "labwareDefinitionSchemaRef": {
-      "description": "The schema to use for labware definitions. Looked up as a schema-id in shared-data/labware.",
+    "labwareDefinitionSchemaId": {
+      "description": "The schema to use for labware definitions.",
       "type": "string"
     },
 
@@ -124,8 +124,8 @@
       }
     },
 
-    "liquidSchemaRef": {
-      "description": "The schema to use for liquid definitions. Looked up as a schema-id in shared-data/liquid/schemas.",
+    "liquidSchemaId": {
+      "description": "The schema to use for liquid definitions.",
       "type": "string"
     },
 
@@ -137,8 +137,8 @@
         }
       }
     },
-    "commandSchemaRef": {
-      "description": "The schema to which the commands adhere. The value will be looked up as a schema-id under shared-data/command/schemas/",
+    "commandSchemaId": {
+      "description": "The schema to which the commands adhere.",
       "type": "string"
     },
 
@@ -148,8 +148,8 @@
       "items": { "$ref": "#/properties/commandSchemaRef" }
     },
 
-    "commandAnnotationSchemaRef": {
-      "description": "The schema to which the command annotations adhere. The value will be looked up as a schema-id under shared-data/commandAnnotation/schemas/",
+    "commandAnnotationSchemaId": {
+      "description": "The schema to which the command annotations adhere.",
       "type": "string"
     },
 
