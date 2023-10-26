@@ -55,16 +55,17 @@ _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
 
 
 class InstrumentContext(publisher.CommandPublisher):
-    """
+    """A context for a specific pipette or instrument.
+
        The InstrumentContext class provides the objects,
-       attributes, and methods that allow you to use pipettes in your protocols. 
-       
-       Methods generally fall into one of two categories. 
-       
-         - They can change the state of the InstrumentContext object, such as how fast 
-         it moves liquid or where it disposes of used tips). 
+       attributes, and methods that allow you to use pipettes in your protocols.
+
+       Methods generally fall into one of two categories.
+
+         - They can change the state of the InstrumentContext object, such as how fast
+         it moves liquid or where it disposes of used tips).
          - They can command the instrument to perform an action, like picking up tips, moving
-         to certain locations, and aspirating or dispensing liquid. 
+         to certain locations, and aspirating or dispensing liquid.
 
        This class also includes action methods (e.g., ``aspirate()`` and ``distribute()``).
        We’ve included and defined many of these here for convenience.
@@ -159,7 +160,7 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """
         Draw liquid into a pipette tip.
-        
+
         See :ref:`new-aspirate` for more details and examples.
 
         :param volume: The volume to aspirate, measured in µL. If 0 or
@@ -390,7 +391,7 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> InstrumentContext:
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a single location.
-        
+
         See :ref:`mix`.
 
         :param repetitions: Number of times to mix (default is 1).
