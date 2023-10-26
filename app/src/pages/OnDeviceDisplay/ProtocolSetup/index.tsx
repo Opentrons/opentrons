@@ -32,6 +32,7 @@ import {
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  getFixtureDisplayName,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
@@ -47,6 +48,7 @@ import {
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
@@ -56,7 +58,7 @@ import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchL
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
-  getAreInstrumentsReady,
+  getNumUnreadyInstruments,
   getProtocolUsesGripper,
 } from '../../../organisms/ProtocolSetupInstruments/utils'
 import {
@@ -81,6 +83,11 @@ import { CloseButton, PlayButton } from './Buttons'
 
 import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import {
+  useRequiredProtocolHardwareFromAnalysis,
+  useMissingProtocolHardwareFromAnalysis,
+} from '../../Protocols/hooks'
+import type { ProtocolHardware, ProtocolFixture } from '../../Protocols/hooks'
 
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
@@ -238,6 +245,7 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+
   const robotType = useRobotType(robotName)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
@@ -254,6 +262,18 @@ function PrepareToRun({
       refetchInterval: FETCH_DURATION_MS,
     }) ?? []
 
+  const { requiredProtocolHardware } = useRequiredProtocolHardwareFromAnalysis(
+    mostRecentAnalysis
+  )
+
+  const requiredFixtures = requiredProtocolHardware.filter(
+    (hardware): hardware is ProtocolFixture => {
+      return hardware.hardwareType === 'fixture'
+    }
+  )
+
+  const protocolHasFixtures = requiredFixtures.length > 0
+
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
 
@@ -268,16 +288,16 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
-  const areInstrumentsReady =
+  const numUnreadyInstruments =
     mostRecentAnalysis != null && attachedInstruments != null
-      ? getAreInstrumentsReady(mostRecentAnalysis, attachedInstruments)
+      ? getNumUnreadyInstruments(mostRecentAnalysis, attachedInstruments)
       : false
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd: !areInstrumentsReady,
+    hasMissingCalForOdd: numUnreadyInstruments !== 0,
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
@@ -298,17 +318,50 @@ function PrepareToRun({
         (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
       : 0
 
-  const instrumentsDetail = t('instruments_connected', {
-    count: speccedInstrumentCount,
-  })
-  const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
+  const missingProtocolHardware = useMissingProtocolHardwareFromAnalysis(
+    mostRecentAnalysis
+  )
+
+  const isLocationConflict = missingProtocolHardware.conflictedSlots.length > 0
+
+  const missingModules = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'module'
+  )
+  const missingFixtures = missingProtocolHardware.missingProtocolHardware.filter(
+    (hardware): hardware is ProtocolFixture =>
+      hardware.hardwareType === 'fixture'
+  )
+
+  let instrumentsDetail
+  if (numUnreadyInstruments === 0) {
+    instrumentsDetail = t('instruments_connected', {
+      count: speccedInstrumentCount,
+    })
+  } else {
+    instrumentsDetail =
+      numUnreadyInstruments > 1
+        ? t('instrument_calibrations_missing_plural', {
+            num: numUnreadyInstruments,
+          })
+        : t('instrument_calibration_missing', {
+            num: numUnreadyInstruments,
+          })
+  }
+
+  const instrumentsStatus = numUnreadyInstruments === 0 ? 'ready' : 'not ready'
+
+  const areModulesReady = !isMissingModules && moduleCalibrationStatus.complete
+
+  const isMissingFixtures = missingFixtures.length > 0
+
+  const areFixturesReady = !isMissingFixtures
 
   const modulesStatus =
-    isMissingModules || !moduleCalibrationStatus.complete
-      ? 'not ready'
-      : 'ready'
+    areModulesReady && areFixturesReady && !isLocationConflict
+      ? 'ready'
+      : 'not ready'
 
-  const isReadyToRun = areInstrumentsReady && !isMissingModules
+  const isReadyToRun = numUnreadyInstruments === 0 && areModulesReady
 
   const onPlay = (): void => {
     if (isDoorOpen) {
@@ -342,25 +395,91 @@ function PrepareToRun({
       ? getModuleDisplayName(firstMissingModuleModel)
       : ''
 
-  // determine modules detail messages
-  const connectedModulesText =
-    protocolModulesInfo.length === 0
-      ? t('no_modules_used_in_this_protocol')
-      : t('modules_connected', {
-          count: attachedModules.length,
-        })
+  const getConnectedHardwareText = (
+    protocolModulesInfo: ProtocolModuleInfo[],
+    requiredFixtures: ProtocolHardware[]
+  ): {
+    detail: string
+    subdetail?: string
+  } => {
+    if (protocolModulesInfo.length === 0 && requiredFixtures.length === 0) {
+      return { detail: t('no_modules_used_in_this_protocol') }
+    } else if (
+      protocolModulesInfo.length > 0 &&
+      requiredFixtures.length === 0
+    ) {
+      // protocol only uses modules
+      return {
+        detail:
+          protocolModulesInfo.length > 1
+            ? t('modules_connected_plural', {
+                count: protocolModulesInfo.length,
+              })
+            : t('modules_connected', { count: protocolModulesInfo.length }),
+      }
+    } else if (
+      protocolModulesInfo.length === 0 &&
+      requiredFixtures.length > 0
+    ) {
+      // protocol only uses fixtures
+      return {
+        detail:
+          requiredFixtures.length > 1
+            ? t('fixtures_connected_plural', {
+                count: requiredFixtures.length,
+              })
+            : t('fixtures_connected', { count: requiredFixtures.length }),
+      }
+    } else {
+      // protocol uses fixtures and modules
+      return {
+        detail:
+          requiredFixtures.length > 1
+            ? t('fixtures_connected_plural', {
+                count: requiredFixtures.length,
+              })
+            : t('fixtures_connected', { count: requiredFixtures.length }),
+        subdetail:
+          protocolModulesInfo.length > 1
+            ? t('modules_connected_plural', {
+                count: protocolModulesInfo.length,
+              })
+            : t('modules_connected', { count: protocolModulesInfo.length }),
+      }
+    }
+  }
+
   const missingModulesText =
     missingModuleIds.length === 1
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
-      : t('multiple_modules_missing')
+      : t('multiple_modules_missing', { count: missingModuleIds.length })
 
-  const modulesDetail = (): string => {
-    if (isMissingModules) {
-      return missingModulesText
+  const missingFixturesText =
+    missingFixtures.length === 1
+      ? `${t('missing')} ${getFixtureDisplayName(
+          missingFixtures[0].fixtureName
+        )}`
+      : t('multiple_fixtures_missing', { count: missingFixtures.length })
+
+  const missingMultipleHardwareTypes =
+    [missingModules, missingFixtures].filter(
+      missingHardwareArr => missingHardwareArr.length > 0
+    ).length > 1
+
+  const modulesDetail = (): { detail: string; subdetail?: string } => {
+    if (isLocationConflict) {
+      return { detail: t('location_conflict') }
+    } else if (missingMultipleHardwareTypes) {
+      return { detail: t('hardware_missing') }
+    } else if (missingFixtures.length > 0) {
+      return { detail: missingFixturesText }
+    } else if (isMissingModules) {
+      return { detail: missingModulesText }
     } else if (!moduleCalibrationStatus.complete) {
-      return t('calibration_required')
+      return { detail: t('calibration_required') }
     } else {
-      return connectedModulesText
+      // modules and deck are ready
+      return getConnectedHardwareText(protocolModulesInfo, requiredFixtures)
     }
   }
 
@@ -471,9 +590,12 @@ function PrepareToRun({
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
               title={enableDeckConfig ? t('modules_and_deck') : t('modules')}
-              detail={modulesDetail()}
+              detail={modulesDetail().detail}
+              subDetail={modulesDetail().subdetail}
               status={modulesStatus}
-              disabled={protocolModulesInfo.length === 0}
+              disabled={
+                protocolModulesInfo.length === 0 && !protocolHasFixtures
+              }
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {

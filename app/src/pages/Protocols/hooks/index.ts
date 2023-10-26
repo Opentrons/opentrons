@@ -41,10 +41,11 @@ interface ProtocolGripper {
   connected: boolean
 }
 
-interface ProtocolFixture {
+export interface ProtocolFixture {
   hardwareType: 'fixture'
   fixtureName: FixtureLoadName
   location: { cutout: Cutout }
+  hasSlotConflict: boolean
 }
 
 export type ProtocolHardware =
@@ -53,22 +54,9 @@ export type ProtocolHardware =
   | ProtocolGripper
   | ProtocolFixture
 
-/**
- * Returns an array of ProtocolHardware objects that are required by the given protocol ID.
- *
- * @param {string} protocolId The ID of the protocol for which required hardware is being retrieved.
- * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID.
- */
-export const useRequiredProtocolHardware = (
-  protocolId: string
+export const useRequiredProtocolHardwareFromAnalysis = (
+  analysis?: CompletedProtocolAnalysis | null
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
-  const { data: protocolData } = useProtocolQuery(protocolId)
-  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
-  )
-
   const {
     data: attachedModulesData,
     isLoading: isLoadingModules,
@@ -163,18 +151,22 @@ export const useRequiredProtocolHardware = (
       hardwareType: 'fixture',
       fixtureName: 'wasteChute',
       location: { cutout: 'D3' },
+      hasSlotConflict: false,
     },
     {
       hardwareType: 'fixture',
       fixtureName: 'standardSlot',
       location: { cutout: 'C3' },
+      hasSlotConflict: false,
     },
     {
       hardwareType: 'fixture',
       fixtureName: 'stagingArea',
       location: { cutout: 'B3' },
+      hasSlotConflict: false,
     },
   ]
+
   return {
     requiredProtocolHardware: enableDeckConfigurationFeatureFlag
       ? [
@@ -184,14 +176,29 @@ export const useRequiredProtocolHardware = (
           // ...requiredFixture,
           ...STUBBED_FIXTURES,
         ]
-      : [
-          ...requiredPipettes,
-          ...requiredModules,
-          ...requiredGripper,
-          // ...requiredFixture,
-        ],
+      : [...requiredPipettes, ...requiredModules, ...requiredGripper],
     isLoading: isLoadingInstruments || isLoadingModules,
   }
+}
+
+/**
+ * Returns an array of ProtocolHardware objects that are required by the given protocol ID.
+ *
+ * @param {string} protocolId The ID of the protocol for which required hardware is being retrieved.
+ * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID.
+ */
+
+export const useRequiredProtocolHardware = (
+  protocolId: string
+): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
+
+  return useRequiredProtocolHardwareFromAnalysis(analysis)
 }
 
 /**
@@ -225,6 +232,75 @@ export const useRequiredProtocolLabware = (
  * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID,
  * but not currently connected.
  */
+
+const useMissingProtocolHardwareFromRequiredProtocolHardare = (
+  requiredProtocolHardware: ProtocolHardware[],
+  isLoading: boolean
+): {
+  missingProtocolHardware: ProtocolHardware[]
+  conflictedSlots: string[]
+  isLoading: boolean
+} => {
+  const { data: deckConfig } = useDeckConfigurationQuery()
+  console.log('🚀 ~ file: index.ts:252 ~ deckConfig:', deckConfig)
+
+  const enableDeckConfigurationFeatureFlag = useFeatureFlag(
+    'enableDeckConfiguration'
+  )
+  // determine missing or conflicted hardware
+  return {
+    missingProtocolHardware: requiredProtocolHardware.filter(hardware => {
+      if ('connected' in hardware) {
+        // instruments and modules
+        return !hardware.connected
+      } else {
+        // fixtures
+        return (
+          enableDeckConfigurationFeatureFlag &&
+          !deckConfig?.find(
+            fixture =>
+              hardware.location.cutout === fixture.fixtureLocation &&
+              hardware.fixtureName === fixture.loadName
+          )
+        )
+      }
+    }),
+    conflictedSlots: requiredProtocolHardware
+      .filter(
+        (hardware): hardware is ProtocolModule | ProtocolFixture =>
+          (hardware.hardwareType === 'module' ||
+            (enableDeckConfigurationFeatureFlag &&
+              hardware.hardwareType === 'fixture')) &&
+          hardware.hasSlotConflict
+      )
+      .map(
+        hardware =>
+          hardware.hardwareType === 'module'
+            ? hardware.slot // module
+            : hardware.location.cutout // fixture
+      ),
+    isLoading,
+  }
+}
+
+export const useMissingProtocolHardwareFromAnalysis = (
+  analysis?: CompletedProtocolAnalysis | null
+): {
+  missingProtocolHardware: ProtocolHardware[]
+  conflictedSlots: string[]
+  isLoading: boolean
+} => {
+  const {
+    requiredProtocolHardware,
+    isLoading,
+  } = useRequiredProtocolHardwareFromAnalysis(analysis)
+
+  return useMissingProtocolHardwareFromRequiredProtocolHardare(
+    requiredProtocolHardware,
+    isLoading
+  )
+}
+
 export const useMissingProtocolHardware = (
   protocolId: string
 ): {
@@ -235,16 +311,9 @@ export const useMissingProtocolHardware = (
   const { requiredProtocolHardware, isLoading } = useRequiredProtocolHardware(
     protocolId
   )
-  return {
-    missingProtocolHardware: requiredProtocolHardware.filter(
-      hardware => 'connected' in hardware && !hardware.connected
-    ),
-    conflictedSlots: requiredProtocolHardware
-      .filter(
-        (hardware): hardware is ProtocolModule =>
-          hardware.hardwareType === 'module' && hardware.hasSlotConflict
-      )
-      .map(mod => mod.slot),
-    isLoading,
-  }
+
+  return useMissingProtocolHardwareFromRequiredProtocolHardare(
+    requiredProtocolHardware,
+    isLoading
+  )
 }
