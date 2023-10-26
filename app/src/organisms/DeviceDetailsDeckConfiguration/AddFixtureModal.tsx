@@ -28,16 +28,19 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
-import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
+import type {
+  Cutout,
+  DeckConfiguration,
+  Fixture,
+  FixtureLoadName,
+} from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
-import type { DeckConfigData } from '../../pages/DeckConfiguration'
 
 interface AddFixtureModalProps {
   fixtureLocation: Cutout
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
-  deckConfigData?: DeckConfigData
-  setDeckConfigData?: (deckConfigData: DeckConfigData) => void
+  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<DeckConfiguration>>
   providedFixtureOptions?: FixtureLoadName[]
   isOnDevice?: boolean
 }
@@ -45,11 +48,10 @@ interface AddFixtureModalProps {
 export function AddFixtureModal({
   fixtureLocation,
   setShowAddFixtureModal,
-  deckConfigData,
-  setDeckConfigData,
+  setCurrentDeckConfig,
   providedFixtureOptions,
   isOnDevice = false,
-}: AddFixtureModalProps): JSX.Element | null {
+}: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
@@ -81,18 +83,15 @@ export function AddFixtureModal({
 
   // For Touchscreen app
   const handleTapAdd = (fixtureLoadName: FixtureLoadName): void => {
-    if (deckConfigData != null && setDeckConfigData != null) {
-      const addedFixture = { fixtureLocation, loadName: fixtureLoadName }
-      const currentDeckConfig = deckConfigData.currentDeckConfig.map(fixture =>
-        fixture.fixtureLocation === addedFixture.fixtureLocation
-          ? { ...fixture, ...addedFixture }
-          : fixture
+    if (setCurrentDeckConfig != null)
+      setCurrentDeckConfig(
+        (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
+          prevDeckConfig.map((fixture: Fixture) =>
+            fixture.fixtureLocation === fixtureLocation
+              ? { ...fixture, loadName: fixtureLoadName }
+              : fixture
+          )
       )
-      setDeckConfigData({
-        addedFixture,
-        currentDeckConfig,
-      })
-    }
 
     setShowAddFixtureModal(false)
   }

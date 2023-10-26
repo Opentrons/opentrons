@@ -2,40 +2,19 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import {
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
-} from '@opentrons/shared-data'
+import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
 
-import type { DeckConfigData } from '../../../pages/DeckConfiguration'
-
 jest.mock('@opentrons/react-api-client')
 const mockSetShowAddFixtureModal = jest.fn()
 const mockUpdateDeckConfiguration = jest.fn()
-const mockSetDeckConfigData = jest.fn()
+const mockSetCurrentDeckConfig = jest.fn()
 
 const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
   typeof useUpdateDeckConfigurationMutation
 >
-
-const mockDeckConfigData = {
-  addedFixture: null,
-  currentDeckConfig: [
-    {
-      fixtureId: 'mockFixtureIdC3',
-      fixtureLocation: 'C3',
-      loadName: TRASH_BIN_LOAD_NAME,
-    },
-    {
-      fixtureId: 'mockFixtureIdD3',
-      fixtureLocation: 'D3',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-    },
-  ],
-} as DeckConfigData
 
 const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -50,8 +29,7 @@ describe('Touchscreen AddFixtureModal', () => {
     props = {
       fixtureLocation: 'D3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
-      deckConfigData: mockDeckConfigData,
-      setDeckConfigData: mockSetDeckConfigData,
+      setCurrentDeckConfig: mockSetCurrentDeckConfig,
       isOnDevice: true,
     }
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
@@ -74,7 +52,7 @@ describe('Touchscreen AddFixtureModal', () => {
   it('should a mock function when tapping app button', () => {
     const [{ getAllByText }] = render(props)
     getAllByText('Add')[0].click()
-    expect(mockSetDeckConfigData).toHaveBeenCalled()
+    expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
   })
 })
 

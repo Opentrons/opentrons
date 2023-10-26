@@ -5,23 +5,19 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
+  useCreateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-import {
-  TRASH_BIN_LOAD_NAME,
-  // WASTE_CHUTE_LOAD_NAME,
-} from '@opentrons/shared-data'
+import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { DeckConfigurationEditor } from '..'
 
-import { UseQueryResult } from 'react-query'
+import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
-// import type { DeckConfigData } from '..'
 
-const mockUpdateDeckConfiguration = jest.fn()
+const mockCreateDeckConfiguration = jest.fn()
 const mockGoBack = jest.fn()
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -38,21 +34,6 @@ const mockDeckConfig = [
     loadName: TRASH_BIN_LOAD_NAME,
   },
 ]
-// const mockDeckConfigData = {
-//   addedFixture: null,
-//   currentDeckConfig: [
-//     {
-//       fixtureId: 'mockFixtureIdC3',
-//       fixtureLocation: 'C3',
-//       loadName: TRASH_BIN_LOAD_NAME,
-//     },
-//     {
-//       fixtureId: 'mockFixtureIdD3',
-//       fixtureLocation: 'D3',
-//       loadName: WASTE_CHUTE_LOAD_NAME,
-//     },
-//   ],
-// } as DeckConfigData
 
 jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
 jest.mock('@opentrons/react-api-client')
@@ -72,11 +53,11 @@ const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery
 >
-const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useUpdateDeckConfigurationMutation
->
 const mockDeckConfigurationDiscardChangesModal = DeckConfigurationDiscardChangesModal as jest.MockedFunction<
   typeof DeckConfigurationDiscardChangesModal
+>
+const mockUseCreateDeckConfigurationMutation = useCreateDeckConfigurationMutation as jest.MockedFunction<
+  typeof useCreateDeckConfigurationMutation
 >
 
 const render = () => {
@@ -99,12 +80,12 @@ describe('DeckConfigurationEditor', () => {
     when(mockUseDeckConfigurationQuery).mockReturnValue({
       data: mockDeckConfig,
     } as UseQueryResult<DeckConfiguration>)
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
-      updateDeckConfiguration: mockUpdateDeckConfiguration,
-    } as any)
     mockDeckConfigurationDiscardChangesModal.mockReturnValue(
       <div>mock DeckConfigurationDiscardChangesModal</div>
     )
+    when(mockUseCreateDeckConfigurationMutation).mockReturnValue({
+      createDeckConfiguration: mockCreateDeckConfiguration,
+    } as any)
   })
 
   afterEach(() => {
@@ -126,7 +107,8 @@ describe('DeckConfigurationEditor', () => {
   })
 
   it('should call a mock function when tapping confirm', () => {
-    // This test case needs manual operation since need to update localState
+    // (kk:10/26/2023)
+    // Once get approval, I will be able to update this case
     // const [{ getByText }] = render()
     // getByText('Confirm').click()
     // expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
@@ -139,7 +121,8 @@ describe('DeckConfigurationEditor', () => {
   })
 
   it('should render modal when tapping back button if there is a change', () => {
-    // This test case needs manual operation since need to update localState
+    // (kk:10/26/2023)
+    // Once get approval, I will be able to update this case
     // const [{ getByTestId }] = render()
     // getByTestId('ChildNavigation_Back_Button').click()
     // expect(mockGoBack).toHaveBeenCalled()

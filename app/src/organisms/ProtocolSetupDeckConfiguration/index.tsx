@@ -8,10 +8,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-import {
-  useUpdateDeckConfigurationMutation,
-  useCreateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useCreateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   STANDARD_SLOT_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
@@ -31,7 +28,6 @@ import type {
   LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { DeckConfigData } from '../../pages/DeckConfiguration'
 
 interface ProtocolSetupDeckConfigurationProps {
   fixtureLocation: Cutout
@@ -94,12 +90,11 @@ export function ProtocolSetupDeckConfiguration({
         }
     ) as DeckConfiguration) ?? []
 
-  const [deckConfigData, setDeckConfigData] = React.useState<DeckConfigData>({
-    addedFixture: null,
-    currentDeckConfig: deckConfig,
-  })
+  const [
+    currentDeckConfig,
+    setCurrentDeckConfig,
+  ] = React.useState<DeckConfiguration>(deckConfig)
 
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { createDeckConfiguration } = useCreateDeckConfigurationMutation()
 
   const handleClickAdd = (fixtureLocation: Cutout): void => {
@@ -108,14 +103,18 @@ export function ProtocolSetupDeckConfiguration({
   }
 
   const handleClickRemove = (fixtureLocation: Cutout): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    })
+    setCurrentDeckConfig(prevDeckConfig =>
+      prevDeckConfig.map(fixture =>
+        fixture.fixtureLocation === fixtureLocation
+          ? { ...fixture, loadName: STANDARD_SLOT_LOAD_NAME }
+          : fixture
+      )
+    )
+    createDeckConfiguration(currentDeckConfig)
   }
 
   const handleClickConfirm = (): void => {
-    createDeckConfiguration(deckConfigData.currentDeckConfig)
+    createDeckConfiguration(currentDeckConfig)
   }
 
   return (
@@ -132,8 +131,7 @@ export function ProtocolSetupDeckConfiguration({
             fixtureLocation={targetFixtureLocation}
             setShowAddFixtureModal={setShowConfigurationModal}
             providedFixtureOptions={providedFixtureOptions}
-            deckConfigData={deckConfigData}
-            setDeckConfigData={setDeckConfigData}
+            setCurrentDeckConfig={setCurrentDeckConfig}
             isOnDevice
           />
         ) : null}
