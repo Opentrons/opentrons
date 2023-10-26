@@ -8,7 +8,7 @@
   },
   "include": [
     "js",
-    "protocol/types",
+    "protocol",
     "command/types",
     "liquid/types",
     "commandAnnotation/types"
