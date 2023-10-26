@@ -2,6 +2,7 @@ import { getLoadedLabware } from './accessors'
 
 import {
   CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
   getLabwareDefURI,
   getLabwareDisplayName,
 } from '@opentrons/shared-data'
@@ -13,7 +14,7 @@ const FIXED_TRASH_DEF_URIS = [
   'opentrons/opentrons_1_trash_3200ml_fixed/1',
 ]
 export function getLabwareName(
-  analysis: CompletedProtocolAnalysis,
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   labwareId: string
 ): string {
   const loadedLabware = getLoadedLabware(analysis, labwareId)

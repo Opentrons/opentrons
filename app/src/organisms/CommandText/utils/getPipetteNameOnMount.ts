@@ -3,10 +3,11 @@ import { getLoadedPipette } from './accessors'
 import type {
   CompletedProtocolAnalysis,
   PipetteName,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 export function getPipetteNameOnMount(
-  analysis: CompletedProtocolAnalysis,
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   mount: string
 ): PipetteName | null {
   const loadedPipette = getLoadedPipette(analysis, mount)

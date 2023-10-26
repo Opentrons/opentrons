@@ -105,6 +105,7 @@ async def _analyze(
             pipettes=analysis.state_summary.pipettes,
             modules=analysis.state_summary.modules,
             liquids=analysis.state_summary.liquids,
+            commandAnnotations=protocol_source.command_annotations,
         )
 
         await json_output.write_text(
@@ -156,3 +157,4 @@ class AnalyzeResults(BaseModel):
     modules: List[LoadedModule]
     liquids: List[Liquid]
     errors: List[ErrorOccurrence]
+    commandAnnotations: List[Any]

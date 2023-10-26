@@ -9,6 +9,7 @@ import {
   PickUpTipRunTimeCommand,
   getLabwareDefURI,
   RobotType,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { getLoadedLabware } from './utils/accessors'
@@ -27,21 +28,21 @@ type PipettingRunTimeCommmand =
   | PickUpTipRunTimeCommand
 interface PipettingCommandTextProps {
   command: PipettingRunTimeCommmand
-  robotSideAnalysis: CompletedProtocolAnalysis
+  analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   robotType: RobotType
 }
 
 export const PipettingCommandText = ({
   command,
-  robotSideAnalysis,
+  analysis,
   robotType,
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
   const { labwareId, wellName } = command.params
-  const allPreviousCommands = robotSideAnalysis.commands.slice(
+  const allPreviousCommands = analysis.commands.slice(
     0,
-    robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+    analysis.commands.findIndex(c => c.id === command.id)
   )
   const labwareLocation = getFinalLabwareLocation(
     labwareId,
@@ -50,7 +51,7 @@ export const PipettingCommandText = ({
   const displayLocation =
     labwareLocation != null
       ? getLabwareDisplayLocation(
-          robotSideAnalysis,
+          analysis,
           labwareLocation,
           t,
           robotType
@@ -61,7 +62,7 @@ export const PipettingCommandText = ({
       const { volume, flowRate } = command.params
       return t('aspirate', {
         well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware: getLabwareName(analysis, labwareId),
         labware_location: displayLocation,
         volume: volume,
         flow_rate: flowRate,
@@ -72,7 +73,7 @@ export const PipettingCommandText = ({
       return pushOut
         ? t('dispense_push_out', {
             well_name: wellName,
-            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware: getLabwareName(analysis, labwareId),
             labware_location: displayLocation,
             volume: volume,
             flow_rate: flowRate,
@@ -80,7 +81,7 @@ export const PipettingCommandText = ({
           })
         : t('dispense', {
             well_name: wellName,
-            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware: getLabwareName(analysis, labwareId),
             labware_location: displayLocation,
             volume: volume,
             flow_rate: flowRate,
@@ -90,7 +91,7 @@ export const PipettingCommandText = ({
       const { flowRate } = command.params
       return t('blowout', {
         well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware: getLabwareName(analysis, labwareId),
         labware_location: displayLocation,
         flow_rate: flowRate,
       })
@@ -98,14 +99,14 @@ export const PipettingCommandText = ({
     case 'moveToWell': {
       return t('move_to_well', {
         well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware: getLabwareName(analysis, labwareId),
         labware_location: displayLocation,
       })
     }
     case 'dropTip': {
-      const loadedLabware = getLoadedLabware(robotSideAnalysis, labwareId)
+      const loadedLabware = getLoadedLabware(analysis, labwareId)
       const labwareDefinitions = getLabwareDefinitionsFromCommands(
-        robotSideAnalysis.commands
+        analysis.commands
       )
       const labwareDef = labwareDefinitions.find(
         lw => getLabwareDefURI(lw) === loadedLabware?.definitionUri
@@ -113,18 +114,18 @@ export const PipettingCommandText = ({
       return labwareDef?.parameters.isTiprack
         ? t('return_tip', {
             well_name: wellName,
-            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware: getLabwareName(analysis, labwareId),
             labware_location: displayLocation,
           })
         : t('drop_tip', {
             well_name: wellName,
-            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware: getLabwareName(analysis, labwareId),
           })
     }
     case 'pickUpTip': {
       return t('pickup_tip', {
         well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware: getLabwareName(analysis, labwareId),
         labware_location: displayLocation,
       })
     }

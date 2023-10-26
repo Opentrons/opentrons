@@ -2,7 +2,7 @@
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Sequence, Union
+from typing import Any, Dict, List, Sequence, Union
 
 import anyio
 
@@ -44,6 +44,8 @@ class IdentifiedJsonMain:
     metadata: Metadata
     """The protocol metadata extracted from this file."""
 
+    command_annotations: List[Any]
+
 
 @dataclass(frozen=True)
 class IdentifiedPythonMain:
@@ -60,6 +62,8 @@ class IdentifiedPythonMain:
 
     metadata: Metadata
     """The protocol metadata extracted from this file."""
+
+    command_annotations: List[Any]
 
 
 @dataclass(frozen=True)
@@ -181,6 +185,7 @@ def _analyze_json_protocol(
         metadata = json_contents["metadata"]
         schema_version = json_contents["schemaVersion"]
         robot_type = json_contents["robot"]["model"]
+        command_annotations = json_contents.get("commandAnnotations", [])
     except KeyError as e:
         raise FileIdentificationError(error_message) from e
 
@@ -188,6 +193,9 @@ def _analyze_json_protocol(
     # arbitrary dict: its fields are supposed to follow a schema. Should we validate
     # this metadata against that schema instead of doing this simple isinstance() check?
     if not isinstance(metadata, dict):
+        raise FileIdentificationError(error_message)
+
+    if not isinstance(command_annotations, list):
         raise FileIdentificationError(error_message)
 
     if not isinstance(schema_version, int):
@@ -202,6 +210,7 @@ def _analyze_json_protocol(
         schema_version=schema_version,
         robot_type=robot_type,
         metadata=metadata,
+        command_annotations=command_annotations,
     )
 
 
@@ -235,4 +244,5 @@ def _analyze_python_protocol(
         metadata=parsed.metadata or {},
         robot_type=parsed.robot_type,
         api_level=parsed.api_level,
+        command_annotations=[],
     )

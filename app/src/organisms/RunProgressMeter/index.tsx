@@ -137,7 +137,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   ) {
     currentStepContents = (
       <CommandText
-        robotSideAnalysis={analysis}
+        analysis={analysis}
         command={analysisCommands[lastRunAnalysisCommandIndex]}
         robotType={robotType}
       />
@@ -149,7 +149,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   ) {
     currentStepContents = (
       <CommandText
-        robotSideAnalysis={analysis}
+        analysis={analysis}
         command={runCommandDetails.data}
         robotType={robotType}
       />

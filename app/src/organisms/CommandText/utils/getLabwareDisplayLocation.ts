@@ -11,12 +11,13 @@ import { getModuleModel } from './getModuleModel'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 import type {
   CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data/'
 import type { TFunction } from 'react-i18next'
 
 export function getLabwareDisplayLocation(
-  robotSideAnalysis: CompletedProtocolAnalysis,
+  robotSideAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   location: LabwareLocation,
   t: TFunction<'protocol_command_text'>,
   robotType: RobotType,

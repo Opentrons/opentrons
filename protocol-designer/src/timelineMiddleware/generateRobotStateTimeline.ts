@@ -57,12 +57,10 @@ export const generateRobotStateTimeline = (
       if (pipetteId != null && dropTipLocation != null) {
         const nextStepArgsForPipette = continuousStepArgs
           .slice(stepIndex + 1)
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
-          .find(stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId)
+          .find(stepArgs => 'pipette' in stepArgs && stepArgs.pipette === pipetteId)
         const willReuseTip =
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
-          nextStepArgsForPipette?.changeTip &&
-          // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
+          nextStepArgsForPipette != null &&
+          'changeTip' in nextStepArgsForPipette &&
           nextStepArgsForPipette.changeTip === 'never'
 
         if (!willReuseTip) {

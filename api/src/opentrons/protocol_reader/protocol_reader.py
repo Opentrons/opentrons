@@ -98,6 +98,7 @@ class ProtocolReader:
             config=self._map_config(role_analysis),
             robot_type=role_analysis.main_file.robot_type,
             metadata=role_analysis.main_file.metadata,
+            command_annotations=role_analysis.main_file.command_annotations,
         )
 
     async def read_saved(
@@ -164,6 +165,7 @@ class ProtocolReader:
             config=self._map_config(role_analysis),
             robot_type=role_analysis.main_file.robot_type,
             metadata=role_analysis.main_file.metadata,
+            command_annotations=role_analysis.main_file.command_annotations,
         )
 
     @staticmethod
