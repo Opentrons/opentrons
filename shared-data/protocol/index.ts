@@ -5,7 +5,7 @@ import type { ProtocolFile as ProtocolFileV5 } from './types/schemaV5'
 import type { ProtocolFile as ProtocolFileV6 } from './types/schemaV6'
 import type { ProtocolFile as ProtocolFileV7 } from './types/schemaV7'
 
-export {
+export type {
   ProtocolFileV1,
   ProtocolFileV3,
   ProtocolFileV4,
