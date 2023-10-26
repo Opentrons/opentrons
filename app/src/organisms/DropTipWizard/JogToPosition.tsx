@@ -70,7 +70,7 @@ const ConfirmPosition = (props: ConfirmPositionProps): JSX.Element | null => {
           <Flex gridGap={SPACING.spacing24}>
             <Icon
               name="ot-alert"
-              size={isOnDevice ? '3.75rem' : '2.5rem'}
+              size="3.75rem"
               color={COLORS.warningEnabled}
               aria-label="ot-alert"
             />
