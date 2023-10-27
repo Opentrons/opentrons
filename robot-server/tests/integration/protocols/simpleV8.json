@@ -1211,6 +1211,7 @@
   "commands": [
     {
       "commandType": "loadPipette",
+      "id": "0abc123",
       "params": {
         "pipetteId": "pipetteId",
         "pipetteName": "p10_single",
@@ -1219,14 +1220,16 @@
     },
     {
       "commandType": "loadModule",
+      "id": "1abc123",
       "params": {
         "moduleId": "magneticModuleId",
-        "model": "magneticModuleV2",
+        "model": "magneticModuleV1",
         "location": { "slotName": "3" }
       }
     },
     {
       "commandType": "loadModule",
+      "id": "2abc123",
       "params": {
         "moduleId": "temperatureModuleId",
         "model": "temperatureModuleV2",
@@ -1235,10 +1238,11 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "3abc123",
       "params": {
         "labwareId": "sourcePlateId",
-        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
-        "namespace": "opentrons",
+        "loadName": "foo_8_plate_33ul",
+        "namespace": "example",
         "version": 1,
         "location": {
           "moduleId": "temperatureModuleId"
@@ -1248,10 +1252,11 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "4abc123",
       "params": {
         "labwareId": "destPlateId",
-        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
-        "namespace": "opentrons",
+        "loadName": "foo_8_plate_33ul",
+        "namespace": "example",
         "version": 1,
         "location": {
           "moduleId": "magneticModuleId"
@@ -1261,6 +1266,7 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "5abc123",
       "params": {
         "labwareId": "tipRackId",
         "location": { "slotName": "8" },
@@ -1272,6 +1278,7 @@
     },
     {
       "commandType": "loadLabware",
+      "id": "6abc123",
       "params": {
         "labwareId": "fixedTrash",
         "location": {
@@ -1295,11 +1302,8 @@
       }
     },
     {
-      "commandType": "home",
-      "params": {}
-    },
-    {
       "commandType": "pickUpTip",
+      "id": "8abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
@@ -1308,6 +1312,7 @@
     },
     {
       "commandType": "aspirate",
+      "id": "9abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "sourcePlateId",
@@ -1321,13 +1326,8 @@
       }
     },
     {
-      "commandType": "waitForDuration",
-      "params": {
-        "seconds": 42
-      }
-    },
-    {
       "commandType": "dispense",
+      "id": "11abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1341,39 +1341,8 @@
       }
     },
     {
-      "commandType": "touchTip",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 11 }
-        }
-      }
-    },
-    {
-      "commandType": "blowout",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B1",
-        "flowRate": 2,
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 12 }
-        }
-      }
-    },
-    {
-      "commandType": "moveToCoordinates",
-      "params": {
-        "pipetteId": "pipetteId",
-        "coordinates": { "x": 100, "y": 100, "z": 100 }
-      }
-    },
-    {
       "commandType": "moveToWell",
+      "id": "15abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1382,6 +1351,7 @@
     },
     {
       "commandType": "moveToWell",
+      "id": "16abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
@@ -1391,67 +1361,17 @@
           "offset": { "x": 2, "y": 3, "z": 10 }
         },
         "minimumZHeight": 35,
-        "forceDirect": true
+        "forceDirect": true,
+        "speed": 12.3
       }
     },
     {
       "commandType": "dropTip",
+      "id": "17abc123",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "fixedTrash",
         "wellName": "A1"
-      }
-    },
-    {
-      "commandType": "waitForResume",
-      "params": {
-        "message": "pause command"
-      }
-    },
-    {
-      "commandType": "moveToCoordinates",
-      "params": {
-        "pipetteId": "pipetteId",
-        "coordinates": { "x": 0, "y": 0, "z": 0 },
-        "minimumZHeight": 35,
-        "forceDirect": true
-      }
-    },
-    {
-      "commandType": "moveRelative",
-      "params": {
-        "pipetteId": "pipetteId",
-        "axis": "x",
-        "distance": 1
-      }
-    },
-    {
-      "commandType": "moveRelative",
-      "params": {
-        "pipetteId": "pipetteId",
-        "axis": "y",
-        "distance": 0.1
-      }
-    },
-    {
-      "commandType": "savePosition",
-      "params": {
-        "pipetteId": "pipetteId"
-      }
-    },
-    {
-      "commandType": "moveRelative",
-      "params": {
-        "pipetteId": "pipetteId",
-        "axis": "z",
-        "distance": 10
-      }
-    },
-    {
-      "commandType": "savePosition",
-      "params": {
-        "pipetteId": "pipetteId",
-        "positionId": "positionId"
       }
     }
   ],
@@ -1459,15 +1379,8 @@
   "commandAnnotations": [
     {
       "commandKeys": [
-        "1abc123",
-        "2abc123",
-        "3abc123",
-        "4abc123",
-        "5abc123",
-        "6abc123",
-        "7abc123"
       ],
-      "annotationType": "initialSetup"
+      "annotationType": "custom"
     }
   ]
 }

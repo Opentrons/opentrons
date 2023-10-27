@@ -2,23 +2,14 @@
   "$otSharedSchema": "#/protocol/schemas/8",
   "schemaVersion": 8,
   "metadata": {
-    "protocolName": "Simple test protocol",
+    "protocolName": "Move labware",
     "author": "engineering <engineering@opentrons.com>",
-    "description": "A short test protocol",
-    "created": 1223131231,
+    "description": "A short test protocol that involves moving labware.",
     "tags": ["unitTest"]
   },
   "robot": {
-    "model": "OT-2 Standard",
-    "deckId": "ot2_standard"
-  },
-  "liquidSchemaId": "opentronsLiquidSchemaV1",
-  "liquids": {
-    "waterId": {
-      "displayName": "Water",
-      "description": "Liquid H2O",
-      "displayColor": "#7332a8"
-    }
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
   },
   "labwareSchemaId": "opentronsLabwareSchemaV2",
   "labwareDefinitions": {
@@ -1091,115 +1082,103 @@
         "z": 0
       }
     },
-    "example/plate/1": {
+    "opentrons/corning_6_wellplate_16.8ml_flat/1": {
       "ordering": [
-        ["A1", "B1", "C1", "D1"],
-        ["A2", "B2", "C2", "D2"]
+        ["A1", "B1"],
+        ["A2", "B2"],
+        ["A3", "B3"]
       ],
-      "brand": {
-        "brand": "foo",
-        "brandId": []
-      },
       "metadata": {
-        "displayName": "Foo 8 Well Plate 33uL",
+        "displayName": "Corning 6 Well Plate 16.8 mL Flat",
+        "displayVolumeUnits": "mL",
         "displayCategory": "wellPlate",
-        "displayVolumeUnits": "µL"
+        "tags": []
       },
+      "schemaVersion": 2,
+      "version": 1,
+      "namespace": "opentrons",
       "dimensions": {
-        "xDimension": 127.75,
-        "yDimension": 85.5,
-        "zDimension": 100
+        "xDimension": 127.76,
+        "yDimension": 85.47,
+        "zDimension": 20.27
+      },
+      "parameters": {
+        "format": "irregular",
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "corning_6_wellplate_16.8ml_flat"
       },
       "wells": {
-        "A1": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
-          "shape": "circular",
-          "diameter": 10,
-          "x": 18.21,
-          "y": 75.43,
-          "z": 75
-        },
         "B1": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
           "shape": "circular",
-          "diameter": 10,
-          "x": 18.21,
-          "y": 56.15,
-          "z": 75
+          "depth": 17.4,
+          "diameter": 35.43,
+          "totalLiquidVolume": 16800,
+          "x": 24.76,
+          "y": 23.16,
+          "z": 2.87
         },
-        "C1": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
+        "A1": {
           "shape": "circular",
-          "diameter": 10,
-          "x": 18.21,
-          "y": 36.87,
-          "z": 75
-        },
-        "D1": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
-          "shape": "circular",
-          "diameter": 10,
-          "x": 18.21,
-          "y": 17.59,
-          "z": 75
-        },
-        "A2": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
-          "shape": "circular",
-          "diameter": 10,
-          "x": 38.1,
-          "y": 75.43,
-          "z": 75
+          "depth": 17.4,
+          "diameter": 35.43,
+          "totalLiquidVolume": 16800,
+          "x": 24.76,
+          "y": 62.28,
+          "z": 2.87
         },
         "B2": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
           "shape": "circular",
-          "diameter": 10,
-          "x": 38.1,
-          "y": 56.15,
-          "z": 75
+          "depth": 17.4,
+          "diameter": 35.43,
+          "totalLiquidVolume": 16800,
+          "x": 63.88,
+          "y": 23.16,
+          "z": 2.87
         },
-        "C2": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
+        "A2": {
           "shape": "circular",
-          "diameter": 10,
-          "x": 38.1,
-          "y": 36.87,
-          "z": 75
+          "depth": 17.4,
+          "diameter": 35.43,
+          "totalLiquidVolume": 16800,
+          "x": 63.88,
+          "y": 62.28,
+          "z": 2.87
         },
-        "D2": {
-          "depth": 25,
-          "totalLiquidVolume": 33,
+        "B3": {
           "shape": "circular",
-          "diameter": 10,
-          "x": 38.1,
-          "y": 17.59,
-          "z": 75
+          "depth": 17.4,
+          "diameter": 35.43,
+          "totalLiquidVolume": 16800,
+          "x": 103,
+          "y": 23.16,
+          "z": 2.87
+        },
+        "A3": {
+          "shape": "circular",
+          "depth": 17.4,
+          "diameter": 35.43,
+          "totalLiquidVolume": 16800,
+          "x": 103,
+          "y": 62.28,
+          "z": 2.87
         }
+      },
+      "brand": {
+        "brand": "Corning",
+        "brandId": ["3335", "3506", "3516", "3471"],
+        "links": [
+          "https://ecatalog.corning.com/life-sciences/b2c/US/en/Microplates/Assay-Microplates/96-Well-Microplates/Costar%C2%AE-Multiple-Well-Cell-Culture-Plates/p/3335"
+        ]
       },
       "groups": [
         {
-          "metadata": {},
-          "wells": ["A1", "B1", "C1", "A2", "B2", "C2"]
+          "wells": ["A1", "B1", "A2", "B2", "A3", "B3"],
+          "metadata": {
+            "wellBottomShape": "flat"
+          }
         }
       ],
-      "parameters": {
-        "format": "irregular",
-        "quirks": [],
-        "isTiprack": false,
-        "isMagneticModuleCompatible": false,
-        "loadName": "foo_8_plate_33ul"
-      },
-      "namespace": "example",
-      "version": 1,
-      "schemaVersion": 2,
       "cornerOffsetFromSlot": {
         "x": 0,
         "y": 0,
@@ -1209,67 +1188,6 @@
   },
   "commandSchemaId": "opentronsCommandSchemaV8",
   "commands": [
-    {
-      "commandType": "loadPipette",
-      "params": {
-        "pipetteId": "pipetteId",
-        "pipetteName": "p10_single",
-        "mount": "left"
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "moduleId": "magneticModuleId",
-        "model": "magneticModuleV2",
-        "location": { "slotName": "3" }
-      }
-    },
-    {
-      "commandType": "loadModule",
-      "params": {
-        "moduleId": "temperatureModuleId",
-        "model": "temperatureModuleV2",
-        "location": { "slotName": "1" }
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "labwareId": "sourcePlateId",
-        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "moduleId": "temperatureModuleId"
-        },
-        "displayName": "Source Plate"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "labwareId": "destPlateId",
-        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
-        "namespace": "opentrons",
-        "version": 1,
-        "location": {
-          "moduleId": "magneticModuleId"
-        },
-        "displayName": "Sample Collection Plate"
-      }
-    },
-    {
-      "commandType": "loadLabware",
-      "params": {
-        "labwareId": "tipRackId",
-        "location": { "slotName": "8" },
-        "loadName": "opentrons_96_tiprack_10ul",
-        "namespace": "opentrons",
-        "version": 1,
-        "displayName": "Opentrons 96 Tip Rack 10 µL"
-      }
-    },
     {
       "commandType": "loadLabware",
       "params": {
@@ -1284,14 +1202,35 @@
       }
     },
     {
-      "commandType": "loadLiquid",
+      "commandType": "loadLabware",
       "params": {
-        "liquidId": "waterId",
-        "labwareId": "sourcePlateId",
-        "volumeByWell": {
-          "A1": 100,
-          "B1": 100
-        }
+        "labwareId": "tipRackId",
+        "location": { "slotName": "1" },
+        "loadName": "opentrons_96_tiprack_1000ul",
+        "namespace": "opentrons",
+        "version": 1,
+        "displayName": "Opentrons 96 Tip Rack 10 µL"
+      }
+    },
+    {
+      "commandType": "loadLabware",
+      "params": {
+        "labwareId": "wellPlateId",
+        "location": {
+          "slotName": "2"
+        },
+        "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "namespace": "opentrons",
+        "version": 1,
+        "displayName": "Super Duper Plate"
+      }
+    },
+    {
+      "commandType": "loadPipette",
+      "params": {
+        "pipetteId": "pipetteId",
+        "pipetteName": "p1000_96",
+        "mount": "left"
       }
     },
     {
@@ -1303,171 +1242,68 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "tipRackId",
-        "wellName": "B1"
-      }
-    },
-    {
-      "commandType": "aspirate",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "sourcePlateId",
-        "wellName": "A1",
-        "volume": 5,
-        "flowRate": 3,
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 2 }
-        }
-      }
-    },
-    {
-      "commandType": "waitForDuration",
-      "params": {
-        "seconds": 42
-      }
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B1",
-        "volume": 4.5,
-        "flowRate": 2.5,
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 1 }
-        }
-      }
-    },
-    {
-      "commandType": "touchTip",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B1",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 11 }
-        }
-      }
-    },
-    {
-      "commandType": "blowout",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B1",
-        "flowRate": 2,
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 0, "y": 0, "z": 12 }
-        }
-      }
-    },
-    {
-      "commandType": "moveToCoordinates",
-      "params": {
-        "pipetteId": "pipetteId",
-        "coordinates": { "x": 100, "y": 100, "z": 100 }
-      }
-    },
-    {
-      "commandType": "moveToWell",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B2"
-      }
-    },
-    {
-      "commandType": "moveToWell",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
-        "wellName": "B2",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 2, "y": 3, "z": 10 }
-        },
-        "minimumZHeight": 35,
-        "forceDirect": true
-      }
-    },
-    {
-      "commandType": "dropTip",
-      "params": {
-        "pipetteId": "pipetteId",
-        "labwareId": "fixedTrash",
         "wellName": "A1"
       }
     },
     {
-      "commandType": "waitForResume",
-      "params": {
-        "message": "pause command"
-      }
-    },
-    {
-      "commandType": "moveToCoordinates",
+      "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "coordinates": { "x": 0, "y": 0, "z": 0 },
-        "minimumZHeight": 35,
-        "forceDirect": true
+        "labwareId": "wellPlateId",
+        "wellName": "A1",
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2 }
+        }
       }
     },
     {
-      "commandType": "moveRelative",
+      "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "axis": "x",
-        "distance": 1
+        "labwareId": "wellPlateId",
+        "wellName": "B3",
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2 }
+        }
       }
     },
     {
-      "commandType": "moveRelative",
+      "commandType": "moveLabware",
+      "params": {
+        "labwareId": "wellPlateId",
+        "newLocation": { "slotName": "3" },
+        "strategy": "manualMoveWithPause"
+      }
+    },
+    {
+      "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "axis": "y",
-        "distance": 0.1
+        "labwareId": "wellPlateId",
+        "wellName": "A1",
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2 }
+        }
       }
     },
     {
-      "commandType": "savePosition",
-      "params": {
-        "pipetteId": "pipetteId"
-      }
-    },
-    {
-      "commandType": "moveRelative",
+      "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "axis": "z",
-        "distance": 10
-      }
-    },
-    {
-      "commandType": "savePosition",
-      "params": {
-        "pipetteId": "pipetteId",
-        "positionId": "positionId"
+        "labwareId": "wellPlateId",
+        "wellName": "B3",
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2 }
+        }
       }
     }
   ],
-  "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
-  "commandAnnotations": [
-    {
-      "commandKeys": [
-        "1abc123",
-        "2abc123",
-        "3abc123",
-        "4abc123",
-        "5abc123",
-        "6abc123",
-        "7abc123"
-      ],
-      "annotationType": "initialSetup"
-    }
-  ]
+  "liquids": {},
+  "liquidSchemaId": "opentronsLiquidSchemaV1",
+  "commandAnnotations": [],
+  "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1"
 }

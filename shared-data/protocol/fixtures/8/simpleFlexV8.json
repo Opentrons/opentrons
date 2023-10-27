@@ -9,8 +9,8 @@
     "tags": ["unitTest"]
   },
   "robot": {
-    "model": "OT-2 Standard",
-    "deckId": "ot2_standard"
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {
@@ -1213,7 +1213,7 @@
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "pipetteId",
-        "pipetteName": "p10_single",
+        "pipetteName": "p1000_96",
         "mount": "left"
       }
     },
@@ -1264,10 +1264,10 @@
       "params": {
         "labwareId": "tipRackId",
         "location": { "slotName": "8" },
-        "loadName": "opentrons_96_tiprack_10ul",
+        "loadName": "opentrons_96_tiprack_1000ul",
         "namespace": "opentrons",
         "version": 1,
-        "displayName": "Opentrons 96 Tip Rack 10 µL"
+        "displayName": "Opentrons 96 Tip Rack 1000 µL"
       }
     },
     {
@@ -1346,6 +1346,7 @@
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
         "wellName": "B1",
+        "speed": 42.0,
         "wellLocation": {
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 11 }
@@ -1377,7 +1378,8 @@
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "destPlateId",
-        "wellName": "B2"
+        "wellName": "B2",
+        "speed": 12.3
       }
     },
     {

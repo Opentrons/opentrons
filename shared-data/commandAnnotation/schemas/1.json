@@ -23,7 +23,12 @@
         "description": "Annotates a group of atomic commands which were the direct result of a second order command (e.g. transfer, consolidate, mix)",
         "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
         "type": "object",
-        "required": ["annotationType", "commandKeys", "params", "machineReadableName"],
+        "required": [
+          "annotationType",
+          "commandKeys",
+          "params",
+          "machineReadableName"
+        ],
         "properties": {
           "annotationType": {
             "type": "string",
