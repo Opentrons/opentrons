@@ -335,7 +335,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    blow_out_submerged=20,
+                    blow_out_submerged=30,
                 ),
                 100: DispenseSettings(  # 100uL
                     z_submerge_depth=_default_submerge_dispense_mm,
@@ -344,7 +344,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    blow_out_submerged=20,
+                    blow_out_submerged=30,
                 ),
                 1000: DispenseSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_dispense_mm,
@@ -353,7 +353,7 @@ _dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]]
                     delay=_default_dispense_delay_seconds,
                     z_retract_discontinuity=_default_retract_discontinuity,
                     z_retract_height=_default_retract_mm,
-                    blow_out_submerged=20,
+                    blow_out_submerged=30,
                 ),
             },
         },
