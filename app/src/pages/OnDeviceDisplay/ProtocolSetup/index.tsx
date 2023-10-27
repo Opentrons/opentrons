@@ -324,6 +324,14 @@ function PrepareToRun({
 
   const isLocationConflict = missingProtocolHardware.conflictedSlots.length > 0
 
+  const missingPipettes = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'pipette'
+  )
+
+  const missingGripper = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'gripper'
+  )
+
   const missingModules = missingProtocolHardware.missingProtocolHardware.filter(
     hardware => hardware.hardwareType === 'module'
   )
@@ -333,7 +341,19 @@ function PrepareToRun({
   )
 
   let instrumentsDetail
-  if (numUnreadyInstruments === 0) {
+  if (missingPipettes.length > 0 && missingGripper.length > 0) {
+    instrumentsDetail = t('missing_instruments_plural', {
+      num: missingPipettes.length + missingGripper.length,
+    })
+  } else if (missingPipettes.length > 0) {
+    missingPipettes.length > 1
+      ? (instrumentsDetail = t('missing_pipettes_plural', {
+          num: missingPipettes.length,
+        }))
+      : t('missing_pipette', { num: missingPipettes.length })
+  } else if (missingGripper.length > 0) {
+    instrumentsDetail = t('missing_gripper')
+  } else if (numUnreadyInstruments === 0) {
     instrumentsDetail = t('instruments_connected', {
       count: speccedInstrumentCount,
     })
@@ -361,7 +381,8 @@ function PrepareToRun({
       ? 'ready'
       : 'not ready'
 
-  const isReadyToRun = numUnreadyInstruments === 0 && areModulesReady
+  const isReadyToRun =
+    numUnreadyInstruments === 0 && areModulesReady && areFixturesReady
 
   const onPlay = (): void => {
     if (isDoorOpen) {
