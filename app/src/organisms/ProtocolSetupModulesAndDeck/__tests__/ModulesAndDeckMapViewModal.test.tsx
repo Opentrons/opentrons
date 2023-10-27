@@ -15,9 +15,11 @@ import { useStoredProtocolAnalysis } from '../../Devices/hooks'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import _uncastedSimpleV7Protocol from '@opentrons/shared-data/protocol/fixtures/7/simpleV7.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 
 import type {
+  LabwareDefinition2,
   ProtocolAnalysisOutput,
   ModuleModel,
 } from '@opentrons/shared-data'
@@ -37,14 +39,41 @@ const PROTOCOL_ANALYSIS = {
 } as any
 const simpleV7Protocol = (_uncastedSimpleV7Protocol as unknown) as ProtocolAnalysisOutput
 
+// const mockModuleLocations = {
+//   moduleModel: 'magneticBlockV1',
+//   moduleLocation: {
+//     slotName: 'C3',
+//   },
+//   moduleChildren: {
+//     key: null,
+//     ref: null,
+//     props: {
+//       moduleModel: 'magneticBlockV1',
+//       isAttached: false,
+//       physicalPort: null,
+//       runId: 'b79286b6-b71b-47e2-9d29-7640f1a95a17',
+//     },
+//   },
+// }
+
 const mockModuleLocations = [
   {
     moduleModel: 'heaterShakerModuleV1' as ModuleModel,
     moduleLocation: { slotName: 'B1' },
-    nestedLabwareDef: null,
+    nestedLabwareDef: mockProtocolModuleInfo[0]
+      .nestedLabwareDef as LabwareDefinition2,
     onLabwareClick: expect.any(Function),
     moduleChildren: null,
     innerProps: {},
+  },
+]
+const mockLabwareLocations = [
+  {
+    labwareLocation: { slotName: 'C1' },
+    definition: fixture_tiprack_300_ul as LabwareDefinition2,
+    topLabwareId: '300_ul_tiprack_id',
+    onLabwareClick: expect.any(Function),
+    labwareChildren: null,
   },
 ]
 
@@ -143,19 +172,19 @@ describe('ModulesAndDeckMapViewModal', () => {
     when(mockGetDeckConfigFromProtocolCommands).mockReturnValue(
       EXTENDED_DECK_CONFIG_FIXTURE
     )
-    mockRobotWorkSpace.mockReturnValue(<div>mock RobotWorkSpace</div>)
+    mockUseStoredProtocolAnalysis.mockReturnValue(
+      (simpleV7Protocol as unknown) as ProtocolAnalysisOutput
+    )
     when(mockBaseDeck)
       .calledWith({
         deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
         deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
         robotType: FLEX_ROBOT_TYPE,
-        labwareLocations: [],
+        labwareLocations: mockLabwareLocations,
         moduleLocations: mockModuleLocations,
       })
       .mockReturnValue(<div>mock BaseDeck</div>)
-    mockUseStoredProtocolAnalysis.mockReturnValue(
-      (simpleV7Protocol as unknown) as ProtocolAnalysisOutput
-    )
+    mockRobotWorkSpace.mockReturnValue(<div>mock RobotWorkSpace</div>)
   })
 
   afterEach(() => {
