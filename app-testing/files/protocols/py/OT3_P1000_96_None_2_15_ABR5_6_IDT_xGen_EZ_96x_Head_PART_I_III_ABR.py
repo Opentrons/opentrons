@@ -5,7 +5,6 @@ metadata = {
     "protocolName": "IDT xGen EZ 96x Head PART I-III ABR",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
-    "apiLevel": "2.15",
 }
 
 requirements = {
@@ -89,7 +88,7 @@ def run(protocol: protocol_api.ProtocolContext):
     Liquid_trash = reservoir_4["A1"]
 
     # pipette
-    p1000 = protocol.load_instrument("p1000_96", "left")
+    p1000 = protocol.load_instrument("flex_96channel_1000", "left")
 
     # tip and sample tracking
 
