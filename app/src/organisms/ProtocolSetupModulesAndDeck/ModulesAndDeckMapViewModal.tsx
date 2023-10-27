@@ -81,9 +81,6 @@ export function ModulesAndDeckMapViewModal({
     ),
   }))
 
-  // console.log('moduleLocations', JSON.stringify(moduleLocations, null, 4))
-  // console.log('deckConfig', JSON.stringify(deckConfig, null, 4))
-
   return (
     <Modal
       header={modalHeader}
