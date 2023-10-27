@@ -52,6 +52,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: Record<
   [THERMOCYCLER_MODULE_TYPE]: [
     'biorad_96_wellplate_200ul_pcr',
     'nest_96_wellplate_100ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     'opentrons_96_deep_well_adapter',

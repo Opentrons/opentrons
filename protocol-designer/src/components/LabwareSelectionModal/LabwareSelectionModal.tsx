@@ -87,7 +87,10 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
-  [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [THERMOCYCLER_MODULE_TYPE]: [
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+  ],
   [HEATERSHAKER_MODULE_TYPE]: [
     'opentrons_96_deep_well_adapter',
     'opentrons_96_flat_bottom_adapter',
