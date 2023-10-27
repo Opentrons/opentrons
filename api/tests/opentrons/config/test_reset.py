@@ -4,8 +4,15 @@ from unittest.mock import MagicMock, patch
 
 from opentrons.config import reset
 
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
+
 if TYPE_CHECKING:
     from opentrons_shared_data.deck.dev_types import RobotModel
+
+
+@pytest.fixture
+def robot_type_enum(robot_model: "RobotModel") -> RobotTypeEnum:
+    return RobotTypeEnum.OT2 if robot_model == "OT-2 Standard" else RobotTypeEnum.FLEX
 
 
 @pytest.fixture
@@ -36,7 +43,10 @@ def mock_reset_tip_length_calibrations() -> Generator[MagicMock, None, None]:
 def mock_cal_pipette_offset(
     robot_model: "RobotModel",
 ) -> Generator[MagicMock, None, None]:
-    with patch("opentrons.config.reset.clear_pipette_offset_calibrations") as m:
+    prefix = "ot2" if robot_model == "OT-2 Standard" else "ot3"
+    with patch(
+        f"opentrons.config.reset.{prefix}.clear_pipette_offset_calibrations"
+    ) as m:
         yield m
 
 
@@ -50,7 +60,8 @@ def mock_cal_gripper_offset(
 
 @pytest.fixture
 def mock_cal_tip_length(robot_model: "RobotModel") -> Generator[MagicMock, None, None]:
-    with patch("opentrons.config.reset.clear_tip_length_calibration") as m:
+    prefix = "ot2" if robot_model == "OT-2 Standard" else "ot3"
+    with patch(f"opentrons.config.reset.{prefix}.clear_tip_length_calibration") as m:
         yield m
 
 
@@ -71,10 +82,10 @@ def mock_cal_module_offset(
 
 
 def test_get_options() -> None:
-    options = reset.reset_options("OT-2 Standard")
+    options = reset.reset_options(RobotTypeEnum.OT2)
     assert list(options.keys()) == reset._OT_2_RESET_OPTIONS
 
-    options = reset.reset_options("OT-3 Standard")
+    options = reset.reset_options(RobotTypeEnum.FLEX)
     assert list(options.keys()) == reset._FLEX_RESET_OPTIONS
 
 
@@ -84,8 +95,9 @@ def test_reset_empty_set(
     mock_reset_deck_calibration: MagicMock,
     mock_reset_tip_length_calibrations: MagicMock,
     mock_cal_module_offset: MagicMock,
+    robot_type_enum: RobotTypeEnum,
 ) -> None:
-    reset.reset(set())
+    reset.reset(set(), robot_type_enum)
     mock_reset_boot_scripts.assert_not_called()
     mock_reset_pipette_offset.assert_not_called()
     mock_reset_deck_calibration.assert_not_called()
@@ -98,6 +110,7 @@ def test_reset_all_set(
     mock_reset_pipette_offset: MagicMock,
     mock_reset_deck_calibration: MagicMock,
     mock_reset_tip_length_calibrations: MagicMock,
+    robot_type_enum: RobotTypeEnum,
 ) -> None:
     reset.reset(
         {
@@ -105,7 +118,8 @@ def test_reset_all_set(
             reset.ResetOptionId.deck_calibration,
             reset.ResetOptionId.pipette_offset,
             reset.ResetOptionId.tip_length_calibrations,
-        }
+        },
+        robot_type_enum,
     )
     mock_reset_boot_scripts.assert_called_once()
     mock_reset_pipette_offset.assert_called_once()
@@ -114,23 +128,30 @@ def test_reset_all_set(
 
 
 def test_deck_calibration_reset(
-    mock_cal_pipette_offset: MagicMock, mock_cal_robot_attitude: MagicMock
+    mock_cal_pipette_offset: MagicMock,
+    mock_cal_robot_attitude: MagicMock,
+    robot_type_enum: RobotTypeEnum,
 ) -> None:
-    reset.reset_deck_calibration()
+    reset.reset_deck_calibration(robot_type_enum)
     mock_cal_robot_attitude.assert_called_once()
     mock_cal_pipette_offset.assert_called_once()
 
 
 def test_tip_length_calibrations_reset(
-    mock_cal_pipette_offset: MagicMock, mock_cal_tip_length: MagicMock
+    mock_cal_pipette_offset: MagicMock,
+    mock_cal_tip_length: MagicMock,
+    robot_type_enum: RobotTypeEnum,
 ) -> None:
-    reset.reset_tip_length_calibrations()
+    reset.reset_tip_length_calibrations(robot_type_enum)
     mock_cal_tip_length.assert_called_once()
     mock_cal_pipette_offset.assert_called_once()
 
 
-def test_pipette_offset_reset(mock_cal_pipette_offset: MagicMock) -> None:
-    reset.reset_pipette_offset()
+def test_pipette_offset_reset(
+    mock_cal_pipette_offset: MagicMock,
+    robot_type_enum: RobotTypeEnum,
+) -> None:
+    reset.reset_pipette_offset(robot_type_enum)
     mock_cal_pipette_offset.assert_called_once()
 
 
