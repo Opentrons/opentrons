@@ -18,7 +18,6 @@ STANDARD_OT3_DECK = "ot3_standard"
 
 
 LOAD_FIXED_TRASH_GATE_VERSION_PYTHON = APIVersion(2, 15)
-# TODO(jbl 2023-10-26) potentially replace using schema version in JSON protocols with another/new field
 LOAD_FIXED_TRASH_GATE_VERSION_JSON = 7
 
 
@@ -29,6 +28,7 @@ def should_load_fixed_trash(protocol_config: ProtocolConfig) -> bool:
         load_fixed_trash = (
             protocol_config.api_version <= LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
         )
+    # TODO(jbl 2023-10-27), when schema v8 is out, use a new deck version field to support fixed trash protocols
     elif isinstance(protocol_config, JsonProtocolConfig):
         load_fixed_trash = (
             protocol_config.schema_version <= LOAD_FIXED_TRASH_GATE_VERSION_JSON
