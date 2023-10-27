@@ -213,6 +213,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     return (
       <SimpleWizardBody
         header={t('unable_to_detect_probe')}
+        subHeader={
+          numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
+        }
         iconColor={COLORS.errorEnabled}
         isSuccess={false}
       >
