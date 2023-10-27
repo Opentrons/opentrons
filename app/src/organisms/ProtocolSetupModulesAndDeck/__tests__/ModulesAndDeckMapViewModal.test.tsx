@@ -8,7 +8,6 @@ import {
   EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
@@ -21,7 +20,6 @@ import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 import type {
   ProtocolAnalysisOutput,
   ModuleModel,
-  LoadedLabware,
 } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
@@ -165,6 +163,12 @@ describe('ModulesAndDeckMapViewModal', () => {
     resetAllWhenMocks()
   })
 
+  it('should render map view when ff is on', () => {
+    const { getByText } = render(props)
+    getByText('Map View')
+    getByText('mock BaseDeck')
+  })
+
   it('should render map view when ff is off', () => {
     when(mockUseFeatureFlag)
       .calledWith('enableDeckConfiguration')
@@ -172,11 +176,5 @@ describe('ModulesAndDeckMapViewModal', () => {
     const { getByText } = render(props)
     getByText('Map View')
     getByText('mock RobotWorkSpace')
-  })
-
-  it('should render map view when ff is on', () => {
-    const { getByText } = render(props)
-    getByText('Map View')
-    getByText('mock BaseDeck')
   })
 })
