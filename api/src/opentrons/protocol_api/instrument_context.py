@@ -622,7 +622,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
 
         :raises RuntimeError: If location cache is ``None``. This should happen if
-                              ``touch_tip()`` is called without first calling a method
+                              ``air_gap()`` is called without first calling a method
                               that takes a location (e.g., :py:meth:`.aspirate`,
                               :py:meth:`dispense`)
 
