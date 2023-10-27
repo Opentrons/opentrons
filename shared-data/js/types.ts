@@ -434,13 +434,6 @@ export interface LoadedModule {
   }
   serialNumber: string
 }
-export interface LoadedFixture {
-  id: string
-  model: FixtureLoadName
-  location: {
-    slotName: Cutout
-  }
-}
 export interface Liquid {
   id: string
   displayName: string
