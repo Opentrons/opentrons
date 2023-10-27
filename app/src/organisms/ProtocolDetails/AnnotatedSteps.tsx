@@ -44,7 +44,7 @@ export const AnnotatedSteps = (
         ...acc.slice(0, -1),
         {
           ...acc[acc.length - 1],
-          subCommands: [...acc[acc.length - 1].subCommands, {command: c, isHighlighted: i === currentCommandIndex}],
+          subCommands: [...acc[acc.length - 1].subCommands, { command: c, isHighlighted: i === currentCommandIndex }],
           isHighlighted: acc[acc.length - 1].isHighlighted || i === currentCommandIndex
         }
       ]
@@ -94,23 +94,45 @@ interface AnnotatedGroupProps {
   isHighlighted: boolean
 }
 function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
-  const { subCommands, annotationType, analysis, stepNumber } = props
+  const { subCommands, annotationType, analysis, stepNumber, isHighlighted } = props
   const [isExpanded, setIsExpanded] = React.useState(false)
+  const borderColor = isHighlighted
+    ? COLORS.blueEnabled
+    : COLORS.transparent
+  const backgroundColor = isHighlighted
+    ? COLORS.lightBlue
+    : COLORS.fundamentalsBackground
+  const contentColor = isHighlighted
+    ? COLORS.darkBlackEnabled
+    : COLORS.darkGreyEnabled
   return (
     <Flex onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
       {
         isExpanded
           ? (
             <>
-              <Flex alignItems={ALIGN_CENTER} alignSelf={ALIGN_FLEX_START}>
+              <Flex
+                alignItems={ALIGN_CENTER}
+                alignSelf={ALIGN_FLEX_START}
+                gridGap={SPACING.spacing8}
+              >
                 <StyledText
                   minWidth={SPACING.spacing16}
                   fontSize={TYPOGRAPHY.fontSizeCaption}
                 >
                   {stepNumber}
                 </StyledText>
-                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginLeft={SPACING.spacing8}>{annotationType}</StyledText>
-                <Icon name="chevron-up" size="2rem" />
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  border={`solid 1px ${borderColor}`}
+                  backgroundColor={backgroundColor}
+                  color={contentColor}
+                  borderRadius={BORDERS.radiusSoftCorners}
+                  padding={SPACING.spacing8}
+                >
+                  <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginLeft={SPACING.spacing8}>{annotationType}</StyledText>
+                  <Icon name="chevron-up" size="2rem" />
+                </Flex>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32} gridGap={SPACING.spacing4}>
                 {subCommands.map((c, i) => (
@@ -125,15 +147,27 @@ function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
               </Flex>
             </>
           ) : (
-            <Flex alignItems={ALIGN_CENTER}>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              gridGap={SPACING.spacing8}
+            >
               <StyledText
                 minWidth={SPACING.spacing16}
                 fontSize={TYPOGRAPHY.fontSizeCaption}
               >
                 {stepNumber}
               </StyledText>
-              <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginLeft={SPACING.spacing8}>{annotationType}</StyledText>
-              <Icon name="chevron-down" size="2rem" />
+              <Flex
+                alignItems={ALIGN_CENTER}
+                border={`solid 1px ${borderColor}`}
+                backgroundColor={backgroundColor}
+                color={contentColor}
+                borderRadius={BORDERS.radiusSoftCorners}
+                padding={SPACING.spacing8}
+              >
+                <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginLeft={SPACING.spacing8}>{annotationType}</StyledText>
+                <Icon name="chevron-down" size="2rem" />
+              </Flex>
             </Flex>
           )
       }

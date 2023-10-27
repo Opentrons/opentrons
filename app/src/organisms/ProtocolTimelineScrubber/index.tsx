@@ -96,9 +96,9 @@ export function ProtocolTimelineScrubber(
       : null
 
   return (
-    <Flex width="100%" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex gridGap={SPACING.spacing8}>
-        <Flex size="25rem">
+    <Flex width="100%" height="95vh" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      <Flex gridGap={SPACING.spacing8} flex="1 1 0">
+        <Flex flex="1 1 0">
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
