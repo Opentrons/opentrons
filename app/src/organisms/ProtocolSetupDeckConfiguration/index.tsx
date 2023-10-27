@@ -96,25 +96,9 @@ export function ProtocolSetupDeckConfiguration({
   ] = React.useState<DeckConfiguration>(deckConfig)
 
   const { createDeckConfiguration } = useCreateDeckConfigurationMutation()
-
-  const handleClickAdd = (fixtureLocation: Cutout): void => {
-    setTargetFixtureLocation(fixtureLocation)
-    setShowConfigurationModal(true)
-  }
-
-  const handleClickRemove = (fixtureLocation: Cutout): void => {
-    setCurrentDeckConfig(prevDeckConfig =>
-      prevDeckConfig.map(fixture =>
-        fixture.fixtureLocation === fixtureLocation
-          ? { ...fixture, loadName: STANDARD_SLOT_LOAD_NAME }
-          : fixture
-      )
-    )
-    createDeckConfiguration(currentDeckConfig)
-  }
-
   const handleClickConfirm = (): void => {
     createDeckConfiguration(currentDeckConfig)
+    setSetupScreen('modules')
   }
 
   return (
@@ -151,8 +135,8 @@ export function ProtocolSetupDeckConfiguration({
           {/* DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready */}
           <DeckConfigurator
             deckConfig={deckConfig}
-            handleClickAdd={handleClickAdd}
-            handleClickRemove={handleClickRemove}
+            handleClickAdd={() => {}}
+            handleClickRemove={() => {}}
           />
         </Flex>
       </Flex>

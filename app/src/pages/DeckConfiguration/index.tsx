@@ -77,6 +77,7 @@ export function DeckConfigurationEditor(): JSX.Element {
     if (!isEqual(deckConfig, currentDeckConfig)) {
       createDeckConfiguration(currentDeckConfig)
     }
+    history.goBack()
   }
 
   const handleClickBack = (): void => {
