@@ -75,6 +75,7 @@ export const getPipetteWizardSteps = (
               section: SECTIONS.RESULTS,
               mount: detachMount,
               flowType: FLOWS.DETACH,
+              nextMount: 'both',
             },
             {
               section: SECTIONS.CARRIAGE,

@@ -48,15 +48,15 @@ export interface PipetteData {
       reasonability_check_failures?: CalibrationReasonabilityCheckFailure[]
     }
   }
-  state: {
-    tipDetected: boolean
-  }
   firmwareVersion?: string
   instrumentName: string
   instrumentModel: PipetteModel
   instrumentType: 'pipette'
   mount: 'left' | 'right'
   serialNumber: string
+  state?: {
+    tipDetected: boolean
+  }
   subsystem: 'pipette_left' | 'pipette_right'
   ok: true
 }
