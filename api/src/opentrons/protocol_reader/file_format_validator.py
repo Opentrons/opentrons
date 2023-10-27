@@ -10,7 +10,9 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV6 as JsonProtocolV6,
     ProtocolSchemaV7 as JsonProtocolV7,
+    ProtocolSchemaV8 as JsonProtocolV8,
 )
+from opentrons_shared_data.errors.exceptions import PythonException
 
 from opentrons.protocols.models import JsonProtocol as JsonProtocolUpToV5
 
@@ -51,7 +53,9 @@ async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> Non
             LabwareDefinition.parse_obj(info.unvalidated_json)
         except PydanticValidationError as e:
             raise FileFormatValidationError(
-                f"{info.original_file.name} could not be read as a labware definition."
+                message=f"{info.original_file.name} could not be read as a labware definition.",
+                detail={"kind": "bad-labware-definition"},
+                wrapping=[PythonException(e)],
             ) from e
 
     await anyio.to_thread.run_sync(validate_sync)
@@ -60,7 +64,9 @@ async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> Non
 async def _validate_json_protocol(info: IdentifiedJsonMain) -> None:
     def validate_sync() -> None:
         try:
-            if info.schema_version == 7:
+            if info.schema_version == 8:
+                JsonProtocolV8.parse_obj(info.unvalidated_json)
+            elif info.schema_version == 7:
                 JsonProtocolV7.parse_obj(info.unvalidated_json)
             elif info.schema_version == 6:
                 JsonProtocolV6.parse_obj(info.unvalidated_json)
@@ -68,7 +74,9 @@ async def _validate_json_protocol(info: IdentifiedJsonMain) -> None:
                 JsonProtocolUpToV5.parse_obj(info.unvalidated_json)
         except PydanticValidationError as e:
             raise FileFormatValidationError(
-                f"{info.original_file.name} could not be read as a JSON protocol."
+                message=f"{info.original_file.name} could not be read as a JSON protocol.",
+                detail={"kind": "bad-json-protocol"},
+                wrapping=[PythonException(e)],
             ) from e
 
     await anyio.to_thread.run_sync(validate_sync)
