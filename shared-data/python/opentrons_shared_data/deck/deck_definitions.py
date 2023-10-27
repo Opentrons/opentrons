@@ -43,7 +43,8 @@ class AreaType(Enum):
 class CutoutFixture(BaseModel):
     id: str = Field(..., description="Unique identifier for the cutout fixture.")
     mayMountTo: List[str] = Field(
-        ..., description="A list of compatible cutouts this fixture may be mounted to."
+        ...,
+        description="A list of compatible cutouts this fixture may be mounted to. These must match `id`s in `cutouts`.",
     )
     displayName: str = Field(
         ...,
