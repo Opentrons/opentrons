@@ -148,7 +148,7 @@ export function FixtureTable({
         }
 
         return (
-          <>
+          <React.Fragment key={fixture.id}>
             {showLocationConflictModal ? (
               <LocationConflictModal
                 onCloseClick={() => setShowLocationConflictModal(false)}
@@ -188,7 +188,7 @@ export function FixtureTable({
                 {chipLabel}
               </Flex>
             </Flex>
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>
