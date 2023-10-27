@@ -63,7 +63,6 @@ export interface LabwareRenderProps {
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
   const { gRef } = props
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
-  
   return (
     <g
       transform={`translate(${cornerOffsetFromSlot.x}, ${cornerOffsetFromSlot.y})`}
