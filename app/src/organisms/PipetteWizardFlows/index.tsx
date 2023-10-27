@@ -248,7 +248,19 @@ export const PipetteWizardFlows = (
     selectedPipette,
     isOnDevice,
   }
-  const exitModal = (
+  const is96ChannelUnskippableStep =
+    currentStep.section === SECTIONS.CARRIAGE ||
+    currentStep.section === SECTIONS.MOUNTING_PLATE ||
+    (selectedPipette === NINETY_SIX_CHANNEL &&
+      currentStep.section === SECTIONS.DETACH_PIPETTE)
+
+  const exitModal = is96ChannelUnskippableStep ? (
+    <UnskippableModal
+      proceed={handleCleanUpAndClose}
+      goBack={cancelExit}
+      isOnDevice={isOnDevice}
+    />
+  ) : (
     <ExitModal
       isRobotMoving={isRobotMoving}
       goBack={cancelExit}
@@ -257,16 +269,7 @@ export const PipetteWizardFlows = (
       isOnDevice={isOnDevice}
     />
   )
-  const [
-    showUnskippableStepModal,
-    setIsUnskippableStep,
-  ] = React.useState<boolean>(false)
-  const unskippableModal = (
-    <UnskippableModal
-      goBack={() => setIsUnskippableStep(false)}
-      isOnDevice={isOnDevice}
-    />
-  )
+
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -348,7 +351,9 @@ export const PipetteWizardFlows = (
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
-    modalContent = (
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
       <DetachPipette
         {...currentStep}
         {...calibrateBaseProps}
@@ -356,37 +361,25 @@ export const PipetteWizardFlows = (
         setFetching={setIsFetchingPipettes}
       />
     )
-    if (showConfirmExit) {
-      modalContent = exitModal
-    } else if (showUnskippableStepModal) {
-      modalContent = unskippableModal
-    }
   } else if (currentStep.section === SECTIONS.CARRIAGE) {
     onExit = confirmExit
-    modalContent = showUnskippableStepModal ? (
-      unskippableModal
+    modalContent = showConfirmExit ? (
+      exitModal
     ) : (
       <Carriage {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.MOUNTING_PLATE) {
     onExit = confirmExit
-    modalContent = showUnskippableStepModal ? (
-      unskippableModal
+    modalContent = showConfirmExit ? (
+      exitModal
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   }
-  const is96ChannelUnskippableStep =
-    currentStep.section === SECTIONS.CARRIAGE ||
-    currentStep.section === SECTIONS.MOUNTING_PLATE ||
-    (selectedPipette === NINETY_SIX_CHANNEL &&
-      currentStep.section === SECTIONS.DETACH_PIPETTE)
 
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal) {
+  if (isRobotMoving) {
     exitWizardButton = undefined
-  } else if (is96ChannelUnskippableStep) {
-    exitWizardButton = () => setIsUnskippableStep(true)
   } else if (showConfirmExit || errorMessage != null) {
     exitWizardButton = handleCleanUpAndClose
   }
