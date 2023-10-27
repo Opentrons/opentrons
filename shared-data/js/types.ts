@@ -462,7 +462,6 @@ export interface CompletedProtocolAnalysis {
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
-  fixtures: LoadedFixture[]
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
