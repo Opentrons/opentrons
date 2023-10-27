@@ -14,6 +14,7 @@ describe('UnskippableModal', () => {
   it('returns the correct information for unskippable modal, pressing return button calls goBack prop', () => {
     props = {
       goBack: jest.fn(),
+      proceed: jest.fn(),
       isOnDevice: false,
     }
     const { getByText, getByRole } = render(props)
