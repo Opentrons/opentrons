@@ -30,6 +30,9 @@ DATA_SUBDIRS = [
     "gripper",
     "robot",
     "errors",
+    "command",
+    "commandAnnotation",
+    "liquid"
 ]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
