@@ -1,22 +1,55 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import { RIGHT } from '@opentrons/shared-data'
-import { TYPOGRAPHY, COLORS } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  Btn,
+  PrimaryButton,
+  Flex,
+  TYPOGRAPHY,
+  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_FLEX_END,
+  ALIGN_CENTER,
+  SPACING,
+  RESPONSIVENESS,
+} from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { Skeleton } from '../../atoms/Skeleton'
+import { SmallButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
+import type { PipetteData } from '@opentrons/api-client'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
   isFetching: boolean
   setFetching: React.Dispatch<React.SetStateAction<boolean>>
 }
 const BACKGROUND_SIZE = '47rem'
+
+const GO_BACK_BUTTON_TEXT_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    font-size: ${TYPOGRAPHY.fontSize22};
+    line-height: ${TYPOGRAPHY.lineHeight28};
+
+    &:hover {
+      opacity: 100%;
+    }
+  }
+`
 
 export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   const {
@@ -34,6 +67,12 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     setShowErrorMessage,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
+    enabled: false,
+    onSettled: () => {
+      setFetching(false)
+    },
+  })
   const pipetteWizardStep = {
     mount,
     flowType,
@@ -42,6 +81,13 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
   const is96ChannelPipette =
     memoizedAttachedPipettes[mount]?.instrumentName === 'p1000_96'
+  const pipetteName =
+    attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
+  const isPipetteStillAttached = (attachedInstrumentsData?.data ?? []).some(
+    (i): i is PipetteData =>
+      i.instrumentType === 'pipette' && i.ok && i.mount === mount
+  )
+
   const handle96ChannelProceed = (): void => {
     chainRunCommands?.(
       [
@@ -68,6 +114,27 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         setShowErrorMessage(error.message)
       })
   }
+
+  const [
+    showPipetteStillAttached,
+    setShowPipetteStillAttached,
+  ] = React.useState(false)
+
+  const handleOnClick = (): void => {
+    setFetching(true)
+    refetch()
+      .then(() => {
+        if (!isPipetteStillAttached) {
+          is96ChannelPipette ? handle96ChannelProceed() : proceed()
+        } else {
+          setShowPipetteStillAttached(true)
+        }
+      })
+      .catch(() => {
+        setShowPipetteStillAttached(true)
+      })
+  }
+
   const channel = memoizedAttachedPipettes[mount]?.data.channels
   let bodyText: React.ReactNode = <div></div>
   if (isFetching) {
@@ -90,6 +157,38 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   }
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
+  if (showPipetteStillAttached)
+    return (
+      <SimpleWizardBody
+        iconColor={COLORS.errorEnabled}
+        header={t('pipette_failed_to_detach', { pipetteName: pipetteName })}
+        isSuccess={false}
+      >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          <Btn onClick={() => setShowPipetteStillAttached(false)}>
+            <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
+              {t('shared:go_back')}
+            </StyledText>
+          </Btn>
+          {isOnDevice ? (
+            <SmallButton
+              disabled={isFetching}
+              buttonText={t('try_again')}
+              onClick={handleOnClick}
+            />
+          ) : (
+            <PrimaryButton disabled={isFetching} onClick={handleOnClick}>
+              {t('try_again')}
+            </PrimaryButton>
+          )}
+        </Flex>
+      </SimpleWizardBody>
+    )
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
@@ -131,15 +230,9 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       bodyText={bodyText}
       backIsDisabled={isFetching}
       back={goBack}
-      proceedButton={
-        <CheckPipetteButton
-          isOnDevice={isOnDevice}
-          proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-          proceed={is96ChannelPipette ? handle96ChannelProceed : proceed}
-          setFetching={setFetching}
-          isFetching={isFetching}
-        />
-      }
+      proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
+      proceed={handleOnClick}
+      proceedIsDisabled={isFetching}
     />
   )
 }
