@@ -16,6 +16,7 @@ describe('UnskippableModal', () => {
       goBack: jest.fn(),
       proceed: jest.fn(),
       isOnDevice: false,
+      isRobotMoving: false,
     }
     const { getByText, getByRole } = render(props)
     getByText('This is a critical step that should not be skipped')
@@ -30,6 +31,7 @@ describe('UnskippableModal', () => {
       goBack: jest.fn(),
       proceed: jest.fn(),
       isOnDevice: true,
+      isRobotMoving: false,
     }
     const { getByText, getByLabelText } = render(props)
     getByText('This is a critical step that should not be skipped')
