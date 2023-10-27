@@ -24,7 +24,7 @@
   "connect_96_channel": "connect and attach 96-channel pipette",
   "connect_and_secure_pipette": "connect and secure pipette",
   "continue": "Continue",
-  "critical_unskippable_step": "this is a critical step that cannot be skipped",
+  "critical_unskippable_step": "this is a critical step that should not be skipped",
   "detach_96_attach_mount": "Detach 96-Channel Pipette and Attach {{mount}} Pipette",
   "detach_96_channel": "Detach 96-Channel Pipette",
   "detach_and_reattach": "Detach and reattach pipette",

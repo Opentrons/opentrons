@@ -259,6 +259,7 @@ export const PipetteWizardFlows = (
       proceed={handleCleanUpAndClose}
       goBack={cancelExit}
       isOnDevice={isOnDevice}
+      isRobotMoving={isRobotMoving}
     />
   ) : (
     <ExitModal

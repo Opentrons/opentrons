@@ -18,7 +18,7 @@ describe('UnskippableModal', () => {
       isOnDevice: false,
     }
     const { getByText, getByRole } = render(props)
-    getByText('This is a critical step that cannot be skipped')
+    getByText('This is a critical step that should not be skipped')
     getByText(
       'You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.'
     )
@@ -32,7 +32,7 @@ describe('UnskippableModal', () => {
       isOnDevice: true,
     }
     const { getByText, getByLabelText } = render(props)
-    getByText('This is a critical step that cannot be skipped')
+    getByText('This is a critical step that should not be skipped')
     getByText(
       'You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.'
     )

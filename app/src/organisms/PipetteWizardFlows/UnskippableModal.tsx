@@ -13,11 +13,12 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 interface UnskippableModalProps {
   goBack: () => void
   proceed: () => void
+  isRobotMoving: boolean
   isOnDevice: boolean | null
 }
 
 export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
-  const { goBack, proceed, isOnDevice } = props
+  const { goBack, proceed, isOnDevice, isRobotMoving } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   return (
     <SimpleWizardBody
@@ -33,16 +34,26 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
             onClick={proceed}
             buttonText={t('shared:exit')}
             buttonType="alert"
+            disabled={isRobotMoving}
           />
 
-          <SmallButton buttonText={t('shared:go_back')} onClick={goBack} />
+          <SmallButton
+            disabled={isRobotMoving}
+            buttonText={t('shared:go_back')}
+            onClick={goBack}
+          />
         </>
       ) : (
         <>
-          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing4}>
+          <SecondaryButton
+            disabled={isRobotMoving}
+            onClick={goBack}
+            marginRight={SPACING.spacing4}
+          >
             {t('shared:go_back')}
           </SecondaryButton>
           <AlertPrimaryButton
+            disabled={isRobotMoving}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={proceed}
           >

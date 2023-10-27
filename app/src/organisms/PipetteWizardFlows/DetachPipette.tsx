@@ -170,7 +170,10 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
           gridGap={SPACING.spacing8}
         >
-          <Btn onClick={() => setShowPipetteStillAttached(false)}>
+          <Btn
+            onClick={() => setShowPipetteStillAttached(false)}
+            marginLeft={SPACING.spacing32}
+          >
             <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
               {t('shared:go_back')}
             </StyledText>
@@ -178,12 +181,12 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           {isOnDevice ? (
             <SmallButton
               disabled={isFetching}
-              buttonText={t('try_again')}
+              buttonText={i18n.format(t('try_again'), 'capitalize')}
               onClick={handleOnClick}
             />
           ) : (
             <PrimaryButton disabled={isFetching} onClick={handleOnClick}>
-              {t('try_again')}
+              {i18n.format(t('try_again'), 'capitalize')}
             </PrimaryButton>
           )}
         </Flex>
