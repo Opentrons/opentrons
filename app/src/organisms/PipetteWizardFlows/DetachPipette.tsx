@@ -157,7 +157,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   }
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
-  if (showPipetteStillAttached)
+  if (showPipetteStillAttached) {
     return (
       <SimpleWizardBody
         iconColor={COLORS.errorEnabled}
@@ -192,6 +192,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         </Flex>
       </SimpleWizardBody>
     )
+  }
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}

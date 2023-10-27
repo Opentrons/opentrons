@@ -25,8 +25,8 @@ import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Prob
 import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
+import type { PipetteData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
-import { PipetteData } from '@opentrons/api-client'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
@@ -113,7 +113,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setIsPending(true)
     refetch()
       .then(() => {
-        if (attachedPipette?.state?.tipDetected === true) {
+        if (attachedPipette?.state?.tipDetected) {
           chainRunCommands?.(
             [
               {
