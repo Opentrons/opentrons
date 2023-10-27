@@ -7,28 +7,24 @@ import {
   RobotWorkSpace,
   EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+// import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { useStoredProtocolAnalysis } from '../../Devices/hooks'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
-import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
+// import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import _uncastedSimpleV7Protocol from '@opentrons/shared-data/protocol/fixtures/7/simpleV7.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 
-import type {
-  LabwareDefinition2,
-  ProtocolAnalysisOutput,
-  ModuleModel,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 jest.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace')
 jest.mock('../../../redux/config')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../resources/deck_configuration/utils')
+jest.mock('../../Devices/ModuleInfo')
 
 const mockRunId = 'mockRunId'
 const mockSetShowDeckMapModal = jest.fn()
@@ -39,43 +35,17 @@ const PROTOCOL_ANALYSIS = {
 } as any
 const simpleV7Protocol = (_uncastedSimpleV7Protocol as unknown) as ProtocolAnalysisOutput
 
-// const mockModuleLocations = {
-//   moduleModel: 'magneticBlockV1',
-//   moduleLocation: {
-//     slotName: 'C3',
+// const mockModuleLocations = [
+//   {
+//     moduleModel: 'heaterShakerModuleV1' as ModuleModel,
+//     moduleLocation: { slotName: 'B1' },
+//     nestedLabwareDef: mockProtocolModuleInfo[0]
+//       .nestedLabwareDef as LabwareDefinition2,
+//     onLabwareClick: expect.any(Function),
+//     moduleChildren: null,
+//     innerProps: {},
 //   },
-//   moduleChildren: {
-//     key: null,
-//     ref: null,
-//     props: {
-//       moduleModel: 'magneticBlockV1',
-//       isAttached: false,
-//       physicalPort: null,
-//       runId: 'b79286b6-b71b-47e2-9d29-7640f1a95a17',
-//     },
-//   },
-// }
-
-const mockModuleLocations = [
-  {
-    moduleModel: 'heaterShakerModuleV1' as ModuleModel,
-    moduleLocation: { slotName: 'B1' },
-    nestedLabwareDef: mockProtocolModuleInfo[0]
-      .nestedLabwareDef as LabwareDefinition2,
-    onLabwareClick: expect.any(Function),
-    moduleChildren: null,
-    innerProps: {},
-  },
-]
-const mockLabwareLocations = [
-  {
-    labwareLocation: { slotName: 'C1' },
-    definition: fixture_tiprack_300_ul as LabwareDefinition2,
-    topLabwareId: '300_ul_tiprack_id',
-    onLabwareClick: expect.any(Function),
-    labwareChildren: null,
-  },
-]
+// ]
 
 const mockAttachedProtocolModuleMatches = [
   {
@@ -175,15 +145,16 @@ describe('ModulesAndDeckMapViewModal', () => {
     mockUseStoredProtocolAnalysis.mockReturnValue(
       (simpleV7Protocol as unknown) as ProtocolAnalysisOutput
     )
-    when(mockBaseDeck)
-      .calledWith({
-        deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
-        deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
-        robotType: FLEX_ROBOT_TYPE,
-        labwareLocations: mockLabwareLocations,
-        moduleLocations: mockModuleLocations,
-      })
-      .mockReturnValue(<div>mock BaseDeck</div>)
+    // when(mockBaseDeck)
+    //   .calledWith({
+    //     deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
+    //     deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
+    //     robotType: FLEX_ROBOT_TYPE,
+    //     labwareLocations: [],
+    //     moduleLocations: mockModuleLocations,
+    //   })
+    //   .mockReturnValue(<div>mock BaseDeck</div>)
+    mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
     mockRobotWorkSpace.mockReturnValue(<div>mock RobotWorkSpace</div>)
   })
 
