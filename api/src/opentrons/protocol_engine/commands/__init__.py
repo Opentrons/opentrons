@@ -111,6 +111,14 @@ from .home import (
     HomeCommandType,
 )
 
+from .load_fixture import (
+    LoadFixture,
+    LoadFixtureParams,
+    LoadFixtureCreate,
+    LoadFixtureResult,
+    LoadFixtureCommandType,
+)
+
 from .load_labware import (
     LoadLabware,
     LoadLabwareParams,
@@ -345,6 +353,12 @@ __all__ = [
     "RetractAxisParams",
     "RetractAxisResult",
     "RetractAxisCommandType",
+    # load fixture command models
+    "LoadFixture",
+    "LoadFixtureCreate",
+    "LoadFixtureParams",
+    "LoadFixtureResult",
+    "LoadFixtureCommandType",
     # load labware command models
     "LoadLabware",
     "LoadLabwareCreate",
