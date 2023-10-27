@@ -9,10 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { useCreateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import {
-  STANDARD_SLOT_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
-} from '@opentrons/shared-data'
+import { WASTE_CHUTE_LOAD_NAME } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
@@ -48,10 +45,6 @@ export function ProtocolSetupDeckConfiguration({
     showConfigurationModal,
     setShowConfigurationModal,
   ] = React.useState<boolean>(true)
-  const [
-    targetFixtureLocation,
-    setTargetFixtureLocation,
-  ] = React.useState<Cutout>(fixtureLocation)
   const [
     showDiscardChangeModal,
     setShowDiscardChangeModal,
@@ -109,10 +102,9 @@ export function ProtocolSetupDeckConfiguration({
             setShowConfirmationModal={setShowDiscardChangeModal}
           />
         ) : null}
-        {showConfigurationModal &&
-        (fixtureLocation != null || targetFixtureLocation != null) ? (
+        {showConfigurationModal && fixtureLocation != null ? (
           <AddFixtureModal
-            fixtureLocation={targetFixtureLocation}
+            fixtureLocation={fixtureLocation}
             setShowAddFixtureModal={setShowConfigurationModal}
             providedFixtureOptions={providedFixtureOptions}
             setCurrentDeckConfig={setCurrentDeckConfig}
