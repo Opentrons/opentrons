@@ -60,15 +60,15 @@ class InstrumentContext(publisher.CommandPublisher):
     A context for a specific pipette or instrument.
 
     The InstrumentContext class provides the objects, attributes, and methods that allow
-    you to use pipettes in your protocols. 
+    you to use pipettes in your protocols.
 
-    Methods generally fall into one of two categories. 
+    Methods generally fall into one of two categories.
 
       - They can change the state of the InstrumentContext object, like how fast it
-        moves liquid or where it disposes of used tips. 
- 
+        moves liquid or where it disposes of used tips.
+
       - They can command the instrument to perform an action, like picking up tips,
-        moving to certain locations, and aspirating or dispensing liquid. 
+        moving to certain locations, and aspirating or dispensing liquid.
 
     Objects in this class should not be instantiated directly. Instead, instances are
     returned by :py:meth:`ProtocolContext.load_instrument`.
@@ -292,7 +292,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
                             - If the ``location`` is unspecified, the robot will
                               dispense into its current position.
-                              
+
                             If only a ``location`` is passed (e.g.,
                             ``pipette.dispense(location=plate['A1'])``), all of the
                             liquid aspirated into the pipette will be dispensed (the
@@ -420,7 +420,7 @@ class InstrumentContext(publisher.CommandPublisher):
             All the arguments of ``mix`` are optional. However, if you omit one of them,
             all subsequent arguments must be passed as keyword arguments. For instance,
             ``pipette.mix(1, location=wellplate['A1'])`` is a valid call, but
-            ``pipette.mix(1, wellplate['A1'])`` is not. 
+            ``pipette.mix(1, wellplate['A1'])`` is not.
 
         """
         _log.debug(
@@ -528,8 +528,8 @@ class InstrumentContext(publisher.CommandPublisher):
         speed: float = 60.0,
     ) -> InstrumentContext:
         """
-        Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets. 
-        
+        Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
+
         See :ref:`touch-tip` for more details and examples.
 
         :param location: If no location is passed, the pipette will touch its tip at the
@@ -871,7 +871,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See :ref:`pipette-drop-tip` for examples.
 
         If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop
-        the attached tip into its default :py:attr:`trash_container`. 
+        the attached tip into its default :py:attr:`trash_container`.
 
         Starting with API version 2.15, if the trash container is the default fixed
         trash, the API will instruct the pipette to drop tips in different locations
@@ -1073,8 +1073,8 @@ class InstrumentContext(publisher.CommandPublisher):
         # TODO: What should happen if the user passes a non-first-row well
         # TODO: ..as src/dest *while using multichannel pipette?
         """
-        Move liquid from one well or group of wells to another. 
-        
+        Move liquid from one well or group of wells to another.
+
         Transfer is a higher-level command, incorporating other
         :py:class:`InstrumentContext` commands, like :py:meth:`aspirate` and
         :py:meth:`dispense`. It makes writing a protocol easier at the cost of
@@ -1288,14 +1288,14 @@ class InstrumentContext(publisher.CommandPublisher):
         publish: bool = True,
     ) -> InstrumentContext:
         """Move the instrument.
-        
+
         See :ref:`move-to` for examples.
 
         :param location: The location to move to.
         :type location: :py:class:`~.types.Location`
         :param force_direct: If ``True``, move directly to the destination without arc
                              motion.
-                             
+
                              .. warning::
                                 Forcing direct motion can cause the pipette to crash
                                 into labware, modules, or other objects on the deck.
@@ -1307,8 +1307,8 @@ class InstrumentContext(publisher.CommandPublisher):
                       straight linear speed of the motion. To limit individual axis
                       speeds, use :py:obj:`.ProtocolContext.max_speeds`.
 
-        :param publish: Whether to list this function call in the run preview. 
-                        Default is ``True``. 
+        :param publish: Whether to list this function call in the run preview.
+                        Default is ``True``.
         """
         publish_ctx = nullcontext()
 
@@ -1419,7 +1419,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
-        
+
         By default, the trash container is in slot A3 on Flex and in slot 12 on OT-2.
         """
         return self._trash
@@ -1479,7 +1479,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 7)
     def has_tip(self) -> bool:
         """Whether this instrument has a tip attached or not.
-        
+
         The value of this property is determined logically by the API, not by detecting
         the physical presence of a tip. This is the case even on Flex, which has sensors
         to detect tip attachment.
