@@ -95,19 +95,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       isSuccess={false}
       iconColor={COLORS.errorEnabled}
       header={t('shared:error_encountered')}
-      subHeader={
-        <Trans
-          t={t}
-          i18nKey={'detach_pipette_error'}
-          values={{ error: errorMessage }}
-          components={{
-            block: <StyledText as="p" />,
-            bold: (
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
-            ),
-          }}
-        />
-      }
+      subHeader={errorMessage}
     />
   ) : (
     <GenericWizardTile
