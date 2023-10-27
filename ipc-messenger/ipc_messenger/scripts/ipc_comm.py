@@ -24,7 +24,6 @@ class OT3API:
     def __init__(self, controller, source, host, port, destination, ipc_messenger = None, destinations = None):
         self._controller = controller
         self._ipc_messenger = ipc_messenger or IPCMessenger(source, host, port, ipc_dispatcher)
-        self._online_process: Process = dict()
 
     @ipc_dispatcher.add_method
     async def home():
@@ -37,7 +36,7 @@ class OT3API:
         print(f"Im online: {online}")
 
 
-def main(args):
+def main(args: argparse.Namespace) -> None:
     source = Process(args.process)
     target = [Process(dest) for dest in args.target] if args.target else list(Process)
     destination = [dest for dest in target if dest != source]

@@ -1,8 +1,7 @@
 """This module is responsible for executing and formulating an rpc response."""
 
 import json
-from asyncio import wait_for
-from typing import Any, Union, Optional, Iterator
+from typing import Any, Optional, AsyncGenerator, List
 
 from jsonrpc.jsonrpc2 import JSONRPC20BatchRequest, JSONRPC20BatchResponse
 from jsonrpc.utils import is_invalid_params
@@ -14,6 +13,7 @@ from jsonrpc.exceptions import (
     JSONRPCDispatchException,
     JSONRPCServerError,
     JSONRPCMethodNotFound,
+    JSONRPCInvalidParams,
 )
 
 from .constants import JSONRPCRequest, JSONRPCResponse
@@ -30,10 +30,13 @@ class JSONRPCVersionNotSupported(JSONRPCError):
 SUPPORTED_JSON_RPC_VERSION = ["2.0"]
 
 class JSONRPCResponseManager:
+    """This class is responsible for validating json-rpc messages and executing commands."""
     def __init__(self, dispatcher: JSONRPCDispatcher) -> None:
+        """Constructor"""
         self._dispatcher = dispatcher
 
-    async def handle(self, request_str: str, context: Optional[Any] = None) -> JSONRPCResponse:
+    async def handle(self, request_str: str, context: Optional[Any] = None) -> Optional[JSONRPCResponse]:
+        """Validate that this data is a json-rpc message and execute its method, returning a JSONRPCResponse if applicable."""
         try:
             data = json.loads(request_str)
         except (TypeError, ValueError, json.JSONDecodeError):
@@ -52,7 +55,7 @@ class JSONRPCResponseManager:
         self,
         request: JSONRPCRequest,
         context: Optional[Any] = None
-    ) -> JSONRPCResponse:
+    ) -> Optional[JSONRPCResponse]:
         """Execute a valid json-rpc request and return a response."""
         rs = request if isinstance(request, JSONRPC20BatchRequest) \
             else [request]
@@ -63,7 +66,7 @@ class JSONRPCResponseManager:
 
         # dont respond if this is a notification
         if not responses:
-            return
+            return None
 
         if isinstance(request, JSONRPC20BatchRequest):
             response = JSONRPC20BatchResponse(*responses)
@@ -72,11 +75,15 @@ class JSONRPCResponseManager:
         else:
             return responses[0]
 
-    async def _get_responses(self, requests, context=None
-    ) -> Iterator[JSONRPCResponse]:
-        """ Response to each single JSON-RPC Request."""
+    async def _get_responses(self, requests: List[JSONRPCRequest], context=None
+    ) -> AsyncGenerator[JSONRPCResponse]:
+        """ Response for each single JSON-RPC Request."""
 
-        def _make_response(**kwargs):
+        # response helper
+        def _make_response(
+                request: JSONRPCRequest,
+                **kwargs: int
+            ) -> Optional[JSONRPCResponse]:
             response = JSONRPCResponse(_id=request._id, **kwargs)
             response.request = request
             # only respond if this is not a notify message
@@ -84,13 +91,13 @@ class JSONRPCResponseManager:
 
         for request in requests:
             if request.JSONRPC_VERSION not in SUPPORTED_JSON_RPC_VERSION:
-                yield _make_response(error=JSONRPCVersionNotSupported()._data)
+                yield _make_response(request, error=JSONRPCVersionNotSupported()._data)
 
             # attempt get the method from the dispatcher
             try:
                 method = self._dispatcher[request.method]
             except KeyError:
-                yield _make_response(error=JSONRPCMethodNotFound()._data)
+                yield _make_response(request, error=JSONRPCMethodNotFound()._data)
 
             # get the kwargs if available
             kwargs = request.kwargs
@@ -103,10 +110,10 @@ class JSONRPCResponseManager:
 
             # execute the command and get the response
             try:
-                result = await wait_for(method(*request.args, **kwargs), timeout=None)
-                yield _make_response(result=result)
+                result = await method(*request.args, **kwargs)
+                yield _make_response(request, result=result)
             except JSONRPCDispatchException as e:
-                yield _make_response(error=e.error._data)
+                yield _make_response(request, error=e.error._data)
             except Exception as e:
                 data = {
                     "type": e.__class__.__name__,
@@ -119,7 +126,9 @@ class JSONRPCResponseManager:
                 if isinstance(e, TypeError) and is_invalid_params(
                         method, *request.args, **request.kwargs):
                     yield _make_response(
+                        request,
                         error=JSONRPCInvalidParams(data=data)._data)
                 else:
                     yield _make_response(
+                        request,
                         error=JSONRPCServerError(data=data)._data)

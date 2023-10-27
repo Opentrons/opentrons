@@ -1,15 +1,9 @@
-"""This is the server module ipc messenger."""
+"""This is the ipc messenger."""
 import json
-import argparse
 import asyncio
 
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
-from dataclasses import dataclass
-
-from jsonrpc.exceptions import (
-    JSONRPCInvalidRequestException,
-)
+from typing import Any, Dict, Optional, Set
 
 from .dispatcher import JSONRPCDispatcher
 from .manager import JSONRPCResponseManager
@@ -35,14 +29,15 @@ class IPCMessenger:
         self._host = host
         self._port = port
 
-        # register the dispatcher
+        # register helper with the dispatcher
         self._dispatcher = dispatcher
-        self._dispatcher.add_method(self._get_health, name="get_health")
+        async def _get_health() -> bool: return True
+        self._dispatcher.add_method(_get_health, name="get_health")
         self._handler = JSONRPCResponseManager(self._dispatcher)
 
         # state variables
         self._req_id = 0
-        self._server = None
+        self._server: Optional[asyncio.base_events.Server] = None
         self._online_process: Set[Process] = set()
 
     @property
@@ -50,7 +45,7 @@ class IPCMessenger:
         """Processes that are responding to ipc messages."""
         return self._online_process
 
-    async def start(self):
+    async def start(self) -> None:
         """Creates and starts the ipc listener server."""
         self._server = await asyncio.start_server(self._handle_incoming, self._host, self._port)
         # update list of online ipc processes and start the server
@@ -58,7 +53,12 @@ class IPCMessenger:
         print(f"Online procs: {self.online_procs}")
         await self._server.serve_forever()
 
-    async def _handle_incoming(self, reader, writer):
+    async def _handle_incoming(
+        self,
+        reader: asyncio.StreamReader,
+        writer: asyncio.StreamWriter
+    ) -> None:
+        """Handler for data sent over asyncio sockets."""
         data = await reader.read()
         # received a message, handle and respond
         response = await self._handler.handle(data.decode())
@@ -70,8 +70,12 @@ class IPCMessenger:
         writer.close()
         await writer.wait_closed()
 
-    async def send(self, message: JSONRPCRequest, destinations: Optional[Destinations] = None, notify=False) -> Dict[Process, Any]:
-        """Sends a message to one or more nodes and return the response."""
+    async def send(self,
+        message: JSONRPCRequest,
+        destinations: Optional[Destinations] = None,
+        notify: bool = False
+    ) -> Dict[Process, Any]:
+        """Sends a message to one or more Processes and return the response."""
         response: Dict[Process, Any] = dict()
         destinations = destinations or list(Process)
         for target in destinations:
@@ -94,6 +98,7 @@ class IPCMessenger:
         if not notify:
             request._id = self._req_id
 
+        response: Any = None
         port = DESTINATION_PORT[target]
         print(f"Sending: {self._source.name} ({self._host}:{self._port}) -> {target.name} ({self._host}:{port})\n{request}")
         try:
@@ -117,26 +122,20 @@ class IPCMessenger:
 
             # return the response
             print(f"Receive: {data.decode()}")
-            return json.loads(data).get("result")
+            reponse = json.loads(data).get("result")
         except OSError:
             print("probably offline")
         except json.JSONDecodeError:
             print("Received invalid reponse")
         except Exception as e:
             print(e)
+        return response
 
     async def request_health(self) -> Set[Process]:
-        """Get a dictionary of other online ipc processes."""
+        """Set of online ipc messengers from other processes."""
         req = JSONRPCRequest(method="get_health")
         responses = await self.send(req)
-        for process, online in responses.items():
-            if online:
-                self._online_process.add(process)
-            elif process in self._online_process:
-                self._online_process.remove(process)
-        return self._online_process
-
-    async def _get_health(self):
-        """Respond to request"""
-        return True
+        online_procs = {proc for proc, online in responses.items() if online}
+        self._online_process = online_procs
+        return online_procs
 
