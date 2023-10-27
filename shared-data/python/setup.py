@@ -142,7 +142,7 @@ DESCRIPTION = (
     "Does not need to be installed manually; only a dependency of the "
     "opentrons package"
 )
-PACKAGES = find_packages(where=".", exclude=["tests"])
+PACKAGES = find_packages(where=".", exclude=["tests", "tests.*"])
 INSTALL_REQUIRES = [
     "jsonschema==3.0.2",
     "typing-extensions>=4.0.0,<5",
