@@ -10,6 +10,7 @@ export function getDisabledFieldsMoveLiquidForm(
   if (rawForm.dispense_labware?.includes('wasteChute')) {
     disabled.add('dispense_mix_checkbox')
     disabled.add('dispense_touchTip_checkbox')
+    disabled.add('dispense_mmFromBottom')
   }
   if (rawForm.path === 'multiAspirate') {
     disabled.add('aspirate_mix_checkbox')

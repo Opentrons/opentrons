@@ -37,7 +37,10 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields, allLabware } = props
-
+  const hasWasteChuteSelected =
+    propsForFields.dispense_labware.value != null
+      ? String(propsForFields.dispense_labware.value)?.includes('wasteChute')
+      : false
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const getDelayFields = (): JSX.Element => (
     <DelayFields
@@ -101,20 +104,22 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             ]
           }
         />
-        <WellOrderField
-          prefix={prefix}
-          label={i18n.t('form.step_edit_form.field.well_order.label')}
-          updateFirstWellOrder={
-            propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
-          }
-          updateSecondWellOrder={
-            propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
-          }
-          firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
-          secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
-          firstName={addFieldNamePrefix('wellOrder_first')}
-          secondName={addFieldNamePrefix('wellOrder_second')}
-        />
+        {prefix === 'dispense' && hasWasteChuteSelected ? null : (
+          <WellOrderField
+            prefix={prefix}
+            label={i18n.t('form.step_edit_form.field.well_order.label')}
+            updateFirstWellOrder={
+              propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
+            }
+            updateSecondWellOrder={
+              propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
+            }
+            firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
+            secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
+            firstName={addFieldNamePrefix('wellOrder_first')}
+            secondName={addFieldNamePrefix('wellOrder_second')}
+          />
+        )}
       </div>
 
       <div className={styles.checkbox_column}>
