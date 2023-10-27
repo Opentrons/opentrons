@@ -25,7 +25,7 @@ interface SP {
   customLabwareDefs: LabwareSelectionModalProps['customLabwareDefs']
   slot: LabwareSelectionModalProps['slot']
   parentSlot: LabwareSelectionModalProps['parentSlot']
-  moduleType: LabwareSelectionModalProps['moduleType']
+  moduleModel: LabwareSelectionModalProps['moduleModel']
   permittedTipracks: LabwareSelectionModalProps['permittedTipracks']
   isNextToHeaterShaker: boolean
   has96Channel: boolean
@@ -49,7 +49,7 @@ function mapStateToProps(state: BaseState): SP {
       initialModules.find(moduleOnDeck => moduleOnDeck.id === slot)) ||
     null
   const parentSlot = parentModule != null ? parentModule.slot : null
-  const moduleType = parentModule != null ? parentModule.type : null
+  const moduleModel = parentModule != null ? parentModule.model : null
   const isNextToHeaterShaker = initialModules.some(
     hardwareModule =>
       hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
@@ -63,7 +63,7 @@ function mapStateToProps(state: BaseState): SP {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     slot,
     parentSlot,
-    moduleType,
+    moduleModel,
     isNextToHeaterShaker,
     has96Channel,
     adapterDefUri: has96Channel ? adapter96ChannelDefUri : undefined,
