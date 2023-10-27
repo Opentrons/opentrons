@@ -64,11 +64,13 @@ describe('Hardware', () => {
             hardwareType: 'fixture',
             fixtureName: WASTE_CHUTE_LOAD_NAME,
             location: { cutout: WASTE_CHUTE_SLOT },
+            hasSlotConflict: false,
           },
           {
             hardwareType: 'fixture',
             fixtureName: STAGING_AREA_LOAD_NAME,
             location: { cutout: 'B3' },
+            hasSlotConflict: false,
           },
         ],
         isLoading: false,
