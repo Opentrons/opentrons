@@ -11,9 +11,6 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
-  Module,
-  RobotWorkSpace,
-  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -22,7 +19,6 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
-  inferModuleOrientationFromXCoordinate,
   NON_CONNECTING_MODULE_TYPES,
   STANDARD_SLOT_LOAD_NAME,
   TC_MODULE_LOCATION_OT3,
@@ -33,14 +29,12 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
 } from '../../organisms/Devices/hooks'
-import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/MultipleModulesModal'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -61,23 +55,23 @@ import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
+import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { Cutout, Fixture, FixtureLoadName } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 
-const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'DECK_BASE',
-  'BARCODE_COVERS',
-  'SLOT_SCREWS',
-  'SLOT_10_EXPANSION',
-  'CALIBRATION_CUTOUTS',
-]
+// const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
+//   'DECK_BASE',
+//   'BARCODE_COVERS',
+//   'SLOT_SCREWS',
+//   'SLOT_10_EXPANSION',
+//   'CALIBRATION_CUTOUTS',
+// ]
 
 interface RenderModuleStatusProps {
   isModuleReady: boolean
@@ -386,10 +380,6 @@ export function ProtocolSetupModulesAndDeck({
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
 
-  const modalHeader: ModalHeaderBaseProps = {
-    title: t('map_view'),
-    hasExitIcon: true,
-  }
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   return (
@@ -406,46 +396,13 @@ export function ProtocolSetupModulesAndDeck({
           />
         ) : null}
         {showDeckMapModal ? (
-          <Modal
-            header={modalHeader}
-            modalSize="large"
-            onOutsideClick={() => setShowDeckMapModal(false)}
-          >
-            <RobotWorkSpace
-              deckDef={deckDef}
-              deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-              deckFill={COLORS.light1}
-              trashSlotName="A3"
-              id="ModuleSetup_deckMap"
-              trashColor={COLORS.darkGreyEnabled}
-            >
-              {() => (
-                <>
-                  {attachedProtocolModuleMatches.map(module => (
-                    <Module
-                      key={module.moduleId}
-                      x={module.x}
-                      y={module.y}
-                      orientation={inferModuleOrientationFromXCoordinate(
-                        module.x
-                      )}
-                      def={module.moduleDef}
-                    >
-                      <ModuleInfo
-                        moduleModel={module.moduleDef.model}
-                        isAttached={module.attachedModuleMatch != null}
-                        physicalPort={
-                          module.attachedModuleMatch?.usbPort ?? null
-                        }
-                        runId={runId}
-                      />
-                    </Module>
-                  ))}
-                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
-                </>
-              )}
-            </RobotWorkSpace>
-          </Modal>
+          <ModulesAndDeckMapViewModal
+            setShowDeckMapModal={setShowDeckMapModal}
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            runId={runId}
+            deckDef={deckDef}
+            mostRecentAnalysis={mostRecentAnalysis}
+          />
         ) : null}
       </Portal>
       <ChildNavigation
