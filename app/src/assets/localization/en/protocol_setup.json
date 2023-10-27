@@ -112,7 +112,7 @@
   "lpc_disabled_no_tipracks_used": "Labware Position Check requires that the protocol has at least one pipette that picks up a tip",
   "magnetic_module_attention_warning": "<block>Opentrons recommends securing labware with the module’s bracket. <a>See how to secure labware to the Magnetic Module</a></block>",
   "magnetic_module_extra_attention": "Opentrons recommends securing labware with the module’s bracket",
-  "map_view": "Map view",
+  "map_view": "Map View",
   "missing": "Missing",
   "modal_instructions_title": "{{moduleName}} Setup Instructions",
   "modal_instructions": "For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to visit the modules section of the Opentrons Help Center.",

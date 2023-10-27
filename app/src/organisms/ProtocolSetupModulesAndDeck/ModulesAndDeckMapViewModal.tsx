@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
-  getRobotTypeFromLoadedLabware,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { Modal } from '../../molecules/Modal'
 import { ModuleInfo } from '../Devices/ModuleInfo'
@@ -51,13 +51,6 @@ export function ModulesAndDeckMapViewModal({
   deckDef,
   mostRecentAnalysis,
 }: ModulesAndDeckMapViewModalProps): JSX.Element | null {
-  console.log(
-    'attachedProtocolModuleMatches',
-    JSON.stringify(attachedProtocolModuleMatches, null, 4)
-  )
-  console.log('deckDef', JSON.stringify(deckDef, null, 4))
-  console.log('mostRecentAnalysis', JSON.stringify(mostRecentAnalysis, null, 4))
-
   const { t } = useTranslation('protocol_setup')
   const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
@@ -71,7 +64,6 @@ export function ModulesAndDeckMapViewModal({
 
   if (protocolAnalysis == null) return null
 
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
   const deckConfig = getDeckConfigFromProtocolCommands(
     protocolAnalysis.commands
   )
@@ -99,8 +91,10 @@ export function ModulesAndDeckMapViewModal({
       {enableDeckConfig ? (
         <BaseDeck
           deckConfig={deckConfig}
-          deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
-          robotType={robotType}
+          deckLayerBlocklist={getStandardDeckViewLayerBlockList(
+            FLEX_ROBOT_TYPE
+          )}
+          robotType={FLEX_ROBOT_TYPE}
           labwareLocations={[]}
           moduleLocations={moduleLocations}
         />
