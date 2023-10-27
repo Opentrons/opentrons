@@ -486,6 +486,12 @@ export interface RobotState {
         [well: string]: LocationLiquidState
       }
     }
+    additionalEquipment: {
+      /** for now, the only entity in here will be the waste chute */
+      [additionalEquipmentId: string]: {
+        [well: string]: LocationLiquidState
+      }
+    }
   }
 }
 

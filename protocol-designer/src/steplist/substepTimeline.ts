@@ -56,6 +56,8 @@ const _createNextTimelineFrame = (args: {
   return newTimelineFrame
 }
 
+const wasteChuteWell = 'A1'
+
 interface SubstepTimelineAcc {
   timeline: SubstepTimelineFrame[]
   errors: CommandCreatorError[] | null | undefined
@@ -83,17 +85,35 @@ export const substepTimelineSingleChannel = (
         command.commandType === 'dispense'
       ) {
         const { wellName, volume, labwareId } = command.params
-        const preIngreds =
-          acc.prevRobotState.liquidState.labware[labwareId] != null
-            ? acc.prevRobotState.liquidState.labware[labwareId][wellName]
-            : {}
-        const postIngreds =
-          nextRobotState.liquidState.labware[labwareId] != null
-            ? nextRobotState.liquidState.labware[labwareId][wellName]
-            : {}
+
+        let preIngreds = {}
+        if (acc.prevRobotState.liquidState.labware[labwareId] != null) {
+          preIngreds =
+            acc.prevRobotState.liquidState.labware[labwareId][wellName]
+        } else if (
+          acc.prevRobotState.liquidState.additionalEquipment[labwareId] != null
+        ) {
+          preIngreds =
+            acc.prevRobotState.liquidState.additionalEquipment[labwareId][
+              wasteChuteWell
+            ]
+        }
+
+        let postIngreds = {}
+        if (nextRobotState.liquidState.labware[labwareId] != null) {
+          postIngreds = nextRobotState.liquidState.labware[labwareId][wellName]
+        } else if (
+          nextRobotState.liquidState.additionalEquipment[labwareId] != null
+        ) {
+          postIngreds =
+            nextRobotState.liquidState.additionalEquipment[labwareId][
+              wasteChuteWell
+            ]
+        }
+
         const wellInfo = {
           labwareId,
-          wells: [wellName] ?? ['A1'],
+          wells: [wellName] ?? [wasteChuteWell],
           preIngreds: preIngreds,
           postIngreds: postIngreds,
         }
@@ -152,22 +172,46 @@ export const substepTimelineMultiChannel = (
           invariantContext.labwareEntities[labwareId] != null
             ? invariantContext.labwareEntities[labwareId].def
             : null
+
         const wellsForTips =
           channels &&
           labwareDef &&
           getWellsForTips(channels, labwareDef, wellName).wellsForTips
+
+        let preIngreds = {}
+        let wells: string[] | null = null
+
+        if (acc.prevRobotState.liquidState.labware[labwareId] != null) {
+          preIngreds =
+            acc.prevRobotState.liquidState.labware[labwareId][wellName]
+          wells = wellsForTips
+        } else if (
+          acc.prevRobotState.liquidState.additionalEquipment[labwareId] != null
+        ) {
+          preIngreds =
+            acc.prevRobotState.liquidState.additionalEquipment[labwareId][
+              wasteChuteWell
+            ]
+          wells = [wasteChuteWell]
+        }
+
+        let postIngreds = {}
+        if (nextRobotState.liquidState.labware[labwareId] != null) {
+          postIngreds = nextRobotState.liquidState.labware[labwareId][wellName]
+        } else if (
+          nextRobotState.liquidState.additionalEquipment[labwareId] != null
+        ) {
+          postIngreds =
+            nextRobotState.liquidState.additionalEquipment[labwareId][
+              wasteChuteWell
+            ]
+        }
+
         const wellInfo = {
           labwareId,
-          wells: wellsForTips || [],
-          preIngreds: wellsForTips
-            ? pick(
-                acc.prevRobotState.liquidState.labware[labwareId],
-                wellsForTips
-              )
-            : {},
-          postIngreds: wellsForTips
-            ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
-            : {},
+          wells: wells ?? [],
+          preIngreds: wells ? pick(preIngreds, wells) : {},
+          postIngreds: wells ? pick(postIngreds, wells) : {},
         }
         return {
           ...acc,

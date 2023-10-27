@@ -72,15 +72,10 @@ export function dispenseUpdateLiquidState(
       : //  special-casing waste chute info
         { wellsForTips: ['A1'], allWellsShared: true }
 
-  const wasteChuteLocationLiquidState: LocationLiquidState = {
-    wasteChute: { volume: 0 },
-  }
-  const wasteChuteLiquidState = {
-    A1: wasteChuteLocationLiquidState,
-  }
-
   const liquidLabware =
-    prevLiquidState.labware[labwareId] ?? wasteChuteLiquidState
+    prevLiquidState.labware[labwareId] ??
+    prevLiquidState.additionalEquipment[labwareId]
+
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
   // and dests are "droplets" that need to be merged to dest well contents
@@ -127,8 +122,15 @@ export function dispenseUpdateLiquidState(
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
-  prevLiquidState.labware[labwareId] = Object.assign(
-    liquidLabware,
-    labwareLiquidState
-  )
+  if (prevLiquidState.additionalEquipment[labwareId] != null) {
+    prevLiquidState.additionalEquipment[labwareId] = Object.assign(
+      liquidLabware,
+      labwareLiquidState
+    )
+  } else if (prevLiquidState.labware[labwareId] != null) {
+    prevLiquidState.labware[labwareId] = Object.assign(
+      liquidLabware,
+      labwareLiquidState
+    )
+  }
 }

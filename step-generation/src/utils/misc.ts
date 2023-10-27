@@ -25,6 +25,7 @@ import type {
 } from '../types'
 import {
   AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
   LabwareEntities,
   WASTE_CHUTE_STUBBED_DEPTH,
 } from '..'
@@ -282,7 +283,11 @@ export const blowoutUtil = (args: {
 export function createEmptyLiquidState(
   invariantContext: InvariantContext
 ): RobotState['liquidState'] {
-  const { labwareEntities, pipetteEntities } = invariantContext
+  const {
+    labwareEntities,
+    pipetteEntities,
+    additionalEquipmentEntities,
+  } = invariantContext
   return {
     pipettes: reduce(
       pipetteEntities,
@@ -296,6 +301,17 @@ export function createEmptyLiquidState(
       labwareEntities,
       (acc, labware: LabwareEntity, id: string) => {
         return { ...acc, [id]: mapValues(labware.def.wells, () => ({})) }
+      },
+      {}
+    ),
+    additionalEquipment: reduce(
+      additionalEquipmentEntities,
+      (acc, additionalEquipment: AdditionalEquipmentEntity, id: string) => {
+        if (additionalEquipment.name === 'wasteChute') {
+          return { ...acc, [id]: { A1: {} } }
+        } else {
+          return acc
+        }
       },
       {}
     ),
