@@ -7,6 +7,7 @@ import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
 
 import * as FileSystem from './file-system'
+import * as UI from '../ui'
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
@@ -224,6 +225,14 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
 
       case ProtocolStorageActions.VIEW_PROTOCOL_SOURCE_FOLDER: {
         FileSystem.viewProtocolSourceFolder(
+          action.payload.protocolKey,
+          FileSystem.PROTOCOLS_DIRECTORY_PATH
+        )
+        break
+      }
+
+      case ProtocolStorageActions.EDIT_PROTOCOL: {
+        FileSystem.editProtocol(
           action.payload.protocolKey,
           FileSystem.PROTOCOLS_DIRECTORY_PATH
         )

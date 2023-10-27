@@ -7,6 +7,7 @@ import { app, shell } from 'electron'
 import type { StoredProtocolDir } from '@opentrons/app/src/redux/protocol-storage'
 import type { Dirent } from 'fs'
 import { analyzeProtocolSource } from '../protocol-analysis'
+import { createProtocolEditorUi } from '../ui'
 
 /**
  * Module for managing local protocol files on the host filesystem
@@ -170,3 +171,13 @@ export function viewProtocolSourceFolder(
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
   shell.openPath(srcDirPath)
 }
+
+export function editProtocol(
+  protocolKey: string,
+  protocolsDirPath: string
+): void {
+  const protocolDirPath = path.join(protocolsDirPath, protocolKey)
+  const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
+  createProtocolEditorUi()
+}
+

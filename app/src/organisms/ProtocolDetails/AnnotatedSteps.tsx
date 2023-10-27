@@ -59,7 +59,7 @@ export const AnnotatedSteps = (
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight="25rem"
+      maxHeight="65vh"
       flex="1 1 0"
       overflowY="auto"
     >
