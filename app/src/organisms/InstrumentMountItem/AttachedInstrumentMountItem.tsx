@@ -5,8 +5,6 @@ import {
   getGripperDisplayName,
   getPipetteModelSpecs,
   GripperModel,
-  LEFT,
-  NINETY_SIX_CHANNEL,
   PipetteModel,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
@@ -85,10 +83,7 @@ export function AttachedInstrumentMountItem(
         <ChoosePipette
           proceed={() => {
             setWizardProps({
-              mount:
-                selectedPipette === NINETY_SIX_CHANNEL
-                  ? LEFT
-                  : (mount as Mount),
+              mount: mount as Mount,
               flowType: FLOWS.ATTACH,
               selectedPipette,
               closeFlow: () => {

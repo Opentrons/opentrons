@@ -204,7 +204,12 @@ describe('getPipetteWizardSteps', () => {
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,

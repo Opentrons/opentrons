@@ -73,6 +73,15 @@ class Poller:
             await self._poll_once()
             await asyncio.sleep(self.interval)
 
+    @staticmethod
+    def _set_waiter_complete(
+        waiter: "asyncio.Future[None]", e: Optional[Exception] = None
+    ) -> None:
+        try:
+            waiter.set_result(None) if e is None else waiter.set_exception(e)
+        except asyncio.InvalidStateError:
+            log.warning("Poller waiter was already cancelled")
+
     async def _poll_once(self) -> None:
         """Trigger a single read, notifying listeners of success or error."""
         previous_waiters = self._poll_waiters
@@ -87,7 +96,7 @@ class Poller:
             log.exception("Polling exception")
             self._reader.on_error(e)
             for waiter in previous_waiters:
-                waiter.set_exception(e)
+                Poller._set_waiter_complete(waiter, e)
         else:
             for waiter in previous_waiters:
-                waiter.set_result(None)
+                Poller._set_waiter_complete(waiter)

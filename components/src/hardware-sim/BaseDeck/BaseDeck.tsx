@@ -43,6 +43,7 @@ interface BaseDeckProps {
     definition: LabwareDefinition2
     // generic prop to render self-positioned children for each labware
     labwareChildren?: React.ReactNode
+    onLabwareClick?: () => void
   }>
   moduleLocations: Array<{
     moduleModel: ModuleModel
@@ -51,6 +52,7 @@ interface BaseDeckProps {
     innerProps?: React.ComponentProps<typeof Module>['innerProps']
     // generic prop to render self-positioned children for each module
     moduleChildren?: React.ReactNode
+    onLabwareClick?: () => void
   }>
   deckConfig?: DeckConfiguration
   deckLayerBlocklist?: string[]
@@ -150,6 +152,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           nestedLabwareDef,
           innerProps,
           moduleChildren,
+          onLabwareClick,
         }) => {
           const slotDef = deckDef.locations.orderedSlots.find(
             s => s.id === moduleLocation.slotName
@@ -167,7 +170,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               innerProps={innerProps}
             >
               {nestedLabwareDef != null ? (
-                <LabwareRender definition={nestedLabwareDef} />
+                <LabwareRender
+                  definition={nestedLabwareDef}
+                  onLabwareClick={onLabwareClick}
+                />
               ) : null}
               {moduleChildren}
             </Module>
@@ -175,7 +181,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         }
       )}
       {labwareLocations.map(
-        ({ labwareLocation, definition, labwareChildren }) => {
+        ({ labwareLocation, definition, labwareChildren, onLabwareClick }) => {
           const slotDef = deckDef.locations.orderedSlots.find(
             s =>
               labwareLocation !== 'offDeck' &&
@@ -187,7 +193,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               key={slotDef.id}
               transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
             >
-              <LabwareRender definition={definition} />
+              <LabwareRender
+                definition={definition}
+                onLabwareClick={onLabwareClick}
+              />
               {labwareChildren}
             </g>
           ) : null
