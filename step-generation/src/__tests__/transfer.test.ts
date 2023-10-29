@@ -1,3 +1,4 @@
+import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
@@ -22,14 +23,13 @@ import {
   dropTipInPlaceHelper,
   moveToAddressableAreaHelper,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '..'
+import { FIXED_TRASH_ID } from '../constants'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
 import { transfer } from '../commandCreators/compound/transfer'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
@@ -212,9 +212,9 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
       },
     },
   }
-  // robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId.A1 = {
-  //   '0': { volume: 200 },
-  // }
+  robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId = {
+    A1: { '0': { volume: 200 } },
+  }
   robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
     '0': { volume: 200 },
   }
