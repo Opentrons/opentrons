@@ -212,7 +212,9 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
       },
     },
   }
-
+  // robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId.A1 = {
+  //   '0': { volume: 200 },
+  // }
   robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
     '0': { volume: 200 },
   }

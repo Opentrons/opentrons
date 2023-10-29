@@ -17,6 +17,7 @@ Object {
     },
   },
   "liquidState": Object {
+    "additionalEquipment": Object {},
     "labware": Object {
       "fixedTrash": Object {
         "A1": Object {},
