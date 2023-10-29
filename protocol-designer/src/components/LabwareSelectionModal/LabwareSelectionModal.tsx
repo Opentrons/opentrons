@@ -117,7 +117,7 @@ export const getLabwareIsRecommended = (
   //  since its different from V1
   if (moduleModel === THERMOCYCLER_MODULE_V2) {
     return (
-      'opentrons_96_wellplate_200ul_pcr_full_skirt' === def.parameters.loadName
+      def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
     )
   } else {
     return moduleType
