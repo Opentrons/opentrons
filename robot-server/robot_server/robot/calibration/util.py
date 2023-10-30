@@ -9,18 +9,8 @@ from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.calibration_storage import helpers
-from opentrons.config.feature_flags import enable_ot3_hardware_controller as is_ot3
 
-if is_ot3():
-    from opentrons.calibration_storage.ot3 import (
-        create_tip_length_data,
-        save_tip_length_calibration as cal_storage_save_tip_length,
-    )
-else:
-    from opentrons.calibration_storage.ot2 import (
-        create_tip_length_data,
-        save_tip_length_calibration as cal_storage_save_tip_length,
-    )
+from opentrons.calibration_storage import ot2 as ot2_cal_storage
 
 from opentrons.types import Point, Location
 
@@ -212,10 +202,10 @@ def save_tip_length_calibration(
     # TODO: 07-22-2020 parent slot is not important when tracking
     # tip length data, hence the empty string, we should remove it
     # from create_tip_length_data in a refactor
-    tip_length_data = create_tip_length_data(
+    tip_length_data = ot2_cal_storage.create_tip_length_data(
         tip_rack._core.get_definition(), tip_length_offset
     )
-    cal_storage_save_tip_length(pipette_id, tip_length_data)
+    ot2_cal_storage.save_tip_length_calibration(pipette_id, tip_length_data)
 
 
 def get_default_tipracks(default_uris: List["LabwareUri"]) -> List["LabwareDefinition"]:

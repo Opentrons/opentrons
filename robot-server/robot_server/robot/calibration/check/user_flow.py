@@ -2,7 +2,6 @@ import logging
 from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
 from typing_extensions import Literal
 
-from opentrons.config.feature_flags import enable_ot3_hardware_controller as is_ot3
 from opentrons.calibration_storage import (
     helpers,
     types as cal_types,
@@ -12,26 +11,13 @@ from opentrons.calibration_storage import (
     mark_bad_calibration,
 )
 
-if is_ot3():
-    from opentrons.calibration_storage.ot3.tip_length import (
-        load_tip_length_calibration,
-        save_tip_length_calibration,
-        create_tip_length_data,
-    )
-    from opentrons.calibration_storage.ot3.pipette_offset import (
-        get_pipette_offset,
-        save_pipette_calibration,
-    )
-else:
-    from opentrons.calibration_storage.ot2.tip_length import (
-        load_tip_length_calibration,
-        save_tip_length_calibration,
-        create_tip_length_data,
-    )
-    from opentrons.calibration_storage.ot2.pipette_offset import (
-        get_pipette_offset,
-        save_pipette_calibration,
-    )
+from opentrons.calibration_storage.ot2 import (
+    get_pipette_offset,
+    save_pipette_calibration,
+    load_tip_length_calibration,
+    create_tip_length_data,
+    save_tip_length_calibration,
+)
 
 from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point, Location
@@ -358,6 +344,7 @@ class CheckCalibrationUserFlow:
         pipette_offsets = {
             m: get_pipette_offset(p.pipette_id, m)
             for m, p in self._filtered_hw_pips.items()
+            if p.pipette_id is not None
         }
         tip_lengths = {
             m: self._get_tip_length_from_pipette(m, p)
@@ -435,9 +422,11 @@ class CheckCalibrationUserFlow:
         mount: Optional[Mount] = None,
     ) -> models.v1.InstrumentOffsetModel:
         if not pipette or not mount:
-            pip_offset = get_pipette_offset(self.hw_pipette.pipette_id, self.mount)
+            pip_offset = get_pipette_offset(
+                self.hw_pipette.pipette_id or "", self.mount
+            )
         else:
-            pip_offset = get_pipette_offset(pipette.pipette_id, mount)
+            pip_offset = get_pipette_offset(pipette.pipette_id or "", mount)
         assert pip_offset, "No Pipette Offset Found"
         return pip_offset
 
