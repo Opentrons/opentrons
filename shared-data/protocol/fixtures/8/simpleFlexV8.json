@@ -21,7 +21,7 @@
       "displayColor": "#7332a8"
     }
   },
-  "labwareSchemaId": "opentronsLabwareSchemaV2",
+  "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
   "labwareDefinitions": {
     "opentrons/opentrons_1_trash_1100ml_fixed/1": {
       "ordering": [["A1"]],
@@ -1470,7 +1470,7 @@
         "6abc123",
         "7abc123"
       ],
-      "annotationType": "initialSetup"
+      "annotationType": "custom"
     }
   ]
 }

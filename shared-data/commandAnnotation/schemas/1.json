@@ -1,5 +1,5 @@
 {
-  "$id": "opentronsCommandAnnotationSchemaV1",
+  "$id": "opentronsCommandAnnotationSchemaV1#",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$defs": {
     "baseAnnotation": {
@@ -18,53 +18,53 @@
           "description": "The type of annotation (for machine parsing)",
           "type": "string"
         }
-      },
-      "secondOrderCommand": {
-        "description": "Annotates a group of atomic commands which were the direct result of a second order command (e.g. transfer, consolidate, mix)",
-        "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
-        "type": "object",
-        "required": [
-          "annotationType",
-          "commandKeys",
-          "params",
-          "machineReadableName"
-        ],
-        "properties": {
-          "annotationType": {
-            "type": "string",
-            "enum": ["secondOrderCommand"]
-          },
-          "params": {
-            "description": "key value pairs of the parameters that were passed to the second order command that this annotates",
-            "type": "object"
-          },
-          "machineReadableName": {
-            "description": "The name of the second order command in the form that the generating software refers to it. (e.g. 'transfer', 'thermocyclerStep')",
-            "type": "string"
-          },
-          "userSpecifiedName": {
-            "description": "The optional user-specified name of the second order command",
-            "type": "string"
-          },
-          "userSpecifiedDescription": {
-            "description": "The optional user-specified description of the second order command",
-            "type": "string"
-          }
+      }
+    },
+    "secondOrderCommand": {
+      "description": "Annotates a group of atomic commands which were the direct result of a second order command (e.g. transfer, consolidate, mix)",
+      "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
+      "type": "object",
+      "required": [
+        "annotationType",
+        "commandKeys",
+        "params",
+        "machineReadableName"
+      ],
+      "properties": {
+        "annotationType": {
+          "type": "string",
+          "enum": ["secondOrderCommand"]
+        },
+        "params": {
+          "description": "key value pairs of the parameters that were passed to the second order command that this annotates",
+          "type": "object"
+        },
+        "machineReadableName": {
+          "description": "The name of the second order command in the form that the generating software refers to it. (e.g. 'transfer', 'thermocyclerStep')",
+          "type": "string"
+        },
+        "userSpecifiedName": {
+          "description": "The optional user-specified name of the second order command",
+          "type": "string"
+        },
+        "userSpecifiedDescription": {
+          "description": "The optional user-specified description of the second order command",
+          "type": "string"
+        }
+      }
+    },
+    "custom": {
+      "description": "Annotates a group of atomic commands in some manner that Opentrons software does not anticipate or originate",
+      "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
+      "type": "object",
+      "required": ["annotationType", "commandKeys"],
+      "properties": {
+        "annotationType": {
+          "type": "string",
+          "enum": ["custom"]
         }
       },
-      "custom": {
-        "description": "Annotates a group of atomic commands in some manner that Opentrons software does not anticipate or originate",
-        "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
-        "type": "object",
-        "required": ["annotationType", "commandKeys"],
-        "properties": {
-          "annotationType": {
-            "type": "string",
-            "enum": ["custom"]
-          }
-        },
-        "additionalProperties": true
-      }
+      "additionalProperties": true
     }
   },
   "oneOf": [

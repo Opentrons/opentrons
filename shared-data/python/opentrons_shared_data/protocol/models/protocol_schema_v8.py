@@ -79,6 +79,12 @@ class CommandAnnotation(BaseModel):
         extra = Extra.allow
 
 
+class RobotV8(BaseModel):
+    model: Literal["OT-2 Standard", "OT-3 Standard"]
+    deckId: str
+    deckSchemaId: str
+
+
 class ProtocolSchemaV8(BaseModel):
     otSharedSchema: Literal["#/protocol/schemas/8"] = Field(
         ...,
@@ -88,10 +94,10 @@ class ProtocolSchemaV8(BaseModel):
     )
     schemaVersion: Literal[8]
     metadata: Metadata
-    robot: Robot
+    robot: RobotV8
     liquidSchemaId: Literal["opentronsLiquidSchemaV1"]
     liquids: Dict[str, Liquid]
-    labwareSchemaId: Literal["opentronsLabwareSchemaV2"]
+    labwareDefinitionSchemaId: Literal["opentronsLabwareSchemaV2"]
     labwareDefinitions: Dict[str, LabwareDefinition]
     commandSchemaId: Literal["opentronsCommandSchemaV8"]
     commands: List[Command]

@@ -1,5 +1,5 @@
 {
-  "$id": "opentronsProtocolSchemaV7",
+  "$id": "opentronsProtocolSchemaV8",
   "$schema": "http://json-schema.org/draft-07/schema#",
 
   "definitions": {},
@@ -14,16 +14,16 @@
     "labwareDefinitions",
     "labwareDefinitionSchemaId",
     "commands",
-    "commandsSchemaId",
+    "commandSchemaId",
     "commandAnnotations",
-    "commandAnnotationsSchemaId",
+    "commandAnnotationSchemaId",
     "liquids",
     "liquidSchemaId"
   ],
   "properties": {
     "$otSharedSchema": {
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
-      "enum": ["#/protocol/schemas/7"]
+      "enum": ["#/protocol/schemas/8"]
     },
 
     "schemaVersion": {
@@ -122,9 +122,7 @@
     "labwareDefinitions": {
       "description": "All labware definitions used by labware in this protocol, keyed by a unique identifier (definitionId)",
       "patternProperties": {
-        ".+": {
-          "$ref": "#/properties/labwareDefinitionSchemaRef"
-        }
+        ".+": { "type": "object" }
       }
     },
 
@@ -136,9 +134,7 @@
     "liquids": {
       "description": "All instances of liquid used in this protocol, keyed by a unique identifier (liquidId)",
       "patternProperties": {
-        ".+": {
-          "$ref": "#/properties/liquidSchemaRef"
-        }
+        ".+": { "type": "object" }
       }
     },
     "commandSchemaId": {
@@ -149,7 +145,7 @@
     "commands": {
       "description": "An array of command objects representing steps to be executed on the robot.",
       "type": "array",
-      "items": { "$ref": "#/properties/commandSchemaRef" }
+      "items": { "type": "object" }
     },
 
     "commandAnnotationSchemaId": {
@@ -159,7 +155,7 @@
 
     "commandAnnotations": {
       "type": "array",
-      "items": { "$ref": "#/properties/commandAnnotationSchemaRef" }
+      "items": { "type": "object" }
     }
   }
 }

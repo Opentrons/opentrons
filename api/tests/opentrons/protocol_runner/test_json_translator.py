@@ -786,7 +786,7 @@ def _make_v8_json_protocol(
         metadata=SD_Metadata(),
         robot=Robot(model="OT-2 Standard", deckId="ot2_standard"),
         labwareDefinitions=labware_definitions,
-        labwareSchemaId="opentronsLabwareSchemaV2",
+        labwareDefinitionSchemaId="opentronsLabwareSchemaV2",
         commandSchemaId="opentronsCommandSchemaV8",
         commands=commands,
         liquidSchemaId="opentronsLiquidSchemaV1",

@@ -12,7 +12,7 @@
     "deckId": "ot3_standard",
     "deckSchemaId": "opentronsDeckSchemaV3"
   },
-  "labwareSchemaId": "opentronsLabwareSchemaV2",
+  "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
   "labwareDefinitions": {
     "opentrons/opentrons_1_trash_1100ml_fixed/1": {
       "ordering": [["A1"]],
