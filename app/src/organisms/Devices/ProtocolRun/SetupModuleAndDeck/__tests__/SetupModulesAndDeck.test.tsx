@@ -8,6 +8,7 @@ import { useFeatureFlag } from '../../../../../redux/config'
 import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
 } from '../../../hooks'
 import { SetupModuleAndDeck } from '../index'
 import { SetupModulesList } from '../SetupModulesList'
@@ -43,6 +44,9 @@ const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockSetupModulesList = SetupModulesList as jest.MockedFunction<
   typeof SetupModulesList
@@ -88,6 +92,9 @@ describe('SetupModuleAndDeck', () => {
     when(mockUseFeatureFlag)
       .calledWith('enableDeckConfiguration')
       .mockReturnValue(false)
+    when(mockUseModuleCalibrationStatus)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({ complete: true })
   })
 
   it('renders the list and map view buttons', () => {
@@ -111,6 +118,17 @@ describe('SetupModuleAndDeck', () => {
         missingModuleIds: ['foo'],
         remainingAttachedModules: [mockTemperatureModule],
       })
+    const { getByRole } = render(props)
+    const button = getByRole('button', {
+      name: 'Proceed to labware position check',
+    })
+    expect(button).toBeDisabled()
+  })
+
+  it('should render a disabled Proceed to labware setup CTA if the protocol requests modules they are not all calibrated', () => {
+    when(mockUseModuleCalibrationStatus)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({ complete: false })
     const { getByRole } = render(props)
     const button = getByRole('button', {
       name: 'Proceed to labware position check',

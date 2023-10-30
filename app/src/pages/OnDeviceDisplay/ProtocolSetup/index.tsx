@@ -12,10 +12,8 @@ import {
   Btn,
   COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_STICKY,
@@ -41,10 +39,11 @@ import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,
 } from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   useAttachedModules,
   useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useRobotType,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -52,6 +51,7 @@ import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
+import { ProtocolSetupDeckConfiguration } from '../../../organisms/ProtocolSetupDeckConfiguration'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -66,7 +66,7 @@ import {
 import { useToaster } from '../../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
 import { getLabwareSetupItemGroups } from '../../Protocols/utils'
-import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
+import { getLocalRobot } from '../../../redux/discovery'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -77,7 +77,9 @@ import {
 } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { CloseButton, PlayButton } from './Buttons'
 
+import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
 
 const FETCH_DURATION_MS = 5000
@@ -193,134 +195,6 @@ export function ProtocolSetupStep({
   )
 }
 
-const CLOSE_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.red2Pressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.red2};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.red2};
-  }
-
-  &:active {
-    background-color: ${COLORS.red2Pressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
-// TODO(ew, 05/03/2023): refactor the run buttons into a shared component
-interface CloseButtonProps {
-  onClose: () => void
-}
-
-function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.red2}
-      borderRadius="6.25rem"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      onClick={onClose}
-      aria-label="close"
-      css={CLOSE_BUTTON_STYLE}
-    >
-      <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
-    </Btn>
-  )
-}
-
-interface PlayButtonProps {
-  ready: boolean
-  onPlay?: () => void
-  disabled?: boolean
-  isDoorOpen: boolean
-}
-
-function PlayButton({
-  disabled = false,
-  onPlay,
-  ready,
-  isDoorOpen,
-}: PlayButtonProps): JSX.Element {
-  const playButtonStyle = css`
-    -webkit-tap-highlight-color: transparent;
-    &:focus {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
-      color: ${COLORS.white};
-    }
-
-    &:hover {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
-      color: ${COLORS.white};
-    }
-
-    &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
-    }
-
-    &:active {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
-      color: ${COLORS.white};
-    }
-
-    &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack60};
-    }
-  `
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={
-        disabled || !ready || isDoorOpen
-          ? COLORS.darkBlack20
-          : COLORS.blueEnabled
-      }
-      borderRadius="6.25rem"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      disabled={disabled}
-      onClick={onPlay}
-      aria-label="play"
-      css={playButtonStyle}
-    >
-      <Icon
-        color={
-          disabled || !ready || isDoorOpen ? COLORS.darkBlack60 : COLORS.white
-        }
-        name="play-icon"
-        size="2.5rem"
-      />
-    </Btn>
-  )
-}
-
 interface PrepareToRunProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
@@ -339,6 +213,8 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -362,7 +238,8 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId, protocolName)
+  const robotType = useRobotType(robotName)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -380,7 +257,7 @@ function PrepareToRun({
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo =
     mostRecentAnalysis != null
@@ -402,9 +279,7 @@ function PrepareToRun({
     hasMissingModulesForOdd: isMissingModules,
     hasMissingCalForOdd: !areInstrumentsReady,
   })
-  const requiredCalibration = attachedModules.some(
-    module => module.moduleOffset?.last_modified == null
-  )
+  const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
   const [
     showConfirmCancelModal,
@@ -429,7 +304,9 @@ function PrepareToRun({
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
   const modulesStatus =
-    isMissingModules || requiredCalibration ? 'not ready' : 'ready'
+    isMissingModules || !moduleCalibrationStatus.complete
+      ? 'not ready'
+      : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
 
@@ -480,7 +357,7 @@ function PrepareToRun({
   const modulesDetail = (): string => {
     if (isMissingModules) {
       return missingModulesText
-    } else if (requiredCalibration) {
+    } else if (!moduleCalibrationStatus.complete) {
       return t('calibration_required')
     } else {
       return connectedModulesText
@@ -662,6 +539,7 @@ export type SetupScreens =
   | 'modules'
   | 'labware'
   | 'liquids'
+  | 'deck configuration'
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -682,6 +560,12 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
   )
+  const [fixtureLocation, setFixtureLocation] = React.useState<Cutout>(
+    '' as Cutout
+  )
+  const [providedFixtureOptions, setProvidedFixtureOptions] = React.useState<
+    FixtureLoadName[]
+  >([])
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -704,6 +588,8 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupModulesAndDeck
         runId={runId}
         setSetupScreen={setSetupScreen}
+        setFixtureLocation={setFixtureLocation}
+        setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
     labware: (
@@ -711,6 +597,14 @@ export function ProtocolSetup(): JSX.Element {
     ),
     liquids: (
       <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
+    ),
+    'deck configuration': (
+      <ProtocolSetupDeckConfiguration
+        fixtureLocation={fixtureLocation}
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        providedFixtureOptions={providedFixtureOptions}
+      />
     ),
   }
 

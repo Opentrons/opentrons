@@ -54,6 +54,10 @@ const mockLoadedStagingAreaFixture = {
   status: 'succeeded',
 } as LoadFixtureRunTimeCommand
 
+const mockSetSetupScreen = jest.fn()
+const mockSetFixtureLocation = jest.fn()
+const mockSetProvidedFixtureOptions = jest.fn()
+
 const render = (props: React.ComponentProps<typeof FixtureTable>) => {
   return renderWithProviders(<FixtureTable {...props} />, {
     i18nInstance: i18n,
@@ -65,6 +69,9 @@ describe('FixtureTable', () => {
   beforeEach(() => {
     props = {
       mostRecentAnalysis: [] as any,
+      setSetupScreen: mockSetSetupScreen,
+      setFixtureLocation: mockSetFixtureLocation,
+      setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
     when(mockUseFeatureFlag)
       .calledWith('enableDeckConfiguration')
@@ -85,6 +92,7 @@ describe('FixtureTable', () => {
   })
   it('should render the current status - configured', () => {
     props = {
+      ...props,
       mostRecentAnalysis: { commands: [mockLoadedFixture] } as any,
     }
     const [{ getByText }] = render(props)
@@ -95,6 +103,7 @@ describe('FixtureTable', () => {
       { ...mockLoadedFixture, configurationStatus: 'not configured' },
     ])
     props = {
+      ...props,
       mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
     }
     const [{ getByText }] = render(props)
@@ -105,10 +114,25 @@ describe('FixtureTable', () => {
       { ...mockLoadedFixture, configurationStatus: 'conflicting' },
     ])
     props = {
+      ...props,
       mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
     }
     const [{ getByText, getAllByText }] = render(props)
     getByText('Location conflict').click()
     getAllByText('mock location conflict modal')
+  })
+  it('should call a mock function when tapping not configured row', () => {
+    mockUseLoadedFixturesConfigStatus.mockReturnValue([
+      { ...mockLoadedFixture, configurationStatus: 'not configured' },
+    ])
+    props = {
+      ...props,
+      mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
+    }
+    const [{ getByText }] = render(props)
+    getByText('Not configured').click()
+    expect(mockSetFixtureLocation).toHaveBeenCalledWith('D3')
+    expect(mockSetSetupScreen).toHaveBeenCalledWith('deck configuration')
+    expect(mockSetProvidedFixtureOptions).toHaveBeenCalledWith(['wasteChute'])
   })
 })

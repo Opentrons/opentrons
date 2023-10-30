@@ -35,6 +35,7 @@ from ..types import (
     LoadedModule,
     ModuleModel,
     ModuleOffsetVector,
+    ModuleOffsetData,
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
@@ -144,7 +145,7 @@ class ModuleState:
     substate_by_module_id: Dict[str, ModuleSubStateType]
     """Information about each module that's specific to the module type."""
 
-    module_offset_by_serial: Dict[str, ModuleOffsetVector]
+    module_offset_by_serial: Dict[str, ModuleOffsetData]
     """Information about each modules offsets."""
 
 
@@ -154,7 +155,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     _state: ModuleState
 
     def __init__(
-        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None
+        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
@@ -195,6 +196,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             self._update_module_calibration(
                 module_id=command.params.moduleId,
                 module_offset=command.result.moduleOffset,
+                location=command.result.location,
             )
 
         if isinstance(
@@ -289,7 +291,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
 
     def _update_module_calibration(
-        self, module_id: str, module_offset: ModuleOffsetVector
+        self,
+        module_id: str,
+        module_offset: ModuleOffsetVector,
+        location: DeckSlotLocation,
     ) -> None:
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
@@ -297,7 +302,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             assert (
                 module_serial is not None
             ), "Expected a module SN and got None instead."
-            self._state.module_offset_by_serial[module_serial] = module_offset
+            self._state.module_offset_by_serial[module_serial] = ModuleOffsetData(
+                moduleOffsetVector=module_offset,
+                location=location,
+            )
 
     def _handle_heater_shaker_commands(
         self,
@@ -650,19 +658,10 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
-        """Get the stored module calibration offset."""
-        module_serial = self.get(module_id).serialNumber
-        if module_serial is not None:
-            offset = self._state.module_offset_by_serial.get(module_serial)
-            if offset:
-                return offset
-        return ModuleOffsetVector(x=0, y=0, z=0)
-
     def get_nominal_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
-        """Get the module's offset vector computed with slot transform."""
+        """Get the module's nominal offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
         slot = self.get_location(module_id).slotName.id
 
@@ -689,19 +688,14 @@ class ModuleView(HasState[ModuleState]):
             z=xformed[2],
         )
 
-    def get_module_offset(
-        self, module_id: str, deck_type: DeckType
-    ) -> LabwareOffsetVector:
-        """Get the module's offset vector computed with slot transform and calibrated module offsets."""
-        offset_vector = self.get_nominal_module_offset(module_id, deck_type)
-
-        # add the calibrated module offset if there is one
-        cal_offset = self.get_module_calibration_offset(module_id)
-        return LabwareOffsetVector(
-            x=offset_vector.x + cal_offset.x,
-            y=offset_vector.y + cal_offset.y,
-            z=offset_vector.z + cal_offset.z,
-        )
+    def get_module_calibration_offset(
+        self, module_id: str
+    ) -> Optional[ModuleOffsetData]:
+        """Get the calibration module offset."""
+        module_serial = self.get(module_id).serialNumber
+        if module_serial:
+            return self._state.module_offset_by_serial.get(module_serial)
+        return None
 
     def get_overall_height(self, module_id: str) -> float:
         """Get the height of the module, excluding any labware loaded atop it."""

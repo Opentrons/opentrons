@@ -54,9 +54,11 @@ export const drillUpFromLabware: () => DrillUpFromLabwareAction = createAction(
 )
 // ==== Create/delete/modify labware =====
 export interface CreateContainerArgs {
-  slot?: DeckSlot
-  // NOTE: if slot is omitted, next available slot will be used.
   labwareDefURI: string
+  // NOTE: adapterUnderLabwareDefURI is only for rendering an adapter under the labware/tiprack
+  adapterUnderLabwareDefURI?: string
+  // NOTE: if slot is omitted, next available slot will be used.
+  slot?: DeckSlot
 }
 export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'

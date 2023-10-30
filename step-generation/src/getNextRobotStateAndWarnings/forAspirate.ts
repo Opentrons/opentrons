@@ -23,7 +23,6 @@ export function forAspirate(
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
   const { allWellsShared, wellsForTips } = getWellsForTips(
-    // @ts-expect-error 96 channels not yet supported
     pipetteSpec.channels,
     labwareDef,
     params.wellName

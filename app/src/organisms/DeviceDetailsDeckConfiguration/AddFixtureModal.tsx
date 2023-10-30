@@ -28,22 +28,32 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
-import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
+import type {
+  Cutout,
+  DeckConfiguration,
+  Fixture,
+  FixtureLoadName,
+} from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
-interface AddDeckConfigurationModalProps {
+interface AddFixtureModalProps {
   fixtureLocation: Cutout
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
+  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<DeckConfiguration>>
+  providedFixtureOptions?: FixtureLoadName[]
   isOnDevice?: boolean
 }
 
-export function AddDeckConfigurationModal({
+export function AddFixtureModal({
   fixtureLocation,
   setShowAddFixtureModal,
+  setCurrentDeckConfig,
+  providedFixtureOptions,
   isOnDevice = false,
-}: AddDeckConfigurationModalProps): JSX.Element {
+}: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', { slotName: fixtureLocation }),
@@ -59,8 +69,6 @@ export function AddDeckConfigurationModal({
     width: '23.125rem',
   }
 
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-
   const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
   if (
     fixtureLocation === 'A3' ||
@@ -72,6 +80,24 @@ export function AddDeckConfigurationModal({
   if (fixtureLocation === 'D3') {
     availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
   }
+
+  // For Touchscreen app
+  const handleTapAdd = (fixtureLoadName: FixtureLoadName): void => {
+    if (setCurrentDeckConfig != null)
+      setCurrentDeckConfig(
+        (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
+          prevDeckConfig.map((fixture: Fixture) =>
+            fixture.fixtureLocation === fixtureLocation
+              ? { ...fixture, loadName: fixtureLoadName }
+              : fixture
+          )
+      )
+
+    setShowAddFixtureModal(false)
+  }
+
+  // For Desktop app
+  const fixtureOptions = providedFixtureOptions ?? availableFixtures
 
   const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
     updateDeckConfiguration({
@@ -91,11 +117,11 @@ export function AddDeckConfigurationModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableFixtures.map(fixture => (
+              {fixtureOptions.map(fixture => (
                 <React.Fragment key={fixture}>
                   <AddFixtureButton
                     fixtureLoadName={fixture}
-                    handleClickAdd={handleClickAdd}
+                    handleClickAdd={handleTapAdd}
                   />
                 </React.Fragment>
               ))}
@@ -107,7 +133,7 @@ export function AddDeckConfigurationModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableFixtures.map(fixture => (
+              {fixtureOptions.map(fixture => (
                 <React.Fragment key={fixture}>
                   <Flex
                     flexDirection={DIRECTION_ROW}

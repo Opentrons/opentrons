@@ -30,7 +30,7 @@ describe('StagingAreasRow', () => {
   })
   it('renders no staging areas', () => {
     const { getByRole, getByText } = render(props)
-    getByText('Staging Areas')
+    getByText('Staging Area Slots')
     getByRole('button', { name: 'add' }).click()
     getByText('mock portal')
   })

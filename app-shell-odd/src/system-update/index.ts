@@ -29,7 +29,8 @@ let updateSet: ReleaseSetFilepaths | null = null
 
 const readFileInfoAndDispatch = (
   dispatch: Dispatch,
-  fileName: string
+  fileName: string,
+  isManualFile: boolean = false
 ): Promise<void> =>
   readUserFileInfo(fileName)
     .then(fileInfo => ({
@@ -37,6 +38,7 @@ const readFileInfoAndDispatch = (
       payload: {
         systemFile: fileInfo.systemFile,
         version: fileInfo.versionInfo.opentrons_api_version,
+        isManualFile,
       },
     }))
     .catch((error: Error) => ({
@@ -99,7 +101,7 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
       case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        readFileInfoAndDispatch(dispatch, systemFile)
+        readFileInfoAndDispatch(dispatch, systemFile, true)
         break
       }
       case 'robotUpdate:READ_SYSTEM_FILE': {

@@ -20,7 +20,9 @@ import {
   ALIGN_FLEX_START,
   Icon,
   PrimaryButton,
-  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+  Link,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -33,6 +35,9 @@ import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent
 import type { RunCommandSummary, RunData } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
+const LEARN_ABOUT_MANUAL_STEPS_URL =
+  'https://support.opentrons.com/s/article/Manual-protocol-steps'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -82,7 +87,7 @@ const FOOTER_STYLE = {
   display: DISPLAY_FLEX,
   width: '100%',
   alignItems: ALIGN_CENTER,
-  justifyContent: JUSTIFY_FLEX_END,
+  justifyContent: JUSTIFY_SPACE_BETWEEN,
 } as const
 
 export interface InterventionModalProps {
@@ -202,9 +207,11 @@ export function InterventionModal({
           <Box {...CONTENT_STYLE}>
             {childContent}
             <Box {...FOOTER_STYLE}>
-              {/* 
-              TODO(BC, 08/31/23): reintroduce this link and justify space between when support article is written 
-              <Link css={TYPOGRAPHY.darkLinkH4SemiBold} href="" external>
+              <Link
+                css={TYPOGRAPHY.darkLinkH4SemiBold}
+                href={LEARN_ABOUT_MANUAL_STEPS_URL}
+                external
+              >
                 {t('protocol_info:manual_steps_learn_more')}
                 <Icon
                   name="open-in-new"
@@ -212,7 +219,6 @@ export function InterventionModal({
                   size="0.5rem"
                 />
               </Link>
-              */}
               <PrimaryButton onClick={onResume}>
                 {t('confirm_and_resume')}
               </PrimaryButton>

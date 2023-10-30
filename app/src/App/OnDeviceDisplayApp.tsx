@@ -13,6 +13,7 @@ import {
   useScrolling,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import NiceModal from '@ebay/nice-modal-react'
 
 import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../atoms/SleepScreen'
@@ -39,7 +40,7 @@ import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashbo
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
 import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScreen'
-import { DeckConfiguration } from '../pages/DeckConfiguration'
+import { DeckConfigurationEditor } from '../pages/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
@@ -48,8 +49,14 @@ import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
+import { hackWindowNavigatorOnLine } from './hacks'
+
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
+
+// forces electron to think we're online which means axios won't elide
+// network calls to localhost. see ./hacks.ts for more.
+hackWindowNavigatorOnLine()
 
 export const onDeviceDisplayRoutes: RouteProps[] = [
   {
@@ -185,7 +192,7 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/emergency-stop',
   },
   {
-    Component: DeckConfiguration,
+    Component: DeckConfigurationEditor,
     exact: true,
     name: 'Deck Configuration',
     path: '/deck-configuration',
@@ -264,7 +271,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="localhost">
+    <ApiHostProvider hostname="127.0.0.1">
       <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
         <Box width="100%" css="user-select: none;">
           {isIdle ? (
@@ -274,24 +281,26 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
               <EstopTakeover />
               <MaintenanceRunTakeover>
                 <FirmwareUpdateTakeover />
-                <ToasterOven>
-                  <ProtocolReceiptToasts />
-                  <Switch>
-                    {onDeviceDisplayRoutes.map(
-                      ({ Component, exact, path }: RouteProps) => {
-                        return (
-                          <Route key={path} exact={exact} path={path}>
-                            <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                              <ModalPortalRoot />
-                              <Component />
-                            </Box>
-                          </Route>
-                        )
-                      }
-                    )}
-                    <Redirect exact from="/" to={'/loading'} />
-                  </Switch>
-                </ToasterOven>
+                <NiceModal.Provider>
+                  <ToasterOven>
+                    <ProtocolReceiptToasts />
+                    <Switch>
+                      {onDeviceDisplayRoutes.map(
+                        ({ Component, exact, path }: RouteProps) => {
+                          return (
+                            <Route key={path} exact={exact} path={path}>
+                              <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                                <ModalPortalRoot />
+                                <Component />
+                              </Box>
+                            </Route>
+                          )
+                        }
+                      )}
+                      <Redirect exact from="/" to={'/loading'} />
+                    </Switch>
+                  </ToasterOven>
+                </NiceModal.Provider>
               </MaintenanceRunTakeover>
             </>
           )}

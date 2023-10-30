@@ -378,6 +378,14 @@ class ModuleOffsetVector(BaseModel):
     z: float
 
 
+@dataclass
+class ModuleOffsetData:
+    """Module calibration offset data."""
+
+    moduleOffsetVector: ModuleOffsetVector
+    location: DeckSlotLocation
+
+
 class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
 

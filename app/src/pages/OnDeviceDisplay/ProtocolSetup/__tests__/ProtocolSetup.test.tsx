@@ -12,7 +12,10 @@ import {
   useDoorQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { i18n } from '../../../../i18n'
@@ -22,7 +25,10 @@ import {
   useAttachedModules,
   useLPCDisabledReason,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
+  useRobotType,
 } from '../../../../organisms/Devices/hooks'
+import { getLocalRobot } from '../../../../redux/discovery'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -72,6 +78,7 @@ jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../../organisms/ToasterOven')
 
@@ -127,6 +134,9 @@ const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
 const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
   typeof useIsHeaterShakerInProtocol
 >
+const mockUseRobotType = useRobotType as jest.MockedFunction<
+  typeof useRobotType
+>
 const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
   typeof ConfirmAttachedModal
 >
@@ -136,6 +146,12 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
   typeof useFeatureFlag
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
+>
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
 >
 
 const render = (path = '/') => {
@@ -151,6 +167,7 @@ const render = (path = '/') => {
   )
 }
 
+const ROBOT_NAME = 'fake-robot-name'
 const RUN_ID = 'my-run-id'
 const PROTOCOL_ID = 'my-protocol-id'
 const PROTOCOL_NAME = 'Mock Protocol Name'
@@ -219,6 +236,11 @@ describe('ProtocolSetup', () => {
     mockConfirmCancelRunModal.mockReturnValue(
       <div>Mock ConfirmCancelRunModal</div>
     )
+    mockUseModuleCalibrationStatus.mockReturnValue({ complete: true })
+    mockGetLocalRobot.mockReturnValue({ name: ROBOT_NAME } as any)
+    when(mockUseRobotType)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockUseRunControls)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -273,7 +295,7 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID, PROTOCOL_NAME)
+      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, PROTOCOL_NAME)
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,

@@ -14,7 +14,7 @@ from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Point
 
 from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api.core.engine import WellCore, point_calculations
+from opentrons.protocol_api.core.engine import WellCore, point_calculations, stringify
 
 
 @pytest.fixture(autouse=True)
@@ -24,6 +24,13 @@ def patch_mock_point_calculations(
     """Mock out point_calculations.py functions."""
     for name, func in inspect.getmembers(point_calculations, inspect.isfunction):
         monkeypatch.setattr(point_calculations, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_stringify(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out stringify.py functions."""
+    for name, func in inspect.getmembers(stringify, inspect.isfunction):
+        monkeypatch.setattr(stringify, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -73,10 +80,14 @@ def test_display_name(
 ) -> None:
     """It should have a display name."""
     decoy.when(
-        mock_engine_client.state.labware.get_display_name("labware-id")
-    ).then_return("Cool Labware")
+        stringify.well(
+            engine_client=mock_engine_client,
+            well_name="well-name",
+            labware_id="labware-id",
+        )
+    ).then_return("Matthew Zwimpfer")
 
-    assert subject.get_display_name() == "well-name of Cool Labware"
+    assert subject.get_display_name() == "Matthew Zwimpfer"
 
 
 @pytest.mark.parametrize(

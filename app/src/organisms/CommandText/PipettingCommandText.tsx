@@ -8,10 +8,15 @@ import {
   DropTipRunTimeCommand,
   PickUpTipRunTimeCommand,
   getLabwareDefURI,
+  RobotType,
 } from '@opentrons/shared-data'
 import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { getLoadedLabware } from './utils/accessors'
-import { getLabwareName, getLabwareDisplayLocation } from './utils'
+import {
+  getLabwareName,
+  getLabwareDisplayLocation,
+  getFinalLabwareLocation,
+} from './utils'
 
 type PipettingRunTimeCommmand =
   | AspirateRunTimeCommand
@@ -23,21 +28,33 @@ type PipettingRunTimeCommmand =
 interface PipettingCommandTextProps {
   command: PipettingRunTimeCommmand
   robotSideAnalysis: CompletedProtocolAnalysis
+  robotType: RobotType
 }
 
 export const PipettingCommandText = ({
   command,
   robotSideAnalysis,
+  robotType,
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
   const { labwareId, wellName } = command.params
-  const labwareLocation = getLoadedLabware(robotSideAnalysis, labwareId)
-    ?.location
-
+  const allPreviousCommands = robotSideAnalysis.commands.slice(
+    0,
+    robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+  )
+  const labwareLocation = getFinalLabwareLocation(
+    labwareId,
+    allPreviousCommands
+  )
   const displayLocation =
     labwareLocation != null
-      ? getLabwareDisplayLocation(robotSideAnalysis, labwareLocation, t)
+      ? getLabwareDisplayLocation(
+          robotSideAnalysis,
+          labwareLocation,
+          t,
+          robotType
+        )
       : ''
   switch (command.commandType) {
     case 'aspirate': {

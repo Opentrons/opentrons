@@ -243,7 +243,7 @@ def test_load_labware(mock_hw):
         uf = CheckCalibrationUserFlow(hardware=mock_hw, has_calibration_block=True)
         assert (
             uf.active_tiprack._core.get_display_name()
-            == "Opentrons 96 Filter Tip Rack 200 µL on 8"
+            == "Opentrons OT-2 96 Filter Tip Rack 200 µL on 8"
         )
         assert len(uf.get_required_labware()) == 2
 

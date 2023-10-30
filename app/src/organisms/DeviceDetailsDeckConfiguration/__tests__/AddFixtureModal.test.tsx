@@ -1,35 +1,35 @@
 import * as React from 'react'
 
-import { i18n } from '../../../i18n'
-
 import { renderWithProviders } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
-import { AddDeckConfigurationModal } from '../AddDeckConfigurationModal'
+
+import { i18n } from '../../../i18n'
+import { AddFixtureModal } from '../AddFixtureModal'
 
 jest.mock('@opentrons/react-api-client')
 const mockSetShowAddFixtureModal = jest.fn()
 const mockUpdateDeckConfiguration = jest.fn()
+const mockSetCurrentDeckConfig = jest.fn()
 
 const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
   typeof useUpdateDeckConfigurationMutation
 >
 
-const render = (
-  props: React.ComponentProps<typeof AddDeckConfigurationModal>
-) => {
-  return renderWithProviders(<AddDeckConfigurationModal {...props} />, {
+const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
+  return renderWithProviders(<AddFixtureModal {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('Touchscreen AddDeckConfigurationModal', () => {
-  let props: React.ComponentProps<typeof AddDeckConfigurationModal>
+describe('Touchscreen AddFixtureModal', () => {
+  let props: React.ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
     props = {
       fixtureLocation: 'D3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
+      setCurrentDeckConfig: mockSetCurrentDeckConfig,
       isOnDevice: true,
     }
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
@@ -49,11 +49,15 @@ describe('Touchscreen AddDeckConfigurationModal', () => {
     expect(getAllByText('Add').length).toBe(3)
   })
 
-  it.todo('should a mock function when tapping a button')
+  it('should a mock function when tapping app button', () => {
+    const [{ getAllByText }] = render(props)
+    getAllByText('Add')[0].click()
+    expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
+  })
 })
 
-describe('Desktop AddDeckConfigurationModal', () => {
-  let props: React.ComponentProps<typeof AddDeckConfigurationModal>
+describe('Desktop AddFixtureModal', () => {
+  let props: React.ComponentProps<typeof AddFixtureModal>
 
   beforeEach(() => {
     props = {

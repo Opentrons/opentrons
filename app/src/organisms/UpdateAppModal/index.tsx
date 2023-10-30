@@ -35,7 +35,6 @@ interface PlaceHolderErrorProps {
   errorMessage?: string
 }
 
-// TODO(jh, 2023-08-25): refactor default error handling into LegacyModal
 const PlaceholderError = ({
   errorMessage,
 }: PlaceHolderErrorProps): JSX.Element => {
@@ -75,9 +74,14 @@ const UpdateAppBanner = styled(Banner)`
   border: none;
 `
 const UPDATE_PROGRESS_BAR_STYLE = css`
-  margin-top: 1.5rem;
+  margin-top: ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize3};
   background: ${COLORS.medGreyEnabled};
+  width: 17.12rem;
+`
+const LEGACY_MODAL_STYLE = css`
+  width: 40rem;
+  textalign: center;
 `
 
 const RESTART_APP_AFTER_TIME = 5000
@@ -134,12 +138,16 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   return (
     <>
       {error != null ? (
-        <LegacyModal title={UPDATE_ERROR} onClose={() => closeModal(true)}>
+        <LegacyModal
+          title={UPDATE_ERROR}
+          onClose={() => closeModal(true)}
+          css={LEGACY_MODAL_STYLE}
+        >
           <PlaceholderError errorMessage={error.message} />
         </LegacyModal>
       ) : null}
       {(downloading || downloaded) && error == null ? (
-        <LegacyModal title={t('opentrons_app_update')}>
+        <LegacyModal title={t('opentrons_app_update')} css={LEGACY_MODAL_STYLE}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
@@ -162,6 +170,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
           maxHeight="80%"
+          css={LEGACY_MODAL_STYLE}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>

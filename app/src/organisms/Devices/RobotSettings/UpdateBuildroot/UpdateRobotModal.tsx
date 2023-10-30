@@ -18,7 +18,6 @@ import {
 import {
   getRobotUpdateDisplayInfo,
   robotUpdateChangelogSeen,
-  startRobotUpdate,
   OT2_BALENA,
   UPGRADE,
   REINSTALL,
@@ -29,6 +28,7 @@ import { useIsRobotBusy } from '../../hooks'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Banner } from '../../../../atoms/Banner'
+import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 
 import type { State, Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/robot-update/types'
@@ -72,6 +72,7 @@ export function UpdateRobotModal({
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
+  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
   const isRobotBusy = useIsRobotBusy()
   const updateDisabled = updateFromFileDisabledReason !== null || isRobotBusy
 
@@ -106,7 +107,7 @@ export function UpdateRobotModal({
         {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
       </NewSecondaryBtn>
       <NewPrimaryBtn
-        onClick={() => dispatch(startRobotUpdate(robotName))}
+        onClick={() => dispatchStartRobotUpdate(robotName)}
         marginRight={SPACING.spacing12}
         css={FOOTER_BUTTON_STYLE}
         disabled={updateDisabled}

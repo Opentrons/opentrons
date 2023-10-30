@@ -305,6 +305,15 @@ def test_get_is_started() -> None:
     assert subject.has_been_played() is True
 
 
+def test_get_is_terminal() -> None:
+    """It should return true if run is in a terminal state."""
+    subject = get_command_view(run_result=None)
+    assert subject.get_is_terminal() is False
+
+    subject = get_command_view(run_result=RunResult.SUCCEEDED)
+    assert subject.get_is_terminal() is True
+
+
 class ActionAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 
@@ -658,15 +667,6 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
 def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None:
     """It should report whether an engine is ok to clear."""
     assert subject.get_is_okay_to_clear() is expected_is_okay
-
-
-def test_get_running() -> None:
-    """It should return the command that's currently running."""
-    subject = get_command_view(running_command_id=None)
-    assert subject.get_running() is None
-
-    subject = get_command_view(running_command_id="command-id")
-    assert subject.get_running() == "command-id"
 
 
 def test_get_current() -> None:

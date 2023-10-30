@@ -12,6 +12,13 @@ export function insufficientTips(): CommandCreatorError {
   }
 }
 
+export function missingAdapter(): CommandCreatorError {
+  return {
+    type: 'MISSING_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips fully without an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string

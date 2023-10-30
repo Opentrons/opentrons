@@ -24,13 +24,11 @@ import { analyzeProtocolSource } from '../protocol-analysis'
  *  │  ├─ analysis/
  *  │  │  ├─ 1646303906.json
  */
-// TODO(jh, 2023-09-11): remove OLD_PROTOCOLS_DIRECTORY_PATH after
-// OT-2 parity work is completed and move all protocols back to "protocols" directory.
-export const OLD_PROTOCOLS_DIRECTORY_PATH = path.join(
+export const PRE_V7_PARITY_DIRECTORY_PATH = path.join(
   app.getPath('userData'),
-  'protocols'
+  'protocols_v7.0-supported'
 )
-export const PROTOCOLS_DIRECTORY_NAME = 'protocols_v7.0-supported'
+export const PROTOCOLS_DIRECTORY_NAME = 'protocols'
 export const PROTOCOLS_DIRECTORY_PATH = path.join(
   app.getPath('userData'),
   PROTOCOLS_DIRECTORY_NAME

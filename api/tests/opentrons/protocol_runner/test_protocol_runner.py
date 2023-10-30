@@ -444,10 +444,11 @@ async def test_load_legacy_python(
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(legacy_protocol)
+    broker_captor = matchers.Captor()
     decoy.when(
         legacy_context_creator.create(
             protocol=legacy_protocol,
-            broker=matchers.IsA(LegacyBroker),
+            broker=broker_captor,
             equipment_broker=matchers.IsA(Broker),
         )
     ).then_return(legacy_context)
@@ -469,6 +470,7 @@ async def test_load_legacy_python(
             context=legacy_context,
         ),
     )
+    assert broker_captor.value is legacy_python_runner_subject.broker
 
 
 async def test_load_python_with_pe_papi_core(
@@ -514,9 +516,10 @@ async def test_load_python_with_pe_papi_core(
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(legacy_protocol)
+    broker_captor = matchers.Captor()
     decoy.when(
         legacy_context_creator.create(
-            protocol=legacy_protocol, broker=None, equipment_broker=None
+            protocol=legacy_protocol, broker=broker_captor, equipment_broker=None
         )
     ).then_return(legacy_context)
 
@@ -526,6 +529,7 @@ async def test_load_python_with_pe_papi_core(
     )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
+    assert broker_captor.value is legacy_python_runner_subject.broker
 
 
 async def test_load_legacy_json(

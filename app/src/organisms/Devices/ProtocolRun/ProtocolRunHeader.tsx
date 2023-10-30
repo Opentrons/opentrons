@@ -20,8 +20,15 @@ import {
   useRunQuery,
   useModulesQuery,
   useDoorQuery,
+  useHost,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  getPipetteModelSpecs,
+  HEATERSHAKER_MODULE_TYPE,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import {
   Box,
   Flex,
@@ -48,6 +55,8 @@ import {
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getRobotSettings } from '../../../redux/robot-settings'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
+import { ProtocolDropTipBanner } from './ProtocolDropTipBanner'
+import { DropTipWizard } from '../../DropTipWizard'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
 import {
@@ -85,7 +94,9 @@ import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
   useIsFlex,
+  useModuleCalibrationStatus,
 } from '../hooks'
+import { getPipettesWithTipAttached } from '../../DropTipWizard/getPipettesWithTipAttached'
 import { formatTimestamp } from '../utils'
 import { RunTimer } from './RunTimer'
 import { EMPTY_TIMESTAMP } from '../constants'
@@ -96,6 +107,12 @@ import { RunProgressMeter } from '../../RunProgressMeter'
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+
+interface PipettesWithTip {
+  mount: 'left' | 'right'
+  specs?: PipetteModelSpecs | null
+}
 
 const EQUIPMENT_POLL_MS = 5000
 const CANCELLABLE_STATUSES = [
@@ -104,6 +121,11 @@ const CANCELLABLE_STATUSES = [
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
+]
+const RUN_OVER_STATUSES: RunStatus[] = [
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
 ]
 
 interface ProtocolRunHeaderProps {
@@ -121,6 +143,7 @@ export function ProtocolRunHeader({
 }: ProtocolRunHeaderProps): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
   const history = useHistory()
+  const host = useHost()
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
   const {
     protocolData,
@@ -133,10 +156,16 @@ export function ProtocolRunHeader({
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
+  const { data: attachedInstruments } = useInstrumentsQuery()
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
+  const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
+  const [showDropTipBanner, setShowDropTipBanner] = React.useState(true)
+  const [pipettesWithTip, setPipettesWithTip] = React.useState<
+    PipettesWithTip[]
+  >([])
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
     runRecord?.data.errors?.[0] != null
@@ -161,6 +190,37 @@ export function ProtocolRunHeader({
   } else {
     isDoorOpen = false
   }
+
+  React.useEffect(() => {
+    // Reset drop tip state when a new run occurs.
+    if (runStatus === RUN_STATUS_IDLE) {
+      setShowDropTipBanner(true)
+      setPipettesWithTip([])
+    } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
+      getPipettesWithTipAttached({
+        host,
+        runId,
+        runRecord,
+        attachedInstruments,
+        isFlex,
+      })
+        .then(pipettesWithTipAttached => {
+          const newPipettesWithTipAttached = pipettesWithTipAttached.map(
+            pipette => {
+              const specs = getPipetteModelSpecs(pipette.instrumentModel)
+              return {
+                specs,
+                mount: pipette.mount,
+              }
+            }
+          )
+          setPipettesWithTip(() => newPipettesWithTipAttached)
+        })
+        .catch(e => {
+          console.log(`Error checking pipette tip attachement state: ${e}`)
+        })
+    }
+  }, [runStatus, attachedInstruments, host, runId, runRecord, isFlex])
 
   React.useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -300,6 +360,15 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
+        {isRunCurrent && showDropTipBanner && pipettesWithTip.length !== 0 ? (
+          <ProtocolDropTipBanner
+            onLaunchWizardClick={setShowDropTipWizard}
+            onCloseClick={() => {
+              closeCurrentRun()
+              setShowDropTipBanner(false)
+            }}
+          />
+        ) : null}
         <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
           <LabeledValue label={t('run')} value={createdAtTimestamp} />
           <LabeledValue
@@ -364,6 +433,23 @@ export function ProtocolRunHeader({
           <ConfirmCancelModal
             onClose={() => setShowConfirmCancelModal(false)}
             runId={runId}
+          />
+        ) : null}
+        {showDropTipWizard &&
+        pipettesWithTip[0]?.specs != null &&
+        isRunCurrent ? (
+          <DropTipWizard
+            robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
+            mount={pipettesWithTip[0].mount}
+            instrumentModelSpecs={pipettesWithTip[0].specs}
+            closeFlow={() => {
+              setShowDropTipWizard(false)
+              setPipettesWithTip(prevPipettesWithTip => {
+                const pipettesWithTip = prevPipettesWithTip.slice(1) ?? []
+                if (pipettesWithTip.length === 0) closeCurrentRun()
+                return pipettesWithTip
+              })
+            }}
           />
         ) : null}
       </Flex>
@@ -476,10 +562,17 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runId
   )
+  const { complete: isModuleCalibrationComplete } = useModuleCalibrationStatus(
+    robotName,
+    runId
+  )
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const isSetupComplete = isCalibrationComplete && missingModuleIds.length === 0
+  const isSetupComplete =
+    isCalibrationComplete &&
+    isModuleCalibrationComplete &&
+    missingModuleIds.length === 0
   const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
     useSelector((state: State) => {
       return getRobotUpdateDisplayInfo(state, robotName)
@@ -543,6 +636,12 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
+  } else if (
+    isDoorOpen &&
+    runStatus != null &&
+    START_RUN_STATUSES.includes(runStatus)
+  ) {
+    disableReason = t('close_door')
   }
 
   if (isProtocolAnalyzing) {

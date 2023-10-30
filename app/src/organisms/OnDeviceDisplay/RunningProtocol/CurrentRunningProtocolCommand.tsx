@@ -30,6 +30,7 @@ import {
 
 import type {
   CompletedProtocolAnalysis,
+  RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
@@ -111,6 +112,7 @@ interface RunTimerInfo {
 interface CurrentRunningProtocolCommandProps {
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
+  robotType: RobotType
   runTimerInfo: RunTimerInfo
   playRun: () => void
   pauseRun: () => void
@@ -132,6 +134,7 @@ export function CurrentRunningProtocolCommand({
   setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
   robotAnalyticsData,
+  robotType,
   protocolName,
   currentRunCommandIndex,
   lastAnimatedCommand,
@@ -231,6 +234,7 @@ export function CurrentRunningProtocolCommand({
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
+            robotType={robotType}
           />
         ) : null}
       </Flex>
