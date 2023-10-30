@@ -1,10 +1,9 @@
 """Deck configuration resource provider."""
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List, Set, Dict
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, AddressableArea
 
-from opentrons.types import DeckSlotName
 
 from ..errors import FixtureDoesNotExistError
 
@@ -14,13 +13,14 @@ class DeckCutoutFixture:
     """Basic cutout fixture data class."""
 
     name: str
-    slot_location: DeckSlotName
+    # TODO(jbl 10-30-2023) this is in reference to the cutout ID that is supplied in mayMountTo in the definition.
+    #   We might want to make this not a string.
+    cutout_slot_location: str
 
 
 class DeckConfigurationProvider:
     """Provider class to ingest deck configuration data and retrieve relevant deck definition data."""
 
-    # TODO maybe make the key a DeckSlot enum?
     _configuration: Dict[str, DeckCutoutFixture]
 
     def __init__(
@@ -31,29 +31,32 @@ class DeckConfigurationProvider:
         """Initialize a DeckDataProvider."""
         self._deck_definition = deck_definition
         self._configuration = {
-            cutout_fixture.slot_location.id: cutout_fixture
+            cutout_fixture.cutout_slot_location: cutout_fixture
             for cutout_fixture in deck_configuration
         }
 
     def get_addressable_areas_for_cutout_fixture(
-        self, cutout_fixture_id: str, deck_slot_id: str
-    ) -> List[str]:
-        """Get the allowable addressable areas for a cutout fixture loaded on a specific slot."""
+        self, cutout_fixture_id: str, cutout_id: str
+    ) -> Set[str]:
+        """Get the allowable addressable areas for a cutout fixture loaded on a specific cutout slot."""
         for cutout_fixture in self._deck_definition["cutoutFixtures"]:
             if cutout_fixture_id == cutout_fixture["id"]:
-                return cutout_fixture["providesAddressableAreas"].get(deck_slot_id, [])
+                return set(
+                    cutout_fixture["providesAddressableAreas"].get(cutout_id, [])
+                )
 
-        # TODO need to decide whether an invalid combo should raise an error or just return empty list
-        return []
+        raise FixtureDoesNotExistError(
+            f'Could not resolve "{cutout_fixture_id}" to a fixture.'
+        )
 
-    def get_configured_addressable_areas(self) -> List[str]:
+    def get_configured_addressable_areas(self) -> Set[str]:
         """Get a list of all addressable areas the robot is configured for."""
-        configured_addressable_areas = []
-        for slot_id, cutout_fixture in self._configuration.items():
+        configured_addressable_areas = set()
+        for cutout_id, cutout_fixture in self._configuration.items():
             addressable_areas = self.get_addressable_areas_for_cutout_fixture(
-                cutout_fixture.name, slot_id
+                cutout_fixture.name, cutout_id
             )
-            configured_addressable_areas.extend(addressable_areas)
+            configured_addressable_areas.update(addressable_areas)
         return configured_addressable_areas
 
     def get_addressable_area_definition(

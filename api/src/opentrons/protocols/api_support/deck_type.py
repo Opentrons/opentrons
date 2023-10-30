@@ -29,13 +29,15 @@ class NoTrashDefinedError(Exception):
     pass
 
 
+def should_load_fixed_trash_for_python_protocol(api_version: APIVersion) -> bool:
+    return api_version <= LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
+
+
 def should_load_fixed_trash(protocol_config: ProtocolConfig) -> bool:
     """Decide whether to automatically load fixed trash on the deck based on version."""
     load_fixed_trash = False
     if isinstance(protocol_config, PythonProtocolConfig):
-        load_fixed_trash = (
-            protocol_config.api_version <= LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
-        )
+        return should_load_fixed_trash_for_python_protocol(protocol_config.api_version)
     # TODO(jbl 2023-10-27), when schema v8 is out, use a new deck version field to support fixed trash protocols
     elif isinstance(protocol_config, JsonProtocolConfig):
         load_fixed_trash = (
