@@ -65,7 +65,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         self._core_map = core_map
         self._api_version = api_version
 
-        # TODO make this less hardcoded when we figure out how load slots based off of deck configuration
+        # TODO(jbl 10-30-2023) this hardcoding should be removed once slots are refactored to work with deck config
         if self._protocol_core.robot_type == "OT-2 Standard":
             ordered_slot_ids = [
                 "1",

@@ -812,7 +812,7 @@ def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
     result = subject.get_slot_definition(DeckSlotName.SLOT_6)
 
     assert result["id"] == "6"
-    # assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
+    assert result["displayName"] == "Slot 6"
 
 
 def test_get_slot_definition_raises_with_bad_slot_name(

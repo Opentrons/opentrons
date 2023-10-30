@@ -228,6 +228,8 @@ def test_delitem_raises_if_slot_has_module(
         del subject[2]
 
 
+# TODO(jbl 10-30-2023) the following commented out tests are too tightly coupled to DeckDefinitionV3 to easily port over
+#   Either refactor them when the deck class is updated/made anew or delete them later
 # @pytest.mark.parametrize(
 #     "deck_definition",
 #     [

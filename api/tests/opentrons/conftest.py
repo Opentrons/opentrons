@@ -312,7 +312,9 @@ def _make_ot3_pe_ctx(
         ),
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
-        load_fixed_trash=True,  # TODO change how this works, make a new one?
+        # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
+        #   this be False
+        load_fixed_trash=True,
     ) as (
         engine,
         loop,

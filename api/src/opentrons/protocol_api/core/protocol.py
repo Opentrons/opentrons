@@ -157,7 +157,7 @@ class AbstractProtocol(
     def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
 
-    # TODO this may or may not exist past the rapid dev part of Deck Configuration
+    # TODO(jbl 10-30-2023) this method may no longer need to exist post deck config work being completed
     @abstractmethod
     def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""

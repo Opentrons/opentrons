@@ -893,7 +893,6 @@ def test_load_module(
         [mock_hw_mod_1, mock_hw_mod_2]
     )
 
-    # _get_slot_def(deck_def=deck_def, slot_name=slot_name)  # type: ignore[arg-type]
     decoy.when(subject.get_slot_definition(slot_name)).then_return(
         cast(
             SlotDefV3,
