@@ -26,7 +26,6 @@ Slot 11 = 1000ul tips (only used during elution steps)
 metadata = {
     "protocolName": "Omega HDQ DNA Extraction: Bacteria 96 FOR ABR TESTING",
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "apiLevel": "2.15",
 }
 
 requirements = {
@@ -87,7 +86,7 @@ def run(ctx):
     elution_vol = 100
 
     # load 96 channel pipette
-    pip = ctx.load_instrument("p1000_96", mount="left")
+    pip = ctx.load_instrument("flex_96channel_1000", mount="left")
 
     pip.flow_rate.aspirate = 50
     pip.flow_rate.dispense = 150
