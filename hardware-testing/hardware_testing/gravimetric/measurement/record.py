@@ -281,6 +281,7 @@ class GravimetricRecorder:
         self._thread: Optional[Thread] = None
         self._sample_tag: str = ""
         self._scale_serial: str = ""
+        self._scale_max_capacity: float = 0.0
         super().__init__()
         self.activate()
 
@@ -310,6 +311,11 @@ class GravimetricRecorder:
         return self._scale
 
     @property
+    def max_capacity(self) -> float:
+        """Max capacity."""
+        return self._scale_max_capacity
+
+    @property
     def serial_number(self) -> str:
         """Serial number."""
         return self._scale_serial
@@ -330,8 +336,8 @@ class GravimetricRecorder:
         #   2) Set screensaver to NONE
         self._scale.connect()
         self._scale.initialize()
-        self._scale.tare(0.0)
         self._scale_serial = self._scale.read_serial_number()
+        self._scale_max_capacity = self._scale.read_max_capacity()
 
     def deactivate(self) -> None:
         """Deactivate."""
@@ -370,6 +376,10 @@ class GravimetricRecorder:
     def clear_sample_tag(self) -> None:
         """Clear the sample tag."""
         self._sample_tag = ""
+
+    def zero_scale(self) -> None:
+        """Zero scale."""
+        self._scale.zero()
 
     def calibrate_scale(self) -> None:
         """Calibrate scale."""

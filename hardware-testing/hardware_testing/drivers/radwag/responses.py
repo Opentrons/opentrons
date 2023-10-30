@@ -98,10 +98,20 @@ def _on_serial_number(
     return data
 
 
+def _on_max_capacity(
+    command: RadwagCommand, response_list: List[str]
+) -> RadwagResponse:
+    data = RadwagResponse.build(command, response_list)
+    assert len(response_list) == 3
+    data.message = response_list[-1].replace('"', "")
+    return data
+
+
 HANDLERS = {
     RadwagCommand.GET_MEASUREMENT_BASIC_UNIT: _on_unstable_measurement,
     RadwagCommand.GET_MEASUREMENT_CURRENT_UNIT: _on_unstable_measurement,
     RadwagCommand.GET_SERIAL_NUMBER: _on_serial_number,
+    RadwagCommand.GET_MAX_CAPACITY: _on_max_capacity,
 }
 
 
