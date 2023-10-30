@@ -1,48 +1,64 @@
 """This is the ipc messenger."""
 import json
 import asyncio
+import logging
 
 from enum import Enum
 from typing import Any, Dict, Optional, Set
 
+
+from .utils.log import init_logging
 from .dispatcher import JSONRPCDispatcher
 from .manager import JSONRPCResponseManager
 from .constants import (
-    Process,
+    IPCProcess,
     Destinations,
     DESTINATION_PORT,
     JSONRPCRequest,
     JSONRPCResponse,
 )
 
+log = logging.getLogger(__name__)
+init_logging("INFO")
+
 
 class IPCMessenger:
     def __init__(
         self,
-        source: Process,
+        source: IPCProcess,
         host: str,
         port: int,
         dispatcher: JSONRPCDispatcher,
+        context=None
     ) -> None:
         """Constructor."""
         self._source = source
         self._host = host
         self._port = port
+        self._context = context
 
         # register helper with the dispatcher
         self._dispatcher = dispatcher
         async def _get_health() -> bool: return True
         self._dispatcher.add_method(_get_health, name="get_health")
-        self._handler = JSONRPCResponseManager(self._dispatcher)
+        self._handler = JSONRPCResponseManager(self._dispatcher, context=context)
 
         # state variables
         self._req_id = 0
         self._server: Optional[asyncio.base_events.Server] = None
-        self._online_process: Set[Process] = set()
+        self._online_process: Set[IPCProcess] = set()
+
+    def add_context(self, context_arg: str, context_obj: Any) -> Any:
+        """Register a new context arg and its corresponding object."""
+        return self._handler.add_context(context_arg, context_obj)
+
+    def remove_context(self, context_arg: str) -> Optional[Any]:
+        """Unregister a context arg."""
+        return self._handler.remove_context(context_arg)
 
     @property
-    def online_procs(self) -> Set[Process]:
-        """Processes that are responding to ipc messages."""
+    def online_procs(self) -> Set[IPCProcess]:
+        """IPCProcesses that are responding to ipc messages."""
         return self._online_process
 
     async def start(self) -> None:
@@ -50,7 +66,6 @@ class IPCMessenger:
         self._server = await asyncio.start_server(self._handle_incoming, self._host, self._port)
         # update list of online ipc processes and start the server
         await self.request_health()
-        print(f"Online procs: {self.online_procs}")
         await self._server.serve_forever()
 
     async def _handle_incoming(
@@ -60,13 +75,15 @@ class IPCMessenger:
     ) -> None:
         """Handler for data sent over asyncio sockets."""
         data = await reader.read()
+        message = data.decode()
+
         # received a message, handle and respond
-        response = await self._handler.handle(data.decode())
+        log.info(f"Received IPC message: {message}")
+        response = await self._handler.handle(message)
         if response:
+            log.info(f"Sending IPC response: {response.json}")
             writer.write(response.json.encode())
             await writer.drain()
-
-        print("Close the connection")
         writer.close()
         await writer.wait_closed()
 
@@ -74,10 +91,10 @@ class IPCMessenger:
         message: JSONRPCRequest,
         destinations: Optional[Destinations] = None,
         notify: bool = False
-    ) -> Dict[Process, Any]:
-        """Sends a message to one or more Processes and return the response."""
-        response: Dict[Process, Any] = dict()
-        destinations = destinations or list(Process)
+    ) -> Dict[IPCProcess, Any]:
+        """Sends a message to one or more IPCProcesses and return the response."""
+        response: Dict[IPCProcess, Any] = dict()
+        destinations = destinations or list(IPCProcess)
         for target in destinations:
             # Don't send data to your own process
             if target == self._source:
@@ -88,7 +105,7 @@ class IPCMessenger:
 
     async def _send(
         self,
-        target: Process,
+        target: IPCProcess,
         request: JSONRPCRequest,
         notify: bool = False,
     ) -> Optional[Any]:
@@ -100,13 +117,12 @@ class IPCMessenger:
 
         response: Any = None
         port = DESTINATION_PORT[target]
-        print(f"Sending: {self._source.name} ({self._host}:{self._port}) -> {target.name} ({self._host}:{port})\n{request}")
+        log.info(f"Sending: {self._source.name} ({self._host}:{self._port}) -> {target.name} ({self._host}:{port})\n{request}")
         try:
             # open connection to the corresponding port
             reader, writer = await asyncio.open_connection(self._host, port)
 
             message = request.json
-            print(f'Send: {message}')
             writer.write(message.encode())
 
             # we are done sending data so write EOF
@@ -121,17 +137,18 @@ class IPCMessenger:
             await writer.wait_closed()
 
             # return the response
-            print(f"Receive: {data.decode()}")
-            reponse = json.loads(data).get("result")
+            log.debug(f"Received IPC response: {data.decode()}")
+            response = json.loads(data).get('result')
+            # todo (ba, 2023-10-27): raise exception if we get an 'error' response.
         except OSError:
-            print("probably offline")
+            log.warning(f"{self._host}:{port} is probably offline")
         except json.JSONDecodeError:
-            print("Received invalid reponse")
+            log.error("Received invalid IPC response.")
         except Exception as e:
-            print(e)
+            log.exception(e)
         return response
 
-    async def request_health(self) -> Set[Process]:
+    async def request_health(self) -> Set[IPCProcess]:
         """Set of online ipc messengers from other processes."""
         req = JSONRPCRequest(method="get_health")
         responses = await self.send(req)

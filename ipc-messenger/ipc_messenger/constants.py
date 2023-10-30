@@ -19,17 +19,17 @@ class JSONRPCResponse(JSONRPC20Response):
         return f"<{self.__class__.__name__}: id={self._id} result={self.result}>"
 
 
-class Process(Enum):
-    """Processes we can talk to over ipc."""
+class IPCProcess(Enum):
+    """IPCProcesses we can talk to over ipc."""
     HARDWARE = "hardware"
     ROBOT_SERVER = "robot_server"
     SYSTEM_SERVER = "system_server"
 
 
 DESTINATION_PORT = {
-    Process.HARDWARE: 4000,
-    Process.ROBOT_SERVER: 4001,
-    Process.SYSTEM_SERVER: 4002,
+    IPCProcess.HARDWARE: 4000,
+    IPCProcess.ROBOT_SERVER: 4001,
+    IPCProcess.SYSTEM_SERVER: 4002,
 }
 
-Destinations = List[Process]
+Destinations = List[IPCProcess]

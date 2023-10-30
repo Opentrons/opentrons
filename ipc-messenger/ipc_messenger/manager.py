@@ -1,12 +1,11 @@
 """This module is responsible for executing and formulating an rpc response."""
-
+import asyncio
 import json
-from typing import Any, Optional, AsyncGenerator, List
+from typing import Any, Optional, AsyncGenerator, List, Dict
 
 from jsonrpc.jsonrpc2 import JSONRPC20BatchRequest, JSONRPC20BatchResponse
 from jsonrpc.utils import is_invalid_params
 from jsonrpc.exceptions import (
-    JSONRPCError,
     JSONRPCInvalidRequest,
     JSONRPCInvalidRequestException,
     JSONRPCParseError,
@@ -18,12 +17,7 @@ from jsonrpc.exceptions import (
 
 from .constants import JSONRPCRequest, JSONRPCResponse
 from .dispatcher import JSONRPCDispatcher
-
-class JSONRPCVersionNotSupported(JSONRPCError):
-    """ json-rpc version is not supported error. """
-
-    CODE = -32605
-    MESSAGE = "Invalid json-rpc version."
+from .errors import JSONRPCVersionNotSupported, contextAlreadyRegisteredException
 
 
 # we only support json-rpc v2.0
@@ -31,11 +25,33 @@ SUPPORTED_JSON_RPC_VERSION = ["2.0"]
 
 class JSONRPCResponseManager:
     """This class is responsible for validating json-rpc messages and executing commands."""
-    def __init__(self, dispatcher: JSONRPCDispatcher) -> None:
+    def __init__(self,
+        dispatcher: JSONRPCDispatcher,
+        context: Optional[Dict[str, Any]] = None
+    ) -> None:
         """Constructor"""
         self._dispatcher = dispatcher
+        self._context = context or dict()
 
-    async def handle(self, request_str: str, context: Optional[Any] = None) -> Optional[JSONRPCResponse]:
+    @property
+    def context(self) -> Dict[str, Any]:
+        """Dictionary of context args to their objects."""
+        return self._context
+
+    def add_context(self, context_arg: str, context_obj: Any) -> Any:
+        """Register a context arg and context object."""
+        if self._context.get(context_arg):
+            raise contextAlreadyRegisteredException(context_arg)
+        self._context[context_arg] = context_obj
+        return context_obj
+
+    def remove_context(self, context_arg: str) -> Optional[Any]:
+        """Remove a context arg and object from the dict."""
+        if self._context.get(context_arg):
+            return self._context.pop(context_arg)
+        return None
+
+    async def handle(self, request_str: str) -> Optional[JSONRPCResponse]:
         """Validate that this data is a json-rpc message and execute its method, returning a JSONRPCResponse if applicable."""
         try:
             data = json.loads(request_str)
@@ -48,21 +64,18 @@ class JSONRPCResponseManager:
         except JSONRPCInvalidRequestException:
             return JSONRPCResponse(error=JSONRPCInvalidRequest()._data)
 
-        print(request)
-        return await self._handle_request(request, context)
+        return await self._handle_request(request)
 
     async def _handle_request(
         self,
         request: JSONRPCRequest,
-        context: Optional[Any] = None
     ) -> Optional[JSONRPCResponse]:
         """Execute a valid json-rpc request and return a response."""
         rs = request if isinstance(request, JSONRPC20BatchRequest) \
             else [request]
 
         # lets collect our responses
-        responses = [resp async for resp in self._get_responses(rs, context)]
-        print(responses)
+        responses = [resp async for resp in self._get_responses(rs)]
 
         # dont respond if this is a notification
         if not responses:
@@ -75,8 +88,10 @@ class JSONRPCResponseManager:
         else:
             return responses[0]
 
-    async def _get_responses(self, requests: List[JSONRPCRequest], context=None
-    ) -> AsyncGenerator[JSONRPCResponse]:
+    async def _get_responses(
+        self,
+        requests: List[JSONRPCRequest],
+    ) -> JSONRPCResponse:
         """ Response for each single JSON-RPC Request."""
 
         # response helper
@@ -84,33 +99,41 @@ class JSONRPCResponseManager:
                 request: JSONRPCRequest,
                 **kwargs: int
             ) -> Optional[JSONRPCResponse]:
+            # make sure we can serialize this response
             response = JSONRPCResponse(_id=request._id, **kwargs)
+            assert response.json
             response.request = request
+
             # only respond if this is not a notify message
             return response if not request.is_notification else None
 
         for request in requests:
             if request.JSONRPC_VERSION not in SUPPORTED_JSON_RPC_VERSION:
                 yield _make_response(request, error=JSONRPCVersionNotSupported()._data)
+                return
 
             # attempt get the method from the dispatcher
             try:
                 method = self._dispatcher[request.method]
             except KeyError:
                 yield _make_response(request, error=JSONRPCMethodNotFound()._data)
+                return
 
-            # get the kwargs if available
+            # get the args, kwargs, and add context object if available
+            args = request.args
             kwargs = request.kwargs
-            if context is not None:
-                context_arg = self._dispatcher.context_arg_for_method.get(
-                    request.method)
-                if context_arg:
-                    context["request"] = request
-                    kwargs[context_arg] = context
+            context_arg = self._dispatcher.context_arg_for_method.get(request.method)
+            context_obj = self._context.get(context_arg)
+            if context_arg and context_obj:
+                # add context to the args
+                args = (context_obj, *args)
 
             # execute the command and get the response
             try:
-                result = await method(*request.args, **kwargs)
+                if asyncio.iscoroutinefunction(method):
+                    result = await method(*args, **kwargs)
+                else:
+                    result = method(*args, **kwargs)
                 yield _make_response(request, result=result)
             except JSONRPCDispatchException as e:
                 yield _make_response(request, error=e.error._data)
@@ -120,8 +143,6 @@ class JSONRPCResponseManager:
                     "args": e.args,
                     "message": str(e),
                 }
-
-                print("API Exception: {0}".format(data))
 
                 if isinstance(e, TypeError) and is_invalid_params(
                         method, *request.args, **request.kwargs):

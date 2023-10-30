@@ -22,6 +22,8 @@ from typing import (
     Mapping,
     Awaitable,
 )
+
+from ipc_messenger import IPCProcess, IPCMessenger, ipc_dispatcher, JSONRPCDispatcher
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
@@ -231,6 +233,10 @@ class OT3API(
         self._backend = backend
         self._loop = loop
 
+        # initialize the ipc messenger and register self context
+        self._ipc_messenger = IPCMessenger(IPCProcess.HARDWARE, 'localhost', 4000, ipc_dispatcher)
+        self._ipc_messenger.add_context('self', self)
+
         def estop_cb(event: HardwareEvent) -> None:
             self._update_estop_state(event)
 
@@ -397,6 +403,7 @@ class OT3API(
         api_instance._update_door_state(door_state)
         backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
+        checked_loop.create_task(api_instance._ipc_messenger.start())
         backend.initialized = True
         await api_instance.refresh_positions()
         return api_instance
@@ -443,6 +450,7 @@ class OT3API(
         )
         backend.module_controls = module_controls
         await backend.watch(api_instance.loop)
+        checked_loop.create_task(api_instance._ipc_messenger.start())
         await api_instance.refresh_positions()
         return api_instance
 
@@ -517,6 +525,7 @@ class OT3API(
         """Control the robot lights."""
         await self._backend.set_lights(button, rails)
 
+    @ipc_dispatcher.add_method(context_arg='self')
     async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights."""
         return await self._backend.get_lights()
@@ -614,6 +623,7 @@ class OT3API(
         self._gripper_handler.gripper = g
         return skipped
 
+    @ipc_dispatcher.add_method(context_arg='self')
     def get_all_attached_instr(self) -> Dict[OT3Mount, Optional[InstrumentDict]]:
         # NOTE (spp, 2023-03-07): The return type of this method indicates that
         #  if a particular mount has no attached instrument then it will provide a
