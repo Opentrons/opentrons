@@ -109,6 +109,7 @@ class Cutout(TypedDict):
     id: str
     position: List[float]
     displayName: str
+    compatibleFixtureTypes: List[str]
 
 
 class CutoutFixture(TypedDict):

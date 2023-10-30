@@ -218,62 +218,74 @@
       {
         "id": "cutout1",
         "position": [0.0, 0.0, 0.0],
-        "displayName": "Cutout 1"
+        "displayName": "Cutout 1",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout2",
         "position": [132.5, 0.0, 0.0],
-        "displayName": "Cutout 2"
+        "displayName": "Cutout 2",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout3",
         "position": [265.0, 0.0, 0.0],
-        "displayName": "Cutout 3"
+        "displayName": "Cutout 3",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout4",
         "position": [0.0, 90.5, 0.0],
-        "displayName": "Cutout 4"
+        "displayName": "Cutout 4",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout5",
         "position": [132.5, 90.5, 0.0],
-        "displayName": "Cutout 5"
+        "displayName": "Cutout 5",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout6",
         "position": [265.0, 90.5, 0.0],
-        "displayName": "Cutout 6"
+        "displayName": "Cutout 6",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout7",
         "position": [0.0, 181.0, 0.0],
-        "displayName": "Cutout 7"
+        "displayName": "Cutout 7",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout8",
         "position": [132.5, 181.0, 0.0],
-        "displayName": "Cutout 8"
+        "displayName": "Cutout 8",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout9",
         "position": [265.0, 181.0, 0.0],
-        "displayName": "Cutout 9"
+        "displayName": "Cutout 9",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout10",
         "position": [0.0, 271.5, 0.0],
-        "displayName": "Slot 10"
+        "displayName": "Slot 10",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout11",
         "position": [132.5, 271.5, 0.0],
-        "displayName": "Cutout 11"
+        "displayName": "Cutout 11",
+        "compatibleFixtureTypes": ["singleStandardSlot"]
       },
       {
         "id": "cutout12",
         "position": [265.0, 271.5, 0.0],
-        "displayName": "Cutout 12"
+        "displayName": "Cutout 12",
+        "compatibleFixtureTypes": ["fixedTrashSlot"]
       }
     ],
     "calibrationPoints": [
