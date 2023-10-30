@@ -8,11 +8,13 @@ import {
   EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
 // import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+// import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { useStoredProtocolAnalysis } from '../../Devices/hooks'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
+import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 // import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import _uncastedSimpleV7Protocol from '@opentrons/shared-data/protocol/fixtures/7/simpleV7.json'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
@@ -21,10 +23,12 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 jest.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace')
+jest.mock('@opentrons/api-client')
 jest.mock('../../../redux/config')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../resources/deck_configuration/utils')
 jest.mock('../../Devices/ModuleInfo')
+jest.mock('../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
 
 const mockRunId = 'mockRunId'
 const mockSetShowDeckMapModal = jest.fn()
@@ -124,6 +128,9 @@ const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFu
 const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
   typeof getDeckConfigFromProtocolCommands
 >
+const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
+  typeof getLabwareRenderInfo
+>
 
 describe('ModulesAndDeckMapViewModal', () => {
   let props: React.ComponentProps<typeof ModulesAndDeckMapViewModal>
@@ -156,6 +163,7 @@ describe('ModulesAndDeckMapViewModal', () => {
     //   .mockReturnValue(<div>mock BaseDeck</div>)
     mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
     mockRobotWorkSpace.mockReturnValue(<div>mock RobotWorkSpace</div>)
+    mockGetLabwareRenderInfo.mockReturnValue({})
   })
 
   afterEach(() => {
