@@ -170,7 +170,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_labware(labware=dye_container, new_location="2")
 
     # Step 3
-    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top(z=5.0))
+    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
 
     # Step 4
     ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2?")
@@ -179,7 +179,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_labware(labware=dye_container, new_location="3")
 
     # Step 6
-    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top(z=5.0))
+    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
 
     # Step 7
     ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3?")
@@ -188,7 +188,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_labware(labware=custom_labware, new_location="2")
 
     # Step 9
-    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top(z=5.0))
+    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
 
     # Step 10
     ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 2?")
@@ -197,7 +197,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_labware(labware=custom_labware, new_location="6")
 
     # Step 12
-    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top(z=5.0))
+    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
 
     # Step 13
     ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 6?")
@@ -206,7 +206,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_labware(labware=logo_destination_plate, new_location="2")
 
     # Step 15
-    pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top(z=5.0))
+    pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top())
 
     # Step 16
     ctx.pause("Is the pipette tip in the middle of well A1 in slot 2?")
