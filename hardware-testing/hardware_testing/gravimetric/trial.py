@@ -241,6 +241,7 @@ def _finish_test(
         resources.ctx.home()
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
+            assert resources.pipette.trash_container is not None
             trash = resources.pipette.trash_container.wells()[0]
             dispense_location = trash.top()
             if resources.pipette.channels == 96:
