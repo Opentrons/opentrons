@@ -32,7 +32,7 @@ DATA_SUBDIRS = [
     "errors",
     "command",
     "commandAnnotation",
-    "liquid"
+    "liquid",
 ]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
