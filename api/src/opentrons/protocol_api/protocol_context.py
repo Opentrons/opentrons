@@ -979,7 +979,7 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def fixed_trash(self) -> Labware:
+    def fixed_trash(self) -> Optional[Labware]:
         """The trash fixed to slot 12 of the robot deck.
 
         It has one well and should be accessed like labware in your protocol.
@@ -989,13 +989,14 @@ class ProtocolContext(CommandPublisher):
 
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._core.fixed_trash
-        fixed_trash = Labware(
-            core=fixed_trash_core,
-            api_version=self._api_version,
-            protocol_core=self._core,
-            core_map=self._core_map,
-        )
-        self._core_map.add(fixed_trash_core, fixed_trash)
+        if fixed_trash_core is not None:
+            fixed_trash = Labware(
+                core=fixed_trash_core,
+                api_version=self._api_version,
+                protocol_core=self._core,
+                core_map=self._core_map,
+            )
+            self._core_map.add(fixed_trash_core, fixed_trash)
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool) -> None:

@@ -28,7 +28,7 @@ class AbstractProtocol(
 ):
     @property
     @abstractmethod
-    def fixed_trash(self) -> LabwareCoreType:
+    def fixed_trash(self) -> Optional[LabwareCoreType]:
         """Get the fixed trash labware core."""
         ...
 

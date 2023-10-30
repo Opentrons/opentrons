@@ -1081,8 +1081,7 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-    with pytest.raises(errors.LabwareNotLoadedError):
-        subject.get_fixed_trash_id()
+    assert subject.get_fixed_trash_id() is None
 
 
 @pytest.mark.parametrize(

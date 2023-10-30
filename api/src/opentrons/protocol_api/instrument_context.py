@@ -16,6 +16,7 @@ from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control import transfers
 
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.util import (
@@ -80,7 +81,7 @@ class InstrumentContext(publisher.CommandPublisher):
         broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
-        trash: labware.Labware,
+        trash: Optional[labware.Labware],
         requested_as: str,
     ) -> None:
         super().__init__(broker)
@@ -941,6 +942,12 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
+            # TODO(jbl 10-30-2023) this needs to eventually check and discern between multiple trash bins/waste chute
+            #   Same goes for opentrons.protocols.advanced_control.transfers
+            if self.trash_container is None:
+                raise NoTrashDefinedError(
+                    "Cannot drop tip with no location argument when no trash has been loaded"
+                )
             well = self.trash_container.wells()[0]
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
@@ -1454,7 +1461,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(self) -> labware.Labware:
+    def trash_container(self) -> Optional[labware.Labware]:
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out
@@ -1464,7 +1471,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._trash
 
     @trash_container.setter
-    def trash_container(self, trash: labware.Labware) -> None:
+    def trash_container(self, trash: Optional[labware.Labware]) -> None:
         self._trash = trash
 
     @property  # type: ignore

@@ -21,6 +21,14 @@ LOAD_FIXED_TRASH_GATE_VERSION_PYTHON = APIVersion(2, 15)
 LOAD_FIXED_TRASH_GATE_VERSION_JSON = 7
 
 
+class NoTrashDefinedError(Exception):
+    """
+    Error raised when a protocol attempts to automatically access a trash bin without one being loaded.
+    """
+
+    pass
+
+
 def should_load_fixed_trash(protocol_config: ProtocolConfig) -> bool:
     """Decide whether to automatically load fixed trash on the deck based on version."""
     load_fixed_trash = False

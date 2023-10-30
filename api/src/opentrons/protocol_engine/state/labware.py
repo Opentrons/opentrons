@@ -707,7 +707,7 @@ class LabwareView(HasState[LabwareState]):
 
         return None
 
-    def get_fixed_trash_id(self) -> str:
+    def get_fixed_trash_id(self) -> Optional[str]:
         """Get the identifier of labware loaded into the fixed trash location.
 
         Raises:
@@ -723,9 +723,7 @@ class LabwareView(HasState[LabwareState]):
             }:
                 return labware.id
 
-        raise errors.LabwareNotLoadedError(
-            "No labware loaded into fixed trash location by this deck type."
-        )
+        return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""

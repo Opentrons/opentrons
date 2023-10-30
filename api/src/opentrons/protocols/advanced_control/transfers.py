@@ -16,6 +16,7 @@ from typing import (
 from opentrons.protocol_api.labware import Well
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -800,6 +801,12 @@ class TransferPlan:
                 self._strategy.blow_out_strategy == BlowOutStrategy.TRASH
                 or self._strategy.disposal_volume
             ):
+                # TODO(jbl 10-30-2023) this needs to eventually check and discern between multiple trash bins/chute
+                #   Same goes for opentrons.protocol_api.instrument_context drop_tip
+                if self._instr.trash_container is None:
+                    raise NoTrashDefinedError(
+                        'Cannot use blow out strategy "trash" when no trash has been defined'
+                    )
                 yield self._format_dict(
                     "blow_out", [self._instr.trash_container.wells()[0]]
                 )

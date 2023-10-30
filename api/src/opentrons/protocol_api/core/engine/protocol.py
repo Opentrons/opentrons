@@ -102,17 +102,20 @@ class ProtocolCore(
         return self._engine_client.state.config.robot_type
 
     @property
-    def fixed_trash(self) -> LabwareCore:
+    def fixed_trash(self) -> Optional[LabwareCore]:
         """Get the fixed trash labware."""
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        return self._labware_cores_by_id[trash_id]
+        if trash_id is not None:
+            return self._labware_cores_by_id[trash_id]
+        return None
 
     def _load_fixed_trash(self) -> None:
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        self._labware_cores_by_id[trash_id] = LabwareCore(
-            labware_id=trash_id,
-            engine_client=self._engine_client,
-        )
+        if trash_id is not None:
+            self._labware_cores_by_id[trash_id] = LabwareCore(
+                labware_id=trash_id,
+                engine_client=self._engine_client,
+            )
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
