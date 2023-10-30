@@ -170,8 +170,7 @@ def reset_tip_length_calibrations(robot_type: RobotTypeEnum) -> None:
         ot2.clear_tip_length_calibration()
         ot2.clear_pipette_offset_calibrations()
     else:
-        ot3.clear_tip_length_calibration()
-        ot3.clear_pipette_offset_calibrations()
+        raise UnrecognizedOption("Tip Length calibration not supported on Flex")
 
 
 def reset_module_calibration() -> None:

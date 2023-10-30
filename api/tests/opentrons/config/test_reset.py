@@ -60,8 +60,7 @@ def mock_cal_gripper_offset(
 
 @pytest.fixture
 def mock_cal_tip_length(robot_model: "RobotModel") -> Generator[MagicMock, None, None]:
-    prefix = "ot2" if robot_model == "OT-2 Standard" else "ot3"
-    with patch(f"opentrons.config.reset.{prefix}.clear_tip_length_calibration") as m:
+    with patch("opentrons.config.reset.ot2.clear_tip_length_calibration") as m:
         yield m
 
 
@@ -137,14 +136,20 @@ def test_deck_calibration_reset(
     mock_cal_pipette_offset.assert_called_once()
 
 
+@pytest.mark.ot2_only
 def test_tip_length_calibrations_reset(
     mock_cal_pipette_offset: MagicMock,
     mock_cal_tip_length: MagicMock,
-    robot_type_enum: RobotTypeEnum,
 ) -> None:
-    reset.reset_tip_length_calibrations(robot_type_enum)
+    reset.reset_tip_length_calibrations(RobotTypeEnum.OT2)
     mock_cal_tip_length.assert_called_once()
     mock_cal_pipette_offset.assert_called_once()
+
+
+@pytest.mark.ot3_only
+def test_tip_length_calibrations_reset_ot3() -> None:
+    with pytest.raises(reset.UnrecognizedOption):
+        reset.reset_tip_length_calibrations(RobotTypeEnum.FLEX)
 
 
 def test_pipette_offset_reset(
