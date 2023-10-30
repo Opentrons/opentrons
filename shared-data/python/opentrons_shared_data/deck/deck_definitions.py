@@ -149,10 +149,6 @@ class Cutout(BaseModel):
         ...,
         description='An optional human-readable nickname for this cutout e.g. "Cutout A1"',
     )
-    compatibleFixtureTypes: List[str] = Field(
-        ...,
-        description="A list of cutout fixture types that can be loaded onto this cutout.",
-    )
 
 
 class Locations(BaseModel):

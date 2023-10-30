@@ -200,12 +200,7 @@
           "description": "The machined cutout slots on the deck surface.",
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "position",
-              "displayName",
-              "compatibleFixtureTypes"
-            ],
+            "required": ["id", "position", "displayName"],
             "properties": {
               "id": {
                 "description": "Unique identifier for the cutout",
@@ -218,13 +213,6 @@
               "displayName": {
                 "description": "An optional human-readable nickname for this cutout e.g. \"Cutout A1\"",
                 "type": "string"
-              },
-              "compatibleFixtureTypes": {
-                "description": "A list of cutout fixture types that can be loaded onto this cutout.",
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
               }
             }
           }
