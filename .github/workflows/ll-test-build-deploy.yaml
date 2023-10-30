@@ -190,10 +190,10 @@ jobs:
           path: ./dist
       - name: 'deploy builds to s3'
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_TEMP_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_TEMP_SANDBOX_SECRET }}
           AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
+        uses: './.github/actions/temp-webstack/temp-deploy-to-sandbox'
         with:
           domain: 'labware.opentrons.com'
           distPath: './dist'
