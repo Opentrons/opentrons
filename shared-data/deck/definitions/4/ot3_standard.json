@@ -306,92 +306,62 @@
       {
         "id": "D1",
         "position": [0.0, 0.0, 0.0],
-        "displayName": "Cutout D1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout D1"
       },
       {
         "id": "D2",
         "position": [164.0, 0.0, 0.0],
-        "displayName": "Cutout D2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout D2"
       },
       {
         "id": "D3",
         "position": [328.0, 0.0, 0.0],
-        "displayName": "Cutout D3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter",
-          "wasteChuteRightAdapter",
-          "wasteChuteRightAdapterWithStagingAreaSlot"
-        ]
+        "displayName": "Cutout D3"
       },
       {
         "id": "C1",
         "position": [0.0, 107, 0.0],
-        "displayName": "Cutout C1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout C1"
       },
       {
         "id": "C2",
         "position": [164.0, 107, 0.0],
-        "displayName": "Cutout C2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout C2"
       },
       {
         "id": "C3",
         "position": [328.0, 107, 0.0],
-        "displayName": "Cutout C3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter"
-        ]
+        "displayName": "Cutout C3"
       },
       {
         "id": "B1",
         "position": [0.0, 214.0, 0.0],
-        "displayName": "Cutout B1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout B1"
       },
       {
         "id": "B2",
         "position": [164.0, 214.0, 0.0],
-        "displayName": "Cutout B2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout B2"
       },
       {
         "id": "B3",
         "position": [328.0, 214.0, 0.0],
-        "displayName": "Cutout B3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter"
-        ]
+        "displayName": "Cutout B3"
       },
       {
         "id": "A1",
         "position": [0.0, 321.0, 0.0],
-        "displayName": "Cutout A1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout A1"
       },
       {
         "id": "A2",
         "position": [164.0, 321.0, 0.0],
-        "displayName": "Cutout A2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout A2"
       },
       {
         "id": "A3",
         "position": [328.0, 321.0, 0.0],
-        "displayName": "Cutout A3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter"
-        ]
+        "displayName": "Cutout A3"
       }
     ],
     "calibrationPoints": []
