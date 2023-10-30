@@ -23,19 +23,30 @@ init_logging("INFO")
 
 
 class IPCMessenger:
+    class _Method(object):
+        def __init__(self, ipc_messenger, method):
+            self.ipc_messenger = ipc_messenger
+            self.method = method
+
+        async def __call__(self, *args, **kwargs):
+            log.info("inside _Method!")
+            return await self.ipc_messenger.call(self.method, *args, **kwargs)
+
     def __init__(
         self,
         source: IPCProcess,
         host: str,
         port: int,
         dispatcher: JSONRPCDispatcher,
-        context=None
+        context = None,
+        target: Optional[IPCProcess] = None
     ) -> None:
         """Constructor."""
         self._source = source
         self._host = host
         self._port = port
         self._context = context
+        self._target = target or list(IPCProcess)
 
         # register helper with the dispatcher
         self._dispatcher = dispatcher
@@ -87,6 +98,32 @@ class IPCMessenger:
         writer.close()
         await writer.wait_closed()
 
+    def __getattr__(self, method) -> Any:
+        """This will let us call an IPC function as if it were part of this class."""
+        return self._Method(ipc_messenger = self, method = method)
+
+    async def call(self, method, *args, **kwargs) -> Any:
+        """Call some function and return the output."""
+        # remove control key __target if set
+        target = None
+        if '__target' in kwargs:
+            target = kwargs.pop('__target')
+            target = target if isinstance(target, list) else [target]
+
+        # deal with args and kwargs
+        params = args
+        if kwargs:
+            params = kwargs
+            if args:
+                params["__args"] = args
+
+        # create our request
+        req = JSONRPCRequest(
+            method=method,
+            params=params,
+        )
+        return await self.send(req, destinations=target)
+
     async def send(self,
         message: JSONRPCRequest,
         destinations: Optional[Destinations] = None,
@@ -94,7 +131,7 @@ class IPCMessenger:
     ) -> Dict[IPCProcess, Any]:
         """Sends a message to one or more IPCProcesses and return the response."""
         response: Dict[IPCProcess, Any] = dict()
-        destinations = destinations or list(IPCProcess)
+        destinations = destinations or self._target
         for target in destinations:
             # Don't send data to your own process
             if target == self._source:

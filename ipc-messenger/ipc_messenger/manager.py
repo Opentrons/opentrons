@@ -119,9 +119,14 @@ class JSONRPCResponseManager:
                 yield _make_response(request, error=JSONRPCMethodNotFound()._data)
                 return
 
-            # get the args, kwargs, and add context object if available
+            # get the args and kwargs
             args = request.args
             kwargs = request.kwargs
+            if '__args' in kwargs:
+                pos_args = kwargs.pop('__args')
+                args = tuple(pos_args)
+
+            # add context object if available
             context_arg = self._dispatcher.context_arg_for_method.get(request.method)
             context_obj = self._context.get(context_arg)
             if context_arg and context_obj:

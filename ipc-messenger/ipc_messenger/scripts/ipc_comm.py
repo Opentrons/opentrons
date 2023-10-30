@@ -64,6 +64,25 @@ class OT3API:
         return {OT3Mount.X: {"name": "p50"},
                 OT3Mount.Y: None}
 
+    @ipc_dispatcher.add_method(context_arg='self')
+    async def args_kwargs(self, this: bool, that: str ='that') -> Dict[str, Any]:
+        return {"args": this,
+                "kwargs": that}
+
+    def get_some(self, this):
+        return True
+
+
+class DummyServer:
+    def __init__(self, host, port):
+        self._ipc_messenger = IPCMessenger(IPCProcess.SYSTEM_SERVER, host, port, ipc_dispatcher)
+        self._ipc_messenger.add_context('self', self)
+
+    @ipc_dispatcher.add_method(context_arg='self')
+    def get_something(self):
+        pass
+
+
 def main(args):
     source = IPCProcess(args.process)
     target = [IPCProcess(dest) for dest in args.target] if args.target else list(IPCProcess)
@@ -75,12 +94,19 @@ def main(args):
     ipc_messenger = ot3_api._ipc_messenger
 
     if args.message:
-        req = JSONRPCRequest(
-            **args.message,
-            is_notification=args.notify,
-        )
-        resp = asyncio.run(ipc_messenger.send(req, destination, notify=args.notify))
-        print(f"Resp: {resp}")
+        #resp = asyncio.run(ot3_api._ipc_messenger.home())
+        #print(f"resp: {resp}")
+
+        resp = asyncio.run(ot3_api._ipc_messenger.home())
+        print(f"resp: {resp}")
+
+
+        #req = JSONRPCRequest(
+        #    **args.message,
+        #    is_notification=args.notify,
+        #)
+        #resp = asyncio.run(ipc_messenger.send(req, destination, notify=args.notify))
+        #print(f"Resp: {resp}")
     else:
         asyncio.run(ipc_messenger.start())
 
