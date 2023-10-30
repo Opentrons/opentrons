@@ -17,6 +17,7 @@ import {
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
 import { FileSidebar, v7WarningContent } from '../FileSidebar'
+import { FLEX_TRASH_DEF_URI } from '@opentrons/step-generation'
 
 jest.mock('../../Hints/useBlockingHint')
 jest.mock('../../../file-data/selectors')
@@ -54,6 +55,7 @@ describe('FileSidebar', () => {
       savedStepForms: {},
       robotType: 'OT-2 Standard',
       additionalEquipment: {},
+      labwareOnDeck: {},
     }
 
     commands = [
@@ -155,6 +157,44 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
+  })
+
+  it('warning modal is shown when export is clicked with unused staging area slot', () => {
+    const stagingArea = 'stagingAreaId'
+    props.savedStepForms = savedStepForms
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
+    props.fileData.commands = commands
+    props.additionalEquipment = {
+      [stagingArea]: { name: 'stagingArea', id: stagingArea, location: 'A3' },
+    }
+
+    const wrapper = shallow(<FileSidebar {...props} />)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
+    downloadButton.simulate('click')
+    const alertModal = wrapper.find(AlertModal)
+
+    expect(alertModal).toHaveLength(1)
+    expect(alertModal.prop('heading')).toEqual(
+      'One or more staging area slots are unused'
+    )
+  })
+
+  it('warning modal is shown when export is clicked with unused trash bin', () => {
+    props.savedStepForms = savedStepForms
+    const labwareId = 'mockLabwareId'
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
+    props.fileData.commands = commands
+    props.labwareOnDeck = {
+      [labwareId]: { labwareDefURI: FLEX_TRASH_DEF_URI, id: labwareId } as any,
+    }
+
+    const wrapper = shallow(<FileSidebar {...props} />)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
+    downloadButton.simulate('click')
+    const alertModal = wrapper.find(AlertModal)
+
+    expect(alertModal).toHaveLength(1)
+    expect(alertModal.prop('heading')).toEqual('Unused trash bin')
   })
 
   it('warning modal is shown when export is clicked with unused gripper', () => {
