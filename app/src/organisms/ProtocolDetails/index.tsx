@@ -352,6 +352,7 @@ export function ProtocolDetails(
 
   const deckThumbnail = (
     <DeckThumbnail
+      protocolAnalysis={mostRecentAnalysis}
       commands={mostRecentAnalysis?.commands ?? []}
       labware={mostRecentAnalysis?.labware ?? []}
       liquids={

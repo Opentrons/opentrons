@@ -3,13 +3,31 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import {
   getRobotTypeFromLoadedLabware,
   getDeckDefFromRobotType,
+  OT2_ROBOT_TYPE,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { renderWithProviders } from '@opentrons/components'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import {
+  BaseDeck,
+  EXTENDED_DECK_CONFIG_FIXTURE,
+  renderWithProviders,
+} from '@opentrons/components'
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
+
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
+import { useAttachedModules } from '../../../organisms/Devices/hooks'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupLabware/__fixtures__'
 import { DeckThumbnail } from '../'
-import type { LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
+
+import type {
+  LabwareDefinition2,
+  LoadedLabware,
+  ModuleModel,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -33,7 +51,10 @@ jest.mock('@opentrons/components', () => {
     )),
   }
 })
+
+jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 jest.mock('../../../redux/config')
+jest.mock('../../../organisms/Devices/hooks')
 
 const mockgetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<
   typeof getRobotTypeFromLoadedLabware
@@ -42,7 +63,12 @@ const mockgetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.
 const mockgetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
 >
+const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 
+const protocolAnalysis = simpleAnalysisFileFixture as any
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 const labware: LoadedLabware[] = simpleAnalysisFileFixture.labware as any
 
@@ -60,41 +86,68 @@ describe('DeckThumbnail', () => {
     when(mockgetDeckDefFromRobotType)
       .calledWith('OT-2 Standard')
       .mockReturnValue(ot2StandardDeckDef as any)
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
+    when(mockBaseDeck)
+      .calledWith({
+        robotType: OT2_ROBOT_TYPE,
+        deckLayerBlocklist: getStandardDeckViewLayerBlockList(OT2_ROBOT_TYPE),
+        deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
+        labwareLocations: [],
+        moduleLocations: [],
+      })
+      .mockReturnValue(<div>mock BaseDeck</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
   })
 
-  it('renders loaded equipment from protocol analysis file', () => {
-    const { queryByText } = render({ commands, labware })
-    expect(queryByText('mock Module (0,0) magneticModuleV2')).not.toBeFalsy()
-    expect(
-      queryByText('mock Module (265,0) temperatureModuleV2')
-    ).not.toBeFalsy()
-    expect(
-      queryByText('mock LabwareRender opentrons_96_tiprack_300ul')
-    ).not.toBeFalsy()
-    expect(
-      queryByText(
-        'mock LabwareRender opentrons_24_aluminumblock_generic_2ml_screwcap'
-      )
-    ).not.toBeFalsy()
-    expect(
-      queryByText('mock LabwareRender nest_96_wellplate_100ul_pcr_full_skirt')
-    ).not.toBeFalsy()
-  })
   it('renders an OT-2 deck view when the protocol is an OT-2 protocol', () => {
     when(mockgetRobotTypeFromLoadedLabware)
       .calledWith(labware)
       .mockReturnValue('OT-2 Standard')
-    render({ commands, labware })
+    const { getByText } = render({ protocolAnalysis, commands, labware })
     expect(mockgetDeckDefFromRobotType).toHaveBeenCalledWith('OT-2 Standard')
+    getByText('mock BaseDeck')
   })
   it('renders an OT-3 deck view when the protocol is an OT-3 protocol', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableDeckConfiguration')
+      .mockReturnValue(false)
+    const mockLabwareLocations = [
+      {
+        labwareLocation: { slotName: 'C1' },
+        definition: fixture_tiprack_300_ul as LabwareDefinition2,
+        topLabwareId: '300_ul_tiprack_id',
+        onLabwareClick: expect.any(Function),
+        labwareChildren: null,
+      },
+    ]
+    const mockModuleLocations = [
+      {
+        moduleModel: 'heaterShakerModuleV1' as ModuleModel,
+        moduleLocation: { slotName: 'B1' },
+        nestedLabwareDef: mockProtocolModuleInfo[0]
+          .nestedLabwareDef as LabwareDefinition2,
+        onLabwareClick: expect.any(Function),
+        moduleChildren: null,
+        innerProps: {},
+      },
+    ]
+    when(mockBaseDeck)
+      .calledWith({
+        robotType: FLEX_ROBOT_TYPE,
+        deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
+        deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
+        labwareLocations: mockLabwareLocations,
+        moduleLocations: mockModuleLocations,
+      })
+      .mockReturnValue(<div>mock BaseDeck</div>)
     when(mockgetRobotTypeFromLoadedLabware)
       .calledWith(labware)
       .mockReturnValue('OT-3 Standard')
-    render({ commands, labware })
+    render({ protocolAnalysis, commands, labware })
     expect(mockgetDeckDefFromRobotType).toHaveBeenCalledWith('OT-3 Standard')
   })
 })

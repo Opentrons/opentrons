@@ -1,5 +1,7 @@
 import * as React from 'react'
 import last from 'lodash/last'
+
+import { Flex } from '@opentrons/components'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -20,18 +22,21 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
   )
 
   return (
-    <DeckThumbnail
-      commands={
-        (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
-      }
-      labware={(mostRecentAnalysis as CompletedProtocolAnalysis)?.labware ?? []}
-      liquids={
-        (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids != null
-          ? (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids
-          : []
-      }
-      showSlotLabels
-      marginX="12rem"
-    />
+    <Flex height="26.9375rem">
+      <DeckThumbnail
+        protocolAnalysis={mostRecentAnalysis}
+        commands={
+          (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+        }
+        labware={
+          (mostRecentAnalysis as CompletedProtocolAnalysis)?.labware ?? []
+        }
+        liquids={
+          (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids != null
+            ? (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids
+            : []
+        }
+      />
+    </Flex>
   )
 }

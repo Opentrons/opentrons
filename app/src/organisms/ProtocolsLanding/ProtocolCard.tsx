@@ -172,6 +172,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
             complete: (
               <DeckThumbnail
+                protocolAnalysis={mostRecentAnalysis}
                 commands={mostRecentAnalysis?.commands ?? []}
                 labware={mostRecentAnalysis?.labware ?? []}
               />
