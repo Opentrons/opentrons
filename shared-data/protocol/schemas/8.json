@@ -103,8 +103,12 @@
           "type": "string",
           "enum": ["OT-2 Standard", "OT-3 Standard"]
         },
+        "deckSchemaId": {
+          "description": "The schema ID to which the deck definition shall adhere",
+          "type": "string"
+        },
         "deckId": {
-          "description": "Identifier of physical deck this protocol is written for. This should match a top-level key in shared-data/deck/definitions/3.json",
+          "description": "Identifier of physical deck this protocol is written for. This should match a definition in the shared-data directory matching the schema id",
           "type": "string"
         }
       }

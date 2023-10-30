@@ -10,7 +10,8 @@
   },
   "robot": {
     "model": "OT-3 Standard",
-    "deckId": "ot3_standard"
+    "deckId": "ot3_standard",
+    "deckSchemaId": "opentronsDeckSchemaV3"
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {

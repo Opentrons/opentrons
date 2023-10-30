@@ -26,6 +26,7 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
   robot: {
     model: 'OT-2 Standard' | 'OT-3 Standard'
     deckId: 'ot2_standard' | 'ot2_short_trash' | 'ot3_standard'
+    deckSchemaId: 'opentronsDeckSchemaV3' | 'opentronsDeckSchemaV4'
   }
   labwareDefinitionSchemaId: string
   labwareDefinitions: {
