@@ -11,7 +11,6 @@ from .shared_models import (
     WellLocation,
     OffsetVector,
     Metadata,
-    Robot,
     DesignerApplication,
 )
 
