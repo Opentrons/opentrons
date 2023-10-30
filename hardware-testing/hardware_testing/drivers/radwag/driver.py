@@ -168,9 +168,15 @@ class RadwagScale(RadwagScaleBase):
         """Read the max capacity."""
         cmd = RadwagCommand.GET_MAX_CAPACITY
         res = self._write_command_and_read_response(cmd)
-        assert (
-            res.code == RadwagResponseCodes.IN_PROGRESS
-        ), f"Unexpected response code: {res.code}"
+        # NOTE: very annoying, different scales give different response codes
+        #       where some will just not have a response code at all...
+        if len(res.response_list) == 3:
+            expected_code = RadwagResponseCodes.IN_PROGRESS
+        elif len(res.response_list) == 2:
+            expected_code = RadwagResponseCodes.NONE
+        else:
+            raise RuntimeError(f"unexpected reponse list: {res.response_list}")
+        assert res.code == expected_code, f"Unexpected response code: {res.code}"
         assert res.message is not None
         return float(res.message)
 
@@ -301,7 +307,7 @@ class SimRadwagScale(RadwagScaleBase):
 
     def read_max_capacity(self) -> float:
         """Read the max capacity."""
-        return 22.0  # :shrug:
+        return 220.0  # :shrug: might as well simulate as low-rez scale
 
     def read_serial_number(self) -> str:
         """Read serial number."""

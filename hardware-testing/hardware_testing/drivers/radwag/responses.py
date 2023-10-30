@@ -102,8 +102,10 @@ def _on_max_capacity(
     command: RadwagCommand, response_list: List[str]
 ) -> RadwagResponse:
     data = RadwagResponse.build(command, response_list)
-    assert len(response_list) == 3
-    data.message = response_list[-1].replace('"', "")
+    if 2 <= len(response_list) <= 3:
+        data.message = response_list[-1].replace('"', "")
+    else:
+        raise RuntimeError(f"unexpected response list: {response_list}")
     return data
 
 
