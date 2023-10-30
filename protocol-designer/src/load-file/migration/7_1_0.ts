@@ -122,7 +122,7 @@ export const migrateFile = (
       },
     },
     labwareDefinitions: {
-      ...{ [trashId]: trashDefinition },
+      ...{ [trashDefUri]: trashDefinition },
       ...appData.labwareDefinitions,
     },
     commands: [...commands, ...trashLoadCommand],
