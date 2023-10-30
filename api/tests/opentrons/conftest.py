@@ -44,7 +44,6 @@ from opentrons_shared_data.deck.dev_types import (
 from opentrons_shared_data.deck import (
     load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
-    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
 )
 
 from opentrons import config
@@ -58,6 +57,9 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.deck import (
+    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
+)
 from opentrons.protocol_engine import (
     create_protocol_engine_in_thread,
     Config as ProtocolEngineConfig,
