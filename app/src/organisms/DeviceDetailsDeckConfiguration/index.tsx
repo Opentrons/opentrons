@@ -126,7 +126,6 @@ export function DeviceDetailsDeckConfiguration({
           paddingBottom={SPACING.spacing32}
           paddingTop={isRunRunning ? undefined : SPACING.spacing32}
           width="100%"
-          id="hello"
           flexDirection={DIRECTION_COLUMN}
         >
           {isRunRunning ? (
