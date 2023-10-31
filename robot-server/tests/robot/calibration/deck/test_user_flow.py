@@ -3,7 +3,8 @@ import datetime
 from mock import MagicMock, call
 from typing import List, Tuple
 from pathlib import Path
-from opentrons.calibration_storage import types as cal_types, models
+from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config import robot_configs

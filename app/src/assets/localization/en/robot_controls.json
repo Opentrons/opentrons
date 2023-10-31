@@ -1,10 +1,12 @@
 {
   "confirm_location": "confirm location",
+  "drop_tips": "Drop tips",
   "home_button": "home",
   "home_description": "Return robot to starting position.",
   "home_label": "home all axes",
   "lights_description": "Control lights on deck.",
   "lights_label": "lights",
+  "recalibrate": "Recalibrate",
   "restart_button": "restart",
   "restart_description": "Restart robot.",
   "restart_label": "Restart robot",

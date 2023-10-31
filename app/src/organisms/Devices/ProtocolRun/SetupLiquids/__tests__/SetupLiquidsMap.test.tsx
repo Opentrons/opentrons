@@ -229,6 +229,7 @@ describe('SetupLiquidsMap', () => {
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
+          slotName: '1',
         },
       })
 
@@ -254,6 +255,7 @@ describe('SetupLiquidsMap', () => {
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
+          slotName: '1',
         },
       })
 
@@ -320,6 +322,7 @@ describe('SetupLiquidsMap', () => {
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
           z: MOCK_300_UL_TIPRACK_COORDS[2],
+          slotName: '1',
         },
       })
     mockGetWellFillFromLabwareId.mockReturnValue(MOCK_WELL_FILL)

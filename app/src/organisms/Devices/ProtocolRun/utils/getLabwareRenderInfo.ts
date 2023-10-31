@@ -41,6 +41,7 @@ export interface LabwareRenderInfoById {
     z: number
     labwareDef: LabwareDefinition2
     displayName: string | null
+    slotName: string
   }
 }
 
@@ -77,7 +78,9 @@ export const getLabwareRenderInfo = (
           )} but could not`
         )
       }
+      // TODO(bh, 2023-10-19): convert this to deck definition v4 addressableAreas
       const slotName = location.slotName.toString()
+      // TODO(bh, 2023-10-19): remove slotPosition when render info no longer relies on directly
       const slotPosition = getSlotPosition(deckDef, slotName)
 
       const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
@@ -94,6 +97,7 @@ export const getLabwareRenderInfo = (
               z: slotPosition[2],
               labwareDef,
               displayName,
+              slotName,
             },
           }
         : { ...acc }

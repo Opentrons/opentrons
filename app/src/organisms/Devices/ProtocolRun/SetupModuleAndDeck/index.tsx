@@ -10,8 +10,8 @@ import {
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useFeatureFlag } from '../../../../redux/config'
 import {
+  useIsFlex,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
@@ -41,8 +41,8 @@ export const SetupModuleAndDeck = ({
     t('list_view'),
     t('map_view')
   )
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
+  const isFlex = useIsFlex(robotName)
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const runHasStarted = useRunHasStarted(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -58,13 +58,12 @@ export const SetupModuleAndDeck = ({
             {hasModules ? (
               <SetupModulesList robotName={robotName} runId={runId} />
             ) : null}
-            {Object.keys(loadedFixturesBySlot).length > 0 &&
-            enableDeckConfig ? (
+            {Object.keys(loadedFixturesBySlot).length > 0 && isFlex ? (
               <SetupFixtureList loadedFixturesBySlot={loadedFixturesBySlot} />
             ) : null}
           </>
         ) : (
-          <SetupModulesMap robotName={robotName} runId={runId} />
+          <SetupModulesMap runId={runId} />
         )}
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>

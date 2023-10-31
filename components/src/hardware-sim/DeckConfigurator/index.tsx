@@ -10,7 +10,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../ui-style-constants'
-import { DeckSlotLocation } from '../DeckSlotLocation'
+import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
 import { SlotLabels } from '../Deck'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { EmptyConfigFixture } from './EmptyConfigFixture'
@@ -26,6 +26,7 @@ interface DeckConfiguratorProps {
   handleClickRemove: (fixtureLocation: Cutout) => void
   lightFill?: string
   darkFill?: string
+  readOnly?: boolean
   children?: React.ReactNode
 }
 
@@ -36,6 +37,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     handleClickRemove,
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
+    readOnly = false,
     children,
   } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -61,9 +63,11 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   const wasteChuteFixtures = configurableDeckConfig.filter(
     fixture => fixture.loadName === WASTE_CHUTE_LOAD_NAME
   )
-  const emptyFixtures = configurableDeckConfig.filter(
-    fixture => fixture.loadName === STANDARD_SLOT_LOAD_NAME
-  )
+  const emptyFixtures = readOnly
+    ? []
+    : configurableDeckConfig.filter(
+        fixture => fixture.loadName === STANDARD_SLOT_LOAD_NAME
+      )
   const trashBinFixtures = configurableDeckConfig.filter(
     fixture => fixture.loadName === TRASH_BIN_LOAD_NAME
   )
@@ -74,19 +78,20 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
+      {/* TODO(bh, 2023-10-18): migrate to v4 deck def cutouts */}
       {deckDef.locations.orderedSlots.map(slotDef => (
-        <DeckSlotLocation
+        <SingleSlotFixture
           key={slotDef.id}
-          slotName={slotDef.id}
+          cutoutLocation={slotDef.id as Cutout}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
-          slotBaseColor={lightFill}
+          fixtureBaseColor={lightFill}
         />
       ))}
       {stagingAreaFixtures.map(fixture => (
         <StagingAreaConfigFixture
           key={fixture.fixtureId}
-          handleClickRemove={handleClickRemove}
+          handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />
       ))}
@@ -100,14 +105,14 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {wasteChuteFixtures.map(fixture => (
         <WasteChuteConfigFixture
           key={fixture.fixtureId}
-          handleClickRemove={handleClickRemove}
+          handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />
       ))}
       {trashBinFixtures.map(fixture => (
         <TrashBinConfigFixture
           key={fixture.fixtureId}
-          handleClickRemove={handleClickRemove}
+          handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />
       ))}
