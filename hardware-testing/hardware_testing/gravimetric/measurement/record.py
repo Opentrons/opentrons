@@ -218,6 +218,16 @@ class GravimetricRecording(List):
                 f"(start={start}, duration={duration})"
             )
 
+    def get_tagged_samples(self, tag: str) -> "GravimetricRecording":
+        """Get samples with given tag."""
+        return GravimetricRecording(
+            [sample for sample in self if sample.tag and sample.tag == tag]
+        )
+
+    def get_stable_samples(self) -> "GravimetricRecording":
+        """Get stable samples."""
+        return GravimetricRecording([sample for sample in self if sample.stable])
+
 
 class GravimetricRecorderConfig:
     """Recording config."""
@@ -292,19 +302,8 @@ class GravimetricRecorder:
             return
         print("starting plot server")
         assert self._cfg.test_name
-        # kill the previously running process
-        output = check_output(["ps", "aux"])
-        for line in output.decode("utf-8").splitlines():
-            if SERVER_CMD in line:
-                fields = line.split()
-                pid = int(fields[1])
-                kill(pid, signal.SIGTERM)
-                print(f"Terminated process with PID {pid}")
         # start a new process
-        Popen(
-            f"nohup {SERVER_CMD} --test-name {self._cfg.test_name} &",
-            shell=True
-        )
+        Popen(f"nohup {SERVER_CMD} --test-name {self._cfg.test_name} &", shell=True)
         print("NOTE: please REFRESH the graph page")
 
     @property
