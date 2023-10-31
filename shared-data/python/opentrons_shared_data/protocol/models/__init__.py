@@ -45,5 +45,5 @@ __all__ = [
     "Pipette",
     "Robot",
     "DesignerApplication",
-    "RobotV8"
+    "RobotV8",
 ]
