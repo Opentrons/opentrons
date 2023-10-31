@@ -227,13 +227,9 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     height="4.25rem"
                     width="4.75rem"
                   >
-                    <DeckThumbnail
-                      protocolAnalysis={protocolAnalysis}
-                      commands={
-                        storedProtocol.mostRecentAnalysis?.commands ?? []
-                      }
-                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
-                    />
+                    {protocolAnalysis != null ? (
+                      <DeckThumbnail protocolAnalysis={protocolAnalysis} />
+                    ) : null}
                   </Box>
                   <StyledText
                     as="p"

@@ -177,8 +177,6 @@ describe('DeckThumbnail', () => {
   it('renders an OT-2 deck view when the protocol is an OT-2 protocol', () => {
     const { getByText } = render({
       protocolAnalysis: protocolAnalysis,
-      commands: commands,
-      labware: labware,
     })
     getByText('mock BaseDeck')
   })
@@ -283,8 +281,6 @@ describe('DeckThumbnail', () => {
 
     const { getByText } = render({
       protocolAnalysis: protocolAnalysis,
-      commands: commands,
-      labware: labware,
     })
     getByText('mock BaseDeck')
   })

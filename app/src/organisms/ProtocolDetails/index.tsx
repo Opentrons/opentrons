@@ -350,16 +350,7 @@ export function ProtocolDetails(
     ) : null,
   }
 
-  const deckThumbnail = (
-    <DeckThumbnail
-      protocolAnalysis={mostRecentAnalysis}
-      commands={mostRecentAnalysis?.commands ?? []}
-      labware={mostRecentAnalysis?.labware ?? []}
-      liquids={
-        mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : []
-      }
-    />
-  )
+  const deckThumbnail = <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
     missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,

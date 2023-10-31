@@ -19,35 +19,28 @@ import { getAttachedProtocolModuleMatches } from '../../organisms/ProtocolSetupM
 import type { StyleProps } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
-  Liquid,
-  LoadedLabware,
   ProtocolAnalysisOutput,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps extends StyleProps {
-  protocolAnalysis?: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
-  commands: RunTimeCommand[]
-  labware: LoadedLabware[]
-  liquids?: Liquid[]
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 }
 
-export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const {
-    protocolAnalysis,
-    commands,
-    liquids,
-    labware = [],
-    ...styleProps
-  } = props
-  const robotType = getRobotTypeFromLoadedLabware(labware)
-  const deckDef = getDeckDefFromRobotType(robotType)
-  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
-    commands
-  )
+export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
+  const { protocolAnalysis, ...styleProps } = props
   const attachedModules = useAttachedModules()
 
-  const deckConfig = getDeckConfigFromProtocolCommands(commands)
+  if (protocolAnalysis == null) return null
+
+  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
+    protocolAnalysis.commands
+  )
+
+  const deckConfig = getDeckConfigFromProtocolCommands(
+    protocolAnalysis.commands
+  )
 
   const labwareRenderInfo =
     protocolAnalysis != null

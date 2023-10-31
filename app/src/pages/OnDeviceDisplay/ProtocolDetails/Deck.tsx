@@ -9,8 +9,6 @@ import {
 
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-
 export const Deck = (props: { protocolId: string }): JSX.Element => {
   const { data: protocolData } = useProtocolQuery(props.protocolId)
   const {
@@ -23,20 +21,9 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
 
   return (
     <Flex height="26.9375rem">
-      <DeckThumbnail
-        protocolAnalysis={mostRecentAnalysis}
-        commands={
-          (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
-        }
-        labware={
-          (mostRecentAnalysis as CompletedProtocolAnalysis)?.labware ?? []
-        }
-        liquids={
-          (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids != null
-            ? (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids
-            : []
-        }
-      />
+      {mostRecentAnalysis != null ? (
+        <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
+      ) : null}
     </Flex>
   )
 }
