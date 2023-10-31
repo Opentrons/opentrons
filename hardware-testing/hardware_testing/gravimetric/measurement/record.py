@@ -11,6 +11,7 @@ from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
     create_file_name,
+    ui,
 )
 
 from .scale import Scale
@@ -298,11 +299,13 @@ class GravimetricRecorder:
     def _start_graph_server_process(self) -> None:
         if self.is_simulator:
             return
-        print("starting plot server")
         assert self._cfg.test_name
-        # start a new process
+        # NOTE: it's ok if this fails b/c prior process is already using port
+        #       the server just needs to be running, doesn't matter when it started
         Popen(f"nohup {SERVER_CMD} --test-name {self._cfg.test_name} &", shell=True)
-        print("NOTE: please REFRESH the graph page")
+        if not self.is_simulator:
+            sleep(2)  # small delay so nohup output isn't confusing
+            ui.get_user_ready("open WEBPAGE to port 8080")
 
     @property
     def tag(self) -> str:
