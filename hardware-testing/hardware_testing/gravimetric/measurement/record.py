@@ -1,7 +1,10 @@
 """Record weight measurements."""
 from contextlib import contextmanager
 from dataclasses import dataclass
+from os import kill
+import signal
 from statistics import stdev
+from subprocess import Popen, check_output
 from threading import Thread, Event
 from time import sleep, time
 from typing import List, Optional, Callable, Generator
@@ -17,8 +20,7 @@ from .scale import Scale
 SLEEP_TIME_IN_RECORD_LOOP = 0.05
 SLEEP_TIME_IN_RECORD_LOOP_SIMULATING = 0.01
 
-SERVER_PORT = 8080
-SERVER_CMD = "{0} -m hardware_testing.tools.plot --test-name gravimetric-ot3 --port {1}"
+SERVER_CMD = "python3 -m hardware_testing.tools.plot"
 
 
 @dataclass
@@ -285,6 +287,26 @@ class GravimetricRecorder:
         super().__init__()
         self.activate()
 
+    def _start_graph_server_process(self) -> None:
+        if self.is_simulator:
+            return
+        print("starting plot server")
+        assert self._cfg.test_name
+        # kill the previously running process
+        output = check_output(["ps", "aux"])
+        for line in output.decode("utf-8").splitlines():
+            if SERVER_CMD in line:
+                fields = line.split()
+                pid = int(fields[1])
+                kill(pid, signal.SIGTERM)
+                print(f"Terminated process with PID {pid}")
+        # start a new process
+        Popen(
+            f"nohup {SERVER_CMD} --test-name {self._cfg.test_name} &",
+            shell=True
+        )
+        print("NOTE: please REFRESH the graph page")
+
     @property
     def tag(self) -> str:
         """Tag."""
@@ -330,6 +352,7 @@ class GravimetricRecorder:
 
     def activate(self) -> None:
         """Activate."""
+        self._start_graph_server_process()
         # Some Radwag settings cannot be controlled remotely.
         # Listed below are the things the must be done using the touchscreen:
         #   1) Set profile to USER
