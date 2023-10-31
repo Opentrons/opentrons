@@ -239,6 +239,12 @@ function installListeners(
   }
   s.on('free', onFree)
 
+  function onError(): void {
+    agent.log('error', 'CLIENT socket onError')
+    // need to emit free to attach listeners to serialport
+  }
+  s.on('error', onError)
+
   function onClose(): void {
     agent.log('debug', 'CLIENT socket onClose')
     // This is the only place where sockets get removed from the Agent.
@@ -250,18 +256,15 @@ function installListeners(
   s.on('close', onClose)
 
   function onTimeout(): void {
-    agent.log('debug', 'CLIENT socket onTimeout')
+    agent.log(
+      'debug',
+      'CLIENT socket onTimeout, closing and reopening the socket'
+    )
 
-    // Destroy if in free list.
-    // TODO(ronag): Always destroy, even if not in free list.
-    const sockets = agent.freeSockets
-    if (
-      Object.keys(sockets).some(name =>
-        sockets[name]?.includes((s as unknown) as Socket)
-      )
-    ) {
-      return s.destroy()
-    }
+    s.close()
+    setTimeout(() => {
+      s.open()
+    }, 1000)
   }
   s.on('timeout', onTimeout)
 
