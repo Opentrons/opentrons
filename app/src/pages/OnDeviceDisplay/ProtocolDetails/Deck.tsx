@@ -11,7 +11,6 @@ import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 
 export const Deck = (props: { protocolId: string }): JSX.Element => {
   const { data: protocolData } = useProtocolQuery(props.protocolId)
-  console.log('protocolData', protocolData)
   const {
     data: mostRecentAnalysis,
   } = useProtocolAnalysisAsDocumentQuery(
