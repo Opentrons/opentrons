@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.geometry import waste_chute_dimensions
 from opentrons.types import Point
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -26,7 +27,6 @@ from ..instrument import AbstractInstrument
 from .well import WellCore
 
 from ..._waste_chute import WasteChute
-from ... import _waste_chute_dimensions
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -404,9 +404,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         speed: Optional[float],
     ) -> None:
         if self.get_channels() == 96:
-            slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_96_TIP_A1
+            slot_origin_to_tip_a1 = waste_chute_dimensions.SLOT_ORIGIN_TO_96_TIP_A1
         else:
-            slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
+            slot_origin_to_tip_a1 = waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
 
         # TODO: All of this logic to compute the destination coordinate belongs in Protocol Engine.
         slot_d3 = next(
@@ -423,7 +423,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         # 1000µL tips, we have slightly not enough room to meet that margin. We can make the margin
         # as big as 7.5 mm before the motion planner raises an error. So, use that reduced margin,
         # with a little more subtracted in order to leave wiggle room for pipette calibration.
-        minimum_z = _waste_chute_dimensions.ENVELOPE_HEIGHT + 5.0
+        minimum_z = waste_chute_dimensions.ENVELOPE_HEIGHT + 5.0
 
         self.move_to(
             Location(destination_point, labware=None),

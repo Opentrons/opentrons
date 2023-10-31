@@ -1,8 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing import Dict, Optional, Type, Union, List, Tuple
 
-from opentrons.protocol_api import _waste_chute_dimensions
-
 from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -17,6 +15,7 @@ from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.geometry import waste_chute_dimensions
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -318,7 +317,7 @@ class ProtocolCore(
         slot_width = 128
         slot_height = 86
         drop_offset_from_slot = (
-            _waste_chute_dimensions.SLOT_ORIGIN_TO_GRIPPER_JAW_CENTER
+            waste_chute_dimensions.SLOT_ORIGIN_TO_GRIPPER_JAW_CENTER
             - Point(x=slot_width / 2, y=slot_height / 2)
         )
         if drop_offset is not None:
