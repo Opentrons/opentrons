@@ -96,7 +96,7 @@ class InstrumentContext(publisher.CommandPublisher):
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
-        self.trash_container = trash  # type: ignore[assignment]
+        self._trash = trash
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -1463,11 +1463,13 @@ class InstrumentContext(publisher.CommandPublisher):
         arguments.
         """
         if self._trash is None:
-            raise NoTrashDefinedError("No trash container has been defined in this protocol.")
+            raise NoTrashDefinedError(
+                "No trash container has been defined in this protocol."
+            )
         return self._trash
 
     @trash_container.setter
-    def trash_container(self, trash: Optional[labware.Labware]) -> None:
+    def trash_container(self, trash: labware.Labware) -> None:
         self._trash = trash
 
     @property  # type: ignore

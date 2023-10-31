@@ -994,7 +994,9 @@ class ProtocolContext(CommandPublisher):
         """
         fixed_trash = self._core_map.get(self._core.fixed_trash)
         if fixed_trash is None:
-            raise NoTrashDefinedError("No trash container has been defined in this protocol.")
+            raise NoTrashDefinedError(
+                "No trash container has been defined in this protocol."
+            )
         return fixed_trash
 
     def _load_fixed_trash(self) -> None:
