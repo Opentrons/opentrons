@@ -123,7 +123,7 @@ def _test_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> None:
     _check_unstable_count(tag)
 
 
-def _wait_for_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> float:
+def _wait_for_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI, tag: str) -> float:
     prev_light_state = hw.get_status_bar_state()
     hw.set_status_bar_state(COLOR_STATES["stable"])
     for i in range(STABLE_ATTEMPTS):
@@ -132,14 +132,14 @@ def _wait_for_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> f
             f"attempting {STABLE_CHECK_SECONDS} seconds of stability "
             f"(attempt {attempt}/{STABLE_ATTEMPTS})"
         )
-        tag = f"wait-for-stable-attempt-{attempt}"
-        with recorder.samples_of_tag(tag):
+        tag_detailed = f"{tag}-wait-for-stable-attempt-{attempt}"
+        with recorder.samples_of_tag(tag_detailed):
             if hw.is_simulator:
                 # NOTE: give a bit of time during simulation, so some fake data can be stored
                 sleep(0.1)
             else:
                 sleep(STABLE_CHECK_SECONDS)
-        segment = recorder.recording.get_tagged_samples(tag)
+        segment = recorder.recording.get_tagged_samples(tag_detailed)
         if hw.is_simulator and len(segment) == 1:
             segment.append(segment[0])
         stable_only = segment.get_stable_samples()
@@ -152,12 +152,35 @@ def _wait_for_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> f
     )
 
 
-def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability: bool) -> None:
+def _run(
+    hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability: bool
+) -> None:
     ui.print_title("GRAVIMETRIC DAILY SETUP")
     ui.print_info(f"Scale: {recorder.max_capacity}g (SN:{recorder.serial_number})")
-    hw_api.home()  # home gantry before we start recording from the scale
+
+    def _record() -> None:
+        recorder.set_tag(create_datetime_string())
+        recorder.record(in_thread=True)
+
+    def _zero() -> None:
+        hw_api.set_status_bar_state(COLOR_STATES["stable"])
+        recorder.stop()
+        ui.print_info("zeroing scale...")
+        recorder.zero_scale()
+        _record()
+        hw_api.set_status_bar_state(COLOR_STATES["idle"])
+
+    def _calibrate() -> None:
+        hw_api.set_status_bar_state(COLOR_STATES["stable"])
+        recorder.stop()
+        ui.print_info("calibrating scale, this may take up to 1 minute...")
+        ui.print_info("DO NOT MOVE NEAR SCALE UNTIL CALIBRATION IS COMPLETE!!")
+        recorder.calibrate_scale()
+        _record()
+        hw_api.set_status_bar_state(COLOR_STATES["idle"])
 
     ui.print_header("SETUP SCALE")
+    _record()
     hw_api.set_status_bar_state(COLOR_STATES["interact"])
     if not hw_api.is_simulator:
         ui.get_user_ready("INSTALL Radwag's default weighing pan")
@@ -167,7 +190,8 @@ def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability:
 
     ui.print_header("TEST STABILITY")
     if not skip_stability:
-        _wait_for_stability(recorder, hw_api)
+        hw_api.home()
+        _wait_for_stability(recorder, hw_api, tag="stability")
         _test_stability(recorder, hw_api)
     else:
         ui.print_info("skipping")
@@ -175,22 +199,19 @@ def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability:
     ui.print_header("ZERO SCALE")
     if not hw_api.is_simulator:
         ui.get_user_ready("about to ZERO the scale:")
-    _wait_for_stability(recorder, hw_api)
-    recorder.zero_scale()
-    while not hw_api.is_simulator and ui.get_user_answer("ZERO again"):
-        _wait_for_stability(recorder, hw_api)
-        recorder.zero_scale()
+    _wait_for_stability(recorder, hw_api, tag="zero")
+    _zero()
 
     ui.print_header("CALIBRATE SCALE")
     if not hw_api.is_simulator:
         ui.get_user_ready("about to CALIBRATE the scale:")
-    _wait_for_stability(recorder, hw_api)
-    recorder.calibrate_scale()
+    _wait_for_stability(recorder, hw_api, tag="calibrate")
+    _calibrate()
 
     ui.print_header("TEST ACCURACY")
     if hw_api.is_simulator:
         recorder.set_simulation_mass(0.0)
-    start_grams = _wait_for_stability(recorder, hw_api)
+    start_grams = _wait_for_stability(recorder, hw_api, tag="accuracy-start")
     ui.print_info(f"start grams: {start_grams}")
     weight_grams = 20 if recorder.max_capacity < 200 else 200
     if not hw_api.is_simulator:
@@ -203,8 +224,8 @@ def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability:
         real_weight = float(weight_grams)
         recorder.set_simulation_mass(float(weight_grams))
     ui.print_info(f"real grams: {real_weight}")
-    end_grams = _wait_for_stability(recorder, hw_api)
-    ui.print_info(f"end grams: {start_grams}")
+    end_grams = _wait_for_stability(recorder, hw_api, tag="accuracy-end")
+    ui.print_info(f"end grams: {end_grams}")
     found_grams = end_grams - start_grams
 
     # CALCULATE ACCURACY
@@ -238,8 +259,6 @@ if __name__ == "__main__":
         scale=Scale.build(simulate=_hw.is_simulator),
         simulate=_hw.is_simulator,
     )
-    _rec.set_tag(create_datetime_string())
-    _rec.record(in_thread=True)
     try:
         _run(_hw, _rec, args.skip_stability)
         _hw.set_status_bar_state(COLOR_STATES["pass"])
