@@ -65,10 +65,10 @@ def _wait_for_stability(recorder: GravimetricRecorder, is_simulating: bool) -> f
 
 
 def _run(is_simulating: bool) -> None:
-    ui.print_title("GRAVIMETRIC SETUP")
+    ui.print_title("GRAVIMETRIC DAILY SETUP")
     _rec = GravimetricRecorder(
         GravimetricRecorderConfig(
-            test_name="gravimetric-setup",
+            test_name="gravimetric-daily-setup",
             run_id=create_run_id(),
             start_time=time(),
             duration=0,
