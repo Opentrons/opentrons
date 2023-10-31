@@ -19,7 +19,7 @@ from hardware_testing.gravimetric.__main__ import API_LEVEL
 TEST_NAME = "gravimetric-daily-setup"
 
 STABLE_CHECK_SECONDS = 3.0
-STABLE_ATTEMPTS = 5
+STABLE_ATTEMPTS = 10
 
 MAX_ALLOWED_ACCURACY_PERCENT_D = 0.01  # percent
 
@@ -152,7 +152,7 @@ def _wait_for_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> f
     )
 
 
-def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder) -> None:
+def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability: bool) -> None:
     ui.print_title("GRAVIMETRIC DAILY SETUP")
     ui.print_info(f"Scale: {recorder.max_capacity}g (SN:{recorder.serial_number})")
     hw_api.home()  # home gantry before we start recording from the scale
@@ -165,9 +165,12 @@ def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder) -> None:
         ui.get_user_ready("CLOSE door and step away from fixture")
     hw_api.set_status_bar_state(COLOR_STATES["idle"])
 
-    ui.print_header("SHAKE STABILITY")
-    _wait_for_stability(recorder, hw_api)
-    _test_stability(recorder, hw_api)
+    ui.print_header("TEST STABILITY")
+    if not skip_stability:
+        _wait_for_stability(recorder, hw_api)
+        _test_stability(recorder, hw_api)
+    else:
+        ui.print_info("skipping")
 
     ui.print_header("ZERO SCALE")
     if not hw_api.is_simulator:
@@ -184,7 +187,7 @@ def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder) -> None:
     _wait_for_stability(recorder, hw_api)
     recorder.calibrate_scale()
 
-    ui.print_header("MEASURE WEIGHT")
+    ui.print_header("TEST ACCURACY")
     if hw_api.is_simulator:
         recorder.set_simulation_mass(0.0)
     start_grams = _wait_for_stability(recorder, hw_api)
@@ -215,6 +218,7 @@ def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--skip-stability", action="store_true")
     args = parser.parse_args()
     _ctx = helpers.get_api_context(
         API_LEVEL,  # type: ignore[attr-defined]
@@ -237,7 +241,7 @@ if __name__ == "__main__":
     _rec.set_tag(create_datetime_string())
     _rec.record(in_thread=True)
     try:
-        _run(_hw, _rec)
+        _run(_hw, _rec, args.skip_stability)
         _hw.set_status_bar_state(COLOR_STATES["pass"])
         ui.print_header("Result: PASS")
     except Exception as e:

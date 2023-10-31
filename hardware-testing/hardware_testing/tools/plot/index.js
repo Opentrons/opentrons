@@ -118,7 +118,9 @@ function parseGravimetricCSV(CSVData, retData) {
 
 window.addEventListener('load', function (evt) {
   const _updateTimeoutMillis = 100
+  const _reloadTimeoutMillis = 1000
   let _timeout
+  let _timeoutReload
   const layout = {
     title: 'Untitled',
     uirevision: true,
@@ -150,6 +152,10 @@ window.addEventListener('load', function (evt) {
       clearTimeout(_timeout)
       _timeout = undefined
     }
+    if (_timeoutReload) {
+      clearTimeout(_timeoutReload)
+      _timeoutReload = undefined
+    }
   }
 
   function _onScreenSizeUpdate(evt) {
@@ -171,6 +177,7 @@ window.addEventListener('load', function (evt) {
   }
 
   function _onTestNameResponse() {
+    _clearTimeout()
     const responseData = JSON.parse(this.responseText)
     name_input_div.value = responseData.name
     let btn_val;
@@ -182,14 +189,13 @@ window.addEventListener('load', function (evt) {
         allButtons[i].style.backgroundColor = "#bbb"
       }
     }
-    _clearTimeout()
-    _timeout = setTimeout(_getLatestDataFromServer, _updateTimeoutMillis)
     _getLatestDataFromServer()
   }
 
   function _onServerError(evt) {
     document.body.style.backgroundColor = "red"
     document.body.innerHTML = "<h1>Lost Connection (refresh)</h1>"
+    location.reload()
   }
 
   function _getLatestDataFromServer(evt) {
@@ -209,6 +215,7 @@ window.addEventListener('load', function (evt) {
     })
     oReq.open('GET', 'http://' + window.location.host + '/data/latest')
     oReq.send()
+    _timeoutReload = setTimeout(_onServerError, _reloadTimeoutMillis)
   }
 
   function _getTestNameFromServer(evt) {
