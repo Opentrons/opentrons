@@ -91,14 +91,6 @@ def _ot3_session_server(server_temp_directory: str) -> Generator[str, None, None
     base_url = (
         f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}"
     )
-
-    with _requests_session() as requests_session:
-        has_dev_server = _check_is_ready(requests_session, base_url)
-    if has_dev_server:
-        print("Using pre-existing flex dev server")
-        yield base_url
-        return
-
     with DevServer(
         port=_OT3_SESSION_SERVER_PORT,
         is_ot3=True,
@@ -116,26 +108,22 @@ def _requests_session() -> Generator[requests.Session, None, None]:
         yield session
 
 
-def _check_is_ready(requests_session: requests.Session, base_url: str) -> bool:
-    try:
-        health_response = requests_session.get(f"{base_url}/health")
-    except requests.ConnectionError:
-        # The server isn't up yet to accept requests. Keep polling.
-        return False
-    else:
-        if health_response.status_code == 503:
-            # The server is accepting requests but reporting not ready. Keep polling.
-            return False
-        else:
-            # The server's replied with something other than a busy indicator. Stop polling.
-            return True
-
-
 def _wait_until_ready(base_url: str) -> None:
     with _requests_session() as requests_session:
         while True:
-            if _check_is_ready(requests_session, base_url):
-                return
+            try:
+                health_response = requests_session.get(f"{base_url}/health")
+            except requests.ConnectionError:
+                # The server isn't up yet to accept requests. Keep polling.
+                pass
+            else:
+                if health_response.status_code == 503:
+                    # The server is accepting requests but reporting not ready. Keep polling.
+                    pass
+                else:
+                    # The server's replied with something other than a busy indicator. Stop polling.
+                    return
+
             time.sleep(0.1)
 
 
