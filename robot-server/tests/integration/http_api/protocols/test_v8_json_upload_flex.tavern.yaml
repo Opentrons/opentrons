@@ -3,6 +3,7 @@ test_name: Upload and analyze a JSONv8 protocol
 marks:
   - usefixtures:
       - ot3_server_base_url
+  - ot3_only
 
 stages:
   - name: Upload simple v8 protocol for flex
@@ -593,6 +594,7 @@ test_name: Upload and analyze a JSONv8 protocol, with liquids
 marks:
   - usefixtures:
       - ot3_server_base_url
+  - ot3_only
 
 stages:
   - name: Upload simple v8 protocol
