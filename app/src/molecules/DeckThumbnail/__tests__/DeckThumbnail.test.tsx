@@ -111,7 +111,7 @@ describe('DeckThumbnail', () => {
       .calledWith(labware)
       .mockReturnValue(OT2_ROBOT_TYPE)
     when(mockGetDeckDefFromRobotType)
-      .calledWith('OT-2 Standard')
+      .calledWith(OT2_ROBOT_TYPE)
       .mockReturnValue(ot2StandardDeckDef as any)
     when(mockParseInitialLoadedLabwareByAdapter)
       .calledWith(commands)
