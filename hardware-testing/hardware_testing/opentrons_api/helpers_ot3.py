@@ -320,7 +320,6 @@ def set_csv_report_meta_data_ot3(
     report.set_firmware(api.fw_version)
     report.set_version(get_git_description())
 
-
 def set_gantry_per_axis_setting_ot3(
     settings: PerPipetteAxisSettings, axis: Axis, load: GantryLoad, value: float
 ) -> None:
@@ -540,6 +539,32 @@ def get_plunger_positions_ot3(
         pipette.plunger_positions.drop_tip,
     )
 
+async def update_drop_tip_current(
+    api: OT3API, mount: OT3Mount, current: float = 1.0
+) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._drop_configurations
+    config_model.current = current
+    pipette._drop_configurations = config_model
+
+async def update_drop_tip_speed(
+    api: OT3API, mount: OT3Mount, speed: float = 1.0
+) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._drop_configurations
+    config_model.speed = speed
+    pipette._drop_configurations = config_model
+
+async def update_pick_up_speed(
+    api: OT3API, mount: OT3Mount, speed: float = 5.0
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._pick_up_configurations
+    config_model.speed = speed
+    pipette._pick_up_configurations = config_model
 
 async def update_pick_up_current(
     api: OT3API, mount: OT3Mount, current: float = 0.125
@@ -549,7 +574,6 @@ async def update_pick_up_current(
     config_model = pipette.pick_up_configurations
     config_model.current = current
     pipette.pick_up_configurations = config_model
-
 
 async def update_pick_up_distance(
     api: OT3API, mount: OT3Mount, distance: float = 17.0
