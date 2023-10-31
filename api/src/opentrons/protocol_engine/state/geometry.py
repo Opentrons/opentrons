@@ -4,6 +4,7 @@ from numpy import array, dot
 from typing import Optional, List, Set, Tuple, Union, cast
 
 from opentrons.types import Point, DeckSlotName, MountType
+from opentrons.protocols.geometry import waste_chute_dimensions
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
@@ -99,7 +100,9 @@ class GeometryView:
             default=0.0,
         )
 
-        return max(highest_labware_z, highest_module_z)
+        highest_fixture_z = self._get_highest_z_of_fixtures()
+
+        return max(highest_labware_z, highest_module_z, highest_fixture_z)
 
     def get_min_travel_z(
         self,
@@ -805,3 +808,16 @@ class GeometryView:
         return slot_based_offset or self._labware.get_labware_gripper_offsets(
             labware_id=labware_id, slot_name=None
         )
+
+    def _get_highest_z_of_fixtures(self) -> float:
+        """Return the highest z-point of all fixtures on the deck."""
+        # HACK: If the protocol has mentioned any addressable area, assume there's a waste chute
+        # on the deck that we need to clear.
+        #
+        # What this needs to do instead is look at the deck layout that the *robot* (not the
+        # protocol) has been configured with. And, obviously, we shouldn't assume every fixture
+        # is the waste chute.
+        if self._labware.get_loaded_addressable_areas():
+            return waste_chute_dimensions.ENVELOPE_HEIGHT
+        else:
+            return 0
