@@ -27,7 +27,6 @@ import { mockApiHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { mockProtocolModuleInfo } from '../../ProtocolSetupInstruments/__fixtures__'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../redux/config'
 import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
@@ -43,7 +42,6 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/config')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -88,9 +86,6 @@ const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
 >
 const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
   typeof useChainLiveCommands
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const mockFixtureTable = FixtureTable as jest.MockedFunction<
   typeof FixtureTable
@@ -177,9 +172,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
     mockLocationConflictModal.mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    mockUseDeckConfigurationQuery.mockReturnValue({
-      data: [mockFixture],
-    } as UseQueryResult<DeckConfiguration>)
+    mockUseDeckConfigurationQuery.mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -189,9 +184,6 @@ describe('ProtocolSetupModulesAndDeck', () => {
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     mockFixtureTable.mockReturnValue(<div>mock FixtureTable</div>)
     mockModulesAndDeckMapViewModal.mockReturnValue(
       <div>mock ModulesAndDeckMapViewModal</div>
@@ -226,6 +218,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render module information when a protocol has module - connected', () => {
+    // TODO: connected not location conflict
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith(calibratedMockApiHeaterShaker as any, mockProtocolModuleInfo)
       .mockReturnValue({
@@ -244,6 +237,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render module information when a protocol has module - disconnected', () => {
+    // TODO: disconnected not location conflict
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .mockReturnValue({
@@ -261,6 +255,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render module information with calibrate button when a protocol has module', async () => {
+    // TODO: not location conflict
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
       .mockReturnValue({
@@ -360,16 +355,16 @@ describe('ProtocolSetupModulesAndDeck', () => {
     getByText('Calibration required Calibrate pipette first')
   })
 
-  it('should render mock Fixture table and module location conflict when is enableDeckConfiguration on', () => {
+  it('should render mock Fixture table and module location conflict', () => {
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
     mockGetAttachedProtocolModuleMatches.mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: calibratedMockApiHeaterShaker,
       },
     ])
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
     const [{ getByText }] = render()
     getByText('mock FixtureTable')
     getByText('Location conflict').click()
