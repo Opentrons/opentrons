@@ -1,6 +1,5 @@
 """Setup."""
 import argparse
-from atexit import register as atexit_register
 from time import time, sleep
 
 from opentrons.types import Point
@@ -153,22 +152,8 @@ def _wait_for_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> f
     )
 
 
-def _run(hw_api: SyncHardwareAPI) -> None:
+def _run(hw_api: SyncHardwareAPI, recorder: GravimetricRecorder) -> None:
     ui.print_title("GRAVIMETRIC DAILY SETUP")
-    recorder = GravimetricRecorder(
-        GravimetricRecorderConfig(
-            test_name=TEST_NAME,
-            run_id=create_run_id(),
-            start_time=time(),
-            duration=0,
-            frequency=1000 if hw_api.is_simulator else 5,
-            stable=False,
-        ),
-        scale=Scale.build(simulate=hw_api.is_simulator),
-        simulate=hw_api.is_simulator,
-    )
-    recorder.set_tag(create_datetime_string())
-    recorder.record(in_thread=True)
     ui.print_info(f"Scale: {recorder.max_capacity}g (SN:{recorder.serial_number})")
     hw_api.home()  # home gantry before we start recording from the scale
 
@@ -203,6 +188,7 @@ def _run(hw_api: SyncHardwareAPI) -> None:
     if hw_api.is_simulator:
         recorder.set_simulation_mass(0.0)
     start_grams = _wait_for_stability(recorder, hw_api)
+    ui.print_info(f"start grams: {start_grams}")
     weight_grams = 20 if recorder.max_capacity < 200 else 200
     if not hw_api.is_simulator:
         real_weight = _get_real_weight()
@@ -213,7 +199,9 @@ def _run(hw_api: SyncHardwareAPI) -> None:
     else:
         real_weight = float(weight_grams)
         recorder.set_simulation_mass(float(weight_grams))
+    ui.print_info(f"real grams: {real_weight}")
     end_grams = _wait_for_stability(recorder, hw_api)
+    ui.print_info(f"end grams: {start_grams}")
     found_grams = end_grams - start_grams
 
     # CALCULATE ACCURACY
@@ -234,13 +222,30 @@ if __name__ == "__main__":
     )
     _hw = workarounds.get_sync_hw_api(_ctx)
     _hw.set_status_bar_state(COLOR_STATES["idle"])
-    atexit_register(_hw.set_status_bar_state, COLOR_STATES["idle"])
+    _rec = GravimetricRecorder(
+        GravimetricRecorderConfig(
+            test_name=TEST_NAME,
+            run_id=create_run_id(),
+            start_time=time(),
+            duration=0,
+            frequency=1000 if _hw.is_simulator else 5,
+            stable=False,
+        ),
+        scale=Scale.build(simulate=_hw.is_simulator),
+        simulate=_hw.is_simulator,
+    )
+    _rec.set_tag(create_datetime_string())
+    _rec.record(in_thread=True)
     try:
-        _run(_hw)
+        _run(_hw, _rec)
         _hw.set_status_bar_state(COLOR_STATES["pass"])
         ui.print_header(f"Result: PASS")
     except Exception as e:
         _hw.set_status_bar_state(COLOR_STATES["fail"])
         ui.print_header(f"Result: FAIL")
-        print(str(e))
-    ui.get_user_ready("test done")
+        ui.print_error(str(e))
+    finally:
+        if not args.simulate:
+            ui.get_user_ready("test done")
+        _rec.stop()
+        _hw.set_status_bar_state(COLOR_STATES["idle"])
