@@ -1638,15 +1638,15 @@ class InstrumentContext(publisher.CommandPublisher):
         preparing for aspiration, moving into a well, and then aspirating *without
         leaving the well*::
 
-             pipette.move_to(well.top(z=-5))
+             pipette.move_to(well.bottom(z=2))
              pipette.delay(5)
              pipette.mix(10, 10)
              pipette.move_to(well.top(z=5))
              pipette.blow_out()
              pipette.prepare_to_aspirate()
-             pipette.move_to(well.top(z=-5))
+             pipette.move_to(well.bottom(z=2))
              pipette.delay(5)
-             pipette.aspirate(10, well.top(z=-5))
+             pipette.aspirate(10, well.bottom(z=2))
 
         The call to ``prepare_to_aspirate()`` means that the plunger will be in the
         bottom position before the call to ``aspirate()``. Since it doesn't need to
