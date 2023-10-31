@@ -3,6 +3,7 @@
 from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
 from opentrons.protocols.api_support import deck_type
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
     DeckType,
@@ -58,6 +59,7 @@ async def create_simulating_runner(
             use_virtual_gripper=True,
             use_virtual_pipettes=(not feature_flags.disable_fast_protocol_upload()),
         ),
+        load_fixed_trash=should_load_fixed_trash(protocol_config),
     )
 
     simulating_legacy_context_creator = LegacySimulatingContextCreator(
