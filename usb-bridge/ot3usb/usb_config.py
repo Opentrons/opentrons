@@ -45,6 +45,32 @@ FUNCTION_SUBFOLDER = "functions/acm.usb0"
 # Folder holding all of the UDC handles (as filenames)
 UDC_HANDLE_FOLDER = "/sys/class/udc/"
 
+# Hack alert!
+# Serialport resets the input buffer of ports when it opens them. But in a gadget
+# like this, if a host connects and sends data before we open the port, then the
+# data will be in the input buffer, and resetting it will lose it.
+#
+# We can change this behavior by replacing the function definition of
+# _reset_input_buffer on the internal _class_ of serial.serialposix.Serial.
+# By replacing the function on the class, new instances will get the faked reset
+# by default. Since we don't want to entirely remove the ability to reset the buffer,
+# just make it not happen on open, after we create the instance we can replace the
+# dummy implementation with the bound-method variant of the actual implementation.
+
+def _fake_serialport_input_reset(*args: typing.Any, **kwargs: typing.Any) -> None:
+    pass
+
+saved_serialport_input_reset = serial.serialposix.Serial._reset_input_buffer
+# this is how you alter the function stored in the class definition so that new instances
+# get this function bound in as a method
+serial.serialposix.Serial._reset_input_buffer = _fake_serialport_input_reset
+
+def _restore_serialport_input_reset(port: serial.serialposix.Serial) -> None:
+    # this is how you take a function object and bind it to an instance as a
+    # method of that instance
+    bound_reset = saved_serialport_input_reset.__get__(port, port.__class__)
+    setattr(port, '_reset_input_buffer', bound_reset)
+
 
 class OSDriver:
     """Class to abstract OS functions."""
@@ -221,4 +247,5 @@ class SerialGadget:
         # To support select()
         ser.write_timeout = 0
         ser.nonblocking()
+        _restore_serialport_input_reset(ser)
         return ser
