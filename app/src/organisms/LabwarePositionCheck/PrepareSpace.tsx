@@ -14,6 +14,7 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   BaseDeck,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
@@ -28,6 +29,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
 
 import type { CheckLabwareStep } from './types'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -76,6 +78,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   } = props
 
   const isOnDevice = useSelector(getIsOnDevice)
+  const deckConfig = useDeckConfigurationQuery().data ?? []
 
   if (protocolData == null || robotType == null) return null
 
@@ -83,14 +86,14 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
     <Flex css={TILE_CONTAINER_STYLE}>
       <Flex flex="1" flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
         <Flex
-          flex="1"
+          flex="2"
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing16}
         >
           <Title>{header}</Title>
           {body}
         </Flex>
-        <Flex flex="2" justifyContent={JUSTIFY_CENTER}>
+        <Flex flex="3" justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_FLEX_START}>
           <BaseDeck
             robotType={robotType}
             moduleLocations={protocolData.modules.map(mod => ({
@@ -109,6 +112,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
               labwareLocation: location,
               definition: labwareDef,
             }]}
+            deckConfig={deckConfig}
           />
         </Flex>
       </Flex>
