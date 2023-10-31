@@ -372,12 +372,16 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const commands = [...loadCommands, ...nonLoadCommands]
 
     const flexDeckSpec: OT3RobotMixin = {
-      model: FLEX_ROBOT_TYPE,
-      deckId: FLEX_STANDARD_DECKID,
+      robot: {
+        model: FLEX_ROBOT_TYPE,
+        deckId: FLEX_STANDARD_DECKID,
+      },
     }
     const ot2DeckSpec: OT2RobotMixin = {
-      model: OT2_STANDARD_MODEL,
-      deckId: OT2_STANDARD_DECKID,
+      robot: {
+        model: OT2_STANDARD_MODEL,
+        deckId: OT2_STANDARD_DECKID,
+      },
     }
     const deckStructure =
       robotType === FLEX_ROBOT_TYPE ? flexDeckSpec : ot2DeckSpec

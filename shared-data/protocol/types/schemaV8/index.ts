@@ -69,13 +69,17 @@ export interface RobotStructure {
 }
 
 export interface OT2RobotMixin {
-  model: 'OT-2 Standard'
-  deckId: 'ot2_standard' | 'ot2_short_trash'
+  robot: {
+    model: 'OT-2 Standard'
+    deckId: 'ot2_standard' | 'ot2_short_trash'
+  }
 }
 
 export interface OT3RobotMixin {
-  model: 'OT-3 Standard'
-  deckId: 'ot3_standard'
+  robot: {
+    model: 'OT-3 Standard'
+    deckId: 'ot3_standard'
+  }
 }
 
 export interface ProtocolBase<DesignerApplicationData> {
