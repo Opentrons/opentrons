@@ -19,6 +19,7 @@ _SESSION_SERVER_SCHEME = "http://"
 _SESSION_SERVER_HOST = "localhost"
 _OT2_SESSION_SERVER_PORT = "31950"
 _OT3_SESSION_SERVER_PORT = "31960"
+_INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
 
 def pytest_tavern_beta_before_every_test_run(
@@ -114,7 +115,7 @@ def _wait_until_ready(base_url: str) -> None:
         started = datetime.now()
         while True:
             now = datetime.now()
-            if (now - started).total_seconds() > 30:
+            if (now - started).total_seconds() > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
                 raise RuntimeError("Could not start dev server")
             try:
                 health_response = requests_session.get(f"{base_url}/health")
