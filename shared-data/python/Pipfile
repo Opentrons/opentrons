@@ -4,16 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
-mypy = "==0.800"
+mypy = "==0.942"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.2.1"
-twine = "==2.0.0"
-wheel = "==0.30.0"
-pytest = "==7.0.1"
+twine = "==4.0.0"
+wheel = "==0.37.1"
+pytest = "==7.1.1"
 pytest-cov = "==2.10.1"
-pytest-xdist = "~=2.2.1 "
+pytest-xdist = "~=2.5.0 "
 typeguard = "~=2.13"
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
