@@ -2,7 +2,7 @@
 const path = require('path')
 const { versionForProject } = require('../scripts/git-version')
 
-const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER } = process.env
+const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER, APPLE_TEAM_ID } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
@@ -56,6 +56,9 @@ module.exports = async () => ({
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
     forceCodeSigning: !DEV_MODE,
     gatekeeperAssess: true,
+    notarize: {
+      teamId: APPLE_TEAM_ID 
+    }
   },
   dmg: {
     icon: null,
