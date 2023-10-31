@@ -38,7 +38,7 @@ class RadwagScaleBase(ABC):
         ...
 
     @abstractmethod
-    def read_serial_number(self) -> float:
+    def read_serial_number(self) -> str:
         """Read the serial number."""
         ...
 

@@ -1,10 +1,8 @@
 """Record weight measurements."""
 from contextlib import contextmanager
 from dataclasses import dataclass
-from os import kill
-import signal
 from statistics import stdev
-from subprocess import Popen, check_output
+from subprocess import Popen
 from threading import Thread, Event
 from time import sleep, time
 from typing import List, Optional, Callable, Generator

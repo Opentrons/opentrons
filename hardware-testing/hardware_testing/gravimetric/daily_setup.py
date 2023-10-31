@@ -239,10 +239,10 @@ if __name__ == "__main__":
     try:
         _run(_hw, _rec)
         _hw.set_status_bar_state(COLOR_STATES["pass"])
-        ui.print_header(f"Result: PASS")
+        ui.print_header("Result: PASS")
     except Exception as e:
         _hw.set_status_bar_state(COLOR_STATES["fail"])
-        ui.print_header(f"Result: FAIL")
+        ui.print_header("Result: FAIL")
         ui.print_error(str(e))
     finally:
         if not args.simulate:
