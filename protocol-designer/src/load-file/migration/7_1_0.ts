@@ -79,6 +79,10 @@ export const migrateFile = (
       if (stepForm.stepType === 'moveLiquid') {
         return {
           ...stepForm,
+          aspirate_labware:
+            stepForm.aspirate_labware === 'fixedTrash'
+              ? trashId
+              : stepForm.aspirate_labware,
           dispense_labware:
             stepForm.dispense_labware === 'fixedTrash'
               ? trashId
@@ -113,15 +117,24 @@ export const migrateFile = (
         command.commandType === 'loadLabware'
     )
     .map(command => {
-      const { parameters } = labwareDefinitions[command.params.loadName]
+      //  protocols that do multiple migrations through 7.0.0 have a loadName === definitionURI
+      //  this ternary below fixes that
+      const loadName =
+        labwareDefinitions[command.params.loadName] != null
+          ? labwareDefinitions[command.params.loadName].parameters.loadName
+          : command.params.loadName
       return {
         ...command,
         params: {
           ...command.params,
-          loadName: parameters.loadName,
+          loadName,
         },
       }
     })
+
+  const migratedCommandsV7_1 = commands.filter(
+    command => command.commandType !== 'loadLabware'
+  )
 
   return {
     ...appData,
@@ -147,6 +160,10 @@ export const migrateFile = (
       ...{ [trashDefUri]: trashDefinition },
       ...appData.labwareDefinitions,
     },
-    commands: [...commands, ...loadLabwareCommands, ...trashLoadCommand],
+    commands: [
+      ...migratedCommandsV7_1,
+      ...loadLabwareCommands,
+      ...trashLoadCommand,
+    ],
   }
 }
