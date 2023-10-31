@@ -179,7 +179,7 @@ describe('FileSidebar', () => {
     )
   })
 
-  it('warning modal is shown when export is clicked with unused trash bin', () => {
+  it('warning modal is shown when export is clicked with unused trash', () => {
     props.savedStepForms = savedStepForms
     const labwareId = 'mockLabwareId'
     // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
@@ -194,7 +194,7 @@ describe('FileSidebar', () => {
     const alertModal = wrapper.find(AlertModal)
 
     expect(alertModal).toHaveLength(1)
-    expect(alertModal.prop('heading')).toEqual('Unused trash bin')
+    expect(alertModal.prop('heading')).toEqual('Unused trash')
   })
 
   it('warning modal is shown when export is clicked with unused gripper', () => {
