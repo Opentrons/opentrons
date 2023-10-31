@@ -10,7 +10,7 @@ from hardware_testing.gravimetric.measurement.record import (
 )
 from hardware_testing.gravimetric.measurement.scale import Scale  # type: ignore[import]
 
-STABLE_CHECK_SECONDS = 1.0
+STABLE_CHECK_SECONDS = 3.0
 STABLE_ATTEMPTS = 5
 
 MAX_ALLOWED_ACCURACY_PERCENT_D = 0.01  # percent
