@@ -1,3 +1,17 @@
+// NOTE: removed "gravimetric-" from string so buttons can be smaller
+const testNames = [
+  "rnd",
+  "daily-setup",
+  "ot3-p50-multi",
+  "ot3-p50-multi-50ul-tip-increment",
+  "ot3-p50-single",
+  "ot3-p1000-96",
+  "ot3-p1000-multi",
+  "ot3-p1000-multi-50ul-tip-increment",
+  "ot3-p1000-multi-200ul-tip-increment",
+  "ot3-p1000-multi-1000ul-tip-increment",
+  "ot3-p1000-single"
+]
 function getEmptyGravData() {
   return [
     {
@@ -103,7 +117,7 @@ function parseGravimetricCSV(CSVData, retData) {
 }
 
 window.addEventListener('load', function (evt) {
-  const _updateTimeoutMillis = 100
+  const _updateTimeoutMillis = 200
   let _timeout
   const layout = {
     title: 'Untitled',
@@ -112,6 +126,23 @@ window.addEventListener('load', function (evt) {
     yaxis: { autorange: true },
   }
   const name_input_div = document.getElementById('testname')
+  const button_input_div = document.getElementById('buttoncontainer')
+  let allButtons = []
+  for (let i = 0; i < testNames.length; i++) {
+    let btn = document.createElement("input")
+    btn.type = "button"
+    btn.value = testNames[i]
+    btn.onclick = function(){
+        name_input_div.value = "gravimetric-" + btn.value
+        _setTestNameOfServer(null)
+    }
+    btn.style.backgroundColor = "grey"
+    btn.style.marginRight = "5px"
+    button_input_div.appendChild(btn)
+    allButtons.push(btn)
+  }
+
+
   const plotlyDivName = 'plotly'
 
   function _clearTimeout() {
@@ -125,6 +156,12 @@ window.addEventListener('load', function (evt) {
     const div = document.getElementById(plotlyDivName)
     div.style.width = window.innerWidth - 50 + 'px'
     div.style.height = window.innerHeight - 100 + 'px'
+    button_input_div.style.width = window.innerWidth - 50 + 'px'
+    if (window.innerWidth - 160 > 400) {
+      name_input_div.style.width = window.innerWidth - 160 + 'px'
+    } else {
+      name_input_div.style.width = 400 + 'px'
+    }
   }
 
   function _initializePlot() {
@@ -136,6 +173,15 @@ window.addEventListener('load', function (evt) {
   function _onTestNameResponse() {
     const responseData = JSON.parse(this.responseText)
     name_input_div.value = responseData.name
+    let btn_val;
+    for (let i=0;i<allButtons.length;i++) {
+      btn_val = "gravimetric-" + allButtons[i].value
+      if (btn_val === responseData.name) {
+        allButtons[i].style.backgroundColor = "yellow"
+      } else {
+        allButtons[i].style.backgroundColor = "#bbb"
+      }
+    }
     _clearTimeout()
     _timeout = setTimeout(_getLatestDataFromServer, _updateTimeoutMillis)
     _getLatestDataFromServer()
