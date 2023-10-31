@@ -9,6 +9,7 @@ export type PipettingRunTimeCommand =
   | DropTipRunTimeCommand
   | DropTipInPlaceRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
+  | PrepareToAspirateRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -20,6 +21,7 @@ export type PipettingCreateCommand =
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
   | ConfigureForVolumeCreateCommand
+  | PrepareToAspirateCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -112,6 +114,18 @@ export interface DropTipInPlaceRunTimeCommand
   result?: any
 }
 
+export interface PrepareToAspirateCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'prepareToAspirate'
+  params: PipetteIdParams
+}
+
+export interface PrepareToAspirateRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    PrepareToAspirateCreateCommand {
+  result?: any
+}
+
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -144,8 +158,11 @@ interface FlowRateParams {
   flowRate: number // µL/s
 }
 
-interface PipetteAccessParams {
+interface PipetteIdParams {
   pipetteId: string
+}
+
+interface PipetteAccessParams extends PipetteIdParams {
   labwareId: string
   wellName: string
 }
