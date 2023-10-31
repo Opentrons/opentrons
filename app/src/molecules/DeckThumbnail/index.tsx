@@ -1,7 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 
-import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
+import { BaseDeck } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
@@ -25,8 +25,6 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
-const ATTACHED_MODULE_POLL_MS = 5000
-
 interface DeckThumbnailProps extends StyleProps {
   protocolAnalysis?: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   commands: RunTimeCommand[]
@@ -47,10 +45,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     commands
   )
-  const attachedModules =
-    useAttachedModules({
-      refetchInterval: ATTACHED_MODULE_POLL_MS,
-    }) ?? []
+  const attachedModules = useAttachedModules()
 
   const deckConfig = getDeckConfigFromProtocolCommands(commands)
 
