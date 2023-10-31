@@ -24,7 +24,7 @@ interface LabwareLocationUpdate {
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>
 ): ProtocolFile => {
-  const { designerApplication, robot, commands } = appData
+  const { designerApplication, robot, commands, labwareDefinitions } = appData
   const labwareLocationUpdate: LabwareLocationUpdate =
     designerApplication?.data?.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       .labwareLocationUpdate
@@ -68,23 +68,29 @@ export const migrateFile = (
     savedStepForms: Record<string, any>
   ): Record<string, any> => {
     return mapValues(savedStepForms, stepForm => {
+      const sharedParams = {
+        blowout_location:
+          stepForm.blowout_location === 'fixedTrash'
+            ? trashId
+            : stepForm.blowout_location,
+        dropTip_location: trashId,
+      }
+
       if (stepForm.stepType === 'moveLiquid') {
         return {
           ...stepForm,
-          blowout_location:
-            stepForm.blowout_location === 'fixedTrash'
+          dispense_labware:
+            stepForm.dispense_labware === 'fixedTrash'
               ? trashId
-              : stepForm.blowout_location,
-          dropTip_location: trashId,
+              : stepForm.dispense_labware,
+          ...sharedParams,
         }
       } else if (stepForm.stepType === 'mix') {
         return {
           ...stepForm,
-          blowout_location:
-            stepForm.blowout_location === 'fixedTrash'
-              ? trashId
-              : stepForm.blowout_location,
-          dropTip_location: trashId,
+          labware:
+            stepForm.labware === 'fixedTrash' ? trashId : stepForm.labware,
+          ...sharedParams,
         }
       }
 
@@ -100,6 +106,22 @@ export const migrateFile = (
   const newFilteredSavedStepForms = migrateSavedStepForms(
     filteredSavedStepForms
   )
+
+  const loadLabwareCommands: LoadLabwareCreateCommand[] = commands
+    .filter(
+      (command): command is LoadLabwareCreateCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .map(command => {
+      const { parameters } = labwareDefinitions[command.params.loadName]
+      return {
+        ...command,
+        params: {
+          ...command.params,
+          loadName: parameters.loadName,
+        },
+      }
+    })
 
   return {
     ...appData,
@@ -125,6 +147,6 @@ export const migrateFile = (
       ...{ [trashDefUri]: trashDefinition },
       ...appData.labwareDefinitions,
     },
-    commands: [...commands, ...trashLoadCommand],
+    commands: [...commands, ...loadLabwareCommands, ...trashLoadCommand],
   }
 }

@@ -1154,23 +1154,19 @@ export const labwareInvariantProperties: Reducer<
         ...loadLabwareCommands.reduce(
           (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
             const { labwareId, loadName } = command.params
-            const labwareDefintionForV7 = Object.entries(
+            const matchingLabwareDefintion = Object.entries(
               file.labwareDefinitions
             ).find(([key, value]) => value.parameters.loadName === loadName)
-            let defUri: string = ''
-            if (labwareDefintionForV7 != null) {
-              const [key] = labwareDefintionForV7
-              defUri = key
-            } else {
-              defUri = loadName
+            let labwareDefURI: string = ''
+            if (matchingLabwareDefintion != null) {
+              const [key] = matchingLabwareDefintion
+              labwareDefURI = key
             }
-
             const id = labwareId ?? ''
-
             return {
               ...acc,
               [id]: {
-                labwareDefURI: defUri,
+                labwareDefURI,
               },
             }
           },
