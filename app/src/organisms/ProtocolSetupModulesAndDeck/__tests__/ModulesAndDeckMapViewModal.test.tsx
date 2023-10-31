@@ -12,14 +12,9 @@ import {
 
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
-import { useStoredProtocolAnalysis } from '../../Devices/hooks'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
-import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 // import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
-import _uncastedSimpleV7Protocol from '@opentrons/shared-data/protocol/fixtures/7/simpleV7.json'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
-
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 jest.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace')
@@ -37,7 +32,6 @@ const PROTOCOL_ANALYSIS = {
   status: 'completed',
   labware: [],
 } as any
-const simpleV7Protocol = (_uncastedSimpleV7Protocol as unknown) as ProtocolAnalysisOutput
 
 // const mockModuleLocations = [
 //   {
@@ -122,14 +116,8 @@ const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
 const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
   typeof RobotWorkSpace
 >
-const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
-  typeof useStoredProtocolAnalysis
->
 const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
   typeof getDeckConfigFromProtocolCommands
->
-const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
-  typeof getLabwareRenderInfo
 >
 
 describe('ModulesAndDeckMapViewModal', () => {
@@ -149,9 +137,7 @@ describe('ModulesAndDeckMapViewModal', () => {
     when(mockGetDeckConfigFromProtocolCommands).mockReturnValue(
       EXTENDED_DECK_CONFIG_FIXTURE
     )
-    mockUseStoredProtocolAnalysis.mockReturnValue(
-      (simpleV7Protocol as unknown) as ProtocolAnalysisOutput
-    )
+
     // when(mockBaseDeck)
     //   .calledWith({
     //     deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
@@ -163,7 +149,6 @@ describe('ModulesAndDeckMapViewModal', () => {
     //   .mockReturnValue(<div>mock BaseDeck</div>)
     mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
     mockRobotWorkSpace.mockReturnValue(<div>mock RobotWorkSpace</div>)
-    mockGetLabwareRenderInfo.mockReturnValue({})
   })
 
   afterEach(() => {

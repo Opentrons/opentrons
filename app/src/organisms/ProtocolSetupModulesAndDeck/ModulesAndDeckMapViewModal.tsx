@@ -1,6 +1,5 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import map from 'lodash/map'
 
 import {
   BaseDeck,
@@ -13,15 +12,12 @@ import {
   inferModuleOrientationFromXCoordinate,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 
 import { Modal } from '../../molecules/Modal'
 import { ModuleInfo } from '../Devices/ModuleInfo'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery' // need to switch if needed to use this
 import { useFeatureFlag } from '../../redux/config'
 import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
-import { useStoredProtocolAnalysis } from '../Devices/hooks'
-import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
 import type {
@@ -63,8 +59,7 @@ export function ModulesAndDeckMapViewModal({
     hasExitIcon: true,
   }
 
-  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
-  const protocolAnalysis = mostRecentAnalysis ?? storedProtocolAnalysis
+  const protocolAnalysis = mostRecentAnalysis
 
   if (protocolAnalysis == null) return null
 
@@ -85,30 +80,6 @@ export function ModulesAndDeckMapViewModal({
     ),
   }))
 
-  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
-    protocolAnalysis.commands
-  )
-  const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
-
-  const labwareLocations = map(
-    labwareRenderInfo,
-    ({ labwareDef, displayName, slotName }, labwareId) => {
-      const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
-      const topLabwareDefinition =
-        labwareInAdapter?.result?.definition ?? labwareDef
-      const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
-      const topLabwareDisplayName =
-        labwareInAdapter?.params.displayName ?? displayName
-
-      return {
-        labwareLocation: { slotName },
-        definition: topLabwareDefinition,
-        topLabwareId,
-        topLabwareDisplayName,
-      }
-    }
-  )
-
   return (
     <Modal
       header={modalHeader}
@@ -123,7 +94,7 @@ export function ModulesAndDeckMapViewModal({
             FLEX_ROBOT_TYPE
           )}
           robotType={FLEX_ROBOT_TYPE}
-          labwareLocations={labwareLocations}
+          labwareLocations={[]}
           moduleLocations={moduleLocations}
         />
       ) : (

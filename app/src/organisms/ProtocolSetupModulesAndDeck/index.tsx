@@ -65,14 +65,6 @@ import type { AttachedProtocolModuleMatch } from './utils'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 
-// const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-//   'DECK_BASE',
-//   'BARCODE_COVERS',
-//   'SLOT_SCREWS',
-//   'SLOT_10_EXPANSION',
-//   'CALIBRATION_CUTOUTS',
-// ]
-
 interface RenderModuleStatusProps {
   isModuleReady: boolean
   isDuplicateModuleModel: boolean
