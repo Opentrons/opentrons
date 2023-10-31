@@ -7,13 +7,10 @@ import {
   RobotWorkSpace,
   EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
-// import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-// import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
-// import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
@@ -32,18 +29,6 @@ const PROTOCOL_ANALYSIS = {
   status: 'completed',
   labware: [],
 } as any
-
-// const mockModuleLocations = [
-//   {
-//     moduleModel: 'heaterShakerModuleV1' as ModuleModel,
-//     moduleLocation: { slotName: 'B1' },
-//     nestedLabwareDef: mockProtocolModuleInfo[0]
-//       .nestedLabwareDef as LabwareDefinition2,
-//     onLabwareClick: expect.any(Function),
-//     moduleChildren: null,
-//     innerProps: {},
-//   },
-// ]
 
 const mockAttachedProtocolModuleMatches = [
   {
@@ -137,16 +122,6 @@ describe('ModulesAndDeckMapViewModal', () => {
     when(mockGetDeckConfigFromProtocolCommands).mockReturnValue(
       EXTENDED_DECK_CONFIG_FIXTURE
     )
-
-    // when(mockBaseDeck)
-    //   .calledWith({
-    //     deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
-    //     deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
-    //     robotType: FLEX_ROBOT_TYPE,
-    //     labwareLocations: [],
-    //     moduleLocations: mockModuleLocations,
-    //   })
-    //   .mockReturnValue(<div>mock BaseDeck</div>)
     mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
     mockRobotWorkSpace.mockReturnValue(<div>mock RobotWorkSpace</div>)
   })
