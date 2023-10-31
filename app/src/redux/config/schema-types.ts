@@ -7,7 +7,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag = 'enableDeckConfiguration' | 'protocolStats'
+export type DevInternalFlag = 'protocolStats'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

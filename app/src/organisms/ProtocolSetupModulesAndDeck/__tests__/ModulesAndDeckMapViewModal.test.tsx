@@ -4,17 +4,14 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import {
   renderWithProviders,
   BaseDeck,
-  RobotWorkSpace,
   EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useFeatureFlag } from '../../../redux/config'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
-jest.mock('@opentrons/components/src/hardware-sim/Deck/RobotWorkSpace')
 jest.mock('@opentrons/api-client')
 jest.mock('../../../redux/config')
 jest.mock('../../Devices/hooks')
@@ -94,13 +91,7 @@ const render = (
   })[0]
 }
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
-const mockRobotWorkSpace = RobotWorkSpace as jest.MockedFunction<
-  typeof RobotWorkSpace
->
 const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
   typeof getDeckConfigFromProtocolCommands
 >
@@ -112,18 +103,13 @@ describe('ModulesAndDeckMapViewModal', () => {
     props = {
       setShowDeckMapModal: mockSetShowDeckMapModal,
       attachedProtocolModuleMatches: mockAttachedProtocolModuleMatches,
-      deckDef: {} as any,
       runId: mockRunId,
-      mostRecentAnalysis: PROTOCOL_ANALYSIS,
+      protocolAnalysis: PROTOCOL_ANALYSIS,
     }
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
     when(mockGetDeckConfigFromProtocolCommands).mockReturnValue(
       EXTENDED_DECK_CONFIG_FIXTURE
     )
     mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
-    mockRobotWorkSpace.mockReturnValue(<div>mock RobotWorkSpace</div>)
   })
 
   afterEach(() => {
@@ -131,18 +117,9 @@ describe('ModulesAndDeckMapViewModal', () => {
     resetAllWhenMocks()
   })
 
-  it('should render map view when ff is on', () => {
+  it('should render BaseDeck map view', () => {
     const { getByText } = render(props)
     getByText('Map View')
     getByText('mock BaseDeck')
-  })
-
-  it('should render map view when ff is off', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
-    const { getByText } = render(props)
-    getByText('Map View')
-    getByText('mock RobotWorkSpace')
   })
 })
