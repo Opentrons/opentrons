@@ -60,6 +60,7 @@ export interface LoadLiquidRunTimeCommand
     LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
+//  TODO(jr, 10/31/23): update `loadFixture` to `loadAddressableArea`
 export interface LoadFixtureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadFixture'
   params: LoadFixtureParams

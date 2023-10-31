@@ -17,7 +17,7 @@ import { Modal } from '../../../molecules/Modal'
 
 import welcomeModalImage from '../../../assets/images/on-device-display/welcome_dashboard_modal.png'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
 interface WelcomeModalProps {
   setShowAnalyticsOptInModal: (showAnalyticsOptInModal: boolean) => void

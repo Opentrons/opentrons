@@ -29,4 +29,4 @@ export type JsonProtocolFile =
   | Readonly<ProtocolFileV7<{}>>
   | Readonly<ProtocolFileV8<{}>>
 
-export * from './types/schemaV7'
+export * from './types/schemaV8'
