@@ -10,17 +10,7 @@ import {
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
   FLEX_STANDARD_DECKID,
-  PipetteName,
   SPAN7_8_10_11_SLOT,
-  Cutout,
-  OT3DeckSpec,
-  OT2DeckSpec,
-  RobotDeckV3Mixin,
-  LabwareV2Mixin,
-  LiquidV1Mixin,
-  CommandV8Mixin,
-  CommandAnnotationV1Mixin,
-  ProtocolBase,
 } from '@opentrons/shared-data'
 import { selectors as dismissSelectors } from '../../dismiss'
 import {
@@ -54,12 +44,22 @@ import type {
   AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import type {
+  CommandAnnotationV1Mixin,
+  CommandV8Mixin,
   CreateCommand,
+  Cutout,
+  LabwareV2Mixin,
+  LiquidV1Mixin,
   LoadFixtureCreateCommand,
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
+  OT2DeckSpec,
+  OT3DeckSpec,
+  PipetteName,
+  ProtocolBase,
   ProtocolFile,
+  RobotDeckV3Mixin,
 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 
@@ -372,16 +372,16 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const commands = [...loadCommands, ...nonLoadCommands]
 
+    const flexDeckSpec: OT3DeckSpec = {
+      model: FLEX_ROBOT_TYPE,
+      deckId: FLEX_STANDARD_DECKID,
+    }
+    const ot2DeckSpec: OT2DeckSpec = {
+      model: OT2_STANDARD_MODEL,
+      deckId: OT2_STANDARD_DECKID,
+    }
     const deckStructure =
-      robotType === FLEX_ROBOT_TYPE
-        ? ({
-            model: FLEX_ROBOT_TYPE,
-            deckId: FLEX_STANDARD_DECKID,
-          } as OT3DeckSpec)
-        : ({
-            model: OT2_STANDARD_MODEL,
-            deckId: OT2_STANDARD_DECKID,
-          } as OT2DeckSpec)
+      robotType === FLEX_ROBOT_TYPE ? flexDeckSpec : ot2DeckSpec
 
     const robotDeckV3Mixin: RobotDeckV3Mixin = {
       robot: {
@@ -427,16 +427,13 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       designerApplication,
     }
 
-    const protocolFile = {
+    return {
       ...protocolBase,
       ...robotDeckV3Mixin,
       ...labwareV2Mixin,
       ...liquidV1Mixin,
       ...commandv8Mixin,
       ...commandAnnotionaV1Mixin,
-    }
-    return {
-      ...protocolFile,
     }
   }
 )
