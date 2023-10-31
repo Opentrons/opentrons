@@ -2,7 +2,7 @@
 from . import protocol_schema_v6, protocol_schema_v7
 from .protocol_schema_v6 import ProtocolSchemaV6
 from .protocol_schema_v7 import ProtocolSchemaV7
-from .protocol_schema_v8 import ProtocolSchemaV8
+from .protocol_schema_v8 import ProtocolSchemaV8, RobotV8
 from .shared_models import (
     Liquid,
     Labware,
@@ -45,4 +45,5 @@ __all__ = [
     "Pipette",
     "Robot",
     "DesignerApplication",
+    "RobotV8"
 ]

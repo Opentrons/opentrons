@@ -28,6 +28,7 @@ from opentrons_shared_data.protocol.models import (
     Module,
     Pipette,
     Robot,
+    RobotV8
 )
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, MountType
@@ -784,7 +785,7 @@ def _make_v8_json_protocol(
         otSharedSchema="#/protocol/schemas/8",
         schemaVersion=8,
         metadata=SD_Metadata(),
-        robot=Robot(model="OT-2 Standard", deckId="ot2_standard"),
+        robot=RobotV8(model="OT-2 Standard", deckId="ot2_standard", deckSchemaId="opentronsDeckSchemaV3"),
         labwareDefinitions=labware_definitions,
         labwareDefinitionSchemaId="opentronsLabwareSchemaV2",
         commandSchemaId="opentronsCommandSchemaV8",
