@@ -1,6 +1,13 @@
 import type { CreateCommand } from '../../../command/types'
+import type {
+  LoadedPipette,
+  LoadedLabware,
+  LoadedModule,
+  Liquid,
+} from '../../../js'
 import type { CommandAnnotation } from '../../../commandAnnotation/types'
-import type { LabwareDefinition2 } from '../../../js/types'
+import type { LabwareDefinition2, RobotType } from '../../../js/types'
+import type { RunTimeCommand } from '../schemaV8'
 
 export * from '../../../command/types'
 
@@ -125,3 +132,43 @@ export type ProtocolStructure = ProtocolBase<{}> &
   LiquidStructure &
   CommandsStructure &
   CommandAnnotationsStructure
+
+/**
+ * This type interface is represents the output of the opentrons analyze cli tool
+ * which contains the protocol analysis engine
+ * TODO: reconcile this type with that of the analysis returned from
+ * the protocols record endpoints on the robot-server
+ */
+export interface ProtocolAnalysisOutput {
+  createdAt: string
+  files: AnalysisSourceFile[]
+  config: JsonConfig | PythonConfig
+  metadata: { [key: string]: any }
+  commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  pipettes: LoadedPipette[]
+  modules: LoadedModule[]
+  liquids: Liquid[]
+  errors: AnalysisError[]
+  robotType?: RobotType
+}
+
+interface AnalysisSourceFile {
+  name: string
+  role: 'main' | 'labware'
+}
+export interface JsonConfig {
+  protocolType: 'json'
+  schemaVersion: number
+}
+export interface PythonConfig {
+  protocolType: 'python'
+  apiVersion: [major: number, minor: number]
+}
+
+interface AnalysisError {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
+}

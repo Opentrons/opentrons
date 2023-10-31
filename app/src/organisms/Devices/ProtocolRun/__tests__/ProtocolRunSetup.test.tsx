@@ -6,10 +6,7 @@ import {
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
-import {
-  ProtocolAnalysisOutput,
-  protocolHasLiquids,
-} from '@opentrons/shared-data'
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
@@ -78,9 +75,6 @@ const mockSetupModuleAndDeck = SetupModuleAndDeck as jest.MockedFunction<
 >
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
->
-const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
-  typeof protocolHasLiquids
 >
 const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
   typeof EmptySetupStep
@@ -243,24 +237,6 @@ describe('ProtocolRunSetup', () => {
       expect(getByText('Mock SetupRobotCalibration')).not.toBeVisible()
       expect(getByText('Mock SetupLabware')).not.toBeVisible()
       getByText('Setup is view-only once run has started')
-    })
-  })
-
-  describe('when liquids are in the protocol', () => {
-    it('renders correct text for liquids', () => {
-      when(mockUseMostRecentCompletedAnalysis)
-        .calledWith(RUN_ID)
-        .mockReturnValue({
-          ...noModulesProtocol,
-          liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-        } as any)
-      mockProtocolHasLiquids.mockReturnValue(true)
-
-      const { getByText } = render()
-      getByText('STEP 5')
-      getByText('Liquids')
-      getByText('View liquid starting locations and volumes')
-      getByText('Mock SetupLiquids')
     })
   })
 
