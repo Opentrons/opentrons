@@ -118,7 +118,7 @@ def _run(is_simulating: bool) -> None:
 
     # CALCULATE ACCURACY
     accuracy_d = ((found_grams - real_weight) / real_weight) * 100.0
-    ui.print_info(f"found weight: {found_grams} grams ({round(accuracy_d, 3)} %D)")
+    ui.print_info(f"found weight: {found_grams} grams ({round(accuracy_d, 5)} %D)")
     ui.print_info(f"%D must be less than {MAX_ALLOWED_ACCURACY_PERCENT_D} %")
     if abs(accuracy_d) > MAX_ALLOWED_ACCURACY_PERCENT_D:
         ui.print_header(f"Result: FAIL")
