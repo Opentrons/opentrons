@@ -75,6 +75,7 @@ export function ProtocolRunSetup({
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
+  const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
 
   //  TODO(Jr, 10/4/23): stubbed in the fixtures for now - delete IMMEDIATELY
   // const loadedFixturesBySlot = parseInitialLoadedFixturesByCutout(
@@ -251,6 +252,7 @@ export function ProtocolRunSetup({
           protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
+          protocolAnalysis={protocolAnalysis}
         />
       ),
       description: hasLiquids
