@@ -9,8 +9,7 @@
   },
   "robot": {
     "model": "OT-2 Standard",
-    "deckId": "ot2_standard",
-    "deckSchemaId": "opentronsDeckSchemaV3"
+    "deckId": "ot2_standard"
   },
   "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
   "labwareDefinitions": {

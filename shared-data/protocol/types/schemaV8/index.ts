@@ -63,37 +63,19 @@ export interface LiquidV1Mixin {
   }
 }
 
-export interface DeckStructure {
+export interface RobotStructure {
   model: string
   deckId: string
 }
 
-export interface OT2DeckSpec {
+export interface OT2RobotMixin {
   model: 'OT-2 Standard'
   deckId: 'ot2_standard' | 'ot2_short_trash'
 }
 
-export interface OT3DeckSpec {
+export interface OT3RobotMixin {
   model: 'OT-3 Standard'
   deckId: 'ot3_standard'
-}
-
-export interface RobotStructure {
-  robot: {
-    deckSchemaId: string
-  } & DeckStructure
-}
-
-export interface RobotDeckV3Mixin {
-  robot: {
-    deckSchemaId: 'opentronsDeckSchemaV3'
-  } & (OT2DeckSpec | OT3DeckSpec)
-}
-
-export interface RobotDeckV4Mixin {
-  robot: {
-    deckSchemaId: 'opentronsDeckSchemaV3'
-  } & (OT2DeckSpec | OT3DeckSpec)
 }
 
 export interface ProtocolBase<DesignerApplicationData> {
@@ -120,7 +102,7 @@ export interface ProtocolBase<DesignerApplicationData> {
 export type ProtocolFile<
   DesignerApplicationData = {}
 > = ProtocolBase<DesignerApplicationData> &
-  (RobotDeckV3Mixin | RobotDeckV4Mixin) &
+  (OT2RobotMixin | OT3RobotMixin) &
   LabwareV2Mixin &
   LiquidV1Mixin &
   CommandV8Mixin &

@@ -385,7 +385,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const robotDeckV3Mixin: RobotDeckV3Mixin = {
       robot: {
-        deckSchemaId: 'opentronsDeckSchemaV3',
         ...deckStructure,
       },
     }
