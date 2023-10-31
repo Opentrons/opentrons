@@ -117,7 +117,7 @@ function parseGravimetricCSV(CSVData, retData) {
 }
 
 window.addEventListener('load', function (evt) {
-  const _updateTimeoutMillis = 200
+  const _updateTimeoutMillis = 100
   let _timeout
   const layout = {
     title: 'Untitled',
@@ -187,9 +187,15 @@ window.addEventListener('load', function (evt) {
     _getLatestDataFromServer()
   }
 
+  function _onServerError(evt) {
+    document.body.style.backgroundColor = "red"
+    document.body.innerHTML = "<h1>Lost Connection (refresh)</h1>"
+  }
+
   function _getLatestDataFromServer(evt) {
     _clearTimeout()
     const oReq = new XMLHttpRequest()
+    oReq.addEventListener('error', _onServerError)
     oReq.addEventListener('load', function () {
       const responseData = JSON.parse(this.responseText)
       let newData = getEmptyPlotlyData()
@@ -207,6 +213,7 @@ window.addEventListener('load', function (evt) {
 
   function _getTestNameFromServer(evt) {
     const oReq = new XMLHttpRequest()
+    oReq.addEventListener('error', _onServerError)
     oReq.addEventListener('load', _onTestNameResponse)
     oReq.open('GET', 'http://' + window.location.host + '/name')
     oReq.send()
@@ -216,6 +223,7 @@ window.addEventListener('load', function (evt) {
     _clearTimeout()
     _initializePlot()
     const oReq = new XMLHttpRequest()
+    oReq.addEventListener('error', _onServerError)
     oReq.addEventListener('load', _onTestNameResponse)
     oReq.open(
       'GET',
