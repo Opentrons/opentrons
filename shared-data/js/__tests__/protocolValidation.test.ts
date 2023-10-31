@@ -1,11 +1,9 @@
 /** Ensure that we can parse all our fixture json protocols, which also
- * ensures that our protocol schemas are correct*/
+ * ensures that our protocol schemas are correct */
 import path from 'path'
 import glob from 'glob'
 import { validate } from '../protocols'
 import { omit } from 'lodash'
-
-import type * as ProtocolSchemas from '../../protocol'
 
 const relRoot = path.join(__dirname, '../../protocol/fixtures/')
 
