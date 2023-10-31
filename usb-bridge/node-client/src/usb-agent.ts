@@ -108,6 +108,7 @@ export function createSerialPortListMonitor(
   return { start, stop }
 }
 
+const SOCKET_OPEN_RETRY_TIME = 10000
 class SerialPortSocket extends SerialPort {
   // allow node socket destroy
   destroy(): void {}
@@ -198,7 +199,15 @@ class SerialPortHttpAgent extends http.Agent {
       baudRate: 115200,
     })
     if (!socket.isOpen && !socket.opening) {
-      socket.open()
+      socket.open(error => {
+        this.log(
+          'error',
+          `could not open serialport socket: ${error?.message}. Retrying in ${SOCKET_OPEN_RETRY_TIME} ms`
+        )
+        setTimeout(() => {
+          socket.open()
+        }, SOCKET_OPEN_RETRY_TIME)
+      })
     }
     if (socket != null) oncreate(null, socket)
   }
