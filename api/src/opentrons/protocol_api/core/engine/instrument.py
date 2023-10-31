@@ -1,7 +1,7 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, cast
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
@@ -20,11 +20,17 @@ from opentrons.protocol_engine import (
     ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
 )
+from opentrons.protocol_engine.types import (
+    PRIMARY_NOZZLE_LITERAL,
+    ALLOWED_PRIMARY_NOZZLES,
+    NozzleLayoutConfigurationType,
+)
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -539,34 +545,41 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def configure_nozzle_layout(
         self,
-        style: str,
+        style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
     ) -> None:
-        if not primary_nozzle and style != "EMPTY":
-            raise ValueError("Incompatible params")
-        if style == "COLUMN":
-            configuration_model = ColumnNozzleLayoutConfiguration(
-                style=style, primary_nozzle=primary_nozzle
+        if not primary_nozzle and style != NozzleLayout.EMPTY:
+            raise ValueError(
+                f"Cannot configure a nozzle layout of style {style} without a starting nozzle."
             )
-        elif style == "ROW":
+        if primary_nozzle not in ALLOWED_PRIMARY_NOZZLES:
+            raise ValueError(f"Primary nozzle is not of {ALLOWED_PRIMARY_NOZZLES}")
+        if style == NozzleLayout.COLUMN:
+            configuration_model: NozzleLayoutConfigurationType = (
+                ColumnNozzleLayoutConfiguration(
+                    primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+                )
+            )
+        elif style == NozzleLayout.ROW:
             configuration_model = RowNozzleLayoutConfiguration(
-                style=style, primary_nozzle=primary_nozzle
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
-        elif style == "QUADRANT":
+        elif style == NozzleLayout.QUADRANT:
             if not front_right_nozzle:
-                raise ValueError("Incompatible params")
+                raise ValueError(
+                    "Cannot configure a QUADRANT layout without a front right nozzle."
+                )
             configuration_model = QuadrantNozzleLayoutConfiguration(
-                style=style,
-                primary_nozzle=primary_nozzle,
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 front_right_nozzle=front_right_nozzle,
             )
-        elif style == "SINGLE":
+        elif style == NozzleLayout.SINGLE:
             configuration_model = SingleNozzleLayoutConfiguration(
-                style=style, primary_nozzle=primary_nozzle
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
         else:
-            configuration_model = EmptyNozzleLayoutConfiguration(style=style)
+            configuration_model = EmptyNozzleLayoutConfiguration()
         self._engine_client.configure_nozzle_layout(
             pipette_id=self._pipette_id, configuration_params=configuration_model
         )

@@ -178,6 +178,7 @@ def test_get_pipette_static_config(
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
+        "current_nozzle_map": None,
     }
 
     result = subject.get_pipette_static_config(pipette_dict)

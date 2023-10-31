@@ -1,7 +1,6 @@
 """Common configuration command base models."""
 
 from pydantic import BaseModel, Field
-from typing_extensions import Literal
 from typing import Optional
 from dataclasses import dataclass
 from opentrons.hardware_control.nozzle_manager import (
@@ -20,6 +19,8 @@ class PipetteConfigUpdateResultMixin:
 
 
 class PipetteNozzleLayoutResultMixin(BaseModel):
+    """A nozzle layout result for updating the pipette state."""
+
     pipette_id: str
     nozzle_map: Optional[NozzleMap] = Field(
         default=None,

@@ -1660,5 +1660,5 @@ class InstrumentContext(publisher.CommandPublisher):
             instr.configure_nozzle_layout(style=RESET)
         """
         self._core.configure_nozzle_layout(
-            style.value, primary_nozzle=start, front_right_nozzle=front_right
+            style, primary_nozzle=start, front_right_nozzle=front_right
         )

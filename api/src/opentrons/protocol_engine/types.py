@@ -657,6 +657,8 @@ class PostRunHardwareState(Enum):
 
 
 NOZZLE_NAME_REGEX = "[A-Z][0-100]"
+ALLOWED_PRIMARY_NOZZLES = ["A1", "H1", "A12", "H12"]
+PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 
 class EmptyNozzleLayoutConfiguration(BaseModel):
@@ -669,7 +671,7 @@ class SingleNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["SINGLE"] = "SINGLE"
-    primary_nozzle: Literal["A1", "H1", "A12", "H12"] = Field(
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -680,7 +682,7 @@ class RowNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["ROW"] = "ROW"
-    primary_nozzle: Literal["A1", "H1", "A12", "H12"] = Field(
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -691,7 +693,7 @@ class ColumnNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type ROW and COLUMN."""
 
     style: Literal["COLUMN"] = "COLUMN"
-    primary_nozzle: Literal["A1", "H1", "H12"] = Field(
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -702,7 +704,7 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type QUADRANT."""
 
     style: Literal["QUADRANT"] = "QUADRANT"
-    primary_nozzle: Literal["A1", "H1", "H12"] = Field(
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
@@ -712,3 +714,12 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
     )
+
+
+NozzleLayoutConfigurationType = Union[
+    EmptyNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
+]

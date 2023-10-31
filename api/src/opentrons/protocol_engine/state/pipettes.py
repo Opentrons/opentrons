@@ -100,7 +100,7 @@ class PipetteState:
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
-    nozzle_configuration_by_id: Dict[str, NozzleMap]
+    nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -609,7 +609,8 @@ class PipetteView(HasState[PipetteState]):
 
     def get_nozzle_layout_type(self, pipette_id: str) -> NozzleConfigurationType:
         """Get the current set nozzle layout configuration."""
-        if self._state.nozzle_configuration_by_id[pipette_id]:
-            return self._state.nozzle_configuration_by_id[pipette_id].configuration
+        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
+        if nozzle_map_for_pipette:
+            return nozzle_map_for_pipette.configuration
         else:
             return NozzleConfigurationType.FULL

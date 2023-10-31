@@ -17,6 +17,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 from opentrons.protocols.geometry import planning
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
@@ -514,7 +515,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def configure_nozzle_layout(
         self,
-        style: str,
+        style: NozzleLayout,
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
     ) -> None:

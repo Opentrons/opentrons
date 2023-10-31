@@ -14,10 +14,16 @@ class TipHandler(TypingProtocol):
 
     async def available_for_nozzle_layout(
         self,
+        pipette_id: str,
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
-    ) -> Dict[str, str]:
+    ) -> Dict[str, Optional[str]]:
+        """Check nozzle layout is compatible with the pipette.
+        
+        Returns:
+            
+        """
         ...
 
     async def pick_up_tip(
@@ -63,7 +69,7 @@ class HardwareTipHandler(TipHandler):
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
-    ) -> Dict[str, str]:
+    ) -> Dict[str, Optional[str]]:
         if not primary_nozzle:
             return {"primary_nozzle": "A1"}
         if style == "COLUMN":
@@ -169,10 +175,15 @@ class VirtualTipHandler(TipHandler):
 
     async def available_for_nozzle_layout(
         self,
+        pipette_id: str,
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
-    ) -> Dict[str, str]:
+    ) -> Dict[str, Optional[str]]:
+        self._state_view.pipettes.validate_tip_state(
+            pipette_id=pipette_id,
+            expected_has_tip=False,
+        )
         if not primary_nozzle:
             return {"primary_nozzle": "A1"}
         if style == "COLUMN":

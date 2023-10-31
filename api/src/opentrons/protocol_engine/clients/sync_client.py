@@ -1,6 +1,6 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, List, Optional, Dict, Union
+from typing import cast, List, Optional, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -23,11 +23,7 @@ from ..types import (
     LabwareOffsetVector,
     MotorAxis,
     Liquid,
-    EmptyNozzleLayoutConfiguration,
-    SingleNozzleLayoutConfiguration,
-    RowNozzleLayoutConfiguration,
-    ColumnNozzleLayoutConfiguration,
-    QuadrantNozzleLayoutConfiguration,
+    NozzleLayoutConfigurationType,
 )
 from .transports import ChildThreadTransport
 
@@ -277,16 +273,9 @@ class SyncClient:
     def configure_nozzle_layout(
         self,
         pipette_id: str,
-        configuration_params: Union[
-            EmptyNozzleLayoutConfiguration,
-            SingleNozzleLayoutConfiguration,
-            RowNozzleLayoutConfiguration,
-            ColumnNozzleLayoutConfiguration,
-            QuadrantNozzleLayoutConfiguration,
-        ],
+        configuration_params: NozzleLayoutConfigurationType,
     ) -> commands.ConfigureNozzleLayoutResult:
         """Execute a ConfigureForVolume command."""
-
         request = commands.ConfigureNozzleLayoutCreate(
             params=commands.ConfigureNozzleLayoutParams(
                 pipetteId=pipette_id, configuration_params=configuration_params

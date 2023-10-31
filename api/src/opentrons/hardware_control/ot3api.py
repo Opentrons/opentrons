@@ -2287,7 +2287,9 @@ class OT3API(
         If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
         """
         if not (back_left_nozzle and front_right_nozzle and starting_nozzle):
-            await self._pipette_handler.reset_nozzle_configuration(mount)
+            await self._pipette_handler.reset_nozzle_configuration(
+                OT3Mount.from_mount(mount)
+            )
         else:
             await self._pipette_handler.update_nozzle_configuration(
                 OT3Mount.from_mount(mount),

@@ -56,7 +56,7 @@ class VirtualPipetteDataProvider:
     ) -> None:
         """Emulate update_nozzle_configuration_for_mount."""
         if pipette_id not in self._nozzle_manager_layout_by_id:
-            config = self.get_virtual_pipette_full_config_by_model_string(
+            config = self._get_virtual_pipette_full_config_by_model_string(
                 pipette_model_string
             )
             new_nozzle_manager = NozzleConfigurationManager.build_from_nozzlemap(
@@ -99,6 +99,7 @@ class VirtualPipetteDataProvider:
         self._liquid_class_by_id[pipette_id] = liquid_class
 
     def get_nozzle_layout_for_pipette(self, pipette_id: str) -> NozzleMap:
+        """Get the current nozzle layout stored for a virtual pipette."""
         return self._nozzle_manager_layout_by_id[pipette_id].current_configuration
 
     def get_virtual_pipette_static_config_by_model_string(
@@ -112,9 +113,10 @@ class VirtualPipetteDataProvider:
             pipette_model, pipette_id
         )
 
-    def get_virtual_pipette_full_config_by_model_string(
+    def _get_virtual_pipette_full_config_by_model_string(
         self, pipette_model_string: str
     ) -> pipette_definition.PipetteConfigurations:
+        """Get the full pipette config from a model string."""
         pipette_model = pipette_load_name.convert_pipette_model(
             PipetteModel(pipette_model_string)
         )

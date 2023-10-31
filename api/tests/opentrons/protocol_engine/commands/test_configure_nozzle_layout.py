@@ -5,6 +5,7 @@ from typing import Union, Optional
 
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
+    TipHandler,
 )
 from opentrons.types import Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
@@ -19,9 +20,9 @@ from opentrons.protocol_engine.commands.configure_nozzle_layout import (
 
 from opentrons.protocol_engine.types import (
     EmptyNozzleLayoutConfiguration,
-    BaseNozzleLayoutConfiguration,
-    RowColumnNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
 )
 
 
@@ -129,7 +130,7 @@ NINETY_SIX_MAP = {
     argnames=["request_model", "expected_nozzlemap"],
     argvalues=[
         [
-            BaseNozzleLayoutConfiguration(primary_nozzle="A1"),
+            SingleNozzleLayoutConfiguration(primary_nozzle="A1"),
             NozzleMap.build(
                 physical_nozzle_map={"A1": Point(0, 0, 0)},
                 starting_nozzle="A1",
@@ -138,9 +139,7 @@ NINETY_SIX_MAP = {
             ),
         ],
         [
-            RowColumnNozzleLayoutConfiguration(
-                primary_nozzle="A1", front_right_nozzle="H1"
-            ),
+            ColumnNozzleLayoutConfiguration(primary_nozzle="A1"),
             NozzleMap.build(
                 physical_nozzle_map=NINETY_SIX_MAP,
                 starting_nozzle="A1",
@@ -150,13 +149,13 @@ NINETY_SIX_MAP = {
         ],
         [
             QuadrantNozzleLayoutConfiguration(
-                primary_nozzle="A1", back_left_nozzle="A1", front_right_nozzle="E1"
+                primary_nozzle="A1", front_right_nozzle="E1"
             ),
             NozzleMap.build(
                 physical_nozzle_map=NINETY_SIX_MAP,
                 starting_nozzle="A1",
                 back_left_nozzle="A1",
-                front_right_nozzle="H2",
+                front_right_nozzle="E1",
             ),
         ],
         [
@@ -168,16 +167,19 @@ NINETY_SIX_MAP = {
 async def test_configure_nozzle_layout_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
+    tip_handler: TipHandler,
     request_model: Union[
         EmptyNozzleLayoutConfiguration,
-        BaseNozzleLayoutConfiguration,
-        RowColumnNozzleLayoutConfiguration,
+        ColumnNozzleLayoutConfiguration,
         QuadrantNozzleLayoutConfiguration,
+        SingleNozzleLayoutConfiguration,
     ],
     expected_nozzlemap: Optional[NozzleMap],
 ) -> None:
     """A ConfigureForVolume command should have an execution implementation."""
-    subject = ConfigureNozzleLayoutImplementation(equipment=equipment)
+    subject = ConfigureNozzleLayoutImplementation(
+        equipment=equipment, tip_handler=tip_handler
+    )
 
     requested_nozzle_layout = ConfigureNozzleLayoutParams(
         pipetteId="pipette-id",
@@ -187,7 +189,7 @@ async def test_configure_nozzle_layout_implementation(
     decoy.when(
         await equipment.configure_nozzle_layout(
             pipette_id="pipette-id",
-            *requested_nozzle_layout.configuration_params,
+            **request_model.dict(),
         )
     ).then_return(expected_nozzlemap)
 

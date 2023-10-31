@@ -61,7 +61,7 @@ class ConfigureNozzleLayoutImplementation(
         ConfigureNozzleLayoutPrivateResult,
     ]
 ):
-    """Configure for volume command implementation."""
+    """Configure nozzle layout command implementation."""
 
     def __init__(
         self, equipment: EquipmentHandler, tip_handler: TipHandler, **kwargs: object
@@ -73,18 +73,10 @@ class ConfigureNozzleLayoutImplementation(
         self, params: ConfigureNozzleLayoutParams
     ) -> Tuple[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult]:
         """Check that requested pipette can support the requested nozzle layout."""
-
-        # check if a tip is attached
-        # move to tip handler
-        # if self._core.has_tip():
-        #     raise CommandPreconditionViolated(
-        #         message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
-        #     )
         nozzle_params = await self._tip_handler.available_for_nozzle_layout(
+            pipette_id=params.pipetteId,
             **params.configuration_params.dict()
         )
-
-        # style = params.configuration_style.upper()
 
         nozzle_map = await self._equipment.configure_nozzle_layout(
             pipette_id=params.pipetteId,
