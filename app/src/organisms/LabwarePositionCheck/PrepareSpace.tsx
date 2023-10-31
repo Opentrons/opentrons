@@ -54,11 +54,11 @@ const Title = styled.h1`
 `
 interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
   section:
-  | 'CHECK_LABWARE'
-  | 'CHECK_TIP_RACKS'
-  | 'PICK_UP_TIP'
-  | 'RETURN_TIP'
-  | 'CHECK_POSITIONS'
+    | 'CHECK_LABWARE'
+    | 'CHECK_TIP_RACKS'
+    | 'PICK_UP_TIP'
+    | 'RETURN_TIP'
+    | 'CHECK_POSITIONS'
   labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void
@@ -68,14 +68,7 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
-  const {
-    location,
-    labwareDef,
-    protocolData,
-    header,
-    body,
-    robotType,
-  } = props
+  const { location, labwareDef, protocolData, header, body, robotType } = props
 
   const isOnDevice = useSelector(getIsOnDevice)
   const deckConfig = useDeckConfigurationQuery().data ?? []
@@ -93,25 +86,33 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
           <Title>{header}</Title>
           {body}
         </Flex>
-        <Flex flex="3" justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_FLEX_START}>
+        <Flex
+          flex="3"
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_FLEX_START}
+        >
           <BaseDeck
             robotType={robotType}
             moduleLocations={protocolData.modules.map(mod => ({
               moduleModel: mod.model,
               moduleLocation: mod.location,
-              nestedLabwareDef: ('moduleModel' in location && location.moduleModel != null) ? labwareDef : null,
+              nestedLabwareDef:
+                'moduleModel' in location && location.moduleModel != null
+                  ? labwareDef
+                  : null,
               innerProps:
-                'moduleModel' in location
-                  && location.moduleModel != null
-                  && getModuleType(location.moduleModel) ===
-                  THERMOCYCLER_MODULE_TYPE
+                'moduleModel' in location &&
+                location.moduleModel != null &&
+                getModuleType(location.moduleModel) === THERMOCYCLER_MODULE_TYPE
                   ? { lidMotorState: 'open' }
-                  : {}
+                  : {},
             }))}
-            labwareLocations={[{
-              labwareLocation: location,
-              definition: labwareDef,
-            }]}
+            labwareLocations={[
+              {
+                labwareLocation: location,
+                definition: labwareDef,
+              },
+            ]}
             deckConfig={deckConfig}
           />
         </Flex>
