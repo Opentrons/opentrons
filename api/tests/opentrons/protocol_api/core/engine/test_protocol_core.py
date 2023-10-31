@@ -1377,7 +1377,7 @@ def test_get_highest_z(
 ) -> None:
     """It should return a slot center from engine state."""
     decoy.when(
-        mock_engine_client.state.geometry.get_all_labware_highest_z()
+        mock_engine_client.state.geometry.get_all_obstacles_highest_z()
     ).then_return(9001)
 
     result = subject.get_highest_z()

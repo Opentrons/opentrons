@@ -144,7 +144,7 @@ class MotionView:
                 Ignored if `direct` is True. If lower than the default height,
                 the default is used; this can only increase the height, not decrease it.
         """
-        all_labware_highest_z = self._geometry.get_all_labware_highest_z()
+        all_labware_highest_z = self._geometry.get_all_obstacles_highest_z()
         if additional_min_travel_z is None:
             additional_min_travel_z = float("-inf")
         min_travel_z = max(all_labware_highest_z, additional_min_travel_z)

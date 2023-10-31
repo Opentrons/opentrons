@@ -359,7 +359,7 @@ def test_get_movement_waypoints_to_coords(
     dest = Point(4, 5, 6)
     max_travel_z = 789
 
-    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(
+    decoy.when(geometry_view.get_all_obstacles_highest_z()).then_return(
         all_labware_highest_z
     )
 
@@ -401,7 +401,7 @@ def test_get_movement_waypoints_to_coords_raises(
     subject: MotionView,
 ) -> None:
     """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""
-    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(123)
+    decoy.when(geometry_view.get_all_obstacles_highest_z()).then_return(123)
     decoy.when(
         # TODO(mm, 2022-06-22): We should use decoy.matchers.Anything() for all
         # arguments. For some reason, Decoy does not match the call unless we

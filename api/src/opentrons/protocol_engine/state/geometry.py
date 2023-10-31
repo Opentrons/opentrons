@@ -80,9 +80,8 @@ class GeometryView:
 
         return self._get_highest_z_from_labware_data(labware_data)
 
-    # TODO(mc, 2022-06-24): rename this method
-    def get_all_labware_highest_z(self) -> float:
-        """Get the highest Z-point across all labware."""
+    def get_all_obstacles_highest_z(self) -> float:
+        """Get the highest Z-point across everything on the deck: labware, modules, and fixtures."""
         highest_labware_z = max(
             (
                 self._get_highest_z_from_labware_data(lw_data)
@@ -117,7 +116,7 @@ class GeometryView:
         ):
             min_travel_z = self.get_labware_highest_z(labware_id)
         else:
-            min_travel_z = self.get_all_labware_highest_z()
+            min_travel_z = self.get_all_obstacles_highest_z()
         if minimum_z_height:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z

@@ -427,7 +427,7 @@ def test_get_all_labware_highest_z_no_equipment(
     decoy.when(module_view.get_all()).then_return([])
     decoy.when(labware_view.get_all()).then_return([])
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacles_highest_z()
 
     assert result == 0
 
@@ -500,7 +500,7 @@ def test_get_all_labware_highest_z(
 
     plate_z = subject.get_labware_highest_z("plate-id")
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
-    all_z = subject.get_all_labware_highest_z()
+    all_z = subject.get_all_obstacles_highest_z()
 
     # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
@@ -521,7 +521,7 @@ def test_get_all_labware_highest_z_with_modules(
     decoy.when(module_view.get_overall_height("module-id-1")).then_return(42.0)
     decoy.when(module_view.get_overall_height("module-id-2")).then_return(1337.0)
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacles_highest_z()
 
     assert result == 1337.0
 
