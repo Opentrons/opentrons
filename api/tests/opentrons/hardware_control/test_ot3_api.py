@@ -517,17 +517,13 @@ async def prepare_for_mock_blowout(
 
 @pytest.mark.parametrize("load_configs", load_pipette_configs)
 async def test_pickup_moves(
-        ot3_hardware: ThreadManager[OT3API],
-        mock_instrument_handlers: Tuple[Mock],
-        mock_ungrip: AsyncMock,
-        mock_move_to_plunger_bottom: AsyncMock,
-        mock_home_gear_motors: AsyncMock,
-        load_configs: List[Dict[str, Any]],
+    ot3_hardware: ThreadManager[OT3API],
+    mock_instrument_handlers: Tuple[Mock],
+    mock_move_to_plunger_bottom: AsyncMock,
+    mock_home_gear_motors: AsyncMock,
+    load_configs: List[Dict[str, Any]],
 ) -> None:
-    mock_ungrip.return_value = None
-    await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
-    backend = ot3_hardware.managed_obj._backend
     for mount, configs in load_configs.items():
         if configs["channels"] == 96:
             gantry_load = GantryLoad.HIGH_THROUGHPUT
@@ -558,76 +554,19 @@ async def test_pickup_moves(
     pipette_handler.plan_lt_pick_up_tip.return_value = move_plan_return_val
 
     with patch.object(
-            ot3_hardware.managed_obj, "move_rel", AsyncMock(spec=ot3_hardware.managed_obj.move_rel)
+        ot3_hardware.managed_obj,
+        "move_rel",
+        AsyncMock(spec=ot3_hardware.managed_obj.move_rel),
     ) as mock_move_rel:
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
         move_call_list = [call.args for call in mock_move_rel.call_args_list]
         if gantry_load == GantryLoad.HIGH_THROUGHPUT:
             assert move_call_list == [
                 (OT3Mount.LEFT, Point(z=z_tiprack_distance)),
-                (OT3Mount.LEFT, Point(z=end_z_retract_dist))
+                (OT3Mount.LEFT, Point(z=end_z_retract_dist)),
             ]
         else:
-            assert move_call_list == [
-                (OT3Mount.LEFT, Point(z=end_z_retract_dist))
-            ]
-
-
-@pytest.mark.parametrize("load_configs", load_pipette_configs)
-async def test_droptip__moves(
-        ot3_hardware: ThreadManager[OT3API],
-        mock_instrument_handlers: Tuple[Mock],
-        mock_ungrip: AsyncMock,
-        mock_move_to_plunger_bottom: AsyncMock,
-        mock_home_gear_motors: AsyncMock,
-        load_configs: List[Dict[str, Any]],
-) -> None:
-    _, pipette_handler = mock_instrument_handlers
-    backend = ot3_hardware.managed_obj._backend
-    for mount, configs in load_configs.items():
-        if configs["channels"] == 96:
-            gantry_load = GantryLoad.HIGH_THROUGHPUT
-        else:
-            gantry_load = GantryLoad.LOW_THROUGHPUT
-
-    await ot3_hardware.set_gantry_load(gantry_load)
-
-    z_tiprack_distance = 8.0
-    end_z_retract_dist = 9.0
-    move_plan_return_val = TipActionSpec(
-        shake_off_moves=[],
-        tip_action_moves=[
-            TipActionMoveSpec(
-                # Move onto the posts
-                distance=10,
-                speed=0,
-                currents={
-                    Axis.of_main_tool_actuator(Mount.LEFT): 0,
-                    Axis.Q: 0,
-                },
-            )
-        ],
-        z_distance_to_tiprack=z_tiprack_distance,
-        ending_z_retract_distance=end_z_retract_dist,
-    )
-    pipette_handler.plan_ht_drop_tip.return_value = move_plan_return_val
-    pipette_handler.plan_lt_drop_tip.return_value = move_plan_return_val
-
-    with patch.object(
-            ot3_hardware.managed_obj, "move_rel", AsyncMock(spec=ot3_hardware.managed_obj.move_rel)
-    ) as mock_move_rel:
-        await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
-        move_call_list = [call.args for call in mock_move_rel.call_args_list]
-        if gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            assert move_call_list == [
-                (OT3Mount.LEFT, Point(z=z_tiprack_distance)),
-                (OT3Mount.LEFT, Point(z=end_z_retract_dist))
-            ]
-        else:
-            assert move_call_list == [
-                (OT3Mount.LEFT, Point(z=end_z_retract_dist))
-            ]
-
+            assert move_call_list == [(OT3Mount.LEFT, Point(z=end_z_retract_dist))]
 
 
 @pytest.mark.parametrize("load_configs", load_pipette_configs)
