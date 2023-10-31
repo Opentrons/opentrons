@@ -27,7 +27,7 @@ from ..types import (
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
-    QuadrantNozzleLayoutConfiguration
+    QuadrantNozzleLayoutConfiguration,
 )
 from .transports import ChildThreadTransport
 
@@ -273,9 +273,17 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.ConfigureForVolumeResult, result)
-    
+
     def configure_nozzle_layout(
-        self, pipette_id: str, configuration_params: Union[EmptyNozzleLayoutConfiguration, SingleNozzleLayoutConfiguration, RowNozzleLayoutConfiguration, ColumnNozzleLayoutConfiguration, QuadrantNozzleLayoutConfiguration]
+        self,
+        pipette_id: str,
+        configuration_params: Union[
+            EmptyNozzleLayoutConfiguration,
+            SingleNozzleLayoutConfiguration,
+            RowNozzleLayoutConfiguration,
+            ColumnNozzleLayoutConfiguration,
+            QuadrantNozzleLayoutConfiguration,
+        ],
     ) -> commands.ConfigureNozzleLayoutResult:
         """Execute a ConfigureForVolume command."""
 
@@ -286,7 +294,6 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.ConfigureNozzleLayoutResult, result)
-
 
     def aspirate(
         self,

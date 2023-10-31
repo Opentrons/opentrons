@@ -18,7 +18,7 @@ from opentrons.protocol_engine import (
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
-    QuadrantNozzleLayoutConfiguration
+    QuadrantNozzleLayoutConfiguration,
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -546,18 +546,27 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if not primary_nozzle and style != "EMPTY":
             raise ValueError("Incompatible params")
         if style == "COLUMN":
-            configuration_model = ColumnNozzleLayoutConfiguration(style=style, primary_nozzle=primary_nozzle)
+            configuration_model = ColumnNozzleLayoutConfiguration(
+                style=style, primary_nozzle=primary_nozzle
+            )
         elif style == "ROW":
-            configuration_model = RowNozzleLayoutConfiguration(style=style, primary_nozzle=primary_nozzle)
+            configuration_model = RowNozzleLayoutConfiguration(
+                style=style, primary_nozzle=primary_nozzle
+            )
         elif style == "QUADRANT":
             if not front_right_nozzle:
                 raise ValueError("Incompatible params")
-            configuration_model = QuadrantNozzleLayoutConfiguration(style=style, primary_nozzle=primary_nozzle, front_right_nozzle=front_right_nozzle)
+            configuration_model = QuadrantNozzleLayoutConfiguration(
+                style=style,
+                primary_nozzle=primary_nozzle,
+                front_right_nozzle=front_right_nozzle,
+            )
         elif style == "SINGLE":
-            configuration_model = SingleNozzleLayoutConfiguration(style=style, primary_nozzle=primary_nozzle)
+            configuration_model = SingleNozzleLayoutConfiguration(
+                style=style, primary_nozzle=primary_nozzle
+            )
         else:
             configuration_model = EmptyNozzleLayoutConfiguration(style=style)
         self._engine_client.configure_nozzle_layout(
-            pipette_id=self._pipette_id,
-            configuration_params=configuration_model
+            pipette_id=self._pipette_id, configuration_params=configuration_model
         )

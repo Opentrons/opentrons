@@ -17,7 +17,7 @@ from opentrons.protocol_engine.commands.configure_nozzle_layout import (
     ConfigureNozzleLayoutImplementation,
 )
 
-from opentrons.protocol_engine.commands.configuring_common import (
+from opentrons.protocol_engine.types import (
     EmptyNozzleLayoutConfiguration,
     BaseNozzleLayoutConfiguration,
     RowColumnNozzleLayoutConfiguration,

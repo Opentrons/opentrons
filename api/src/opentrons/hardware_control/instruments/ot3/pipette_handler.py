@@ -419,8 +419,8 @@ class OT3PipetteHandler:
                 back_left_nozzle, front_right_nozzle, starting_nozzle
             )
 
-    async def reset_nozzle_configuration(self, mount: MountType) -> None:
-        instr = self._attached_instruments[mount]
+    async def reset_nozzle_configuration(self, mount: OT3Mount) -> None:
+        instr = self._attached_instruments[OT3Mount.from_mount(mount)]
         if instr:
             instr.reset_nozzle_configuration()
 

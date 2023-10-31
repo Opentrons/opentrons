@@ -1,5 +1,5 @@
 """Tip pickup and drop procedures."""
-from typing import Optional, Tuple
+from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -11,6 +11,14 @@ from ..types import TipGeometry
 
 class TipHandler(TypingProtocol):
     """Pick up and drop tips."""
+
+    async def available_for_nozzle_layout(
+        self,
+        style: str,
+        primary_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+    ) -> Dict[str, str]:
+        ...
 
     async def pick_up_tip(
         self,
@@ -51,11 +59,35 @@ class HardwareTipHandler(TipHandler):
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
 
     async def available_for_nozzle_layout(
-        style: str, primary_nozzle: str = None, front_right_nozzle: str = None
-    ) -> Tuple(str):
+        self,
+        style: str,
+        primary_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+    ) -> Dict[str, str]:
         if not primary_nozzle:
-            return "A1"
-        return []
+            return {"primary_nozzle": "A1"}
+        if style == "COLUMN":
+            if primary_nozzle == "A1":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
+            elif primary_nozzle == "H1":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
+            elif primary_nozzle == "A12":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
+            elif primary_nozzle == "H12":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
+        elif style == "ROW":
+            if primary_nozzle == "A1":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A12"}
+            elif primary_nozzle == "H1":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
+            elif primary_nozzle == "A12":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
+            elif primary_nozzle == "H12":
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
+        return {
+            "primary_nozzle": primary_nozzle,
+            "front_right_nozzle": front_right_nozzle,
+        }
 
     async def pick_up_tip(
         self,
@@ -136,29 +168,35 @@ class VirtualTipHandler(TipHandler):
         self._state_view = state_view
 
     async def available_for_nozzle_layout(
-        style: str, primary_nozzle: str = None, front_right_nozzle: str = None
-    ) -> Tuple(str):
+        self,
+        style: str,
+        primary_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+    ) -> Dict[str, str]:
         if not primary_nozzle:
-            return "A1"
+            return {"primary_nozzle": "A1"}
         if style == "COLUMN":
             if primary_nozzle == "A1":
-                return ("A1", "H1")
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
             elif primary_nozzle == "H1":
-                return ("H1", "A1")
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
             elif primary_nozzle == "A12":
-                return ("A12", "H12")
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
             elif primary_nozzle == "H12":
-                return ("H12", "A12")
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
         elif style == "ROW":
             if primary_nozzle == "A1":
-                return ("A1", "A12")
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A12"}
             elif primary_nozzle == "H1":
-                return ("H1", "H12")
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
             elif primary_nozzle == "A12":
-                return ("A12", "A1")
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
             elif primary_nozzle == "H12":
-                return ("H12", "H1")
-        return (primary_nozzle, front_right_nozzle)
+                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
+        return {
+            "primary_nozzle": primary_nozzle,
+            "front_right_nozzle": front_right_nozzle,
+        }
 
     async def pick_up_tip(
         self,

@@ -8,7 +8,6 @@ from typing import Any, Generic, Optional, TypeVar
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
-from opentrons.protocol_api._nozzle_layout import NozzleLayoutBase
 
 from .well import WellCoreType
 

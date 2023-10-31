@@ -56,7 +56,7 @@ from .types import (
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
-    QuadrantNozzleLayoutConfiguration
+    QuadrantNozzleLayoutConfiguration,
 )
 
 

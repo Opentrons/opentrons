@@ -1659,4 +1659,6 @@ class InstrumentContext(publisher.CommandPublisher):
             # Resets the pipette configuration to default
             instr.configure_nozzle_layout(style=RESET)
         """
-        self._core.configure_nozzle_layout(style.value, primary_nozzle=start, front_right_nozzle=front_right)
+        self._core.configure_nozzle_layout(
+            style.value, primary_nozzle=start, front_right_nozzle=front_right
+        )

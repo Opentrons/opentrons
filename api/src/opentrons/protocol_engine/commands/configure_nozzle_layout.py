@@ -15,7 +15,13 @@ from .command import (
 from .configuring_common import (
     PipetteNozzleLayoutResultMixin,
 )
-from ..types import (EmptyNozzleLayoutConfiguration, SingleNozzleLayoutConfiguration, RowNozzleLayoutConfiguration, QuadrantNozzleLayoutConfiguration)
+from ..types import (
+    EmptyNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
+)
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, TipHandler
@@ -31,6 +37,7 @@ class ConfigureNozzleLayoutParams(PipetteIdMixin):
         EmptyNozzleLayoutConfiguration,
         SingleNozzleLayoutConfiguration,
         RowNozzleLayoutConfiguration,
+        ColumnNozzleLayoutConfiguration,
         QuadrantNozzleLayoutConfiguration,
     ]
 
@@ -74,7 +81,7 @@ class ConfigureNozzleLayoutImplementation(
         #         message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
         #     )
         nozzle_params = await self._tip_handler.available_for_nozzle_layout(
-            params.configuration_params.type.upper(), params
+            **params.configuration_params.dict()
         )
 
         # style = params.configuration_style.upper()

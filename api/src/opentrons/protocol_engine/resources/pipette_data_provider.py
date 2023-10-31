@@ -70,7 +70,7 @@ class VirtualPipetteDataProvider:
             self._nozzle_manager_layout_by_id[pipette_id] = new_nozzle_manager
         elif back_left_nozzle and front_right_nozzle and starting_nozzle:
             # Need to make sure that we pass all the right nozzles here.
-            self._nozzle_manager_layout_by_id[pipette_id].update_nozzle_layout(
+            self._nozzle_manager_layout_by_id[pipette_id].update_nozzle_configuration(
                 back_left_nozzle, front_right_nozzle, starting_nozzle
             )
         else:
