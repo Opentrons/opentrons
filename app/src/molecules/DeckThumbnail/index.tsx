@@ -9,7 +9,6 @@ import {
 } from '@opentrons/shared-data'
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 
-import { useFeatureFlag } from '../../redux/config'
 import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
 import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
 import { getLabwareRenderInfo } from '../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
@@ -53,10 +52,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       refetchInterval: ATTACHED_MODULE_POLL_MS,
     }) ?? []
 
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
-  const deckConfig = enableDeckConfig
-    ? EXTENDED_DECK_CONFIG_FIXTURE
-    : getDeckConfigFromProtocolCommands(commands)
+  const deckConfig = getDeckConfigFromProtocolCommands(commands)
 
   const labwareRenderInfo =
     protocolAnalysis != null

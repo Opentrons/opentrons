@@ -16,7 +16,6 @@ import {
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
-import { useFeatureFlag } from '../../../redux/config'
 import { useAttachedModules } from '../../../organisms/Devices/hooks'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupLabware/__fixtures__'
@@ -64,9 +63,6 @@ const mockgetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFuncti
   typeof getDeckDefFromRobotType
 >
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const protocolAnalysis = simpleAnalysisFileFixture as any
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
@@ -86,9 +82,6 @@ describe('DeckThumbnail', () => {
     when(mockgetDeckDefFromRobotType)
       .calledWith('OT-2 Standard')
       .mockReturnValue(ot2StandardDeckDef as any)
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     when(mockBaseDeck)
       .calledWith({
         robotType: OT2_ROBOT_TYPE,
@@ -112,9 +105,6 @@ describe('DeckThumbnail', () => {
     getByText('mock BaseDeck')
   })
   it('renders an OT-3 deck view when the protocol is an OT-3 protocol', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     const mockLabwareLocations = [
       {
         labwareLocation: { slotName: 'C1' },
