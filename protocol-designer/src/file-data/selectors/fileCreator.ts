@@ -54,12 +54,11 @@ import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
-  OT2DeckSpec,
-  OT3DeckSpec,
+  OT2RobotMixin,
+  OT3RobotMixin,
   PipetteName,
   ProtocolBase,
   ProtocolFile,
-  RobotDeckV3Mixin,
 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 
@@ -372,22 +371,16 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const commands = [...loadCommands, ...nonLoadCommands]
 
-    const flexDeckSpec: OT3DeckSpec = {
+    const flexDeckSpec: OT3RobotMixin = {
       model: FLEX_ROBOT_TYPE,
       deckId: FLEX_STANDARD_DECKID,
     }
-    const ot2DeckSpec: OT2DeckSpec = {
+    const ot2DeckSpec: OT2RobotMixin = {
       model: OT2_STANDARD_MODEL,
       deckId: OT2_STANDARD_DECKID,
     }
     const deckStructure =
       robotType === FLEX_ROBOT_TYPE ? flexDeckSpec : ot2DeckSpec
-
-    const robotDeckV3Mixin: RobotDeckV3Mixin = {
-      robot: {
-        ...deckStructure,
-      },
-    }
 
     const labwareV2Mixin: LabwareV2Mixin = {
       labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
@@ -428,7 +421,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     return {
       ...protocolBase,
-      ...robotDeckV3Mixin,
+      ...deckStructure,
       ...labwareV2Mixin,
       ...liquidV1Mixin,
       ...commandv8Mixin,
