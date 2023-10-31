@@ -1,8 +1,7 @@
-// Helper functions for validating protocols
+// Helper functions for validating protocols. Used only in tests right now but
+// intended for use as the thing that turns something from a json document into
+// a protocol inside the js ecosystem.
 
-import type * as ProtocolSchemas from '../protocol'
-import type { CreateCommand } from '../command/types'
-import type { CommandAnnotation } from '../commandAnnotation/types'
 import Ajv from 'ajv'
 
 import commandSchema8 from '../command/schemas/8.json'
@@ -18,6 +17,10 @@ import protocolSchema5 from '../protocol/schemas/5.json'
 import protocolSchema4 from '../protocol/schemas/4.json'
 import protocolSchema3 from '../protocol/schemas/3.json'
 import protocolSchema1 from '../protocol/schemas/1.json'
+
+import type * as ProtocolSchemas from '../protocol'
+import type { CreateCommand } from '../command/types'
+import type { CommandAnnotation } from '../commandAnnotation/types'
 
 export type { ProtocolSchemas }
 
