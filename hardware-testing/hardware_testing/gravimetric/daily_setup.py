@@ -123,7 +123,9 @@ def _test_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> None:
     _check_unstable_count(tag)
 
 
-def _wait_for_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI, tag: str) -> float:
+def _wait_for_stability(
+    recorder: GravimetricRecorder, hw: SyncHardwareAPI, tag: str
+) -> float:
     prev_light_state = hw.get_status_bar_state()
     hw.set_status_bar_state(COLOR_STATES["stable"])
     for i in range(STABLE_ATTEMPTS):
@@ -266,7 +268,7 @@ if __name__ == "__main__":
     except Exception as e:
         _hw.set_status_bar_state(COLOR_STATES["fail"])
         ui.print_header("Result: FAIL")
-        ui.print_error(str(e))
+        raise e
     finally:
         if not args.simulate:
             ui.get_user_ready("test done")
