@@ -111,6 +111,10 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def load_waste_chute(self, with_lid: bool) -> None:
+        ...
+
+    @abstractmethod
     def pause(self, msg: Optional[str]) -> None:
         ...
 

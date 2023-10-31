@@ -444,11 +444,14 @@ class ProtocolContext(CommandPublisher):
         *,
         # TODO: Confirm official naming of "staging area slot".
         with_staging_area_slot_d4: bool = False,
+        # TODO: Confirm official naming of "lid", and determine whether False is a safe default.
+        with_lid: bool = False,
     ) -> WasteChute:
         if with_staging_area_slot_d4:
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."
             )
+        self._core.load_waste_chute(with_lid=with_lid)
         return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
 
     @requires_version(2, 15)

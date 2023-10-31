@@ -358,6 +358,11 @@ class LegacyProtocolCore(
 
         return new_instr
 
+    def load_waste_chute(self, with_lid: bool) -> None:
+        raise APIVersionError(
+            "Loading waste chutes is not supported in this Python Protocol API version."
+        )
+
     def get_loaded_instruments(
         self,
     ) -> Dict[Mount, Optional[LegacyInstrumentCore]]:

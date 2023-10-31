@@ -484,6 +484,11 @@ class ProtocolCore(
             default_movement_speed=400,
         )
 
+    def load_waste_chute(self, with_lid: bool) -> None:
+        self._engine_client.load_addressable_area(
+            _get_waste_chute_addressable_area_name(with_lid=with_lid)
+        )
+
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
         self._engine_client.wait_for_resume(message=msg)
@@ -663,3 +668,10 @@ class ProtocolCore(
             return OFF_DECK_LOCATION
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
+
+
+def _get_waste_chute_addressable_area_name(with_lid: bool) -> str:
+    if with_lid:
+        return "stagingAreaSlotWithWasteChuteRightAdapterCovered"
+    else:
+        return "stagingAreaSlotWithWasteChuteRightAdapterNoCover"
