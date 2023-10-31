@@ -13,6 +13,16 @@ import {
   PipetteName,
   SPAN7_8_10_11_SLOT,
   Cutout,
+  DeckStructure,
+  OT3DeckSpec,
+  OT2DeckSpec,
+  RobotStructure,
+  RobotDeckV3Mixin,
+  LabwareV2Mixin,
+  LiquidV1Mixin,
+  CommandV8Mixin,
+  CommandAnnotationV1Mixin,
+  ProtocolBase,
 } from '@opentrons/shared-data'
 import { selectors as dismissSelectors } from '../../dismiss'
 import {
@@ -23,7 +33,10 @@ import { uuid } from '../../utils'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import {
+  DesignerApplicationData,
+  getLoadLiquidCommands,
+} from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { swatchColors } from '../../components/swatchColors'
 import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 import {
@@ -44,14 +57,12 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   CreateCommand,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
-import type {
+  LoadFixtureCreateCommand,
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
-  LoadFixtureCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  ProtocolFile,
+} from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
@@ -292,7 +303,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       []
     )
 
-    //  TODO(jr, 10/3/23): add standard slot, and trash bin loadFixtures
+    //  TODO(jr, 10/31/23): update to loadAddressableArea
     const loadFixtureCommands = reduce<
       AdditionalEquipmentEntity,
       LoadFixtureCreateCommand[]
@@ -363,7 +374,47 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const commands = [...loadCommands, ...nonLoadCommands]
 
-    const protocolFile = {
+    const deckStructure =
+      robotType === FLEX_ROBOT_TYPE
+        ? ({
+            model: FLEX_ROBOT_TYPE,
+            deckId: FLEX_STANDARD_DECKID,
+          } as OT3DeckSpec)
+        : ({
+            model: OT2_STANDARD_MODEL,
+            deckId: OT2_STANDARD_DECKID,
+          } as OT2DeckSpec)
+
+    const robotDeckV3Mixin: RobotDeckV3Mixin = {
+      robot: {
+        deckSchemaId: 'opentronsDeckSchemaV3',
+        ...deckStructure,
+      },
+    }
+
+    const labwareV2Mixin: LabwareV2Mixin = {
+      labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
+      labwareDefinitions,
+    }
+
+    const liquidV1Mixin: LiquidV1Mixin = {
+      liquidSchemaId: 'opentronsLiquidSchemaV1',
+      liquids,
+    }
+
+    const commandv8Mixin: CommandV8Mixin = {
+      commandSchemaId: 'opentronsCommandSchemaV8',
+      commands,
+    }
+
+    const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {
+      commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV1',
+      commandAnnotations: [],
+    }
+
+    const protocolBase: ProtocolBase<DesignerApplicationData> = {
+      $otSharedSchema: '#/protocol/schemas/8',
+      schemaVersion: 8,
       metadata: {
         protocolName: name,
         author,
@@ -376,18 +427,18 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         tags: [],
       },
       designerApplication,
-      robot:
-        robotType === FLEX_ROBOT_TYPE
-          ? { model: FLEX_ROBOT_TYPE, deckId: FLEX_STANDARD_DECKID }
-          : { model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID },
-      liquids,
-      labwareDefinitions,
+    }
+
+    const protocolFile = {
+      ...protocolBase,
+      ...robotDeckV3Mixin,
+      ...labwareV2Mixin,
+      ...liquidV1Mixin,
+      ...commandv8Mixin,
+      ...commandAnnotionaV1Mixin,
     }
     return {
       ...protocolFile,
-      $otSharedSchema: '#/protocol/schemas/7',
-      schemaVersion: 7,
-      commands,
     }
   }
 )
