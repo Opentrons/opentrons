@@ -25,7 +25,7 @@ from opentrons.config import (
 )
 
 from robot_server.errors import LegacyErrorResponse
-from robot_server.hardware import get_hardware, get_robot_type
+from robot_server.hardware import get_hardware, get_robot_type, get_robot_type_enum
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
@@ -210,7 +210,7 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     response_model=FactoryResetOptions,
 )
 async def get_settings_reset_options(
-    robot_type: str = Depends(get_robot_type),
+    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> FactoryResetOptions:
     reset_options = reset_util.reset_options(robot_type).items()
     return FactoryResetOptions(
@@ -231,7 +231,7 @@ async def get_settings_reset_options(
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
-    robot_type: str = Depends(get_robot_type),
+    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> V1BasicResponse:
     reset_options = reset_util.reset_options(robot_type)
     not_allowed_options = [
@@ -247,7 +247,7 @@ async def post_settings_reset_options(
         ).as_error(status.HTTP_403_FORBIDDEN)
 
     options = set(k for k, v in factory_reset_commands.items() if v)
-    reset_util.reset(options)
+    reset_util.reset(options, robot_type)
 
     if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
         await persistence_resetter.mark_directory_reset()

@@ -121,6 +121,7 @@ async def get_engine_store(
     return engine_store
 
 
+# TODO (jh, 2023-10-31): Add test cases.
 async def get_is_okay_to_create_maintenance_run(
     engine_store: EngineStore = Depends(get_engine_store),
 ) -> bool:
@@ -128,7 +129,7 @@ async def get_is_okay_to_create_maintenance_run(
     try:
         protocol_run_state = engine_store.engine.state_view
     except AssertionError:
-        return False
+        return True
     return (
         not protocol_run_state.commands.has_been_played()
         or protocol_run_state.commands.get_is_terminal()

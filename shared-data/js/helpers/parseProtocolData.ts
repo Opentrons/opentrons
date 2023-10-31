@@ -12,7 +12,6 @@ import type {
   JsonProtocolFile,
   ProtocolAnalysisFile,
   ProtocolAnalysisOutput,
-  ProtocolFileV1,
 } from '../../protocol'
 
 export type ProtocolParseErrorKey = 'INVALID_FILE_TYPE' | 'INVALID_JSON_FILE'
@@ -42,9 +41,7 @@ const SCHEMA_BY_VERSION: { [version: string]: ProtocolSchema } = {
   '5': protocolSchemaV5,
 }
 
-export type PythonProtocolMetadata = ProtocolFileV1<{
-  [key: string]: unknown
-}> & {
+export interface PythonProtocolMetadata {
   source?: string
   [key: string]: unknown
 }
