@@ -5,17 +5,15 @@ import {
 } from '@opentrons/shared-data'
 
 import type {
+  CompletedProtocolAnalysis,
   CreateCommand,
-  RunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
-import type { SetupRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
+  HomeCreateCommand,
+  RunTimeCommand,
+  SetupRunTimeCommand,
   TCOpenLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { HomeCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/gantry'
+} from '@opentrons/shared-data'
 
 type LPCPrepCommand =
   | HomeCreateCommand

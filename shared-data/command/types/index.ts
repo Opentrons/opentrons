@@ -22,6 +22,7 @@ import type {
 export * from './annotation'
 export * from './calibration'
 export * from './gantry'
+export * from './incidental'
 export * from './module'
 export * from './pipetting'
 export * from './setup'
