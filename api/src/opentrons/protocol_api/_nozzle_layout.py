@@ -1,47 +1,27 @@
-import re
-from dataclasses import dataclass
-
-# TODO MEOW THIS STRING TYPE TO SHARED PLACE
-ACCEPTABLE_NOZZLE_KEY_RE = re.compile("[A-Z][0-100]")
+from typing_extensions import Final
+import enum
 
 
-@dataclass
-class NozzleLayoutBase:
-    primary_nozzle: str
-
-    def __post_init__(self):
-        if not ACCEPTABLE_NOZZLE_KEY_RE.match(self.primary_nozzle):
-            raise ValueError(
-                f"{self.primary_nozzle} does not fit the standard nozzle naming convention. Please ensure the nozzle is labled <LETTER><NUMBER> and that your letter is capitalized."
-            )
+class NozzleLayout(enum.Enum):
+    COLUMN = "COLUMN"
+    SINGLE = "SINGLE"
+    ROW = "ROW"
+    QUADRANT = "QUADRANT"
+    EMPTY = "EMPTY"
 
 
-@dataclass
-class SingleNozzleLayout(NozzleLayoutBase):
-    pass
+COLUMN: Final = NozzleLayout.COLUMN
+EMPTY: Final = NozzleLayout.EMPTY
 
+# Set __doc__ manually as a workaround. When this docstring is written the normal way, right after
+# the constant definition, Sphinx has trouble picking it up.
+COLUMN.__doc__ = """\
+A special nozzle configuration type indicating a full single column pick up. Predominantly meant for the 96 channel.
 
-@dataclass
-class RowNozzleLayout(NozzleLayoutBase):
-    pass
+See <ADD REFERENCE HERE> for details on using ``COLUMN`` with :py:obj:`InstrumentContext.configure_nozzle_layout()`.
+"""
+EMPTY.__doc__ = """\
+A special nozzle configuration type indicating a reset back to default where the pipette will pick up its max capacity of tips.
 
-
-@dataclass
-class ColumnNozzleLayout(NozzleLayoutBase):
-    pass
-
-
-@dataclass
-class QuadrantNozzleLayout(NozzleLayoutBase):
-    back_left_nozzle: str
-    front_right_nozzle: str
-
-    def __post_init__(self):
-        if not ACCEPTABLE_NOZZLE_KEY_RE.match(self.back_left_nozzle):
-            raise ValueError(
-                f"{self.back_left_nozzle} does not fit the standard nozzle naming convention. Please ensure the nozzle is labled <LETTER><NUMBER> and that your letter is capitalized."
-            )
-        if not ACCEPTABLE_NOZZLE_KEY_RE.match(self.front_right_nozzle):
-            raise ValueError(
-                f"{self.front_right_nozzle} does not fit the standard nozzle naming convention. Please ensure the nozzle is labled <LETTER><NUMBER> and that your letter is capitalized."
-            )
+See <ADD REFERENCE HERE> for details on using ``RESET`` with :py:obj:`InstrumentContext.configure_nozzle_layout()`.
+"""

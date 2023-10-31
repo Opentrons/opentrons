@@ -935,7 +935,9 @@ def test_configure_nozzle_layout(
     decoy.when(mock_instrument_core.get_channels()).then_return(channels)
 
     decoy.when(
-        mock_instrument_core.configure_nozzle_layout(primary_nozzle="A1", front_right_nozzle="A12")
+        mock_instrument_core.configure_nozzle_layout(
+            primary_nozzle="A1", front_right_nozzle="A12"
+        )
     ).then_return(None)
     if channels == 8 or channels == 1:
         with pytest.raises(CommandParameterLimitViolated):
@@ -947,7 +949,6 @@ def test_configure_nozzle_layout(
         mock_instrument_core.configure_nozzle_layout(primary_nozzle="A1")
     ).then_return(None)
     subject.configure_nozzle_layout(SingleNozzleLayout(primary_nozzle="A1"))
-
 
     subject.configure_nozzle_layout(
         QuadrantNozzleLayout(

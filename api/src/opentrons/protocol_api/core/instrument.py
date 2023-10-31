@@ -239,8 +239,8 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
     def configure_nozzle_layout(
         self,
+        style: str,
         primary_nozzle: Optional[str],
-        back_left_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
     ) -> None:
         """Configure the pipette to a specific nozzle layout.

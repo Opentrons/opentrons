@@ -13,15 +13,12 @@ from .command import (
     BaseCommandCreate,
 )
 from .configuring_common import (
-    EmptyNozzleLayoutConfiguration,
-    BaseNozzleLayoutConfiguration,
-    RowColumnNozzleLayoutConfiguration,
-    QuadrantNozzleLayoutConfiguration,
     PipetteNozzleLayoutResultMixin,
 )
+from ..types import (EmptyNozzleLayoutConfiguration, SingleNozzleLayoutConfiguration, RowNozzleLayoutConfiguration, QuadrantNozzleLayoutConfiguration)
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler
+    from ..execution import EquipmentHandler, TipHandler
 
 
 ConfigureNozzleLayoutCommandType = Literal["configureNozzleLayout"]
@@ -32,8 +29,8 @@ class ConfigureNozzleLayoutParams(PipetteIdMixin):
 
     configuration_params: Union[
         EmptyNozzleLayoutConfiguration,
-        BaseNozzleLayoutConfiguration,
-        RowColumnNozzleLayoutConfiguration,
+        SingleNozzleLayoutConfiguration,
+        RowNozzleLayoutConfiguration,
         QuadrantNozzleLayoutConfiguration,
     ]
 
@@ -59,17 +56,32 @@ class ConfigureNozzleLayoutImplementation(
 ):
     """Configure for volume command implementation."""
 
-    def __init__(self, equipment: EquipmentHandler, **kwargs: object) -> None:
+    def __init__(
+        self, equipment: EquipmentHandler, tip_handler: TipHandler, **kwargs: object
+    ) -> None:
         self._equipment = equipment
+        self._tip_handler = tip_handler
 
     async def execute(
         self, params: ConfigureNozzleLayoutParams
     ) -> Tuple[ConfigureNozzleLayoutResult, ConfigureNozzleLayoutPrivateResult]:
         """Check that requested pipette can support the requested nozzle layout."""
 
+        # check if a tip is attached
+        # move to tip handler
+        # if self._core.has_tip():
+        #     raise CommandPreconditionViolated(
+        #         message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
+        #     )
+        nozzle_params = await self._tip_handler.available_for_nozzle_layout(
+            params.configuration_params.type.upper(), params
+        )
+
+        # style = params.configuration_style.upper()
+
         nozzle_map = await self._equipment.configure_nozzle_layout(
             pipette_id=params.pipetteId,
-            *params.configuration_params,
+            **nozzle_params,
         )
 
         return ConfigureNozzleLayoutResult(), ConfigureNozzleLayoutPrivateResult(

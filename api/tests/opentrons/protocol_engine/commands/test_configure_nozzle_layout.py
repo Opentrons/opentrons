@@ -7,7 +7,7 @@ from opentrons.protocol_engine.execution import (
     EquipmentHandler,
 )
 from opentrons.types import Point
-from opentrons.hardware_control.instruments.nozzle_manager import NozzleMap
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
 from opentrons.protocol_engine.commands.configure_nozzle_layout import (
