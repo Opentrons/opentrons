@@ -1,6 +1,6 @@
 import Ajv from 'ajv'
-import protocolV7Schema from '@opentrons/shared-data/protocol/schemas/7.json'
-import commandV7Schema from '@opentrons/shared-data/command/schemas/7.json'
+import protocolV8Schema from '@opentrons/shared-data/protocol/schemas/8.json'
+import commandV8Schema from '@opentrons/shared-data/command/schemas/8.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
@@ -42,11 +42,11 @@ const ajv = new Ajv({
   jsonPointers: true,
 })
 // v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
-// and add v7 command schema
+// and add v8 command schema
 ajv.addSchema(labwareV2Schema)
-ajv.addSchema(commandV7Schema)
+ajv.addSchema(commandV8Schema)
 
-const validateProtocol = ajv.compile(protocolV7Schema)
+const validateProtocol = ajv.compile(protocolV8Schema)
 
 const expectResultToMatchSchema = (result: any): void => {
   const valid = validateProtocol(result)
@@ -67,7 +67,7 @@ describe('createFile selector', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it('should return a schema-valid JSON V7 protocol', () => {
+  it('should return a schema-valid JSON V8 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
@@ -85,7 +85,7 @@ describe('createFile selector', () => {
       labwareNicknamesById,
       labwareDefsByURI,
       //  TODO(jr, 10/3/23): add additionalEquipmentEntities when the schemaV8 supports
-      //  loadFixture
+      //  loadAddressableArea
       {}
     )
     expectResultToMatchSchema(result)
