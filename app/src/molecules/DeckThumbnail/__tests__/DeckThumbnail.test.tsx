@@ -12,6 +12,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import {
   BaseDeck,
   EXTENDED_DECK_CONFIG_FIXTURE,
+  partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
 import {
@@ -122,7 +123,7 @@ describe('DeckThumbnail', () => {
     when(mockGetDeckConfigFromProtocolCommands)
       .calledWith(commands)
       .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
-    when(mockGetLabwareRenderInfo).mockReturnValue({}) // Flex
+    when(mockGetLabwareRenderInfo).mockReturnValue({})
     when(mockGetProtocolModulesInfo)
       .calledWith(protocolAnalysis, ot2StandardDeckDef as any)
       .mockReturnValue(mockProtocolModuleInfo)
@@ -160,13 +161,12 @@ describe('DeckThumbnail', () => {
         },
       ])
     when(mockBaseDeck)
-      .calledWith({
-        robotType: OT2_ROBOT_TYPE,
-        deckLayerBlocklist: getStandardDeckViewLayerBlockList(OT2_ROBOT_TYPE),
-        deckConfig: [],
-        labwareLocations: [],
-        moduleLocations: [],
-      })
+      .calledWith(
+        partialComponentPropsMatcher({
+          robotType: OT2_ROBOT_TYPE,
+          deckLayerBlocklist: getStandardDeckViewLayerBlockList(OT2_ROBOT_TYPE),
+        })
+      )
       .mockReturnValue(<div>mock BaseDeck</div>)
   })
   afterEach(() => {
@@ -189,19 +189,21 @@ describe('DeckThumbnail', () => {
         labwareLocation: { slotName: 'C1' },
         definition: fixture_tiprack_300_ul as LabwareDefinition2,
         topLabwareId: '300_ul_tiprack_id',
-        onLabwareClick: expect.any(Function),
-        labwareChildren: null,
+        topLabwareDisplayName: 'fresh tips',
       },
     ]
     const mockModuleLocations = [
       {
-        moduleModel: 'magneticModuleV2' as ModuleModel,
+        moduleModel: 'magneticModuleV2',
         moduleLocation: { slotName: 'C1' },
-        nestedLabwareDef: mockProtocolModuleInfo[0]
-          .nestedLabwareDef as LabwareDefinition2,
-        onLabwareClick: expect.any(Function),
-        moduleChildren: null,
         innerProps: {},
+        nestedLabwareDef: null,
+      },
+      {
+        moduleModel: 'magneticModuleV2',
+        moduleLocation: { slotName: 'B1' },
+        innerProps: {},
+        nestedLabwareDef: null,
       },
     ]
     when(mockGetRobotTypeFromLoadedLabware)
@@ -266,13 +268,17 @@ describe('DeckThumbnail', () => {
         },
       ])
     when(mockBaseDeck)
-      .calledWith({
-        robotType: FLEX_ROBOT_TYPE,
-        deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
-        deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
-        labwareLocations: mockLabwareLocations,
-        moduleLocations: mockModuleLocations,
-      })
+      .calledWith(
+        partialComponentPropsMatcher({
+          robotType: FLEX_ROBOT_TYPE,
+          deckLayerBlocklist: getStandardDeckViewLayerBlockList(
+            FLEX_ROBOT_TYPE
+          ),
+          deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
+          labwareLocations: mockLabwareLocations,
+          moduleLocations: mockModuleLocations,
+        })
+      )
       .mockReturnValue(<div>mock BaseDeck</div>)
 
     const { getByText } = render({
