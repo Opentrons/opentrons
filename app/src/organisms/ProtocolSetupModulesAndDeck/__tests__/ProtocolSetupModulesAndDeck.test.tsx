@@ -36,6 +36,7 @@ import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndD
 import { ModuleWizardFlows } from '../../ModuleWizardFlows'
 import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
+import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 import { ProtocolSetupModulesAndDeck } from '..'
 
 jest.mock('@opentrons/react-api-client')
@@ -53,6 +54,7 @@ jest.mock('../SetupInstructionsModal')
 jest.mock('../../ModuleWizardFlows')
 jest.mock('../FixtureTable')
 jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
+jest.mock('../ModulesAndDeckMapViewModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -98,6 +100,9 @@ const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFu
 >
 const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
   typeof LocationConflictModal
+>
+const mockModulesAndDeckMapViewModal = ModulesAndDeckMapViewModal as jest.MockedFunction<
+  typeof ModulesAndDeckMapViewModal
 >
 
 const ROBOT_NAME = 'otie'
@@ -188,6 +193,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
       .calledWith('enableDeckConfiguration')
       .mockReturnValue(false)
     mockFixtureTable.mockReturnValue(<div>mock FixtureTable</div>)
+    mockModulesAndDeckMapViewModal.mockReturnValue(
+      <div>mock ModulesAndDeckMapViewModal</div>
+    )
   })
 
   afterEach(() => {
@@ -366,5 +374,11 @@ describe('ProtocolSetupModulesAndDeck', () => {
     getByText('mock FixtureTable')
     getByText('Location conflict').click()
     getByText('mock location conflict modal')
+  })
+
+  it('should render ModulesAndDeckMapViewModal when tapping map view button', () => {
+    const [{ getByText }] = render()
+    getByText('Map View').click()
+    getByText('mock ModulesAndDeckMapViewModal')
   })
 })

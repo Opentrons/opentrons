@@ -1,16 +1,24 @@
-import type { ProtocolFile as _ProtocolFileV1 } from './types/schemaV1'
-import type { ProtocolFile as _ProtocolFileV3 } from './types/schemaV3'
-import type { ProtocolFile as _ProtocolFileV4 } from './types/schemaV4'
-import type { ProtocolFile as _ProtocolFileV5 } from './types/schemaV5'
-import type { ProtocolFile as _ProtocolFileV6 } from './types/schemaV6'
+import type { ProtocolFile as ProtocolFileV1 } from './types/schemaV1'
+import type { ProtocolFile as ProtocolFileV3 } from './types/schemaV3'
+import type { ProtocolFile as ProtocolFileV4 } from './types/schemaV4'
+import type { ProtocolFile as ProtocolFileV5 } from './types/schemaV5'
+import type { ProtocolFile as ProtocolFileV6 } from './types/schemaV6'
+import type { ProtocolFile as ProtocolFileV7 } from './types/schemaV7'
+import type {
+  ProtocolFile as ProtocolFileV8,
+  ProtocolStructure as ProtocolStructureV8,
+} from './types/schemaV8'
 
-// TODO(mc, 2021-04-27): these awkward re-exports only for flowgen support
-// remove when able
-export type ProtocolFileV1<AppData> = _ProtocolFileV1<AppData>
-export type ProtocolFileV3<AppData> = _ProtocolFileV3<AppData>
-export type ProtocolFileV4<AppData> = _ProtocolFileV4<AppData>
-export type ProtocolFileV5<AppData> = _ProtocolFileV5<AppData>
-export type ProtocolFileV6<AppData> = _ProtocolFileV6<AppData>
+export type {
+  ProtocolFileV1,
+  ProtocolFileV3,
+  ProtocolFileV4,
+  ProtocolFileV5,
+  ProtocolFileV6,
+  ProtocolFileV7,
+  ProtocolFileV8,
+  ProtocolStructureV8,
+}
 
 export type JsonProtocolFile =
   | Readonly<ProtocolFileV1<{}>>
@@ -18,5 +26,7 @@ export type JsonProtocolFile =
   | Readonly<ProtocolFileV4<{}>>
   | Readonly<ProtocolFileV5<{}>>
   | Readonly<ProtocolFileV6<{}>>
+  | Readonly<ProtocolFileV7<{}>>
+  | Readonly<ProtocolFileV8<{}>>
 
 export * from './types/schemaV7'

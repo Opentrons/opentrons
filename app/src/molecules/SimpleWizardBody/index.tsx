@@ -77,6 +77,7 @@ const WIZARD_CONTAINER_STYLE = css`
 `
 const FLEX_SPACING_STYLE = css`
   height: 1.75rem;
+  margin-bottom: ${SPACING.spacing32};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 0rem;
   }

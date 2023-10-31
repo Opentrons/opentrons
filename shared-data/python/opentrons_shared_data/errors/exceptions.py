@@ -887,3 +887,16 @@ class UnsupportedHardwareCommand(GeneralError):
         super().__init__(
             ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, detail, wrapping
         )
+
+
+class InvalidProtocolData(GeneralError):
+    """An error indicating that some protocol data is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidProtocolData."""
+        super().__init__(ErrorCodes.INVALID_PROTOCOL_DATA, message, detail, wrapping)

@@ -15,6 +15,7 @@ from opentrons_shared_data.pipette import (
     pipette_definition as pip_def,
 )
 from opentrons.types import Mount
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 
 from robot_server import app
@@ -592,7 +593,7 @@ def test_reset_success(
 ):
     resp = api_client.post("/settings/reset", json=body)
     assert resp.status_code == 200
-    mock_reset.assert_called_once_with(called_with)
+    mock_reset.assert_called_once_with(called_with, RobotTypeEnum.OT2)
 
 
 def test_reset_invalid_option(api_client, mock_reset, mock_persistence_resetter):

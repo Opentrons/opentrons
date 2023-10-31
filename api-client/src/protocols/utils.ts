@@ -132,7 +132,7 @@ export function parseInitialLoadedLabwareBySlot(
   )
 }
 
-interface LoadedLabwareByAdapter {
+export interface LoadedLabwareByAdapter {
   [labwareId: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareByAdapter(
