@@ -23,6 +23,7 @@ from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -822,13 +823,19 @@ class ProtocolContext(CommandPublisher):
                 log=logger,
             )
 
+        trash: Optional[Labware]
+        try:
+            trash = self.fixed_trash
+        except NoTrashDefinedError:
+            trash = None
+
         instrument = InstrumentContext(
             core=instrument_core,
             protocol_core=self._core,
             broker=self._broker,
             api_version=self._api_version,
             tip_racks=tip_racks,
-            trash=self.fixed_trash,
+            trash=trash,
             requested_as=instrument_name,
         )
 
@@ -979,13 +986,16 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def fixed_trash(self) -> Optional[Labware]:
+    def fixed_trash(self) -> Labware:
         """The trash fixed to slot 12 of the robot deck.
 
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        return self._core_map.get(self._core.fixed_trash)
+        fixed_trash = self._core_map.get(self._core.fixed_trash)
+        if fixed_trash is None:
+            raise NoTrashDefinedError("No trash container has been defined in this protocol.")
+        return fixed_trash
 
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._core.fixed_trash

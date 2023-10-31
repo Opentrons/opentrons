@@ -96,7 +96,7 @@ class InstrumentContext(publisher.CommandPublisher):
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
-        self.trash_container = trash
+        self.trash_container = trash  # type: ignore[assignment]
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -942,12 +942,6 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
-            # TODO(jbl 10-30-2023) this needs to eventually check and discern between multiple trash bins/waste chute
-            #   Same goes for opentrons.protocols.advanced_control.transfers
-            if self.trash_container is None:
-                raise NoTrashDefinedError(
-                    "Cannot drop tip with no location argument when no trash has been loaded"
-                )
             well = self.trash_container.wells()[0]
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
@@ -1461,13 +1455,15 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(self) -> Optional[labware.Labware]:
+    def trash_container(self) -> labware.Labware:
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out
         liquids when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without
         arguments.
         """
+        if self._trash is None:
+            raise NoTrashDefinedError("No trash container has been defined in this protocol.")
         return self._trash
 
     @trash_container.setter

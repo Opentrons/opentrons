@@ -1,4 +1,8 @@
+from typing import Sequence, Dict, Optional, Any
+
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 from opentrons.config import feature_flags
 
@@ -21,12 +25,24 @@ LOAD_FIXED_TRASH_GATE_VERSION_PYTHON = APIVersion(2, 15)
 LOAD_FIXED_TRASH_GATE_VERSION_JSON = 7
 
 
-class NoTrashDefinedError(Exception):
+class NoTrashDefinedError(EnumeratedError):
     """
     Error raised when a protocol attempts to automatically access a trash bin without one being loaded.
     """
 
-    pass
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ProtocolEngineError."""
+        super().__init__(
+            code=ErrorCodes.GENERAL_ERROR,
+            message=message,
+            detail=detail,
+            wrapping=wrapping,
+        )
 
 
 def should_load_fixed_trash_for_python_protocol(api_version: APIVersion) -> bool:
