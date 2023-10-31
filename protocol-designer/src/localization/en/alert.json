@@ -242,15 +242,10 @@
       "body1": "The Flex Gripper specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
       "body2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
     },
-    "unused_waste_chute": {
-      "heading": "Unused waste chute",
-      "body1": "The waste chute specified in your protocol is not currently used in any step. It will not appear as a needed item on the deck when uploaded to the app.",
-      "body2": "If you don't intend to use the waste chute, please consider removing it from your protocol."
-    },
-    "unused_trash_bin": {
-      "heading": "Unused trash bin",
-      "body1": "The trash bin specified in your protocol is not currently used in any step. It will not appear as a needed item on the deck when uploaded to the app.",
-      "body2": "If you don't intend to use the trash bin, please consider removing it from your protocol."
+    "unused_trash": {
+      "heading": "Unused trash",
+      "body": "The {{name}} specified in your protocol is not currently used in any step. It will not appear as a needed item on the deck when uploaded to the app.",
+      "body_both": "The {{trashName}} and {{wasteName}} specified in your protocol are not currently used in any step. They will not appear as a needed item on the deck when uploaded to the app."
     },
     "unused_staging_area": {
       "heading": "One or more staging area slots are unused",

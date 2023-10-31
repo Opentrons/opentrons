@@ -113,18 +113,6 @@ function getWarningContent({
     }
   }
 
-  if (fixtureWithoutStep.wasteChute) {
-    return {
-      content: (
-        <>
-          <p>{i18n.t('alert.export_warnings.unused_waste_chute.body1')}</p>
-          <p>{i18n.t('alert.export_warnings.unused_waste_chute.body2')}</p>
-        </>
-      ),
-      heading: i18n.t('alert.export_warnings.unused_waste_chute.heading'),
-    }
-  }
-
   const pipettesDetails = pipettesWithoutStep
     .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
     .join(' and ')
@@ -189,15 +177,25 @@ function getWarningContent({
     }
   }
 
-  if (fixtureWithoutStep.trashBin) {
+  if (fixtureWithoutStep.trashBin || fixtureWithoutStep.wasteChute) {
     return {
-      content: (
-        <>
-          <p>{i18n.t('alert.export_warnings.unused_trash_bin.body1')}</p>
-          <p>{i18n.t('alert.export_warnings.unused_trash_bin.body2')}</p>
-        </>
-      ),
-      heading: i18n.t('alert.export_warnings.unused_trash_bin.heading'),
+      content:
+        (fixtureWithoutStep.trashBin && !fixtureWithoutStep.wasteChute) ||
+        (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
+          <p>
+            {i18n.t('alert.export_warnings.unused_trash.body', {
+              name: fixtureWithoutStep.trashBin ? 'trash bin' : 'waste chute',
+            })}
+          </p>
+        ) : (
+          <p>
+            {i18n.t('alert.export_warnings.unused_trash.body_both', {
+              trashName: 'trash bin',
+              wasteName: 'waste chute',
+            })}
+          </p>
+        ),
+      heading: i18n.t('alert.export_warnings.unused_trash.heading'),
     }
   }
 
