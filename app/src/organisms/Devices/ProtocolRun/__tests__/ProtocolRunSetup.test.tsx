@@ -14,7 +14,6 @@ import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simple
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
-import { useFeatureFlag } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -85,9 +84,6 @@ const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
 const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
   typeof EmptySetupStep
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
@@ -150,9 +146,6 @@ describe('ProtocolRunSetup', () => {
     when(mockSetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -303,7 +296,7 @@ describe('ProtocolRunSetup', () => {
 
       const { getByText } = render()
       getByText('STEP 2')
-      getByText('Modules')
+      getByText('Modules & deck')
       getByText('Calibration needed')
     })
 
@@ -378,9 +371,6 @@ describe('ProtocolRunSetup', () => {
 
     it('renders correct text contents for modules and fixtures', () => {
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseFeatureFlag)
-        .calledWith('enableDeckConfiguration')
-        .mockReturnValue(true)
       when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({

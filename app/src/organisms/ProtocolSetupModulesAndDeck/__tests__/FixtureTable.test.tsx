@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import {
   STAGING_AREA_LOAD_NAME,
@@ -8,18 +7,13 @@ import {
 
 import { i18n } from '../../../i18n'
 import { useLoadedFixturesConfigStatus } from '../../../resources/deck_configuration/hooks'
-import { useFeatureFlag } from '../../../redux/config'
 import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { FixtureTable } from '../FixtureTable'
 import type { LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
 
-jest.mock('../../../redux/config')
 jest.mock('../../../resources/deck_configuration/hooks')
 jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockUseLoadedFixturesConfigStatus = useLoadedFixturesConfigStatus as jest.MockedFunction<
   typeof useLoadedFixturesConfigStatus
 >
@@ -73,9 +67,6 @@ describe('FixtureTable', () => {
       setFixtureLocation: mockSetFixtureLocation,
       setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
     mockUseLoadedFixturesConfigStatus.mockReturnValue([
       { ...mockLoadedFixture, configurationStatus: 'configured' },
     ])
