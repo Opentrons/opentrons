@@ -56,6 +56,7 @@ interface BaseDeckProps {
   }>
   deckConfig?: DeckConfiguration
   deckLayerBlocklist?: string[]
+  showExpansion?: boolean
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode
@@ -72,6 +73,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     // TODO(bh, 2023-10-09): remove deck config fixture for Flex after migration to v4
     // deckConfig = EXTENDED_DECK_CONFIG_FIXTURE,
     deckConfig = STANDARD_SLOT_DECK_CONFIG_FIXTURE,
+    showExpansion = true,
     children,
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -104,6 +106,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               deckDefinition={deckDef}
               slotClipColor={darkFill}
               fixtureBaseColor={lightFill}
+              showExpansion={showExpansion}
             />
           ))}
           {stagingAreaFixtures.map(fixture => (
