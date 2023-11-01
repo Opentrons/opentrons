@@ -34,7 +34,7 @@ stages:
 
 ---
 
-test_name: Make sure you can create a maintenance run while there is an inactive normal run
+test_name: Make sure you can create a maintenance run while there is an unstarted protocol run
 
 marks:
   - usefixtures:
