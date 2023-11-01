@@ -219,7 +219,16 @@ export const createSessionEpic: Epic = action$ => {
         )
       }
 
-      return of(unexpectedRobotUpdateError(UNABLE_TO_START_UPDATE_SESSION))
+      return fetchRobotApi(host, {
+        method: POST,
+        path: `${pathPrefix}/cancel`,
+      }).pipe(
+        map(cancelResp => {
+          return cancelResp.ok
+            ? createSession(host, path)
+            : unexpectedRobotUpdateError(UNABLE_TO_START_UPDATE_SESSION)
+        })
+      )
     })
   )
 }

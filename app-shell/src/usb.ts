@@ -29,6 +29,7 @@ import type { Action, Dispatch } from './types'
 
 let usbHttpAgent: SerialPortHttpAgent | undefined
 const usbLog = createLogger('usb')
+let usbFetchInterval: NodeJS.Timeout
 
 export function getSerialPortHttpAgent(): SerialPortHttpAgent | undefined {
   return usbHttpAgent
@@ -43,6 +44,7 @@ export function createSerialPortHttpAgent(path: string): void {
     keepAliveMsecs: 10000,
     path,
     logger: usbLog,
+    timeout: 100000,
   })
 
   usbHttpAgent = serialPortHttpAgent
@@ -110,6 +112,48 @@ async function usbListener(
   }
 }
 
+function pollSerialPortAndCreateAgent(dispatch: Dispatch): void {
+  // usb poll already initialized
+  if (usbFetchInterval != null) {
+    return
+  }
+  usbFetchInterval = setInterval(() => {
+    // already connected to an Opentrons robot via USB
+    if (getSerialPortHttpAgent() != null) {
+      return
+    }
+    usbLog.debug('fetching serialport list')
+    fetchSerialPortList()
+      .then((list: PortInfo[]) => {
+        const ot3UsbSerialPort = list.find(
+          port =>
+            port.productId?.localeCompare(DEFAULT_PRODUCT_ID, 'en-US', {
+              sensitivity: 'base',
+            }) === 0 &&
+            port.vendorId?.localeCompare(DEFAULT_VENDOR_ID, 'en-US', {
+              sensitivity: 'base',
+            }) === 0
+        )
+
+        if (ot3UsbSerialPort == null) {
+          usbLog.debug('no OT-3 serial port found')
+          return
+        }
+
+        createSerialPortHttpAgent(ot3UsbSerialPort.path)
+        // remove any existing handler
+        ipcMain.removeHandler('usb:request')
+        ipcMain.handle('usb:request', usbListener)
+
+        dispatch(usbRequestsStart())
+      })
+      .catch(e =>
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        usbLog.debug(`fetchSerialPortList error ${e?.message ?? 'unknown'}`)
+      )
+  }, 10000)
+}
+
 function startUsbHttpRequests(dispatch: Dispatch): void {
   fetchSerialPortList()
     .then((list: PortInfo[]) => {
@@ -150,6 +194,7 @@ export function registerUsb(dispatch: Dispatch): (action: Action) => unknown {
         if (action.payload.usbDevices.find(isUsbDeviceOt3) != null) {
           startUsbHttpRequests(dispatch)
         }
+        pollSerialPortAndCreateAgent(dispatch)
         break
       case USB_DEVICE_ADDED:
         if (isUsbDeviceOt3(action.payload.usbDevice)) {
