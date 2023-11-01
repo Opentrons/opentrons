@@ -192,6 +192,7 @@ window.addEventListener('load', function (evt) {
   }
 
   function _onServerError(evt) {
+    clearTimeout()
     document.body.style.backgroundColor = 'red'
     document.body.innerHTML = '<h1>Lost Connection (refresh)</h1>'
     location.reload()
