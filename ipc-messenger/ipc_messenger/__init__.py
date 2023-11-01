@@ -3,9 +3,8 @@
 from .dispatcher import JSONRPCDispatcher
 from .manager import JSONRPCResponseManager
 from .messenger import IPCMessenger
-from .constants import (
+from .types import (
     IPCProcess,
-    Destinations,
     DESTINATION_PORT,
 )
 
@@ -19,6 +18,5 @@ __all__ = [
     "JSONRPCResponseManager",
     "IPCMessenger",
     "IPCProcess",
-    "Destinations",
     "DESTINATION_PORT",
 ]

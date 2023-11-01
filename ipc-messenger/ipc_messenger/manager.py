@@ -3,7 +3,6 @@ import asyncio
 import json
 from typing import Any, Optional, AsyncGenerator, List, Dict
 
-from jsonrpc.jsonrpc2 import JSONRPC20BatchRequest, JSONRPC20BatchResponse
 from jsonrpc.utils import is_invalid_params
 from jsonrpc.exceptions import (
     JSONRPCInvalidRequest,
@@ -15,13 +14,16 @@ from jsonrpc.exceptions import (
     JSONRPCInvalidParams,
 )
 
-from .constants import JSONRPCRequest, JSONRPCResponse
+from .constants import JSONRPC_VERSION
+from .types import (
+    JSONRPCRequest,
+    JSONRPCResponse,
+    JSONRPCBatchRequest,
+    JSONRPCBatchResponse,
+)
 from .dispatcher import JSONRPCDispatcher
 from .errors import JSONRPCVersionNotSupported, contextAlreadyRegisteredException
 
-
-# we only support json-rpc v2.0
-SUPPORTED_JSON_RPC_VERSION = ["2.0"]
 
 class JSONRPCResponseManager:
     """This class is responsible for validating json-rpc messages and executing commands."""
@@ -63,7 +65,6 @@ class JSONRPCResponseManager:
             request = JSONRPCRequest.from_data(data)
         except JSONRPCInvalidRequestException:
             return JSONRPCResponse(error=JSONRPCInvalidRequest()._data)
-
         return await self._handle_request(request)
 
     async def _handle_request(
@@ -71,7 +72,7 @@ class JSONRPCResponseManager:
         request: JSONRPCRequest,
     ) -> Optional[JSONRPCResponse]:
         """Execute a valid json-rpc request and return a response."""
-        rs = request if isinstance(request, JSONRPC20BatchRequest) \
+        rs = request if isinstance(request, JSONRPCBatchRequest) \
             else [request]
 
         # lets collect our responses
@@ -81,8 +82,8 @@ class JSONRPCResponseManager:
         if not responses:
             return None
 
-        if isinstance(request, JSONRPC20BatchRequest):
-            response = JSONRPC20BatchResponse(*responses)
+        if isinstance(request, JSONRPCBatchRequest):
+            response = JSONRPCBatchResponse(*responses)
             response.request = request
             return response
         else:
@@ -108,7 +109,7 @@ class JSONRPCResponseManager:
             return response if not request.is_notification else None
 
         for request in requests:
-            if request.JSONRPC_VERSION not in SUPPORTED_JSON_RPC_VERSION:
+            if request.version != JSONRPC_VERSION:
                 yield _make_response(request, error=JSONRPCVersionNotSupported()._data)
                 return
 
@@ -140,6 +141,8 @@ class JSONRPCResponseManager:
                     result = await function(*args, **kwargs)
                 else:
                     result = function(*args, **kwargs)
+
+
                 yield _make_response(request, result=result)
             except JSONRPCDispatchException as e:
                 yield _make_response(request, error=e.error._data)

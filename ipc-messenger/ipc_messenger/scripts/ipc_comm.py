@@ -8,11 +8,11 @@ from typing import Dict, Any
 
 from ipc_messenger import ipc_dispatcher
 from ipc_messenger import IPCMessenger
-from ipc_messenger.constants import (
+from ipc_messenger.types import (
     IPCProcess,
-    Destinations,
     DESTINATION_PORT,
     JSONRPCRequest,
+    JSONRPCBatchRequest,
 )
 
 
@@ -49,7 +49,6 @@ class OT3API:
     @ipc_dispatcher.add_method
     def non_async():
         return "NOTHING"
-
 
     @ipc_dispatcher.add_method(context='self')
     async def context(self, this):
@@ -97,16 +96,27 @@ def main(args):
         #resp = asyncio.run(ot3_api._ipc_messenger.home())
         #print(f"resp: {resp}")
 
-        resp = asyncio.run(ot3_api._ipc_messenger.home())
-        print(f"resp: {resp}")
+        #resp = asyncio.run(ot3_api._ipc_messenger.home())
+        #print(f"resp: {resp}")
 
-
-        #req = JSONRPCRequest(
-        #    **args.message,
-        #    is_notification=args.notify,
-        #)
-        #resp = asyncio.run(ipc_messenger.send(req, destination, notify=args.notify))
-        #print(f"Resp: {resp}")
+        
+        if isinstance(args.message, list):
+            requests = []
+            for data in args.message:
+                requests.append(
+                    JSONRPCRequest(
+                        **data,
+                        is_notification=args.notify,
+                    )
+                )
+            req = JSONRPCBatchRequest(*requests)
+        else:
+            req = JSONRPCRequest(
+                **args.message,
+                is_notification=args.notify,
+            )
+        resp = asyncio.run(ipc_messenger.send(req, destination, notify=args.notify))
+        print(f"Resp: {resp}")
     else:
         asyncio.run(ipc_messenger.start())
 

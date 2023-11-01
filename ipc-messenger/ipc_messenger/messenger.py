@@ -4,18 +4,19 @@ import asyncio
 import logging
 
 from enum import Enum
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional, Set, List
 
 
+from .constants import JSONRPC_VERSION
 from .utils.log import init_logging
 from .dispatcher import JSONRPCDispatcher
 from .manager import JSONRPCResponseManager
-from .constants import (
+from .types import (
     IPCProcess,
-    Destinations,
-    DESTINATION_PORT,
     JSONRPCRequest,
+    JSONRPCBatchRequest,
     JSONRPCResponse,
+    DESTINATION_PORT,
 )
 
 log = logging.getLogger(__name__)
@@ -121,12 +122,14 @@ class IPCMessenger:
         req = JSONRPCRequest(
             method=method,
             params=params,
+            version=JSONRPC_VERSION,
         )
+
         return await self.send(req, destinations=target)
 
     async def send(self,
         message: JSONRPCRequest,
-        destinations: Optional[Destinations] = None,
+        destinations: Optional[List[IPCProcess]] = None,
         notify: bool = False
     ) -> Dict[IPCProcess, Any]:
         """Sends a message to one or more IPCProcesses and return the response."""
@@ -146,10 +149,16 @@ class IPCMessenger:
         request: JSONRPCRequest,
         notify: bool = False,
     ) -> Optional[Any]:
-        self._req_id += 1
 
-        # notifications dont have id's
-        if not notify:
+        is_batch = isinstance(request, JSONRPCBatchRequest)
+        if is_batch:
+            for req in request:
+                if not notify:
+                    self._req_id += 1
+                    req._id = self._req_id
+        elif not notify:
+            # notifications dont have id's
+            self._req_id += 1
             request._id = self._req_id
 
         response: Any = None
@@ -160,6 +169,7 @@ class IPCMessenger:
             reader, writer = await asyncio.open_connection(self._host, port)
 
             message = request.json
+            log.debug(f"sending: {message}")
             writer.write(message.encode())
 
             # we are done sending data so write EOF
@@ -175,7 +185,8 @@ class IPCMessenger:
 
             # return the response
             log.debug(f"Received IPC response: {data.decode()}")
-            response = json.loads(data).get('result')
+            resp =  json.loads(data)
+            response = resp if is_batch else resp.get('result')
             # todo (ba, 2023-10-27): raise exception if we get an 'error' response.
         except OSError:
             log.warning(f"{self._host}:{port} is probably offline")
