@@ -75,7 +75,7 @@ stages:
 
 ---
 
-test_name: Make sure you can create a maintenance run while there is a completed protococl run
+test_name: Make sure you can create a maintenance run while there is a completed protocol run
 
 marks:
   - usefixtures:
