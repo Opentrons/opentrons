@@ -44,28 +44,8 @@ stages:
   - *assert_no_runs
   - *assert_no_maintenance_runs
 
-  - name: Create a normal run
-    request:
-      url: '{ot2_server_base_url}/runs'
-      method: POST
-    response:
-      status_code: 201
-
-  - *assert_can_create_maintenance_run
-
----
-
-test_name: Make sure you can create a maintenance run while there is a completed normal run
-
-marks:
-  - usefixtures:
-      - ot2_server_base_url
-
-stages:
-  - *assert_no_runs
-  - *assert_no_maintenance_runs
-
-  - name: Upload a protocol
+  - &upload_protocol_and_save_id
+    name: Upload a protocol
     request:
       url: '{ot2_server_base_url}/protocols'
       method: POST
@@ -77,7 +57,8 @@ stages:
         json:
           protocol_id: data.id
 
-  - name: Create a normal run from the protocol
+  - &create_protocol_run_and_save_id
+    name: Create a protocol run
     request:
       url: '{ot2_server_base_url}/runs'
       method: POST
@@ -89,6 +70,23 @@ stages:
       save:
         json:
           run_id: data.id
+
+  - *assert_can_create_maintenance_run
+
+---
+
+test_name: Make sure you can create a maintenance run while there is a completed protococl run
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - *assert_no_runs
+  - *assert_no_maintenance_runs
+
+  - *upload_protocol_and_save_id
+  - *create_protocol_run_and_save_id
 
   - name: Issue a play action
     request:
