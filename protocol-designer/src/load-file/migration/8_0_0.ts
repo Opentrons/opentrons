@@ -170,7 +170,7 @@ export const migrateFile = (
   const deckStructure =
     robotType === FLEX_ROBOT_TYPE ? flexDeckSpec : ot2DeckSpec
 
-  const protocolBase: ProtocolBase<any> = {
+  const protocolBase: ProtocolBase<DesignerApplicationData> = {
     $otSharedSchema: '#/protocol/schemas/8',
     schemaVersion: SCHEMA_VERSION,
     metadata: {
@@ -181,7 +181,6 @@ export const migrateFile = (
       version: PD_VERSION,
       data: {
         ...appData.designerApplication?.data,
-
         savedStepForms: {
           [INITIAL_DECK_SETUP_STEP_ID]: {
             ...appData.designerApplication?.data?.savedStepForms[
