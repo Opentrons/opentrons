@@ -76,10 +76,7 @@ import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
-import {
-  getIsHeaterShakerAttached,
-  useFeatureFlag,
-} from '../../../redux/config'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
@@ -524,8 +521,6 @@ function PrepareToRun({
   const isDoorOpen =
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
-
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <>

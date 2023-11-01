@@ -351,6 +351,9 @@ export const mockPipetteData1Channel: PipetteData = {
   serialNumber: 'abc',
   subsystem: 'pipette_left',
   ok: true,
+  state: {
+    tipDetected: false,
+  },
 }
 export const mockAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData1Channel,
@@ -376,6 +379,9 @@ export const mockPipetteData8Channel: PipetteData = {
   serialNumber: 'cba',
   subsystem: 'pipette_right',
   ok: true,
+  state: {
+    tipDetected: false,
+  },
 }
 export const mock8ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData8Channel,
@@ -400,6 +406,9 @@ export const mockPipetteData96Channel: PipetteData = {
   serialNumber: 'cba',
   subsystem: 'pipette_left',
   ok: true,
+  state: {
+    tipDetected: false,
+  },
 }
 export const mock96ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData96Channel,

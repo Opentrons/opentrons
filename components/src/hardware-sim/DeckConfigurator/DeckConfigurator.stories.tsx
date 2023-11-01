@@ -69,3 +69,12 @@ Default.args = {
   handleClickRemove: fixtureLocation =>
     console.log(`remove at ${fixtureLocation}`),
 }
+
+export const ReadOnly = Template.bind({})
+ReadOnly.args = {
+  deckConfig,
+  handleClickAdd: fixtureLocation => console.log(`add at ${fixtureLocation}`),
+  handleClickRemove: fixtureLocation =>
+    console.log(`remove at ${fixtureLocation}`),
+  readOnly: true,
+}

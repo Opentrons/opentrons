@@ -1,5 +1,7 @@
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type {
+  LoadPipetteRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export const getPipetteMount = (
   pipetteId: string,

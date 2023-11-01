@@ -20,7 +20,7 @@ import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
-import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule

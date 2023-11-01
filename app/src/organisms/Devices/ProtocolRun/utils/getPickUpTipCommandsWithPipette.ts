@@ -1,5 +1,7 @@
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
+import type {
+  PickUpTipRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export const getPickUpTipCommandsWithPipette = (
   commands: RunTimeCommand[],

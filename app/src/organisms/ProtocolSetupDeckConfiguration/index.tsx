@@ -8,11 +8,8 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import {
-  STANDARD_SLOT_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
-} from '@opentrons/shared-data'
+import { useCreateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import { WASTE_CHUTE_LOAD_NAME } from '@opentrons/shared-data'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
@@ -48,10 +45,6 @@ export function ProtocolSetupDeckConfiguration({
     showConfigurationModal,
     setShowConfigurationModal,
   ] = React.useState<boolean>(true)
-  const [
-    targetFixtureLocation,
-    setTargetFixtureLocation,
-  ] = React.useState<Cutout>(fixtureLocation)
   const [
     showDiscardChangeModal,
     setShowDiscardChangeModal,
@@ -90,22 +83,15 @@ export function ProtocolSetupDeckConfiguration({
         }
     ) as DeckConfiguration) ?? []
 
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const [
+    currentDeckConfig,
+    setCurrentDeckConfig,
+  ] = React.useState<DeckConfiguration>(deckConfig)
 
-  const handleClickAdd = (fixtureLocation: Cutout): void => {
-    setTargetFixtureLocation(fixtureLocation)
-    setShowConfigurationModal(true)
-  }
-
-  const handleClickRemove = (fixtureLocation: Cutout): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    })
-  }
-
+  const { createDeckConfiguration } = useCreateDeckConfigurationMutation()
   const handleClickConfirm = (): void => {
-    // ToDo (kk:10/17/2023) add a function for the confirmation in a following PR for RAUT-804
+    createDeckConfiguration(currentDeckConfig)
+    setSetupScreen('modules')
   }
 
   return (
@@ -116,12 +102,12 @@ export function ProtocolSetupDeckConfiguration({
             setShowConfirmationModal={setShowDiscardChangeModal}
           />
         ) : null}
-        {showConfigurationModal &&
-        (fixtureLocation != null || targetFixtureLocation != null) ? (
+        {showConfigurationModal && fixtureLocation != null ? (
           <AddFixtureModal
-            fixtureLocation={targetFixtureLocation}
+            fixtureLocation={fixtureLocation}
             setShowAddFixtureModal={setShowConfigurationModal}
             providedFixtureOptions={providedFixtureOptions}
+            setCurrentDeckConfig={setCurrentDeckConfig}
             isOnDevice
           />
         ) : null}
@@ -136,14 +122,13 @@ export function ProtocolSetupDeckConfiguration({
         <Flex
           marginTop="7.75rem"
           paddingX={SPACING.spacing40}
-          paddingBottom={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
         >
           {/* DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready */}
           <DeckConfigurator
             deckConfig={deckConfig}
-            handleClickAdd={handleClickAdd}
-            handleClickRemove={handleClickRemove}
+            handleClickAdd={() => {}}
+            handleClickRemove={() => {}}
           />
         </Flex>
       </Flex>

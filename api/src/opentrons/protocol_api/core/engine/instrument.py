@@ -18,7 +18,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -409,13 +409,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
 
         # TODO: All of this logic to compute the destination coordinate belongs in Protocol Engine.
-        slot_d3 = next(
-            s
-            for s in self._protocol_core.get_deck_definition()["locations"][
-                "orderedSlots"
-            ]
-            if s["id"] == "D3"
-        )
+        slot_d3 = self._protocol_core.get_slot_definition(DeckSlotName.SLOT_D3)
         slot_d3_origin = Point(*slot_d3["position"])
         destination_point = slot_d3_origin + slot_origin_to_tip_a1
 
@@ -590,3 +584,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._engine_client.configure_for_volume(
             pipette_id=self._pipette_id, volume=volume
         )
+
+    def prepare_to_aspirate(self) -> None:
+        self._engine_client.prepare_to_aspirate(pipette_id=self._pipette_id)

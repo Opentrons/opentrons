@@ -1,24 +1,20 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
 
-import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/gantry'
 import type {
   BlowoutRunTimeCommand,
-  DispenseRunTimeCommand,
   ConfigureForVolumeRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
-import type {
+  DispenseRunTimeCommand,
+  DropTipRunTimeCommand,
+  LabwareDefinition2,
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import {
-  LabwareDefinition2,
+  MoveToWellRunTimeCommand,
   RunTimeCommand,
-  DropTipRunTimeCommand,
-  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 describe('CommandText', () => {

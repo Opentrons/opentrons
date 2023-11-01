@@ -25,7 +25,6 @@ import {
 
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
-import { useFeatureFlag } from '../../../redux/config'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   useIsFlex,
@@ -76,7 +75,7 @@ export function ProtocolRunSetup({
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
   const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
+
   //  TODO(Jr, 10/4/23): stubbed in the fixtures for now - delete IMMEDIATELY
   // const loadedFixturesBySlot = parseInitialLoadedFixturesByCutout(
   //   protocolData?.commands ?? []
@@ -175,11 +174,11 @@ export function ProtocolRunSetup({
   let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
     count: modules.length,
   })
-  if (!hasModules && !enableDeckConfig) {
+  if (!hasModules && !isFlex) {
     moduleDescription = i18n.format(t('no_modules_specified'), 'capitalize')
-  } else if (isFlex && enableDeckConfig && (hasModules || hasFixtures)) {
+  } else if (isFlex && (hasModules || hasFixtures)) {
     moduleDescription = t('install_modules_and_fixtures')
-  } else if (isFlex && enableDeckConfig && !hasModules && !hasFixtures) {
+  } else if (isFlex && !hasModules && !hasFixtures) {
     moduleDescription = t('no_modules_or_fixtures')
   }
 
@@ -278,15 +277,15 @@ export function ProtocolRunSetup({
           ) : (
             stepsKeysInOrder.map((stepKey, index) => {
               const setupStepTitle = t(
-                isFlex && stepKey === MODULE_SETUP_KEY && enableDeckConfig
+                isFlex && stepKey === MODULE_SETUP_KEY
                   ? `module_and_deck_setup`
                   : `${stepKey}_title`
               )
               const showEmptySetupStep =
                 (stepKey === 'liquid_setup_step' && !hasLiquids) ||
                 (stepKey === 'module_setup_step' &&
-                  ((!enableDeckConfig && !hasModules) ||
-                    (enableDeckConfig && !hasModules && !hasFixtures)))
+                  ((!isFlex && !hasModules) ||
+                    (isFlex && !hasModules && !hasFixtures)))
               return (
                 <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
                   {showEmptySetupStep ? (

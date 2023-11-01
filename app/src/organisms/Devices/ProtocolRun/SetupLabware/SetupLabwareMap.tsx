@@ -8,7 +8,6 @@ import {
   Box,
   DIRECTION_COLUMN,
   SPACING,
-  EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -18,7 +17,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
-import { useFeatureFlag } from '../../../../redux/config'
 import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { useAttachedModules } from '../../hooks'
@@ -48,8 +46,6 @@ export function SetupLabwareMap({
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
     }) ?? []
-
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
@@ -111,10 +107,9 @@ export function SetupLabwareMap({
 
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
 
-  // hide the extended deck behind feature flag to avoid confustion
-  const deckConfig = enableDeckConfig
-    ? EXTENDED_DECK_CONFIG_FIXTURE
-    : getDeckConfigFromProtocolCommands(protocolAnalysis.commands)
+  const deckConfig = getDeckConfigFromProtocolCommands(
+    protocolAnalysis.commands
+  )
 
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
 

@@ -1,5 +1,8 @@
 import { when, resetAllWhenMocks } from 'jest-when'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
 import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
 import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
@@ -8,14 +11,13 @@ import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
 import type {
   LoadedLabware,
   LoadedModule,
-  ProtocolAnalysisFile,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 jest.mock('../getLabwareLocation')
 jest.mock('../getModuleInitialLoadInfo')
 
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisFile
+const protocolWithTC = (_uncastedProtocolWithTC as unknown) as CompletedProtocolAnalysis
 const mockAdapterDef = fixture_adapter as LabwareDefinition2
 const mockAdapterId = 'mockAdapterId'
 const TCModelInProtocol = 'thermocyclerModuleV1'
@@ -32,7 +34,7 @@ const mockGetModuleInitialLoadInfo = getModuleInitialLoadInfo as jest.MockedFunc
 
 describe('getLabwareOffsetLocation', () => {
   let MOCK_LABWARE_ID: string
-  let MOCK_COMMANDS: ProtocolAnalysisFile['commands']
+  let MOCK_COMMANDS: CompletedProtocolAnalysis['commands']
   let MOCK_MODULES: LoadedModule[]
   let MOCK_LABWARE: LoadedLabware[]
   beforeEach(() => {

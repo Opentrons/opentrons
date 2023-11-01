@@ -84,7 +84,7 @@ def run(ctx):
     tips1 = ctx.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "11").wells()[0]
 
     # load 96 channel pipette
-    pip = ctx.load_instrument("p1000_96", mount="left")
+    pip = ctx.load_instrument("flex_96channel_1000", mount="left")
 
     pip.flow_rate.aspirate = 50
     pip.flow_rate.dispense = 150

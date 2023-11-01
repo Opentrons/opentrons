@@ -5,7 +5,6 @@ metadata = {
     "protocolName": "Illumina DNA Prep 96x Head PART III",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
-    "apiLevel": "2.15",
 }
 
 requirements = {
@@ -63,7 +62,7 @@ def run(protocol: protocol_api.ProtocolContext):
     if USE_8xMULTI == "YES":
         p1000 = protocol.load_instrument("flex_1channel_1000", "right")
     else:
-        p1000 = protocol.load_instrument("p1000_96", "left")
+        p1000 = protocol.load_instrument("flex_96channel_1000", "left")
 
     def grip_offset(action, item, slot=None):
         """Grip offset."""

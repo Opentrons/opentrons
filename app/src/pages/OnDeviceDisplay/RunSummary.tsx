@@ -30,7 +30,12 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useProtocolQuery,
+  useRunQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
 import { LargeButton } from '../../atoms/buttons'
 import {
@@ -55,15 +60,27 @@ import {
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
+import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
+import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+
+interface PipettesWithTip {
+  mount: 'left' | 'right'
+  specs?: PipetteModelSpecs | null
+}
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
   const { t } = useTranslation('run_details')
   const history = useHistory()
+  const host = useHost()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const isRunCurrent = Boolean(runRecord?.data?.current)
+  const { data: attachedInstruments } = useInstrumentsQuery()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const protocolId = runRecord?.data.protocolId ?? null
@@ -100,6 +117,9 @@ export function RunSummary(): JSX.Element {
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
+  const [pipettesWithTip, setPipettesWithTip] = React.useState<
+    PipettesWithTip[]
+  >([])
 
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {
@@ -109,17 +129,37 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleReturnToDash = (): void => {
-    closeCurrentRun()
-    history.push('/')
+    const { mount, specs } = pipettesWithTip[0] || {}
+    if (isRunCurrent && pipettesWithTip.length !== 0 && specs != null) {
+      handleTipsAttachedModal(
+        mount,
+        specs,
+        FLEX_ROBOT_TYPE,
+        setPipettesWithTip
+      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+    } else {
+      closeCurrentRun()
+      history.push('/')
+    }
   }
 
   const handleRunAgain = (): void => {
-    reset()
-    trackEvent({
-      name: 'proceedToRun',
-      properties: { sourceLocation: 'RunSummary' },
-    })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+    const { mount, specs } = pipettesWithTip[0] || {}
+    if (isRunCurrent && pipettesWithTip.length !== 0 && specs != null) {
+      handleTipsAttachedModal(
+        mount,
+        specs,
+        FLEX_ROBOT_TYPE,
+        setPipettesWithTip
+      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+    } else {
+      reset()
+      trackEvent({
+        name: 'proceedToRun',
+        properties: { sourceLocation: 'RunSummary' },
+      })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+    }
   }
 
   const handleViewErrorDetails = (): void => {
@@ -133,6 +173,29 @@ export function RunSummary(): JSX.Element {
     })
     setShowSplash(false)
   }
+
+  React.useEffect(() => {
+    getPipettesWithTipAttached({
+      host,
+      runId,
+      runRecord,
+      attachedInstruments,
+      isFlex: true,
+    })
+      .then(pipettesWithTipAttached => {
+        const pipettesWithTip = pipettesWithTipAttached.map(pipette => {
+          const specs = getPipetteModelSpecs(pipette.instrumentModel)
+          return {
+            specs,
+            mount: pipette.mount,
+          }
+        })
+        setPipettesWithTip(() => pipettesWithTip)
+      })
+      .catch(e => {
+        console.log(`Error checking pipette tip attachement state: ${e}`)
+      })
+  }, [])
 
   return (
     <Btn

@@ -17,7 +17,7 @@ from opentrons.calibration_storage.ot3.pipette_offset import (
 )
 from opentrons.calibration_storage import (
     types as cal_top_types,
-    ot3_gripper_offset,
+    gripper_offset,
 )
 from opentrons.hardware_control.types import OT3Mount
 
@@ -122,7 +122,7 @@ def load_gripper_calibration_offset(
         status=cal_top_types.CalibrationStatus(),
     )
     if gripper_id and ff.enable_ot3_hardware_controller():
-        grip_offset_data = ot3_gripper_offset.get_gripper_calibration_offset(gripper_id)
+        grip_offset_data = gripper_offset.get_gripper_calibration_offset(gripper_id)
         if grip_offset_data:
             return GripperCalibrationOffset(
                 offset=grip_offset_data.offset,
@@ -141,7 +141,7 @@ def save_gripper_calibration_offset(
     gripper_id: typing.Optional[str], delta: Point
 ) -> None:
     if gripper_id and ff.enable_ot3_hardware_controller():
-        ot3_gripper_offset.save_gripper_calibration(delta, gripper_id)
+        gripper_offset.save_gripper_calibration(delta, gripper_id)
 
 
 def check_instrument_offset_reasonability(

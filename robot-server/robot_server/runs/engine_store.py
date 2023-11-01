@@ -14,6 +14,7 @@ from opentrons.hardware_control.types import (
     HardwareEventHandler,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
     AnyRunner,
     JsonRunner,
@@ -159,6 +160,11 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             a new set may not be created.
         """
+        if protocol is not None:
+            load_fixed_trash = should_load_fixed_trash(protocol.source.config)
+        else:
+            load_fixed_trash = False
+
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -168,6 +174,7 @@ class EngineStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            load_fixed_trash=load_fixed_trash,
         )
         runner = create_protocol_runner(
             protocol_engine=engine,

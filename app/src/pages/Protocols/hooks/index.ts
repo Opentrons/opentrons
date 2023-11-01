@@ -9,7 +9,6 @@ import {
 import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
-import { useFeatureFlag } from '../../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
@@ -70,9 +69,6 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   const { data: deckConfig } = useDeckConfigurationQuery()
-  const enableDeckConfigurationFeatureFlag = useFeatureFlag(
-    'enableDeckConfiguration'
-  )
 
   if (analysis == null || analysis?.status !== 'completed') {
     return { requiredProtocolHardware: [], isLoading: true }
@@ -168,15 +164,13 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   ]
 
   return {
-    requiredProtocolHardware: enableDeckConfigurationFeatureFlag
-      ? [
-          ...requiredPipettes,
-          ...requiredModules,
-          ...requiredGripper,
-          // ...requiredFixture,
-          ...STUBBED_FIXTURES,
-        ]
-      : [...requiredPipettes, ...requiredModules, ...requiredGripper],
+    requiredProtocolHardware: [
+      ...requiredPipettes,
+      ...requiredModules,
+      ...requiredGripper,
+      // ...requiredFixture,
+      ...STUBBED_FIXTURES,
+    ],
     isLoading: isLoadingInstruments || isLoadingModules,
   }
 }

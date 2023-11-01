@@ -25,7 +25,7 @@ import type { ThermocyclerModule } from '../../redux/modules/types'
 import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+} from '@opentrons/shared-data'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
