@@ -109,7 +109,6 @@ class Cutout(TypedDict):
     id: str
     position: List[float]
     displayName: str
-    compatibleFixtureTypes: List[str]
 
 
 class CutoutFixture(TypedDict):
@@ -134,6 +133,7 @@ class LocationsV4(TypedDict):
     addressableAreas: List[AddressableArea]
     calibrationPoints: List[CalibrationPoint]
     cutouts: List[Cutout]
+    legacyFixtures: List[Fixture]
 
 
 class NamedOffset(TypedDict):

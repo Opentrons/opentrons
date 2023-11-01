@@ -110,7 +110,12 @@
     },
     "locations": {
       "type": "object",
-      "required": ["addressableAreas", "calibrationPoints", "cutouts"],
+      "required": [
+        "addressableAreas",
+        "calibrationPoints",
+        "cutouts",
+        "legacyFixtures"
+      ],
       "properties": {
         "addressableAreas": {
           "type": "array",
@@ -201,12 +206,7 @@
           "description": "The machined cutout slots on the deck surface.",
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "position",
-              "displayName",
-              "compatibleFixtureTypes"
-            ],
+            "required": ["id", "position", "displayName"],
             "properties": {
               "id": {
                 "description": "Unique identifier for the cutout",
@@ -219,13 +219,32 @@
               "displayName": {
                 "description": "An optional human-readable nickname for this cutout e.g. \"Cutout A1\"",
                 "type": "string"
+              }
+            }
+          }
+        },
+        "legacyFixtures": {
+          "type": "array",
+          "description": "Fixed position objects on the deck.",
+          "items": {
+            "type": "object",
+            "required": ["id", "displayName"],
+            "properties": {
+              "id": {
+                "description": "Unique identifier for fixed object",
+                "type": "string"
               },
-              "compatibleFixtureTypes": {
-                "description": "A list of cutout fixture types that can be loaded onto this cutout.",
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
+              "labware": {
+                "description": "Valid labware loadName for fixed object",
+                "type": "string"
+              },
+              "slot": {
+                "description": "Slot location of the fixed object",
+                "type": "string"
+              },
+              "displayName": {
+                "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
+                "type": "string"
               }
             }
           }

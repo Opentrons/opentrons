@@ -64,6 +64,8 @@ from opentrons.protocols.types import (
 )
 from opentrons.protocols.api_support.deck_type import (
     for_simulation as deck_type_for_simulation,
+    should_load_fixed_trash,
+    should_load_fixed_trash_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -792,6 +794,7 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(robot_type),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            load_fixed_trash=should_load_fixed_trash_for_python_protocol(api_version),
         )
     )
 
@@ -886,6 +889,7 @@ def _run_file_pe(
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(robot_type),
+            load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(

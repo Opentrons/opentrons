@@ -1,6 +1,17 @@
+from typing import Sequence, Dict, Optional, Any
+
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 from opentrons.config import feature_flags
+
+from opentrons.protocol_reader.protocol_source import (
+    ProtocolConfig,
+    PythonProtocolConfig,
+    JsonProtocolConfig,
+)
+from opentrons.protocols.api_support.types import APIVersion
 
 
 # TODO(mm, 2023-05-10): Deduplicate these constants with
@@ -8,6 +19,48 @@ from opentrons.config import feature_flags
 SHORT_TRASH_DECK = "ot2_short_trash"
 STANDARD_OT2_DECK = "ot2_standard"
 STANDARD_OT3_DECK = "ot3_standard"
+
+
+LOAD_FIXED_TRASH_GATE_VERSION_PYTHON = APIVersion(2, 15)
+LOAD_FIXED_TRASH_GATE_VERSION_JSON = 7
+
+
+class NoTrashDefinedError(EnumeratedError):
+    """
+    Error raised when a protocol attempts to automatically access a trash bin without one being loaded.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ProtocolEngineError."""
+        super().__init__(
+            code=ErrorCodes.GENERAL_ERROR,
+            message=message,
+            detail=detail,
+            wrapping=wrapping,
+        )
+
+
+def should_load_fixed_trash_for_python_protocol(api_version: APIVersion) -> bool:
+    return api_version <= LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
+
+
+def should_load_fixed_trash(protocol_config: ProtocolConfig) -> bool:
+    """Decide whether to automatically load fixed trash on the deck based on version."""
+    load_fixed_trash = False
+    if isinstance(protocol_config, PythonProtocolConfig):
+        return should_load_fixed_trash_for_python_protocol(protocol_config.api_version)
+    # TODO(jbl 2023-10-27), when schema v8 is out, use a new deck version field to support fixed trash protocols
+    elif isinstance(protocol_config, JsonProtocolConfig):
+        load_fixed_trash = (
+            protocol_config.schema_version <= LOAD_FIXED_TRASH_GATE_VERSION_JSON
+        )
+
+    return load_fixed_trash
 
 
 def guess_from_global_config() -> str:

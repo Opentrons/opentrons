@@ -9,7 +9,7 @@ import type {
   TemperatureModuleAwaitTemperatureParams,
   TemperatureParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+} from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotStateAndWarnings,

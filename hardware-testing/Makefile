@@ -129,6 +129,7 @@ test-gravimetric-96:
 .PHONY: test-gravimetric
 test-gravimetric:
 	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
 	$(MAKE) test-gravimetric-96

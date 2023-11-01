@@ -30,7 +30,11 @@ def _run(is_simulating: bool) -> None:
         scale=Scale.build(simulate=is_simulating),
         simulate=is_simulating,
     )
+    print(f"Scale: {_rec.max_capacity}g (SN:{_rec.serial_number})")
     if CALIBRATE_SCALE:
+        input("Press ENTER to ZERO the scale:")
+        _rec.zero_scale()
+        input("Press ENTER to CALIBRATE the scale:")
         _rec.calibrate_scale()
     while True:
         input("Press ENTER to Record:")

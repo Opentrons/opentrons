@@ -3,8 +3,7 @@ import {
   getPickUpTipCommandsWithPipette,
   getTipracksVisited,
 } from '../../Devices/ProtocolRun/utils'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
-import type { LoadedLabware } from '@opentrons/shared-data'
+import type { LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
 
 export const doesPipetteVisitAllTipracks = (
   pipetteId: string,
