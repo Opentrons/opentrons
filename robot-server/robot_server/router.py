@@ -78,7 +78,7 @@ router.include_router(
 
 router.include_router(
     router=instruments_router,
-    tags=["Attached instruments"],
+    tags=["Attached Instruments"],
     dependencies=[Depends(check_version_header)],
 )
 
