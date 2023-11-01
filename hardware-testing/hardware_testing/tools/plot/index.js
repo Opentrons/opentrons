@@ -1,16 +1,16 @@
 // NOTE: removed "gravimetric-" from string so buttons can be smaller
 const testNames = [
-  'rnd',
-  'daily-setup',
-  'ot3-p50-multi',
-  'ot3-p50-multi-50ul-tip-increment',
-  'ot3-p50-single',
-  'ot3-p1000-96',
-  'ot3-p1000-multi',
-  'ot3-p1000-multi-50ul-tip-increment',
-  'ot3-p1000-multi-200ul-tip-increment',
-  'ot3-p1000-multi-1000ul-tip-increment',
-  'ot3-p1000-single',
+  "rnd",
+  "daily-setup",
+  "ot3-p50-multi",
+  "ot3-p50-multi-50ul-tip-increment",
+  "ot3-p50-single",
+  "ot3-p1000-96",
+  "ot3-p1000-multi",
+  "ot3-p1000-multi-50ul-tip-increment",
+  "ot3-p1000-multi-200ul-tip-increment",
+  "ot3-p1000-multi-1000ul-tip-increment",
+  "ot3-p1000-single"
 ]
 function getEmptyGravData() {
   return [
@@ -129,20 +129,21 @@ window.addEventListener('load', function (evt) {
   }
   const name_input_div = document.getElementById('testname')
   const button_input_div = document.getElementById('buttoncontainer')
-  let allButtons = []
+  const allButtons = []
   for (let i = 0; i < testNames.length; i++) {
-    let btn = document.createElement('input')
-    btn.type = 'button'
+    const btn = document.createElement("input")
+    btn.type = "button"
     btn.value = testNames[i]
-    btn.onclick = function () {
-      name_input_div.value = 'gravimetric-' + btn.value
-      _setTestNameOfServer(null)
+    btn.onclick = function(){
+        name_input_div.value = "gravimetric-" + btn.value
+        _setTestNameOfServer(null)
     }
-    btn.style.backgroundColor = 'grey'
-    btn.style.marginRight = '5px'
+    btn.style.backgroundColor = "grey"
+    btn.style.marginRight = "5px"
     button_input_div.appendChild(btn)
     allButtons.push(btn)
   }
+
 
   const plotlyDivName = 'plotly'
 
@@ -179,21 +180,21 @@ window.addEventListener('load', function (evt) {
     _clearTimeout()
     const responseData = JSON.parse(this.responseText)
     name_input_div.value = responseData.name
-    let btn_val
-    for (let i = 0; i < allButtons.length; i++) {
-      btn_val = 'gravimetric-' + allButtons[i].value
+    let btn_val;
+    for (let i=0;i<allButtons.length;i++) {
+      btn_val = "gravimetric-" + allButtons[i].value
       if (btn_val === responseData.name) {
-        allButtons[i].style.backgroundColor = 'yellow'
+        allButtons[i].style.backgroundColor = "yellow"
       } else {
-        allButtons[i].style.backgroundColor = '#bbb'
+        allButtons[i].style.backgroundColor = "#bbb"
       }
     }
     _getLatestDataFromServer()
   }
 
   function _onServerError(evt) {
-    document.body.style.backgroundColor = 'red'
-    document.body.innerHTML = '<h1>Lost Connection (refresh)</h1>'
+    document.body.style.backgroundColor = "red"
+    document.body.innerHTML = "<h1>Lost Connection (refresh)</h1>"
     location.reload()
   }
 
