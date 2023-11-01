@@ -102,7 +102,6 @@ def _test_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> None:
             OT3Mount.LEFT, Point(x=MOVE_X_MM, y=MOVE_Y_MM), speed=GANTRY_MAX_SPEED
         )
     _check_unstable_count(tag)
-
     hw.set_status_bar_state(COLOR_STATES["idle"])
 
     # WALKING
@@ -121,6 +120,7 @@ def _test_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> None:
             if not hw.is_simulator:
                 sleep(5)
     _check_unstable_count(tag)
+    hw.set_status_bar_state(COLOR_STATES["idle"])
 
 
 def _wait_for_stability(
@@ -155,7 +155,7 @@ def _wait_for_stability(
 
 
 def _run(
-    hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability: bool
+    hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability: bool, skip_accuracy: bool
 ) -> None:
     ui.print_title("GRAVIMETRIC DAILY SETUP")
     ui.print_info(f"Scale: {recorder.max_capacity}g (SN:{recorder.serial_number})")
@@ -185,18 +185,24 @@ def _run(
     _record()
     hw_api.set_status_bar_state(COLOR_STATES["interact"])
     if not hw_api.is_simulator:
-        ui.get_user_ready("INSTALL Radwag's default weighing pan")
-        ui.get_user_ready("REMOVE all weights, vials, and labware from scale")
+        if not skip_accuracy:
+            ui.get_user_ready("INSTALL Radwag's default weighing pan")
+        if not skip_accuracy or recorder.max_capacity > 200:
+            ui.get_user_ready("REMOVE all weights, vials, and labware from scale")
         ui.get_user_ready("CLOSE door and step away from fixture")
     hw_api.set_status_bar_state(COLOR_STATES["idle"])
 
     ui.print_header("TEST STABILITY")
     if not skip_stability:
+        print("homing...")
         hw_api.home()
         _wait_for_stability(recorder, hw_api, tag="stability")
         _test_stability(recorder, hw_api)
     else:
         ui.print_info("skipping")
+
+    if skip_accuracy:
+        return
 
     ui.print_header("ZERO SCALE")
     if not hw_api.is_simulator:
@@ -243,6 +249,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--skip-stability", action="store_true")
+    parser.add_argument("--skip-accuracy", action="store_true")
     args = parser.parse_args()
     _ctx = helpers.get_api_context(
         API_LEVEL,  # type: ignore[attr-defined]
@@ -263,15 +270,17 @@ if __name__ == "__main__":
         simulate=_hw.is_simulator,
     )
     try:
-        _run(_hw, _rec, args.skip_stability)
+        _run(_hw, _rec, args.skip_stability, args.skip_accuracy)
         _hw.set_status_bar_state(COLOR_STATES["pass"])
         ui.print_header("Result: PASS")
+        if not args.simulate:
+            ui.get_user_ready("test done")
     except Exception as e:
         _hw.set_status_bar_state(COLOR_STATES["fail"])
         ui.print_header("Result: FAIL")
-        raise e
-    finally:
         if not args.simulate:
             ui.get_user_ready("test done")
+        raise e
+    finally:
         _rec.stop()
         _hw.set_status_bar_state(COLOR_STATES["idle"])
