@@ -1,5 +1,10 @@
 import mapValues from 'lodash/mapValues'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  FLEX_STANDARD_DECKID,
+  OT2_STANDARD_DECKID,
+  OT2_STANDARD_MODEL,
+} from '@opentrons/shared-data'
 import { getOnlyLatestDefs } from '../../labware-defs'
 import { uuid } from '../../utils'
 import {
@@ -7,24 +12,38 @@ import {
   INITIAL_DECK_SETUP_STEP_ID,
   OT_2_TRASH_DEF_URI,
 } from '../../constants'
+import type { ProtocolFileV7 } from '@opentrons/shared-data'
 import type {
+  CommandAnnotationV1Mixin,
+  CommandV8Mixin,
+  LabwareV2Mixin,
+  LiquidV1Mixin,
   LoadLabwareCreateCommand,
+  OT2RobotMixin,
+  OT3RobotMixin,
+  ProtocolBase,
   ProtocolFile,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/protocol/types/schemaV8'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
-// NOTE: this migration updates fixed trash by treating it as an entity
-// additionally, drop tip location is now selectable
+// NOTE: this migration is to schema v8 and updates fixed trash by
+// treating it as an entity. Additionally, drop tip location is now selectable
 const PD_VERSION = '8.0.0'
-
+const SCHEMA_VERSION = 8
 interface LabwareLocationUpdate {
   [id: string]: string
 }
 
 export const migrateFile = (
-  appData: ProtocolFile<DesignerApplicationData>
+  appData: ProtocolFileV7<DesignerApplicationData>
 ): ProtocolFile => {
-  const { designerApplication, robot, commands, labwareDefinitions } = appData
+  const {
+    designerApplication,
+    commands,
+    robot,
+    labwareDefinitions,
+    liquids,
+  } = appData
   const labwareLocationUpdate: LabwareLocationUpdate =
     designerApplication?.data?.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       .labwareLocationUpdate
@@ -136,13 +155,33 @@ export const migrateFile = (
     command => command.commandType !== 'loadLabware'
   )
 
-  return {
-    ...appData,
+  const flexDeckSpec: OT3RobotMixin = {
+    robot: {
+      model: FLEX_ROBOT_TYPE,
+      deckId: FLEX_STANDARD_DECKID,
+    },
+  }
+  const ot2DeckSpec: OT2RobotMixin = {
+    robot: {
+      model: OT2_STANDARD_MODEL,
+      deckId: OT2_STANDARD_DECKID,
+    },
+  }
+  const deckStructure =
+    robotType === FLEX_ROBOT_TYPE ? flexDeckSpec : ot2DeckSpec
+
+  const protocolBase: ProtocolBase<any> = {
+    $otSharedSchema: '#/protocol/schemas/8',
+    schemaVersion: SCHEMA_VERSION,
+    metadata: {
+      ...appData.metadata,
+    },
     designerApplication: {
       ...appData.designerApplication,
       version: PD_VERSION,
       data: {
         ...appData.designerApplication?.data,
+
         savedStepForms: {
           [INITIAL_DECK_SETUP_STEP_ID]: {
             ...appData.designerApplication?.data?.savedStepForms[
@@ -156,14 +195,41 @@ export const migrateFile = (
         },
       },
     },
+  }
+
+  const labwareV2Mixin: LabwareV2Mixin = {
+    labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
     labwareDefinitions: {
       ...{ [trashDefUri]: trashDefinition },
       ...appData.labwareDefinitions,
     },
+  }
+
+  const liquidV1Mixin: LiquidV1Mixin = {
+    liquidSchemaId: 'opentronsLiquidSchemaV1',
+    liquids,
+  }
+
+  const commandv8Mixin: CommandV8Mixin = {
+    commandSchemaId: 'opentronsCommandSchemaV8',
     commands: [
       ...migratedCommandsV8,
       ...loadLabwareCommands,
       ...trashLoadCommand,
     ],
+  }
+
+  const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {
+    commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV1',
+    commandAnnotations: [],
+  }
+
+  return {
+    ...protocolBase,
+    ...deckStructure,
+    ...labwareV2Mixin,
+    ...liquidV1Mixin,
+    ...commandv8Mixin,
+    ...commandAnnotionaV1Mixin,
   }
 }

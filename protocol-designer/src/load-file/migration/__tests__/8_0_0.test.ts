@@ -2,11 +2,11 @@ import { migrateFile } from '../8_0_0'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import _oldDoItAllProtocol from '../../../../fixtures/protocol/7/doItAllV7.json'
 import { getOnlyLatestDefs, LabwareDefByDefURI } from '../../../labware-defs'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolFileV7 } from '@opentrons/shared-data'
 
 jest.mock('../../../labware-defs')
 
-const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFile<any>
+const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV7<any>
 
 const mockGetOnlyLatestDefs = getOnlyLatestDefs as jest.MockedFunction<
   typeof getOnlyLatestDefs
