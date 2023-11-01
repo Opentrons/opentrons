@@ -263,7 +263,7 @@ function installListeners(
     s.close()
     setTimeout(() => {
       s.open()
-    }, 1000)
+    }, 3000)
   }
   s.on('timeout', onTimeout)
 
