@@ -4,6 +4,7 @@ import { map, switchMap, catchError } from 'rxjs/operators'
 import mapValues from 'lodash/mapValues'
 import toString from 'lodash/toString'
 import omitBy from 'lodash/omitBy'
+import inRange from 'lodash/inRange'
 
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
@@ -53,11 +54,6 @@ export function fetchRobotApi(
     options.body = reqForm
   }
 
-  const isFirstDigitTwo = function (statusCode: number): boolean {
-    const len = Math.floor(Math.log(statusCode) / Math.LN10)
-    return ((statusCode / Math.pow(10, len)) % 10 | 0) === 2
-  }
-
   return host.ip === OPENTRONS_USB
     ? from(
         appShellRequestor({
@@ -73,7 +69,7 @@ export function fetchRobotApi(
           body: response?.data,
           status: response?.status,
           // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
-          ok: isFirstDigitTwo(response?.status),
+          ok: inRange(response?.status, 200, 300),
         }))
       )
     : from(fetch(url, options)).pipe(
