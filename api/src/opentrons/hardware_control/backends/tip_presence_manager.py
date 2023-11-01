@@ -1,7 +1,7 @@
 import logging
 from functools import partial
 from typing import cast, Callable, Optional, List, Set
-from typing_extensions import TypedDict, Literal, Final
+from typing_extensions import TypedDict, Literal
 
 from opentrons.hardware_control.types import TipStateType, OT3Mount
 
@@ -27,6 +27,11 @@ class TipDetectorByMount(TypedDict):
     right: Optional[TipDetector]
 
 
+class UnsubMethodByMount(TypedDict):
+    left: Optional[Callable[[], None]]
+    right: Optional[Callable[[], None]]
+
+
 class TipUpdateByMount(TypedDict):
     left: Optional[bool]
     right: Optional[bool]
@@ -44,6 +49,7 @@ class TipPresenceManager:
 
     _listeners: Set[TipListener]
     _detectors: TipDetectorByMount
+    _unsub_methods: UnsubMethodByMount
     _last_state: TipUpdateByMount
 
     def __init__(
@@ -54,6 +60,7 @@ class TipPresenceManager:
         self._messenger = can_messenger
         self._listeners = listeners
         self._detectors = TipDetectorByMount(left=None, right=None)
+        self._unsub_methods = UnsubMethodByMount(left=None, right=None)
         self._last_state = TipUpdateByMount(left=None, right=None)
 
     @staticmethod
@@ -61,17 +68,31 @@ class TipPresenceManager:
         assert mount != OT3Mount.GRIPPER
         return cast(PipetteMountKeys, mount.name.lower())
 
-    async def build_detector(self, mount: OT3Mount, sensor_count: int) -> None:
-        # clear detector if pipette does not exist
-        if sensor_count <= 0:
+    async def clear_detector(self, mount: OT3Mount) -> None:
+        """Clean up and remove tip detector."""
+
+        def _unsubscribe() -> None:
+            """Unsubscribe from detector."""
+            unsub = self._unsub_methods[self._get_key(mount)]
+            if unsub:
+                unsub()
+                self.set_unsub(mount, None)
+
+        detector = self.get_detector(mount)
+        if detector:
+            _unsubscribe()
+            detector.cleanup()
             self.set_detector(mount, None)
-        else:
-            # set up and subscribe to the detector
-            d = TipDetector(self._messenger, _mount_to_node(mount), sensor_count)
-            # listens to the detector so we can immediately notify listeners
-            # the most up-to-date tip state
-            d.add_subscriber(partial(self._handle_tip_update, mount))
-            self.set_detector(mount, d)
+
+    async def build_detector(self, mount: OT3Mount, sensor_count: int) -> None:
+        assert self.get_detector(mount) is None
+        # set up and subscribe to the detector
+        d = TipDetector(self._messenger, _mount_to_node(mount), sensor_count)
+        # listens to the detector so we can immediately notify listeners
+        # the most up-to-date tip state
+        unsub = d.add_subscriber(partial(self._handle_tip_update, mount))
+        self.set_unsub(mount, unsub)
+        self.set_detector(mount, d)
 
     def _handle_tip_update(
         self, mount: OT3Mount, update: tip_types.TipNotification
@@ -112,6 +133,9 @@ class TipPresenceManager:
 
     def set_detector(self, mount: OT3Mount, detector: Optional[TipDetector]) -> None:
         self._detectors[self._get_key(mount)] = detector
+
+    def set_unsub(self, mount: OT3Mount, unsub: Optional[Callable[[], None]]) -> None:
+        self._unsub_methods[self._get_key(mount)] = unsub
 
     def add_listener(self, listener: TipListener) -> Callable[[], None]:
         self._listeners.add(listener)

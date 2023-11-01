@@ -721,9 +721,13 @@ class OT3API(
         for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
             # rebuild tip detector using the attached instrument
             self._log.info(f"resetting tip detector for mount {mount}")
-            await self._backend.update_tip_detector(
-                mount, self._pipette_handler.get_tip_sensor_count(mount)
-            )
+            if self._pipette_handler.has_pipette(mount):
+                await self._backend.update_tip_detector(
+                    mount, self._pipette_handler.get_tip_sensor_count(mount)
+                )
+            else:
+                await self._backend.teardown_tip_detector(mount)
+
             if refresh_state and self._pipette_handler.has_pipette(mount):
                 await self.get_tip_presence_status(mount)
 

@@ -1311,7 +1311,11 @@ class OT3Controller:
 
     async def update_tip_detector(self, mount: OT3Mount, sensor_count: int) -> None:
         """Build indiviudal tip detector for a mount."""
+        await self.teardown_tip_detector(mount)
         await self._tip_presence_manager.build_detector(mount, sensor_count)
+
+    async def teardown_tip_detector(self, mount: OT3Mount) -> None:
+        await self._tip_presence_manager.clear_detector(mount)
 
     async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
         return await self.tip_presence_manager.get_tip_status(mount)

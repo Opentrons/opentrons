@@ -745,3 +745,6 @@ class OT3Simulator:
 
     async def update_tip_detector(self, mount: OT3Mount, sensor_count: int) -> None:
         pass
+
+    async def teardown_tip_detector(self, mount: OT3Mount) -> None:
+        pass
