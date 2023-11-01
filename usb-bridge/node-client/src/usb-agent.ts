@@ -196,7 +196,7 @@ class SerialPortHttpAgent extends http.Agent {
 
     const socket = new SerialPortSocket({
       path: this.options.path,
-      baudRate: 115200,
+      baudRate: 1152000,
     })
     if (!socket.isOpen && !socket.opening) {
       socket.open(error => {
