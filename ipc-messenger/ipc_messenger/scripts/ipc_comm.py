@@ -6,7 +6,7 @@ import asyncio
 
 from typing import Dict, Any
 
-from ipc_messenger.dispatcher import ipc_dispatcher, JSONRPCDispatcher
+from ipc_messenger import ipc_dispatcher
 from ipc_messenger import IPCMessenger
 from ipc_messenger.constants import (
     IPCProcess,
@@ -37,7 +37,7 @@ class OT3API:
         self._online_process: IPCProcess = dict()
         self._value = 47
 
-    @ipc_dispatcher.add_method(context_arg='self')
+    @ipc_dispatcher.add_method(context='self')
     async def home(self):
         print("Homing Gantry")
         return await self._controller.home()
@@ -51,20 +51,20 @@ class OT3API:
         return "NOTHING"
 
 
-    @ipc_dispatcher.add_method(context_arg='self')
+    @ipc_dispatcher.add_method(context='self')
     async def context(self, this):
         print(f"inside context! {self._value}")
 
-    @ipc_dispatcher.add_method(context_arg='self')
+    @ipc_dispatcher.add_method(context='self')
     async def context_return(self, this) -> bool:
         return True
 
-    @ipc_dispatcher.add_method(context_arg='self')
+    @ipc_dispatcher.add_method(context='self')
     def get_instruments(self) -> Dict[OT3Mount, Any]:
         return {OT3Mount.X: {"name": "p50"},
                 OT3Mount.Y: None}
 
-    @ipc_dispatcher.add_method(context_arg='self')
+    @ipc_dispatcher.add_method(context='self')
     async def args_kwargs(self, this: bool, that: str ='that') -> Dict[str, Any]:
         return {"args": this,
                 "kwargs": that}
@@ -78,7 +78,7 @@ class DummyServer:
         self._ipc_messenger = IPCMessenger(IPCProcess.SYSTEM_SERVER, host, port, ipc_dispatcher)
         self._ipc_messenger.add_context('self', self)
 
-    @ipc_dispatcher.add_method(context_arg='self')
+    @ipc_dispatcher.add_method(context='self')
     def get_something(self):
         pass
 
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         def __init__(self):
             self._inner = 47
 
-        @ipc_dispatcher.add_method(context_arg='self')
+        @ipc_dispatcher.add_method(context='self')
         async def test(self, something, that=None):
             print(something, that, self._inner)
 
@@ -140,4 +140,4 @@ if __name__ == '__main__':
     kwargs={"that": "that"}
 
 
-    asyncio.run(method(*args, **kwargs))
+    #asyncio.run(method(*args, **kwargs))

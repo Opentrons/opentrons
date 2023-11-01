@@ -114,7 +114,7 @@ class JSONRPCResponseManager:
 
             # attempt get the method from the dispatcher
             try:
-                method = self._dispatcher[request.method]
+                method = self._dispatcher.methods[request.method]
             except KeyError:
                 yield _make_response(request, error=JSONRPCMethodNotFound()._data)
                 return
@@ -127,18 +127,19 @@ class JSONRPCResponseManager:
                 args = tuple(pos_args)
 
             # add context object if available
-            context_arg = self._dispatcher.context_arg_for_method.get(request.method)
+            context_arg = self._dispatcher.context.get(method.name)
             context_obj = self._context.get(context_arg)
             if context_arg and context_obj:
                 # add context to the args
                 args = (context_obj, *args)
 
-            # execute the command and get the response
+           # execute the command and get the response
             try:
-                if asyncio.iscoroutinefunction(method):
-                    result = await method(*args, **kwargs)
+                function = method.method
+                if asyncio.iscoroutinefunction(function):
+                    result = await function(*args, **kwargs)
                 else:
-                    result = method(*args, **kwargs)
+                    result = function(*args, **kwargs)
                 yield _make_response(request, result=result)
             except JSONRPCDispatchException as e:
                 yield _make_response(request, error=e.error._data)

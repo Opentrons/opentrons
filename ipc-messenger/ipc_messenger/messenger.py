@@ -19,7 +19,7 @@ from .constants import (
 )
 
 log = logging.getLogger(__name__)
-init_logging("INFO")
+init_logging("DEBUG")
 
 
 class IPCMessenger:
