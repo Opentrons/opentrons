@@ -58,9 +58,11 @@ def _mock_instrument_support_module(
 def mock_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock implementation core."""
     mock_core = decoy.mock(cls=ProtocolCore)
-    decoy.when(mock_core.fixed_trash.get_name()).then_return("cool trash")
-    decoy.when(mock_core.fixed_trash.get_display_name()).then_return("Cool Trash")
-    decoy.when(mock_core.fixed_trash.get_well_columns()).then_return([])
+    mock_fixed_trash = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_core.fixed_trash).then_return(mock_fixed_trash)
+    decoy.when(mock_fixed_trash.get_name()).then_return("cool trash")
+    decoy.when(mock_fixed_trash.get_display_name()).then_return("Cool Trash")
+    decoy.when(mock_fixed_trash.get_well_columns()).then_return([])
     return mock_core
 
 
@@ -107,6 +109,7 @@ def test_fixed_trash(
     """It should get the fixed trash labware from the core."""
     trash_captor = matchers.Captor()
 
+    assert mock_core.fixed_trash is not None
     decoy.verify(mock_core_map.add(mock_core.fixed_trash, trash_captor), times=1)
 
     trash = trash_captor.value

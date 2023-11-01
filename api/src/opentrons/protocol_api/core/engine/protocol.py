@@ -4,7 +4,7 @@ from typing import Dict, Optional, Type, Union, List, Tuple
 from opentrons.protocol_api import _waste_chute_dimensions
 
 from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -102,17 +102,20 @@ class ProtocolCore(
         return self._engine_client.state.config.robot_type
 
     @property
-    def fixed_trash(self) -> LabwareCore:
+    def fixed_trash(self) -> Optional[LabwareCore]:
         """Get the fixed trash labware."""
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        return self._labware_cores_by_id[trash_id]
+        if trash_id is not None:
+            return self._labware_cores_by_id[trash_id]
+        return None
 
     def _load_fixed_trash(self) -> None:
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        self._labware_cores_by_id[trash_id] = LabwareCore(
-            labware_id=trash_id,
-            engine_client=self._engine_client,
-        )
+        if trash_id is not None:
+            self._labware_cores_by_id[trash_id] = LabwareCore(
+                labware_id=trash_id,
+                engine_client=self._engine_client,
+            )
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
@@ -532,11 +535,12 @@ class ProtocolCore(
         self._last_location = location
         self._last_mount = mount
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
 
     def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+        """Get the slot definition from the robot's deck."""
         return self._engine_client.state.labware.get_slot_definition(slot)
 
     def _ensure_module_location(

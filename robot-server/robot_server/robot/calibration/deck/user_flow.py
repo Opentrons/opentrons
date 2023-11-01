@@ -16,9 +16,15 @@ from typing import (
 from opentrons.calibration_storage import (
     helpers,
     types as cal_types,
-    clear_pipette_offset_calibrations,
+)
+
+from opentrons.calibration_storage.ot2.tip_length import (
     load_tip_length_calibration,
 )
+from opentrons.calibration_storage.ot2.pipette_offset import (
+    clear_pipette_offset_calibrations,
+)
+
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import (
     HardwareControlAPI,

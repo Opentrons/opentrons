@@ -17,7 +17,7 @@ DeckSchemaVersion1 = Literal[1]
 
 DeckSchema = NewType("DeckSchema", Dict[str, Any])
 
-
+DeckSchemaId = Literal["opentronsDeckSchemaV3", "opentronsDeckSchemaV4"]
 RobotModel = Union[Literal["OT-2 Standard"], Literal["OT-3 Standard"]]
 
 
@@ -134,6 +134,7 @@ class LocationsV4(TypedDict):
     addressableAreas: List[AddressableArea]
     calibrationPoints: List[CalibrationPoint]
     cutouts: List[Cutout]
+    legacyFixtures: List[Fixture]
 
 
 class NamedOffset(TypedDict):

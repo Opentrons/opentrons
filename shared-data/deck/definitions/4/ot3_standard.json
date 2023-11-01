@@ -394,7 +394,15 @@
         ]
       }
     ],
-    "calibrationPoints": []
+    "calibrationPoints": [],
+    "legacyFixtures": [
+      {
+        "id": "fixedTrash",
+        "slot": "A3",
+        "labware": "opentrons_1_trash_3200ml_fixed",
+        "displayName": "Fixed Trash"
+      }
+    ]
   },
   "cutoutFixtures": [
     {

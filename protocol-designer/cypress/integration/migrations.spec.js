@@ -12,7 +12,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
   })
 
   const testCases = [
-    //  TODO(jr, 9/26/23): when 7.1 is more developed, lets go back and fix these
+    //  TODO(jr, 10/31/23): when 8.0 is more developed, lets go back and fix these
     //  {
     //   title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 7.0.x, schema 7',
     //   importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
@@ -62,13 +62,14 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     //   migrationModal: 'generic',
     //   unusedPipettes: false,
     // },
-    {
-      title: 'doItAllV7 Flex robot (schema 7, PD version 7.1.0)',
-      importFixture: '../../fixtures/protocol/7/doItAllV7.json',
-      expectedExportFixture: '../../fixtures/protocol/7/doItAllV7.json',
-      migrationModal: null,
-      unusedPipettes: false,
-    },
+    // {
+    //   title: 'doItAllV4MigratedToV7 ot-2 robot (schema 8, PD version 8.0.0)',
+    //   importFixture: '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
+    //   expectedExportFixture:
+    //     '../../fixtures/protocol/8/doItAllV4MigratedToV8.json',
+    //   migrationModal: 'generic',
+    //   unusedPipettes: false,
+    // },
   ]
 
   testCases.forEach(

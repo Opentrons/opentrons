@@ -16,6 +16,7 @@ from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control import transfers
 
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.util import (
@@ -84,7 +85,7 @@ class InstrumentContext(publisher.CommandPublisher):
         broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
-        trash: labware.Labware,
+        trash: Optional[labware.Labware],
         requested_as: str,
     ) -> None:
         super().__init__(broker)
@@ -99,7 +100,7 @@ class InstrumentContext(publisher.CommandPublisher):
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
-        self.trash_container = trash
+        self._trash = trash
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -1422,6 +1423,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         By default, the trash container is in slot A3 on Flex and in slot 12 on OT-2.
         """
+        if self._trash is None:
+            raise NoTrashDefinedError(
+                "No trash container has been defined in this protocol."
+            )
         return self._trash
 
     @trash_container.setter

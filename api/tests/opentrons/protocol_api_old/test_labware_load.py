@@ -11,16 +11,16 @@ labware_name = "corning_96_wellplate_360ul_flat"
 # TODO(mm, 2022-04-28): Make sure this logic is tested elsewhere, then delete this test.
 @pytest.mark.apiv2_non_pe_only
 def test_load_to_slot(
-    ctx: papi.ProtocolContext, deck_definition: DeckDefinitionV3
+    ctx: papi.ProtocolContext, legacy_deck_definition: DeckDefinitionV3
 ) -> None:
     slot_1 = [
         slot
-        for slot in deck_definition["locations"]["orderedSlots"]
+        for slot in legacy_deck_definition["locations"]["orderedSlots"]
         if slot["id"] == "1"
     ][0]
     slot_2 = [
         slot
-        for slot in deck_definition["locations"]["orderedSlots"]
+        for slot in legacy_deck_definition["locations"]["orderedSlots"]
         if slot["id"] == "2"
     ][0]
     labware = ctx.load_labware(labware_name, "1")

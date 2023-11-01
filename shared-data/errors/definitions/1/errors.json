@@ -205,6 +205,10 @@
     "4005": {
       "detail": "Command Parameter Limit Violated",
       "category": "generalError"
+    },
+    "4006": {
+      "detail": "Invalid Protocol Data",
+      "category": "generalError"
     }
   }
 }

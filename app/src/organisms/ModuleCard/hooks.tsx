@@ -19,15 +19,15 @@ import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
-  HeaterShakerOpenLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
+  HeaterShakerOpenLatchCreateCommand,
   MagneticModuleDisengageCreateCommand,
+  TCCloseLidCreateCommand,
   TCDeactivateBlockCreateCommand,
   TCDeactivateLidCreateCommand,
-  TemperatureModuleDeactivateCreateCommand,
   TCOpenLidCreateCommand,
-  TCCloseLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+  TemperatureModuleDeactivateCreateCommand,
+} from '@opentrons/shared-data'
 
 import type { AttachedModule } from '../../redux/modules/types'
 

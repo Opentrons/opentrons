@@ -43,7 +43,6 @@ import {
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
-import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -77,7 +76,6 @@ jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
-jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../../organisms/ToasterOven')
@@ -144,9 +142,6 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
   typeof useModuleCalibrationStatus
 >
@@ -310,9 +305,6 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(({
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -324,7 +316,7 @@ describe('ProtocolSetup', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByText('Prepare to run')
     getByText('Instruments')
-    getByText('Modules')
+    getByText('Modules & deck')
     getByText('Labware')
     getByText('Labware Position Check')
     getByText('Liquids')
@@ -358,7 +350,7 @@ describe('ProtocolSetup', () => {
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupModulesAndDeck')).toBeNull()
-    queryByText('Modules')?.click()
+    queryByText('Modules & deck')?.click()
     getByText('Mock ProtocolSetupModulesAndDeck')
   })
 
@@ -417,13 +409,5 @@ describe('ProtocolSetup', () => {
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run.'
     )
-  })
-
-  it('should render modules & deck when enableDeckConfiguration is on', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
-    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
-    getByText('Modules & deck')
   })
 })
