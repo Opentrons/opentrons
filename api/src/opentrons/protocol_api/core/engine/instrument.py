@@ -22,7 +22,6 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.types import (
     PRIMARY_NOZZLE_LITERAL,
-    ALLOWED_PRIMARY_NOZZLES,
     NozzleLayoutConfigurationType,
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
@@ -549,12 +548,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
     ) -> None:
-        if not primary_nozzle and style != NozzleLayout.EMPTY:
-            raise ValueError(
-                f"Cannot configure a nozzle layout of style {style} without a starting nozzle."
-            )
-        if primary_nozzle not in ALLOWED_PRIMARY_NOZZLES:
-            raise ValueError(f"Primary nozzle is not of {ALLOWED_PRIMARY_NOZZLES}")
+
         if style == NozzleLayout.COLUMN:
             configuration_model: NozzleLayoutConfigurationType = (
                 ColumnNozzleLayoutConfiguration(
@@ -566,10 +560,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
         elif style == NozzleLayout.QUADRANT:
-            if not front_right_nozzle:
-                raise ValueError(
-                    "Cannot configure a QUADRANT layout without a front right nozzle."
-                )
+            assert front_right_nozzle is not None
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 front_right_nozzle=front_right_nozzle,

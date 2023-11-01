@@ -1659,6 +1659,20 @@ class InstrumentContext(publisher.CommandPublisher):
             # Resets the pipette configuration to default
             instr.configure_nozzle_layout(style=RESET)
         """
+        if style != NozzleLayout.EMPTY:
+            if start is None:
+                raise ValueError(
+                    f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."
+                )
+            if start not in types.ALLOWED_PRIMARY_NOZZLES:
+                raise ValueError(
+                    f"Starting nozzle specified is not of {types.ALLOWED_PRIMARY_NOZZLES}"
+                )
+        if style == NozzleLayout.QUADRANT:
+            if front_right is None:
+                raise ValueError(
+                    "Cannot configure a QUADRANT layout without a front right nozzle."
+                )
         self._core.configure_nozzle_layout(
             style, primary_nozzle=start, front_right_nozzle=front_right
         )

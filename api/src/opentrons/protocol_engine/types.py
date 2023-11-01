@@ -657,7 +657,6 @@ class PostRunHardwareState(Enum):
 
 
 NOZZLE_NAME_REGEX = "[A-Z][0-100]"
-ALLOWED_PRIMARY_NOZZLES = ["A1", "H1", "A12", "H12"]
 PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 
