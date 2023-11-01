@@ -7,5 +7,6 @@ export interface CalibrateTipLengthParentProps {
   dispatchRequests: DispatchRequestsType
   showSpinner: boolean
   isJogging: boolean
+  allowChangeTipRack?: boolean
   offsetInvalidationHandler?: () => void
 }

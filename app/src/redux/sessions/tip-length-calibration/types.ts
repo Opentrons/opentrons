@@ -8,7 +8,7 @@ import {
   TIP_LENGTH_STEP_MEASURING_TIP_OFFSET,
   TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
 } from '../constants'
-import type { CalibrationLabware } from '../types'
+import type { CalibrationLabware, SessionCommandString } from '../types'
 
 import type { LabwareDefinition2, PipetteModel } from '@opentrons/shared-data'
 
@@ -40,4 +40,5 @@ export interface TipLengthCalibrationSessionDetails {
   instrument: TipLengthCalibrationInstrument
   currentStep: TipLengthCalibrationStep
   labware: CalibrationLabware[]
+  supportedCommands: SessionCommandString[]
 }
