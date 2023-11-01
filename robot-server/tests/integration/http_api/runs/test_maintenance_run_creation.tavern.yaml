@@ -69,7 +69,7 @@ stages:
       status_code: 201
       save:
         json:
-          run_id: data.id
+          protocol_run_id: data.id
 
   - *assert_can_create_maintenance_run
 
@@ -90,7 +90,7 @@ stages:
 
   - name: Issue a play action
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{protocol_run_id}/actions'
       json:
         data:
           actionType: play
@@ -98,11 +98,11 @@ stages:
     response:
       status_code: 201
 
-  - name: Wait for the normal run to complete
+  - name: Wait for the protocol run to complete
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{protocol_run_id}'
       method: GET
     response:
       status_code: 200
