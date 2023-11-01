@@ -49,10 +49,10 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v7_protocol_7_0": {
+    "export_v8_protocol_7_1": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "7.0 or higher",
+      "body2": "7.1 or higher",
       "body3": ". Please ensure your robot is updated to the correct version."
     },
     "change_magnet_module_model": {
