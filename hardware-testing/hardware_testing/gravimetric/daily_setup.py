@@ -1,4 +1,4 @@
-"""Setup."""
+"""Daily Setup."""
 import argparse
 from time import time, sleep
 
@@ -205,10 +205,11 @@ def _run(
     _zero()
 
     ui.print_header("CALIBRATE SCALE")
-    if not hw_api.is_simulator:
-        ui.get_user_ready("about to CALIBRATE the scale:")
-    _wait_for_stability(recorder, hw_api, tag="calibrate")
-    _calibrate()
+    if not hw_api.is_simulator and ui.get_user_answer("calibrate (ADJUST) this scale"):
+        if not hw_api.is_simulator:
+            ui.get_user_ready("about to CALIBRATE the scale:")
+        _wait_for_stability(recorder, hw_api, tag="calibrate")
+        _calibrate()
 
     ui.print_header("TEST ACCURACY")
     if hw_api.is_simulator:
