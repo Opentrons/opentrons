@@ -41,7 +41,7 @@ class EngineConflictError(RuntimeError):
     """
 
 
-class NoEngineError(RuntimeError):
+class NoRunnerEnginePairError(RuntimeError):
     """Raised if you try to get the current engine or runner while there is none."""
 
 
@@ -95,14 +95,14 @@ class EngineStore:
     def engine(self) -> ProtocolEngine:
         """Get the "current" persisted ProtocolEngine."""
         if self._runner_engine_pair is None:
-            raise NoEngineError()
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
         if self._runner_engine_pair is None:
-            raise NoEngineError()
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.runner
 
     @property

@@ -23,7 +23,7 @@ from robot_server.settings import get_settings
 from robot_server.deletion_planner import RunDeletionPlanner
 
 from .run_auto_deleter import RunAutoDeleter
-from .engine_store import EngineStore, NoEngineError
+from .engine_store import EngineStore, NoRunnerEnginePairError
 from .run_store import RunStore
 from .run_data_manager import RunDataManager
 from robot_server.errors.robot_errors import (
@@ -127,7 +127,7 @@ async def get_is_okay_to_create_maintenance_run(
     """Whether a maintenance run can be created if a protocol run already exists."""
     try:
         protocol_run_state = engine_store.engine.state_view
-    except NoEngineError:
+    except NoRunnerEnginePairError:
         return True
     return (
         not protocol_run_state.commands.has_been_played()
