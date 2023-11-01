@@ -8,13 +8,13 @@ import {
   useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
 } from '../../../redux/analytics'
-import { UploadInput } from '../UploadInput'
+import { ProtocolUploadInput } from '../ProtocolUploadInput'
 
 jest.mock('../../../redux/analytics')
 
 const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
 
-describe('UploadInput', () => {
+describe('ProtocolUploadInput', () => {
   let onUpload: jest.MockedFunction<() => {}>
   let trackEvent: jest.MockedFunction<any>
   let render: () => ReturnType<typeof renderWithProviders>[0]
@@ -26,7 +26,7 @@ describe('UploadInput', () => {
     render = () => {
       return renderWithProviders(
         <BrowserRouter>
-          <UploadInput onUpload={onUpload} />
+          <ProtocolUploadInput onUpload={onUpload} />
         </BrowserRouter>,
         {
           i18nInstance: i18n,
