@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  PrepareToAspirateRunTimeCommand,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
@@ -144,6 +147,24 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )[0]
     getByText('Configure P300 Single-Channel GEN1 to aspirate 1 µL')
+  })
+  it('renders correct text for prepareToAspirate', () => {
+    const command = {
+      commandType: 'prepareToAspirate',
+      params: {
+        pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+      },
+    } as PrepareToAspirateRunTimeCommand
+
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={command}
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Preparing P300 Single-Channel GEN1 to aspirate')
   })
   it('renders correct text for dropTip', () => {
     const command = mockRobotSideAnalysis.commands.find(

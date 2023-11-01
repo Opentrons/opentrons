@@ -165,6 +165,23 @@ export function CommandText(props: Props): JSX.Element | null {
         </StyledText>
       )
     }
+    case 'prepareToAspirate': {
+      const { pipetteId } = command.params
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('prepare_to_aspirate', {
+            pipette:
+              pipetteName != null
+                ? getPipetteNameSpecs(pipetteName)?.displayName
+                : '',
+          })}
+        </StyledText>
+      )
+    }
     case 'touchTip':
     case 'home':
     case 'savePosition':
