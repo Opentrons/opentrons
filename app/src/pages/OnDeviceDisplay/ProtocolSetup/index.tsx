@@ -596,7 +596,7 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
-              title={enableDeckConfig ? t('modules_and_deck') : t('modules')}
+              title={t('modules_and_deck')}
               detail={modulesDetail}
               subDetail={modulesSubDetail}
               status={modulesStatus}

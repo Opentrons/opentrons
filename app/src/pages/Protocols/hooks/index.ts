@@ -237,9 +237,6 @@ const useMissingProtocolHardwareFromRequiredProtocolHardare = (
 } => {
   const { data: deckConfig } = useDeckConfigurationQuery()
 
-  const enableDeckConfigurationFeatureFlag = useFeatureFlag(
-    'enableDeckConfiguration'
-  )
   // determine missing or conflicted hardware
   return {
     missingProtocolHardware: requiredProtocolHardware.filter(hardware => {
@@ -248,13 +245,10 @@ const useMissingProtocolHardwareFromRequiredProtocolHardare = (
         return !hardware.connected
       } else {
         // fixtures
-        return (
-          enableDeckConfigurationFeatureFlag &&
-          !deckConfig?.find(
-            fixture =>
-              hardware.location.cutout === fixture.fixtureLocation &&
-              hardware.fixtureName === fixture.loadName
-          )
+        return !deckConfig?.find(
+          fixture =>
+            hardware.location.cutout === fixture.fixtureLocation &&
+            hardware.fixtureName === fixture.loadName
         )
       }
     }),
@@ -262,8 +256,7 @@ const useMissingProtocolHardwareFromRequiredProtocolHardare = (
       .filter(
         (hardware): hardware is ProtocolModule | ProtocolFixture =>
           (hardware.hardwareType === 'module' ||
-            (enableDeckConfigurationFeatureFlag &&
-              hardware.hardwareType === 'fixture')) &&
+            hardware.hardwareType === 'fixture') &&
           hardware.hasSlotConflict
       )
       .map(
