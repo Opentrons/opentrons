@@ -196,7 +196,7 @@ class SerialPortHttpAgent extends http.Agent {
 
     const socket = new SerialPortSocket({
       path: this.options.path,
-      baudRate: 115200,
+      baudRate: 1152000,
     })
     if (!socket.isOpen && !socket.opening) {
       socket.open(error => {
@@ -239,9 +239,8 @@ function installListeners(
   }
   s.on('free', onFree)
 
-  function onError(): void {
-    agent.log('error', 'CLIENT socket onError')
-    // need to emit free to attach listeners to serialport
+  function onError(err: Error): void {
+    agent.log('error', `CLIENT socket onError: ${err?.message}`)
   }
   s.on('error', onError)
 
@@ -264,7 +263,7 @@ function installListeners(
     s.close()
     setTimeout(() => {
       s.open()
-    }, 1000)
+    }, 3000)
   }
   s.on('timeout', onTimeout)
 
