@@ -20,14 +20,10 @@ import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
+  getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 
-import {
-  useAttachedModules,
-  useLabwareRenderInfoForRunById,
-  useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
-} from '../../hooks'
+import { useAttachedModules } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import {
   getLabwareRenderInfo,
@@ -59,12 +55,6 @@ export function SetupLiquidsMap({
 }: SetupLiquidsMapProps): JSX.Element | null {
   const [hoverLabwareId, setHoverLabwareId] = React.useState<string>('')
 
-  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
-    robotName,
-    runId
-  )
-  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  const { robotType } = useProtocolDetailsForRun(runId)
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -74,6 +64,7 @@ export function SetupLiquidsMap({
   >(null)
 
   if (protocolAnalysis == null) return null
+  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis?.labware)
 
   const liquids = parseLiquidsInLoadOrder(
     protocolAnalysis.liquids != null ? protocolAnalysis.liquids : [],
@@ -173,7 +164,7 @@ export function SetupLiquidsMap({
         moduleLocations={moduleLocations}
       >
         {map(
-          moduleRenderInfoById,
+          protocolModulesInfo,
           ({
             x,
             y,
@@ -259,7 +250,7 @@ export function SetupLiquidsMap({
           }
         )}
         {map(
-          labwareRenderInfoById,
+          labwareRenderInfo,
           ({ x, y, labwareDef, displayName }, labwareId) => {
             const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
             //  only rendering the labware on top most layer so
