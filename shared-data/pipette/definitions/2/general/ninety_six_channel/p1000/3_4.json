@@ -4,7 +4,7 @@
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
-    "presses": 0.0,
+    "presses": 1.0,
     "speed": 5.5,
     "increment": 0.0,
     "distance": 19.0
