@@ -1,0 +1,115 @@
+test_name: Make sure you can create a maintenance run while there are no normal runs
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - &assert_no_runs
+    name: 'Setup check: Make sure there are no runs'
+    request:
+      url: '{ot2_server_base_url}/runs'
+    response:
+      json:
+        data: []
+        links: {}
+        meta:
+          cursor: 0
+          totalLength: 0
+
+  - &assert_no_maintenance_runs
+    name: 'Setup check: Make sure there are no maintenance runs'
+    request:
+      url: '{ot2_server_base_url}/maintenance_runs/current'
+    response:
+      status_code: 404
+
+  - &assert_can_create_maintenance_run
+    name: Make sure we can create a maintenance run
+    request:
+      url: '{ot2_server_base_url}/maintenance_runs'
+      method: POST
+    response:
+      status_code: 201
+
+---
+
+test_name: Make sure you can create a maintenance run while there is an unstarted protocol run
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - *assert_no_runs
+  - *assert_no_maintenance_runs
+
+  - &upload_protocol_and_save_id
+    name: Upload a protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: tests/integration/protocols/simple_v6.json
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - &create_protocol_run_and_save_id
+    name: Create a protocol run
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_run_id: data.id
+
+  - *assert_can_create_maintenance_run
+
+---
+
+test_name: Make sure you can create a maintenance run while there is a completed protocol run
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - *assert_no_runs
+  - *assert_no_maintenance_runs
+
+  - *upload_protocol_and_save_id
+  - *create_protocol_run_and_save_id
+
+  - name: Issue a play action
+    request:
+      url: '{ot2_server_base_url}/runs/{protocol_run_id}/actions'
+      json:
+        data:
+          actionType: play
+      method: POST
+    response:
+      status_code: 201
+
+  - name: Wait for the protocol run to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/runs/{protocol_run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - *assert_can_create_maintenance_run
