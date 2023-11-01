@@ -232,34 +232,9 @@
   color: var(--c-font-disabled);
 }
 
-.export_section {
-  margin: 2rem auto;
-
-  @media (--large) {
-    max-width: var(--size-75p);
-  }
-}
-
 .export_button {
   margin-top: 2rem;
   width: 100%;
-}
-
-.export_callout {
-  padding: 2rem;
-  text-align: center;
-  font-size: var(--fs-body-1);
-}
-
-.test_labware_heading {
-  font-size: var(--fs-body-2);
-}
-
-.test_guide_button {
-  @apply --link-btn-blue;
-
-  margin-top: 0;
-  padding: 1rem 4rem;
 }
 
 .capitalize {

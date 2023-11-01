@@ -32,7 +32,7 @@ describe('Export', () => {
     onExportClick = jest.fn()
 
     when(isEveryFieldHiddenMock)
-      .calledWith(['pipetteName'], formikConfig.initialValues)
+      .calledWith(['loadName'], formikConfig.initialValues)
       .mockReturnValue(false)
   })
 
@@ -59,8 +59,8 @@ describe('Export', () => {
 
   it('should render alert when error is present', () => {
     const FAKE_ERROR = 'ahh'
-    formikConfig.initialErrors = { pipetteName: FAKE_ERROR }
-    formikConfig.initialTouched = { pipetteName: true }
+    formikConfig.initialErrors = { loadName: FAKE_ERROR }
+    formikConfig.initialTouched = { loadName: true }
     render(wrapInFormik(<Export onExportClick={onExportClick} />, formikConfig))
 
     // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
@@ -83,7 +83,7 @@ describe('Export', () => {
 
   it('should not render when all of the fields are hidden', () => {
     when(isEveryFieldHiddenMock)
-      .calledWith(['pipetteName'], formikConfig.initialValues)
+      .calledWith(['loadName'], formikConfig.initialValues)
       .mockReturnValue(true)
 
     const { container } = render(

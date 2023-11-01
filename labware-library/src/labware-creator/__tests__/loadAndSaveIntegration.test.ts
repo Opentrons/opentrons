@@ -16,7 +16,6 @@ const fixture24TubeRack = _fixture24TubeRack as LabwareDefinition2
 jest.mock('../../definitions')
 
 describe('load and immediately save integrity test', () => {
-  const pipetteName = 'p10_single'
   const fakeDisplayName = 'Fake Display Name'
   const fakeLoadName = 'fake_load_name'
 
@@ -25,19 +24,19 @@ describe('load and immediately save integrity test', () => {
   const testCases = [
     {
       inputDef: fixture96Plate,
-      extraFields: { pipetteName },
+      extraFields: {},
     },
     {
       inputDef: fixture12Trough,
-      extraFields: { pipetteName },
+      extraFields: {},
     },
     {
       inputDef: fixtureTiprack,
-      extraFields: { pipetteName },
+      extraFields: {},
     },
     {
       inputDef: fixture24TubeRack,
-      extraFields: { pipetteName, tubeRackInsertLoadName: 'customTubeRack' },
+      extraFields: { tubeRackInsertLoadName: 'customTubeRack' },
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {

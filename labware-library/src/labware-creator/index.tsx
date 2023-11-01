@@ -3,7 +3,6 @@ import Ajv from 'ajv'
 import * as React from 'react'
 import { Formik } from 'formik'
 import { saveAs } from 'file-saver'
-import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal } from '@opentrons/components'
@@ -25,8 +24,6 @@ import {
   formLevelValidation,
   LabwareCreatorErrors,
 } from './formLevelValidation'
-import { labwareTestProtocol } from './testProtocols/labwareTestProtocol'
-import { tipRackTestProtocol } from './testProtocols/tipRackTestProtocol'
 import { fieldsToLabware } from './fieldsToLabware'
 import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
 import { Dropdown } from './components/Dropdown'
@@ -153,8 +150,7 @@ export const LabwareCreator = (): JSX.Element => {
     setShowCreatorForm(true)
     window.scrollTo({
       left: 0,
-      // @ts-expect-error(IL, 2021-03-24): needs code change to ensure no null to `top`
-      top: scrollRef.current && scrollRef.current.offsetTop - 200,
+      top: scrollRef.current != null ? scrollRef.current.offsetTop - 200 : 0,
       behavior: 'smooth',
     })
   }, [scrollRef])
@@ -196,7 +192,7 @@ export const LabwareCreator = (): JSX.Element => {
 
           try {
             parsedLabwareDef = JSON.parse(result as string)
-          } catch (error) {
+          } catch (error: any) {
             console.error(error)
             setImportError({
               key: 'INVALID_JSON_FILE',
@@ -205,7 +201,7 @@ export const LabwareCreator = (): JSX.Element => {
             return
           }
 
-          if (!validateLabwareSchema(parsedLabwareDef)) {
+          if (!Boolean(validateLabwareSchema(parsedLabwareDef))) {
             console.warn(validateLabwareSchema.errors)
 
             setImportError({
@@ -222,7 +218,7 @@ export const LabwareCreator = (): JSX.Element => {
             return
           }
           const fields = labwareDefToFields(parsedLabwareDef)
-          if (!fields) {
+          if (fields == null) {
             setImportError(
               { key: 'UNSUPPORTED_LABWARE_PROPERTIES' },
               parsedLabwareDef
@@ -258,12 +254,12 @@ export const LabwareCreator = (): JSX.Element => {
 
   return (
     <LabwareCreatorComponent>
-      {importError && (
+      {importError != null ? (
         <ImportErrorModal
           onClose={() => setImportError(null)}
           importError={importError}
         />
-      )}
+      ) : null}
       {showExportErrorModal && (
         <AlertModal
           className={styles.error_modal}
@@ -281,7 +277,7 @@ export const LabwareCreator = (): JSX.Element => {
         </AlertModal>
       )}
       <Formik
-        initialValues={lastUploaded || getDefaultFormState()}
+        initialValues={lastUploaded ?? getDefaultFormState()}
         enableReinitialize
         validationSchema={labwareFormSchema}
         validate={formLevelValidation}
@@ -290,26 +286,13 @@ export const LabwareCreator = (): JSX.Element => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
           )
-          const { pipetteName } = castValues
           const def = fieldsToLabware(castValues)
           const { displayName } = def.metadata
           const { loadName } = def.parameters
-
-          const testProtocol =
-            values.labwareType === 'tipRack'
-              ? tipRackTestProtocol({ pipetteName, definition: def })
-              : labwareTestProtocol({ pipetteName, definition: def })
-
-          const zip = new JSZip()
-          zip.file(`${loadName}.json`, JSON.stringify(def, null, 4))
-
-          zip.file(`test_${loadName}.py`, testProtocol)
-
-          // TODO(IL, 2021-03-31): add `catch`
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          zip.generateAsync({ type: 'blob' }).then(blob => {
-            saveAs(blob, `${loadName}.zip`)
+          const blob = new Blob([JSON.stringify(def, null, 4)], {
+            type: 'text/plain;charset=utf-8',
           })
+          saveAs(blob, `${loadName}.json`)
 
           reportEvent({
             name: 'labwareCreatorFileExport',
@@ -342,13 +325,6 @@ export const LabwareCreator = (): JSX.Element => {
             (status.prevValues !== values && status.prevValues == null) ||
             getIsXYGeometryChanged(status.prevValues, values)
           ) {
-            // since geometry has changed, clear the pipette field (to avoid multi-channel selection
-            // for labware not that is not multi-channel compatible)
-            setValues({
-              ...values,
-              pipetteName: getDefaultFormState().pipetteName,
-            })
-
             // update defaultedDef with new values
             setStatus({
               defaultedDef: getDefaultedDef(values),

@@ -144,9 +144,6 @@ export interface LabwareFields {
 
   loadName: string | null | undefined
   displayName: string | null | undefined
-
-  // fields for test protocol
-  pipetteName: string | null | undefined
 }
 
 // NOTE: these fields & types should be kept in sync with Yup schema `labwareFormSchema`.
@@ -196,9 +193,6 @@ export interface ProcessedLabwareFields {
   // if loadName or displayName are left blank, Yup schema generates them
   loadName: string
   displayName: string
-
-  // fields for test protocol
-  pipetteName: string
 }
 
 export const tubeRackInsertOptions: Options = [
@@ -404,9 +398,6 @@ export const getDefaultFormState = (): LabwareFields => ({
 
   loadName: null,
   displayName: null,
-
-  // fields for test protocol
-  pipetteName: null,
 })
 
 export const LABELS: Record<keyof LabwareFields, string> = {
@@ -440,7 +431,6 @@ export const LABELS: Record<keyof LabwareFields, string> = {
   groupBrandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
-  pipetteName: 'Test Pipette',
 }
 
 export const getLabel = (

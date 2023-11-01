@@ -291,7 +291,6 @@ export const labwareFormSchemaBaseObject = Yup.object({
         originalValue: string | null | undefined
       ) => (currentValue == null ? currentValue : currentValue.trim())
     ),
-  pipetteName: requiredString(LABELS.pipetteName),
 })
 
 // @ts-expect-error(IL, 2021-03-25): something(s) about this schema don't match the flow type (labwareType: string problem??)
