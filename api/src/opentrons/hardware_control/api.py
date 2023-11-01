@@ -1073,7 +1073,7 @@ class API(
 
         If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
         """
-        if not (back_left_nozzle and front_right_nozzle and starting_nozzle):
+        if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
             await self.reset_nozzle_configuration(mount)
         else:
             await self.update_nozzle_configuration(
