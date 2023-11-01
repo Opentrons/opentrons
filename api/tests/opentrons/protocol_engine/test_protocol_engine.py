@@ -456,6 +456,7 @@ async def test_finish(
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
             drop_tips_after_run=drop_tips_after_run,
+            robot_type=subject.state_view.config.robot_type,
             post_run_hardware_state=post_run_hardware_state,
         ),
         await plugin_starter.stop(),
@@ -480,6 +481,7 @@ async def test_finish_with_defaults(
         action_dispatcher.dispatch(FinishAction(set_run_status=True)),
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         await hardware_stopper.do_stop_and_recover(
+            robot_type=subject.state_view.config.robot_type,
             drop_tips_after_run=True,
             post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         ),
@@ -504,6 +506,7 @@ async def test_finish_with_error(
     door_watcher: DoorWatcher,
     state_store: StateStore,
     stopped_by_estop: bool,
+    expected_home: bool,
     expected_drop_tips: bool,
     expected_end_state: PostRunHardwareState,
 ) -> None:
@@ -533,6 +536,7 @@ async def test_finish_with_error(
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
+            robot_type=subject.state_view.config.robot_type,
             drop_tips_after_run=expected_drop_tips,
             post_run_hardware_state=expected_end_state,
         ),
@@ -585,6 +589,7 @@ async def test_finish_with_estop_error_will_not_drop_tip_and_home(
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
+            robot_type=subject.state_view.config.robot_type,
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.DISENGAGE_IN_PLACE,
         ),
@@ -632,6 +637,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
+            robot_type=subject.state_view.config.robot_type,
             drop_tips_after_run=True,
             post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
         ),

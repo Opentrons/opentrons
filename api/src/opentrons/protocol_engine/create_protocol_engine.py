@@ -69,7 +69,10 @@ def create_protocol_engine_in_thread(
     """
     with async_context_manager_in_thread(
         _protocol_engine(
-            hardware_api, config, drop_tips_after_run, post_run_hardware_state
+            hardware_api,
+            config,
+            drop_tips_after_run,
+            post_run_hardware_state,
         )
     ) as (
         protocol_engine,

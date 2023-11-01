@@ -393,6 +393,7 @@ class ProtocolEngine:
             # Cleanup after hardware halt and reset the hardware controller
             self._hardware_stopper.do_stop_and_recover,
             post_run_hardware_state=post_run_hardware_state,
+            robot_type=self.state_view.config.robot_type,
             drop_tips_after_run=drop_tips_after_run,
         )
         exit_stack.callback(self._door_watcher.stop)
