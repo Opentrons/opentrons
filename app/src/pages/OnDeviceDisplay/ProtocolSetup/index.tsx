@@ -46,9 +46,12 @@ import {
   useModuleCalibrationStatus,
   useRobotType,
 } from '../../../organisms/Devices/hooks'
+import {
+  useRequiredProtocolHardwareFromAnalysis,
+  useMissingProtocolHardwareFromAnalysis,
+} from '../../Protocols/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
@@ -58,7 +61,7 @@ import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchL
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
-  getNumUnreadyInstruments,
+  getIncompleteInstrumentCount,
   getProtocolUsesGripper,
 } from '../../../organisms/ProtocolSetupInstruments/utils'
 import {
@@ -83,11 +86,8 @@ import { CloseButton, PlayButton } from './Buttons'
 
 import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
-import {
-  useRequiredProtocolHardwareFromAnalysis,
-  useMissingProtocolHardwareFromAnalysis,
-} from '../../Protocols/hooks'
 import type { ProtocolHardware, ProtocolFixture } from '../../Protocols/hooks'
+import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
@@ -288,16 +288,17 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
-  const numUnreadyInstruments =
+  const incompleteInstrumentCount: number | null =
     mostRecentAnalysis != null && attachedInstruments != null
-      ? getNumUnreadyInstruments(mostRecentAnalysis, attachedInstruments)
-      : false
+      ? getIncompleteInstrumentCount(mostRecentAnalysis, attachedInstruments)
+      : null
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd: numUnreadyInstruments !== 0,
+    hasMissingCalForOdd:
+      incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
@@ -342,33 +343,30 @@ function PrepareToRun({
 
   let instrumentsDetail
   if (missingPipettes.length > 0 && missingGripper.length > 0) {
-    instrumentsDetail = t('missing_instruments_plural', {
-      num: missingPipettes.length + missingGripper.length,
+    instrumentsDetail = t('missing_instruments', {
+      count: missingPipettes.length + missingGripper.length,
     })
   } else if (missingPipettes.length > 0) {
-    missingPipettes.length > 1
-      ? (instrumentsDetail = t('missing_pipettes_plural', {
-          num: missingPipettes.length,
-        }))
-      : t('missing_pipette', { num: missingPipettes.length })
+    instrumentsDetail = t('missing_pipettes', { count: missingPipettes.length })
   } else if (missingGripper.length > 0) {
     instrumentsDetail = t('missing_gripper')
-  } else if (numUnreadyInstruments === 0) {
+  } else if (incompleteInstrumentCount === 0) {
     instrumentsDetail = t('instruments_connected', {
       count: speccedInstrumentCount,
     })
+  } else if (
+    incompleteInstrumentCount != null &&
+    incompleteInstrumentCount > 0
+  ) {
+    instrumentsDetail = t('instrument_calibrations_missing', {
+      count: incompleteInstrumentCount,
+    })
   } else {
-    instrumentsDetail =
-      numUnreadyInstruments > 1
-        ? t('instrument_calibrations_missing_plural', {
-            num: numUnreadyInstruments,
-          })
-        : t('instrument_calibration_missing', {
-            num: numUnreadyInstruments,
-          })
+    instrumentsDetail = null
   }
 
-  const instrumentsStatus = numUnreadyInstruments === 0 ? 'ready' : 'not ready'
+  const instrumentsStatus =
+    incompleteInstrumentCount === 0 ? 'ready' : 'not ready'
 
   const areModulesReady = !isMissingModules && moduleCalibrationStatus.complete
 
@@ -382,7 +380,7 @@ function PrepareToRun({
       : 'not ready'
 
   const isReadyToRun =
-    numUnreadyInstruments === 0 && areModulesReady && areFixturesReady
+    incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
 
   const onPlay = (): void => {
     if (isDoorOpen) {
@@ -431,12 +429,9 @@ function PrepareToRun({
     ) {
       // protocol only uses modules
       return {
-        detail:
-          protocolModulesInfo.length > 1
-            ? t('modules_connected_plural', {
-                count: protocolModulesInfo.length,
-              })
-            : t('modules_connected', { count: protocolModulesInfo.length }),
+        detail: t('modules_connected', {
+          count: protocolModulesInfo.length,
+        }),
       }
     } else if (
       protocolModulesInfo.length === 0 &&
@@ -444,28 +439,19 @@ function PrepareToRun({
     ) {
       // protocol only uses fixtures
       return {
-        detail:
-          requiredFixtures.length > 1
-            ? t('fixtures_connected_plural', {
-                count: requiredFixtures.length,
-              })
-            : t('fixtures_connected', { count: requiredFixtures.length }),
+        detail: t('fixtures_connected', {
+          count: requiredFixtures.length,
+        }),
       }
     } else {
       // protocol uses fixtures and modules
       return {
-        detail:
-          requiredFixtures.length > 1
-            ? t('fixtures_connected_plural', {
-                count: requiredFixtures.length,
-              })
-            : t('fixtures_connected', { count: requiredFixtures.length }),
-        subdetail:
-          protocolModulesInfo.length > 1
-            ? t('modules_connected_plural', {
-                count: protocolModulesInfo.length,
-              })
-            : t('modules_connected', { count: protocolModulesInfo.length }),
+        detail: t('fixtures_connected', {
+          count: requiredFixtures.length,
+        }),
+        subdetail: t('modules_connected', {
+          count: protocolModulesInfo.length,
+        }),
       }
     }
   }
@@ -487,21 +473,26 @@ function PrepareToRun({
       missingHardwareArr => missingHardwareArr.length > 0
     ).length > 1
 
-  const modulesDetail = (): { detail: string; subdetail?: string } => {
-    if (isLocationConflict) {
-      return { detail: t('location_conflict') }
-    } else if (missingMultipleHardwareTypes) {
-      return { detail: t('hardware_missing') }
-    } else if (missingFixtures.length > 0) {
-      return { detail: missingFixturesText }
-    } else if (isMissingModules) {
-      return { detail: missingModulesText }
-    } else if (!moduleCalibrationStatus.complete) {
-      return { detail: t('calibration_required') }
-    } else {
-      // modules and deck are ready
-      return getConnectedHardwareText(protocolModulesInfo, requiredFixtures)
-    }
+  let modulesDetail: string
+  let modulesSubDetail: string | null = null
+  if (isLocationConflict) {
+    modulesDetail = t('location_conflict')
+  } else if (missingMultipleHardwareTypes) {
+    modulesDetail = t('hardware_missing')
+  } else if (missingFixtures.length > 0) {
+    modulesDetail = missingFixturesText
+  } else if (isMissingModules) {
+    modulesDetail = missingModulesText
+  } else if (!moduleCalibrationStatus.complete) {
+    modulesDetail = t('calibration_required')
+  } else {
+    // modules and deck are ready
+    const hardwareDetail = getConnectedHardwareText(
+      protocolModulesInfo,
+      requiredFixtures
+    )
+    modulesDetail = hardwareDetail.detail
+    modulesSubDetail = hardwareDetail?.subdetail ?? null
   }
 
   // Labware information
@@ -611,8 +602,8 @@ function PrepareToRun({
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
               title={enableDeckConfig ? t('modules_and_deck') : t('modules')}
-              detail={modulesDetail().detail}
-              subDetail={modulesDetail().subdetail}
+              detail={modulesDetail}
+              subDetail={modulesSubDetail}
               status={modulesStatus}
               disabled={
                 protocolModulesInfo.length === 0 && !protocolHasFixtures

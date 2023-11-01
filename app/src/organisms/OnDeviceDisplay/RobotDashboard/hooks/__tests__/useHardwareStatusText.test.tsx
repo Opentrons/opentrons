@@ -75,7 +75,7 @@ describe('useHardwareStatusText', () => {
     )
     expect(result.current).toEqual('Missing 2 modules')
   })
-  it('should return missing 1 instrument', () => {
+  it('should return missing 1 pipette', () => {
     const { result } = renderHook(
       () =>
         useHardwareStatusText(
@@ -93,9 +93,9 @@ describe('useHardwareStatusText', () => {
         wrapper,
       }
     )
-    expect(result.current).toEqual('Missing 1 instrument')
+    expect(result.current).toEqual('Missing 1 pipette')
   })
-  it('should return missing 2 instruments', () => {
+  it('should return missing 2 pipettes', () => {
     const { result } = renderHook(
       () =>
         useHardwareStatusText(
@@ -119,7 +119,7 @@ describe('useHardwareStatusText', () => {
         wrapper,
       }
     )
-    expect(result.current).toEqual('Missing 2 instruments')
+    expect(result.current).toEqual('Missing 2 pipettes')
   })
   it('should return missing hardware', () => {
     const { result } = renderHook(

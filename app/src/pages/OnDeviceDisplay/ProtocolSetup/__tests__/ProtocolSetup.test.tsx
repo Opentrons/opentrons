@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { UseQueryResult } from 'react-query'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
@@ -51,6 +50,7 @@ import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { useFeatureFlag } from '../../../../redux/config'
 import { ProtocolSetup } from '..'
 
+import type { UseQueryResult } from 'react-query'
 import type {
   DeckConfiguration,
   CompletedProtocolAnalysis,
@@ -329,7 +329,7 @@ describe('ProtocolSetup', () => {
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    when(mockUseDeckConfigurationQuery).mockReturnValue({
+    mockUseDeckConfigurationQuery.mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
     when(mockUseToaster)

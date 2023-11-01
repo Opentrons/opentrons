@@ -63,13 +63,13 @@ export function getAreInstrumentsReady(
   return allSpeccedPipettesReady && isExtensionMountReady
 }
 
-export function getNumUnreadyInstruments(
+export function getIncompleteInstrumentCount(
   analysis: CompletedProtocolAnalysis,
   attachedInstruments: Instruments
 ): number {
   const speccedPipettes = analysis?.pipettes ?? []
 
-  const numUnreadySpeccedPipettes = speccedPipettes.filter(loadedPipette => {
+  const incompleteInstrumentCount = speccedPipettes.filter(loadedPipette => {
     const attachedPipetteMatch = getPipetteMatch(
       loadedPipette,
       attachedInstruments
@@ -82,5 +82,5 @@ export function getNumUnreadyInstruments(
         ?.last_modified != null
     : true
 
-  return numUnreadySpeccedPipettes + (isExtensionMountReady ? 0 : 1)
+  return incompleteInstrumentCount + (isExtensionMountReady ? 0 : 1)
 }
