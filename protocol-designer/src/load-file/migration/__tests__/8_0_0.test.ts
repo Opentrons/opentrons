@@ -42,21 +42,6 @@ describe('v8.0 migration', () => {
         commandType: 'loadLabware',
         key: expect.any(String),
         params: {
-          displayName: 'Opentrons Fixed Trash',
-          labwareId:
-            '89d0e1b6-4d51-447b-b01b-3726a1f54137:opentrons/opentrons_1_trash_3200ml_fixed/1',
-          loadName: 'opentrons_1_trash_3200ml_fixed',
-          location: {
-            slotName: 'A3',
-          },
-          namespace: 'opentrons',
-          version: 1,
-        },
-      },
-      {
-        commandType: 'loadLabware',
-        key: expect.any(String),
-        params: {
           displayName: 'Opentrons Flex 96 Filter Tip Rack 50 µL',
           labwareId:
             '23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1',
