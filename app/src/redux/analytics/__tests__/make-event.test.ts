@@ -14,18 +14,6 @@ const getAnalyticsSessionExitDetails = selectors.getAnalyticsSessionExitDetails 
 const getSessionInstrumentAnalyticsData = selectors.getSessionInstrumentAnalyticsData as jest.MockedFunction<
   typeof selectors.getSessionInstrumentAnalyticsData
 >
-const getAnalyticsHealthCheckData = selectors.getAnalyticsHealthCheckData as jest.MockedFunction<
-  typeof selectors.getAnalyticsHealthCheckData
->
-const getAnalyticsDeckCalibrationData = selectors.getAnalyticsDeckCalibrationData as jest.MockedFunction<
-  typeof selectors.getAnalyticsDeckCalibrationData
->
-const getAnalyticsPipetteCalibrationData = selectors.getAnalyticsPipetteCalibrationData as jest.MockedFunction<
-  typeof selectors.getAnalyticsPipetteCalibrationData
->
-const getAnalyticsTipLengthCalibrationData = selectors.getAnalyticsTipLengthCalibrationData as jest.MockedFunction<
-  typeof selectors.getAnalyticsTipLengthCalibrationData
->
 
 describe('analytics events map', () => {
   beforeEach(() => {
@@ -63,11 +51,6 @@ describe('analytics events map', () => {
           someStuff: 'some-other-stuff',
         },
       } as any
-      getAnalyticsPipetteCalibrationData.mockReturnValue({
-        markedBad: true,
-        calibrationExists: true,
-        pipetteModel: 'my pipette model',
-      })
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'pipetteOffsetCalibrationStarted',
         properties: {
@@ -87,11 +70,6 @@ describe('analytics events map', () => {
           someStuff: 'some-other-stuff',
         },
       } as any
-      getAnalyticsTipLengthCalibrationData.mockReturnValue({
-        markedBad: true,
-        calibrationExists: true,
-        pipetteModel: 'pipette-model',
-      })
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'tipLengthCalibrationStarted',
         properties: {
@@ -111,12 +89,6 @@ describe('analytics events map', () => {
           sessionType: 'deckCalibration',
         },
       } as any
-      getAnalyticsDeckCalibrationData.mockReturnValue({
-        calibrationStatus: 'IDENTITY',
-        markedBad: true,
-        pipettes: { left: { model: 'my pipette model' } },
-      } as any)
-
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'deckCalibrationStarted',
         properties: {
@@ -135,9 +107,6 @@ describe('analytics events map', () => {
           sessionType: 'calibrationCheck',
         },
       } as any
-      getAnalyticsHealthCheckData.mockReturnValue({
-        pipettes: { left: { model: 'my pipette model' } },
-      } as any)
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'calibrationHealthCheckStarted',
         properties: {
