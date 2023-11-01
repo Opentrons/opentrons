@@ -53,6 +53,11 @@ export function fetchRobotApi(
     options.body = reqForm
   }
 
+  const isFirstDigitTwo = function (statusCode: number): boolean {
+    const len = Math.floor(Math.log(statusCode) / Math.LN10)
+    return ((statusCode / Math.pow(10, len)) % 10 | 0) === 2
+  }
+
   return host.ip === OPENTRONS_USB
     ? from(
         appShellRequestor({
@@ -68,7 +73,7 @@ export function fetchRobotApi(
           body: response?.data,
           status: response?.status,
           // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
-          ok: response?.status.toString().startsWith('2'),
+          ok: isFirstDigitTwo(response?.status),
         }))
       )
     : from(fetch(url, options)).pipe(

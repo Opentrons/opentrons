@@ -44,7 +44,7 @@ export function createSerialPortHttpAgent(path: string): void {
     keepAliveMsecs: 10000,
     path,
     logger: usbLog,
-    timeout: 100000
+    timeout: 100000,
   })
 
   usbHttpAgent = serialPortHttpAgent
