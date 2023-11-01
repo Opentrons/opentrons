@@ -83,6 +83,7 @@ class HardwareTipHandler(TipHandler):
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
+        """Check nozzle layout is compatible with the pipette."""
         if self._state_view.pipettes.get_attached_tip(pipette_id):
             raise CommandPreconditionViolated(
                 message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
@@ -202,6 +203,7 @@ class VirtualTipHandler(TipHandler):
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
     ) -> Dict[str, str]:
+        """Check nozzle layout is compatible with the pipette."""
         if self._state_view.pipettes.get_attached_tip(pipette_id):
             raise CommandPreconditionViolated(
                 message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."

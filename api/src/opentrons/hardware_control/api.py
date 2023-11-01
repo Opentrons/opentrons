@@ -1076,7 +1076,7 @@ class API(
         if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
             await self.reset_nozzle_configuration(mount)
         else:
-            # assert back_left_nozzle and front_right_nozzle
+            assert back_left_nozzle and front_right_nozzle
             await self.update_nozzle_configuration(
                 mount, back_left_nozzle, front_right_nozzle, starting_nozzle
             )

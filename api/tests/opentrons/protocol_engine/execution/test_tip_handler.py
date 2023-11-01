@@ -260,6 +260,7 @@ async def test_available_nozzle_layout(
     expected_result: Optional[Dict[str, str]],
     tip_result: Optional[TipGeometry],
 ) -> None:
+    """The virtual and hardware pipettes should return the same data and error at the same time."""
     hw_subject = HardwareTipHandler(
         state_view=mock_state_view,
         hardware_api=mock_hardware_api,

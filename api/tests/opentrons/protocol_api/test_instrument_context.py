@@ -5,6 +5,9 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from decoy import Decoy
 
+from typing import ContextManager, Optional
+from contextlib import nullcontext as does_not_raise
+
 from opentrons.broker import Broker
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -26,6 +29,7 @@ from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.types import Location, Mount, Point
 
 
@@ -912,3 +916,23 @@ def test_plunger_speed_removed(subject: InstrumentContext) -> None:
     """It should raise an error on PAPI >= v2.14."""
     with pytest.raises(APIVersionError):
         subject.speed
+
+
+@pytest.mark.parametrize(
+    argnames=["style", "primary_nozzle", "front_right_nozzle", "exception"],
+    argvalues=[
+        [NozzleLayout.COLUMN, "A1", "H1", does_not_raise()],
+        [NozzleLayout.SINGLE, None, None, pytest.raises(ValueError)],
+        [NozzleLayout.ROW, "E1", None, pytest.raises(ValueError)],
+    ],
+)
+def test_configure_nozzle_layout(
+    subject: InstrumentContext,
+    style: NozzleLayout,
+    primary_nozzle: Optional[str],
+    front_right_nozzle: Optional[str],
+    exception: ContextManager[None],
+) -> None:
+    """The correct model is passed to the engine client."""
+    with exception:
+        subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
