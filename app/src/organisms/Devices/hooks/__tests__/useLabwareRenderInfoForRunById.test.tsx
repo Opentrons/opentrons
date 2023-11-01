@@ -5,7 +5,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
-import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'
+import { getLabwareRenderInfo } from '../../ProtocolRun/utils'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,

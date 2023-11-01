@@ -38,7 +38,7 @@ import {
 } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 

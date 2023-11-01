@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { i18n } from '../../../../../i18n'
+
 import { renderWithProviders } from '@opentrons/components'
+import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
+
 import { SetupLiquids } from '../index'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 import { BackToTopButton } from '../../BackToTopButton'
-import { fireEvent } from '@testing-library/react'
 
 jest.mock('../SetupLiquidsList')
 jest.mock('../SetupLiquidsMap')
@@ -23,7 +25,12 @@ const mockBackToTopButton = BackToTopButton as jest.MockedFunction<
 
 const render = (props: React.ComponentProps<typeof SetupLiquids>) => {
   return renderWithProviders(
-    <SetupLiquids robotName="otie" runId="123" protocolRunHeaderRef={null} />,
+    <SetupLiquids
+      robotName="otie"
+      runId="123"
+      protocolRunHeaderRef={null}
+      protocolAnalysis={withModulesProtocol as any}
+    />,
     {
       i18nInstance: i18n,
     }
@@ -47,13 +54,13 @@ describe('SetupLiquids', () => {
   it('renders the map view when you press that toggle button', () => {
     const [{ getByRole, getByText }] = render(props)
     const mapViewButton = getByRole('button', { name: 'Map View' })
-    fireEvent.click(mapViewButton)
+    mapViewButton.click()
     getByText('Mock setup liquids map')
   })
   it('renders the list view when you press that toggle button', () => {
     const [{ getByRole, getByText }] = render(props)
     const mapViewButton = getByRole('button', { name: 'List View' })
-    fireEvent.click(mapViewButton)
+    mapViewButton.click()
     getByText('Mock setup liquids list')
   })
 })

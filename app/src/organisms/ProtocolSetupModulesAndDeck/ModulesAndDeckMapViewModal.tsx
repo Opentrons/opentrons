@@ -7,7 +7,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { Modal } from '../../molecules/Modal'
 import { ModuleInfo } from '../Devices/ModuleInfo'
 import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
-import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
+import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'

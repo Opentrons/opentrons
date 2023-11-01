@@ -1,5 +1,5 @@
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-import { getLabwareRenderInfo } from '../ProtocolRun/utils/getLabwareRenderInfo'
+import { getLabwareRenderInfo } from '../ProtocolRun/utils'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useProtocolDetailsForRun, useStoredProtocolAnalysis } from '.'
 

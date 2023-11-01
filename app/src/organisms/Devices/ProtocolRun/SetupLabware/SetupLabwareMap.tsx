@@ -21,8 +21,7 @@ import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_co
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { useAttachedModules } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
-import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
+import { getLabwareRenderInfo, getProtocolModulesInfo } from '../utils'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 

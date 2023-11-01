@@ -16,7 +16,7 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../../redux/analytics'
-import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
+import { getLocationInfoNames } from '../../utils'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
   getTotalVolumePerLiquidId,

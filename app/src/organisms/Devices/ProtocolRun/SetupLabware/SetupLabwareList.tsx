@@ -15,7 +15,7 @@ import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { getNestedLabwareInfo } from './getNestedLabwareInfo'
 
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils'
 
 const HeaderRow = styled.div`
   display: grid;

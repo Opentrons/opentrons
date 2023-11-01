@@ -15,7 +15,7 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
-import { getLocationInfoNames } from '../Devices/ProtocolRun/utils/getLocationInfoNames'
+import { getLocationInfoNames } from '../Devices/ProtocolRun/utils'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'

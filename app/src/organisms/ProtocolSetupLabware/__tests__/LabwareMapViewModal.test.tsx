@@ -11,8 +11,10 @@ import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.j
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { i18n } from '../../../i18n'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
-import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
+import {
+  getLabwareRenderInfo,
+  getStandardDeckViewLayerBlockList,
+} from '../../Devices/ProtocolRun/utils'
 import { mockProtocolModuleInfo } from '../__fixtures__'
 import { LabwareMapViewModal } from '../LabwareMapViewModal'
 

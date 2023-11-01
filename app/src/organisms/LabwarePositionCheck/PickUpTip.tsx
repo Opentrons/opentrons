@@ -20,7 +20,7 @@ import {
 } from '@opentrons/shared-data'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils'
 import { TipConfirmation } from './TipConfirmation'
 import {
   getLabwareDef,

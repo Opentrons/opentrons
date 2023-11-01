@@ -11,7 +11,7 @@ import {
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
-import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
+import { getModuleTypesThatRequireExtraAttention } from '../../utils'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import {

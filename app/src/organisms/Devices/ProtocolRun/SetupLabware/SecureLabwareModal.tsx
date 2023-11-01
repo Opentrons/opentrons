@@ -16,9 +16,9 @@ import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
-import { getModuleName } from '../utils/getModuleName'
+import { getModuleName } from '../utils'
 
-import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import type { ModuleTypesThatRequireExtraAttention } from '../utils'
 
 interface SecureLabwareModalProps {
   onCloseClick: () => unknown

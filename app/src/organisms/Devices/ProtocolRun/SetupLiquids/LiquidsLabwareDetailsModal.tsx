@@ -21,8 +21,7 @@ import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
-import { getLocationInfoNames } from '../utils/getLocationInfoNames'
-import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
+import { getLocationInfoNames, getSlotLabwareDefinition } from '../utils'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
   getLiquidsByIdForLabware,

@@ -18,7 +18,7 @@ import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesA
 import { ModuleInfo } from '../../ModuleInfo'
 import { useAttachedModules, useStoredProtocolAnalysis } from '../../hooks'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
-import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import { getStandardDeckViewLayerBlockList } from '../utils'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 

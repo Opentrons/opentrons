@@ -6,7 +6,7 @@ import {
   getLabwareDefURI,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils'
 import type {
   PickUpTipRunTimeCommand,
   LoadLabwareRunTimeCommand,
