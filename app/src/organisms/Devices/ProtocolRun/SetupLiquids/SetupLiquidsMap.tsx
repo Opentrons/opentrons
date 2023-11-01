@@ -28,7 +28,6 @@ import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../../hooks'
-// import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import {
   getLabwareRenderInfo,
@@ -53,10 +52,11 @@ interface SetupLiquidsMapProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 }
 
-export function SetupLiquidsMap(
-  props: SetupLiquidsMapProps
-): JSX.Element | null {
-  const { runId, robotName, protocolAnalysis } = props
+export function SetupLiquidsMap({
+  runId,
+  robotName,
+  protocolAnalysis,
+}: SetupLiquidsMapProps): JSX.Element | null {
   const [hoverLabwareId, setHoverLabwareId] = React.useState<string>('')
 
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
@@ -65,7 +65,6 @@ export function SetupLiquidsMap(
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const { robotType } = useProtocolDetailsForRun(runId)
-  // const protocolData = useMostRecentCompletedAnalysis(runId)
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -78,14 +77,14 @@ export function SetupLiquidsMap(
 
   const liquids = parseLiquidsInLoadOrder(
     protocolAnalysis.liquids != null ? protocolAnalysis.liquids : [],
-    protocolAnalysis.commands ?? []
+    protocolAnalysis.commands
   )
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
-    protocolAnalysis.commands ?? []
+    protocolAnalysis.commands
   )
   const deckDef = getDeckDefFromRobotType(robotType)
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
-    protocolAnalysis.commands ?? []
+    protocolAnalysis.commands
   )
 
   const deckConfig = getDeckConfigFromProtocolCommands(
@@ -161,7 +160,6 @@ export function SetupLiquidsMap(
 
   return (
     <Flex
-      flex="1"
       maxHeight="80vh"
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
