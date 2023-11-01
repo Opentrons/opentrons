@@ -1,4 +1,3 @@
-import { initializeFullstory, shutdownFullstory } from './fullstory'
 import { setMixpanelTracking, AnalyticsEvent } from './mixpanel'
 
 export interface SetOptIn {
@@ -9,10 +8,8 @@ export interface SetOptIn {
 const _setOptIn = (payload: SetOptIn['payload']): SetOptIn => {
   // side effects
   if (payload) {
-    initializeFullstory()
     setMixpanelTracking(true)
   } else {
-    shutdownFullstory()
     setMixpanelTracking(false)
   }
 
