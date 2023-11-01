@@ -239,9 +239,8 @@ function installListeners(
   }
   s.on('free', onFree)
 
-  function onError(): void {
-    agent.log('error', 'CLIENT socket onError')
-    // need to emit free to attach listeners to serialport
+  function onError(err: Error): void {
+    agent.log('error', `CLIENT socket onError: ${err?.message}`)
   }
   s.on('error', onError)
 
