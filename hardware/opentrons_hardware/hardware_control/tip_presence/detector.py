@@ -2,11 +2,10 @@
 
 import asyncio
 import logging
-from typing import Any, List, Callable, Set
+from typing import List, Callable, Set
 
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
-    MultipleMessagesWaitableCallback,
     WaitableCallback,
 )
 
@@ -39,20 +38,25 @@ class TipDetector:
         messenger: CanMessenger,
         node: NodeId,
         number_of_sensors: int = 1,
+        debounce_interval: float = 0.5,
     ) -> None:
         """Initialize a tip detector for a pipette mount."""
         self._messenger = messenger
         self._node = node
         self._number_of_responses = number_of_sensors
-        self._subscribers: List[TipChangeListener] = []
-        self._messenger.add_listener(self._receive_message, self._filter)
-        self._waiters: Set[Callable[[TipNotification], None]] = set()
-        self._tasks: Set[asyncio.Task[Any]] = set()
+        self._debounce_interval = debounce_interval
+        self._subscribers: Set[TipChangeListener] = set()
+        self._task = asyncio.create_task(self._main_task())
+        self._latest = None
 
-    def add_subscriber(self, subscriber: TipChangeListener) -> None:
+    def add_subscriber(self, subscriber: TipChangeListener) -> Callable[[], None]:
         """Add listener to tip change notification."""
-        if subscriber not in self._subscribers:
-            self._subscribers.append(subscriber)
+        self._subscribers.add(subscriber)
+
+        def remove_subscriber() -> None:
+            self._subscribers.discard(subscriber)
+
+        return remove_subscriber
 
     def remove_subscriber(self, subscriber: TipChangeListener) -> None:
         """Remove listener to tip change notification."""
@@ -64,60 +68,42 @@ class TipDetector:
             NodeId(arb_id.parts.originating_node_id) == self._node
         )
 
-    def __del__(self) -> None:
-        self._messenger.remove_listener(self._receive_message)
-        for task in self._tasks:
-            task.cancel()
+    def cleanup(self) -> None:
+        """Clean up."""
+        if not self._task.done():
+            self._task.cancel()
 
-    def _receive_message(
-        self, response: MessageDefinition, arb_id: ArbitrationId
-    ) -> None:
-        if isinstance(response, PushTipPresenceNotification):
-            tip_change = _parse_tip_status(response)
-
-        # pass new update to active waiters
-        for waiter in self._waiters:
-            waiter(tip_change)
-        # create a task that ends up broadcasting this update
-        self._create_reject_debounce_task(tip_change)
-
-    async def _broadcast(
-        self, fut: asyncio.Future[None], tip_change: TipNotification
-    ) -> None:
-        # wait for the future to time out before broadcasting the update
+    async def _main_task(self) -> None:
         try:
-            asyncio.wait_for(fut, timeout=1.0)
-            # this tip change is rejected, end the task here
-            return
-        except asyncio.TimeoutError:
-            # debounce check timed out, broadcast tip update to subscribers
-            for subscriber in self._subscribers:
-                subscriber(tip_change)
-        except asyncio.CancelledError:
-            # fut is canceled before timing out, tip update is lost
-            log.error("A tip update debounce task was unexpectedly canceled")
+            await self._main_task_protected()
+        except Exception:
+            raise
 
-    async def _create_reject_debounce_task(self, tip_change: TipNotification) -> None:
-        fut: asyncio.Future[None] = asyncio.Future()
+    async def _main_task_protected(self) -> None:
+        with WaitableCallback(self._messenger, self._filter) as wc:
+            await self._debounce_task(wc)
 
-        def _debounce_waiter(next_update: TipNotification) -> None:
-            # monitor next updates and make sure it's not a debounce
-            if next_update.presence != tip_change.presence:
-                # Debounced, do not broadcast
-                fut.set_result(None)
+    async def _update_subscribers(self, update: TipNotification) -> None:
+        for s in self._subscribers:
+            s(update)
 
-        # starts the broadcasting task
-        waiter = _debounce_waiter
-        task = asyncio.create_task(self._broadcast(fut, tip_change))
-        self._tasks.add(task)
-        self._waiters.add(waiter)
+    async def _debounce_task(self, callback: WaitableCallback) -> None:
+        async for response, _ in callback:
+            update = _parse_tip_status(response)
 
-        def _done_waiting(fut: asyncio.Future[None]) -> None:
-            # waiter has done its job and can be removed
-            self._waiters.discard(waiter)
+            async def _keep_updating() -> None:
+                nonlocal update
+                async for response, _ in callback:
+                    update = _parse_tip_status(response)
 
-        fut.add_done_callback(_done_waiting)
-        task.add_done_callback(lambda t: self._tasks.discard(t))
+            try:
+                await asyncio.wait_for(
+                    _keep_updating(), timeout=self._debounce_interval
+                )
+            except asyncio.TimeoutError:
+                pass
+            finally:
+                await self._update_subscribers(update)
 
     async def request_tip_status(
         self,
@@ -128,25 +114,28 @@ class TipDetector:
         async def gather_responses(
             reader: WaitableCallback,
         ) -> List[TipNotification]:
-            data = []
+            data: List[TipNotification] = []
             async for response, _ in reader:
                 assert isinstance(response, PushTipPresenceNotification)
-                data.append(_parse_tip_status(response))
+                update = _parse_tip_status(response)
+                # if we've already received a message from the same sensor,
+                # replace it with the latest udpate
+                data = [d for d in data if d.sensor != update.sensor]
+                data.append(update)
                 if len(data) == self._number_of_responses:
                     return data
             raise StopAsyncIteration
 
-        with MultipleMessagesWaitableCallback(
+        with WaitableCallback(
             self._messenger,
             self._filter,
-            self._number_of_responses,
         ) as mc:
             await self._messenger.send(
                 node_id=self._node, message=TipStatusQueryRequest()
             )
             try:
                 status = await asyncio.wait_for(gather_responses(mc), timeout)
-            except asyncio.TimeoutError as te:
+            except (asyncio.TimeoutError, StopAsyncIteration) as te:
                 msg = f"Tip presence poll of {self._node} timed out"
                 log.warning(msg)
                 raise CommandTimedOutError(message=msg) from te
