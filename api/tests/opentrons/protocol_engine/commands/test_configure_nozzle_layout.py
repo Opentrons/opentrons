@@ -1,7 +1,7 @@
 """Test configure nozzle layout commands."""
 import pytest
 from decoy import Decoy
-from typing import Union, Optional
+from typing import Union, Optional, Dict
 
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
@@ -127,7 +127,7 @@ NINETY_SIX_MAP = {
 
 
 @pytest.mark.parametrize(
-    argnames=["request_model", "expected_nozzlemap"],
+    argnames=["request_model", "expected_nozzlemap", "nozzle_params"],
     argvalues=[
         [
             SingleNozzleLayoutConfiguration(primary_nozzle="A1"),
@@ -137,6 +137,7 @@ NINETY_SIX_MAP = {
                 back_left_nozzle="A1",
                 front_right_nozzle="A1",
             ),
+            {"primary_nozzle": "A1"},
         ],
         [
             ColumnNozzleLayoutConfiguration(primary_nozzle="A1"),
@@ -146,6 +147,7 @@ NINETY_SIX_MAP = {
                 back_left_nozzle="A1",
                 front_right_nozzle="H1",
             ),
+            {"primary_nozzle": "A1", "front_right_nozzle": "H1"},
         ],
         [
             QuadrantNozzleLayoutConfiguration(
@@ -157,10 +159,12 @@ NINETY_SIX_MAP = {
                 back_left_nozzle="A1",
                 front_right_nozzle="E1",
             ),
+            {"primary_nozzle": "A1", "front_right_nozzle": "E1"},
         ],
         [
             EmptyNozzleLayoutConfiguration(),
             None,
+            {},
         ],
     ],
 )
@@ -175,6 +179,7 @@ async def test_configure_nozzle_layout_implementation(
         SingleNozzleLayoutConfiguration,
     ],
     expected_nozzlemap: Optional[NozzleMap],
+    nozzle_params: Dict[str, str],
 ) -> None:
     """A ConfigureForVolume command should have an execution implementation."""
     subject = ConfigureNozzleLayoutImplementation(
@@ -187,9 +192,15 @@ async def test_configure_nozzle_layout_implementation(
     )
 
     decoy.when(
+        await tip_handler.available_for_nozzle_layout(
+            "pipette-id", **request_model.dict()
+        )
+    ).then_return(nozzle_params)
+
+    decoy.when(
         await equipment.configure_nozzle_layout(
             pipette_id="pipette-id",
-            **request_model.dict(),
+            **nozzle_params,
         )
     ).then_return(expected_nozzlemap)
 

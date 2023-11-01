@@ -874,3 +874,8 @@ def test_has_tip(
     ).then_return(TipGeometry(length=1, diameter=2, volume=3))
 
     assert subject.has_tip() is True
+
+
+# def test_configure_nozzle_layout(decoy: Decoy, subject: InstrumentCore, mock_engine_client: EngineClient) -> None:
+#     """The correct model is passed to the engine client."""
+#     subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)

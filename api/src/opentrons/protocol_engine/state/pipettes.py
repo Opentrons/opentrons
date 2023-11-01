@@ -544,6 +544,10 @@ class PipetteView(HasState[PipetteState]):
         """Get the serial number of the pipette."""
         return self.get_config(pipette_id).serial_number
 
+    def get_channels(self, pipette_id: str) -> int:
+        """Return the max channels of the pipette."""
+        return self.get_config(pipette_id).channels
+
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""
         return self.get_config(pipette_id).min_volume

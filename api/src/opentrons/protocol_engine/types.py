@@ -673,7 +673,6 @@ class SingleNozzleLayoutConfiguration(BaseModel):
     style: Literal["SINGLE"] = "SINGLE"
     primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
-        regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
 
@@ -684,7 +683,6 @@ class RowNozzleLayoutConfiguration(BaseModel):
     style: Literal["ROW"] = "ROW"
     primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
-        regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
 
@@ -695,7 +693,6 @@ class ColumnNozzleLayoutConfiguration(BaseModel):
     style: Literal["COLUMN"] = "COLUMN"
     primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
-        regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
 
@@ -706,7 +703,6 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     style: Literal["QUADRANT"] = "QUADRANT"
     primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
-        regex=NOZZLE_NAME_REGEX,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
     front_right_nozzle: str = Field(

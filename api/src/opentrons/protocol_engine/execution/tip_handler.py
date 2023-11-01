@@ -3,10 +3,22 @@ from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    CommandParameterLimitViolated,
+)
 
 from ..resources import LabwareDataProvider
 from ..state import StateView
 from ..types import TipGeometry
+
+
+PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
+    "A1": {"COLUMN": "H1", "ROW": "A12"},
+    "H1": {"COLUMN": "A1", "ROW": "H12"},
+    "A12": {"COLUMN": "H12", "ROW": "A1"},
+    "H12": {"COLUMN": "A12", "ROW": "H1"},
+}
 
 
 class TipHandler(TypingProtocol):
@@ -18,11 +30,11 @@ class TipHandler(TypingProtocol):
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
-    ) -> Dict[str, Optional[str]]:
+    ) -> Dict[str, str]:
         """Check nozzle layout is compatible with the pipette.
-        
+
         Returns:
-            
+            A dict of nozzles used to configure the pipette.
         """
         ...
 
@@ -66,30 +78,40 @@ class HardwareTipHandler(TipHandler):
 
     async def available_for_nozzle_layout(
         self,
+        pipette_id: str,
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
-    ) -> Dict[str, Optional[str]]:
+    ) -> Dict[str, str]:
+        if self._state_view.pipettes.get_attached_tip(pipette_id):
+            raise CommandPreconditionViolated(
+                message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
+            )
+        channels = self._state_view.pipettes.get_channels(pipette_id)
+        if channels == 1:
+            raise CommandPreconditionViolated(
+                message=f"Cannot configure nozzle layout with a {channels} channel pipette."
+            )
+        if style == "EMPTY":
+            return {}
+        if style == "ROW" and channels == 8:
+            raise CommandParameterLimitViolated(
+                command_name="configure_nozzle_layout",
+                parameter_name="RowNozzleLayout",
+                limit_statement="RowNozzleLayout is incompatible with {channels} channel pipettes.",
+                actual_value=str(primary_nozzle),
+            )
         if not primary_nozzle:
             return {"primary_nozzle": "A1"}
-        if style == "COLUMN":
-            if primary_nozzle == "A1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
-            elif primary_nozzle == "H1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
-            elif primary_nozzle == "A12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
-            elif primary_nozzle == "H12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
-        elif style == "ROW":
-            if primary_nozzle == "A1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A12"}
-            elif primary_nozzle == "H1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
-            elif primary_nozzle == "A12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
-            elif primary_nozzle == "H12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
+        if style == "SINGLE":
+            return {"primary_nozzle": primary_nozzle}
+        if not front_right_nozzle:
+            return {
+                "primary_nozzle": primary_nozzle,
+                "front_right_nozzle": PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP[
+                    primary_nozzle
+                ][style],
+            }
         return {
             "primary_nozzle": primary_nozzle,
             "front_right_nozzle": front_right_nozzle,
@@ -179,31 +201,36 @@ class VirtualTipHandler(TipHandler):
         style: str,
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
-    ) -> Dict[str, Optional[str]]:
-        self._state_view.pipettes.validate_tip_state(
-            pipette_id=pipette_id,
-            expected_has_tip=False,
-        )
+    ) -> Dict[str, str]:
+        if self._state_view.pipettes.get_attached_tip(pipette_id):
+            raise CommandPreconditionViolated(
+                message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
+            )
+        channels = self._state_view.pipettes.get_channels(pipette_id)
+        if channels == 1:
+            raise CommandPreconditionViolated(
+                message=f"Cannot configure nozzle layout with a {channels} channel pipette."
+            )
+        if style == "EMPTY":
+            return {}
+        if style == "ROW" and channels == 8:
+            raise CommandParameterLimitViolated(
+                command_name="configure_nozzle_layout",
+                parameter_name="RowNozzleLayout",
+                limit_statement="RowNozzleLayout is incompatible with {channels} channel pipettes.",
+                actual_value=str(primary_nozzle),
+            )
         if not primary_nozzle:
             return {"primary_nozzle": "A1"}
-        if style == "COLUMN":
-            if primary_nozzle == "A1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
-            elif primary_nozzle == "H1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
-            elif primary_nozzle == "A12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
-            elif primary_nozzle == "H12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
-        elif style == "ROW":
-            if primary_nozzle == "A1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A12"}
-            elif primary_nozzle == "H1":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H12"}
-            elif primary_nozzle == "A12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "A1"}
-            elif primary_nozzle == "H12":
-                return {"primary_nozzle": primary_nozzle, "front_right_nozzle": "H1"}
+        if style == "SINGLE":
+            return {"primary_nozzle": primary_nozzle}
+        if not front_right_nozzle:
+            return {
+                "primary_nozzle": primary_nozzle,
+                "front_right_nozzle": PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP[
+                    primary_nozzle
+                ][style],
+            }
         return {
             "primary_nozzle": primary_nozzle,
             "front_right_nozzle": front_right_nozzle,
