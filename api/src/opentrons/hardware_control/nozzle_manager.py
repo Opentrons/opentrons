@@ -115,6 +115,7 @@ class NozzleMap:
         starting_nozzle: str,
         back_left_nozzle: str,
         front_right_nozzle: str,
+        origin_nozzle: Optional[str] = None,
     ) -> "NozzleMap":
         difference = (
             physical_nozzle_map[front_right_nozzle]
@@ -125,11 +126,21 @@ class NozzleMap:
 
         map_store_list = list(physical_nozzle_map.items())
 
+        if origin_nozzle:
+            origin_difference = (
+                physical_nozzle_map[back_left_nozzle]
+                - physical_nozzle_map[origin_nozzle]
+            )
+            starting_col = int(abs(origin_difference[0] // INTERNOZZLE_SPACING))
+        else:
+            starting_col = 0
         map_store = OrderedDict(
             {
                 k: v
                 for i in range(x_columns_length)
-                for k, v in map_store_list[i * 8 : y_rows_length * (i + 1)]
+                for k, v in map_store_list[
+                    (i + starting_col) * 8 : y_rows_length * ((i + starting_col) + 1)
+                ]
             }
         )
         return cls(
@@ -267,6 +278,7 @@ class NozzleConfigurationManager:
                 starting_nozzle=starting_nozzle or back_left_nozzle,
                 back_left_nozzle=back_left_nozzle,
                 front_right_nozzle=front_right_nozzle,
+                origin_nozzle=self._physical_nozzle_map.starting_nozzle,
             )
 
     def get_tip_configuration_current(self) -> float:

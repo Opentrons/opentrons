@@ -2291,6 +2291,7 @@ class OT3API(
                 OT3Mount.from_mount(mount)
             )
         else:
+            assert back_left_nozzle and front_right_nozzle
             await self._pipette_handler.update_nozzle_configuration(
                 OT3Mount.from_mount(mount),
                 back_left_nozzle,

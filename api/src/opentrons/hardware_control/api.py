@@ -1052,8 +1052,8 @@ class API(
     async def update_nozzle_configuration_for_mount(
         self,
         mount: top_types.Mount,
-        back_left_nozzle: Optional[str] = None,
-        front_right_nozzle: Optional[str] = None,
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
         starting_nozzle: Optional[str] = None,
     ) -> None:
         """
@@ -1076,6 +1076,7 @@ class API(
         if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
             await self.reset_nozzle_configuration(mount)
         else:
+            # assert back_left_nozzle and front_right_nozzle
             await self.update_nozzle_configuration(
                 mount, back_left_nozzle, front_right_nozzle, starting_nozzle
             )

@@ -19,8 +19,8 @@ class LiquidHandler(
     async def update_nozzle_configuration_for_mount(
         self,
         mount: Mount,
-        back_left_nozzle: Optional[str] = None,
-        front_right_nozzle: Optional[str] = None,
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
         starting_nozzle: Optional[str] = None,
     ) -> None:
         """
