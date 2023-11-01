@@ -181,6 +181,8 @@ ssh $(ssh_helper_ot3) root@$(1) \
 mount -o remount,rw / &&\
 mv /data/plot/index.html /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 mv /data/plot/index.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/plotly-2.12.1.min.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/favicon.png /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 rm -rf /data/plot &&\
 cleanup || cleanup"
 endef
