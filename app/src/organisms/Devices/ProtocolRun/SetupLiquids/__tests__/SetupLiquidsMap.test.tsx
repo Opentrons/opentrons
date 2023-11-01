@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { i18n } from '../../../../../i18n'
+
 import {
-  renderWithProviders,
-  partialComponentPropsMatcher,
-  RobotWorkSpace,
+  BaseDeck,
   LabwareRender,
   Module,
+  partialComponentPropsMatcher,
+  renderWithProviders,
+  RobotWorkSpace,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -16,6 +17,9 @@ import {
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
+
+import { i18n } from '../../../../../i18n'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -24,6 +28,8 @@ import {
 import { getWellFillFromLabwareId } from '../utils'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
+
+// import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -122,7 +128,11 @@ const render = (props: React.ComponentProps<typeof SetupLiquidsMap>) => {
 describe('SetupLiquidsMap', () => {
   let props: React.ComponentProps<typeof SetupLiquidsMap>
   beforeEach(() => {
-    props = { runId: RUN_ID, robotName: ROBOT_NAME }
+    props = {
+      runId: RUN_ID,
+      robotName: ROBOT_NAME,
+      protocolAnalysis: null,
+    }
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
