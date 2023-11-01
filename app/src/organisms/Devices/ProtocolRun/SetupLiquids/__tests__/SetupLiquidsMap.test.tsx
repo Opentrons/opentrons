@@ -45,42 +45,43 @@ import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redu
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 
 import type {
-  CompletedProtocolAnalysis,
   LabwareDefinition2,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
 
-// import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-
-jest.mock('@opentrons/components/src/hardware-sim', () => {
-  const actualComponents = jest.requireActual(
-    '@opentrons/components/src/hardware-sim'
-  )
+jest.mock('@opentrons/components/src/hardware-sim/Module', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
   return {
     ...actualComponents,
     Module: jest.fn(() => <div>mock Module</div>),
-    LabwareRender: jest.fn(() => <div>mock LabwareRender</div>),
   }
 })
-// jest.mock('@opentrons/shared-data', () => {
-//   const actualSharedData = jest.requireActual('@opentrons/shared-data')
-//   return {
-//     ...actualSharedData,
-//     inferModuleOrientationFromXCoordinate: jest.fn(),
-//   }
-// })
+jest.mock(
+  '@opentrons/components/src/hardware-sim/Labware/LabwareRender',
+  () => {
+    const actualComponents = jest.requireActual('@opentrons/components')
+    return {
+      ...actualComponents,
+      LabwareRender: jest.fn(() => <div>mock LabwareRender</div>),
+    }
+  }
+)
+jest.mock('@opentrons/shared-data', () => {
+  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+  return {
+    ...actualSharedData,
+    inferModuleOrientationFromXCoordinate: jest.fn(),
+  }
+})
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
-// jest.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
-// jest.mock('@opentrons/components/src/hardware-sim/Module')
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../LabwareInfoOverlay')
 jest.mock('../../../hooks')
 jest.mock('../utils')
 jest.mock('../../utils')
 jest.mock('../../../../ProtocolSetupModulesAndDeck/utils')
-// jest.mock('../../utils/getProtocolModulesInfo')
 jest.mock('../../../../../resources/deck_configuration/utils')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
@@ -132,6 +133,9 @@ const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFuncti
 const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
   typeof getDeckConfigFromProtocolCommands
 >
+const mockGetStandardDeckViewLayerBlockList = getStandardDeckViewLayerBlockList as jest.MockedFunction<
+  typeof getStandardDeckViewLayerBlockList
+>
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
 
 const MOCK_WELL_FILL = { C1: '#ff4888', C2: '#ff4888' }
@@ -172,7 +176,7 @@ const mockMagneticModule = {
 
 const mockLabwareLocations = [
   {
-    labwareLocation: { slotName: 'C1' },
+    labwareLocation: { slotName: '1' },
     definition: fixture_tiprack_300_ul as LabwareDefinition2,
     topLabwareId: '300_ul_tiprack_id',
     topLabwareDisplayName: 'fresh tips',
@@ -181,13 +185,13 @@ const mockLabwareLocations = [
 const mockModuleLocations = [
   {
     moduleModel: 'magneticModuleV2',
-    moduleLocation: { slotName: 'C1' },
+    moduleLocation: { slotName: '1' },
     innerProps: {},
     nestedLabwareDef: null,
   },
   {
     moduleModel: 'magneticModuleV2',
-    moduleLocation: { slotName: 'B1' },
+    moduleLocation: { slotName: '2' },
     innerProps: {},
     nestedLabwareDef: null,
   },
@@ -198,6 +202,17 @@ const mockTCModule = {
   moduleId: 'TCModuleId',
   model: 'thermocyclerModuleV1' as ModuleModel,
   type: 'thermocyclerModuleType' as ModuleType,
+}
+
+const mockLabwareRenderInfoById = {
+  [MOCK_300_UL_TIPRACK_ID]: {
+    labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+    displayName: 'fresh tips',
+    x: MOCK_300_UL_TIPRACK_COORDS[0],
+    y: MOCK_300_UL_TIPRACK_COORDS[1],
+    z: MOCK_300_UL_TIPRACK_COORDS[2],
+    slotName: '1',
+  },
 }
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsMap>) => {
@@ -301,16 +316,7 @@ describe('SetupLiquidsMap', () => {
     .mockReturnValue(ot3StandardDeckDef as any)
   when(mockGetLabwareRenderInfo)
     .calledWith(simpleAnalysisFileFixture as any, ot3StandardDeckDef as any)
-    .mockReturnValue({
-      [MOCK_300_UL_TIPRACK_ID]: {
-        labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
-        displayName: 'fresh tips',
-        x: MOCK_300_UL_TIPRACK_COORDS[0],
-        y: MOCK_300_UL_TIPRACK_COORDS[1],
-        z: MOCK_300_UL_TIPRACK_COORDS[2],
-        slotName: 'C1',
-      },
-    })
+    .mockReturnValue(mockLabwareRenderInfoById)
 
   // when(mockGetProtocolModulesInfo)
   //   .calledWith(simpleAnalysisFileFixture as any, ot3StandardDeckDef as any)
@@ -331,7 +337,7 @@ describe('SetupLiquidsMap', () => {
         nestedLabwareDef: null,
         nestedLabwareDisplayName: null,
         nestedLabwareId: null,
-        slotName: 'C1',
+        slotName: '1',
         protocolLoadOrder: 1,
         attachedModuleMatch: null,
       },
@@ -344,10 +350,20 @@ describe('SetupLiquidsMap', () => {
         nestedLabwareDef: null,
         nestedLabwareDisplayName: null,
         nestedLabwareId: null,
-        slotName: 'B1',
+        slotName: '1',
         protocolLoadOrder: 0,
         attachedModuleMatch: null,
       },
+    ])
+
+  when(mockGetStandardDeckViewLayerBlockList)
+    .calledWith(FLEX_ROBOT_TYPE)
+    .mockReturnValue([
+      'DECK_BASE',
+      'BARCODE_COVERS',
+      'SLOT_SCREWS',
+      'SLOT_10_EXPANSION',
+      'CALIBRATION_CUTOUTS',
     ])
 
   when(mockBaseDeck)
@@ -357,7 +373,7 @@ describe('SetupLiquidsMap', () => {
         deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
         deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
         labwareLocations: mockLabwareLocations,
-        moduleLocations: mockModuleLocations,
+        moduleLocations: mockModuleLocations as any,
       })
     )
     .mockReturnValue(<div>mock BaseDeck</div>)
@@ -381,14 +397,14 @@ describe('SetupLiquidsMap', () => {
     expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
   })
   it('should render a deck WITH labware and WITHOUT modules', () => {
-    props = {
-      ...props,
-      protocolAnalysis: simpleAnalysisFileFixture as any,
-    }
+    // when(mockUseLabwareRenderInfoForRunById)
+    //   .calledWith(RUN_ID)
+    //   .mockReturnValue(mockLabwareRenderInfoById)
+
     when(mockUseLabwareRenderInfoForRunById)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        '300_ul_tiprack_id': {
+        [MOCK_300_UL_TIPRACK_ID]: {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
           displayName: 'fresh tips',
           x: MOCK_300_UL_TIPRACK_COORDS[0],
@@ -401,6 +417,17 @@ describe('SetupLiquidsMap', () => {
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({})
+
+    // when(mockUseProtocolDetailsForRun)
+    //   .calledWith(RUN_ID)
+    //   .mockReturnValue({
+    //     robotType: FLEX_ROBOT_TYPE,
+    //   } as any)
+
+    props = {
+      ...props,
+      protocolAnalysis: simpleAnalysisFileFixture as any,
+    }
 
     const [{ getByText }] = render(props)
     // expect(mockModule).not.toHaveBeenCalled()
