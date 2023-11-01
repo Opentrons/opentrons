@@ -28,7 +28,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../../hooks'
-import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+// import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import {
   getLabwareRenderInfo,
@@ -65,7 +65,7 @@ export function SetupLiquidsMap(
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const { robotType } = useProtocolDetailsForRun(runId)
-  const protocolData = useMostRecentCompletedAnalysis(runId)
+  // const protocolData = useMostRecentCompletedAnalysis(runId)
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -77,19 +77,19 @@ export function SetupLiquidsMap(
   if (protocolAnalysis == null) return null
 
   const liquids = parseLiquidsInLoadOrder(
-    protocolData?.liquids != null ? protocolData?.liquids : [],
-    protocolData?.commands ?? []
+    protocolAnalysis.liquids != null ? protocolAnalysis.liquids : [],
+    protocolAnalysis.commands ?? []
   )
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
-    protocolData?.commands ?? []
+    protocolAnalysis.commands ?? []
   )
   const deckDef = getDeckDefFromRobotType(robotType)
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
-    protocolData?.commands ?? []
+    protocolAnalysis.commands ?? []
   )
 
   const deckConfig = getDeckConfigFromProtocolCommands(
-    protocolAnalysis?.commands
+    protocolAnalysis.commands
   )
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
