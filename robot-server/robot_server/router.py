@@ -6,6 +6,7 @@ from .errors import LegacyErrorResponse
 from .versioning import check_version_header
 
 from .commands import commands_router
+from .deck_configuration.router import router as deck_configuration_router
 from .health import health_router
 from .instruments import instruments_router
 from .maintenance_runs.router import maintenance_runs_router
@@ -67,6 +68,12 @@ router.include_router(
 router.include_router(
     router=commands_router,
     tags=["Simple Commands"],
+    dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
+    router=deck_configuration_router,
+    tags=["Deck Configuration"],
     dependencies=[Depends(check_version_header)],
 )
 
