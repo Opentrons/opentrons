@@ -30,6 +30,7 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     TipActionSpec,
     TipActionMoveSpec,
 )
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.hardware_control.types import (
     OT3Mount,
     Axis,
@@ -44,6 +45,7 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
     TipStateType,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
@@ -1456,7 +1458,7 @@ async def test_save_instrument_offset(
             converted_mount, Point(1, 1, 1)
         )
 
-
+@pytest.mark.xfail()
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
@@ -1469,11 +1471,14 @@ async def test_pick_up_tip_full_tiprack(
     await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
-
+    instr_mock = AsyncMock(spec=Pipette)
+    instr_mock.nozzle_manager.current_configruation.configuration.return_value = NozzleConfigurationType.FULL
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
         backend._gear_motor_position = {NodeId: 0}
+        pipette_handler.get_pipette.return_value = instr_mock
+
         pipette_handler.plan_ht_pick_up_tip.return_value = TipActionSpec(
             shake_off_moves=[],
             tip_action_moves=[

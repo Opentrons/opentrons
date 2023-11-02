@@ -54,7 +54,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveTarget,
     ZeroLengthMoveError,
 )
-
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
@@ -2043,8 +2043,11 @@ class OT3API(
             instrument.set_current_volume(0)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
-
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and instrument.nozzle_manager.current_configuration.configuration
+            == NozzleConfigurationType.FULL
+        ):
             spec = self._pipette_handler.plan_ht_pick_up_tip()
             if spec.z_distance_to_tiprack:
                 await self.move_rel(
