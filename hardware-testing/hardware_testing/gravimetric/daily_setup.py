@@ -113,12 +113,10 @@ def _test_stability(recorder: GravimetricRecorder, hw: SyncHardwareAPI) -> None:
     if not hw.is_simulator:
         ui.get_user_ready("prepare to WALK")
     tag = "WALKING"
+    hw.set_status_bar_state(COLOR_STATES["walking"])
     with recorder.samples_of_tag(tag):
-        num_disco_cycles = int(WALKING_SECONDS / 5)
-        for _ in range(num_disco_cycles):
-            hw.set_status_bar_state(COLOR_STATES["walking"])
-            if not hw.is_simulator:
-                sleep(5)
+        if not hw.is_simulator:
+            sleep(WALKING_SECONDS)
     _check_unstable_count(tag)
     hw.set_status_bar_state(COLOR_STATES["idle"])
 
