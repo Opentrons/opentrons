@@ -11,7 +11,17 @@ interface BaseDialogOptions {
 
 interface FileDialogOptions extends BaseDialogOptions {
   filters: Array<{ name: string; extensions: string[] }>
-  properties: Array<"openDirectory" | "createDirectory" | "openFile" | "multiSelections" | "showHiddenFiles" | "promptToCreate" | "noResolveAliases" | "treatPackageAsDirectory" | "dontAddToRecent">
+  properties: Array<
+    | 'openDirectory'
+    | 'createDirectory'
+    | 'openFile'
+    | 'multiSelections'
+    | 'showHiddenFiles'
+    | 'promptToCreate'
+    | 'noResolveAliases'
+    | 'treatPackageAsDirectory'
+    | 'dontAddToRecent'
+  >
 }
 
 const BASE_DIRECTORY_OPTS = {
@@ -57,7 +67,10 @@ export function showOpenFileDialog(
   }
 
   if (options.properties != null) {
-    openDialogOpts = { ...openDialogOpts, properties: [...(openDialogOpts.properties ?? []), ...options.properties]}
+    openDialogOpts = {
+      ...openDialogOpts,
+      properties: [...(openDialogOpts.properties ?? []), ...options.properties],
+    }
   }
 
   return dialog

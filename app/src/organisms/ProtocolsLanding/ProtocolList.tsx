@@ -254,7 +254,9 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         onCloseClick={() => setShowImportProtocolSlideout(false)}
       >
         <Box marginTop={SPACING.spacing16}>
-          <ProtocolUploadInput onUpload={() => setShowImportProtocolSlideout(false)} />
+          <ProtocolUploadInput
+            onUpload={() => setShowImportProtocolSlideout(false)}
+          />
         </Box>
       </Slideout>
     </Box>

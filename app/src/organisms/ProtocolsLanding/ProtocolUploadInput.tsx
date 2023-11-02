@@ -24,7 +24,9 @@ export interface UploadInputProps {
   onUpload?: () => void
 }
 
-export function ProtocolUploadInput(props: UploadInputProps): JSX.Element | null {
+export function ProtocolUploadInput(
+  props: UploadInputProps
+): JSX.Element | null {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(__filename)
