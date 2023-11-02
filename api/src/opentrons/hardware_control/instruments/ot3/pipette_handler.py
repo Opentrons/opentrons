@@ -39,7 +39,6 @@ from opentrons.hardware_control.constants import (
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from .pipette import Pipette
 from .instrument_calibration import (
     PipetteOffsetSummary,
@@ -744,7 +743,7 @@ class OT3PipetteHandler:
             prep_move_speed=instrument.pick_up_configurations.prep_move_speed,
             clamp_move_speed=instrument.pick_up_configurations.speed,
             plunger_current=instrument.plunger_motor_current.run,
-            tip_motor_current=instrument.pick_up_configurations.current,
+            tip_motor_current=instrument.nozzle_manager.get_tip_configuration_current(),
         )
 
         return TipActionSpec(

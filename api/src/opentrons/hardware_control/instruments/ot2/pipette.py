@@ -46,7 +46,7 @@ from opentrons.hardware_control.types import (
     BoardRevision,
 )
 from opentrons.hardware_control.errors import InvalidCriticalPoint
-from opentrons.hardware_control.instruments import nozzle_manager
+from opentrons.hardware_control import nozzle_manager
 
 
 from opentrons_shared_data.pipette.dev_types import (

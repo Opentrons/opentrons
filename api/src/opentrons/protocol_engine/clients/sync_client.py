@@ -292,7 +292,7 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.PrepareToAspirateResult, result)
-    
+
     def configure_nozzle_layout(
         self,
         pipette_id: str,

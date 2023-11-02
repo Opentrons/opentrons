@@ -10,9 +10,6 @@ from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
 )
-from opentrons.hardware_control.nozzle_manager import (
-    NozzleConfigurationType,
-)
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as OT3Pipette
 from opentrons.hardware_control.instruments.ot3.pipette_handler import (
     OT3PipetteHandler,
@@ -154,7 +151,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.pick_up_configurations.increment).then_return(increment)
     decoy.when(mock_pipette_ot3.pick_up_configurations.speed).then_return(5.5)
     decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(10)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.current).then_return(1)
+    decoy.when(mock_pipette_ot3.nozzle_manager.get_tip_configuration_current()).then_return(1)
     decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)
@@ -164,9 +161,6 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.pick_up_configurations.prep_move_speed).then_return(10)
     decoy.when(mock_pipette_ot3.connect_tiprack_distance_mm).then_return(8)
     decoy.when(mock_pipette_ot3.end_tip_action_retract_distance_mm).then_return(2)
-    decoy.when(
-        mock_pipette_ot3.nozzle_manager.current_configuration.configuration
-    ).then_return(NozzleConfigurationType.FULL)
 
     if presses_input is None:
         decoy.when(mock_pipette_ot3.config.pick_up_presses).then_return(
