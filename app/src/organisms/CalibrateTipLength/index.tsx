@@ -73,7 +73,8 @@ export function CalibrateTipLength(
     offsetInvalidationHandler,
     allowChangeTipRack = false,
   } = props
-  const { currentStep, instrument, labware, supportedCommands } = session?.details ?? {}
+  const { currentStep, instrument, labware, supportedCommands } =
+    session?.details ?? {}
 
   const queryClient = useQueryClient()
   const host = useHost()

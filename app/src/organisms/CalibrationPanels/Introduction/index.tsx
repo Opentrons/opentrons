@@ -55,15 +55,15 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   let equipmentList: Array<{ loadName: string; displayName: string }> =
     uniqueTipRacks.size > 1
       ? instruments?.map(instr => ({
-        loadName: instr.tipRackLoadName,
-        displayName: instr.tipRackDisplay,
-      })) ?? []
+          loadName: instr.tipRackLoadName,
+          displayName: instr.tipRackDisplay,
+        })) ?? []
       : [
-        {
-          loadName: tipRack.loadName,
-          displayName: getLabwareDisplayName(tipRack.definition),
-        },
-      ]
+          {
+            loadName: tipRack.loadName,
+            displayName: getLabwareDisplayName(tipRack.definition),
+          },
+        ]
 
   if (chosenTipRack != null) {
     equipmentList = [
