@@ -10,7 +10,7 @@ from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
 )
-from opentrons.hardware_control.instruments.nozzle_manager import (
+from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationType,
 )
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as OT3Pipette

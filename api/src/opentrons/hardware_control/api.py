@@ -1087,8 +1087,8 @@ class API(
     async def update_nozzle_configuration_for_mount(
         self,
         mount: top_types.Mount,
-        back_left_nozzle: str,
-        front_right_nozzle: str,
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
         starting_nozzle: Optional[str] = None,
     ) -> None:
         """
@@ -1104,11 +1104,17 @@ class API(
         :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
         of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
         none is provided.
-        :return:
+        :return: None.
+
+        If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
         """
-        await self.update_nozzle_configuration(
-            mount, back_left_nozzle, front_right_nozzle, starting_nozzle
-        )
+        if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
+            await self.reset_nozzle_configuration(mount)
+        else:
+            assert back_left_nozzle and front_right_nozzle
+            await self.update_nozzle_configuration(
+                mount, back_left_nozzle, front_right_nozzle, starting_nozzle
+            )
 
     async def pick_up_tip(
         self,

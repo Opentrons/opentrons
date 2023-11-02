@@ -39,7 +39,7 @@ from opentrons.hardware_control.constants import (
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from ..nozzle_manager import NozzleConfigurationType
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from .pipette import Pipette
 from .instrument_calibration import (
     PipetteOffsetSummary,
@@ -242,6 +242,7 @@ class OT3PipetteHandler:
             for key in configs:
                 result[key] = instr_dict[key]
 
+            result["current_nozzle_map"] = instr.nozzle_manager.current_configuration
             result["min_volume"] = instr.liquid_class.min_volume
             result["max_volume"] = instr.liquid_class.max_volume
             result["channels"] = instr._max_channels
@@ -411,6 +412,11 @@ class OT3PipetteHandler:
             instr.update_nozzle_configuration(
                 back_left_nozzle, front_right_nozzle, starting_nozzle
             )
+
+    async def reset_nozzle_configuration(self, mount: OT3Mount) -> None:
+        instr = self._attached_instruments[OT3Mount.from_mount(mount)]
+        if instr:
+            instr.reset_nozzle_configuration()
 
     async def add_tip(self, mount: OT3Mount, tip_length: float) -> None:
         instr = self._attached_instruments[mount]

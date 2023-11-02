@@ -12,6 +12,7 @@ from opentrons.protocol_engine.execution import (
     RailLightsHandler,
     LabwareMovementHandler,
     StatusBarHandler,
+    TipHandler,
 )
 from opentrons.protocol_engine.state import StateView
 
@@ -44,6 +45,12 @@ def labware_movement(decoy: Decoy) -> LabwareMovementHandler:
 def pipetting(decoy: Decoy) -> PipettingHandler:
     """Get a mocked out PipettingHandler."""
     return decoy.mock(cls=PipettingHandler)
+
+
+@pytest.fixture
+def tip_handler(decoy: Decoy) -> TipHandler:
+    """Get a mocked out EquipmentHandler."""
+    return decoy.mock(cls=TipHandler)
 
 
 @pytest.fixture

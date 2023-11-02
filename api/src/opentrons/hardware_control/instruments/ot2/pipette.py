@@ -491,6 +491,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             back_left_nozzle, front_right_nozzle, starting_nozzle
         )
 
+    def reset_nozzle_configuration(self) -> None:
+        """
+        Reset nozzle configuration manager.
+        """
+        self._nozzle_manager.reset_to_default_configuration()
+
     def add_tip(self, tip_length: float) -> None:
         """
         Add a tip to the pipette for position tracking and validation

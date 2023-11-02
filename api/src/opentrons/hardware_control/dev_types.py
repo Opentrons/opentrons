@@ -28,6 +28,7 @@ from opentrons_shared_data.gripper import (
 from opentrons.drivers.types import MoveSplit
 from opentrons.types import Mount
 from opentrons.hardware_control.types import GripperJawState
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
 class InstrumentSpec(TypedDict):
@@ -94,6 +95,7 @@ class PipetteDict(InstrumentDict):
     has_tip: bool
     default_push_out_volume: Optional[float]
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
+    current_nozzle_map: Optional[NozzleMap]
 
 
 class PipetteStateDict(TypedDict):
