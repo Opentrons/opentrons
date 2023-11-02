@@ -49,6 +49,7 @@
       "wells": "wells"
     },
     "field": {
+      "nozzles": { "label": "nozzles" },
       "airGap": { "label": "air gap" },
       "blowout": { "label": "blowout" },
       "location": {

@@ -1,7 +1,9 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
+import { getPipetteEntities } from '../../../step-forms/selectors'
 import {
   BlowoutLocationField,
   ChangeTipField,
@@ -20,17 +22,22 @@ import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../utils'
-import { AspDispSection } from './AspDispSection'
+import { Configure96ChannelField } from '../fields/Configure96ChannelField'
 import { DropTipField } from '../fields/DropTipField'
+import { AspDispSection } from './AspDispSection'
 
-import { StepFormProps } from '../types'
+import type { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.css'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
+  const pipettes = useSelector(getPipetteEntities)
 
   const { propsForFields, formData } = props
+  const is96Channel =
+    propsForFields.pipette.value != null &&
+    pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
 
   const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
@@ -44,6 +51,9 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
+        {is96Channel ? (
+          <Configure96ChannelField {...propsForFields.nozzles} />
+        ) : null}
         <VolumeField
           {...propsForFields.volume}
           label={i18n.t('form.step_edit_form.mixVolumeLabel')}
@@ -71,6 +81,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           {...propsForFields.wells}
           labwareId={formData.labware}
           pipetteId={formData.pipette}
+          nozzles={String(propsForFields.nozzles.value) ?? null}
         />
       </div>
       <div className={styles.section_divider} />

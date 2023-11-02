@@ -3,6 +3,7 @@ import {
   WellSelectionInput,
   Props as WellSelectionInputProps,
   DP,
+  NozzleType,
 } from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { BaseState } from '../../../../types'
@@ -16,25 +17,34 @@ type Props = Omit<
   keyof DP
 >
 type OP = FieldProps & {
+  nozzles: string | null
   labwareId?: string | null
   pipetteId?: string | null
 }
 interface SP {
-  is8Channel: Props['is8Channel']
+  nozzleType: Props['nozzleType']
   primaryWellCount: Props['primaryWellCount']
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const { pipetteId } = ownProps
+  const { pipetteId, nozzles } = ownProps
   const selectedWells = ownProps.value
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
-  const is8Channel = pipette ? pipette.spec.channels === 8 : false
+  let nozzleType: NozzleType | null = null
+  if (pipette != null && pipette != '' && pipette?.spec.channels === 8) {
+    nozzleType = '8-channel'
+  } else if (nozzles === 'column') {
+    nozzleType = 'column'
+  } else if (nozzles === 'full') {
+    nozzleType = 'full'
+  }
+
   return {
     primaryWellCount: Array.isArray(selectedWells)
       ? selectedWells.length
       : undefined,
-    is8Channel,
+    nozzleType,
   }
 }
 
@@ -53,7 +63,7 @@ function mergeProps(stateProps: SP, _dispatchProps: null, ownProps: OP): Props {
   return {
     disabled,
     errorToShow,
-    is8Channel: stateProps.is8Channel,
+    nozzleType: stateProps.nozzleType,
     labwareId,
     name,
     onFieldBlur,

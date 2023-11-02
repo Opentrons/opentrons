@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import { getWellNamePerMultiTip, PipetteChannels } from '@opentrons/shared-data'
 import { WellGroup } from '@opentrons/components'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -15,11 +15,19 @@ import type { SubstepItemData } from '../steplist/types'
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
-  wells: string[]
+  wells: string[],
+  nozzles: string | null
 ): string[] {
-  const channels = pipetteEntity.spec.channels
+  const pipChannels = pipetteEntity.spec.channels
+
   // `wells` is all the wells that pipette's channel 1 interacts with.
-  if (channels === 8 || channels === 96) {
+  if (pipChannels === 8 || pipChannels === 96) {
+    let channels: 8 | 96 = pipChannels
+    if (nozzles === 'full') {
+      channels = 96
+    } else {
+      channels = 8
+    }
     return wells.reduce((acc: string[], well: string) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(
         labwareEntity.def,
@@ -54,9 +62,10 @@ function _getSelectedWellsForStep(
   if (!pipetteEntity || !labwareEntity) {
     return []
   }
+  const nozzles = 'nozzles' in stepArgs ? stepArgs.nozzles : null
 
   const getWells = (wells: string[]): string[] =>
-    _wellsForPipette(pipetteEntity, labwareEntity, wells)
+    _wellsForPipette(pipetteEntity, labwareEntity, wells, nozzles)
 
   const wells = []
 
@@ -94,25 +103,38 @@ function _getSelectedWellsForStep(
 
   frame.commands.forEach((c: CreateCommand) => {
     if (c.commandType === 'pickUpTip' && c.params.labwareId === labwareId) {
-      const commandWellName = c.params.wellName
       const pipetteId = c.params.pipetteId
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
+      let channels = 1
+      if (
+        stepArgs.commandCreatorFnName === 'mix' ||
+        stepArgs.commandCreatorFnName === 'transfer'
+      ) {
+        if (stepArgs.nozzles === 'full') {
+          channels = 96
+        } else if (stepArgs.nozzles === 'column') {
+          channels = 8
+        } else {
+          channels = pipetteSpec.channels
+        }
+      }
+      const commandWellName = c.params.wellName
 
-      if (pipetteSpec.channels === 1) {
+      if (channels === 1) {
         wells.push(commandWellName)
-      } else if (pipetteSpec.channels === 8 || pipetteSpec.channels === 96) {
+      } else if (channels === 8 || channels === 96) {
         const wellSet =
           getWellSetForMultichannel(
             invariantContext.labwareEntities[labwareId].def,
             commandWellName,
-            pipetteSpec.channels
+            channels
           ) || []
         wells.push(...wellSet)
       } else {
         console.error(
           `Unexpected number of channels: ${
-            pipetteSpec.channels || '?'
+            channels || '?'
           }. Could not get tip highlight state`
         )
       }

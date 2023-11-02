@@ -16,6 +16,8 @@ import { StepIdType } from '../../../../form-types'
 import { BaseState } from '../../../../types'
 import { FieldProps } from '../../types'
 
+//  update nozzle type to include other 96-channel partial tip configurations
+export type NozzleType = '8-channel' | 'column' | 'full'
 export interface SP {
   stepId?: StepIdType | null
   wellSelectionLabwareKey?: string | null
@@ -28,7 +30,7 @@ export interface DP {
 
 export type OP = FieldProps & {
   primaryWellCount?: number
-  is8Channel?: boolean | null
+  nozzleType?: NozzleType | null
   pipetteId?: string | null
   labwareId?: string | null
 }
@@ -64,9 +66,11 @@ export class WellSelectionInputComponent extends React.Component<Props> {
 
   render(): JSX.Element {
     const modalKey = this.getModalKey()
-    const label = this.props.is8Channel
-      ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
-      : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
+    const label =
+      this.props.nozzleType === '8-channel' ||
+      this.props.nozzleType === 'column'
+        ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
+        : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
     return (
       <FormGroup
         label={label}
@@ -94,6 +98,7 @@ export class WellSelectionInputComponent extends React.Component<Props> {
             pipetteId={this.props.pipetteId}
             updateValue={this.props.updateValue}
             value={this.props.value}
+            nozzleType={this.props.nozzleType}
           />
         </Portal>
       </FormGroup>
