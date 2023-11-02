@@ -36,20 +36,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
             mount: 'left',
           },
         ],
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns an empty array when there is no pipette attached and no pipette is needed', () => {
     const mockFlowSteps = [] as PipetteWizardStep[]
     expect(
-      getPipetteWizardStepsForProtocol(
-        { left: null, right: null },
-        [],
-        LEFT,
-        true
-      )
+      getPipetteWizardStepsForProtocol({ left: null, right: null }, [], LEFT)
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the calibration flow only when correct pipette is attached but there is no pip cal data', () => {
@@ -81,8 +75,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
           } as any,
         },
         [{ id: '123', pipetteName: 'p1000_single_flex', mount: 'right' }],
-        RIGHT,
-        true
+        RIGHT
       )
     ).toStrictEqual(mockFlowSteps)
   })
@@ -130,55 +123,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       getPipetteWizardStepsForProtocol(
         mockSingleMountPipetteAttached,
         mockPipettesInProtocolMulti as any,
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
-  it('returns the correct array of info when the attached pipette does not require a firmware update', () => {
-    const mockFlowSteps = [
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.DETACH_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
-      {
-        section: SECTIONS.MOUNT_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
-      {
-        section: SECTIONS.ATTACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.DETACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.CALIBRATE,
-      },
-    ] as PipetteWizardStep[]
-    expect(
-      getPipetteWizardStepsForProtocol(
-        mockSingleMountPipetteAttached,
-        mockPipettesInProtocolMulti as any,
-        LEFT,
-        false
-      )
-    ).toStrictEqual(mockFlowSteps)
-  })
+
   it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount', () => {
     const mockFlowSteps = [
       {
@@ -233,8 +182,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       getPipetteWizardStepsForProtocol(
         { left: mock96ChannelAttachedPipetteInformation, right: null },
         mockPipettesInProtocolNotEmpty as any,
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
@@ -292,8 +240,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       getPipetteWizardStepsForProtocol(
         { left: mockAttachedPipetteInformation, right: null },
         mockPipetteInfo as any,
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
@@ -351,8 +298,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       getPipetteWizardStepsForProtocol(
         { left: null, right: mockAttachedPipetteInformation },
         mockPipetteInfo as any,
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
@@ -419,8 +365,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
           right: mockAttachedPipetteInformation,
         },
         mockPipetteInfo as any,
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
@@ -462,8 +407,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       getPipetteWizardStepsForProtocol(
         { left: null, right: null },
         mockPipettesInProtocolNotEmpty as any,
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
@@ -515,8 +459,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       getPipetteWizardStepsForProtocol(
         { left: null, right: null },
         mockPipetteInfo as any,
-        LEFT,
-        true
+        LEFT
       )
     ).toStrictEqual(mockFlowSteps)
   })
