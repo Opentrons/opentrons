@@ -89,7 +89,6 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
       </Tooltip>
       <div {...targetProps}>
         <FormGroup label={props.label} className={className}>
-
           {firstValue != null && secondValue != null ? (
             <img
               onClick={handleOpen}
