@@ -17,7 +17,7 @@ pytest = "==7.1.1"
 pytest-watch = "~=4.2.0"
 pytest-cov = "==2.10.1"
 pytest-aiohttp = "==0.3.0"
-coverage = "==6.3.2
+coverage = "==6.3.2"
 # atomicwrites and colorama are pytest dependencies on windows,
 # spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
