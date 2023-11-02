@@ -4,7 +4,7 @@ url = "https://pypi.org/simple/"
 verify_ssl = true
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"
 
 [packages]
 opentrons = { editable = true, path = "../api" }
@@ -19,12 +19,12 @@ notify-server = { editable = true, path = "." }
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
-mock = "~=4.0.2"
-mypy = "==0.800"
-pytest = "==6.1.0"
+mock = "~=4.0.3"
+mypy = "==0.942"
+pytest = "==7.1.1"
 pytest-cov = "==2.10.1"
-pytest-asyncio = "==0.15.1"
-pytest-xdist = "~=2.2.1"
+pytest-asyncio = "==0.16.0"
+pytest-xdist = "~=2.5.0"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = { version = "==1.4.0", sys_platform = "== 'win32'" }
