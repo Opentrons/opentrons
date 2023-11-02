@@ -9,6 +9,7 @@ export function executeAnalyzeCli(
   sourcePaths: string[]
 ): Promise<void> {
   return execa(pythonPath, [
+    '-I',
     '-m',
     'opentrons.cli',
     'analyze',
