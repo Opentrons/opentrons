@@ -2,27 +2,27 @@
 import asyncio
 import json
 from typing import Any, Optional, AsyncGenerator, List, Dict
-
 from jsonrpc.utils import is_invalid_params
-from jsonrpc.exceptions import (
-    JSONRPCInvalidRequest,
-    JSONRPCInvalidRequestException,
-    JSONRPCParseError,
-    JSONRPCDispatchException,
-    JSONRPCServerError,
-    JSONRPCMethodNotFound,
-    JSONRPCInvalidParams,
-)
 
 from .constants import JSONRPC_VERSION
+from .dispatcher import JSONRPCDispatcher
 from .types import (
     JSONRPCRequest,
     JSONRPCResponse,
     JSONRPCBatchRequest,
     JSONRPCBatchResponse,
 )
-from .dispatcher import JSONRPCDispatcher
-from .errors import JSONRPCVersionNotSupported, contextAlreadyRegisteredException
+from .errors import (
+    JSONRPCError,
+    JSONRPCParseError,
+    JSONRPCInvalidRequestError,
+    JSONRPCServerError,
+    JSONRPCMethodNotFoundError,
+    JSONRPCInvalidParamsError,
+    JSONRPCVersionNotSupportedError,
+    JSONRPCInvalidRequestException,
+    JSONRPCDispatchException,
+)
 
 
 class JSONRPCResponseManager:
@@ -58,13 +58,13 @@ class JSONRPCResponseManager:
         try:
             data = json.loads(request_str)
         except (TypeError, ValueError, json.JSONDecodeError):
-            return JSONRPCResponse(error=JSONRPCParseError()._data)
+            return JSONRPCResponse(error=JSONRPCParseError().dict)
 
         # Validate the data request
         try:
             request = JSONRPCRequest.from_data(data)
-        except JSONRPCInvalidRequestException:
-            return JSONRPCResponse(error=JSONRPCInvalidRequest()._data)
+        except JSONRPCInvalidRequestException as e:
+            return JSONRPCResponse(error=JSONRPCInvalidRequestError().dict)
         return await self._handle_request(request)
 
     async def _handle_request(
@@ -110,14 +110,14 @@ class JSONRPCResponseManager:
 
         for request in requests:
             if request.version != JSONRPC_VERSION:
-                yield _make_response(request, error=JSONRPCVersionNotSupported()._data)
+                yield _make_response(request, error=JSONRPCVersionNotSupported().dict)
                 return
 
             # attempt get the method from the dispatcher
             try:
                 method = self._dispatcher.methods[request.method]
             except KeyError:
-                yield _make_response(request, error=JSONRPCMethodNotFound()._data)
+                yield _make_response(request, error=JSONRPCMethodNotFoundError().dict)
                 return
 
             # get the args and kwargs
@@ -141,11 +141,9 @@ class JSONRPCResponseManager:
                     result = await function(*args, **kwargs)
                 else:
                     result = function(*args, **kwargs)
-
-
                 yield _make_response(request, result=result)
             except JSONRPCDispatchException as e:
-                yield _make_response(request, error=e.error._data)
+                yield _make_response(request, error=e.error.dict)
             except Exception as e:
                 data = {
                     "type": e.__class__.__name__,
@@ -157,8 +155,8 @@ class JSONRPCResponseManager:
                         method, *request.args, **request.kwargs):
                     yield _make_response(
                         request,
-                        error=JSONRPCInvalidParams(data=data)._data)
+                        error=JSONRPCInvalidParams(data=data).dict)
                 else:
                     yield _make_response(
                         request,
-                        error=JSONRPCServerError(data=data)._data)
+                        error=JSONRPCServerError(data=data).dict)

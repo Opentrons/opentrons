@@ -4,6 +4,9 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Union, Tuple, Iterable
 
 from .constants import JSONRPC_VERSION
+from .errors.exceptions import (
+    JSONRPCInvalidRequestException,
+)
 
 _REQUIRED_FIELDS = set(["jsonrpc", "method"])
 _POSSIBLE_FIELDS = set([*_REQUIRED_FIELDS, "params", "id"])
@@ -58,27 +61,28 @@ class JSONRPCRequest:
         return cls.from_data(data)
 
     @classmethod
-    def from_data(cls, data) -> "JSONRPCRequest":
+    def from_data(cls, data: Union[List,Dict]) -> "JSONRPCRequest":
         is_batch = isinstance(data, list)
         data = data if is_batch else [data]
-        if not data:
-            raise Exception("empty value is not accepted")
-            # raise JSONRPCInvalidRequestException("empty value is not accepted")
+        if not all(data):
+            raise JSONRPCInvalidRequestException("Data cannot be empty or None")
 
+        # Make sure all the requests are dictionaries
         if not all(isinstance(d, dict) for d in data):
-            raise Exception("Each request should be a dict object")
-            #raise JSONRPCInvalidRequestException(
-            #    "Each request should be an object (dict)")
+            raise JSONRPCInvalidRequestException(
+                "Each request should be a dict"
+            )
 
+        # validate the supplied fields
         result: List[JSONRPCRequest] = list()
         for d in data:
             if not _REQUIRED_FIELDS <= set(d.keys()) <= _POSSIBLE_FIELDS:
                 extra = set(d.keys()) - _POSSIBLE_FIELDS
                 missed = _REQUIRED_FIELDS - set(d.keys())
                 msg = f"Invalid request. Extra fields: {extra}, Missed fields: {missed}"
-                raise Exception(msg)
-                #raise JSONRPCInvalidRequestException(msg)
+                raise JSONRPCInvalidRequestException(msg)
 
+            # create the request object
             try:
                 result.append(cls(
                     method=d["method"], params=d.get("params"),
@@ -86,8 +90,7 @@ class JSONRPCRequest:
                     version=d.get("jsonrpc"),
                 ))
             except ValueError as e:
-                raise
-                #raise JSONRPCInvalidRequestException(str(e))
+                raise JSONRPCInvalidRequestException(str(e))
 
         return JSONRPCBatchRequest(*result) if is_batch else result[0]
     
