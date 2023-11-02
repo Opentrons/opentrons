@@ -2,6 +2,7 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
+from time import time
 from typing import List, Union, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
 from opentrons.hardware_control.types import OT3Mount
@@ -600,18 +601,29 @@ if __name__ == "__main__":
             )
             start_temp = env_data.celsius_pipette
             temp_limit = min(start_temp + 3.0, 28.0)
-            for pre_heat_cycle in range(100):
+            max_pre_heat_seconds = 60 * 10
+            now = time()
+            start_time = now
+            while (
+                now - start_time < max_pre_heat_seconds
+                and env_data.celsius_pipette < temp_limit
+            ):
+                ui.print_info(
+                    f"pre-heat {int(now - start_time)} seconds "
+                    f"({max_pre_heat_seconds} limit): "
+                    f"{round(env_data.celsius_pipette, 2)} C "
+                    f"({round(temp_limit, 2)} C limit)"
+                )
+                # NOTE: moving slowly helps make sure full current is sent to coils
+                hw.aspirate(mnt, rate=0.1)
+                hw.dispense(mnt, rate=0.1, push_out=0)
                 env_data = read_environment_data(
                     mnt.name.lower(), hw.is_simulator, run_args.environment_sensor
                 )
-                if env_data.celsius_pipette > temp_limit:
-                    break
-                ui.print_info(
-                    f"pre-heat {pre_heat_cycle}/100: "
-                    f"{round(env_data.celsius_pipette, 2)} Celsius"
-                )
-                hw.aspirate(mnt, rate=0.1)
-                hw.dispense(mnt, rate=0.1, push_out=0)
+                if run_args.ctx.is_simulating():
+                    now += 1
+                else:
+                    now = time()
             hw.remove_tip(mnt)
 
         for tip, volumes in run_args.volumes:

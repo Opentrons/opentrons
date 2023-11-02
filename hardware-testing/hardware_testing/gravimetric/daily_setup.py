@@ -153,7 +153,10 @@ def _wait_for_stability(
 
 
 def _run(
-    hw_api: SyncHardwareAPI, recorder: GravimetricRecorder, skip_stability: bool, skip_accuracy: bool
+    hw_api: SyncHardwareAPI,
+    recorder: GravimetricRecorder,
+    skip_stability: bool,
+    skip_accuracy: bool,
 ) -> None:
     ui.print_title("GRAVIMETRIC DAILY SETUP")
     ui.print_info(f"Scale: {recorder.max_capacity}g (SN:{recorder.serial_number})")
