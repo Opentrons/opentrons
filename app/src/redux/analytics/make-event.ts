@@ -23,7 +23,6 @@ export function makeEvent(
   action: Action,
   state: State
 ): Promise<AnalyticsEvent | null> {
-
   switch (action.type) {
     // robot update events
     case RobotUpdate.ROBOTUPDATE_SET_UPDATE_SEEN: {
@@ -154,15 +153,15 @@ export function makeEvent(
       return Promise.resolve(
         systemInfoProps != null
           ? {
-            superProperties: {
-              ...systemInfoProps,
-              // anonymize IP address so analytics profile can't be mapped to more
-              // specific Intercom support profile
-              'U2E IPv4 Address': Boolean(
-                systemInfoProps['U2E IPv4 Address']
-              ),
-            },
-          }
+              superProperties: {
+                ...systemInfoProps,
+                // anonymize IP address so analytics profile can't be mapped to more
+                // specific Intercom support profile
+                'U2E IPv4 Address': Boolean(
+                  systemInfoProps['U2E IPv4 Address']
+                ),
+              },
+            }
           : null
       )
     }
@@ -178,11 +177,11 @@ export function makeEvent(
           return Promise.resolve(
             sessionDetails != null
               ? {
-                name: `${sessionDetails.sessionType}Exit`,
-                properties: {
-                  step: sessionDetails.step,
-                },
-              }
+                  name: `${sessionDetails.sessionType}Exit`,
+                  properties: {
+                    step: sessionDetails.step,
+                  },
+                }
               : null
           )
         }
@@ -197,14 +196,15 @@ export function makeEvent(
             return Promise.resolve(
               instrData != null
                 ? {
-                  name: `${instrData.sessionType}TipRackSelect`,
-                  properties: {
-                    pipetteModel: instrData.pipetteModel,
-                    tipRackDisplayName: 'tiprackDefinition' in commandData
-                      ? commandData.tiprackDefinition.metadata.displayName
-                      : null,
-                  },
-                }
+                    name: `${instrData.sessionType}TipRackSelect`,
+                    properties: {
+                      pipetteModel: instrData.pipetteModel,
+                      tipRackDisplayName:
+                        'tiprackDefinition' in commandData
+                          ? commandData.tiprackDefinition.metadata.displayName
+                          : null,
+                    },
+                  }
                 : null
             )
           } else {

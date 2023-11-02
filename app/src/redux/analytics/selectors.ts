@@ -24,9 +24,8 @@ export function getBuildrootAnalyticsData(
   state: State,
   robotName: string | null = null
 ): BuildrootAnalyticsData | null {
-  const updateVersion = robotName != null
-    ? getRobotUpdateVersion(state, robotName)
-    : null
+  const updateVersion =
+    robotName != null ? getRobotUpdateVersion(state, robotName) : null
   const session = getRobotUpdateSession(state)
   const robot =
     robotName === null
