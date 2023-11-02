@@ -223,7 +223,7 @@ function getWarningContent({
   return null
 }
 
-export const v7WarningContent: JSX.Element = (
+export const v8WarningContent: JSX.Element = (
   <div>
     <p>
       {i18n.t(`alert.hint.export_v8_protocol_7_1.body1`)}{' '}
@@ -325,8 +325,8 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v7_protocol_7_0',
-      content: v7WarningContent,
+      hintKey: 'export_v8_protocol_7_1',
+      content: v8WarningContent,
     }
   }
 

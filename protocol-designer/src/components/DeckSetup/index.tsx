@@ -16,6 +16,8 @@ import {
   StagingAreaLocation,
   SingleSlotFixture,
   DeckFromData,
+  useHoverTooltip,
+  Tooltip,
 } from '@opentrons/components'
 import {
   AdditionalEquipmentEntity,
@@ -110,6 +112,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     robotType,
     trashSlot,
   } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
   // But when swapping labware when at least one is on a module, we need to be aware
@@ -245,78 +248,83 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         const isAdapter =
           labwareLoadedOnModule?.def.metadata.displayCategory === 'adapter'
         return (
-          <Module
-            key={slot.id}
-            x={slot.position[0]}
-            y={slot.position[1]}
-            def={moduleDef}
-            orientation={inferModuleOrientationFromXCoordinate(
-              slot.position[0]
-            )}
-            innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
-            targetSlotId={slot.id}
-            targetDeckId={deckDef.otId}
-          >
-            {labwareLoadedOnModule != null && !shouldHideChildren ? (
-              <>
-                <LabwareOnDeck
-                  x={0}
-                  y={0}
-                  labwareOnDeck={labwareLoadedOnModule}
-                />
-                {isAdapter ? (
-                  //  @ts-expect-error
-                  <AdapterControls
-                    allLabware={allLabware}
-                    onDeck={false}
-                    labwareId={labwareLoadedOnModule.id}
-                    key={slot.id}
-                    slot={slot}
-                    selectedTerminalItemId={props.selectedTerminalItemId}
-                    handleDragHover={handleHoverEmptySlot}
-                  />
-                ) : (
-                  <LabwareControls
-                    slot={labwareInterfaceSlotDef}
-                    setHoveredLabware={setHoveredLabware}
-                    setDraggedLabware={setDraggedLabware}
-                    swapBlocked={
-                      swapBlocked &&
-                      (labwareLoadedOnModule.id === hoveredLabware?.id ||
-                        labwareLoadedOnModule.id === draggedLabware?.id)
-                    }
+          <>
+            <Module
+              {...targetProps}
+              key={slot.id}
+              x={slot.position[0]}
+              y={slot.position[1]}
+              def={moduleDef}
+              orientation={inferModuleOrientationFromXCoordinate(
+                slot.position[0]
+              )}
+              innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
+              targetSlotId={slot.id}
+              targetDeckId={deckDef.otId}
+            >
+              {labwareLoadedOnModule != null && !shouldHideChildren ? (
+                <>
+                  <LabwareOnDeck
+                    x={0}
+                    y={0}
                     labwareOnDeck={labwareLoadedOnModule}
-                    selectedTerminalItemId={props.selectedTerminalItemId}
                   />
-                )}
-              </>
-            ) : null}
+                  {isAdapter ? (
+                    //  @ts-expect-error
+                    <AdapterControls
+                      allLabware={allLabware}
+                      onDeck={false}
+                      labwareId={labwareLoadedOnModule.id}
+                      key={slot.id}
+                      slot={slot}
+                      selectedTerminalItemId={props.selectedTerminalItemId}
+                      handleDragHover={handleHoverEmptySlot}
+                    />
+                  ) : (
+                    <LabwareControls
+                      slot={labwareInterfaceSlotDef}
+                      setHoveredLabware={setHoveredLabware}
+                      setDraggedLabware={setDraggedLabware}
+                      swapBlocked={
+                        swapBlocked &&
+                        (labwareLoadedOnModule.id === hoveredLabware?.id ||
+                          labwareLoadedOnModule.id === draggedLabware?.id)
+                      }
+                      labwareOnDeck={labwareLoadedOnModule}
+                      selectedTerminalItemId={props.selectedTerminalItemId}
+                    />
+                  )}
+                </>
+              ) : null}
 
-            {labwareLoadedOnModule == null &&
-            !shouldHideChildren &&
-            !isAdapter ? (
-              //  @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
-              <SlotControls
-                key={slot.id}
-                slot={labwareInterfaceSlotDef}
-                selectedTerminalItemId={props.selectedTerminalItemId}
-                moduleType={moduleOnDeck.type}
-                handleDragHover={handleHoverEmptySlot}
-              />
-            ) : null}
-            {robotType === FLEX_ROBOT_TYPE ? (
-              <FlexModuleTag
-                dimensions={moduleDef.dimensions}
-                displayName={getModuleDisplayName(moduleOnDeck.model)}
-              />
-            ) : (
-              <Ot2ModuleTag
-                orientation={moduleOrientation}
-                dimensions={moduleDef.dimensions}
-                model={moduleOnDeck.model}
-              />
-            )}
-          </Module>
+              {labwareLoadedOnModule == null &&
+              !shouldHideChildren &&
+              !isAdapter ? (
+                //  @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
+                <SlotControls
+                  key={slot.id}
+                  slot={labwareInterfaceSlotDef}
+                  selectedTerminalItemId={props.selectedTerminalItemId}
+                  moduleType={moduleOnDeck.type}
+                  handleDragHover={handleHoverEmptySlot}
+                />
+              ) : null}
+              {robotType === FLEX_ROBOT_TYPE ? (
+                <FlexModuleTag
+                  dimensions={moduleDef.dimensions}
+                  displayName={getModuleDisplayName(moduleOnDeck.model)}
+                />
+              ) : (
+                <Ot2ModuleTag
+                  orientation={moduleOrientation}
+                  dimensions={moduleDef.dimensions}
+                  model={moduleOnDeck.model}
+                />
+              )}
+            </Module>
+
+            <Tooltip {...tooltipProps}>{'heat-erhskaer'}</Tooltip>
+          </>
         )
       })}
 

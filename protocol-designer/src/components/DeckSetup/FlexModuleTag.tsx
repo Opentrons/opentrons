@@ -25,6 +25,7 @@ export function FlexModuleTag(props: FlexModuleTagProps): JSX.Element {
         padding: SPACING.spacing4,
         height: '100%',
         color: COLORS.white,
+        border: `1px solid ${COLORS.darkGrey}`,
       }}
     >
       <Text as="p" fontSize="0.5rem">
