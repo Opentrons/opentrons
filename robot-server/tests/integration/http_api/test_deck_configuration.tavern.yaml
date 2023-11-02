@@ -1,0 +1,53 @@
+test_name: Test setting and getting a Flex deck configuration
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Set the deck configuration
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+      method: PUT
+      json:
+        data:
+          cutoutFixtures: &expectedCutoutFixtures
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutA1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutA2
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutA3
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutA4
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB1
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB3
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB4
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutC1
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutC2
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutC3
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutC4
+
+  - name: Get the deck configuration
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+    response:
+      json:
+        data:
+          lastUpdatedAt: !anystr
+          cutoutFixtures: *expectedCutoutFixtures
+# TODO(mm, 2023-11-02):
+#
+# - Test that the server has a default deck configuration.
+#   The default configuration will be different between OT-2 and Flex.
+#
+# - Test that the server rejects invalid deck configurations.
