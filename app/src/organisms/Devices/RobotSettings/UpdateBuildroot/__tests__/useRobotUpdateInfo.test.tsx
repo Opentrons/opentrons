@@ -47,7 +47,7 @@ describe('useRobotUpdateInfo', () => {
     )
 
     expect(result.current.updateStep).toBe('install')
-    expect(Math.round(result.current.progressPercent)).toBe(67)
+    expect(Math.round(result.current.progressPercent)).toBe(75)
 
     rerender({
       ...mockRobotUpdateSession,
@@ -70,7 +70,7 @@ describe('useRobotUpdateInfo', () => {
     )
 
     expect(result.current.updateStep).toBe('install')
-    expect(Math.round(result.current.progressPercent)).toBe(67)
+    expect(Math.round(result.current.progressPercent)).toBe(75)
 
     rerender({
       ...mockRobotUpdateSession,
@@ -78,7 +78,7 @@ describe('useRobotUpdateInfo', () => {
     })
 
     expect(result.current.updateStep).toBe('error')
-    expect(Math.round(result.current.progressPercent)).toBe(67)
+    expect(Math.round(result.current.progressPercent)).toBe(75)
   })
 
   it('should calculate correct progressPercent when the update is not manual', () => {
@@ -94,7 +94,7 @@ describe('useRobotUpdateInfo', () => {
     })
 
     expect(result.current.updateStep).toBe('install')
-    expect(Math.round(result.current.progressPercent)).toBe(67)
+    expect(Math.round(result.current.progressPercent)).toBe(75)
   })
 
   it('should ignore progressPercent reported by a step marked as ignored', () => {
