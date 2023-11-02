@@ -267,7 +267,7 @@
             "type": "string"
           },
           "mayMountTo": {
-            "description": "A list of compatible cutouts this fixture may be mounted to.",
+            "description": "A list of compatible cutouts this fixture may be mounted to. These must match `id`s in `cutouts`.",
             "type": "array",
             "items": {
               "type": "string"
