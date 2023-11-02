@@ -110,17 +110,17 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleType?: ModuleType | null,
   moduleModel?: ModuleModel | null
 ): boolean => {
   //  special-casing the thermocycler module V2 recommended labware
   //  since its different from V1
+  const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
   if (moduleModel === THERMOCYCLER_MODULE_V2) {
     return (
       def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
     )
   } else {
-    return moduleType
+    return moduleType != null
       ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
           def.parameters.loadName
         )
@@ -215,7 +215,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         labwareDef.parameters.loadName === ADAPTER_96_CHANNEL
       return (
         (filterRecommended &&
-          !getLabwareIsRecommended(labwareDef, moduleType, moduleModel)) ||
+          !getLabwareIsRecommended(labwareDef, moduleModel)) ||
         (filterHeight &&
           getIsLabwareAboveHeight(
             labwareDef,
@@ -375,7 +375,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     typeof LabwarePreview
   >['moduleCompatibility'] = null
   if (previewedLabware && moduleType) {
-    if (getLabwareIsRecommended(previewedLabware, moduleType, moduleModel)) {
+    if (getLabwareIsRecommended(previewedLabware, moduleModel)) {
       moduleCompatibility = 'recommended'
     } else if (getLabwareCompatible(previewedLabware)) {
       moduleCompatibility = 'potentiallyCompatible'
@@ -442,11 +442,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
                           <LabwareItem
                             key={index}
                             icon={
-                              getLabwareIsRecommended(
-                                labwareDef,
-                                moduleType,
-                                moduleModel
-                              )
+                              getLabwareIsRecommended(labwareDef, moduleModel)
                                 ? 'check-decagram'
                                 : null
                             }
