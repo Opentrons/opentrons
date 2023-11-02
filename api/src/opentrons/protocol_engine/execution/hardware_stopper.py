@@ -4,7 +4,6 @@ from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
-from opentrons_shared_data.robot.dev_types import RobotType
 
 from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state import StateStore
@@ -101,7 +100,6 @@ class HardwareStopper:
     async def do_stop_and_recover(
         self,
         post_run_hardware_state: PostRunHardwareState,
-        robot_type: RobotType,
         drop_tips_after_run: bool = False,
     ) -> None:
         """Stop and reset the HardwareAPI, homing and dropping tips independently if specified."""
@@ -116,29 +114,22 @@ class HardwareStopper:
                 await self._hardware_api.stop(home_after=home_after_stop)
             else:
                 # Stop and home without dropping tips and without homing the plungers
-                await self._hardware_api.stop(home_after=False)
-                # TODO: do we need to check robot type here and if we are on an OT3 add grippers?
-                # that would mean passing the robot type down thru finish as well
-                if robot_type == "OT-2 Standard":
-                    await self._movement_handler.home(
-                        axes=[
-                            MotorAxis.X,
-                            MotorAxis.Y,
-                            MotorAxis.LEFT_Z,
-                            MotorAxis.RIGHT_Z,
-                        ]
-                    )
-                else:
-                    await self._movement_handler.home(
-                        axes=[
-                            MotorAxis.X,
-                            MotorAxis.Y,
-                            MotorAxis.LEFT_Z,
-                            MotorAxis.RIGHT_Z,
-                            MotorAxis.EXTENSION_Z,
-                            MotorAxis.EXTENSION_JAW,
-                        ]
-                    )
+                instrs = self._hardware_api.get_attached_instruments()
+                try:
+                    if instrs.get(OT3Mount.GRIPPER) is not None:
+                        await self._movement_handler.home(
+                            axes=[MotorAxis.EXTENSION_Z, MotorAxis.EXTENSION_JAW]
+                        )
+                except:
+                    pass
+                await self._movement_handler.home(
+                    axes=[
+                        MotorAxis.X,
+                        MotorAxis.Y,
+                        MotorAxis.LEFT_Z,
+                        MotorAxis.RIGHT_Z,
+                    ]
+                )
         else:
             # Stop without homing or dropping tips
             await self._hardware_api.stop(home_after=False)

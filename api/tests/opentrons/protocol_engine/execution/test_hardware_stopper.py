@@ -100,7 +100,6 @@ async def test_hardware_stopping_sequence(
     # TODO add branching test logic for OT version?
 
     await subject.do_stop_and_recover(
-        robot_type="OT-2 Standard",
         drop_tips_after_run=True,
         post_run_hardware_state=post_run_hardware_state,
     )
@@ -134,7 +133,6 @@ async def test_hardware_stopping_sequence_without_pipette_tips(
     decoy.when(state_store.pipettes.get_all_attached_tips()).then_return([])
 
     await subject.do_stop_and_recover(
-        robot_type="OT-2 Standard",
         drop_tips_after_run=True,
         post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     )
@@ -159,7 +157,6 @@ async def test_hardware_stopping_sequence_no_tip_drop(
     )
 
     await subject.do_stop_and_recover(
-        robot_type="OT-2 Standard",
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.DISENGAGE_IN_PLACE,
     )
@@ -197,7 +194,6 @@ async def test_hardware_stopping_sequence_no_pipette(
     ).then_raise(HwPipetteNotAttachedError("oh no"))
 
     await subject.do_stop_and_recover(
-        robot_type="OT-2 Standard",
         drop_tips_after_run=True,
         post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     )
@@ -231,7 +227,6 @@ async def test_hardware_stopping_sequence_with_gripper(
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
     await subject.do_stop_and_recover(
-        robot_type="OT-2 Standard",
         drop_tips_after_run=True,
         post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     )
