@@ -1,6 +1,7 @@
 import 'cypress-file-upload'
 import cloneDeep from 'lodash/cloneDeep'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../src/constants'
 const semver = require('semver')
 
 // TODO: (sa 2022-03-31: change these migration fixtures to v6 protocols once the liquids key is added to PD protocols
@@ -156,24 +157,45 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
                 //  NOTE: labwareLocationUpdates, trash stubs can be removed for the release after 8.0.0
                 //  currently stubbed because of the newly created trash id for movable trash support
-                f.designerApplication.data.savedStepForms.__INITIAL_DECK_SETUP_STEP__.labwareLocationUpdate =
-                  'trash'
+                const labwareLocationUpdate =
+                  f.designerApplication.data.savedStepForms
+                    .__INITIAL_DECK_SETUP_STEP__.labwareLocationUpdate
 
-                Object.values(f.designerApplication.data.savedStepForms).map(
-                  stepForm => {
-                    if (stepForm.stepType === 'moveLiquid') {
-                      stepForm.dropTip_location = 'trash drop tip location'
-                      stepForm.blowout_location = 'trash blowout location'
-                    }
-                    if (stepForm.stepType === 'mix') {
-                      if (stepForm.labware.includes('trash')) {
-                        stepForm.labware = 'trash'
-                      }
-                      stepForm.dropTip_location = 'trash drop tip location'
-                      stepForm.blowout_location = 'trash blowout location'
+                Object.entries(labwareLocationUpdate).forEach(
+                  ([labwareId, slot]) => {
+                    if (
+                      labwareId.includes(OT_2_TRASH_DEF_URI) ||
+                      labwareId.includes(FLEX_TRASH_DEF_URI)
+                    ) {
+                      labwareLocationUpdate['trashId'] = slot
+                      delete labwareLocationUpdate[labwareId]
                     }
                   }
                 )
+
+                Object.values(
+                  f.designerApplication.data.savedStepForms
+                ).forEach(stepForm => {
+                  if (stepForm.stepType === 'moveLiquid') {
+                    stepForm.dropTip_location = 'trash drop tip location'
+                    if (
+                      stepForm.blowout_location.includes(OT_2_TRASH_DEF_URI) ||
+                      stepForm.blowout_location.includes(FLEX_TRASH_DEF_URI)
+                    ) {
+                      stepForm.blowout_location = 'trash blowout location'
+                    }
+                  }
+                  if (stepForm.stepType === 'mix') {
+                    if (
+                      stepForm.labware.includes(OT_2_TRASH_DEF_URI) ||
+                      stepForm.labware.includes(FLEX_TRASH_DEF_URI)
+                    ) {
+                      stepForm.labware = 'trash'
+                    }
+                    stepForm.dropTip_location = 'trash drop tip location'
+                    stepForm.blowout_location = 'trash blowout location'
+                  }
+                })
                 f.commands.forEach(command => {
                   if ('key' in command) {
                     command.key = '123'
@@ -191,9 +213,10 @@ describe('Protocol fixtures migrate and match snapshots', () => {
                     (command.commandType === 'aspirate' ||
                       command.commandType === 'dispense' ||
                       command.commandType === 'blowout') &&
-                    command.params.labwareId.includes('trash')
+                    (command.params.labwareId.includes(OT_2_TRASH_DEF_URI) ||
+                      command.params.labwareId.includes(FLEX_TRASH_DEF_URI))
                   ) {
-                    command.params.labwareId = 'aspirateTrash'
+                    command.params.labwareId = 'trash'
                   }
                 })
               })

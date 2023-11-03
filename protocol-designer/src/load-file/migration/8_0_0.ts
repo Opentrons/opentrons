@@ -44,8 +44,13 @@ export const migrateFile = (
     labwareDefinitions,
     liquids,
   } = appData
+
+  if (designerApplication == null || designerApplication.data == null) {
+    throw Error('The designerApplication key in your file is corrupt.')
+  }
+
   const labwareLocationUpdate: LabwareLocationUpdate =
-    designerApplication?.data?.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+    designerApplication.data.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       .labwareLocationUpdate
   const allLatestDefs = getOnlyLatestDefs()
 
@@ -180,10 +185,10 @@ export const migrateFile = (
       ...appData.designerApplication,
       version: PD_VERSION,
       data: {
-        ...appData.designerApplication?.data,
+        ...designerApplication.data,
         savedStepForms: {
           [INITIAL_DECK_SETUP_STEP_ID]: {
-            ...appData.designerApplication?.data?.savedStepForms[
+            ...designerApplication.data.savedStepForms[
               INITIAL_DECK_SETUP_STEP_ID
             ],
             labwareLocationUpdate: {

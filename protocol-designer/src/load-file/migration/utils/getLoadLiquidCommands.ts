@@ -3,7 +3,7 @@ import { uuid } from '../../../utils'
 import type { LoadLiquidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export interface DesignerApplicationData {
-  ingredients?: Record<
+  ingredients: Record<
     string,
     {
       name?: string | null
@@ -11,13 +11,13 @@ export interface DesignerApplicationData {
       serialize: boolean
     }
   >
-  ingredLocations?: {
+  ingredLocations: {
     [labwareId: string]: {
       [wellName: string]: { [liquidId: string]: { volume: number } }
     }
   }
   savedStepForms: Record<string, any>
-  orderedStepIds?: string[]
+  orderedStepIds: string[]
 }
 
 export const getLoadLiquidCommands = (
