@@ -1,4 +1,4 @@
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data'
 
 export const getTipracksVisited = (
   pickupTipCommands: PickUpTipRunTimeCommand[]

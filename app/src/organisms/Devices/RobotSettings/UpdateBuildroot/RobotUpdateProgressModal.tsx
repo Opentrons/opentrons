@@ -31,8 +31,8 @@ import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hook
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
 
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
 

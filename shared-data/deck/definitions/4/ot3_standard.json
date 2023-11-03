@@ -304,94 +304,64 @@
     ],
     "cutouts": [
       {
-        "id": "D1",
+        "id": "cutoutD1",
         "position": [0.0, 0.0, 0.0],
-        "displayName": "Cutout D1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout D1"
       },
       {
-        "id": "D2",
+        "id": "cutoutD2",
         "position": [164.0, 0.0, 0.0],
-        "displayName": "Cutout D2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout D2"
       },
       {
-        "id": "D3",
+        "id": "cutoutD3",
         "position": [328.0, 0.0, 0.0],
-        "displayName": "Cutout D3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter",
-          "wasteChuteRightAdapter",
-          "wasteChuteRightAdapterWithStagingAreaSlot"
-        ]
+        "displayName": "Cutout D3"
       },
       {
-        "id": "C1",
+        "id": "cutoutC1",
         "position": [0.0, 107, 0.0],
-        "displayName": "Cutout C1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout C1"
       },
       {
-        "id": "C2",
+        "id": "cutoutC2",
         "position": [164.0, 107, 0.0],
-        "displayName": "Cutout C2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout C2"
       },
       {
-        "id": "C3",
+        "id": "cutoutC3",
         "position": [328.0, 107, 0.0],
-        "displayName": "Cutout C3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter"
-        ]
+        "displayName": "Cutout C3"
       },
       {
-        "id": "B1",
+        "id": "cutoutB1",
         "position": [0.0, 214.0, 0.0],
-        "displayName": "Cutout B1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout B1"
       },
       {
-        "id": "B2",
+        "id": "cutoutB2",
         "position": [164.0, 214.0, 0.0],
-        "displayName": "Cutout B2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout B2"
       },
       {
-        "id": "B3",
+        "id": "cutoutB3",
         "position": [328.0, 214.0, 0.0],
-        "displayName": "Cutout B3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter"
-        ]
+        "displayName": "Cutout B3"
       },
       {
-        "id": "A1",
+        "id": "cutoutA1",
         "position": [0.0, 321.0, 0.0],
-        "displayName": "Cutout A1",
-        "compatibleFixtureTypes": ["singleLeftSlot", "trashBinAdapter"]
+        "displayName": "Cutout A1"
       },
       {
-        "id": "A2",
+        "id": "cutoutA2",
         "position": [164.0, 321.0, 0.0],
-        "displayName": "Cutout A2",
-        "compatibleFixtureTypes": ["singleCenterSlot"]
+        "displayName": "Cutout A2"
       },
       {
-        "id": "A3",
+        "id": "cutoutA3",
         "position": [328.0, 321.0, 0.0],
-        "displayName": "Cutout A3",
-        "compatibleFixtureTypes": [
-          "singleRightSlot",
-          "stagingAreaRightSlot",
-          "trashBinAdapter"
-        ]
+        "displayName": "Cutout A3"
       }
     ],
     "calibrationPoints": [],
@@ -407,77 +377,86 @@
   "cutoutFixtures": [
     {
       "id": "singleLeftSlot",
-      "mayMountTo": ["D1", "C1", "B1", "A1"],
+      "mayMountTo": ["cutoutD1", "cutoutC1", "cutoutB1", "cutoutA1"],
       "displayName": "Standard Slot Left",
       "providesAddressableAreas": {
-        "D1": ["D1"],
-        "C1": ["C1"],
-        "B1": ["B1"],
-        "A1": ["A1"]
+        "cutoutD1": ["D1"],
+        "cutoutC1": ["C1"],
+        "cutoutB1": ["B1"],
+        "cutoutA1": ["A1"]
       }
     },
     {
       "id": "singleCenterSlot",
-      "mayMountTo": ["D2", "C2", "B2", "A2"],
+      "mayMountTo": ["cutoutD2", "cutoutC2", "cutoutB2", "cutoutA2"],
       "displayName": "Standard Slot Center",
       "providesAddressableAreas": {
-        "D2": ["D2"],
-        "C2": ["C2"],
-        "B2": ["B2"],
-        "A2": ["A2"]
+        "cutoutD2": ["D2"],
+        "cutoutC2": ["C2"],
+        "cutoutB2": ["B2"],
+        "cutoutA2": ["A2"]
       }
     },
     {
       "id": "singleRightSlot",
-      "mayMountTo": ["D3", "C3", "B3", "A3"],
+      "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
       "displayName": "Standard Slot Right",
       "providesAddressableAreas": {
-        "D3": ["D3"],
-        "C3": ["C3"],
-        "B3": ["B3"],
-        "A3": ["A3"]
+        "cutoutD3": ["D3"],
+        "cutoutC3": ["C3"],
+        "cutoutB3": ["B3"],
+        "cutoutA3": ["A3"]
       }
     },
     {
       "id": "stagingAreaRightSlot",
-      "mayMountTo": ["D3", "C3", "B3", "A3"],
+      "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
       "displayName": "Staging Area Slot",
       "providesAddressableAreas": {
-        "D3": ["D3", "D4"],
-        "C3": ["C3", "C4"],
-        "B3": ["B3", "B4"],
-        "A3": ["A3", "A4"]
+        "cutoutD3": ["D3", "D4"],
+        "cutoutC3": ["C3", "C4"],
+        "cutoutB3": ["B3", "B4"],
+        "cutoutA3": ["A3", "A4"]
       }
     },
     {
       "id": "trashBinAdapter",
-      "mayMountTo": ["D1", "C1", "B1", "A1", "D3", "C3", "B3", "A3"],
+      "mayMountTo": [
+        "cutoutD1",
+        "cutoutC1",
+        "cutoutB1",
+        "cutoutA1",
+        "cutoutD3",
+        "cutoutC3",
+        "cutoutB3",
+        "cutoutA3"
+      ],
       "displayName": "Slot With Movable Trash",
       "providesAddressableAreas": {
-        "D1": ["movableTrash"],
-        "C1": ["movableTrash"],
-        "B1": ["movableTrash"],
-        "A1": ["movableTrash"],
-        "D3": ["movableTrash"],
-        "C3": ["movableTrash"],
-        "B3": ["movableTrash"],
-        "A3": ["movableTrash"]
+        "cutoutD1": ["movableTrash"],
+        "cutoutC1": ["movableTrash"],
+        "cutoutB1": ["movableTrash"],
+        "cutoutA1": ["movableTrash"],
+        "cutoutD3": ["movableTrash"],
+        "cutoutC3": ["movableTrash"],
+        "cutoutB3": ["movableTrash"],
+        "cutoutA3": ["movableTrash"]
       }
     },
     {
       "id": "wasteChuteRightAdapterCovered",
-      "mayMountTo": ["D3"],
+      "mayMountTo": ["cutoutD3"],
       "displayName": "Waste Chute Adapter for 1 or 8 Channel Pipettes",
       "providesAddressableAreas": {
-        "D3": ["1and8ChannelWasteChute"]
+        "cutoutD3": ["1and8ChannelWasteChute"]
       }
     },
     {
       "id": "wasteChuteRightAdapterNoCover",
-      "mayMountTo": ["D3"],
+      "mayMountTo": ["cutoutD3"],
       "displayName": "Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "D3": [
+        "cutoutD3": [
           "1and8ChannelWasteChute",
           "96ChannelWasteChute",
           "gripperWasteChute"
@@ -486,18 +465,18 @@
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterCovered",
-      "mayMountTo": ["D3"],
+      "mayMountTo": ["cutoutD3"],
       "displayName": "Staging Slot With Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "D3": ["1and8ChannelWasteChute", "D4"]
+        "cutoutD3": ["1and8ChannelWasteChute", "D4"]
       }
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
-      "mayMountTo": ["D3"],
+      "mayMountTo": ["cutoutD3"],
       "displayName": "Staging Slot With Waste Chute Adapter and Staging Area Slot",
       "providesAddressableAreas": {
-        "D3": [
+        "cutoutD3": [
           "1and8ChannelWasteChute",
           "96ChannelWasteChute",
           "gripperWasteChute",

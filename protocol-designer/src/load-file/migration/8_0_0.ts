@@ -10,12 +10,12 @@ import {
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
+} from '@opentrons/shared-data'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration updates fixed trash by treating it as an entity
 // additionally, drop tip location is now selectable
-const PD_VERSION = '7.1.0'
+const PD_VERSION = '8.0.0'
 
 interface LabwareLocationUpdate {
   [id: string]: string
@@ -132,7 +132,7 @@ export const migrateFile = (
       }
     })
 
-  const migratedCommandsV7_1 = commands.filter(
+  const migratedCommandsV8 = commands.filter(
     command => command.commandType !== 'loadLabware'
   )
 
@@ -161,7 +161,7 @@ export const migrateFile = (
       ...appData.labwareDefinitions,
     },
     commands: [
-      ...migratedCommandsV7_1,
+      ...migratedCommandsV8,
       ...loadLabwareCommands,
       ...trashLoadCommand,
     ],

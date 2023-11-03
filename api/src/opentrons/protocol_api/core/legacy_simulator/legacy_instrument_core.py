@@ -106,7 +106,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                         "cause over aspiration if the previous command is a "
                         "blow_out."
                     )
-                self.prepare_for_aspirate()
+                self.prepare_to_aspirate()
             self.move_to(location=location, well_core=well_core)
         elif location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)
@@ -334,7 +334,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def is_ready_to_aspirate(self) -> bool:
         return self._pipette_dict["ready_to_aspirate"]
 
-    def prepare_for_aspirate(self) -> None:
+    def prepare_to_aspirate(self) -> None:
         self._raise_if_no_tip(HardwareAction.PREPARE_ASPIRATE.name)
 
     def get_return_height(self) -> float:

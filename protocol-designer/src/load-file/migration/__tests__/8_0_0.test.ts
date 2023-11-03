@@ -1,4 +1,4 @@
-import { migrateFile } from '../7_1_0'
+import { migrateFile } from '../8_0_0'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import _oldDoItAllProtocol from '../../../../fixtures/protocol/7/doItAllV7.json'
 import { getOnlyLatestDefs, LabwareDefByDefURI } from '../../../labware-defs'
@@ -13,7 +13,7 @@ const mockGetOnlyLatestDefs = getOnlyLatestDefs as jest.MockedFunction<
 >
 const trashUri = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
 
-describe('v7.1 migration', () => {
+describe('v8.0 migration', () => {
   beforeEach(() => {
     mockGetOnlyLatestDefs.mockReturnValue({
       [trashUri]: fixture_trash,

@@ -182,6 +182,10 @@
       "detail": "Invalid Liquid Class Name",
       "category": "roboticsInteractionError"
     },
+    "3018": {
+      "detail": "Tip Detector Not Created",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

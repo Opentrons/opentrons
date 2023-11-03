@@ -11,11 +11,10 @@ import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import { getRobotSessionIsManualFile } from '../../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('@opentrons/shared-data/protocol/types/schemaV7/command/incidental')
 jest.mock('../useRobotUpdateInfo')
 jest.mock('../../../../../redux/robot-update')
 jest.mock('../../../../../redux/robot-update/hooks')

@@ -138,7 +138,7 @@ export function DeviceDetailsDeckConfiguration({
               // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
               marginLeft={`-${SPACING.spacing32}`}
               // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              marginTop={`-${SPACING.spacing60}`}
+              marginTop={`-${SPACING.spacing6}`}
               flexDirection={DIRECTION_COLUMN}
             >
               <DeckConfigurator

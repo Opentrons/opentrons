@@ -28,6 +28,10 @@ from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
 )
 from opentrons.types import Location, Mount, Point
 
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+)
+
 
 @pytest.fixture(autouse=True)
 def _mock_validation_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -912,3 +916,21 @@ def test_plunger_speed_removed(subject: InstrumentContext) -> None:
     """It should raise an error on PAPI >= v2.14."""
     with pytest.raises(APIVersionError):
         subject.speed
+
+
+def test_prepare_to_aspirate(
+    subject: InstrumentContext, decoy: Decoy, mock_instrument_core: InstrumentCore
+) -> None:
+    """It should call the core function."""
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    subject.prepare_to_aspirate()
+    decoy.verify(mock_instrument_core.prepare_to_aspirate(), times=1)
+
+
+def test_prepare_to_aspirate_checks_volume(
+    subject: InstrumentContext, decoy: Decoy, mock_instrument_core: InstrumentCore
+) -> None:
+    """It should raise an error if you prepare for aspirate with liquid in the pipette."""
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(10)
+    with pytest.raises(CommandPreconditionViolated):
+        subject.prepare_to_aspirate()

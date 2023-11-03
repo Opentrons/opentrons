@@ -892,3 +892,8 @@ class OT3PipetteHandler:
             pip.config.liquid_properties,
         )
         pip.set_liquid_class_by_name(new_class_name.name)
+
+    def get_tip_sensor_count(self, mount: OT3Mount) -> int:
+        if not self.has_pipette(mount):
+            return 0
+        return self.get_pipette(mount).tip_presence_responses
