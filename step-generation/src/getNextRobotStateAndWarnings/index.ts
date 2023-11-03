@@ -33,6 +33,7 @@ import {
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
 import { forMoveLabware } from './forMoveLabware'
+import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -90,6 +91,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'moveLabware':
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'moveToAddressableArea':
+      forMoveToAddressableArea(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'touchTip':

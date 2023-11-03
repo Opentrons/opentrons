@@ -13,20 +13,22 @@ import { setTemperature } from './setTemperature'
 import { touchTip } from './touchTip'
 import { moveToWell } from './moveToWell'
 import { moveLabware } from './moveLabware'
+import { moveToAddressableArea } from './moveToAddressableArea'
 export {
   aspirate,
-  waitForTemperature,
   blowout,
   deactivateTemperature,
   delay,
-  dispense,
   disengageMagnet,
+  dispense,
   dropAllTips,
   dropTip,
   engageMagnet,
+  moveLabware,
+  moveToAddressableArea,
+  moveToWell,
   replaceTip,
   setTemperature,
   touchTip,
-  moveToWell,
-  moveLabware,
+  waitForTemperature,
 }
