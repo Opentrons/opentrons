@@ -65,7 +65,7 @@ def get_configuration_errors(
             errors.add(OvercrowdedCutoutError(cutout, tuple(fixtures)))
 
     for placement in placements:
-        found_cutout_fixture = find_cutout_fixture(
+        found_cutout_fixture = _find_cutout_fixture(
             deck_definition, placement.cutout_fixture_id
         )
         if isinstance(found_cutout_fixture, UnrecognizedCutoutFixtureError):
@@ -84,7 +84,7 @@ def get_configuration_errors(
     return errors
 
 
-def find_cutout_fixture(
+def _find_cutout_fixture(
     deck_definition: deck_types.DeckDefinitionV4, cutout_fixture_id: str
 ) -> Union[deck_types.CutoutFixture, UnrecognizedCutoutFixtureError]:
     try:
