@@ -2,12 +2,21 @@
 
 
 from datetime import datetime
+from typing import Union
 
 import fastapi
+from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+
+from robot_server.errors import ErrorBody
+from robot_server.hardware import get_deck_definition
 from robot_server.service.dependencies import get_current_time
 from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody
+
 from . import models
+from . import validation
+from . import validation_mapping
 from .fastapi_dependencies import get_deck_configuration_store
 from .store import DeckConfigurationStore
 
@@ -35,15 +44,35 @@ router = fastapi.APIRouter()
         fastapi.status.HTTP_200_OK: {
             "model": SimpleBody[models.DeckConfigurationResponse]
         },
+        fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorBody[models.InvalidDeckConfigurationResponse]
+        },
     },
 )
 async def put_deck_configuration(  # noqa: D103
     request_body: RequestModel[models.DeckConfigurationRequest],
     store: DeckConfigurationStore = fastapi.Depends(get_deck_configuration_store),
     last_updated_at: datetime = fastapi.Depends(get_current_time),
-) -> PydanticResponse[SimpleBody[models.DeckConfigurationResponse]]:
-    response = await store.set(request_body.data, last_updated_at)
-    return await PydanticResponse.create(content=SimpleBody.construct(data=response))
+    deck_definition: DeckDefinitionV4 = fastapi.Depends(get_deck_definition),
+) -> PydanticResponse[
+    Union[
+        SimpleBody[models.DeckConfigurationResponse],
+        ErrorBody[models.InvalidDeckConfigurationResponse],
+    ]
+]:
+    placements = validation_mapping.map_in(request_body.data)
+    validation_errors = validation.get_configuration_errors(deck_definition, placements)
+    if len(validation_errors) == 0:
+        success_data = await store.set(request_body.data, last_updated_at)
+        return await PydanticResponse.create(
+            content=SimpleBody.construct(data=success_data)
+        )
+    else:
+        error_data = validation_mapping.map_out(validation_errors)
+        return await PydanticResponse.create(
+            content=ErrorBody.construct(errors=error_data),
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+        )
 
 
 @router.get(

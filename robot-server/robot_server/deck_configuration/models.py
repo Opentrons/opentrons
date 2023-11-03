@@ -3,8 +3,11 @@
 
 from datetime import datetime
 from typing import List, Optional
+from typing_extensions import Literal
 
 import pydantic
+
+from robot_server.errors import ErrorDetails
 
 
 class CutoutFixture(pydantic.BaseModel):
@@ -52,3 +55,10 @@ class DeckConfigurationResponse(pydantic.BaseModel):
             " If that has never happened, this will be `null` or omitted."
         )
     )
+
+
+class InvalidDeckConfigurationResponse(ErrorDetails):
+    """A response for when the client supplies an invalid deck configuration."""
+
+    id: Literal["InvalidDeckConfiguration"] = "InvalidDeckConfiguration"
+    title: str = "Invalid Deck Configuration"
