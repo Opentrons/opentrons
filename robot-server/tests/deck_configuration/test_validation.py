@@ -154,9 +154,15 @@ def test_unrecognized_cutout() -> None:
             ("singleRightSlot", "someUnrecognizedCutout"),
         ]
     ]
-    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
-        subject.UnrecognizedCutoutError(cutout_id="someUnrecognizedCutout")
-    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == {
+        subject.InvalidLocationError(
+            cutout_fixture_id="singleRightSlot",
+            cutout_id="someUnrecognizedCutout",
+            allowed_cutout_ids=frozenset(
+                ["cutoutA3", "cutoutB3", "cutoutC3", "cutoutD3"]
+            ),
+        )
+    }
 
 
 def test_unrecognized_cutout_fixture() -> None:

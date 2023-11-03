@@ -31,11 +31,6 @@ class InvalidLocationError:
 
 
 @dataclass(frozen=True)
-class UnrecognizedCutoutError:
-    cutout_id: str
-
-
-@dataclass(frozen=True)
 class UnrecognizedCutoutFixtureError:
     cutout_fixture_id: str
 
@@ -44,7 +39,6 @@ ConfigurationError = Union[
     UnoccupiedCutoutError,
     OvercrowdedCutoutError,
     InvalidLocationError,
-    UnrecognizedCutoutError,
     UnrecognizedCutoutFixtureError,
 ]
 
