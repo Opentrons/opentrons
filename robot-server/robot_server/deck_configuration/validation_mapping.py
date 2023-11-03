@@ -16,17 +16,17 @@ def map_in(request: models.DeckConfigurationRequest) -> List[validation.Placemen
 
 def map_out(
     validation_errors: Iterable[validation.ConfigurationError],
-) -> List[models.InvalidDeckConfigurationResponse]:
+) -> List[models.InvalidDeckConfiguration]:
     return [_map_out_single_error(e) for e in validation_errors]
 
 
 def _map_out_single_error(
     error: validation.ConfigurationError,
-) -> models.InvalidDeckConfigurationResponse:
+) -> models.InvalidDeckConfiguration:
     meta = {
         "deckConfigurationProblem": error.__class__.__name__,
         **dataclasses.asdict(error),
     }
-    return models.InvalidDeckConfigurationResponse(
+    return models.InvalidDeckConfiguration(
         detail="Invalid deck configuration.", meta=meta
     )

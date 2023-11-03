@@ -57,8 +57,8 @@ class DeckConfigurationResponse(pydantic.BaseModel):
     )
 
 
-class InvalidDeckConfigurationResponse(ErrorDetails):
-    """A response for when the client supplies an invalid deck configuration."""
+class InvalidDeckConfiguration(ErrorDetails):
+    """Error details for when a client supplies an invalid deck configuration."""
 
     id: Literal["InvalidDeckConfiguration"] = "InvalidDeckConfiguration"
     title: str = "Invalid Deck Configuration"

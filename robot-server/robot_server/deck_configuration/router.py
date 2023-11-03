@@ -45,7 +45,7 @@ router = fastapi.APIRouter()
             "model": SimpleBody[models.DeckConfigurationResponse]
         },
         fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ErrorBody[models.InvalidDeckConfigurationResponse]
+            "model": ErrorBody[models.InvalidDeckConfiguration]
         },
     },
 )
@@ -57,7 +57,7 @@ async def put_deck_configuration(  # noqa: D103
 ) -> PydanticResponse[
     Union[
         SimpleBody[models.DeckConfigurationResponse],
-        ErrorBody[models.InvalidDeckConfigurationResponse],
+        ErrorBody[models.InvalidDeckConfiguration],
     ]
 ]:
     placements = validation_mapping.map_in(request_body.data)
