@@ -8,6 +8,7 @@ from . import validation
 
 
 def map_in(request: models.DeckConfigurationRequest) -> List[validation.Placement]:
+    """Map a request from HTTP to internal types that can be validated."""
     return [
         validation.Placement(cutout_id=p.cutoutId, cutout_fixture_id=p.cutoutFixtureId)
         for p in request.cutoutFixtures
@@ -17,6 +18,7 @@ def map_in(request: models.DeckConfigurationRequest) -> List[validation.Placemen
 def map_out(
     validation_errors: Iterable[validation.ConfigurationError],
 ) -> List[models.InvalidDeckConfiguration]:
+    """Map internal results from validation to HTTP-exposed types."""
     return [_map_out_single_error(e) for e in validation_errors]
 
 

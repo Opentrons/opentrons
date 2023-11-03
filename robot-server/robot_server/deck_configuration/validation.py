@@ -1,3 +1,6 @@
+"""Validate a deck configuration."""
+
+
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union
@@ -7,17 +10,23 @@ from opentrons_shared_data.deck import dev_types as deck_types
 
 @dataclass(frozen=True)
 class Placement:
+    """A placement of a cutout fixture in a cutout."""
+
     cutout_id: str
     cutout_fixture_id: str
 
 
 @dataclass(frozen=True)
 class UnoccupiedCutoutError:
+    """When a cutout has been left empty--no cutout fixtures mounted to it."""
+
     cutout_id: str
 
 
 @dataclass(frozen=True)
 class OvercrowdedCutoutError:
+    """When a cutout has had more than one cutout fixture mounted to it."""
+
     cutout_id: str
     cutout_fixture_ids: Tuple[str, ...]
     """All the conflicting cutout fixtures, in input order."""
@@ -25,6 +34,8 @@ class OvercrowdedCutoutError:
 
 @dataclass(frozen=True)
 class InvalidLocationError:
+    """When a cutout fixture has been mounted somewhere it cannot be mounted."""
+
     cutout_id: str
     cutout_fixture_id: str
     allowed_cutout_ids: FrozenSet[str]
@@ -32,6 +43,8 @@ class InvalidLocationError:
 
 @dataclass(frozen=True)
 class UnrecognizedCutoutFixtureError:
+    """When an cutout has been mounted that's not defined by the deck definition."""
+
     cutout_fixture_id: str
 
 
@@ -47,6 +60,10 @@ def get_configuration_errors(
     deck_definition: deck_types.DeckDefinitionV4,
     placements: List[Placement],
 ) -> Set[ConfigurationError]:
+    """Return all the problems with the given deck configration.
+
+    If there are no problems, return ``{}``.
+    """
     errors: Set[ConfigurationError] = set()
     fixtures_by_cutout: DefaultDict[str, List[str]] = defaultdict(list)
 
