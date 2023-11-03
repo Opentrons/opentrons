@@ -76,25 +76,30 @@ def get_configuration_errors(
         found_cutout_fixture = find_cutout_fixture(
             deck_definition, cutout_fixture.cutout_fixture_id
         )
-        allowed_cutout_ids = frozenset(found_cutout_fixture["mayMountTo"])
-        if cutout_fixture.cutout_id not in allowed_cutout_ids:
-            errors.add(
-                InvalidLocationError(
-                    cutout_id=cutout_fixture.cutout_id,
-                    cutout_fixture_id=cutout_fixture.cutout_fixture_id,
-                    allowed_cutout_ids=allowed_cutout_ids,
+        if isinstance(found_cutout_fixture, UnrecognizedCutoutFixtureError):
+            errors.add(found_cutout_fixture)
+        else:
+            allowed_cutout_ids = frozenset(found_cutout_fixture["mayMountTo"])
+            if cutout_fixture.cutout_id not in allowed_cutout_ids:
+                errors.add(
+                    InvalidLocationError(
+                        cutout_id=cutout_fixture.cutout_id,
+                        cutout_fixture_id=cutout_fixture.cutout_fixture_id,
+                        allowed_cutout_ids=allowed_cutout_ids,
+                    )
                 )
-            )
 
     return errors
 
 
 def find_cutout_fixture(
     deck_definition: deck_types.DeckDefinitionV4, cutout_fixture_id: str
-) -> deck_types.CutoutFixture:
-    # TODO: What if the cutout fixture doesn't exist?
-    return next(
-        cutout_fixture
-        for cutout_fixture in deck_definition["cutoutFixtures"]
-        if cutout_fixture["id"] == cutout_fixture_id
-    )
+) -> Union[deck_types.CutoutFixture, UnrecognizedCutoutFixtureError]:
+    try:
+        return next(
+            cutout_fixture
+            for cutout_fixture in deck_definition["cutoutFixtures"]
+            if cutout_fixture["id"] == cutout_fixture_id
+        )
+    except StopIteration:
+        return UnrecognizedCutoutFixtureError(cutout_fixture_id=cutout_fixture_id)
