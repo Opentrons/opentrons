@@ -1,13 +1,9 @@
 import * as React from 'react'
 import {
-  RobotType,
   // getDeckDefFromRobotType,
-  ModuleModel,
-  ModuleLocation,
+  getCutoutFromSlotId,
   getModuleDef2,
-  LabwareDefinition2,
   inferModuleOrientationFromXCoordinate,
-  LabwareLocation,
   // OT2_ROBOT_TYPE,
   STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
@@ -36,6 +32,12 @@ import { WasteChuteFixture } from './WasteChuteFixture'
 import type {
   DeckConfiguration,
   DeckDefinitionV4,
+  FlexSlot,
+  LabwareDefinition2,
+  LabwareLocation,
+  ModuleLocation,
+  ModuleModel,
+  RobotType,
 } from '@opentrons/shared-data'
 import type { TrashLocationV4 } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
@@ -177,17 +179,34 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           const slotDef = deckDef.locations.addressableAreas.find(
             s => s.id === moduleLocation.slotName
           )
-          // TODO: read from cutout position
-          // TODO: add offsetFromCutoutFixture
-          const { xDimension, yDimension } = slotDef?.boundingBox ?? {}
+
+          // early return null if no slot def found
+          if (slotDef == null) return null
+
+          const cutoutId = getCutoutFromSlotId(slotDef.id as FlexSlot)
+          const cutoutDef = deckDef.locations.cutouts.find(
+            cutout => cutout.id === cutoutId
+          )
+
+          // early return null if no cutout def found
+          if (cutoutDef == null) return null
+
+          const [xCutout, yCutout] = cutoutDef.position ?? []
+          const [
+            xOffsetFromCutout,
+            yOffsetFromCutout,
+          ] = slotDef.offsetFromCutoutFixture
+          const xCoordinate = xCutout + xOffsetFromCutout
+          const yCoordinate = yCutout + yOffsetFromCutout
+
           const moduleDef = getModuleDef2(moduleModel)
-          return slotDef != null && xDimension != null && yDimension != null ? (
+          return slotDef != null ? (
             <Module
               key={`${moduleModel} ${slotDef.id}`}
               def={moduleDef}
-              x={xDimension}
-              y={yDimension}
-              orientation={inferModuleOrientationFromXCoordinate(xDimension)}
+              x={xCoordinate}
+              y={yCoordinate}
+              orientation={inferModuleOrientationFromXCoordinate(xCoordinate)}
               innerProps={innerProps}
             >
               {nestedLabwareDef != null ? (
@@ -209,11 +228,30 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               'slotName' in labwareLocation &&
               s.id === labwareLocation.slotName
           )
-          const { xDimension, yDimension } = slotDef?.boundingBox ?? {}
-          return slotDef != null && xDimension != null && yDimension != null ? (
+
+          // early return null if no slot def found
+          if (slotDef == null) return null
+
+          const cutoutId = getCutoutFromSlotId(slotDef.id as FlexSlot)
+          const cutoutDef = deckDef.locations.cutouts.find(
+            cutout => cutout.id === cutoutId
+          )
+
+          // early return null if no cutout def found
+          if (cutoutDef == null) return null
+
+          const [xCutout, yCutout] = cutoutDef.position ?? []
+          const [
+            xOffsetFromCutout,
+            yOffsetFromCutout,
+          ] = slotDef.offsetFromCutoutFixture
+          const xCoordinate = xCutout + xOffsetFromCutout
+          const yCoordinate = yCutout + yOffsetFromCutout
+
+          return slotDef != null ? (
             <g
               key={slotDef.id}
-              transform={`translate(${xDimension},${yDimension})`}
+              transform={`translate(${xCoordinate.toString()},${yCoordinate.toString()})`}
             >
               <LabwareRender
                 definition={definition}

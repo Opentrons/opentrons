@@ -328,8 +328,24 @@ export interface LegacyFixture {
   displayName: string
 }
 
+type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'
+
+export interface AddressableArea {
+  id: string
+  areaType: AreaType
+  offsetFromCutoutFixture: CoordinateTuple
+  boundingBox: Dimensions
+  displayName: string
+  compatibleModuleTypes: ModuleType[]
+  ableToDropLabware?: boolean
+  ableToDropTips?: boolean
+  dropLabwareOffset?: CoordinateTuple
+  dropTipsOffset?: CoordinateTuple
+  matingSurfaceUnitVector?: UnitVectorTuple
+}
+
 export interface DeckLocationsV4 {
-  addressableAreas: DeckSlot[]
+  addressableAreas: AddressableArea[]
   calibrationPoints: DeckCalibrationPoint[]
   cutouts: DeckCutout[]
   legacyFixtures: LegacyFixture[]
@@ -584,6 +600,24 @@ export type Cutout =
   | 'cutoutB3'
   | 'cutoutC3'
   | 'cutoutD3'
+
+export type FlexSlot =
+  | 'A1'
+  | 'B1'
+  | 'C1'
+  | 'D1'
+  | 'A2'
+  | 'B2'
+  | 'C2'
+  | 'D2'
+  | 'A3'
+  | 'B3'
+  | 'C3'
+  | 'D3'
+  | 'A4'
+  | 'B4'
+  | 'C4'
+  | 'D4'
 
 export interface Fixture {
   fixtureId: string
