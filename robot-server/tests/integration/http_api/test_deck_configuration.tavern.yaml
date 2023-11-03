@@ -29,13 +29,15 @@ stages:
               cutoutId: cutoutC2
             - cutoutFixtureId: singleCenterSlot
               cutoutId: cutoutD2
+            # Throw in a weird right-side deck layout
+            # so we know this won't happen to match the default.
             - cutoutFixtureId: stagingAreaRightSlot
               cutoutId: cutoutA3
-            - cutoutFixtureId: singleCenterSlot
+            - cutoutFixtureId: singleRightSlot
               cutoutId: cutoutB3
             - cutoutFixtureId: stagingAreaRightSlot
               cutoutId: cutoutC3
-            - cutoutFixtureId: singleCenterSlot
+            - cutoutFixtureId: singleRightSlot
               cutoutId: cutoutD3
 
   - name: Get the deck configuration
