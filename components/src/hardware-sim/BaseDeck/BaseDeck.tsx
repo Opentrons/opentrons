@@ -37,7 +37,7 @@ import type {
   DeckConfiguration,
   DeckDefinitionV4,
 } from '@opentrons/shared-data'
-import type { TrashLocation } from '../Deck/FlexTrash'
+import type { TrashLocationV4 } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 // import type { WasteChuteLocation } from './WasteChuteFixture'
 
@@ -143,10 +143,11 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               fixtureBaseColor={lightFill}
             />
             <FlexTrash
+              deckDefinition={deckDef}
               robotType={robotType}
               trashIconColor={lightFill}
               // TODO(bh, 2023-10-09): typeguard fixture location
-              trashLocation={fixture.fixtureLocation as TrashLocation}
+              trashLocation={fixture.fixtureLocation as TrashLocationV4}
               backgroundColor={darkFill}
             />
           </React.Fragment>
@@ -176,16 +177,17 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           const slotDef = deckDef.locations.addressableAreas.find(
             s => s.id === moduleLocation.slotName
           )
+          // TODO: read from cutout position
+          // TODO: add offsetFromCutoutFixture
+          const { xDimension, yDimension } = slotDef?.boundingBox ?? {}
           const moduleDef = getModuleDef2(moduleModel)
-          return slotDef != null ? (
+          return slotDef != null && xDimension != null && yDimension != null ? (
             <Module
               key={`${moduleModel} ${slotDef.id}`}
               def={moduleDef}
-              x={slotDef.position[0]}
-              y={slotDef.position[1]}
-              orientation={inferModuleOrientationFromXCoordinate(
-                slotDef.position[0]
-              )}
+              x={xDimension}
+              y={yDimension}
+              orientation={inferModuleOrientationFromXCoordinate(xDimension)}
               innerProps={innerProps}
             >
               {nestedLabwareDef != null ? (
@@ -207,10 +209,11 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               'slotName' in labwareLocation &&
               s.id === labwareLocation.slotName
           )
-          return slotDef != null ? (
+          const { xDimension, yDimension } = slotDef?.boundingBox ?? {}
+          return slotDef != null && xDimension != null && yDimension != null ? (
             <g
               key={slotDef.id}
-              transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
+              transform={`translate(${xDimension},${yDimension})`}
             >
               <LabwareRender
                 definition={definition}

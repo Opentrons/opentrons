@@ -558,6 +558,7 @@ export const DeckSetup = (): JSX.Element => {
                             fixtureBaseColor={lightFill}
                           />
                           <FlexTrash
+                            deckDefinition={deckDef}
                             robotType={robotType}
                             trashIconColor={lightFill}
                             trashLocation={

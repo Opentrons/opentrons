@@ -48,6 +48,7 @@ export function StyledDeck(
       />
       {trashLocation != null ? (
         <FlexTrash
+          deckDefinition={deckFromDataProps.def}
           robotType={robotType}
           trashIconColor={deckFill}
           backgroundColor={trashColor}
