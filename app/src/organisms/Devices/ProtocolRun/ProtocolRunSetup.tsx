@@ -251,6 +251,7 @@ export function ProtocolRunSetup({
           protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
+          protocolAnalysis={protocolData}
         />
       ),
       description: hasLiquids
