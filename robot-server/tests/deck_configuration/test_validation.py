@@ -149,8 +149,9 @@ def test_unrecognized_cutout() -> None:
             ("singleRightSlot", "cutoutA3"),
             ("singleRightSlot", "cutoutB3"),
             ("singleRightSlot", "cutoutC3"),
+            ("singleRightSlot", "cutoutD3"),
             # Invalid because "someUnrecognizedCutout" is not defined by the deck definition.
-            ("someUnrecognizedCutout", "cutoutD3"),
+            ("singleRightSlot", "someUnrecognizedCutout"),
         ]
     ]
     assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
