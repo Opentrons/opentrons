@@ -1,6 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import DefaultDict, List, Set, Tuple, Union
+from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union
 
 from opentrons_shared_data.deck import dev_types as deck_types
 
@@ -27,6 +27,7 @@ class OvercrowdedCutoutError:
 class InvalidLocationError:
     cutout_id: str
     cutout_fixture_id: str
+    allowed_cutout_ids: FrozenSet[str]
 
 
 @dataclass(frozen=True)
@@ -71,4 +72,29 @@ def get_configuration_errors(
         if len(fixtures) > 1:
             errors.add(OvercrowdedCutoutError(cutout, tuple(fixtures)))
 
+    for cutout_fixture in cutout_fixtures:
+        found_cutout_fixture = find_cutout_fixture(
+            deck_definition, cutout_fixture.cutout_fixture_id
+        )
+        allowed_cutout_ids = frozenset(found_cutout_fixture["mayMountTo"])
+        if cutout_fixture.cutout_id not in allowed_cutout_ids:
+            errors.add(
+                InvalidLocationError(
+                    cutout_id=cutout_fixture.cutout_id,
+                    cutout_fixture_id=cutout_fixture.cutout_fixture_id,
+                    allowed_cutout_ids=allowed_cutout_ids,
+                )
+            )
+
     return errors
+
+
+def find_cutout_fixture(
+    deck_definition: deck_types.DeckDefinitionV4, cutout_fixture_id: str
+) -> deck_types.CutoutFixture:
+    # TODO: What if the cutout fixture doesn't exist?
+    return next(
+        cutout_fixture
+        for cutout_fixture in deck_definition["cutoutFixtures"]
+        if cutout_fixture["id"] == cutout_fixture_id
+    )

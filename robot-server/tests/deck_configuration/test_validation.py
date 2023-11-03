@@ -105,9 +105,10 @@ def test_invalid_cutout_for_fixture() -> None:
             ("singleLeftSlot", "cutoutD1"),
             ("singleCenterSlot", "cutoutA2"),
             ("singleCenterSlot", "cutoutB2"),
-            # Invalid because wasteChuteRightAdapterNoCover can't be placed in cutout C2.
+            # Invalid because wasteChuteRightAdapterNoCover can't be placed in cutout C2...
             ("wasteChuteRightAdapterNoCover", "cutoutC2"),
-            ("singleCenterSlot", "cutoutD2"),
+            # ...nor can singleLeftSlot be placed in cutout D2.
+            ("singleLeftSlot", "cutoutD2"),
             ("stagingAreaRightSlot", "cutoutA3"),
             ("singleRightSlot", "cutoutB3"),
             ("stagingAreaRightSlot", "cutoutC3"),
@@ -116,8 +117,17 @@ def test_invalid_cutout_for_fixture() -> None:
     ]
     assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == {
         subject.InvalidLocationError(
-            cutout_id="cutoutC2", cutout_fixture_id="wasteChuteRightAdapterNoCover"
-        )
+            cutout_id="cutoutC2",
+            cutout_fixture_id="wasteChuteRightAdapterNoCover",
+            allowed_cutout_ids=frozenset(["cutoutD3"]),
+        ),
+        subject.InvalidLocationError(
+            cutout_id="cutoutD2",
+            cutout_fixture_id="singleLeftSlot",
+            allowed_cutout_ids=frozenset(
+                ["cutoutA1", "cutoutB1", "cutoutC1", "cutoutD1"]
+            ),
+        ),
     }
 
 
