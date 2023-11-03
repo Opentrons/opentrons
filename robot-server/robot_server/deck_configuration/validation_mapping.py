@@ -25,8 +25,13 @@ def map_out(
 def _map_out_single_error(
     error: validation.ConfigurationError,
 ) -> models.InvalidDeckConfiguration:
+    # Expose the error details in a developer-facing, kind of lazy way.
+    # This format isn't guaranteed by robot-server's HTTP API;
+    # it's just meant to help app developers debug their deck config requests.
     meta = {
         "deckConfigurationProblem": error.__class__.__name__,
+        # Note that this dataclasses.asdict() will break if the internal error
+        # that we're mapping from is ever not a dataclass.
         **dataclasses.asdict(error),
     }
     return models.InvalidDeckConfiguration(
