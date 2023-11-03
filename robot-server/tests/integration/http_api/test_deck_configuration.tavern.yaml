@@ -1,6 +1,7 @@
 test_name: Test setting and getting a Flex deck configuration
 
 marks:
+  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 
