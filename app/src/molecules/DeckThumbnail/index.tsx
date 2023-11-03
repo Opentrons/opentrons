@@ -2,7 +2,12 @@ import * as React from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 
-import { BaseDeck, LabwareRender, Module } from '@opentrons/components'
+import {
+  BaseDeck,
+  LabwareRender,
+  Module,
+  SlotLabels,
+} from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
@@ -227,11 +232,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
                 transform={`translate(${x},${y})`}
                 onMouseEnter={() => setHoverLabwareId(topLabwareId)}
                 onMouseLeave={() => setHoverLabwareId('')}
-                onClick={() =>
-                  labwareHasLiquid
-                    ? setLiquidDetailsLabwareId(topLabwareId)
-                    : null
-                }
                 cursor={labwareHasLiquid ? 'pointer' : ''}
               >
                 <LabwareRender
@@ -243,7 +243,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
                   definition={topLabwareDefinition}
                   labwareId={topLabwareId}
                   displayName={topLabwareDisplayName}
-                  runId={runId}
+                  runId={''}
                   hover={labwareId === hoverLabwareId && labwareHasLiquid}
                   labwareHasLiquid={labwareHasLiquid}
                 />

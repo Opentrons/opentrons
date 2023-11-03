@@ -17,6 +17,7 @@ import {
 } from '@opentrons/components'
 import {
   parseInitialLoadedLabwareByAdapter,
+  parseLabwareInfoByLiquidId,
   simpleAnalysisFileFixture,
 } from '@opentrons/api-client'
 
@@ -58,6 +59,9 @@ const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFuncti
 >
 const mockParseInitialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter as jest.MockedFunction<
   typeof parseInitialLoadedLabwareByAdapter
+>
+const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.MockedFunction<
+  typeof parseLabwareInfoByLiquidId
 >
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
@@ -115,6 +119,9 @@ describe('DeckThumbnail', () => {
       .calledWith(OT2_ROBOT_TYPE)
       .mockReturnValue(ot2StandardDeckDef as any)
     when(mockParseInitialLoadedLabwareByAdapter)
+      .calledWith(commands)
+      .mockReturnValue({})
+    when(mockParseLabwareInfoByLiquidId)
       .calledWith(commands)
       .mockReturnValue({})
     mockUseAttachedModules.mockReturnValue(
