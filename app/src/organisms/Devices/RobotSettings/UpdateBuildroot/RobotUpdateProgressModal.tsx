@@ -6,9 +6,7 @@ import { css } from 'styled-components'
 import {
   Flex,
   Icon,
-  Link,
   NewPrimaryBtn,
-  NewSecondaryBtn,
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   COLORS,
@@ -25,14 +23,13 @@ import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
   startRobotUpdate,
   clearRobotUpdateSession,
-  getRobotSessionIsManualFile,
+  getRobotUpdateDownloadError,
 } from '../../../../redux/robot-update'
-import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { State } from '../../../../redux/types'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
 
@@ -45,10 +42,6 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
 `
 const UPDATE_TEXT_STYLE = css`
   color: ${COLORS.darkGreyEnabled};
-  font-size: 0.8rem;
-`
-const TRY_RESTART_STYLE = css`
-  color: ${COLORS.blueEnabled};
   font-size: 0.8rem;
 `
 const HIDDEN_CSS = css`
@@ -71,19 +64,19 @@ export function RobotUpdateProgressModal({
   const { t } = useTranslation('device_settings')
   const [showFileSelect, setShowFileSelect] = React.useState<boolean>(false)
   const installFromFileRef = React.useRef<HTMLInputElement>(null)
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
-  const manualFileUsedForUpdate = useSelector((state: State) =>
-    getRobotSessionIsManualFile(state)
-  )
+
   const completeRobotUpdateHandler = (): void => {
     if (closeUpdateBuildroot != null) closeUpdateBuildroot()
   }
-  const reinstallUpdate = React.useCallback(() => {
-    dispatchStartRobotUpdate(robotName)
-  }, [robotName])
 
-  const { error } = session || { error: null }
-  const { updateStep, progressPercent } = useRobotUpdateInfo(session)
+  const { updateStep, progressPercent } = useRobotUpdateInfo(robotName, session)
+
+  let { error } = session || { error: null }
+  const downloadError = useSelector((state: State) =>
+    getRobotUpdateDownloadError(state, robotName)
+  )
+  if (error == null && downloadError != null) error = downloadError
+
   useStatusBarAnimation(error != null)
   useCleanupRobotUpdateSessionOnDismount()
 
@@ -105,7 +98,9 @@ export function RobotUpdateProgressModal({
     progressPercent
   )
 
-  let modalBodyText = t('installing_update')
+  let modalBodyText = ''
+  if (updateStep === 'download') modalBodyText = t('downloading_update')
+  if (updateStep === 'install') modalBodyText = t('installing_update')
   let subProgressBarText = t('do_not_turn_off')
   if (updateStep === 'restart') modalBodyText = t('restarting_robot')
   if (updateStep === 'restart' && letUserExitUpdate) {
@@ -125,9 +120,6 @@ export function RobotUpdateProgressModal({
       footer={
         hasStoppedUpdating ? (
           <RobotUpdateProgressFooter
-            robotName={robotName}
-            installRobotUpdate={dispatchStartRobotUpdate}
-            errorMessage={error}
             closeUpdateBuildroot={completeRobotUpdateHandler}
           />
         ) : null
@@ -151,17 +143,7 @@ export function RobotUpdateProgressModal({
           <StyledText css={UPDATE_TEXT_STYLE}>
             {letUserExitUpdate && updateStep !== 'restart' ? (
               <>
-                {t('problem_during_update')}{' '}
-                <Link
-                  css={TRY_RESTART_STYLE}
-                  onClick={
-                    !manualFileUsedForUpdate
-                      ? reinstallUpdate
-                      : () => setShowFileSelect(true)
-                  }
-                >
-                  {t('try_restarting_the_update')}
-                </Link>
+                {t('problem_during_update')} {t('try_restarting_the_update')}
                 {showFileSelect && (
                   <input
                     ref={installFromFileRef}
@@ -182,35 +164,16 @@ export function RobotUpdateProgressModal({
 }
 
 interface RobotUpdateProgressFooterProps {
-  robotName: string
-  installRobotUpdate: (robotName: string) => void
-  errorMessage?: string | null
   closeUpdateBuildroot?: () => void
 }
 
 function RobotUpdateProgressFooter({
-  robotName,
-  installRobotUpdate,
-  errorMessage,
   closeUpdateBuildroot,
 }: RobotUpdateProgressFooterProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const installUpdate = React.useCallback(() => {
-    installRobotUpdate(robotName)
-  }, [robotName])
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
-      {errorMessage && (
-        <NewSecondaryBtn
-          onClick={installUpdate}
-          marginRight={SPACING.spacing8}
-          css={FOOTER_BUTTON_STYLE}
-          border="none"
-        >
-          {t('try_again')}
-        </NewSecondaryBtn>
-      )}
       <NewPrimaryBtn
         onClick={closeUpdateBuildroot}
         marginRight={SPACING.spacing12}
@@ -257,7 +220,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
 export const TIME_BEFORE_ALLOWING_EXIT_MS = 600000 // 10 mins
 
 function useAllowExitIfUpdateStalled(
-  updateStep: UpdateStep,
+  updateStep: UpdateStep | null,
   progressPercent: number
 ): boolean {
   const [letUserExitUpdate, setLetUserExitUpdate] = React.useState<boolean>(
