@@ -806,6 +806,19 @@ class InvalidLiquidClassName(RoboticsInteractionError):
         )
 
 
+class TipDetectorNotFound(RoboticsInteractionError):
+    """An error indicating that a tip detector has not been created for a pipette."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a TipDetectorNotFound."""
+        super().__init__(ErrorCodes.TIP_DETECTOR_NOT_FOUND, message, detail, wrapping)
+
+
 class APIRemoved(GeneralError):
     """An error indicating that a specific API is no longer available."""
 
@@ -887,3 +900,16 @@ class UnsupportedHardwareCommand(GeneralError):
         super().__init__(
             ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, detail, wrapping
         )
+
+
+class InvalidProtocolData(GeneralError):
+    """An error indicating that some protocol data is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidProtocolData."""
+        super().__init__(ErrorCodes.INVALID_PROTOCOL_DATA, message, detail, wrapping)

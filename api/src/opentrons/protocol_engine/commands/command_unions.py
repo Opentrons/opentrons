@@ -235,6 +235,14 @@ from .configure_for_volume import (
     ConfigureForVolumePrivateResult,
 )
 
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateParams,
+    PrepareToAspirateCreate,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -257,6 +265,7 @@ Command = Union[
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
+    PrepareToAspirate,
     WaitForResume,
     WaitForDuration,
     PickUpTip,
@@ -313,6 +322,7 @@ CommandParams = Union[
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
+    PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
     PickUpTipParams,
@@ -370,6 +380,7 @@ CommandType = Union[
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
+    PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
     PickUpTipCommandType,
@@ -426,6 +437,7 @@ CommandCreate = Union[
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
+    PrepareToAspirateCreate,
     WaitForResumeCreate,
     WaitForDurationCreate,
     PickUpTipCreate,
@@ -482,6 +494,7 @@ CommandResult = Union[
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
+    PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,
     PickUpTipResult,

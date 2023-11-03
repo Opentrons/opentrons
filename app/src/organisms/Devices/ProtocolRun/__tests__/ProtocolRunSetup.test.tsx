@@ -6,15 +6,11 @@ import {
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
-import {
-  ProtocolAnalysisOutput,
-  protocolHasLiquids,
-} from '@opentrons/shared-data'
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
-import { useFeatureFlag } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -79,14 +75,8 @@ const mockSetupModuleAndDeck = SetupModuleAndDeck as jest.MockedFunction<
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
 >
-const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
-  typeof protocolHasLiquids
->
 const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
   typeof EmptySetupStep
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -150,9 +140,6 @@ describe('ProtocolRunSetup', () => {
     when(mockSetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -246,24 +233,6 @@ describe('ProtocolRunSetup', () => {
     })
   })
 
-  describe('when liquids are in the protocol', () => {
-    it('renders correct text for liquids', () => {
-      when(mockUseMostRecentCompletedAnalysis)
-        .calledWith(RUN_ID)
-        .mockReturnValue({
-          ...noModulesProtocol,
-          liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-        } as any)
-      mockProtocolHasLiquids.mockReturnValue(true)
-
-      const { getByText } = render()
-      getByText('STEP 5')
-      getByText('Liquids')
-      getByText('View liquid starting locations and volumes')
-      getByText('Mock SetupLiquids')
-    })
-  })
-
   describe('when modules are in the protocol', () => {
     beforeEach(() => {
       when(mockParseAllRequiredModuleModels).mockReturnValue([
@@ -303,7 +272,7 @@ describe('ProtocolRunSetup', () => {
 
       const { getByText } = render()
       getByText('STEP 2')
-      getByText('Modules')
+      getByText('Modules & deck')
       getByText('Calibration needed')
     })
 
@@ -378,9 +347,6 @@ describe('ProtocolRunSetup', () => {
 
     it('renders correct text contents for modules and fixtures', () => {
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseFeatureFlag)
-        .calledWith('enableDeckConfiguration')
-        .mockReturnValue(true)
       when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({

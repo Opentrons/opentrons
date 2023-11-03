@@ -11,7 +11,6 @@ import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.j
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { i18n } from '../../../i18n'
 import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
-import { useFeatureFlag } from '../../../redux/config'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { mockProtocolModuleInfo } from '../__fixtures__'
@@ -36,9 +35,6 @@ const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
 const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
   typeof getDeckConfigFromProtocolCommands
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
@@ -58,9 +54,6 @@ describe('LabwareMapViewModal', () => {
   beforeEach(() => {
     mockGetLabwareRenderInfo.mockReturnValue({})
     mockGetDeckConfigFromProtocolCommands.mockReturnValue([])
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
   })
 
   afterEach(() => {

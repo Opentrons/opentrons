@@ -12,17 +12,17 @@ import {
   useStoredProtocolAnalysis,
 } from '.'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type {
+  PickUpTipRunTimeCommand,
+  LoadPipetteRunTimeCommand,
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
 import type {
   Mount,
   AttachedPipette,
   TipRackCalibrationData,
 } from '../../../redux/pipettes/types'
-import type {
-  LabwareDefinition2,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
 
 const EMPTY_MOUNTS = { left: null, right: null }
 

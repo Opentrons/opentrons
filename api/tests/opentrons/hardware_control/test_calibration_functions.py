@@ -1,7 +1,5 @@
-import importlib
 from pathlib import Path
 
-import pytest
 import numpy as np
 
 from opentrons import config, calibration_storage
@@ -10,14 +8,6 @@ from opentrons.hardware_control import robot_calibration
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration
 from opentrons.util.helpers import utc_now
 from opentrons.types import Mount, Point
-
-
-# TODO(mc, 2023-02-17): this reload resolves test polution from repeated
-# reloads of this module in tests/opentrons/calibration_storage.
-# module reloads to be removed in https://github.com/Opentrons/opentrons/pull/12049
-@pytest.fixture(autouse=True, scope="module")
-def reload_module() -> None:
-    importlib.reload(calibration_storage)
 
 
 def test_migrate_affine_xy_to_attitude():
@@ -97,7 +87,7 @@ def test_load_pipette_offset(ot_config_tempdir):
     mount = Mount.LEFT
     offset = Point(1, 2, 3)
 
-    calibration_storage.save_pipette_calibration(
+    calibration_storage.ot2.save_pipette_calibration(
         offset, pip_id, mount, "hash", "opentrons/opentrons_96_tiprack_10ul/1"
     )
     obj = instrument_calibration.load_pipette_offset(pip_id, mount)

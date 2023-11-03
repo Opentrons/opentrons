@@ -33,6 +33,7 @@
   "current_temp": "Current: {{temp}} °C",
   "current_version": "Current Version",
   "deck_cal_missing": "Pipette Offset calibration missing. Calibrate deck first.",
+  "deck_configuration_is_not_available": "Deck configuration is not available when run is in progress",
   "deck_configuration": "deck configuration",
   "deck_fixture_setup_instructions": "Deck fixture setup instructions",
   "deck_fixture_setup_modal_bottom_description_desktop": "For detailed instructions for different types of fixtures, scan the QR code or go to the link below.",

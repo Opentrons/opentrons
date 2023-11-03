@@ -100,8 +100,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
         self._current_tip_length = 0.0
+        self._has_tip_length: Optional[bool] = None
         self._current_tiprack_diameter = 0.0
-        self._has_tip = False
         self._pipette_id = pipette_id
         self._log = mod_log.getChild(
             self._pipette_id if self._pipette_id else "<unknown>"
@@ -231,8 +231,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._current_volume = 0.0
         self._working_volume = float(self.liquid_class.max_volume)
         self._current_tip_length = 0.0
+        self._has_tip_length = None
         self._current_tiprack_diameter = 0.0
-        self._has_tip = False
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self.set_liquid_class_by_name("default")
@@ -322,7 +322,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
             raise InvalidCriticalPoint(cp_override.name, "pipette")
-        if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
+        if not self.has_tip_length or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
         else:
@@ -378,6 +378,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @current_tip_length.setter
     def current_tip_length(self, tip_length: float) -> None:
         self._current_tip_length = tip_length
+        self._has_tip_length = True
 
     @property
     def current_tiprack_diameter(self) -> float:
@@ -492,26 +493,35 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         :return:
         """
         assert tip_length > 0.0, "tip_length must be greater than 0"
-        assert not self.has_tip
-        self._has_tip = True
+        assert not self.has_tip_length
         self._current_tip_length = tip_length
+        self._has_tip_length = True
 
     def remove_tip(self) -> None:
         """
         Remove the tip from the pipette (effectively updates the pipette's
         critical point)
         """
-        assert self.has_tip
-        self._has_tip = False
+        assert self.has_tip_length
         self._current_tip_length = 0.0
+        self._has_tip_length = False
 
     @property
     def has_tip(self) -> bool:
-        return self._has_tip
+        return self.has_tip_length
+
+    @property
+    def has_tip_length(self) -> bool:
+        return self.current_tip_length > 0.0
 
     @property
     def tip_presence_check_dist_mm(self) -> float:
         return self._config.tip_presence_check_distance_mm
+
+    @property
+    def tip_presence_responses(self) -> int:
+        # TODO: put this in shared-data
+        return 2 if self.channels > 8 else 1
 
     @property
     def connect_tiprack_distance_mm(self) -> float:
@@ -547,7 +557,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return "{} current volume {}ul critical point: {} at {}".format(
             self._config.display_name,
             self.current_volume,
-            "tip end" if self.has_tip else "nozzle end",
+            "tip end" if self.has_tip_length else "nozzle end",
             0,
         )
 
@@ -565,7 +575,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "name": self.name,
                 "model": self.model,
                 "pipette_id": self.pipette_id,
-                "has_tip": self.has_tip,
+                "has_tip": self.has_tip_length,
                 "working_volume": self.working_volume,
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
@@ -604,7 +614,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 },
             )
         if (
-            self.has_tip
+            self.has_tip_length
             and self._active_tip_setting_name not in new_class.supported_tips
         ):
             raise CommandPreconditionViolated(
@@ -616,7 +626,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             )
         self._liquid_class_name = new_name
         self._liquid_class = new_class
-        if not self.has_tip:
+        if not self.has_tip_length:
             new_tip_class = sorted(
                 [tip for tip in self._liquid_class.supported_tips.keys()],
                 key=lambda tt: tt.value,

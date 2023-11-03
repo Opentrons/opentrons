@@ -1,0 +1,21 @@
+{
+  "$id": "opentronsLiquidSchemaV1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Fields describing a single liquid",
+  "type": "object",
+  "required": ["displayName", "description"],
+  "properties": {
+    "displayName": {
+      "description": "An human-readable name for this liquid.",
+      "type": "string"
+    },
+    "description": {
+      "description": "A description of this liquid.",
+      "type": "string"
+    },
+    "displayColor": {
+      "description": "Hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.",
+      "type": "string"
+    }
+  }
+}

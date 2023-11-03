@@ -10,12 +10,12 @@ import {
 import type {
   LoadLabwareCreateCommand,
   ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
+} from '@opentrons/shared-data'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration updates fixed trash by treating it as an entity
 // additionally, drop tip location is now selectable
-const PD_VERSION = '7.1.0'
+const PD_VERSION = '8.0.0'
 
 interface LabwareLocationUpdate {
   [id: string]: string
@@ -24,7 +24,7 @@ interface LabwareLocationUpdate {
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>
 ): ProtocolFile => {
-  const { designerApplication, robot, commands } = appData
+  const { designerApplication, robot, commands, labwareDefinitions } = appData
   const labwareLocationUpdate: LabwareLocationUpdate =
     designerApplication?.data?.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       .labwareLocationUpdate
@@ -68,23 +68,33 @@ export const migrateFile = (
     savedStepForms: Record<string, any>
   ): Record<string, any> => {
     return mapValues(savedStepForms, stepForm => {
+      const sharedParams = {
+        blowout_location:
+          stepForm.blowout_location === 'fixedTrash'
+            ? trashId
+            : stepForm.blowout_location,
+        dropTip_location: trashId,
+      }
+
       if (stepForm.stepType === 'moveLiquid') {
         return {
           ...stepForm,
-          blowout_location:
-            stepForm.blowout_location === 'fixedTrash'
+          aspirate_labware:
+            stepForm.aspirate_labware === 'fixedTrash'
               ? trashId
-              : stepForm.blowout_location,
-          dropTip_location: trashId,
+              : stepForm.aspirate_labware,
+          dispense_labware:
+            stepForm.dispense_labware === 'fixedTrash'
+              ? trashId
+              : stepForm.dispense_labware,
+          ...sharedParams,
         }
       } else if (stepForm.stepType === 'mix') {
         return {
           ...stepForm,
-          blowout_location:
-            stepForm.blowout_location === 'fixedTrash'
-              ? trashId
-              : stepForm.blowout_location,
-          dropTip_location: trashId,
+          labware:
+            stepForm.labware === 'fixedTrash' ? trashId : stepForm.labware,
+          ...sharedParams,
         }
       }
 
@@ -99,6 +109,31 @@ export const migrateFile = (
   )
   const newFilteredSavedStepForms = migrateSavedStepForms(
     filteredSavedStepForms
+  )
+
+  const loadLabwareCommands: LoadLabwareCreateCommand[] = commands
+    .filter(
+      (command): command is LoadLabwareCreateCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .map(command => {
+      //  protocols that do multiple migrations through 7.0.0 have a loadName === definitionURI
+      //  this ternary below fixes that
+      const loadName =
+        labwareDefinitions[command.params.loadName] != null
+          ? labwareDefinitions[command.params.loadName].parameters.loadName
+          : command.params.loadName
+      return {
+        ...command,
+        params: {
+          ...command.params,
+          loadName,
+        },
+      }
+    })
+
+  const migratedCommandsV8 = commands.filter(
+    command => command.commandType !== 'loadLabware'
   )
 
   return {
@@ -122,9 +157,13 @@ export const migrateFile = (
       },
     },
     labwareDefinitions: {
-      ...{ [trashId]: trashDefinition },
+      ...{ [trashDefUri]: trashDefinition },
       ...appData.labwareDefinitions,
     },
-    commands: [...commands, ...trashLoadCommand],
+    commands: [
+      ...migratedCommandsV8,
+      ...loadLabwareCommands,
+      ...trashLoadCommand,
+    ],
   }
 }

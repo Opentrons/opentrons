@@ -8,7 +8,7 @@ import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
 import { useLPCDisabledReason } from '../../../hooks'
 import { CurrentOffsetsTable } from '../CurrentOffsetsTable'
 import { getLatestCurrentOffsets } from '../utils'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../../../hooks')
@@ -43,7 +43,7 @@ const render = (props: React.ComponentProps<typeof CurrentOffsetsTable>) => {
     i18nInstance: i18n,
   })[0]
 }
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisFile
+const protocolWithTC = (_uncastedProtocolWithTC as unknown) as CompletedProtocolAnalysis
 const mockCurrentOffsets: LabwareOffset[] = [
   {
     createdAt: '2022-12-20T14:06:23.562082+00:00',

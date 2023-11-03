@@ -4,7 +4,11 @@ import json
 import os
 import re
 
+from opentrons_shared_data.errors.exceptions import InvalidProtocolData, PythonException
+
 from ..load import load_shared_data, get_shared_data_root
+
+SCHEMA_REF_VERSION_RE = re.compile(r"opentronsCommandSchemaV(\d+)")
 
 
 def get_newest_schema_version() -> str:
@@ -23,4 +27,26 @@ def get_newest_schema_version() -> str:
 def load_schema_string(version: str) -> str:
     """Get the string containing the command JSON schema for the given version string."""
     path = Path("command") / "schemas" / f"{version}.json"
-    return json.dumps(json.loads(load_shared_data(path)), indent=2)
+    try:
+        return json.dumps(json.loads(load_shared_data(path)), indent=2)
+    except OSError as ose:
+        raise InvalidProtocolData(
+            message=f"Command schema version {version} is not available",
+            detail={
+                "type": "bad-schema-version",
+                "schema-kind": "command",
+                "version": version,
+            },
+            wrapping=[PythonException(ose)],
+        )
+
+
+def schema_version_from_ref(ref: str) -> str:
+    """Parse the command schema version from a command schema ref."""
+    version = SCHEMA_REF_VERSION_RE.match(ref)
+    if not version:
+        raise InvalidProtocolData(
+            message=f"Could not parse version from command schema ${ref}",
+            detail={"ref": ref, "type": "bad-schema-ref", "schema-kind": "command"},
+        )
+    return version.group(1)

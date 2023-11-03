@@ -19,6 +19,9 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   LabwareDefinition2,
   ModuleType,
+  ModuleModel,
+  getModuleType,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
@@ -35,8 +38,9 @@ import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
-import { DeckSlot } from '../../types'
-import { LabwareDefByDefURI } from '../../labware-defs'
+
+import type { DeckSlot } from '../../types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 export interface Props {
   onClose: (e?: any) => unknown
@@ -47,8 +51,8 @@ export interface Props {
   slot?: DeckSlot | null
   /** if adding to a module, the slot of the parent (for display) */
   parentSlot?: DeckSlot | null
-  /** if adding to a module, the module's type */
-  moduleType?: ModuleType | null
+  /** if adding to a module, the module's model */
+  moduleModel?: ModuleModel | null
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
   isNextToHeaterShaker: boolean
@@ -87,7 +91,10 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
-  [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [THERMOCYCLER_MODULE_TYPE]: [
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+  ],
   [HEATERSHAKER_MODULE_TYPE]: [
     'opentrons_96_deep_well_adapter',
     'opentrons_96_flat_bottom_adapter',
@@ -103,14 +110,23 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleType?: ModuleType | null
-): boolean =>
-  moduleType
-    ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
-        def.parameters.loadName
-      )
-    : false
-
+  moduleModel?: ModuleModel | null
+): boolean => {
+  //  special-casing the thermocycler module V2 recommended labware
+  //  since its different from V1
+  const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
+  if (moduleModel === THERMOCYCLER_MODULE_V2) {
+    return (
+      def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
+    )
+  } else {
+    return moduleType != null
+      ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
+          def.parameters.loadName
+        )
+      : false
+  }
+}
 export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
@@ -119,13 +135,14 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     onUploadLabware,
     slot,
     parentSlot,
-    moduleType,
+    moduleModel,
     selectLabware,
     isNextToHeaterShaker,
     adapterLoadName,
     has96Channel,
   } = props
   const defs = getOnlyLatestDefs()
+  const moduleType = moduleModel != null ? getModuleType(moduleModel) : null
   const URIs = Object.keys(defs)
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
@@ -198,7 +215,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
         labwareDef.parameters.loadName === ADAPTER_96_CHANNEL
       return (
         (filterRecommended &&
-          !getLabwareIsRecommended(labwareDef, moduleType)) ||
+          !getLabwareIsRecommended(labwareDef, moduleModel)) ||
         (filterHeight &&
           getIsLabwareAboveHeight(
             labwareDef,
@@ -358,7 +375,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     typeof LabwarePreview
   >['moduleCompatibility'] = null
   if (previewedLabware && moduleType) {
-    if (getLabwareIsRecommended(previewedLabware, moduleType)) {
+    if (getLabwareIsRecommended(previewedLabware, moduleModel)) {
       moduleCompatibility = 'recommended'
     } else if (getLabwareCompatible(previewedLabware)) {
       moduleCompatibility = 'potentiallyCompatible'
@@ -425,7 +442,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
                           <LabwareItem
                             key={index}
                             icon={
-                              getLabwareIsRecommended(labwareDef, moduleType)
+                              getLabwareIsRecommended(labwareDef, moduleModel)
                                 ? 'check-decagram'
                                 : null
                             }
