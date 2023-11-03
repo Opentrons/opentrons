@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   OutlineButton,
   Flex,
@@ -98,7 +98,7 @@ export function AdditionalItemsRow(
                 <LabeledValue
                   label="Position"
                   value={`Slot ${
-                    name === 'trashBin' ? trashBinSlot : WASTE_CHUTE_SLOT
+                    name === 'trashBin' ? trashBinSlot : WASTE_CHUTE_CUTOUT
                   }`}
                 />
               </div>
@@ -107,7 +107,7 @@ export function AdditionalItemsRow(
                   selectedSlots={
                     name === 'trashBin'
                       ? [trashBinSlot ?? '']
-                      : [WASTE_CHUTE_SLOT]
+                      : [WASTE_CHUTE_CUTOUT]
                   }
                 />
               </div>

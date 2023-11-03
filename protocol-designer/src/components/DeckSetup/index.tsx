@@ -11,7 +11,6 @@ import {
   FlexTrash,
   RobotCoordinateSpaceWithDOMCoords,
   WasteChuteFixture,
-  WasteChuteLocation,
   StagingAreaFixture,
   StagingAreaLocation,
   SingleSlotFixture,
@@ -38,6 +37,7 @@ import {
   Cutout,
   TRASH_BIN_LOAD_NAME,
   STAGING_AREA_LOAD_NAME,
+  WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 import {
@@ -571,7 +571,9 @@ export const DeckSetup = (): JSX.Element => {
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture
                       key={fixture.id}
-                      cutoutLocation={fixture.location as WasteChuteLocation}
+                      cutoutLocation={
+                        fixture.location as typeof WASTE_CHUTE_CUTOUT
+                      }
                       deckDefinition={deckDef}
                       slotClipColor={darkFill}
                       fixtureBaseColor={lightFill}

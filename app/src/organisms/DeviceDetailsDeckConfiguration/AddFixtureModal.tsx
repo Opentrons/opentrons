@@ -71,13 +71,13 @@ export function AddFixtureModal({
 
   const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
   if (
-    fixtureLocation === 'A3' ||
-    fixtureLocation === 'B3' ||
-    fixtureLocation === 'C3'
+    fixtureLocation === 'cutoutA3' ||
+    fixtureLocation === 'cutoutB3' ||
+    fixtureLocation === 'cutoutC3'
   ) {
     availableFixtures.push(STAGING_AREA_LOAD_NAME)
   }
-  if (fixtureLocation === 'D3') {
+  if (fixtureLocation === 'cutoutD3') {
     availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
   }
 

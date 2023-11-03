@@ -8,7 +8,7 @@ import {
   getLabwareDefURI,
   getWellsDepth,
   getWellNamePerMultiTip,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -343,7 +343,7 @@ export const getHasWasteChute = (
 ): boolean => {
   return Object.values(additionalEquipmentEntities).some(
     additionalEquipmentEntity =>
-      additionalEquipmentEntity.location === WASTE_CHUTE_SLOT &&
+      additionalEquipmentEntity.location === WASTE_CHUTE_CUTOUT &&
       additionalEquipmentEntity.name === 'wasteChute'
   )
 }

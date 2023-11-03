@@ -374,7 +374,7 @@ describe('parseInitialLoadedFixturesByCutout', () => {
         commandType: 'loadFixture',
         params: {
           loadName: STAGING_AREA_LOAD_NAME,
-          location: { cutout: 'B3' },
+          location: { cutout: 'cutoutB3' },
         },
         createdAt: 'fake_timestamp',
         startedAt: 'fake_timestamp',
@@ -384,7 +384,10 @@ describe('parseInitialLoadedFixturesByCutout', () => {
       {
         id: 'fakeId2',
         commandType: 'loadFixture',
-        params: { loadName: WASTE_CHUTE_LOAD_NAME, location: { cutout: 'D3' } },
+        params: {
+          loadName: WASTE_CHUTE_LOAD_NAME,
+          location: { cutout: 'cutoutD3' },
+        },
         createdAt: 'fake_timestamp',
         startedAt: 'fake_timestamp',
         completedAt: 'fake_timestamp',
@@ -395,7 +398,7 @@ describe('parseInitialLoadedFixturesByCutout', () => {
         commandType: 'loadFixture',
         params: {
           loadName: STANDARD_SLOT_LOAD_NAME,
-          location: { cutout: 'C3' },
+          location: { cutout: 'cutoutC3' },
         },
         createdAt: 'fake_timestamp',
         startedAt: 'fake_timestamp',

@@ -12,7 +12,7 @@ import {
 } from '../../../labware-ingred/actions'
 import { FLEX_TRASH_DEF_URI } from '../../../constants'
 import { TrashModal } from '../TrashModal'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 jest.mock('../../../step-forms')
 jest.mock('../../../step-forms/selectors')
@@ -114,7 +114,7 @@ describe('TrashModal ', () => {
     await waitFor(() => {
       expect(mockCreateDeckFixture).toHaveBeenCalledWith(
         'wasteChute',
-        WASTE_CHUTE_SLOT
+        WASTE_CHUTE_CUTOUT
       )
     })
   })

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import i18n from 'i18next'
 import { renderWithProviders } from '@opentrons/components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 import { Portal } from '../../portals/TopPortal'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
@@ -71,7 +71,7 @@ describe('AdditionalItemsRow', () => {
     getByAltText('Waste Chute')
     getByText('mock slot map')
     getByText('Position:')
-    getByText(`Slot ${WASTE_CHUTE_SLOT}`)
+    getByText(`Slot ${WASTE_CHUTE_CUTOUT}`)
     getByRole('button', { name: 'remove' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
   })

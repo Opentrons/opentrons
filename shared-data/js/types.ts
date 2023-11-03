@@ -305,6 +305,46 @@ export interface DeckDefinition {
   layers: INode[]
 }
 
+export interface DeckCutout {
+  id: string
+  position: CoordinateTuple
+  displayName: string
+}
+
+export interface CutoutFixture {
+  id: string
+  // TODO: cutout ids
+  mayMountTo: string[]
+  displayName: string
+  // TODO: Cutout id keys and addressable area union type values
+  providesAddressableAreas: { [cutoutId: string]: string[] }
+}
+
+export interface LegacyFixture {
+  id: string
+  // TODO: is this cutout location?
+  slot: string
+  labware: string
+  displayName: string
+}
+
+export interface DeckLocationsV4 {
+  addressableAreas: DeckSlot[]
+  calibrationPoints: DeckCalibrationPoint[]
+  cutouts: DeckCutout[]
+  legacyFixtures: LegacyFixture[]
+}
+
+export interface DeckDefinitionV4 {
+  otId: string
+  cornerOffsetFromOrigin: CoordinateTuple
+  dimensions: CoordinateTuple
+  robot: DeckRobot
+  locations: DeckLocationsV4
+  metadata: DeckMetadata
+  cutoutFixtures: CutoutFixture[]
+}
+
 export interface ModuleDimensions {
   bareOverallHeight: number
   overLabwareHeight: number
@@ -531,20 +571,19 @@ export type StatusBarAnimation =
 
 export type StatusBarAnimations = StatusBarAnimation[]
 
-// TODO(bh, 2023-09-28): refine types when settled
 export type Cutout =
-  | 'A1'
-  | 'B1'
-  | 'C1'
-  | 'D1'
-  | 'A2'
-  | 'B2'
-  | 'C2'
-  | 'D2'
-  | 'A3'
-  | 'B3'
-  | 'C3'
-  | 'D3'
+  | 'cutoutA1'
+  | 'cutoutB1'
+  | 'cutoutC1'
+  | 'cutoutD1'
+  | 'cutoutA2'
+  | 'cutoutB2'
+  | 'cutoutC2'
+  | 'cutoutD2'
+  | 'cutoutA3'
+  | 'cutoutB3'
+  | 'cutoutC3'
+  | 'cutoutD3'
 
 export interface Fixture {
   fixtureId: string

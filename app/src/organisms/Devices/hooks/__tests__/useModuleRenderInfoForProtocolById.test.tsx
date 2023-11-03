@@ -134,7 +134,7 @@ const TEMPERATURE_MODULE_INFO = {
 
 const mockFixture = {
   fixtureId: 'mockId',
-  fixtureLocation: 'D1',
+  fixtureLocation: 'cutoutD1',
   loadName: STAGING_AREA_LOAD_NAME,
 } as Fixture
 

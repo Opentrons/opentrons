@@ -1,16 +1,17 @@
 import * as React from 'react'
 
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
 import { COLORS } from '../../ui-style-constants'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 import { WasteChute } from './WasteChuteFixture'
 
 import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
-import type { WasteChuteLocation } from './WasteChuteFixture'
 
 interface WasteChuteStagingAreaFixtureProps
   extends React.SVGProps<SVGGElement> {
-  cutoutLocation: WasteChuteLocation
+  cutoutLocation: typeof WASTE_CHUTE_CUTOUT
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
@@ -29,7 +30,7 @@ export function WasteChuteStagingAreaFixture(
     ...restProps
   } = props
 
-  if (cutoutLocation !== 'D3') {
+  if (cutoutLocation !== WASTE_CHUTE_CUTOUT) {
     console.warn(
       `cannot render WasteChuteStagingAreaFixture in given cutout location ${cutoutLocation}`
     )

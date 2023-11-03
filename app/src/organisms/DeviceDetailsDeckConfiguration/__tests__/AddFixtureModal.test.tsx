@@ -27,7 +27,7 @@ describe('Touchscreen AddFixtureModal', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'D3',
+      fixtureLocation: 'cutoutD3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
       setCurrentDeckConfig: mockSetCurrentDeckConfig,
       isOnDevice: true,
@@ -61,7 +61,7 @@ describe('Desktop AddFixtureModal', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'D3',
+      fixtureLocation: 'cutoutD3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
     }
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
@@ -86,7 +86,7 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot A1', () => {
-    props = { ...props, fixtureLocation: 'A1' }
+    props = { ...props, fixtureLocation: 'cutoutA1' }
     const [{ getByText, getByRole }] = render(props)
     getByText('Add to slot A1')
     getByText(
@@ -97,7 +97,7 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot B3', () => {
-    props = { ...props, fixtureLocation: 'B3' }
+    props = { ...props, fixtureLocation: 'cutoutB3' }
     const [{ getByText, getAllByRole }] = render(props)
     getByText('Add to slot B3')
     getByText(
@@ -109,11 +109,11 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should call a mock function when clicking add button', () => {
-    props = { ...props, fixtureLocation: 'A1' }
+    props = { ...props, fixtureLocation: 'cutoutA1' }
     const [{ getByRole }] = render(props)
     getByRole('button', { name: 'Add' }).click()
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith({
-      fixtureLocation: 'A1',
+      fixtureLocation: 'cutoutA1',
       loadName: TRASH_BIN_LOAD_NAME,
     })
   })

@@ -14,7 +14,7 @@ import {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
   WASTE_CHUTE_LOAD_NAME,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { useFeatureFlag } from '../../../../redux/config'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
@@ -217,7 +217,7 @@ describe('useMissingProtocolHardware', () => {
       data: [
         {
           fixtureId: 'mockFixtureId',
-          fixtureLocation: WASTE_CHUTE_SLOT,
+          fixtureLocation: WASTE_CHUTE_CUTOUT,
           loadName: WASTE_CHUTE_LOAD_NAME,
         },
       ],

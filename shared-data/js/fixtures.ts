@@ -3,7 +3,11 @@ import {
   TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from './constants'
-import type { FixtureLoadName } from './types'
+import type { Cutout, FixtureLoadName } from './types'
+
+export function getCutoutDisplayName(cutout: Cutout): string {
+  return cutout.replace('cutout', '')
+}
 
 export function getFixtureDisplayName(loadName: FixtureLoadName): string {
   if (loadName === STAGING_AREA_LOAD_NAME) {
