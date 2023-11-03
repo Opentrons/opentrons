@@ -15,9 +15,10 @@ import {
   dispenseLocationHelper,
   moveHelper,
 } from '../../utils'
-import { configureForVolume } from '../atomic/configureForVolume'
 import {
   aspirate,
+  configureForVolume,
+  configureNozzleLayout,
   delay,
   dropTip,
   moveToWell,
@@ -25,6 +26,7 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
+
 import type {
   ConsolidateArgs,
   CommandCreator,
@@ -211,6 +213,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 }),
               ]
             : []
+
           return [
             curryCommandCreator(aspirate, {
               pipette: args.pipette,
@@ -411,11 +414,26 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const dropTipAfterDispenseAirGap =
         airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
 
+      const nozzles = prevRobotState.pipettes[args.pipette].nozzles
+      const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
+      const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+        //  only emit the command if previous nozzle state is different
+        invariantContext.pipetteEntities[args.pipette].name === 'p1000_96' &&
+        args.nozzles != null &&
+        nozzles !== prevNozzles
+          ? [
+              curryCommandCreator(configureNozzleLayout, {
+                nozzles: args.nozzles,
+              }),
+            ]
+          : []
+
       return [
+        ...configureNozzleLayoutCommand,
         ...tipCommands,
+        ...configureForVolumeCommand,
         ...mixBeforeCommands,
         ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
-        ...configureForVolumeCommand,
         ...aspirateCommands,
         ...dispenseCommands,
         ...delayAfterDispenseCommands,

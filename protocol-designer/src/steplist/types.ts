@@ -178,5 +178,3 @@ export type LabwareNamesByModuleId = Record<
   | null
   | undefined
 >
-
-export type NozzleType96Channel = 'full' | 'column'

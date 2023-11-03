@@ -1,13 +1,12 @@
 import { connect } from 'react-redux'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
 import {
   WellSelectionInput,
   Props as WellSelectionInputProps,
   DP,
-  NozzleType,
 } from './WellSelectionInput'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { BaseState } from '../../../../types'
-import { FieldProps } from '../../types'
+import type { BaseState, NozzleType } from '../../../../types'
+import type { FieldProps } from '../../types'
 
 type Props = Omit<
   JSX.LibraryManagedAttributes<
@@ -32,7 +31,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
   let nozzleType: NozzleType | null = null
-  if (pipette != null && pipette != '' && pipette?.spec.channels === 8) {
+  if (pipette !== null && pipette !== '' && pipette?.spec.channels === 8) {
     nozzleType = '8-channel'
   } else if (nozzles === 'column') {
     nozzleType = 'column'

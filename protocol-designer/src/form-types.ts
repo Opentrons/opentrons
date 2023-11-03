@@ -9,6 +9,7 @@ import {
   AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,
+  Nozzles,
   PipetteEntity,
 } from '@opentrons/step-generation'
 export type StepIdType = string
@@ -217,7 +218,7 @@ export interface HydratedMoveLiquidFormData {
     blowout_checkbox: boolean
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
     dropTip_location: string
-    nozzles: string
+    nozzles: Nozzles | null
   }
 }
 
@@ -257,7 +258,7 @@ export interface HydratedMixFormDataLegacy {
   dispense_delay_checkbox: boolean
   dispense_delay_seconds: number | null | undefined
   dropTip_location: string
-  nozzles: string
+  nozzles: Nozzles | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

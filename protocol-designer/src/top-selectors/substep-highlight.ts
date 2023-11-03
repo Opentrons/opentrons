@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import { getWellNamePerMultiTip, PipetteChannels } from '@opentrons/shared-data'
+import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import { WellGroup } from '@opentrons/components'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -8,7 +8,11 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
+import type {
+  PipetteEntity,
+  LabwareEntity,
+  Nozzles,
+} from '@opentrons/step-generation'
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
 
@@ -16,7 +20,7 @@ function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
   wells: string[],
-  nozzles: string | null
+  nozzles: Nozzles | null
 ): string[] {
   const pipChannels = pipetteEntity.spec.channels
 
@@ -207,30 +211,43 @@ function _getSelectedWellsForSubstep(
 
   if (substeps && substeps.substepType === 'sourceDest') {
     let tipWellSet: string[] = []
-
-    if (substeps.multichannel) {
-      const { activeTips } = substeps.multiRows[substepIndex][0]
-
-      // just use first multi row
-      if (activeTips && activeTips.labwareId === labwareId) {
-        const multiTipWellSet = getWellSetForMultichannel(
-          invariantContext.labwareEntities[labwareId].def,
-          activeTips.wellName,
-          8
+    if ('pipette' in stepArgs) {
+      if (substeps.multichannel) {
+        const { activeTips } = substeps.multiRows[substepIndex][0]
+        const pipChannels =
+          invariantContext.pipetteEntities[stepArgs.pipette].spec.channels
+        let channels = pipChannels
+        if ('nozzles' in stepArgs) {
+          if (stepArgs.nozzles === 'full') {
+            channels = 96
+          } else {
+            channels = 8
+          }
+        }
+        // just use first multi row
+        if (
+          activeTips &&
+          activeTips.labwareId === labwareId &&
+          channels !== 1
+        ) {
+          const multiTipWellSet = getWellSetForMultichannel(
+            invariantContext.labwareEntities[labwareId].def,
+            activeTips.wellName,
+            channels
+          )
+          if (multiTipWellSet) tipWellSet = multiTipWellSet
+        }
+      } else {
+        // single-channel
+        const { activeTips } = substeps.rows[substepIndex]
+        if (
+          activeTips &&
+          activeTips.labwareId === labwareId &&
+          activeTips.wellName
         )
-        if (multiTipWellSet) tipWellSet = multiTipWellSet
+          tipWellSet = [activeTips.wellName]
       }
-    } else {
-      // single-channel
-      const { activeTips } = substeps.rows[substepIndex]
-      if (
-        activeTips &&
-        activeTips.labwareId === labwareId &&
-        activeTips.wellName
-      )
-        tipWellSet = [activeTips.wellName]
     }
-
     wells.push(...tipWellSet)
   }
 

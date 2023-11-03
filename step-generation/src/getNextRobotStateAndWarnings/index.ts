@@ -122,6 +122,8 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    //  @ts-expect-error: comamnd isn't added to types yet
+    case 'configureNozzleLayout':
     case 'touchTip':
     case 'waitForDuration':
     case 'waitForResume':

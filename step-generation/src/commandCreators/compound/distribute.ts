@@ -15,6 +15,8 @@ import {
 } from '../../utils'
 import {
   aspirate,
+  configureForVolume,
+  configureNozzleLayout,
   delay,
   dispense,
   dropTip,
@@ -22,7 +24,6 @@ import {
   replaceTip,
   touchTip,
 } from '../atomic'
-import { configureForVolume } from '../atomic/configureForVolume'
 import { mixUtil } from './mix'
 import type {
   DistributeArgs,
@@ -398,10 +399,25 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ]
         : []
 
+      const nozzles = prevRobotState.pipettes[args.pipette].nozzles
+      const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
+      const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+        //  only emit the command if previous nozzle state is different
+        invariantContext.pipetteEntities[args.pipette].name === 'p1000_96' &&
+        args.nozzles != null &&
+        nozzles !== prevNozzles
+          ? [
+              curryCommandCreator(configureNozzleLayout, {
+                nozzles: args.nozzles,
+              }),
+            ]
+          : []
+
       return [
+        ...configureNozzleLayoutCommand,
         ...tipCommands,
-        ...mixBeforeAspirateCommands,
         ...configureForVolumeCommand,
+        ...mixBeforeAspirateCommands,
         curryCommandCreator(aspirate, {
           pipette,
           volume: args.volume * destWellChunk.length + disposalVolume,

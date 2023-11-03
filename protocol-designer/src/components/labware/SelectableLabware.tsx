@@ -3,7 +3,6 @@ import reduce from 'lodash/reduce'
 
 import {
   SELECTABLE_WELL_CLASS,
-  Channels,
   WellMouseEvent,
   WellGroup,
 } from '@opentrons/components'
@@ -16,10 +15,10 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
-import { ContentsByWell } from '../../labware-ingred/types'
-import { WellIngredientNames } from '../../steplist/types'
-import { GenericRect } from '../../collision-types'
-import { NozzleType } from '../StepEditForm/fields/WellSelectionField/WellSelectionInput'
+import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
+import type { GenericRect } from '../../collision-types'
+import type { NozzleType } from '../../types'
 
 export interface Props {
   labwareProps: Omit<

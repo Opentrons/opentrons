@@ -1,23 +1,21 @@
 import * as React from 'react'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { FormGroup, InputField } from '@opentrons/components'
 import { i18n } from '../../../../localization'
-import { WellSelectionModal } from './WellSelectionModal'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   actions as stepsActions,
   getSelectedStepId,
   getWellSelectionLabwareKey,
 } from '../../../../ui/steps'
+import { WellSelectionModal } from './WellSelectionModal'
 import styles from '../../StepEditForm.css'
 
-import { Dispatch } from 'redux'
-import { StepIdType } from '../../../../form-types'
-import { BaseState } from '../../../../types'
-import { FieldProps } from '../../types'
+import type { StepIdType } from '../../../../form-types'
+import type { BaseState, NozzleType } from '../../../../types'
+import type { FieldProps } from '../../types'
 
-//  update nozzle type to include other 96-channel partial tip configurations
-export type NozzleType = '8-channel' | 'column' | 'full'
 export interface SP {
   stepId?: StepIdType | null
   wellSelectionLabwareKey?: string | null

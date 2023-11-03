@@ -15,9 +15,10 @@ import {
   wasteChuteCommandsUtil,
 } from '../../utils'
 import type {
-  CommandCreatorError,
   CurriedCommandCreator,
+  CommandCreatorError,
   CommandCreator,
+  Nozzles,
 } from '../../types'
 interface PickUpTipArgs {
   pipette: string
@@ -32,14 +33,6 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 ) => {
   const errors: CommandCreatorError[] = []
   const tiprackSlot = prevRobotState.labware[args.tiprack].slot
-  const pipetteName = invariantContext.pipetteEntities[args.pipette].name
-  const adapterId =
-    invariantContext.labwareEntities[tiprackSlot] != null
-      ? invariantContext.labwareEntities[tiprackSlot]
-      : null
-  if (adapterId == null && pipetteName === 'p1000_96') {
-    errors.push(errorCreators.missingAdapter())
-  }
   if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
     errors.push(
       errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
@@ -67,6 +60,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 interface ReplaceTipArgs {
   pipette: string
   dropTipLocation: string
+  nozzles?: Nozzles
 }
 
 /**
@@ -79,20 +73,45 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, dropTipLocation } = args
-  const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
+  const { pipette, dropTipLocation, nozzles } = args
+  const { nextTiprack, tipracks } = getNextTiprack(
+    pipette,
+    invariantContext,
+    prevRobotState,
+    nozzles
+  )
+  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const channels = pipetteSpec?.channels
+  const hasMoreTipracksOnDeck =
+    tipracks?.totalTipracks > tipracks?.filteredTipracks
 
-  if (nextTiprack == null) {
+  if (
+    nextTiprack == null &&
+    channels === 96 &&
+    args.nozzles === 'full' &&
+    hasMoreTipracksOnDeck
+  ) {
+    return {
+      errors: [errorCreators.missingAdapter()],
+    }
+  } else if (
+    nextTiprack == null &&
+    channels === 96 &&
+    args.nozzles === 'column' &&
+    hasMoreTipracksOnDeck
+  ) {
+    return {
+      errors: [errorCreators.removeAdapter()],
+    }
+  } else if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
       errors: [errorCreators.insufficientTips()],
     }
   }
 
-  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
-    (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
-    false
+    (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
 
   if (!pipetteSpec)
     return {

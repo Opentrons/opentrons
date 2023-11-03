@@ -17,15 +17,17 @@ import {
 } from '../../utils'
 import {
   aspirate,
+  configureForVolume,
+  configureNozzleLayout,
   delay,
   dispense,
   dropTip,
+  moveToWell,
   replaceTip,
   touchTip,
-  moveToWell,
 } from '../atomic'
-import { configureForVolume } from '../atomic/configureForVolume'
 import { mixUtil } from './mix'
+
 import type {
   TransferArgs,
   CurriedCommandCreator,
@@ -224,6 +226,20 @@ export const transfer: CommandCreator<TransferArgs> = (
             changeTipNow =
               isInitialSubtransfer || destinationWell !== prevDestWell
           }
+          const nozzles = prevRobotState.pipettes[args.pipette].nozzles
+          const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
+          const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+            //  only emit the command if previous nozzle state is different
+            invariantContext.pipetteEntities[args.pipette].name ===
+              'p1000_96' &&
+            args.nozzles != null &&
+            nozzles !== prevNozzles
+              ? [
+                  curryCommandCreator(configureNozzleLayout, {
+                    nozzles: args.nozzles,
+                  }),
+                ]
+              : []
 
           const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
             invariantContext.pipetteEntities[args.pipette].name
@@ -240,6 +256,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ? [
                 curryCommandCreator(replaceTip, {
                   pipette: args.pipette,
+                  nozzles: args.nozzles ?? undefined,
                   dropTipLocation: args.dropTipLocation,
                 }),
               ]
@@ -514,10 +531,11 @@ export const transfer: CommandCreator<TransferArgs> = (
               : []
 
           const nextCommands = [
+            ...configureNozzleLayoutCommand,
             ...tipCommands,
             ...preWetTipCommands,
-            ...mixBeforeAspirateCommands,
             ...configureForVolumeCommand,
+            ...mixBeforeAspirateCommands,
             ...aspirateCommand,
             ...delayAfterAspirateCommands,
             ...touchTipAfterAspirateCommands,

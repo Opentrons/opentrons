@@ -16,6 +16,7 @@ import {
   PipetteEntity,
   LabwareEntity,
   AdditionalEquipmentEntity,
+  Nozzles,
 } from '@opentrons/step-generation'
 export interface FormPipette {
   pipetteName: string | null | undefined
@@ -88,6 +89,8 @@ export interface LabwareTemporalProperties {
 }
 export interface PipetteTemporalProperties {
   mount: Mount
+  nozzles?: Nozzles
+  prevNozzles?: Nozzles
 }
 // =========== ON DECK ========
 // The "on deck" types are entities with added properties (slot / mount)

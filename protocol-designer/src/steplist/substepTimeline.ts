@@ -3,6 +3,7 @@ import pick from 'lodash/pick'
 import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
+  Nozzles,
 } from '@opentrons/step-generation'
 import { Channels } from '@opentrons/components'
 import { getCutoutIdByAddressableArea } from '../utils'
@@ -19,12 +20,7 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import type {
-  NozzleType96Channel,
-  SubstepTimelineFrame,
-  SourceDestData,
-  TipLocation,
-} from './types'
+import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
@@ -213,7 +209,7 @@ export const substepTimelineMultiChannel = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels,
-  nozzles: NozzleType96Channel | null
+  nozzles: Nozzles | null
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
@@ -370,7 +366,7 @@ export const substepTimeline = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels,
-  nozzles: NozzleType96Channel
+  nozzles: Nozzles | null
 ): SubstepTimelineFrame[] => {
   if (channels === 1) {
     return substepTimelineSingleChannel(
