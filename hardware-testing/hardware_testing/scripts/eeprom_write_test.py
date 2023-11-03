@@ -3,6 +3,8 @@ import asyncio
 import logging
 import argparse
 import dataclasses
+import os
+import csv
 from dataclasses import fields as fid
 import sys
 import atexit
@@ -39,6 +41,9 @@ from opentrons_hardware.firmware_bindings.utils import (
     BinarySerializableException,
     UInt16Field
 )
+
+BASE_DIRECTORY = "/userfs/data/testing_data/eeprom_write_test/"
+SAVE_NAME = "test_out"
 
 @dataclasses.dataclass
 class StyledOutput:
@@ -84,6 +89,8 @@ class Writer:
         self._dest.write(self.RESET_STYLE)
         self._dest.flush()
 
+DATA_COUNT = 0
+
 async def monitor_task(
     messenger: CanMessenger,
     write_to: TextIO,
@@ -96,6 +103,7 @@ async def monitor_task(
 
     Returns: Nothing.
     """
+    global DATA_COUNT
     writer = Writer(write_to)
     label_style = "\033[0;37;40m"
 
@@ -107,58 +115,70 @@ async def monitor_task(
 
     err_header_style = "\033[0;31;40m"
     err_data_style = "\033[1;31;40m"
+    # check if directory exists, make if doesn't
+    if not os.path.exists(BASE_DIRECTORY):
+        os.makedirs(BASE_DIRECTORY)
 
-    with WaitableCallback(messenger) as cb:
-        async for message, arbitration_id in cb:
-            try:
-                msg_name = MessageId(arbitration_id.parts.message_id).name
-                from_node = NodeId(arbitration_id.parts.originating_node_id).name
-                to_node = NodeId(arbitration_id.parts.node_id).name
-                arb_id_str = f"{msg_name} ({from_node}->{to_node})"
-            except ValueError:
-                arb_id_str = f"0x{arbitration_id.id:x}"
+    with open(BASE_DIRECTORY + SAVE_NAME + ".csv", mode="w") as csv_file:
+        fieldnames = ["count", "data"]
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
 
-            if arbitration_id.parts.message_id == MessageId.error_message:
-                err_msg = err_msg = cast(ErrorMessage, message)
-                if (
-                    ErrorSeverity(err_msg.payload.severity.value)
-                    == ErrorSeverity.warning
-                ):
-                    header_style = warn_header_style
-                    data_style = warn_data_style
+        with WaitableCallback(messenger) as cb:
+            async for message, arbitration_id in cb:
+                try:
+                    msg_name = MessageId(arbitration_id.parts.message_id).name
+                    from_node = NodeId(arbitration_id.parts.originating_node_id).name
+                    to_node = NodeId(arbitration_id.parts.node_id).name
+                    arb_id_str = f"{msg_name} ({from_node}->{to_node})"
+                except ValueError:
+                    arb_id_str = f"0x{arbitration_id.id:x}"
+
+                if arbitration_id.parts.message_id == MessageId.error_message:
+                    err_msg = err_msg = cast(ErrorMessage, message)
+                    if (
+                        ErrorSeverity(err_msg.payload.severity.value)
+                        == ErrorSeverity.warning
+                    ):
+                        header_style = warn_header_style
+                        data_style = warn_data_style
+                    else:
+                        header_style = err_header_style
+                        data_style = err_data_style
                 else:
-                    header_style = err_header_style
-                    data_style = err_data_style
-            else:
-                header_style = info_header_style
-                data_style = info_data_style
+                    header_style = info_header_style
+                    data_style = info_data_style
 
-            # writer.write(
-            #     [
-            #         StyledOutput(style=header_style, content=str(datetime.now())),
-            #         StyledOutput(style=data_style, content=arb_id_str + "\n"),
-            #     ]
-            # )
-            # for name, value in (
-            #     dict(
-            #         (field.name, getattr(message.payload, field.name))
-            #         for field in fid(message.payload)
-            #     )
-            # ).items():
-            #     writer.write(
-            #         [
-            #             StyledOutput(style=label_style, content=f"\t{name}:"),
-            #             StyledOutput(style=data_style, content=str(value) + "\n"),
-            #         ]
-            #     )
+                # writer.write(
+                #     [
+                #         StyledOutput(style=header_style, content=str(datetime.now())),
+                #         StyledOutput(style=data_style, content=arb_id_str + "\n"),
+                #     ]
+                # )
+                # for name, value in (
+                #     dict(
+                #         (field.name, getattr(message.payload, field.name))
+                #         for field in fid(message.payload)
+                #     )
+                # ).items():
+                #     writer.write(
+                #         [
+                #             StyledOutput(style=label_style, content=f"\t{name}:"),
+                #             StyledOutput(style=data_style, content=str(value) + "\n"),
+                #         ]
+                #     )
 
-            if(msg_name == "read_eeprom_response"):
-                out = message.payload.data.value
-                out_str = ""
-                for data_val in out:
-                    out_str += str(data_val)
-                    out_str += "-"
-                print(out_str)
+                if(msg_name == "read_eeprom_response"):
+                    out = message.payload.data.value
+                    out_str = ""
+                    for data_val in out:
+                        out_str += str(data_val)
+                        out_str += "-"
+                    # print(out_str)
+                    DATA_COUNT = DATA_COUNT + 1
+                    writer.writerow(
+                        {"count": DATA_COUNT,
+                         "data": out_str})
 
 
 
@@ -184,7 +204,7 @@ async def output_task(
     #     if can_message:
     #         await can_driver.send(can_message)
     for cycle in range(4000000):
-        print(cycle)
+        # print(cycle)
         cycle_print = cycle%255
         data_load = bytes([cycle_print,cycle_print,cycle_print,cycle_print,
                            cycle_print,cycle_print,cycle_print,cycle_print])
@@ -205,6 +225,8 @@ async def output_task(
                 )
             )
         error = await can_driver.send(head_node_id, read_msg)
+
+    raise SystemExit()
 
 
 async def run(args: argparse.Namespace) -> None:
