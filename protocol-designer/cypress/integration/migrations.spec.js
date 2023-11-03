@@ -167,7 +167,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
                       labwareId.includes(OT_2_TRASH_DEF_URI) ||
                       labwareId.includes(FLEX_TRASH_DEF_URI)
                     ) {
-                      labwareLocationUpdate['trashId'] = slot
+                      const trashId = 'trashId'
+                      labwareLocationUpdate[trashId] = slot
                       delete labwareLocationUpdate[labwareId]
                     }
                   }
