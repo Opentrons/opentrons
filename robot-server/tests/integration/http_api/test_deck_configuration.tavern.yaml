@@ -16,27 +16,27 @@ stages:
             - cutoutFixtureId: singleLeftSlot
               cutoutId: cutoutA1
             - cutoutFixtureId: singleLeftSlot
-              cutoutId: cutoutA2
-            - cutoutFixtureId: singleLeftSlot
-              cutoutId: cutoutA3
-            - cutoutFixtureId: singleLeftSlot
-              cutoutId: cutoutA4
-            - cutoutFixtureId: singleCenterSlot
               cutoutId: cutoutB1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutC1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutD1
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutA2
             - cutoutFixtureId: singleCenterSlot
               cutoutId: cutoutB2
             - cutoutFixtureId: singleCenterSlot
-              cutoutId: cutoutB3
-            - cutoutFixtureId: singleCenterSlot
-              cutoutId: cutoutB4
-            - cutoutFixtureId: stagingAreaRightSlot
-              cutoutId: cutoutC1
-            - cutoutFixtureId: singleCenterSlot
               cutoutId: cutoutC2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutD2
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutA3
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB3
             - cutoutFixtureId: stagingAreaRightSlot
               cutoutId: cutoutC3
             - cutoutFixtureId: singleCenterSlot
-              cutoutId: cutoutC4
+              cutoutId: cutoutD3
 
   - name: Get the deck configuration
     request:
