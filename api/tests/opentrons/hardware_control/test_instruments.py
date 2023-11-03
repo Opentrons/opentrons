@@ -3,6 +3,7 @@ import mock
 
 import pytest
 from decoy import Decoy
+from typing import Iterator
 
 try:
     import aionotify
@@ -58,6 +59,14 @@ def dummy_instruments_ot3():
     return dummy_instruments_attached_ot3()
 
 
+@pytest.fixture
+def mock_api_verify_tip_presence() -> Iterator[mock.AsyncMock]:
+    from opentrons.hardware_control.ot3api import OT3API
+
+    with mock.patch.object(OT3API, "verify_tip_presence") as mock_tip_presence:
+        yield mock_tip_presence
+
+
 def wrap_build_ot3_sim():
     from opentrons.hardware_control.ot3api import OT3API
 
@@ -65,7 +74,7 @@ def wrap_build_ot3_sim():
 
 
 @pytest.fixture
-def ot3_api_obj(request):
+def ot3_api_obj(request, mock_api_verify_tip_presence):
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing ot2 only")
     from opentrons.hardware_control.ot3api import OT3API
@@ -80,7 +89,7 @@ def ot3_api_obj(request):
     ],
     ids=["ot2", "ot3"],
 )
-def sim_and_instr(request):
+def sim_and_instr(request, mock_api_verify_tip_presence):
     if (
         request.node.get_closest_marker("ot2_only")
         and request.param[0] == wrap_build_ot3_sim
