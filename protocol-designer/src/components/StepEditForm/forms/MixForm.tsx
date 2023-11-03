@@ -81,7 +81,11 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           {...propsForFields.wells}
           labwareId={formData.labware}
           pipetteId={formData.pipette}
-          nozzles={String(propsForFields.nozzles.value) ?? null}
+          nozzles={
+            propsForFields.nozzles.value != null
+              ? String(propsForFields.nozzles.value)
+              : null
+          }
         />
       </div>
       <div className={styles.section_divider} />

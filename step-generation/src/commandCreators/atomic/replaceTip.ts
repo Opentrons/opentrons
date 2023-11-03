@@ -1,7 +1,6 @@
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
 import { COLUMN_4_SLOTS } from '../../constants'
-import { dropTip } from './dropTip'
 import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
@@ -14,10 +13,11 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   wasteChuteCommandsUtil,
 } from '../../utils'
+import { dropTip } from './dropTip'
 import type {
-  CurriedCommandCreator,
-  CommandCreatorError,
   CommandCreator,
+  CommandCreatorError,
+  CurriedCommandCreator,
   Nozzles,
 } from '../../types'
 interface PickUpTipArgs {

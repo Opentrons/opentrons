@@ -168,6 +168,7 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
+//  TODO(Jr, 11/3/23): plug this into pickUpTip and aspirate
 export const tallLabwareEastOf96ChannelPipetteLabware = (): CommandCreatorError => {
   return {
     type: 'TALL_LABWARE_EAST_OF_96_CHANNEL_LABWARE',
