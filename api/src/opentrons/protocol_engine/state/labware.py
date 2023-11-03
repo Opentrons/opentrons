@@ -317,7 +317,7 @@ class LabwareView(HasState[LabwareState]):
         #   things TM TM TM
 
         for cutout in deck_def["locations"]["cutouts"]:
-            if cutout["id"] == slot.id:
+            if cutout["id"].endswith(slot.id):
                 base_position = cutout["position"]
                 break
         else:
