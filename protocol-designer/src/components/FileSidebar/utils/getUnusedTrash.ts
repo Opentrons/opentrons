@@ -5,7 +5,6 @@ import {
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { InitialDeckSetup } from '../../../step-forms'
-// import type { AdditionalEquipment } from '../FileSidebar'
 
 interface UnusedTrash {
   trashBinUnused: boolean
@@ -15,13 +14,8 @@ interface UnusedTrash {
 //  TODO(jr, 10/30/23): plug in waste chute logic when we know the commands!
 export const getUnusedTrash = (
   labwareOnDeck: InitialDeckSetup['labware'],
-  //   additionalEquipment: AdditionalEquipment,
   commands?: CreateCommand[]
 ): UnusedTrash => {
-  // const hasWasteChute = Object.values(additionalEquipment).some(
-  //   equipment => equipment?.name === 'wasteChute'
-  // )
-
   const trashBin = Object.values(labwareOnDeck).find(
     labware =>
       labware.labwareDefURI === FLEX_TRASH_DEF_URI ||

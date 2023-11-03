@@ -7,9 +7,16 @@ export const getUnusedStagingAreas = (
 ): string[] => {
   const stagingAreaSlots = Object.values(additionalEquipment)
     .filter(equipment => equipment?.name === 'stagingArea')
-    .map(equipment => String(equipment.location))
+    .map(equipment => {
+      if (equipment.location == null) {
+        console.error(
+          `expected to find staging area slot location with id ${equipment.id} but could not.`
+        )
+      }
+      return equipment.location ?? ''
+    })
 
-  const updatedStagingAreaSlots = stagingAreaSlots.map(slot => {
+  const corresponding4thColumnSlots = stagingAreaSlots.map(slot => {
     const letter = slot.charAt(0)
     const correspondingLocation = stagingAreaSlots.find(slot =>
       slot.startsWith(letter)
@@ -21,7 +28,7 @@ export const getUnusedStagingAreas = (
     return slot
   })
 
-  const stagingAreaCommandSlots: string[] = updatedStagingAreaSlots.filter(
+  const stagingAreaCommandSlots: string[] = corresponding4thColumnSlots.filter(
     location =>
       commands?.filter(
         command =>
