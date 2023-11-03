@@ -1,5 +1,6 @@
 """Convert between internal types for validation and HTTP-exposed response models."""
 
+import dataclasses
 from typing import Iterable, List
 
 from . import models
@@ -16,5 +17,16 @@ def map_in(request: models.DeckConfigurationRequest) -> List[validation.Placemen
 def map_out(
     validation_errors: Iterable[validation.ConfigurationError],
 ) -> List[models.InvalidDeckConfigurationResponse]:
-    # TODO
-    return [models.InvalidDeckConfigurationResponse.construct(detail="oh god")]
+    return [_map_out_single_error(e) for e in validation_errors]
+
+
+def _map_out_single_error(
+    error: validation.ConfigurationError,
+) -> models.InvalidDeckConfigurationResponse:
+    meta = {
+        "deckConfigurationProblem": error.__class__.__name__,
+        **dataclasses.asdict(error),
+    }
+    return models.InvalidDeckConfigurationResponse(
+        detail="Invalid deck configuration.", meta=meta
+    )

@@ -91,7 +91,10 @@ stages:
           - id: InvalidDeckConfiguration
             title: Invalid Deck Configuration
             errorCode: '4000'
-            detail: !anystr
+            detail: Invalid deck configuration.
+            meta:
+              deckConfigurationProblem: UnoccupiedCutoutError
+              cutout_id: cutoutA1
 
   - name: Get the deck configuration and make sure it's not the invalid one
     request:
