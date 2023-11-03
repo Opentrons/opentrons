@@ -1,0 +1,170 @@
+from opentrons_shared_data.deck import load as load_deck_definition
+
+from robot_server.deck_configuration import validation as subject
+
+
+def test_valid() -> None:
+    deck_definition = load_deck_definition("ot3_standard", version=4)
+    cutout_fixtures = [
+        subject.MountedCutoutFixture(
+            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
+        )
+        for cutout_fixture_id, cutout_id in [
+            ("singleLeftSlot", "cutoutA1"),
+            ("singleLeftSlot", "cutoutB1"),
+            ("singleLeftSlot", "cutoutC1"),
+            ("singleLeftSlot", "cutoutD1"),
+            ("singleCenterSlot", "cutoutA2"),
+            ("singleCenterSlot", "cutoutB2"),
+            ("singleCenterSlot", "cutoutC2"),
+            ("singleCenterSlot", "cutoutD2"),
+            ("stagingAreaRightSlot", "cutoutA3"),
+            ("singleRightSlot", "cutoutB3"),
+            ("stagingAreaRightSlot", "cutoutC3"),
+            ("singleRightSlot", "cutoutD3"),
+        ]
+    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == []
+
+
+def test_invalid_empty_cutout() -> None:
+    deck_definition = load_deck_definition("ot3_standard", version=4)
+    cutout_fixtures = [
+        subject.MountedCutoutFixture(
+            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
+        )
+        for cutout_fixture_id, cutout_id in [
+            ("singleLeftSlot", "cutoutA1"),
+            ("singleLeftSlot", "cutoutB1"),
+            ("singleLeftSlot", "cutoutC1"),
+            ("singleLeftSlot", "cutoutD1"),
+            ("singleCenterSlot", "cutoutA2"),
+            ("singleCenterSlot", "cutoutB2"),
+            # Invalid because we haven't placed anything into cutout C2.
+            # ("singleCenterSlot", "cutoutC2"),
+            ("singleCenterSlot", "cutoutD2"),
+            ("stagingAreaRightSlot", "cutoutA3"),
+            ("singleRightSlot", "cutoutB3"),
+            ("stagingAreaRightSlot", "cutoutC3"),
+            ("singleRightSlot", "cutoutD3"),
+        ]
+    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+        subject.UnoccupiedCutoutError(cutout_id="cutoutC2")
+    ]
+
+
+def test_invalid_overcrowded_cutout() -> None:
+    deck_definition = load_deck_definition("ot3_standard", version=4)
+    cutout_fixtures = [
+        subject.MountedCutoutFixture(
+            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
+        )
+        for cutout_fixture_id, cutout_id in [
+            ("singleLeftSlot", "cutoutA1"),
+            ("singleLeftSlot", "cutoutB1"),
+            ("singleLeftSlot", "cutoutC1"),
+            ("singleLeftSlot", "cutoutD1"),
+            ("singleCenterSlot", "cutoutA2"),
+            ("singleCenterSlot", "cutoutB2"),
+            ("singleCenterSlot", "cutoutC2"),
+            ("singleCenterSlot", "cutoutD2"),
+            ("stagingAreaRightSlot", "cutoutA3"),
+            ("singleRightSlot", "cutoutB3"),
+            ("stagingAreaRightSlot", "cutoutC3"),
+            # Invalid because we're placing two things in cutout D3.
+            ("singleRightSlot", "cutoutD3"),
+            ("wasteChuteRightAdapterNoCover", "cutoutD3"),
+        ]
+    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+        subject.OvercrowdedCutoutError(
+            cutout_id="cutoutD3",
+            cutout_fixture_ids=["singleRightSlot", "wasteChuteRightAdapterNoCover"],
+        )
+    ]
+
+
+def test_invalid_cutout_for_fixture() -> None:
+    deck_definition = load_deck_definition("ot3_standard", version=4)
+    cutout_fixtures = [
+        subject.MountedCutoutFixture(
+            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
+        )
+        for cutout_fixture_id, cutout_id in [
+            ("singleLeftSlot", "cutoutA1"),
+            ("singleLeftSlot", "cutoutB1"),
+            ("singleLeftSlot", "cutoutC1"),
+            ("singleLeftSlot", "cutoutD1"),
+            ("singleCenterSlot", "cutoutA2"),
+            ("singleCenterSlot", "cutoutB2"),
+            # Invalid because wasteChuteRightAdapterNoCover can't be placed in cutout C2.
+            ("wasteChuteRightAdapterNoCover", "cutoutC2"),
+            ("singleCenterSlot", "cutoutD2"),
+            ("stagingAreaRightSlot", "cutoutA3"),
+            ("singleRightSlot", "cutoutB3"),
+            ("stagingAreaRightSlot", "cutoutC3"),
+            ("singleRightSlot", "cutoutD3"),
+        ]
+    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+        subject.InvalidLocationError(
+            cutout_id="cutoutC2", cutout_fixture_id="wasteChuteRightAdapterNoCover"
+        )
+    ]
+
+
+def test_unrecognized_cutout() -> None:
+    deck_definition = load_deck_definition("ot3_standard", version=4)
+    cutout_fixtures = [
+        subject.MountedCutoutFixture(
+            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
+        )
+        for cutout_fixture_id, cutout_id in [
+            ("singleLeftSlot", "cutoutA1"),
+            ("singleLeftSlot", "cutoutB1"),
+            ("singleLeftSlot", "cutoutC1"),
+            ("singleLeftSlot", "cutoutD1"),
+            ("singleCenterSlot", "cutoutA2"),
+            ("singleCenterSlot", "cutoutB2"),
+            ("singleCenterSlot", "cutoutC2"),
+            ("singleCenterSlot", "cutoutD2"),
+            ("singleRightSlot", "cutoutA3"),
+            ("singleRightSlot", "cutoutB3"),
+            ("singleRightSlot", "cutoutC3"),
+            # Invalid because "someUnrecognizedCutout" is not defined by the deck definition.
+            ("someUnrecognizedCutout", "cutoutD3"),
+        ]
+    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+        subject.UnrecognizedCutoutError(cutout_id="someUnrecognizedCutout")
+    ]
+
+
+def test_unrecognized_cutout_fixture() -> None:
+    deck_definition = load_deck_definition("ot3_standard", version=4)
+    cutout_fixtures = [
+        subject.MountedCutoutFixture(
+            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
+        )
+        for cutout_fixture_id, cutout_id in [
+            ("singleLeftSlot", "cutoutA1"),
+            ("singleLeftSlot", "cutoutB1"),
+            ("singleLeftSlot", "cutoutC1"),
+            ("singleLeftSlot", "cutoutD1"),
+            ("singleCenterSlot", "cutoutA2"),
+            ("singleCenterSlot", "cutoutB2"),
+            ("singleCenterSlot", "cutoutC2"),
+            ("singleCenterSlot", "cutoutD2"),
+            ("singleRightSlot", "cutoutA3"),
+            ("singleRightSlot", "cutoutB3"),
+            ("singleRightSlot", "cutoutC3"),
+            # Invalid because "someUnrecognizedCutoutFixture" is not defined by the deck definition.
+            ("someUnrecognizedCutoutFixture", "cutoutD3"),
+        ]
+    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+        subject.UnrecognizedCutoutFixtureError(
+            cutout_fixture_id="someUnrecognizedCutoutFixture"
+        )
+    ]
