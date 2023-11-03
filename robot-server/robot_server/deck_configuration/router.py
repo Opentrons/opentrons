@@ -56,6 +56,11 @@ async def put_deck_configuration(  # noqa: D103
         "Get the robot's current deck configuration."
         " See `PUT /deck_configuration` for background information."
     ),
+    responses={
+        fastapi.status.HTTP_200_OK: {
+            "model": SimpleBody[models.DeckConfigurationResponse]
+        },
+    },
 )
 async def get_deck_configuration(  # noqa: D103
     store: DeckConfigurationStore = fastapi.Depends(get_deck_configuration_store),
