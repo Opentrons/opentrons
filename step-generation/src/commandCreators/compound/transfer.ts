@@ -14,6 +14,7 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
+  getConfigureNozzleLayoutCommandReset,
 } from '../../utils'
 import {
   aspirate,
@@ -240,6 +241,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                   }),
                 ]
               : []
+          const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
+            prevNozzles
+          )
 
           const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
             invariantContext.pipetteEntities[args.pipette].name
@@ -547,6 +551,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...blowoutCommand,
             ...airGapAfterDispenseCommands,
             ...dropTipAfterDispenseAirGap,
+            ...configureNozzleLayoutCommandReset,
           ]
           // NOTE: side-effecting
           prevSourceWell = sourceWell

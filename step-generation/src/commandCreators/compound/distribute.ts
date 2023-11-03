@@ -12,6 +12,7 @@ import {
   blowoutUtil,
   wasteChuteCommandsUtil,
   getDispenseAirGapLocation,
+  getConfigureNozzleLayoutCommandReset,
 } from '../../utils'
 import {
   aspirate,
@@ -412,6 +413,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
               }),
             ]
           : []
+      const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
+        prevNozzles
+      )
 
       return [
         ...configureNozzleLayoutCommand,
@@ -433,6 +437,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ...blowoutCommands,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
+        ...configureNozzleLayoutCommandReset,
       ]
     }
   )

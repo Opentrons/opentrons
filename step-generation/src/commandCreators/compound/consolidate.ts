@@ -14,6 +14,7 @@ import {
   airGapHelper,
   dispenseLocationHelper,
   moveHelper,
+  getConfigureNozzleLayoutCommandReset,
 } from '../../utils'
 import {
   aspirate,
@@ -427,6 +428,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               }),
             ]
           : []
+      const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
+        prevNozzles
+      )
 
       return [
         ...configureNozzleLayoutCommand,
@@ -442,6 +446,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ...blowoutCommand,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
+        ...configureNozzleLayoutCommandReset,
       ]
     }
   )

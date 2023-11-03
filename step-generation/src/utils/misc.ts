@@ -9,30 +9,33 @@ import {
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
+import {
+  moveToAddressableArea,
+  moveToWell,
+  aspirate,
+  dispense,
+} from '../commandCreators/atomic'
 import { blowout } from '../commandCreators/atomic/blowout'
+import { configureNozzleLayout } from '../commandCreators/atomic'
 import { curryCommandCreator } from './curryCommandCreator'
+import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
+  CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
+  LabwareEntities,
   LabwareEntity,
   LocationLiquidState,
+  Nozzles,
   PipetteEntity,
   RobotState,
   SourceAndDest,
 } from '../types'
-import {
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
-  CommandCreator,
-  dispense,
-  LabwareEntities,
-  aspirate,
-} from '..'
-import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
-import { moveToAddressableArea, moveToWell } from '../commandCreators/atomic'
-import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -680,4 +683,16 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+export const getConfigureNozzleLayoutCommandReset = (
+  prevNozzles?: Nozzles
+): CurriedCommandCreator[] => {
+  return prevNozzles === 'column'
+    ? [
+        curryCommandCreator(configureNozzleLayout, {
+          nozzles: 'full',
+        }),
+      ]
+    : []
 }

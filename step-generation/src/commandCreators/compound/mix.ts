@@ -5,6 +5,7 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
+  getConfigureNozzleLayoutCommandReset,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {
@@ -177,7 +178,9 @@ export const mix: CommandCreator<MixArgs> = (
         }),
       ]
     : []
-
+  const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
+    prevNozzles
+  )
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -235,6 +238,7 @@ export const mix: CommandCreator<MixArgs> = (
         ...mixCommands,
         ...blowoutCommand,
         ...touchTipCommands,
+        ...configureNozzleLayoutCommandReset,
       ]
     }
   )
