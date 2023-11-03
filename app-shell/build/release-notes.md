@@ -10,7 +10,6 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v7.0.2 release of the Opentrons App!
 
-
 ### Bug Fixes
 
 - Fixes an issue where robot system updates over USB were stalling
