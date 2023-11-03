@@ -24,10 +24,10 @@ def test_valid() -> None:
             ("singleRightSlot", "cutoutD3"),
         ]
     ]
-    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == []
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == set()
 
 
-def test_invalid_empty_cutout() -> None:
+def test_invalid_empty_cutouts() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
         subject.MountedCutoutFixture(
@@ -40,21 +40,22 @@ def test_invalid_empty_cutout() -> None:
             ("singleLeftSlot", "cutoutD1"),
             ("singleCenterSlot", "cutoutA2"),
             ("singleCenterSlot", "cutoutB2"),
-            # Invalid because we haven't placed anything into cutout C2.
+            # Invalid because we haven't placed anything into cutout C2 or D2.
             # ("singleCenterSlot", "cutoutC2"),
-            ("singleCenterSlot", "cutoutD2"),
+            # ("singleCenterSlot", "cutoutD2"),
             ("stagingAreaRightSlot", "cutoutA3"),
             ("singleRightSlot", "cutoutB3"),
             ("stagingAreaRightSlot", "cutoutC3"),
             ("singleRightSlot", "cutoutD3"),
         ]
     ]
-    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
-        subject.UnoccupiedCutoutError(cutout_id="cutoutC2")
-    ]
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == {
+        subject.UnoccupiedCutoutError(cutout_id="cutoutC2"),
+        subject.UnoccupiedCutoutError(cutout_id="cutoutD2"),
+    }
 
 
-def test_invalid_overcrowded_cutout() -> None:
+def test_invalid_overcrowded_cutouts() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
         subject.MountedCutoutFixture(
@@ -71,18 +72,24 @@ def test_invalid_overcrowded_cutout() -> None:
             ("singleCenterSlot", "cutoutD2"),
             ("stagingAreaRightSlot", "cutoutA3"),
             ("singleRightSlot", "cutoutB3"),
+            # Invalid because we're placing two things in cutout C3...
             ("stagingAreaRightSlot", "cutoutC3"),
-            # Invalid because we're placing two things in cutout D3.
-            ("singleRightSlot", "cutoutD3"),
+            ("stagingAreaRightSlot", "cutoutC3"),
+            # ...and two things in cutout D3.
             ("wasteChuteRightAdapterNoCover", "cutoutD3"),
+            ("singleRightSlot", "cutoutD3"),
         ]
     ]
-    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == {
+        subject.OvercrowdedCutoutError(
+            cutout_id="cutoutC3",
+            cutout_fixture_ids=("stagingAreaRightSlot", "stagingAreaRightSlot"),
+        ),
         subject.OvercrowdedCutoutError(
             cutout_id="cutoutD3",
-            cutout_fixture_ids=["singleRightSlot", "wasteChuteRightAdapterNoCover"],
-        )
-    ]
+            cutout_fixture_ids=("wasteChuteRightAdapterNoCover", "singleRightSlot"),
+        ),
+    }
 
 
 def test_invalid_cutout_for_fixture() -> None:
@@ -107,11 +114,11 @@ def test_invalid_cutout_for_fixture() -> None:
             ("singleRightSlot", "cutoutD3"),
         ]
     ]
-    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == {
         subject.InvalidLocationError(
             cutout_id="cutoutC2", cutout_fixture_id="wasteChuteRightAdapterNoCover"
         )
-    ]
+    }
 
 
 def test_unrecognized_cutout() -> None:
@@ -163,8 +170,8 @@ def test_unrecognized_cutout_fixture() -> None:
             ("someUnrecognizedCutoutFixture", "cutoutD3"),
         ]
     ]
-    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == [
+    assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == {
         subject.UnrecognizedCutoutFixtureError(
             cutout_fixture_id="someUnrecognizedCutoutFixture"
         )
-    ]
+    }
