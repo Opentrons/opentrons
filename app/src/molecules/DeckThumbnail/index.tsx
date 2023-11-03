@@ -194,7 +194,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
                       definition={topLabwareDefinition}
                       labwareId={topLabwareId}
                       displayName={topLabwareDisplayName}
-                      runId={'dummy'}
+                      runId={'dummyId'}
                       hover={
                         topLabwareId === hoverLabwareId && labwareHasLiquid
                       }
@@ -243,7 +243,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
                   definition={topLabwareDefinition}
                   labwareId={topLabwareId}
                   displayName={topLabwareDisplayName}
-                  runId={''}
+                  runId={'dummyId'}
                   hover={labwareId === hoverLabwareId && labwareHasLiquid}
                   labwareHasLiquid={labwareHasLiquid}
                 />
