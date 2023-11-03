@@ -6,9 +6,7 @@ from robot_server.deck_configuration import validation as subject
 def test_valid() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
-        subject.MountedCutoutFixture(
-            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
-        )
+        subject.Placement(cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id)
         for cutout_fixture_id, cutout_id in [
             ("singleLeftSlot", "cutoutA1"),
             ("singleLeftSlot", "cutoutB1"),
@@ -30,9 +28,7 @@ def test_valid() -> None:
 def test_invalid_empty_cutouts() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
-        subject.MountedCutoutFixture(
-            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
-        )
+        subject.Placement(cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id)
         for cutout_fixture_id, cutout_id in [
             ("singleLeftSlot", "cutoutA1"),
             ("singleLeftSlot", "cutoutB1"),
@@ -58,9 +54,7 @@ def test_invalid_empty_cutouts() -> None:
 def test_invalid_overcrowded_cutouts() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
-        subject.MountedCutoutFixture(
-            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
-        )
+        subject.Placement(cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id)
         for cutout_fixture_id, cutout_id in [
             ("singleLeftSlot", "cutoutA1"),
             ("singleLeftSlot", "cutoutB1"),
@@ -95,9 +89,7 @@ def test_invalid_overcrowded_cutouts() -> None:
 def test_invalid_cutout_for_fixture() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
-        subject.MountedCutoutFixture(
-            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
-        )
+        subject.Placement(cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id)
         for cutout_fixture_id, cutout_id in [
             ("singleLeftSlot", "cutoutA1"),
             ("singleLeftSlot", "cutoutB1"),
@@ -134,9 +126,7 @@ def test_invalid_cutout_for_fixture() -> None:
 def test_unrecognized_cutout() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
-        subject.MountedCutoutFixture(
-            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
-        )
+        subject.Placement(cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id)
         for cutout_fixture_id, cutout_id in [
             ("singleLeftSlot", "cutoutA1"),
             ("singleLeftSlot", "cutoutB1"),
@@ -168,9 +158,7 @@ def test_unrecognized_cutout() -> None:
 def test_unrecognized_cutout_fixture() -> None:
     deck_definition = load_deck_definition("ot3_standard", version=4)
     cutout_fixtures = [
-        subject.MountedCutoutFixture(
-            cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id
-        )
+        subject.Placement(cutout_fixture_id=cutout_fixture_id, cutout_id=cutout_id)
         for cutout_fixture_id, cutout_id in [
             ("singleLeftSlot", "cutoutA1"),
             ("singleLeftSlot", "cutoutB1"),

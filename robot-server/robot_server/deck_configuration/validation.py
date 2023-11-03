@@ -6,7 +6,7 @@ from opentrons_shared_data.deck import dev_types as deck_types
 
 
 @dataclass(frozen=True)
-class MountedCutoutFixture:
+class Placement:
     cutout_id: str
     cutout_fixture_id: str
 
@@ -45,15 +45,13 @@ ConfigurationError = Union[
 
 def get_configuration_errors(
     deck_definition: deck_types.DeckDefinitionV4,
-    cutout_fixtures: List[MountedCutoutFixture],
+    placements: List[Placement],
 ) -> Set[ConfigurationError]:
     errors: Set[ConfigurationError] = set()
     fixtures_by_cutout: DefaultDict[str, List[str]] = defaultdict(list)
 
-    for cutout_fixture in cutout_fixtures:
-        fixtures_by_cutout[cutout_fixture.cutout_id].append(
-            cutout_fixture.cutout_fixture_id
-        )
+    for placement in placements:
+        fixtures_by_cutout[placement.cutout_id].append(placement.cutout_fixture_id)
 
     expected_cutouts = set(c["id"] for c in deck_definition["locations"]["cutouts"])
     occupied_cutouts = set(fixtures_by_cutout.keys())
@@ -66,19 +64,19 @@ def get_configuration_errors(
         if len(fixtures) > 1:
             errors.add(OvercrowdedCutoutError(cutout, tuple(fixtures)))
 
-    for cutout_fixture in cutout_fixtures:
+    for placement in placements:
         found_cutout_fixture = find_cutout_fixture(
-            deck_definition, cutout_fixture.cutout_fixture_id
+            deck_definition, placement.cutout_fixture_id
         )
         if isinstance(found_cutout_fixture, UnrecognizedCutoutFixtureError):
             errors.add(found_cutout_fixture)
         else:
             allowed_cutout_ids = frozenset(found_cutout_fixture["mayMountTo"])
-            if cutout_fixture.cutout_id not in allowed_cutout_ids:
+            if placement.cutout_id not in allowed_cutout_ids:
                 errors.add(
                     InvalidLocationError(
-                        cutout_id=cutout_fixture.cutout_id,
-                        cutout_fixture_id=cutout_fixture.cutout_fixture_id,
+                        cutout_id=placement.cutout_id,
+                        cutout_fixture_id=placement.cutout_fixture_id,
                         allowed_cutout_ids=allowed_cutout_ids,
                     )
                 )
