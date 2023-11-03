@@ -4,20 +4,17 @@
 from datetime import datetime
 
 import fastapi
-from robot_server.deck_configuration.fastapi_dependencies import (
-    get_deck_configuration_store,
-)
 
 from robot_server.service.dependencies import get_current_time
 from robot_server.service.json_api import PydanticResponse, RequestModel, SimpleBody
 from . import models
+from .fastapi_dependencies import get_deck_configuration_store
 from .store import DeckConfigurationStore
 
 
 router = fastapi.APIRouter()
 
 
-# TODO: Elaborate on what "the deck configuration" is, conceptually
 @router.put(
     "/deck_configuration",
     summary="Set the deck configuration",
