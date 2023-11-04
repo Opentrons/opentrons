@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional, Set, List
 
 
 from .constants import JSONRPC_VERSION
+from .errors import JSONRPCError
 from .utils.log import init_logging
 from .dispatcher import JSONRPCDispatcher
 from .manager import JSONRPCResponseManager
@@ -20,7 +21,7 @@ from .types import (
 )
 
 log = logging.getLogger(__name__)
-init_logging("DEBUG")
+#init_logging("DEBUG")
 
 
 class IPCMessenger:
@@ -124,7 +125,6 @@ class IPCMessenger:
             params=params,
             version=JSONRPC_VERSION,
         )
-
         return await self.send(req, destinations=target)
 
     async def send(self,
@@ -140,7 +140,15 @@ class IPCMessenger:
             if target == self._source:
                 continue
             resp = await self._send(target, message, notify=notify)
-            response[target] = resp
+            if resp and resp.result:
+                response[target] = resp.result
+            elif resp and resp.error:
+                error = JSONRPCError.from_dict(resp.error)
+                log.error(f"Received jsonrpc error: {error}")
+                if error.data:
+                    exc_type = error.data.get('type')
+                    exc_msg = error.data.get('message')
+                    raise RuntimeError(exc_type, exc_msg)
         return response
 
     async def _send(
@@ -148,8 +156,7 @@ class IPCMessenger:
         target: IPCProcess,
         request: JSONRPCRequest,
         notify: bool = False,
-    ) -> Optional[Any]:
-
+    ) -> Optional[JSONRPCResponse]:
         is_batch = isinstance(request, JSONRPCBatchRequest)
         if is_batch:
             for req in request:
@@ -161,9 +168,9 @@ class IPCMessenger:
             self._req_id += 1
             request._id = self._req_id
 
-        response: Any = None
+        response: Optional[JSONRPCResponse] = None
         port = DESTINATION_PORT[target]
-        log.info(f"Sending: {self._source.name} ({self._host}:{self._port}) -> {target.name} ({self._host}:{port})\n{request}")
+        log.debug(f"Sending: {self._source.name} ({self._host}:{self._port}) -> {target.name} ({self._host}:{port})\n{request}")
         try:
             # open connection to the corresponding port
             reader, writer = await asyncio.open_connection(self._host, port)
@@ -185,9 +192,8 @@ class IPCMessenger:
 
             # return the response
             log.debug(f"Received IPC response: {data.decode()}")
-            resp =  json.loads(data)
-            response = resp if is_batch else resp.get('result')
-            # todo (ba, 2023-10-27): raise exception if we get an 'error' response.
+            response = JSONRPCResponse.from_json(data)
+            response.request = request
         except OSError:
             log.warning(f"{self._host}:{port} is probably offline")
         except json.JSONDecodeError:

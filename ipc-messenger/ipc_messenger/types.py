@@ -4,6 +4,11 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Union, Tuple, Iterable
 
 from .constants import JSONRPC_VERSION
+from .errors import (
+    JSONRPCError,
+    JSONRPCParseError,
+    JSONRPCInvalidRequestError,
+)
 from .errors.exceptions import (
     JSONRPCInvalidRequestException,
 )
@@ -61,7 +66,7 @@ class JSONRPCRequest:
         return cls.from_data(data)
 
     @classmethod
-    def from_data(cls, data: Union[List,Dict]) -> "JSONRPCRequest":
+    def from_data(cls, data: Union[List, Dict]) -> "JSONRPCRequest":
         is_batch = isinstance(data, list)
         data = data if is_batch else [data]
         if not all(data):
@@ -97,7 +102,6 @@ class JSONRPCRequest:
     @property
     def data(self) -> Dict[str, Any]:
         """Dictionary of the json rpc data this object represents."""
-
         data = dict(
             (k, v) for k, v in self._data.items()
             if not (k == "id" and self.is_notification)
@@ -171,30 +175,27 @@ class JSONRPCResponse:
 
     """ class for JSON-RPC 2.0 responses."""
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(
+        self,
+        _id: Optional[int] = None,
+        result: Optional[Any] = None,
+        error: Optional[Dict] = None,
+        **kwargs,
+    ) -> None:
         """Constructor"""
-        self.data: Dict[str, Any] = dict()
+        self.__id = _id
+        self._result = result
+        self._error = error
+        self._version = kwargs.get('jsonrpc', JSONRPC_VERSION)
         self.request: Optional[JSONRPCRequest] = None
-        self._id: Optional[int] = kwargs.get('_id')
 
-        # try and get the result
-        try:
-            self.result = kwargs['result']
-        except KeyError:
-            pass
-
-        # try and get any errors
-        try:
-            self.error = kwargs['error']
-        except KeyError:
-            pass
-
-        if 'result' not in kwargs and 'error' not in kwargs:
+        # we must have either a result or error
+        if result is None and error is None:
             raise ValueError("Either result or error should be used")
 
     def __repr__(self) -> str:
         """String representation of this object."""
-        return f"<{self.__class__.__name__}: id={self._id} result={self.result}>"
+        return f"<{self.__class__.__name__}: id={self.__id} result={self._result}>"
 
     @classmethod
     def from_json(cls, json_str: str) -> "JSONRPCResponse":
@@ -202,24 +203,14 @@ class JSONRPCResponse:
         data = json.loads(json_str)
         if not isinstance(data, dict):
             raise ValueError("jsonrpc data needs to be a dictionary.")
-        return cls(**data)
-
-    @property
-    def data(self) -> Dict[str, Any]:
-        """Dictionary of the json rpc data this object represents."""
-        return self._data
-
-    @data.setter
-    def data(self, value) -> None:
-        """Setter for the data"""
-        if not isinstance(value, dict):
-            raise ValueError("data should be dict")
-        self._data = value
+        resp = cls(**data)
+        resp._id = data.get('id')
+        return resp
 
     @property
     def _id(self) -> Union[str, int]:
         """The index number of this request."""
-        return self._data.get("_id")
+        return self._id
 
     @_id.setter
     def _id(self, value: Union[str,int]) -> None:
@@ -227,32 +218,52 @@ class JSONRPCResponse:
         if value is not None and \
             not (isinstance(value, int) or isinstance(value, str)):
                 raise ValueError("id needs to be an integer or string")
-        self._data["_id"] = value
+        self.__id = value
 
     @property
     def result(self) -> Any:
-        return self._data.get("result")
+        return self._result
 
     @result.setter
     def result(self, value: Any):
         if self.error:
-            raise ValueError("Either result or error should be used")
-        self._data["result"] = value
+            raise ValueError("Can't set result if there is an error")
+        self._result = value
 
     @property
-    def error(self) -> Any:
-        return self._data.get("error")
+    def error(self) -> JSONRPCError:
+        return self._error
 
     @error.setter
-    def error(self, value):
-        self._data.pop('value', None)
-        if value:
-            self._data["error"] = value
+    def error(self, value: JSONRPCError):
+        if self.result:
+            raise ValueError("Can't set error if there is a result")
+            self._error = value
+
+    @property
+    def dict(self) -> Dict[str, Any]:
+        """Get a dict representing the JSONRPCResponse object."""
+        data = {
+            "jsonrpc": self._version,
+            "id": self.__id,
+        }
+
+        if self._result:
+            data["result"] = self._result
+        elif self._error:
+            data["error"] = self._error.dict
+            # If there was an error in detecting the id in the Request 
+            # object (e.g. Parse error/Invalid Request), it MUST be Null.
+            # https://www.jsonrpc.org/specification
+            if isinstance(self._error, JSONRPCParseError) or \
+                    isinstance(self._error, JSONRPCInvalidRequestError):
+                        self.__id = None
+        return data
 
     @property
     def json(self) -> str:
         """Returns a serialized json string of this object."""
-        return json.dumps(self.data)
+        return json.dumps(self.dict)
 
 
 class JSONRPCBatchRequest(object):

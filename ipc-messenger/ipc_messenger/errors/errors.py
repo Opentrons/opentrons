@@ -1,4 +1,5 @@
 """JSONRPC Error codes."""
+import json
 
 from typing import Optional, Any, Dict
 
@@ -42,6 +43,10 @@ class JSONRPCError(object):
         self._message = message
         self._data = data
 
+    def __repr__(self) -> str:
+        """Internal string representation of this object"""
+        return f"<{self.__class__.__name__}: code={self._code}, msg={self._message}>"
+
     @property
     def code(self) -> int:
         return self._code
@@ -74,14 +79,19 @@ class JSONRPCError(object):
         self._data = value
 
     @classmethod
-    def from_json(cls, data_str: str) -> "JSONRPCError":
-        """Get a JSONRPCError instance from a json string."""
-        data = json.loads(data_str)
+    def from_dict(cls, data: Dict[str, Any]) -> "JSONRPCError":
+        """Get a JSONRPCError instance from dict data."""
         return cls(
             code=data["code"],
             message=data["message"],
             data=data.get("data"),
         )
+
+    @classmethod
+    def from_json(cls, data_str: str) -> "JSONRPCError":
+        """Get a JSONRPCError instance from a json string."""
+        data = json.loads(data_str)
+        return cls.from_dict(data)
 
     @property
     def dict(self) -> Dict[str, Any]:
