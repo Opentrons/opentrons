@@ -34,7 +34,7 @@ class JSONRPCError(object):
 
     def __init__(
         self,
-        code: int,
+        code: ErrorCodes,
         message: str,
         data: Optional[Any] = None
     ) -> None:
@@ -48,41 +48,46 @@ class JSONRPCError(object):
         return f"<{self.__class__.__name__}: code={self._code}, msg={self._message}>"
 
     @property
-    def code(self) -> int:
+    def code(self) -> ErrorCodes:
+        """Integer value for this error code."""
         return self._code
 
     @code.setter
-    def code(self, value: int) -> None:
-        """The error code."""
+    def code(self, value: ErrorCodes) -> None:
+        """Setter for the error code."""
         if not isinstance(value, ErrorCodes):
             raise ValueError("Error code needs to be an ErrorCodes Enum.")
         self._code = value
 
     @property
     def message(self) -> str:
+        """Short description of the error"""
         return self._message
 
     @message.setter
     def message(self, value: str) -> None:
-        """The message for this error code."""
+        """Setter for the message for this error code."""
         if not isinstance(value, str):
             raise ValueError("The error message needs to be a string.")
         self._message = value
 
     @property
     def data(self) -> Any:
+        """Additional data for this error message."""
         return self._data
 
     @data.setter
     def data(self, value: Any) -> None:
-        """Additional data for this error message."""
+        """Setter for the data"""
         self._data = value
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "JSONRPCError":
         """Get a JSONRPCError instance from dict data."""
+        value = data.get("code")
+        code = ErrorCodes.from_int(value)
         return cls(
-            code=data["code"],
+            code=code,
             message=data["message"],
             data=data.get("data"),
         )
@@ -95,12 +100,14 @@ class JSONRPCError(object):
 
     @property
     def dict(self) -> Dict[str, Any]:
+        """Dictionary of the data this object represents."""
         return {
             "code": self._code.value,
             "message": self._message,
             "data": self.data,
         }
 
+    @property
     def json(self) -> str:
         """Serialized object"""
         return json.dumps(self.dict)
@@ -114,6 +121,7 @@ class JSONRPCParseError(JSONRPCError):
     """
 
     def __init__(self, data: Optional[Any] = None) -> None:
+        """Contructor"""
         super().__init__(ErrorCodes.JSON_PARSE_ERROR, "Parse Error", data=data)
 
 
@@ -124,6 +132,7 @@ class JSONRPCInvalidRequestError(JSONRPCError):
     """
 
     def __init__(self, data: Optional[Any] = None) -> None:
+        """Contructor"""
         super().__init__(ErrorCodes.INVALID_REQUEST_ERROR, "Invalid Request", data=data)
 
 
@@ -134,6 +143,7 @@ class JSONRPCMethodNotFoundError(JSONRPCError):
     """
 
     def __init__(self, data: Optional[Any] = None) -> None:
+        """Contructor"""
         super().__init__(ErrorCodes.METHOD_NOT_FOUND_ERROR, "Method not found", data=data)
 
 
@@ -144,6 +154,7 @@ class JSONRPCInvalidParamsError(JSONRPCError):
     """
 
     def __init__(self, data: Optional[Any] = None) -> None:
+        """Contructor"""
         super().__init__(ErrorCodes.INVALID_PARAMS_ERROR, "Invalid params", data=data)
 
 
@@ -154,6 +165,7 @@ class JSONRPCInternalError(JSONRPCError):
     """
 
     def __init__(self, data: Optional[Any] = None) -> None:
+        """Contructor"""
         super().__init__(ErrorCodes.INTERNAL_ERROR, "Internal JSON-RPC error.", data=data)
 
 
@@ -164,6 +176,7 @@ class JSONRPCServerError(JSONRPCError):
     """
 
     def __init__(self, data: Optional[Any] = None) -> None:
+        """Contructor"""
         super().__init__(ErrorCodes.SERVER_ERROR, "Server error.", data=data)
 
 
@@ -171,5 +184,6 @@ class JSONRPCVersionNotSupportedError(JSONRPCServerError):
     """ json-rpc version is not supported error. """
 
     def __init__(self, data: Optional[Any] = None) -> None:
+        """Contructor"""
         super().__init__(ErrorCodes.JSONRPC_VERSION_ERROR, "Invalid json-rpc version.", data=data)
 

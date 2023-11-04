@@ -3,6 +3,8 @@
 from inspect import signature, Parameter
 from typing import Callable
 
+from .log import init_logging
+
 
 def has_invalid_params(
     func: Callable,
@@ -25,3 +27,7 @@ def has_invalid_params(
         return True
     return False
 
+__all__ = [
+    "init_logging",
+    "has_invalid_args",
+]

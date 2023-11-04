@@ -6,6 +6,12 @@ from .messenger import IPCMessenger
 from .types import (
     IPCProcess,
     DESTINATION_PORT,
+    JSONRPCRequest,
+    JSONRPCResponse,
+)
+from .errors import (
+    JSONRPCError,
+    ErrorCodes,
 )
 
 
@@ -19,4 +25,8 @@ __all__ = [
     "IPCMessenger",
     "IPCProcess",
     "DESTINATION_PORT",
+    "JSONRPCRequest",
+    "JSONRPCResponse",
+    "JSONRPCError",
+    "ErrorCodes",
 ]

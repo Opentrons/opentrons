@@ -2,7 +2,6 @@
 import asyncio
 import json
 from typing import Any, Optional, AsyncGenerator, List, Dict
-from jsonrpc.utils import is_invalid_params
 
 from .constants import JSONRPC_VERSION
 from .dispatcher import JSONRPCDispatcher

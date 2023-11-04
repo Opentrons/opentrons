@@ -12,3 +12,11 @@ class ErrorCodes(Enum):
     JSONRPC_VERSION_ERROR = -32001
     UNKNOWN_ERROR = -32099
 
+    @classmethod
+    def from_int(cls, value: int) -> "ErrorCodes":
+        """Return corresponding ErrorCodes for given int"""
+        try:
+            return cls(value)
+        except ValueError:
+            return cls.UNKNOWN_ERROR
+

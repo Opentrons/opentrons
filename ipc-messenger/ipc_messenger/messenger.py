@@ -3,7 +3,6 @@ import json
 import asyncio
 import logging
 
-from enum import Enum
 from typing import Any, Dict, Optional, Set, List
 
 
@@ -21,17 +20,20 @@ from .types import (
 )
 
 log = logging.getLogger(__name__)
-#init_logging("DEBUG")
+init_logging("DEBUG")
 
 
 class IPCMessenger:
     class _Method(object):
+        """Helper class to represent a remote callable function."""
+
         def __init__(self, ipc_messenger, method):
+            """Constructor"""
             self.ipc_messenger = ipc_messenger
             self.method = method
 
         async def __call__(self, *args, **kwargs):
-            log.info("inside _Method!")
+            """Send jsonrpc request with our method and arg and return response."""
             return await self.ipc_messenger.call(self.method, *args, **kwargs)
 
     def __init__(
@@ -91,10 +93,10 @@ class IPCMessenger:
         message = data.decode()
 
         # received a message, handle and respond
-        log.info(f"Received IPC message: {message}")
+        log.debug(f"Received IPC message: {message}")
         response = await self._handler.handle(message)
         if response:
-            log.info(f"Sending IPC response: {response.json}")
+            log.debug(f"Sending IPC response: {response.json}")
             writer.write(response.json.encode())
             await writer.drain()
         writer.close()
@@ -140,9 +142,14 @@ class IPCMessenger:
             if target == self._source:
                 continue
             resp = await self._send(target, message, notify=notify)
-            if resp and resp.result:
+            if not resp:
+                # no response from the process
+                response[target] = resp
+            elif not resp.error:
+                # we got success response from the process
                 response[target] = resp.result
-            elif resp and resp.error:
+            else:
+                # we got an error response from the process
                 error = JSONRPCError.from_dict(resp.error)
                 log.error(f"Received jsonrpc error: {error}")
                 if error.data:
@@ -157,6 +164,7 @@ class IPCMessenger:
         request: JSONRPCRequest,
         notify: bool = False,
     ) -> Optional[JSONRPCResponse]:
+        """Actually sends our request via asyncio sockets and waits for response."""
         is_batch = isinstance(request, JSONRPCBatchRequest)
         if is_batch:
             for req in request:
@@ -168,6 +176,8 @@ class IPCMessenger:
             self._req_id += 1
             request._id = self._req_id
 
+        self._req_id = self._req_id % 255
+
         response: Optional[JSONRPCResponse] = None
         port = DESTINATION_PORT[target]
         log.debug(f"Sending: {self._source.name} ({self._host}:{self._port}) -> {target.name} ({self._host}:{port})\n{request}")
@@ -175,9 +185,8 @@ class IPCMessenger:
             # open connection to the corresponding port
             reader, writer = await asyncio.open_connection(self._host, port)
 
-            message = request.json
-            log.debug(f"sending: {message}")
-            writer.write(message.encode())
+            # send out message
+            writer.write(request.json.encode())
 
             # we are done sending data so write EOF
             writer.write_eof()

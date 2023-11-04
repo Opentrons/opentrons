@@ -5,7 +5,7 @@ from typing import Callable, Any, Optional, Dict
 class Method(object):
     """Object representing an rpc method."""
 
-    def __init__(self, method, *args, context = None, **kwargs) -> None:
+    def __init__(self, method: Callable, context: Any = None) -> None:
         """Constructor"""
         self.method = method
         self.context = context
@@ -42,8 +42,8 @@ class JSONRPCDispatcher():
     def add_method(
         self,
         method: Callable = None,
-        name = None,
-        context = None
+        name: str = None,
+        context: Any = None
     ) -> Method:
         """Add this method to the dict of registered methods."""
         if (name or context) and not method:
