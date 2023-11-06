@@ -62,6 +62,8 @@ describe('PickUpTip', () => {
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
       robotType: FLEX_ROBOT_TYPE,
+      protocolHasModules: false,
+      currentStepIndex: 1,
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })
