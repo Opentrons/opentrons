@@ -36,6 +36,7 @@ import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
 import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
+import { UpdateRobotDuringOnboarding } from '../pages/OnDeviceDisplay/UpdateRobotDuringOnboarding'
 import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
@@ -188,6 +189,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Update Robot',
     path: '/robot-settings/update-robot',
+  },
+  {
+    Component: UpdateRobotDuringOnboarding,
+    exact: true,
+    name: 'Update Robot During Onboarding',
+    path: '/robot-settings/update-robot-during-onboarding',
   },
   {
     Component: EmergencyStop,

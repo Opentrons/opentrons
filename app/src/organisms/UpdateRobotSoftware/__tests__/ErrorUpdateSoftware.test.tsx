@@ -1,18 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { startRobotUpdate } from '../../../redux/robot-update'
 import { ErrorUpdateSoftware } from '../ErrorUpdateSoftware'
-
-const mockPush = jest.fn()
-jest.mock('../../../redux/robot-update')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
-  }
-})
 
 const render = (props: React.ComponentProps<typeof ErrorUpdateSoftware>) => {
   return renderWithProviders(<ErrorUpdateSoftware {...props} />, {
@@ -26,29 +15,21 @@ describe('ErrorUpdateSoftware', () => {
   beforeEach(() => {
     props = {
       errorMessage: 'mock error message',
-      robotName: 'mockRobot',
+      children: (
+        <div>
+          <h1>{'mock child'}</h1>
+        </div>
+      ),
     }
   })
 
-  it('should render text and buttons', () => {
+  it('should render text', () => {
     const [{ getByText }] = render(props)
     getByText('Software update error')
     getByText('mock error message')
-    getByText('Proceed without update')
-    getByText('Try again')
   })
-
-  it('call mockPush when tapping Proceed without update', () => {
+  it('should render provided children', () => {
     const [{ getByText }] = render(props)
-    getByText('Proceed without update').click()
-    expect(mockPush).toBeCalledWith('/emergency-stop')
-  })
-
-  it('call mock function when tapping Try again', () => {
-    const [{ getByText }, store] = render(props)
-    getByText('Try again').click()
-    expect(store.dispatch).toHaveBeenCalledWith(
-      startRobotUpdate(props.robotName)
-    )
+    getByText('mock child')
   })
 })
