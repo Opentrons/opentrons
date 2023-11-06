@@ -24,6 +24,7 @@ import {
 
 import type { State } from '../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
+import type { LEFT } from '../../../redux/pipettes'
 
 const StyledTable = styled.table`
   width: 100%;
@@ -66,10 +67,13 @@ export function PipetteOffsetCalibrationItems({
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
   const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
   const isFlex = useIsFlex(robotName)
-  const attachedPipettes = Boolean(isFlex)
+  const attachedPipettes = isFlex
     ? attachedPipetteFromInstrumentQuery
     : attachedPipettesFromPipetteQuery
 
+  const is96Attached =
+    // @ts-expect-error isFlex is a type narrower but not recognized as one
+    isFlex && attachedPipettes?.[LEFT]?.instrumentName === 'p1000_96'
   return (
     <StyledTable>
       <thead>
@@ -97,7 +101,7 @@ export function PipetteOffsetCalibrationItems({
                     as="p"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                   >
-                    {calibration.mount}
+                    {is96Attached ? t('both') : calibration.mount}
                   </StyledText>
                 </StyledTableCell>
                 {isFlex ? null : (
