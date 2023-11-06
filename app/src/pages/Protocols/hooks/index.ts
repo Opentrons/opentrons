@@ -222,9 +222,9 @@ export const useRequiredProtocolLabware = (
  * Returns an array of ProtocolHardware objects that are required by the given protocol ID,
  * but not currently connected.
  *
- * @param {string} protocolId The ID of the protocol for which required but missing hardware is being retrieved.
- * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID,
- * but not currently connected.
+ * @param {ProtocolHardware[]} requiredProtocolHardware An array of ProtocolHardware objects that are required by a protocol.
+ * @param {boolean} isLoading A boolean determining whether any required protocol hardware is loading.
+ * @returns {ProtocolHardware[]} An array of ProtocolHardware objects that are required by the given protocol ID, but not currently connected.
  */
 
 const useMissingProtocolHardwareFromRequiredProtocolHardware = (

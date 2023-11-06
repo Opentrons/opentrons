@@ -376,9 +376,11 @@ function PrepareToRun({
       ? 'ready'
       : 'not ready'
 
-  const isReadyToRun =
-    incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
+  // TODO: (ND: 11/6/23) check for areFixturesReady once we removed stubbed fixtures in useRequiredProtocolHardwareFromAnalysis
+  // const isReadyToRun =
+  //   incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
 
+  const isReadyToRun = incompleteInstrumentCount === 0 && areModulesReady
   const onPlay = (): void => {
     if (isDoorOpen) {
       makeSnackbar(t('shared:close_robot_door'))
