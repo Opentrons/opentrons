@@ -12,13 +12,6 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = 
 ) => {
   const { pipetteId, addressableAreaName } = args
 
-  // No-op if there is no pipette
-  if (!invariantContext.pipetteEntities[pipetteId]) {
-    return {
-      commands: [],
-    }
-  }
-
   const commands = [
     {
       commandType: 'moveToAddressableArea' as const,

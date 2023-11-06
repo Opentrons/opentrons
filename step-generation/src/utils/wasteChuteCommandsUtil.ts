@@ -14,7 +14,7 @@ import type {
   CurriedCommandCreator,
 } from '../types'
 
-export type WasteChuteCommandsTypes = 'dispense' | 'blow out' | 'drop tip'
+export type WasteChuteCommandsTypes = 'dispense' | 'blowOut' | 'dropTip'
 
 interface WasteChuteCommandArgs {
   type: WasteChuteCommandsTypes
@@ -36,10 +36,17 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     invariantContext.additionalEquipmentEntities
   )
 
+  let actionName = 'dispense'
+  if (type === 'blowOut') {
+    actionName = 'blow out'
+  } else if (type === 'dropTip') {
+    actionName = 'drop tip'
+  }
+
   if (pipetteName == null) {
     errors.push(
       errorCreators.pipetteDoesNotExist({
-        actionName: type,
+        actionName,
         pipette: pipetteId,
       })
     )
@@ -54,7 +61,7 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
 
   let commands: CurriedCommandCreator[] = []
   switch (type) {
-    case 'drop tip': {
+    case 'dropTip': {
       commands = [
         curryCommandCreator(moveToAddressableArea, {
           pipetteId,
@@ -83,7 +90,7 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
           : []
       break
     }
-    case 'blow out': {
+    case 'blowOut': {
       commands =
         flowRate != null
           ? [

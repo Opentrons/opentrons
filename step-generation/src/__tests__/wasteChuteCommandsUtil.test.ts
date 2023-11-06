@@ -74,7 +74,7 @@ describe('wasteChuteCommandsUtil', () => {
     const result = wasteChuteCommandsUtil(
       {
         ...args,
-        type: 'blow out',
+        type: 'blowOut',
       },
       invariantContext,
       initialRobotState
@@ -97,7 +97,7 @@ describe('wasteChuteCommandsUtil', () => {
     const result = wasteChuteCommandsUtil(
       {
         ...args,
-        type: 'drop tip',
+        type: 'dropTip',
       },
       invariantContext,
       initialRobotState
