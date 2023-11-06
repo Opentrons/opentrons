@@ -70,7 +70,8 @@ def mock_api_verify_tip_presence_ot3() -> Iterator[mock.AsyncMock]:
 def wrap_build_ot3_sim():
     from opentrons.hardware_control.ot3api import OT3API
 
-    return OT3API.build_hardware_simulator
+    with mock.patch.object(OT3API, "verify_tip_presence") as mock_tip_presence:
+        return OT3API.build_hardware_simulator
 
 
 @pytest.fixture
@@ -89,7 +90,7 @@ def ot3_api_obj(request, mock_api_verify_tip_presence_ot3):
     ],
     ids=["ot2", "ot3"],
 )
-def sim_and_instr(request, mock_api_verify_tip_presence_ot3):
+def sim_and_instr(request):
     if (
         request.node.get_closest_marker("ot2_only")
         and request.param[0] == wrap_build_ot3_sim
