@@ -227,7 +227,7 @@ export const useRequiredProtocolLabware = (
  * but not currently connected.
  */
 
-const useMissingProtocolHardwareFromRequiredProtocolHardare = (
+const useMissingProtocolHardwareFromRequiredProtocolHardware = (
   requiredProtocolHardware: ProtocolHardware[],
   isLoading: boolean
 ): {
@@ -281,7 +281,7 @@ export const useMissingProtocolHardwareFromAnalysis = (
     isLoading,
   } = useRequiredProtocolHardwareFromAnalysis(analysis)
 
-  return useMissingProtocolHardwareFromRequiredProtocolHardare(
+  return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,
     isLoading
   )
@@ -298,7 +298,7 @@ export const useMissingProtocolHardware = (
     protocolId
   )
 
-  return useMissingProtocolHardwareFromRequiredProtocolHardare(
+  return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,
     isLoading
   )
