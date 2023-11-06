@@ -174,7 +174,7 @@ async def monitor_task(
                     for data_val in out:
                         out_str += str(data_val)
                         out_str += "-"
-                    # print(out_str)
+                    print(out_str)
                     DATA_COUNT = DATA_COUNT + 1
                     writer.writerow(
                         {"count": DATA_COUNT,
@@ -204,7 +204,7 @@ async def output_task(
     #     if can_message:
     #         await can_driver.send(can_message)
     for cycle in range(4000000):
-        # print(cycle)
+        print(cycle)
         cycle_print = cycle%255
         data_load = bytes([cycle_print,cycle_print,cycle_print,cycle_print,
                            cycle_print,cycle_print,cycle_print,cycle_print])
@@ -226,6 +226,7 @@ async def output_task(
             )
         error = await can_driver.send(head_node_id, read_msg)
 
+    print("FINISHED")
     raise SystemExit()
 
 
