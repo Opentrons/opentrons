@@ -80,11 +80,12 @@ class TipPresenceManager:
 
         try:
             detector = self.get_detector(mount)
-            _unsubscribe()
-            detector.cleanup()
-            self.set_detector(mount, None)
+            detector.cleanup()    
         except TipDetectorNotFound:
             pass
+        finally:
+            _unsubscribe()
+            self.set_detector(mount, None)
 
     async def build_detector(self, mount: OT3Mount, sensor_count: int) -> None:
         assert self._detectors.get(self._get_key(mount), None) is None
