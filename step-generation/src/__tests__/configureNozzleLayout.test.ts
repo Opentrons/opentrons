@@ -8,7 +8,7 @@ const getRobotInitialState = (): any => {
 const invariantContext: any = {}
 
 describe('configureNozzleLayout', () => {
-  it('should call configureForVolume with correct params', () => {
+  it('should call configureNozzleLayout with correct params', () => {
     const robotInitialState = getRobotInitialState()
     const mockNozzles = 'full'
     const result = configureNozzleLayout(
@@ -19,7 +19,7 @@ describe('configureNozzleLayout', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
-        commandType: 'configureForVolume',
+        commandType: 'configureNozzleLayout',
         key: expect.any(String),
         params: {
           nozzles: mockNozzles,

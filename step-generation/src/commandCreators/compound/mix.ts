@@ -123,7 +123,7 @@ export const mix: CommandCreator<MixArgs> = (
   } = data
 
   const is96Channel =
-    invariantContext.pipetteEntities[pipette].spec.channels === 96
+    invariantContext.pipetteEntities[pipette]?.spec.channels === 96
 
   // Errors
   if (

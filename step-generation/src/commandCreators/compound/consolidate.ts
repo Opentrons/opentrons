@@ -55,7 +55,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const actionName = 'consolidate'
   const pipetteData = prevRobotState.pipettes[args.pipette]
   const is96Channel =
-    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
   if (!pipetteData) {
     // bail out before doing anything else

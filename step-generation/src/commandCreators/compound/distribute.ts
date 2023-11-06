@@ -53,7 +53,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
   const is96Channel =
-    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (

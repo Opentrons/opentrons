@@ -85,7 +85,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
   const is96Channel =
-    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
   if (
     !prevRobotState.pipettes[args.pipette] ||
