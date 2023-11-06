@@ -16,6 +16,7 @@ import type {
   ModuleModel,
   PipetteName,
   RunTimeCommand,
+  AddressableAreaName
 } from '@opentrons/shared-data'
 
 interface PipetteNamesByMount {
@@ -174,7 +175,7 @@ export function parseInitialLoadedLabwareByModuleId(
     loadLabwareCommandsReversed,
     (acc, command) =>
       typeof command.params.location === 'object' &&
-      'moduleId' in command.params.location
+        'moduleId' in command.params.location
         ? { ...acc, [command.params.location.moduleId]: command }
         : acc,
     {}
@@ -225,24 +226,33 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-export interface LoadedFixturesBySlot {
-  [slotName: string]: LoadFixtureRunTimeCommand
+export function parseAllAddressableAreas(commands: RunTimeCommand[]): AddressableAreaName[] {
+  return commands.reduce<AddressableAreaName[]>((acc, command) => {
+    if (
+      command.commandType === 'moveLabware'
+      && command.params.newLocation !== 'offDeck'
+      && 'slotName' in command.params.newLocation
+      && !acc.includes(command.params.newLocation.slotName)
+    ) {
+      return [...acc, command.params.newLocation.slotName]
+    } else if (
+      (command.commandType === 'loadLabware' || command.commandType === 'loadModule')
+      && command.params.location !== 'offDeck'
+      && 'slotName' in command.params.location
+      && !acc.includes(command.params.location.slotName)
+    ) {
+      return [...acc, command.params.location.slotName]
+    } 
+    // TODO(BC, 11/6/23): once moveToAddressableArea command exists add it back here
+    // else if (command.commandType === 'moveToAddressableArea') {
+        // ...
+    // }
+     else {
+      return acc
+    }
+  }, [])
 }
-export function parseInitialLoadedFixturesByCutout(
-  commands: RunTimeCommand[]
-): LoadedFixturesBySlot {
-  const loadFixtureCommandsReversed = commands
-    .filter(
-      (command): command is LoadFixtureRunTimeCommand =>
-        command.commandType === 'loadFixture'
-    )
-    .reverse()
-  return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
-    loadFixtureCommandsReversed,
-    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
-    {}
-  )
-}
+
 
 export interface LiquidsById {
   [liquidId: string]: {
@@ -303,9 +313,9 @@ export function parseLabwareInfoByLiquidId(
   const loadLiquidCommands =
     commands.length !== 0
       ? commands.filter(
-          (command): command is LoadLiquidRunTimeCommand =>
-            command.commandType === 'loadLiquid'
-        )
+        (command): command is LoadLiquidRunTimeCommand =>
+          command.commandType === 'loadLiquid'
+      )
       : []
 
   return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(

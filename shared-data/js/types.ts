@@ -33,6 +33,7 @@ import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../command/types'
 import type { PipetteName } from './pipettes'
 import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
+import type { AddressableArea, CutoutFixtureId, CutoutId } from '../deck'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -135,14 +136,14 @@ export interface LabwareBrand {
 
 export type LabwareWellShapeProperties =
   | {
-      shape: 'circular'
-      diameter: number
-    }
+    shape: 'circular'
+    diameter: number
+  }
   | {
-      shape: 'rectangular'
-      xDimension: number
-      yDimension: number
-    }
+    shape: 'rectangular'
+    xDimension: number
+    yDimension: number
+  }
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -284,10 +285,18 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export interface CutoutFixture {
+  id: CutoutFixtureId
+  mayMountTo: CutoutId[],
+  displayName: string,
+  providesAddressableAreas: Record<CutoutId, AddressableArea[]>
+}
+
 export interface DeckLocations {
   orderedSlots: DeckSlot[]
   calibrationPoints: DeckCalibrationPoint[]
   fixtures: DeckFixture[]
+  cutoutFixtures: CutoutFixture[]
 }
 
 export interface DeckMetadata {
