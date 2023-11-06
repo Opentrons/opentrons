@@ -454,7 +454,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           })}
           body={
             <UnorderedList
-              items={[t('clear_all_slots'), placeItemInstruction]}
+              items={[
+                isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+                placeItemInstruction,
+              ]}
             />
           }
           labwareDef={labwareDef}
