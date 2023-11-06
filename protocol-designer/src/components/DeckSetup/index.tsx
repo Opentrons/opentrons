@@ -535,6 +535,7 @@ export const DeckSetup = (): JSX.Element => {
                       cutoutLocation={fixture.fixtureLocation as Cutout}
                       deckDefinition={deckDef}
                       slotClipColor={darkFill}
+                      showExpansion={fixture.fixtureLocation === 'A1'}
                       fixtureBaseColor={lightFill}
                     />
                   ))}

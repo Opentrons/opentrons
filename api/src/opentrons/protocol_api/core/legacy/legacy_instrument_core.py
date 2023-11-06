@@ -102,7 +102,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                         "cause over aspiration if the previous command is a "
                         "blow_out."
                     )
-                self.prepare_for_aspirate()
+                self.prepare_to_aspirate()
             self.move_to(location=location)
         elif not in_place:
             self.move_to(location=location)
@@ -443,7 +443,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def is_ready_to_aspirate(self) -> bool:
         return self.get_hardware_state()["ready_to_aspirate"]
 
-    def prepare_for_aspirate(self) -> None:
+    def prepare_to_aspirate(self) -> None:
         self._protocol_interface.get_hardware().prepare_for_aspirate(self._mount)
 
     def get_return_height(self) -> float:

@@ -1,11 +1,11 @@
 import { FIXED_TRASH_ID } from '../constants'
 import { tiprackWellNamesFlat } from './data'
-import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   AspDispAirgapParams,
   BlowoutParams,
+  CreateCommand,
   TouchTipParams,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+} from '@opentrons/shared-data'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
 
 /** Used to wrap command creators in tests, effectively casting their results

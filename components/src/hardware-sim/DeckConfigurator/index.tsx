@@ -27,6 +27,7 @@ interface DeckConfiguratorProps {
   lightFill?: string
   darkFill?: string
   readOnly?: boolean
+  showExpansion?: boolean
   children?: React.ReactNode
 }
 
@@ -38,6 +39,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
     readOnly = false,
+    showExpansion = true,
     children,
   } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -86,6 +88,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
           fixtureBaseColor={lightFill}
+          showExpansion={showExpansion}
         />
       ))}
       {stagingAreaFixtures.map(fixture => (

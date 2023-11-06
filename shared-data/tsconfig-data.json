@@ -10,7 +10,9 @@
   "include": [
     "deck/**/*.json",
     "labware/**/*.json",
+    "liquid/**/*.json",
     "command/**/*.json",
+    "commandAnnotation/**/*.json",
     "gripper/**/*.json",
     "module/**/*.json",
     "pipette/**/*.json",

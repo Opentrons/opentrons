@@ -11,11 +11,15 @@ import { resetScrollElements } from '../../ui/steps/utils'
 import { Portal } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
-import { getUnusedEntities } from './utils'
+import {
+  getUnusedEntities,
+  getUnusedTrash,
+  getUnusedStagingAreas,
+} from './utils'
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
-import { HintKey } from '../../tutorial'
+import type { HintKey } from '../../tutorial'
 import type {
   InitialDeckSetup,
   SavedStepFormState,
@@ -28,19 +32,6 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
-export interface Props {
-  loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
-  createNewFile?: () => unknown
-  canDownload: boolean
-  onDownload: () => unknown
-  fileData?: ProtocolFile | null
-  pipettesOnDeck: InitialDeckSetup['pipettes']
-  modulesOnDeck: InitialDeckSetup['modules']
-  savedStepForms: SavedStepFormState
-  robotType: RobotType
-  additionalEquipment: AdditionalEquipment
-}
-
 export interface AdditionalEquipment {
   [additionalEquipmentId: string]: {
     name: 'gripper' | 'wasteChute' | 'stagingArea'
@@ -49,16 +40,36 @@ export interface AdditionalEquipment {
   }
 }
 
+export interface Props {
+  loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
+  createNewFile?: () => unknown
+  canDownload: boolean
+  onDownload: () => unknown
+  fileData?: ProtocolFile | null
+  pipettesOnDeck: InitialDeckSetup['pipettes']
+  modulesOnDeck: InitialDeckSetup['modules']
+  labwareOnDeck: InitialDeckSetup['labware']
+  savedStepForms: SavedStepFormState
+  robotType: RobotType
+  additionalEquipment: AdditionalEquipment
+}
+
 interface WarningContent {
   content: React.ReactNode
   heading: string
 }
 
+interface Fixture {
+  trashBin: boolean
+  wasteChute: boolean
+  stagingAreaSlots: string[]
+}
 interface MissingContent {
   noCommands: boolean
   pipettesWithoutStep: PipetteOnDeck[]
   modulesWithoutStep: ModuleOnDeck[]
   gripperWithoutStep: boolean
+  fixtureWithoutStep: Fixture
 }
 
 const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
@@ -73,6 +84,7 @@ function getWarningContent({
   pipettesWithoutStep,
   modulesWithoutStep,
   gripperWithoutStep,
+  fixtureWithoutStep,
 }: MissingContent): WarningContent | null {
   if (noCommands) {
     return {
@@ -164,6 +176,50 @@ function getWarningContent({
       heading: i18n.t(`alert.export_warnings.${moduleCase}.heading`),
     }
   }
+
+  if (fixtureWithoutStep.trashBin || fixtureWithoutStep.wasteChute) {
+    return {
+      content:
+        (fixtureWithoutStep.trashBin && !fixtureWithoutStep.wasteChute) ||
+        (!fixtureWithoutStep.trashBin && fixtureWithoutStep.wasteChute) ? (
+          <p>
+            {i18n.t('alert.export_warnings.unused_trash.body', {
+              name: fixtureWithoutStep.trashBin ? 'trash bin' : 'waste chute',
+            })}
+          </p>
+        ) : (
+          <p>
+            {i18n.t('alert.export_warnings.unused_trash.body_both', {
+              trashName: 'trash bin',
+              wasteName: 'waste chute',
+            })}
+          </p>
+        ),
+      heading: i18n.t('alert.export_warnings.unused_trash.heading'),
+    }
+  }
+
+  if (fixtureWithoutStep.stagingAreaSlots.length > 0) {
+    return {
+      content: (
+        <>
+          <p>
+            {i18n.t('alert.export_warnings.unused_staging_area.body1', {
+              count: fixtureWithoutStep.stagingAreaSlots.length,
+              slot: fixtureWithoutStep.stagingAreaSlots,
+            })}
+          </p>
+          <p>
+            {i18n.t('alert.export_warnings.unused_staging_area.body2', {
+              count: fixtureWithoutStep.stagingAreaSlots.length,
+            })}
+          </p>
+        </>
+      ),
+      heading: i18n.t('alert.export_warnings.unused_staging_area.heading'),
+    }
+  }
+
   return null
 }
 
@@ -189,6 +245,7 @@ export function FileSidebar(props: Props): JSX.Element {
     savedStepForms,
     robotType,
     additionalEquipment,
+    labwareOnDeck,
   } = props
   const [
     showExportWarningModal,
@@ -197,7 +254,21 @@ export function FileSidebar(props: Props): JSX.Element {
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
+  const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
+    labwareOnDeck,
+    // additionalEquipment,
+    fileData?.commands
+  )
 
+  const fixtureWithoutStep: Fixture = {
+    trashBin: trashBinUnused,
+    //  TODO(jr, 10/30/23): wire this up later when we know waste chute commands
+    wasteChute: wasteChuteUnused,
+    stagingAreaSlots: getUnusedStagingAreas(
+      additionalEquipment,
+      fileData?.commands
+    ),
+  }
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
   const cancelModal = (): void => setShowExportWarningModal(false)
@@ -232,9 +303,12 @@ export function FileSidebar(props: Props): JSX.Element {
 
   const hasWarning =
     noCommands ||
-    modulesWithoutStep.length ||
-    pipettesWithoutStep.length ||
-    gripperWithoutStep
+    modulesWithoutStep.length > 0 ||
+    pipettesWithoutStep.length > 0 ||
+    gripperWithoutStep ||
+    fixtureWithoutStep.trashBin ||
+    fixtureWithoutStep.wasteChute ||
+    fixtureWithoutStep.stagingAreaSlots.length > 0
 
   const warning =
     hasWarning &&
@@ -243,6 +317,7 @@ export function FileSidebar(props: Props): JSX.Element {
       pipettesWithoutStep,
       modulesWithoutStep,
       gripperWithoutStep,
+      fixtureWithoutStep,
     })
 
   const getExportHintContent = (): {

@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Generic, List, Optional, Union, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -28,7 +28,7 @@ class AbstractProtocol(
 ):
     @property
     @abstractmethod
-    def fixed_trash(self) -> LabwareCoreType:
+    def fixed_trash(self) -> Optional[LabwareCoreType]:
         """Get the fixed trash labware core."""
         ...
 
@@ -154,8 +154,13 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
+
+    # TODO(jbl 10-30-2023) this method may no longer need to exist post deck config work being completed
+    @abstractmethod
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+        """Get the slot definition from the robot's deck."""
 
     @abstractmethod
     def get_slot_item(

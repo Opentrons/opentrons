@@ -16,6 +16,7 @@ from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control import transfers
 
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.util import (
@@ -84,7 +85,7 @@ class InstrumentContext(publisher.CommandPublisher):
         broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
-        trash: labware.Labware,
+        trash: Optional[labware.Labware],
         requested_as: str,
     ) -> None:
         super().__init__(broker)
@@ -99,7 +100,7 @@ class InstrumentContext(publisher.CommandPublisher):
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
-        self.trash_container = trash
+        self._trash = trash
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -1422,6 +1423,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         By default, the trash container is in slot A3 on Flex and in slot 12 on OT-2.
         """
+        if self._trash is None:
+            raise NoTrashDefinedError(
+                "No trash container has been defined in this protocol."
+            )
         return self._trash
 
     @trash_container.setter
@@ -1609,3 +1614,47 @@ class InstrumentContext(publisher.CommandPublisher):
         if last_location and isinstance(last_location.labware, labware.Well):
             self.move_to(last_location.labware.top())
         self._core.configure_for_volume(volume)
+
+    @requires_version(2, 16)
+    def prepare_to_aspirate(self) -> None:
+        """Prepare a pipette for aspiration.
+
+        Before a pipette can aspirate into an empty tip, the plunger must be in its
+        bottom position. After dropping a tip or blowing out, the plunger will be in a
+        different position. This function moves the plunger to the bottom position,
+        regardless of its current position, to make sure that the pipette is ready to
+        aspirate.
+
+        You rarely need to call this function. The API automatically prepares the
+        pipette for aspiration as part of other commands:
+
+            - After picking up a tip with :py:meth:`.pick_up_tip`.
+            - When calling :py:meth:`.aspirate`, if the pipette isn't already prepared.
+              If the pipette is in a well, it will move out of the well, move the plunger,
+              and then move back.
+
+        Use ``prepare_to_aspirate`` when you need to control exactly when the plunger
+        motion will happen. A common use case is a pre-wetting routine, which requires
+        preparing for aspiration, moving into a well, and then aspirating *without
+        leaving the well*::
+
+             pipette.move_to(well.bottom(z=2))
+             pipette.delay(5)
+             pipette.mix(10, 10)
+             pipette.move_to(well.top(z=5))
+             pipette.blow_out()
+             pipette.prepare_to_aspirate()
+             pipette.move_to(well.bottom(z=2))
+             pipette.delay(5)
+             pipette.aspirate(10, well.bottom(z=2))
+
+        The call to ``prepare_to_aspirate()`` means that the plunger will be in the
+        bottom position before the call to ``aspirate()``. Since it doesn't need to
+        prepare again, it will not move up out of the well to move the plunger. It will
+        aspirate in place.
+        """
+        if self._core.get_current_volume():
+            raise CommandPreconditionViolated(
+                message=f"Cannot prepare {str(self)} for aspirate while it contains liquid."
+            )
+        self._core.prepare_to_aspirate()

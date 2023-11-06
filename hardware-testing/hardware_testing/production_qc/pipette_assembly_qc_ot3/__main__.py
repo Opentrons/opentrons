@@ -1202,7 +1202,7 @@ async def _jog_for_tip_state(
     async def _matches_state(_state: TipStateType) -> bool:
         try:
             await asyncio.sleep(0.2)
-            await api._backend.check_for_tip_presence(mount, _state)
+            await api.verify_tip_presence(mount, _state)
             return True
         except FailedTipStateCheck:
             return False
