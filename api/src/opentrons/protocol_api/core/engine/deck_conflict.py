@@ -10,6 +10,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
@@ -110,6 +111,10 @@ def _map_labware(
     labware_id: str,
 ) -> Optional[Tuple[DeckSlotName, wrapped_deck_conflict.DeckItem]]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
+
+    if isinstance(location_from_engine, AddressableAreaLocation):
+        # TODO Need to change this to a slot name equivalent or something for a staging slot
+        return None
 
     if isinstance(location_from_engine, DeckSlotLocation):
         # This labware is loaded directly into a deck slot.

@@ -4,6 +4,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
 )
 
 
@@ -41,6 +42,10 @@ def _labware_location_string(
         )
         labware_on_string = _labware_location_string(engine_client, labware_on)
         return f"{labware_name} on {labware_on_string}"
+
+    elif isinstance(location, AddressableAreaLocation):
+        # TODO get the real name of this guy
+        return "my cool addressable area"
 
     elif location == "offDeck":
         return "[off-deck]"

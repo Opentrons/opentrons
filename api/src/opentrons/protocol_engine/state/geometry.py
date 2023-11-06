@@ -28,6 +28,7 @@ from ..types import (
     TipGeometry,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
+    AddressableAreaLocation,
 )
 from .config import Config
 from .labware import LabwareView
@@ -151,7 +152,10 @@ class GeometryView:
           on modules as well as stacking overlaps.
           Does not include module calibration offset or LPC offset.
         """
-        if isinstance(labware_location, DeckSlotLocation):
+        if isinstance(labware_location, AddressableAreaLocation):
+            # TODO here we definitely need to check for standard vs staging and adjust the Z height... maybe?
+            return LabwareOffsetVector(x=0, y=0, z=0)
+        elif isinstance(labware_location, DeckSlotLocation):
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
@@ -227,7 +231,9 @@ class GeometryView:
             return self._normalize_module_calibration_offset(
                 module_location, offset_data
             )
-        elif isinstance(location, DeckSlotLocation):
+        elif isinstance(location, (DeckSlotLocation, AddressableAreaLocation)):
+            # TODO we might want to do a check here to make sure addressable area location is a standard deck slot
+            #   and raise if its not (or maybe we don't actually care since modules will never be loaded elsewhere)
             return ModuleOffsetVector(x=0, y=0, z=0)
         elif isinstance(location, OnLabwareLocation):
             labware_data = self._labware.get(location.labwareId)
@@ -465,7 +471,9 @@ class GeometryView:
     def get_labware_grip_point(
         self,
         labware_id: str,
-        location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
+        location: Union[
+            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+        ],
     ) -> Point:
         """Get the grip point of the labware as placed on the given location.
 
@@ -485,6 +493,10 @@ class GeometryView:
         if isinstance(location, DeckSlotLocation):
             location_slot = location.slotName
             offset = LabwareOffsetVector(x=0, y=0, z=0)
+        elif isinstance(location, AddressableAreaLocation):
+            # TODO here we'll need to both get the slot center (even if the slot doesn't exist),
+            #  the offset for waste chute if it exists, and then make sure to add the grip height offset to Z
+            return Point(0, 0, 0)
         else:
             if isinstance(location, ModuleLocation):
                 location_slot = self._modules.get_location(location.moduleId).slotName
@@ -721,7 +733,9 @@ class GeometryView:
     ) -> LabwareOffsetVector:
         """Get the total of the offsets to be used to pick up labware in its current location."""
         if move_type == _GripperMoveType.PICK_UP_LABWARE:
-            if isinstance(location, (ModuleLocation, DeckSlotLocation)):
+            if isinstance(
+                location, (ModuleLocation, DeckSlotLocation, AddressableAreaLocation)
+            ):
                 return self._nominal_gripper_offsets_for_location(location).pickUpOffset
             else:
                 # If it's a labware on a labware (most likely an adapter),
@@ -741,7 +755,9 @@ class GeometryView:
                     ).pickUpOffset
                 )
         else:
-            if isinstance(location, (ModuleLocation, DeckSlotLocation)):
+            if isinstance(
+                location, (ModuleLocation, DeckSlotLocation, AddressableAreaLocation)
+            ):
                 return self._nominal_gripper_offsets_for_location(location).dropOffset
             else:
                 # If it's a labware on a labware (most likely an adapter),
@@ -769,6 +785,8 @@ class GeometryView:
             offsets = self._labware.get_deck_default_gripper_offsets()
         elif isinstance(location, ModuleLocation):
             offsets = self._modules.get_default_gripper_offsets(location.moduleId)
+        elif isinstance(location, AddressableAreaLocation):
+            offsets = None  # TODO grab real offsets from the store
         else:
             # Labware is on a labware/adapter
             offsets = self._labware_gripper_offsets(location.labwareId)

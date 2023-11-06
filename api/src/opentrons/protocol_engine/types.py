@@ -54,6 +54,14 @@ class DeckSlotLocation(BaseModel):
     )
 
 
+class AddressableAreaLocation(BaseModel):
+    """"""
+
+    addressableAreaName: str = Field(
+        ..., description="lorem ipsum i don't know the rest it aint real latin"
+    )
+
+
 class ModuleLocation(BaseModel):
     """The location of something placed atop a hardware module."""
 
@@ -76,13 +84,21 @@ _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
 LabwareLocation = Union[
-    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    _OffDeckLocationType,
+    AddressableAreaLocation,
 ]
 """Union of all locations where it's legal to keep a labware."""
 
-OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
+OnDeckLabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+]
 
-NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+NonStackedLocation = Union[
+    DeckSlotLocation, AddressableAreaLocation, ModuleLocation, _OffDeckLocationType
+]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
