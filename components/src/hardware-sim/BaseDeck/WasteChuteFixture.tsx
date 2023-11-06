@@ -9,11 +9,11 @@ import { BORDERS, COLORS, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
-import type { DeckDefinitionV4, ModuleType } from '@opentrons/shared-data'
+import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 
 interface WasteChuteFixtureProps extends React.SVGProps<SVGGElement> {
   cutoutLocation: typeof WASTE_CHUTE_CUTOUT
-  deckDefinition: DeckDefinitionV4
+  deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
   slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
@@ -48,7 +48,6 @@ export function WasteChuteFixture(
     return null
   }
 
-  // TODO(bh, 2023-10-10): adjust base and clip d values if needed to fit v4 deck definition
   return (
     <g {...restProps}>
       <SlotBase

@@ -1,4 +1,8 @@
-import { SPAN7_8_10_11_SLOT, getModuleDef2 } from '@opentrons/shared-data'
+import {
+  SPAN7_8_10_11_SLOT,
+  getModuleDef2,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
@@ -37,21 +41,21 @@ export function getRunModuleRenderInfo(
       if (slotName === SPAN7_8_10_11_SLOT) {
         slotName = '7'
       }
-      const slotPosition =
-        deckDef.locations.orderedSlots.find(slot => slot.id === slotName)
-          ?.position ?? []
+      const slotPosition = getPositionFromSlotId(slotName, deckDef)
 
-      return [
-        ...acc,
-        {
-          moduleId: module.id,
-          x: slotPosition[0] ?? 0,
-          y: slotPosition[1] ?? 0,
-          moduleDef,
-          nestedLabwareDef,
-          nestedLabwareId: nestedLabware?.id ?? null,
-        },
-      ]
+      return slotPosition != null
+        ? [
+            ...acc,
+            {
+              moduleId: module.id,
+              x: slotPosition[0] ?? 0,
+              y: slotPosition[1] ?? 0,
+              moduleDef,
+              nestedLabwareDef,
+              nestedLabwareId: nestedLabware?.id ?? null,
+            },
+          ]
+        : acc
     }, [])
   }
   return []

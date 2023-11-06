@@ -1,15 +1,27 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
-import { DeckDefinition, getDeckDefFromRobotType } from '@opentrons/shared-data'
-import { RobotCoordinateSpace } from '../../hardware-sim/RobotCoordinateSpace'
 
-import type { ModuleLocation, RobotType } from '@opentrons/shared-data'
-import { COLORS, SPACING } from '../../ui-style-constants'
-import { RobotCoordsForeignDiv, SlotLabels } from '../../hardware-sim'
+import {
+  getDeckDefFromRobotType,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
+
+import {
+  DeckSlotLocation,
+  RobotCoordinateSpace,
+  RobotCoordsForeignDiv,
+  SlotLabels,
+} from '../../hardware-sim'
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { DeckSlotLocation } from '../../hardware-sim/DeckSlotLocation'
+import { COLORS, SPACING } from '../../ui-style-constants'
+
+import type {
+  DeckDefinition,
+  ModuleLocation,
+  RobotType,
+} from '@opentrons/shared-data'
 
 export type DeckLocationSelectThemes = 'default' | 'grey'
 
@@ -26,7 +38,7 @@ export function useDeckLocationSelect(
     selectedLocation,
     setSelectedLocation,
   ] = React.useState<ModuleLocation>({
-    slotName: deckDef.locations.orderedSlots[0].id,
+    slotName: deckDef.locations.addressableAreas[0].id,
   })
   return {
     DeckLocationSelect: (
@@ -60,7 +72,7 @@ export function DeckLocationSelect({
         deckDef.cornerOffsetFromOrigin[1]
       } ${deckDef.dimensions[0] - X_CROP_MM * 2} ${deckDef.dimensions[1]}`}
     >
-      {deckDef.locations.orderedSlots.map(slot => {
+      {deckDef.locations.addressableAreas.map(slot => {
         const slotLocation = { slotName: slot.id }
         const isDisabled = disabledLocations.some(
           l =>
@@ -101,6 +113,9 @@ export function DeckLocationSelect({
         } else if (slot.id === 'A1' && isThermocycler) {
           return null
         }
+
+        const slotPosition = getPositionFromSlotId(slot.id, deckDef)
+
         return (
           <React.Fragment key={slot.id}>
             <DeckSlotLocation
@@ -119,10 +134,10 @@ export function DeckLocationSelect({
               }
               deckDefinition={deckDef}
             />
-            {isSelected ? (
+            {isSelected && slotPosition != null ? (
               <RobotCoordsForeignDiv
-                x={slot.position[0]}
-                y={slot.position[1]}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
                 width={slot.boundingBox.xDimension}
                 height={slot.boundingBox.yDimension}
                 innerDivProps={INNER_DIV_PROPS}

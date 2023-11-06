@@ -37,8 +37,7 @@ export function WasteChuteStagingAreaFixture(
     return null
   }
 
-  // TODO(bh, 2023-10-09): migrate from "orderedSlots" to v4 "cutouts" key
-  const cutoutDef = deckDefinition?.locations.orderedSlots.find(
+  const cutoutDef = deckDefinition?.locations.cutouts.find(
     s => s.id === cutoutLocation
   )
   if (cutoutDef == null) {
@@ -48,7 +47,6 @@ export function WasteChuteStagingAreaFixture(
     return null
   }
 
-  // TODO(bh, 2023-10-10): adjust base and clip d values if needed to fit v4 deck definition
   return (
     // TODO: render a "Waste chute" foreign object similar to FlexTrash
     <g {...restProps}>

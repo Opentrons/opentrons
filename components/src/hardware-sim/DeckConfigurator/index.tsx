@@ -1,14 +1,13 @@
 import * as React from 'react'
 
 import {
-  // getDeckDefFromRobotType,
+  getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
   STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
   TRASH_BIN_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
-import ot3DeckDefV4 from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { COLORS } from '../../ui-style-constants'
 import { SingleSlotFixture } from '../BaseDeck/SingleSlotFixture'
@@ -19,11 +18,7 @@ import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
 import { TrashBinConfigFixture } from './TrashBinConfigFixture'
 import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
 
-import type {
-  Cutout,
-  DeckConfiguration,
-  DeckDefinitionV4,
-} from '@opentrons/shared-data'
+import type { Cutout, DeckConfiguration } from '@opentrons/shared-data'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
@@ -47,8 +42,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     showExpansion = true,
     children,
   } = props
-  // const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const deckDef = (ot3DeckDefV4 as unknown) as DeckDefinitionV4
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   // restrict configuration to certain locations
   const configurableFixtureLocations: Cutout[] = [

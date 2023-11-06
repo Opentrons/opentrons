@@ -3,13 +3,13 @@ import * as React from 'react'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 
-import type { DeckDefinitionV4, ModuleType } from '@opentrons/shared-data'
+import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 
 export type StagingAreaLocation = 'A3' | 'B3' | 'C3' | 'D3'
 
 interface StagingAreaFixtureProps extends React.SVGProps<SVGGElement> {
   cutoutLocation: StagingAreaLocation
-  deckDefinition: DeckDefinitionV4
+  deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
   slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
@@ -37,7 +37,6 @@ export function StagingAreaFixture(
     return null
   }
 
-  // TODO(bh, 2023-10-10): adjust base and clip d values if needed to fit v4 deck definition
   const contentsByCutoutLocation: {
     [cutoutLocation in StagingAreaLocation]: JSX.Element
   } = {

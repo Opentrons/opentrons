@@ -2,6 +2,7 @@ import {
   SPAN7_8_10_11_SLOT,
   getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
+  getPositionFromSlotId,
 } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
 import type {
@@ -68,13 +69,14 @@ export const getProtocolModulesInfo = (
       if (slotName === SPAN7_8_10_11_SLOT) {
         slotName = '7'
       }
-      const slotPosition =
-        deckDef.locations.orderedSlots.find(slot => slot.id === slotName)
-          ?.position ?? []
-      if (slotPosition.length === 0) {
+
+      const slotPosition = getPositionFromSlotId(slotName, deckDef)
+
+      if (slotPosition == null) {
         console.warn(
-          `expected to find a slot position for slot ${slotName} in the standard OT-2 deck definition, but could not`
+          `expected to find a position for slot ${slotName} in the standard deck definition, but could not`
         )
+        return acc
       }
       return [
         ...acc,

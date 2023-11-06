@@ -295,7 +295,7 @@ export interface DeckMetadata {
   tags: string[]
 }
 
-export interface DeckDefinition {
+export interface DeckDefinitionV3 {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple
@@ -351,7 +351,7 @@ export interface DeckLocationsV4 {
   legacyFixtures: LegacyFixture[]
 }
 
-export interface DeckDefinitionV4 {
+export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple

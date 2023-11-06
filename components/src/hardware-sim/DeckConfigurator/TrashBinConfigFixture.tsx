@@ -6,7 +6,7 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
-import type { Cutout, DeckDefinitionV4 } from '@opentrons/shared-data'
+import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
 
 // TODO: replace stubs with JSON definitions when available
 const trashBinDef = {
@@ -27,7 +27,7 @@ const trashBinDef = {
 }
 
 interface TrashBinConfigFixtureProps {
-  deckDefinition: DeckDefinitionV4
+  deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
 }

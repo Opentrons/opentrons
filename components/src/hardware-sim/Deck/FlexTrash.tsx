@@ -8,22 +8,10 @@ import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import trashDef from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 
-import type { DeckDefinitionV4, RobotType } from '@opentrons/shared-data'
+import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
 
 // only allow edge cutout locations (columns 1 and 3)
-// TODO: replace with V4 below
 export type TrashLocation =
-  | 'A1'
-  | 'B1'
-  | 'C1'
-  | 'D1'
-  | 'A3'
-  | 'B3'
-  | 'C3'
-  | 'D3'
-
-// temp
-export type TrashLocationV4 =
   | 'cutoutA1'
   | 'cutoutB1'
   | 'cutoutC1'
@@ -34,11 +22,11 @@ export type TrashLocationV4 =
   | 'cutoutD3'
 
 interface FlexTrashProps {
-  deckDefinition: DeckDefinitionV4
+  deckDefinition: DeckDefinition
   robotType: RobotType
   trashIconColor: string
   backgroundColor: string
-  trashLocation?: TrashLocationV4
+  trashLocation?: TrashLocation
 }
 
 /**
@@ -55,7 +43,6 @@ export const FlexTrash = ({
   // be sure we don't try to render for an OT-2
   if (robotType !== 'OT-3 Standard') return null
 
-  // TODO(bh, 2023-10-09): migrate from "orderedSlots" to v4 "cutouts" key
   const trashSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === trashLocation
   )

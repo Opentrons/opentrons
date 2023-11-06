@@ -6,7 +6,7 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
-import type { Cutout, DeckDefinitionV4 } from '@opentrons/shared-data'
+import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
 
 // TODO: replace stubs with JSON definitions when available
 const standardSlotDef = {
@@ -27,7 +27,7 @@ const standardSlotDef = {
 }
 
 interface EmptyConfigFixtureProps {
-  deckDefinition: DeckDefinitionV4
+  deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickAdd: (fixtureLocation: Cutout) => void
 }

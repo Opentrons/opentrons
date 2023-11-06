@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {
-  // getDeckDefFromRobotType,
-  getCutoutFromSlotId,
+  getDeckDefFromRobotType,
   getModuleDef2,
+  getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   // OT2_ROBOT_TYPE,
   STAGING_AREA_LOAD_NAME,
@@ -11,7 +11,7 @@ import {
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
-import ot3DeckDefV4 from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
+
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module } from '../Module'
 import { LabwareRender } from '../Labware'
@@ -31,15 +31,13 @@ import { WasteChuteFixture } from './WasteChuteFixture'
 
 import type {
   DeckConfiguration,
-  DeckDefinitionV4,
-  FlexSlot,
   LabwareDefinition2,
   LabwareLocation,
   ModuleLocation,
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type { TrashLocationV4 } from '../Deck/FlexTrash'
+import type { TrashLocation } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 // import type { WasteChuteLocation } from './WasteChuteFixture'
 
@@ -83,14 +81,13 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     showExpansion = true,
     children,
   } = props
-  // const deckDef = getDeckDefFromRobotType(robotType)
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   // TODO: shift to V4 for OT-2
   // const deckDef =
   //   robotType === OT2_ROBOT_TYPE
   //     ? getDeckDefFromRobotType(robotType)
   //     : ((ot3DeckDefV4 as unknown) as DeckDefinitionV4)
-  const deckDef = (ot3DeckDefV4 as unknown) as DeckDefinitionV4
 
   const singleSlotFixtures = deckConfig.filter(
     fixture => fixture.loadName === STANDARD_SLOT_LOAD_NAME
@@ -149,7 +146,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               robotType={robotType}
               trashIconColor={lightFill}
               // TODO(bh, 2023-10-09): typeguard fixture location
-              trashLocation={fixture.fixtureLocation as TrashLocationV4}
+              trashLocation={fixture.fixtureLocation as TrashLocation}
               backgroundColor={darkFill}
             />
           </React.Fragment>
@@ -176,37 +173,21 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           moduleChildren,
           onLabwareClick,
         }) => {
-          const slotDef = deckDef.locations.addressableAreas.find(
-            s => s.id === moduleLocation.slotName
+          const slotPosition = getPositionFromSlotId(
+            moduleLocation.slotName,
+            deckDef
           )
-
-          // early return null if no slot def found
-          if (slotDef == null) return null
-
-          const cutoutId = getCutoutFromSlotId(slotDef.id as FlexSlot)
-          const cutoutDef = deckDef.locations.cutouts.find(
-            cutout => cutout.id === cutoutId
-          )
-
-          // early return null if no cutout def found
-          if (cutoutDef == null) return null
-
-          const [xCutout, yCutout] = cutoutDef.position ?? []
-          const [
-            xOffsetFromCutout,
-            yOffsetFromCutout,
-          ] = slotDef.offsetFromCutoutFixture
-          const xCoordinate = xCutout + xOffsetFromCutout
-          const yCoordinate = yCutout + yOffsetFromCutout
 
           const moduleDef = getModuleDef2(moduleModel)
-          return slotDef != null ? (
+          return slotPosition != null ? (
             <Module
-              key={`${moduleModel} ${slotDef.id}`}
+              key={`${moduleModel} ${moduleLocation.slotName}`}
               def={moduleDef}
-              x={xCoordinate}
-              y={yCoordinate}
-              orientation={inferModuleOrientationFromXCoordinate(xCoordinate)}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
+              orientation={inferModuleOrientationFromXCoordinate(
+                slotPosition[0]
+              )}
               innerProps={innerProps}
             >
               {nestedLabwareDef != null ? (
@@ -222,36 +203,22 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       )}
       {labwareLocations.map(
         ({ labwareLocation, definition, labwareChildren, onLabwareClick }) => {
-          const slotDef = deckDef.locations.addressableAreas.find(
-            s =>
-              labwareLocation !== 'offDeck' &&
-              'slotName' in labwareLocation &&
-              s.id === labwareLocation.slotName
+          if (
+            labwareLocation === 'offDeck' ||
+            !('slotName' in labwareLocation)
+          ) {
+            return null
+          }
+
+          const slotPosition = getPositionFromSlotId(
+            labwareLocation.slotName,
+            deckDef
           )
 
-          // early return null if no slot def found
-          if (slotDef == null) return null
-
-          const cutoutId = getCutoutFromSlotId(slotDef.id as FlexSlot)
-          const cutoutDef = deckDef.locations.cutouts.find(
-            cutout => cutout.id === cutoutId
-          )
-
-          // early return null if no cutout def found
-          if (cutoutDef == null) return null
-
-          const [xCutout, yCutout] = cutoutDef.position ?? []
-          const [
-            xOffsetFromCutout,
-            yOffsetFromCutout,
-          ] = slotDef.offsetFromCutoutFixture
-          const xCoordinate = xCutout + xOffsetFromCutout
-          const yCoordinate = yCutout + yOffsetFromCutout
-
-          return slotDef != null ? (
+          return slotPosition != null ? (
             <g
-              key={slotDef.id}
-              transform={`translate(${xCoordinate.toString()},${yCoordinate.toString()})`}
+              key={labwareLocation.slotName}
+              transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
             >
               <LabwareRender
                 definition={definition}
