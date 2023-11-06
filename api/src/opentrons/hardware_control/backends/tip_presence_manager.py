@@ -80,7 +80,7 @@ class TipPresenceManager:
 
         try:
             detector = self.get_detector(mount)
-            detector.cleanup()    
+            detector.cleanup()
         except TipDetectorNotFound:
             pass
         finally:
