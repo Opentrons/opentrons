@@ -33,7 +33,6 @@ import {
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
 import { forMoveLabware } from './forMoveLabware'
-import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -93,12 +92,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'moveToAddressableArea':
-      forMoveToAddressableArea(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
+    case 'dropTipInPlace':
+      // TODO(jr, 11/6/23): wire up tip state update
+      break
+
+    case 'dispenseInPlace':
+    case 'blowOutInPlace':
+      // TODO(jr, 11/6/23): wire up liquid state update
       break
 
     case 'touchTip':
@@ -107,6 +107,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'moveToWell':
     case 'delay':
     case 'configureForVolume':
+    case 'moveToAddressableArea':
       // these commands don't have any effects on the state
       break
 

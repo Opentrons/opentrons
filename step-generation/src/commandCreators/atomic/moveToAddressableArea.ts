@@ -26,9 +26,6 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = 
       params: {
         pipetteId,
         addressableAreaName,
-        speed: 12.3,
-        minimumZHeight: 1.23,
-        forceDirect: false,
       },
     },
   ]

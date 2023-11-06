@@ -31,9 +31,6 @@ describe('moveToAddressableArea', () => {
         params: {
           pipetteId: mockId,
           addressableAreaName: mockName,
-          speed: 12.3,
-          minimumZHeight: 1.23,
-          forceDirect: false,
         },
       },
     ])

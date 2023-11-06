@@ -16,6 +16,7 @@ export {
   getLabwareSlot,
 }
 export * from './commandCreatorArgsGetters'
-export * from './misc'
+export * from './wasteChuteCommandsUtil'
 export * from './heaterShakerCollision'
+export * from './misc'
 export const uuid: () => string = uuidv4
