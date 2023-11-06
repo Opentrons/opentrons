@@ -33,6 +33,11 @@ import {
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
 import { forMoveLabware } from './forMoveLabware'
+import {
+  forBlowOutInPlace,
+  forDispenseInPlace,
+  forDropTipInPlace,
+} from './InPlaceCommandUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -93,12 +98,20 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'dropTipInPlace':
-      // TODO(jr, 11/6/23): wire up tip state update
+      forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'blowOutInPlace':
+      forBlowOutInPlace(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'dispenseInPlace':
-    case 'blowOutInPlace':
-      // TODO(jr, 11/6/23): wire up liquid state update
+      forDispenseInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+
       break
 
     case 'touchTip':
