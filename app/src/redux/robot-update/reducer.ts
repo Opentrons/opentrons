@@ -46,6 +46,7 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
           [action.payload.target]: {
             ...state[action.payload.target],
             version: action.payload.version,
+            force: action.payload.force ?? false,
           },
         },
       }
@@ -59,6 +60,7 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
             ...state[action.payload.target],
             version: action.payload.version,
             releaseNotes: action.payload.releaseNotes,
+            force: action.payload.force ?? false,
           },
         },
       }

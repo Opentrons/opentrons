@@ -28,14 +28,16 @@ const NO_UPDATE_FILES =
   'Unable to retrieve update for this robot. Ensure your computer is connected to the internet and try again later.'
 const UNAVAILABLE = 'Update unavailable'
 
-export function getRobotUpdateTarget(
+export const getRobotUpdateTarget: (
   state: State,
   robotName: string
+) => RobotUpdateTarget | null = createSelector(getRobotByName, robot =>
+  robot ? getRobotUpdateTargetForRobot(robot) : null
+)
+
+export function getRobotUpdateTargetForRobot(
+  robot: ViewableRobot
 ): RobotUpdateTarget | null {
-  const robot = getRobotByName(state, robotName)
-  if (robot === null) {
-    return null
-  }
   const model = robot?.serverHealth?.robotModel ?? null
   if (model === null) {
     return 'ot2'
@@ -46,6 +48,11 @@ export function getRobotUpdateTarget(
   return 'flex'
 }
 
+export function getRobotUpdateForced(state: State, robotName: string): boolean {
+  const target = getRobotUpdateTarget(state, robotName)
+  return target ? state.robotUpdate[target]?.force ?? false : false
+}
+
 export function getRobotUpdateVersion(
   state: State,
   robotName: string
@@ -54,13 +61,30 @@ export function getRobotUpdateVersion(
   return target ? state.robotUpdate[target]?.version ?? null : null
 }
 
-export function getRobotUpdateInfo(
+export const getRobotUpdateInfo: (
   state: State,
   robotName: string
+) => RobotUpdateInfo | null = createSelector(
+  getRobotUpdateTarget,
+  state => state,
+  (target, state) =>
+    target ? getRobotUpdateInfoForTarget(state, target) : null
+)
+
+export function getRobotUpdateInfoForRobot(
+  state: State,
+  robot: ViewableRobot
 ): RobotUpdateInfo | null {
-  const target = getRobotUpdateTarget(state, robotName)
-  const robotInfo = target ? state.robotUpdate[target] : null
-  if (target === null || robotInfo === null) {
+  const target = getRobotUpdateTargetForRobot(robot)
+  return target ? getRobotUpdateInfoForTarget(state, target) : null
+}
+
+export function getRobotUpdateInfoForTarget(
+  state: State,
+  target: RobotUpdateTarget
+): RobotUpdateInfo | null {
+  const robotInfo = state.robotUpdate[target]
+  if (robotInfo === null) {
     return null
   }
   const { version, releaseNotes } = robotInfo
@@ -168,8 +192,10 @@ export function getRobotUpdateAvailable(
 ): RobotUpdateType | null {
   const currentVersion = getRobotApiVersion(robot)
   const updateVersion = getRobotUpdateVersion(state, robot.name)
-
-  return getRobotUpdateType(currentVersion, updateVersion)
+  const isForced = getRobotUpdateForced(state, robot.name)
+  return isForced
+    ? Constants.UPGRADE
+    : getRobotUpdateType(currentVersion, updateVersion)
 }
 
 export const getRobotUpdateDisplayInfo: (
