@@ -25,6 +25,7 @@ import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
 
 import * as utils from '../../modules/utils'
 import { FormData } from '../../../form-types'
+import { getFormWarningsForSelectedStep } from '../../../dismiss/selectors'
 
 function createArgsForStepId(
   stepId: string,
@@ -575,6 +576,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
@@ -628,6 +633,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           // same thing with dispense_touchTip_mmFromBottom
           blowout_checkbox: false,
           // same thing here with blowout location
+          nozzles: null,
         },
       }
     })
@@ -782,6 +788,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: true,
+          value: null,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
@@ -834,6 +844,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { value: '1', isIndeterminate: false },
         mix_touchTip_checkbox: { value: false, isIndeterminate: false },
         mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+        nozzles: { value: null, isIndeterminate: false },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
@@ -869,6 +880,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           dispense_delay_seconds: '3',
           mix_touchTip_checkbox: true,
           mix_touchTip_mmFromBottom: '14',
+          nozzles: null,
         },
       }
 
@@ -901,6 +913,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { isIndeterminate: true },
         mix_touchTip_checkbox: { isIndeterminate: true },
         mix_touchTip_mmFromBottom: { isIndeterminate: true },
+        nozzles: null,
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
