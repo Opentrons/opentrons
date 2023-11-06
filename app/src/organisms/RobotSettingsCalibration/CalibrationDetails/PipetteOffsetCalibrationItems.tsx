@@ -16,6 +16,7 @@ import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { LEFT } from '../../../redux/pipettes'
 import {
   useAttachedPipettes,
   useIsFlex,
@@ -24,7 +25,6 @@ import {
 
 import type { State } from '../../../redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
-import type { LEFT } from '../../../redux/pipettes'
 
 const StyledTable = styled.table`
   width: 100%;
