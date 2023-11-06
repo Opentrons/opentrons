@@ -70,7 +70,7 @@ def mock_api_verify_tip_presence_ot3() -> Iterator[mock.AsyncMock]:
 def wrap_build_ot3_sim():
     from opentrons.hardware_control.ot3api import OT3API
 
-    with mock.patch.object(OT3API, "verify_tip_presence") as mock_tip_presence:
+    with mock.patch.object(OT3API, "verify_tip_presence") as mock_tip_presence:  # noqa: F841
         return OT3API.build_hardware_simulator
 
 
