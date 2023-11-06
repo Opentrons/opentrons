@@ -11,19 +11,14 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
-  Module,
-  RobotWorkSpace,
-  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
-  Fixture,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
-  inferModuleOrientationFromXCoordinate,
   NON_CONNECTING_MODULE_TYPES,
   STANDARD_SLOT_LOAD_NAME,
   TC_MODULE_LOCATION_OT3,
@@ -34,19 +29,16 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
 } from '../../organisms/Devices/hooks'
-import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/MultipleModulesModal'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
-import { useFeatureFlag } from '../../redux/config'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -62,22 +54,15 @@ import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
+import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
 
 import type { CommandData } from '@opentrons/api-client'
+import type { Cutout, Fixture, FixtureLoadName } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const ATTACHED_MODULE_POLL_MS = 5000
-
-const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'DECK_BASE',
-  'BARCODE_COVERS',
-  'SLOT_SCREWS',
-  'SLOT_10_EXPANSION',
-  'CALIBRATION_CUTOUTS',
-]
 
 interface RenderModuleStatusProps {
   isModuleReady: boolean
@@ -104,7 +89,6 @@ function RenderModuleStatus({
   conflictedFixture,
 }: RenderModuleStatusProps): JSX.Element {
   const { makeSnackbar } = useToaster()
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
 
   const handleCalibrate = (): void => {
@@ -136,7 +120,7 @@ function RenderModuleStatus({
       {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
     </>
   )
-  if (conflictedFixture != null && enableDeckConfig) {
+  if (conflictedFixture != null) {
     moduleStatus = (
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
         <Chip
@@ -151,7 +135,6 @@ function RenderModuleStatus({
     )
   } else if (
     isModuleReady &&
-    calibrationStatus.complete &&
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
@@ -323,6 +306,8 @@ function RowModule({
 interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  setFixtureLocation: (fixtureLocation: Cutout) => void
+  setProvidedFixtureOptions: (providedFixtureOptions: FixtureLoadName[]) => void
 }
 
 /**
@@ -331,6 +316,8 @@ interface ProtocolSetupModulesAndDeckProps {
 export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
+  setFixtureLocation,
+  setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
@@ -383,12 +370,6 @@ export function ProtocolSetupModulesAndDeck({
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
 
-  const modalHeader: ModalHeaderBaseProps = {
-    title: t('map_view'),
-    hasExitIcon: true,
-  }
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
-
   return (
     <>
       <Portal level="top">
@@ -403,50 +384,16 @@ export function ProtocolSetupModulesAndDeck({
           />
         ) : null}
         {showDeckMapModal ? (
-          <Modal
-            header={modalHeader}
-            modalSize="large"
-            onOutsideClick={() => setShowDeckMapModal(false)}
-          >
-            <RobotWorkSpace
-              deckDef={deckDef}
-              deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-              deckFill={COLORS.light1}
-              trashSlotName="A3"
-              id="ModuleSetup_deckMap"
-              trashColor={COLORS.darkGreyEnabled}
-            >
-              {() => (
-                <>
-                  {attachedProtocolModuleMatches.map(module => (
-                    <Module
-                      key={module.moduleId}
-                      x={module.x}
-                      y={module.y}
-                      orientation={inferModuleOrientationFromXCoordinate(
-                        module.x
-                      )}
-                      def={module.moduleDef}
-                    >
-                      <ModuleInfo
-                        moduleModel={module.moduleDef.model}
-                        isAttached={module.attachedModuleMatch != null}
-                        physicalPort={
-                          module.attachedModuleMatch?.usbPort ?? null
-                        }
-                        runId={runId}
-                      />
-                    </Module>
-                  ))}
-                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
-                </>
-              )}
-            </RobotWorkSpace>
-          </Modal>
+          <ModulesAndDeckMapViewModal
+            setShowDeckMapModal={setShowDeckMapModal}
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            runId={runId}
+            protocolAnalysis={mostRecentAnalysis}
+          />
         ) : null}
       </Portal>
       <ChildNavigation
-        header={enableDeckConfig ? t('modules_and_deck') : t('modules')}
+        header={t('modules_and_deck')}
         onClickBack={() => setSetupScreen('prepare to run')}
         buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
         buttonType="tertiaryLowLight"
@@ -514,9 +461,12 @@ export function ProtocolSetupModulesAndDeck({
               )
             })}
           </Flex>
-          {enableDeckConfig ? (
-            <FixtureTable mostRecentAnalysis={mostRecentAnalysis} />
-          ) : null}
+          <FixtureTable
+            mostRecentAnalysis={mostRecentAnalysis}
+            setSetupScreen={setSetupScreen}
+            setFixtureLocation={setFixtureLocation}
+            setProvidedFixtureOptions={setProvidedFixtureOptions}
+          />
         </Flex>
       </Flex>
       <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />

@@ -12,6 +12,7 @@ import {
 import {
   EXTENDED_DECK_CONFIG_FIXTURE,
   STANDARD_SLOT_DECK_CONFIG_FIXTURE,
+  WASTE_CHUTE_DECK_CONFIG_FIXTURE,
 } from './__fixtures__'
 import { BaseDeck as BaseDeckComponent } from './BaseDeck'
 
@@ -26,7 +27,7 @@ const meta: Meta<React.ComponentProps<typeof BaseDeckComponent>> = {
   title: 'Library/Molecules/Simulation/BaseDeck',
   argTypes: {
     deckConfig: {
-      options: ['single slot deck', 'staging area deck'],
+      options: ['single slot deck', 'staging area deck', 'waste chute deck'],
       control: { type: 'radio' },
     },
   },
@@ -35,10 +36,16 @@ const meta: Meta<React.ComponentProps<typeof BaseDeckComponent>> = {
 export default meta
 type Story = StoryObj<React.ComponentProps<typeof BaseDeckComponent>>
 
-const getDeckConfig = (args: any): DeckConfiguration =>
-  args.deckConfig === 'staging area deck'
-    ? EXTENDED_DECK_CONFIG_FIXTURE
-    : STANDARD_SLOT_DECK_CONFIG_FIXTURE
+const getDeckConfig = (args: any): DeckConfiguration => {
+  switch (args.deckConfig) {
+    case 'staging area deck':
+      return EXTENDED_DECK_CONFIG_FIXTURE
+    case 'waste chute deck':
+      return WASTE_CHUTE_DECK_CONFIG_FIXTURE
+    default:
+      return STANDARD_SLOT_DECK_CONFIG_FIXTURE
+  }
+}
 
 export const BaseDeck: Story = {
   args: {

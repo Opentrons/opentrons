@@ -16,6 +16,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
   MoveLabwareCreateCommand,
+  RobotType,
 } from '@opentrons/shared-data'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { UnorderedList } from '../../molecules/UnorderedList'
@@ -47,6 +48,7 @@ interface PickUpTipProps extends PickUpTipStep {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
+  robotType: RobotType
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -64,6 +66,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     workingOffsets,
     setFatalError,
     adapterId,
+    robotType,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
   const isOnDevice = useSelector(getIsOnDevice)
@@ -421,6 +424,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           body={<UnorderedList items={instructions} />}
           labwareDef={labwareDef}
           confirmPlacement={handleConfirmPlacement}
+          robotType={robotType}
         />
       )}
     </Flex>

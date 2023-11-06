@@ -10,8 +10,12 @@ import {
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useFeatureFlag } from '../../../../redux/config'
-import { useRunHasStarted, useUnmatchedModulesForProtocol } from '../../hooks'
+import {
+  useIsFlex,
+  useRunHasStarted,
+  useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
+} from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
@@ -37,11 +41,14 @@ export const SetupModuleAndDeck = ({
     t('list_view'),
     t('map_view')
   )
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
+  const isFlex = useIsFlex(robotName)
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const runHasStarted = useRunHasStarted(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
+
+  const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing32}>
@@ -51,18 +58,21 @@ export const SetupModuleAndDeck = ({
             {hasModules ? (
               <SetupModulesList robotName={robotName} runId={runId} />
             ) : null}
-            {Object.keys(loadedFixturesBySlot).length > 0 &&
-            enableDeckConfig ? (
+            {Object.keys(loadedFixturesBySlot).length > 0 && isFlex ? (
               <SetupFixtureList loadedFixturesBySlot={loadedFixturesBySlot} />
             ) : null}
           </>
         ) : (
-          <SetupModulesMap robotName={robotName} runId={runId} />
+          <SetupModulesMap runId={runId} />
         )}
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>
         <PrimaryButton
-          disabled={missingModuleIds.length > 0 || runHasStarted}
+          disabled={
+            missingModuleIds.length > 0 ||
+            runHasStarted ||
+            !moduleCalibrationStatus.complete
+          }
           onClick={expandLabwarePositionCheckStep}
           id="ModuleSetup_proceedToLabwarePositionCheck"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
@@ -71,11 +81,15 @@ export const SetupModuleAndDeck = ({
           {t('proceed_to_labware_position_check')}
         </PrimaryButton>
       </Flex>
-      {missingModuleIds.length > 0 || runHasStarted ? (
+      {missingModuleIds.length > 0 ||
+      runHasStarted ||
+      !moduleCalibrationStatus.complete ? (
         <Tooltip tooltipProps={tooltipProps}>
           {runHasStarted
             ? t('protocol_run_started')
-            : t('plug_in_required_module', { count: missingModuleIds.length })}
+            : missingModuleIds.length > 0
+            ? t('plug_in_required_module', { count: missingModuleIds.length })
+            : t('calibrate_module_failure_reason')}
         </Tooltip>
       ) : null}
     </>

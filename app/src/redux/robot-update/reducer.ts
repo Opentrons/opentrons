@@ -196,6 +196,17 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
           }
         : state
     }
+    case Constants.ROBOTUPDATE_FILE_UPLOAD_PROGRESS: {
+      return state.session
+        ? {
+            ...state,
+            session: {
+              ...state.session,
+              progress: Math.round(action.payload * 100),
+            },
+          }
+        : state
+    }
   }
 
   return state

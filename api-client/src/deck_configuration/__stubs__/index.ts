@@ -30,6 +30,26 @@ export const DECK_CONFIG_STUB: { [fixtureLocation: string]: Fixture } = {
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
+  A2: {
+    fixtureLocation: 'A2',
+    loadName: STANDARD_SLOT_LOAD_NAME,
+    fixtureId: uuidv4(),
+  },
+  B2: {
+    fixtureLocation: 'B2',
+    loadName: STANDARD_SLOT_LOAD_NAME,
+    fixtureId: uuidv4(),
+  },
+  C2: {
+    fixtureLocation: 'C2',
+    loadName: STANDARD_SLOT_LOAD_NAME,
+    fixtureId: uuidv4(),
+  },
+  D2: {
+    fixtureLocation: 'D2',
+    loadName: STANDARD_SLOT_LOAD_NAME,
+    fixtureId: uuidv4(),
+  },
   A3: {
     fixtureLocation: 'A3',
     loadName: TRASH_BIN_LOAD_NAME,

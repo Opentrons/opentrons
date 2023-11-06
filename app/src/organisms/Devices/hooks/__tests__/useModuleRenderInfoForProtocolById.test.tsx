@@ -2,7 +2,13 @@ import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import {
+  getDeckDefFromRobotType,
+  getRobotTypeFromLoadedLabware,
+  FLEX_ROBOT_TYPE,
+  STAGING_AREA_LOAD_NAME,
+} from '@opentrons/shared-data'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
@@ -17,21 +23,20 @@ import {
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '..'
 
-import {
+import type {
+  DeckConfiguration,
+  DeckDefinition,
+  Fixture,
   ModuleModel,
   ModuleType,
   ProtocolAnalysisOutput,
-  DeckConfiguration,
-  STAGING_AREA_LOAD_NAME,
-  Fixture,
 } from '@opentrons/shared-data'
-import type { ProtocolDetails } from '..'
 
 jest.mock('@opentrons/react-api-client/src/deck_configuration')
+jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
 jest.mock('../useProtocolDetailsForRun')
@@ -44,8 +49,11 @@ const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
+  typeof getDeckDefFromRobotType
+>
+const mockGetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<
+  typeof getRobotTypeFromLoadedLabware
 >
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
@@ -62,7 +70,6 @@ const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: heaterShakerCommandsWithResultsKey,
   protocolKey: 'fakeProtocolKey',
-  robotType: 'OT-2 Standard' as const,
 }
 
 const mockMagneticModuleDefinition = {
@@ -143,9 +150,10 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
         mockTemperatureModuleGen2,
         mockThermocycler,
       ])
-    when(mockUseProtocolDetailsForRun)
-      .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS as any)
+    when(mockGetDeckDefFromRobotType)
+      .calledWith(FLEX_ROBOT_TYPE)
+      .mockReturnValue((standardDeckDef as unknown) as DeckDefinition)
+    when(mockGetRobotTypeFromLoadedLabware).mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
       .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
@@ -153,7 +161,10 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
     when(mockGetProtocolModulesInfo)
-      .calledWith(heaterShakerCommandsWithResultsKey, standardDeckDef as any)
+      .calledWith(
+        heaterShakerCommandsWithResultsKey,
+        (standardDeckDef as unknown) as DeckDefinition
+      )
       .mockReturnValue([TEMPERATURE_MODULE_INFO, MAGNETIC_MODULE_INFO])
   })
 
@@ -161,9 +172,6 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     resetAllWhenMocks()
   })
   it('should return no module render info when protocol details not found', () => {
-    when(mockUseProtocolDetailsForRun)
-      .calledWith('1')
-      .mockReturnValue({} as ProtocolDetails)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
       .mockReturnValue(null)

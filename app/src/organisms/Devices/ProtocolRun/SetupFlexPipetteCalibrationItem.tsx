@@ -20,7 +20,7 @@ import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import type { PipetteData } from '@opentrons/api-client'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data'
 import type { Mount } from '../../../redux/pipettes/types'
 
 interface SetupInstrumentCalibrationItemProps {

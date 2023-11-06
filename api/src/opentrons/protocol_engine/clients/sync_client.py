@@ -257,6 +257,21 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.DropTipResult, result)
 
+    def drop_tip_in_place(
+        self,
+        pipette_id: str,
+        home_after: Optional[bool],
+    ) -> commands.DropTipInPlaceResult:
+        """Execute a DropTipInPlace command and return the result."""
+        request = commands.DropTipInPlaceCreate(
+            params=commands.DropTipInPlaceParams(
+                pipetteId=pipette_id,
+                homeAfter=home_after,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.DropTipInPlaceResult, result)
+
     def configure_for_volume(
         self, pipette_id: str, volume: float
     ) -> commands.ConfigureForVolumeResult:
@@ -268,6 +283,14 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.ConfigureForVolumeResult, result)
+
+    def prepare_to_aspirate(self, pipette_id: str) -> commands.PrepareToAspirateResult:
+        """Execute a PrepareToAspirate command."""
+        request = commands.PrepareToAspirateCreate(
+            params=commands.PrepareToAspirateParams(pipetteId=pipette_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.PrepareToAspirateResult, result)
 
     def aspirate(
         self,

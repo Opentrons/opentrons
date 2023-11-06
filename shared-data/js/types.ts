@@ -30,7 +30,7 @@ import {
   WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
-import type { RunTimeCommand } from '../protocol'
+import type { RunTimeCommand } from '../command/types'
 import type { PipetteName } from './pipettes'
 import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
@@ -448,6 +448,7 @@ export interface AnalysisError {
   createdAt: string
 }
 
+// TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
   status?: 'completed'
@@ -458,7 +459,6 @@ export interface CompletedProtocolAnalysis {
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
-  robotType?: RobotType
 }
 
 export interface ResourceFile {

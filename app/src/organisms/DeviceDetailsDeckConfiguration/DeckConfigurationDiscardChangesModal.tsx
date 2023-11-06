@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
+
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -24,11 +26,11 @@ export function DeckConfigurationDiscardChangesModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('changes_will_be_lost'),
   }
+  const history = useHistory()
 
   const handleDiscard = (): void => {
-    // ToDo (kk: 09/29/2023) discard deck configuration changes
     setShowConfirmationModal(false)
-    // close the modal and then back the previous screen
+    history.goBack()
   }
 
   return (

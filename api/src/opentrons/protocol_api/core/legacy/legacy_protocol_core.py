@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List, Optional, Set, Union, cast, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -18,6 +18,7 @@ from opentrons.protocols import labware as labware_definition
 from ...labware import Labware
 from ..._liquid import Liquid
 from ..._types import OffDeckType
+from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
@@ -252,6 +253,7 @@ class LegacyProtocolCore(
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
+            WasteChute,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,
@@ -450,9 +452,13 @@ class LegacyProtocolCore(
     ) -> Optional[LegacyLabwareCore]:
         assert False, "get_labware_on_labware only supported on engine core"
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
+
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+        """Get the slot definition from the robot's deck."""
+        assert False, "get_slot_definition only supported on engine core"
 
     def get_slot_item(
         self, slot_name: DeckSlotName

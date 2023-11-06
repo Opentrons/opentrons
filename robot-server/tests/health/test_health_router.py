@@ -15,6 +15,45 @@ def test_get_health(
     """Test GET /health."""
     hardware.fw_version = "FW111"
     hardware.board_revision = "BR2.1"
+    hardware.get_serial_number.return_value = "mytestserial"
+    versions.return_value = ComponentVersions(
+        api_version="mytestapiversion", system_version="mytestsystemversion"
+    )
+
+    expected = {
+        "name": "opentrons-dev",
+        "api_version": "mytestapiversion",
+        "fw_version": "FW111",
+        "board_revision": "BR2.1",
+        "logs": ["/logs/serial.log", "/logs/api.log", "/logs/server.log"],
+        "system_version": "mytestsystemversion",
+        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION),
+        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
+        "robot_model": "OT-2 Standard",
+        "links": {
+            "apiLog": "/logs/api.log",
+            "serialLog": "/logs/serial.log",
+            "serverLog": "/logs/server.log",
+            "apiSpec": "/openapi.json",
+            "systemTime": "/system/time",
+        },
+        "robot_serial": "mytestserial",
+    }
+
+    resp = api_client.get("/health")
+    text = resp.json()
+
+    assert resp.status_code == 200
+    assert text == expected
+
+
+def test_get_health_with_none_version(
+    api_client: TestClient, hardware: MagicMock, versions: MagicMock
+) -> None:
+    """Test GET /health with no serial number."""
+    hardware.fw_version = "FW111"
+    hardware.board_revision = "BR2.1"
+    hardware.get_serial_number.return_value = None
     versions.return_value = ComponentVersions(
         api_version="mytestapiversion", system_version="mytestsystemversion"
     )

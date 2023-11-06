@@ -9,6 +9,7 @@ from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
 
+from .._waste_chute import WasteChute
 from .well import WellCoreType
 
 
@@ -133,6 +134,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        ...
+
+    @abstractmethod
     def home(self) -> None:
         ...
 
@@ -234,6 +241,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         Args:
             volume: The volume to preppare to handle.
         """
+        ...
+
+    def prepare_to_aspirate(self) -> None:
+        """Prepare the pipette to aspirate."""
         ...
 
 

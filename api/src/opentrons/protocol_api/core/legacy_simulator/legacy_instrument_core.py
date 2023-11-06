@@ -21,6 +21,8 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
+from ..._waste_chute import WasteChute
+
 from ..instrument import AbstractInstrument
 
 from ..legacy.legacy_well_core import LegacyWellCore
@@ -104,7 +106,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                         "cause over aspiration if the previous command is a "
                         "blow_out."
                     )
-                self.prepare_for_aspirate()
+                self.prepare_to_aspirate()
             self.move_to(location=location, well_core=well_core)
         elif location != self._protocol_interface.get_last_location():
             self.move_to(location=location, well_core=well_core)
@@ -250,6 +252,11 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        raise APIVersionError("Waste chutes are not supported in this PAPI version.")
+
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
 
@@ -327,7 +334,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def is_ready_to_aspirate(self) -> bool:
         return self._pipette_dict["ready_to_aspirate"]
 
-    def prepare_for_aspirate(self) -> None:
+    def prepare_to_aspirate(self) -> None:
         self._raise_if_no_tip(HardwareAction.PREPARE_ASPIRATE.name)
 
     def get_return_height(self) -> float:

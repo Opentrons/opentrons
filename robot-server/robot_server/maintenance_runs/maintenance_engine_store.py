@@ -4,6 +4,7 @@ from typing import List, NamedTuple, Optional
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -30,6 +31,10 @@ class EngineConflictError(RuntimeError):
     The store will not create a new engine unless the "current" runner/engine
     pair is idle.
     """
+
+
+class NoRunnerEnginePairError(RuntimeError):
+    """Raised if you try to get the current engine or runner while there is none."""
 
 
 class RunnerEnginePair(NamedTuple):
@@ -89,13 +94,15 @@ class MaintenanceEngineStore:
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" ProtocolEngine."""
-        assert self._runner_engine_pair is not None, "Engine not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> LiveRunner:
         """Get the "current" ProtocolRunner."""
-        assert self._runner_engine_pair is not None, "Runner not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.runner
 
     @property
@@ -139,7 +146,9 @@ class MaintenanceEngineStore:
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,
-                block_on_door_open=feature_flags.enable_door_safety_switch(),
+                block_on_door_open=feature_flags.enable_door_safety_switch(
+                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+                ),
             ),
         )
 

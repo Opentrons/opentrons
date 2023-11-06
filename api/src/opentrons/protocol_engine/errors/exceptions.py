@@ -373,6 +373,19 @@ class SlotDoesNotExistError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class FixtureDoesNotExistError(ProtocolEngineError):
+    """Raised when referencing an addressable area (aka fixture) that does not exist."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FixtureDoesNotExist."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 # TODO(mc, 2020-11-06): flesh out with structured data to replicate
 # existing LabwareHeightError
 class FailedToPlanMoveError(ProtocolEngineError):

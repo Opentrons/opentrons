@@ -69,7 +69,9 @@ clean_all_cmd = $(clean_cmd) dist
 #     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
 #   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
 #     probably POSIX-only.
-run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
+dev_port ?= "31950"
+dev_host ?= "localhost"
+run_dev ?= uvicorn "robot_server:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload
 
 .PHONY: all
 all: clean sdist wheel
@@ -82,7 +84,7 @@ setup:
 .PHONY: setup-ot2
 setup-ot2:
 	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
+	$(pipenv) run pip uninstall -y python-can
 	$(pipenv) run pip freeze
 
 .PHONY: clean

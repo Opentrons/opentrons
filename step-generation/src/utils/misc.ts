@@ -142,7 +142,7 @@ export function mergeLiquid(
 }
 // TODO: Ian 2019-04-19 move to shared-data helpers?
 export function getWellsForTips(
-  channels: 1 | 8,
+  channels: 1 | 8 | 96,
   labwareDef: LabwareDefinition2,
   well: string
 ): {
@@ -151,7 +151,7 @@ export function getWellsForTips(
 } {
   // Array of wells corresponding to the tip at each position.
   const wellsForTips =
-    channels === 1 ? [well] : getWellNamePerMultiTip(labwareDef, well)
+    channels === 1 ? [well] : getWellNamePerMultiTip(labwareDef, well, channels)
 
   if (!wellsForTips) {
     console.warn(

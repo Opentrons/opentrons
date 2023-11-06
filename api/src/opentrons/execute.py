@@ -11,15 +11,12 @@ import argparse
 import contextlib
 import logging
 import os
-from pathlib import Path
 import sys
-import tempfile
 from typing import (
     TYPE_CHECKING,
     BinaryIO,
     Callable,
     Dict,
-    Generator,
     List,
     Optional,
     TextIO,
@@ -33,11 +30,8 @@ from opentrons import protocol_api, __version__, should_use_ot3
 
 from opentrons.commands import types as command_types
 
-from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-
 from opentrons.hardware_control import (
     API as OT2API,
-    HardwareControlAPI,
     ThreadManagedHardware,
     ThreadManager,
 )
@@ -45,6 +39,8 @@ from opentrons.hardware_control import (
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
+    should_load_fixed_trash,
+    should_load_fixed_trash_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution import execute as execute_apiv2
@@ -61,23 +57,16 @@ from opentrons.protocol_engine import (
     Config,
     DeckType,
     EngineStatus,
-    ErrorOccurrence as ProtocolEngineErrorOccurrence,
-    command_monitor as pe_command_monitor,
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
 from opentrons.protocol_engine.types import PostRunHardwareState
 
-from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+from opentrons.protocol_reader import ProtocolSource
 
 from opentrons.protocol_runner import create_protocol_runner
 
-from .util.entrypoint_util import (
-    FoundLabware,
-    labware_from_paths,
-    datafiles_from_paths,
-    copy_file_like,
-)
+from .util import entrypoint_util
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import (
@@ -124,6 +113,9 @@ def get_protocol_api(
     bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
+    # If you add any more arguments here, make sure they're kw-only to make mistakes harder in
+    # environments without type checking, like Jupyter Notebook.
+    # *
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -170,7 +162,8 @@ def get_protocol_api(
 
     if extra_labware is None:
         extra_labware = {
-            uri: details.definition for uri, details in _get_jupyter_labware().items()
+            uri: details.definition
+            for uri, details in (entrypoint_util.find_jupyter_labware() or {}).items()
         }
 
     robot_type = _get_robot_type()
@@ -189,6 +182,8 @@ def get_protocol_api(
         )
     else:
         if bundled_labware is not None:
+            # Protocol Engine has a deep assumption that standard labware definitions are always
+            # implicitly loadable.
             raise NotImplementedError(
                 f"The bundled_labware argument is not currently supported for Python protocols"
                 f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
@@ -196,7 +191,7 @@ def get_protocol_api(
         context = _create_live_context_pe(
             api_version=checked_version,
             robot_type=robot_type,
-            deck_type=guess_deck_type_from_global_config(),
+            deck_type=deck_type,
             hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
             bundled_data=bundled_data,
             extra_labware=extra_labware,
@@ -322,12 +317,33 @@ def execute(  # noqa: C901
     :param log_level: The level of logs to emit on the command line:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
-    :param emit_runlog: A callback for printing the runlog. If specified, this
-                        will be called whenever a command adds an entry to the
-                        runlog, which can be used for display and progress
-                        estimation. If specified, the callback should take a
-                        single argument (the name doesn't matter) which will
-                        be a dictionary (see below). Default: ``None``
+    :param emit_runlog: A callback for printing the run log. If specified, this
+        will be called whenever a command adds an entry to the
+        run log, which can be used for display and progress
+        estimation. If specified, the callback should take a
+        single argument (the name doesn't matter) which will
+        be a dictionary:
+
+        .. code-block:: python
+
+          {
+            'name': command_name,
+            'payload': {
+              'text': string_command_text,
+              # The rest of this struct is
+              # command-dependent; see
+              # opentrons.commands.commands.
+             }
+          }
+
+        .. note::
+          In older software versions, ``payload["text"]`` was a
+          `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
+          To get human-readable text, you had to do ``payload["text"].format(**payload)``.
+          Don't do that anymore. If ``payload["text"]`` happens to contain any
+          ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
+          ``KeyError``.
+
     :param custom_labware_paths: A list of directories to search for custom labware.
                                  Loads valid labware from these paths and makes them available
                                  to the protocol context. If this is ``None`` (the default), and
@@ -340,39 +356,25 @@ def execute(  # noqa: C901
                               non-recursive contents of specified directories
                               are presented by the protocol context in
                               ``ProtocolContext.bundled_data``.
-
-    The format of the runlog entries is as follows:
-
-    .. code-block:: python
-
-        {
-            'name': command_name,
-            'payload': {
-                 'text': string_command_text,
-                  # The rest of this struct is command-dependent; see
-                  # opentrons.commands.commands. Its keys match format
-                  # keys in 'text', so that
-                  # entry['payload']['text'].format(**entry['payload'])
-                  # will produce a string with information filled in
-             }
-        }
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
 
-    contents = protocol_file.read()
-
+    # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
+    # to match documented behavior.
+    # See notes in https://github.com/Opentrons/opentrons/pull/13107
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = entrypoint_util.labware_from_paths(custom_labware_paths)
     else:
-        extra_labware = _get_jupyter_labware()
+        extra_labware = entrypoint_util.find_jupyter_labware() or {}
 
     if custom_data_paths:
-        extra_data = datafiles_from_paths(custom_data_paths)
+        extra_data = entrypoint_util.datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
 
+    contents = protocol_file.read()
     try:
         protocol = parse.parse(
             contents,
@@ -394,6 +396,8 @@ def execute(  # noqa: C901
 
     # Guard against trying to run protocols for the wrong robot type.
     # This matches what robot-server does.
+    # FIXME: This exposes the internal strings "OT-2 Standard" and "OT-3 Standard".
+    # https://opentrons.atlassian.net/browse/RSS-370
     if protocol.robot_type != _get_robot_type():
         raise RuntimeError(
             f'This robot is of type "{_get_robot_type()}",'
@@ -415,10 +419,8 @@ def execute(  # noqa: C901
             )
         protocol_file.seek(0)
         _run_file_pe(
-            protocol_file=protocol_file,
-            protocol_name=protocol_name,
-            extra_labware=extra_labware,
-            hardware_api=_get_global_hardware_controller(_get_robot_type()).wrapped(),
+            protocol=protocol,
+            hardware_api=_get_global_hardware_controller(_get_robot_type()),
             emit_runlog=emit_runlog,
         )
 
@@ -486,47 +488,13 @@ def main() -> int:
             emit_runlog=printer,
         )
         return 0
-    except _ProtocolEngineExecuteError as error:
-        # _ProtocolEngineExecuteError is a wrapper that's meaningless to the CLI user.
+    except entrypoint_util.ProtocolEngineExecuteError as error:
+        # This exception is a wrapper that's meaningless to the CLI user.
         # Take the actual protocol problem out of it and just print that.
         print(error.to_stderr_string(), file=sys.stderr)
         return 1
     # execute() might raise other exceptions, but we don't have a nice way to print those.
     # Just let Python show a traceback.
-
-
-class _ProtocolEngineExecuteError(Exception):
-    def __init__(self, errors: List[ProtocolEngineErrorOccurrence]) -> None:
-        """Raised when there was any fatal error running a protocol through Protocol Engine.
-
-        Protocol Engine reports errors as data, not as exceptions.
-        But the only way for `execute()` to signal problems to its caller is to raise something.
-        So we need this class to wrap them.
-
-        Params:
-            errors: The errors that Protocol Engine reported.
-        """
-        # Show the full error details if this is part of a traceback. Don't try to summarize.
-        super().__init__(errors)
-        self._error_occurrences = errors
-
-    def to_stderr_string(self) -> str:
-        """Return a string suitable as the stderr output of the `opentrons_execute` CLI.
-
-        This summarizes from the full error details.
-        """
-        # It's unclear what exactly we should extract here.
-        #
-        # First, do we print the first element, or the last, or all of them?
-        #
-        # Second, do we print the .detail? .errorCode? .errorInfo? .wrappedErrors?
-        # By contract, .detail seems like it would be insufficient, but experimentally,
-        # it includes a lot, like:
-        #
-        #     ProtocolEngineError [line 3]: Error 4000 GENERAL_ERROR (ProtocolEngineError):
-        #     UnexpectedProtocolError: Labware "fixture_12_trough" not found with version 1
-        #     in namespace "fixture".
-        return self._error_occurrences[0].detail
 
 
 def _create_live_context_non_pe(
@@ -570,6 +538,7 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            load_fixed_trash=should_load_fixed_trash_for_python_protocol(api_version),
         )
     )
 
@@ -633,45 +602,41 @@ def _run_file_non_pe(
 
 
 def _run_file_pe(
-    protocol_file: Union[BinaryIO, TextIO],
-    protocol_name: str,
-    extra_labware: Dict[str, FoundLabware],
-    hardware_api: HardwareControlAPI,
+    protocol: Protocol,
+    hardware_api: ThreadManagedHardware,
     emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
     """Run a protocol file with Protocol Engine."""
 
-    def send_command_to_emit_runlog(event: pe_command_monitor.Event) -> None:
-        if emit_runlog is not None:
-            emit_runlog(_adapt_command(event))
-
     async def run(protocol_source: ProtocolSource) -> None:
         protocol_engine = await create_protocol_engine(
-            hardware_api=hardware_api,
+            hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(),
+            load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(
             protocol_config=protocol_source.config,
             protocol_engine=protocol_engine,
-            hardware_api=hardware_api,
+            hardware_api=hardware_api.wrapped(),
         )
 
-        with pe_command_monitor.monitor_commands(
-            protocol_engine, callback=send_command_to_emit_runlog
-        ):
+        unsubscribe = protocol_runner.broker.subscribe(
+            "command", lambda event: emit_runlog(event) if emit_runlog else None
+        )
+        try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
             result = await protocol_runner.run(protocol_source)
+        finally:
+            unsubscribe()
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
-            raise _ProtocolEngineExecuteError(result.state_summary.errors)
+            raise entrypoint_util.ProtocolEngineExecuteError(
+                result.state_summary.errors
+            )
 
-    with _adapt_protocol_source(
-        protocol_file=protocol_file,
-        protocol_name=protocol_name,
-        extra_labware=extra_labware,
-    ) as protocol_source:
+    with entrypoint_util.adapt_protocol_source(protocol) as protocol_source:
         asyncio.run(run(protocol_source))
 
 
@@ -689,76 +654,6 @@ def _get_protocol_engine_config() -> Config:
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
     )
-
-
-def _get_jupyter_labware() -> Dict[str, FoundLabware]:
-    """Return labware files in this robot's Jupyter Notebook directory."""
-    if IS_ROBOT:
-        # JUPYTER_NOTEBOOK_LABWARE_DIR should never be None when IS_ROBOT == True.
-        assert JUPYTER_NOTEBOOK_LABWARE_DIR is not None
-        if JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():
-            return labware_from_paths([JUPYTER_NOTEBOOK_LABWARE_DIR])
-
-    return {}
-
-
-@contextlib.contextmanager
-def _adapt_protocol_source(
-    protocol_file: Union[BinaryIO, TextIO],
-    protocol_name: str,
-    extra_labware: Dict[str, FoundLabware],
-) -> Generator[ProtocolSource, None, None]:
-    """Create a `ProtocolSource` representing input protocol files."""
-    with tempfile.TemporaryDirectory() as temporary_directory:
-        # It's not well-defined in our customer-facing interfaces whether the supplied protocol_name
-        # should be just the filename part, or a path with separators. In case it contains stuff
-        # like "../", sanitize it to just the filename part so we don't save files somewhere bad.
-        safe_protocol_name = Path(protocol_name).name
-
-        temp_protocol_file = Path(temporary_directory) / safe_protocol_name
-
-        # FIXME(mm, 2023-06-26): Copying this file is pure overhead, and it introduces encoding
-        # hazards. Remove this when we can parse JSONv6+ and PAPIv2.14+ protocols without going
-        # through the filesystem. https://opentrons.atlassian.net/browse/RSS-281
-        copy_file_like(source=protocol_file, destination=temp_protocol_file)
-
-        custom_labware_files = [labware.path for labware in extra_labware.values()]
-
-        protocol_source = asyncio.run(
-            ProtocolReader().read_saved(
-                files=[temp_protocol_file] + custom_labware_files,
-                directory=None,
-                files_are_prevalidated=False,
-            )
-        )
-
-        yield protocol_source
-
-
-def _adapt_command(event: pe_command_monitor.Event) -> command_types.CommandMessage:
-    """Convert a Protocol Engine command event to an old-school command_types.CommandMesage."""
-    before_or_after: command_types.MessageSequenceId = (
-        "before" if isinstance(event, pe_command_monitor.RunningEvent) else "after"
-    )
-
-    message: command_types.CommentMessage = {
-        # TODO(mm, 2023-09-26): If we can without breaking the public API, remove the requirement
-        # to supply a "name" here. If we can't do that, consider adding a special name value
-        # so we don't have to lie and call every command a comment.
-        "name": "command.COMMENT",
-        "id": event.command.id,
-        "$": before_or_after,
-        # TODO(mm, 2023-09-26): Convert this machine-readable JSON into a human-readable message
-        # to match behavior from before Protocol Engine.
-        # https://opentrons.atlassian.net/browse/RSS-320
-        "payload": {"text": event.command.json()},
-        # As far as I know, "error" is not part of the public-facing API, so it doesn't matter
-        # what we put here. Leaving it as `None` to avoid difficulties in converting between
-        # the Protocol Engine `ErrorOccurrence` model and the regular Python `Exception` type
-        # that this field expects.
-        "error": None,
-    }
-    return message
 
 
 def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:

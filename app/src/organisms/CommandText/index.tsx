@@ -9,7 +9,10 @@ import { PipettingCommandText } from './PipettingCommandText'
 import { TemperatureCommandText } from './TemperatureCommandText'
 import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data/js'
 import type { StyleProps } from '@opentrons/components'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
@@ -38,9 +41,10 @@ const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
 interface Props extends StyleProps {
   command: RunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
+  robotType: RobotType
 }
 export function CommandText(props: Props): JSX.Element | null {
-  const { command, robotSideAnalysis, ...styleProps } = props
+  const { command, robotSideAnalysis, robotType, ...styleProps } = props
   const { t } = useTranslation('protocol_command_text')
 
   switch (command.commandType) {
@@ -52,7 +56,9 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
-          <PipettingCommandText {...{ command, robotSideAnalysis }} />
+          <PipettingCommandText
+            {...{ command, robotSideAnalysis, robotType }}
+          />
         </StyledText>
       )
     }
@@ -62,7 +68,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadLiquid': {
       return (
         <StyledText as="p" {...styleProps}>
-          <LoadCommandText {...{ command, robotSideAnalysis }} />
+          <LoadCommandText {...{ command, robotSideAnalysis, robotType }} />
         </StyledText>
       )
     }
@@ -135,7 +141,9 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
-          <MoveLabwareCommandText {...{ command, robotSideAnalysis }} />
+          <MoveLabwareCommandText
+            {...{ command, robotSideAnalysis, robotType }}
+          />
         </StyledText>
       )
     }
@@ -149,6 +157,23 @@ export function CommandText(props: Props): JSX.Element | null {
         <StyledText as="p" {...styleProps}>
           {t('configure_for_volume', {
             volume,
+            pipette:
+              pipetteName != null
+                ? getPipetteNameSpecs(pipetteName)?.displayName
+                : '',
+          })}
+        </StyledText>
+      )
+    }
+    case 'prepareToAspirate': {
+      const { pipetteId } = command.params
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('prepare_to_aspirate', {
             pipette:
               pipetteName != null
                 ? getPipetteNameSpecs(pipetteName)?.displayName

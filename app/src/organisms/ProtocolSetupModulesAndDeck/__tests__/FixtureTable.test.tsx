@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import {
   STAGING_AREA_LOAD_NAME,
@@ -8,18 +7,13 @@ import {
 
 import { i18n } from '../../../i18n'
 import { useLoadedFixturesConfigStatus } from '../../../resources/deck_configuration/hooks'
-import { useFeatureFlag } from '../../../redux/config'
 import { LocationConflictModal } from '../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { FixtureTable } from '../FixtureTable'
 import type { LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
 
-jest.mock('../../../redux/config')
 jest.mock('../../../resources/deck_configuration/hooks')
 jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockUseLoadedFixturesConfigStatus = useLoadedFixturesConfigStatus as jest.MockedFunction<
   typeof useLoadedFixturesConfigStatus
 >
@@ -54,6 +48,10 @@ const mockLoadedStagingAreaFixture = {
   status: 'succeeded',
 } as LoadFixtureRunTimeCommand
 
+const mockSetSetupScreen = jest.fn()
+const mockSetFixtureLocation = jest.fn()
+const mockSetProvidedFixtureOptions = jest.fn()
+
 const render = (props: React.ComponentProps<typeof FixtureTable>) => {
   return renderWithProviders(<FixtureTable {...props} />, {
     i18nInstance: i18n,
@@ -65,10 +63,10 @@ describe('FixtureTable', () => {
   beforeEach(() => {
     props = {
       mostRecentAnalysis: [] as any,
+      setSetupScreen: mockSetSetupScreen,
+      setFixtureLocation: mockSetFixtureLocation,
+      setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
     mockUseLoadedFixturesConfigStatus.mockReturnValue([
       { ...mockLoadedFixture, configurationStatus: 'configured' },
     ])
@@ -85,6 +83,7 @@ describe('FixtureTable', () => {
   })
   it('should render the current status - configured', () => {
     props = {
+      ...props,
       mostRecentAnalysis: { commands: [mockLoadedFixture] } as any,
     }
     const [{ getByText }] = render(props)
@@ -95,6 +94,7 @@ describe('FixtureTable', () => {
       { ...mockLoadedFixture, configurationStatus: 'not configured' },
     ])
     props = {
+      ...props,
       mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
     }
     const [{ getByText }] = render(props)
@@ -105,10 +105,25 @@ describe('FixtureTable', () => {
       { ...mockLoadedFixture, configurationStatus: 'conflicting' },
     ])
     props = {
+      ...props,
       mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
     }
     const [{ getByText, getAllByText }] = render(props)
     getByText('Location conflict').click()
     getAllByText('mock location conflict modal')
+  })
+  it('should call a mock function when tapping not configured row', () => {
+    mockUseLoadedFixturesConfigStatus.mockReturnValue([
+      { ...mockLoadedFixture, configurationStatus: 'not configured' },
+    ])
+    props = {
+      ...props,
+      mostRecentAnalysis: { commands: [mockLoadedStagingAreaFixture] } as any,
+    }
+    const [{ getByText }] = render(props)
+    getByText('Not configured').click()
+    expect(mockSetFixtureLocation).toHaveBeenCalledWith('D3')
+    expect(mockSetSetupScreen).toHaveBeenCalledWith('deck configuration')
+    expect(mockSetProvidedFixtureOptions).toHaveBeenCalledWith(['wasteChute'])
   })
 })

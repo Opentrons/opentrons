@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import isEqual from 'lodash/isEqual'
 
 import {
   DeckConfigurator,
@@ -11,20 +12,20 @@ import {
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
+  useCreateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
-import { AddDeckConfigurationModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddDeckConfigurationModal'
+import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { Portal } from '../../App/portal'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { Cutout, DeckConfiguration } from '@opentrons/shared-data'
 
-export function DeckConfiguration(): JSX.Element {
+export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'devices_landing',
@@ -49,7 +50,12 @@ export function DeckConfiguration(): JSX.Element {
   ] = React.useState<boolean>(false)
 
   const deckConfig = useDeckConfigurationQuery().data ?? []
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const { createDeckConfiguration } = useCreateDeckConfigurationMutation()
+
+  const [
+    currentDeckConfig,
+    setCurrentDeckConfig,
+  ] = React.useState<DeckConfiguration>(deckConfig)
 
   const handleClickAdd = (fixtureLocation: Cutout): void => {
     setTargetFixtureLocation(fixtureLocation)
@@ -57,20 +63,29 @@ export function DeckConfiguration(): JSX.Element {
   }
 
   const handleClickRemove = (fixtureLocation: Cutout): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    })
+    setCurrentDeckConfig(prevDeckConfig =>
+      prevDeckConfig.map(fixture =>
+        fixture.fixtureLocation === fixtureLocation
+          ? { ...fixture, loadName: STANDARD_SLOT_LOAD_NAME }
+          : fixture
+      )
+    )
+    createDeckConfiguration(currentDeckConfig)
   }
 
   const handleClickConfirm = (): void => {
-    // ToDo (kk:10/13/2023) add a function for the confirmation
+    if (!isEqual(deckConfig, currentDeckConfig)) {
+      createDeckConfiguration(currentDeckConfig)
+    }
+    history.goBack()
   }
 
   const handleClickBack = (): void => {
-    // ToDo If there is any unsaved change, display DeckConfigurationDiscardChangesModal
-    // setShowDiscardChangeModal(true)
-    history.goBack()
+    if (!isEqual(deckConfig, currentDeckConfig)) {
+      setShowDiscardChangeModal(true)
+    } else {
+      history.goBack()
+    }
   }
 
   const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
@@ -80,6 +95,10 @@ export function DeckConfiguration(): JSX.Element {
     iconName: 'information',
     iconPlacement: 'startIcon',
   }
+
+  React.useEffect(() => {
+    setCurrentDeckConfig(deckConfig)
+  }, [deckConfig])
 
   return (
     <>
@@ -96,9 +115,10 @@ export function DeckConfiguration(): JSX.Element {
           />
         ) : null}
         {showConfigurationModal && targetFixtureLocation != null ? (
-          <AddDeckConfigurationModal
+          <AddFixtureModal
             fixtureLocation={targetFixtureLocation}
             setShowAddFixtureModal={setShowConfigurationModal}
+            setCurrentDeckConfig={setCurrentDeckConfig}
             isOnDevice
           />
         ) : null}
@@ -118,7 +138,7 @@ export function DeckConfiguration(): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
         >
           <DeckConfigurator
-            deckConfig={deckConfig}
+            deckConfig={currentDeckConfig}
             handleClickAdd={handleClickAdd}
             handleClickRemove={handleClickRemove}
           />

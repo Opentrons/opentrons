@@ -10,6 +10,8 @@ Your robot needs to attach a disposable tip to the pipette before it can aspirat
 
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
+.. _basic-tip-pickup:
+
 Picking Up a Tip
 ================
 
@@ -69,6 +71,8 @@ Finally, sum the tip count in the range::
         pipette.drop_tip()
 
 For a more advanced "real-world" example, review the :ref:`off-deck location protocol <off-deck-location>` on the :ref:`moving-labware` page. This example also uses a ``for`` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
+
+.. _pipette-drop-tip:
 
 Dropping a Tip
 ==============

@@ -11,7 +11,11 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
 } from '../../utils'
-import type { CurriedCommandCreator, CommandCreator } from '../../types'
+import type {
+  CommandCreatorError,
+  CurriedCommandCreator,
+  CommandCreator,
+} from '../../types'
 interface PickUpTipArgs {
   pipette: string
   tiprack: string
@@ -23,6 +27,20 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
+  const errors: CommandCreatorError[] = []
+  const tiprackSlot = prevRobotState.labware[args.tiprack].slot
+  const pipetteName = invariantContext.pipetteEntities[args.pipette].name
+  const adapterId =
+    invariantContext.labwareEntities[tiprackSlot] != null
+      ? invariantContext.labwareEntities[tiprackSlot]
+      : null
+  if (adapterId == null && pipetteName === 'p1000_96') {
+    errors.push(errorCreators.missingAdapter())
+  }
+
+  if (errors.length > 0) {
+    return { errors }
+  }
   return {
     commands: [
       {
@@ -55,12 +73,14 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
 ) => {
   const { pipette, dropTipLocation } = args
   const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
+
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
       errors: [errorCreators.insufficientTips()],
     }
   }
+
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??

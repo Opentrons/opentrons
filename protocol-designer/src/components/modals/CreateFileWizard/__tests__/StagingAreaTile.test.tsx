@@ -54,7 +54,7 @@ describe('StagingAreaTile', () => {
   it('renders header and deck configurator', () => {
     props.values.fields.robotType = FLEX_ROBOT_TYPE
     const { getByText } = render(props)
-    getByText('Staging areas')
+    getByText('Staging area slots')
     getByText('mock deck configurator')
   })
 })

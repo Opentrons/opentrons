@@ -89,7 +89,7 @@
     "robot_type": "Robot Type",
     "upload_tiprack": "Upload a custom tiprack to select its definition",
     "upload": "Upload",
-    "staging_areas": "Staging areas"
+    "staging_areas": "Staging area slots"
   },
   "well_order": {
     "title": "Well Order",

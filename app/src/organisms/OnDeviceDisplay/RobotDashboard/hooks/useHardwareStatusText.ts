@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
 export function useHardwareStatusText(

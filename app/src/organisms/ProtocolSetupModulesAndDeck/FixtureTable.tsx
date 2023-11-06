@@ -27,22 +27,29 @@ import {
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
-import { useFeatureFlag } from '../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
+  Cutout,
+  FixtureLoadName,
   LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface FixtureTableProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
+  setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  setFixtureLocation: (fixtureLocation: Cutout) => void
+  setProvidedFixtureOptions: (providedFixtureOptions: FixtureLoadName[]) => void
 }
 
 export function FixtureTable({
   mostRecentAnalysis,
+  setSetupScreen,
+  setFixtureLocation,
+  setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
     id: 'stubbed_load_fixture',
     commandType: 'loadFixture',
@@ -63,7 +70,7 @@ export function FixtureTable({
   ] = React.useState<boolean>(false)
 
   const requiredFixtureDetails =
-    enableDeckConfig && mostRecentAnalysis?.commands != null
+    mostRecentAnalysis?.commands != null
       ? [
           // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
           STUBBED_LOAD_FIXTURE,
@@ -113,7 +120,14 @@ export function FixtureTable({
               <Icon name="more" size="3rem" />
             </>
           )
-          handleClick = () => setShowLocationConflictModal(true)
+          handleClick =
+            configurationStatus === CONFLICTING
+              ? () => setShowLocationConflictModal(true)
+              : () => {
+                  setFixtureLocation(fixture.params.location.cutout)
+                  setProvidedFixtureOptions([fixture.params.loadName])
+                  setSetupScreen('deck configuration')
+                }
         } else if (configurationStatus === CONFIGURED) {
           chipLabel = (
             <Chip
@@ -132,7 +146,7 @@ export function FixtureTable({
         }
 
         return (
-          <>
+          <React.Fragment key={fixture.id}>
             {showLocationConflictModal ? (
               <LocationConflictModal
                 onCloseClick={() => setShowLocationConflictModal(false)}
@@ -172,7 +186,7 @@ export function FixtureTable({
                 {chipLabel}
               </Flex>
             </Flex>
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>

@@ -4,21 +4,19 @@ import reduce from 'lodash/reduce'
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
-  ModuleModel,
-  PipetteName,
   Liquid,
-  LoadedPipette,
   LoadedLabware,
   LoadedModule,
-} from '@opentrons/shared-data'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
-import type {
+  LoadedPipette,
+  LoadFixtureRunTimeCommand,
   LoadLabwareRunTimeCommand,
+  LoadLiquidRunTimeCommand,
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
-  LoadLiquidRunTimeCommand,
-  LoadFixtureRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  ModuleModel,
+  PipetteName,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 interface PipetteNamesByMount {
   left: PipetteName | null
@@ -132,7 +130,7 @@ export function parseInitialLoadedLabwareBySlot(
   )
 }
 
-interface LoadedLabwareByAdapter {
+export interface LoadedLabwareByAdapter {
   [labwareId: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareByAdapter(

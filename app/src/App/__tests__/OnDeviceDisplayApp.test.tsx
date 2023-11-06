@@ -22,7 +22,7 @@ import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { EmergencyStop } from '../../pages/EmergencyStop'
-import { DeckConfiguration } from '../../pages/DeckConfiguration'
+import { DeckConfigurationEditor } from '../../pages/DeckConfiguration'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
 import { getLocalRobot } from '../../redux/discovery'
@@ -102,8 +102,8 @@ const mockNameRobot = NameRobot as jest.MockedFunction<typeof NameRobot>
 const mockEmergencyStop = EmergencyStop as jest.MockedFunction<
   typeof EmergencyStop
 >
-const mockDeckConfiguration = DeckConfiguration as jest.MockedFunction<
-  typeof DeckConfiguration
+const mockDeckConfigurationEditor = DeckConfigurationEditor as jest.MockedFunction<
+  typeof DeckConfigurationEditor
 >
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings
@@ -154,7 +154,9 @@ describe('OnDeviceDisplayApp', () => {
     mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
     mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
     mockEmergencyStop.mockReturnValue(<div>Mock EmergencyStop</div>)
-    mockDeckConfiguration.mockReturnValue(<div>Mock DeckConfiguration</div>)
+    mockDeckConfigurationEditor.mockReturnValue(
+      <div>Mock DeckConfiguration</div>
+    )
     mockUseCurrentRunRoute.mockReturnValue(null)
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
   })

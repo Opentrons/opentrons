@@ -144,7 +144,6 @@ export function MoveLabwareInterventionContent({
     movedLabwareDefUri != null
       ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
       : null
-
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
     <Flex
@@ -202,9 +201,17 @@ export function MoveLabwareInterventionContent({
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(
-                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                    ({
+                      x,
+                      y,
+                      moduleId,
+                      moduleDef,
+                      nestedLabwareDef,
+                      nestedLabwareId,
+                    }) => (
                       <Module key={moduleId} def={moduleDef} x={x} y={y}>
-                        {nestedLabwareDef != null ? (
+                        {nestedLabwareDef != null &&
+                        nestedLabwareId !== command.params.labwareId ? (
                           <LabwareRender definition={nestedLabwareDef} />
                         ) : null}
                       </Module>
@@ -214,7 +221,10 @@ export function MoveLabwareInterventionContent({
                     .filter(l => l.labwareId !== command.params.labwareId)
                     .map(({ x, y, labwareDef, labwareId }) => (
                       <g key={labwareId} transform={`translate(${x},${y})`}>
-                        <LabwareRender definition={labwareDef} />
+                        {labwareDef != null &&
+                        labwareId !== command.params.labwareId ? (
+                          <LabwareRender definition={labwareDef} />
+                        ) : null}
                       </g>
                     ))}
                 </>

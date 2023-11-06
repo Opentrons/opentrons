@@ -31,16 +31,17 @@ export function renderWithProviders<State>(
   const ProviderWrapper: React.ComponentType<React.PropsWithChildren<{}>> = ({
     children,
   }) => {
+    const BaseWrapper = (
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>{children}</Provider>
+      </QueryClientProvider>
+    )
     if (i18nInstance != null) {
       return (
-        <I18nextProvider i18n={i18nInstance}>
-          <QueryClientProvider client={queryClient}>
-            <Provider store={store}>{children}</Provider>
-          </QueryClientProvider>
-        </I18nextProvider>
+        <I18nextProvider i18n={i18nInstance}>{BaseWrapper}</I18nextProvider>
       )
     } else {
-      return <Provider store={store}>{children}</Provider>
+      return BaseWrapper
     }
   }
 

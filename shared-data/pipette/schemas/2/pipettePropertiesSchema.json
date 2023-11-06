@@ -180,6 +180,18 @@
       "type": "string",
       "description": "Display name of the pipette include model and generation number in readable format."
     },
+    "tipPresenceCheckDistanceMM": {
+      "type": "string",
+      "description": "The distance to move the gear motors down to check tip presence status."
+    },
+    "connectTiprackDistanceMM": {
+      "type": "string",
+      "description": "The distance to move the z stage down to connect with the tiprack before clamping."
+    },
+    "endTipActionRetractDistanceMM": {
+      "type": "string",
+      "description": "The distance to move the z stage up after a tip pickup or dropoff."
+    },
     "model": {
       "type": "string",
       "description": "the model of the pipette, for example an eightChannel pipette"

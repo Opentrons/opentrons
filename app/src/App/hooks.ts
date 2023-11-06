@@ -5,7 +5,7 @@ import { useQueryClient } from 'react-query'
 import { useRouteMatch } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
-import { useInterval } from '@opentrons/components'
+import { useInterval, truncateString } from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
   useAllRunsQuery,
@@ -26,7 +26,7 @@ import {
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '../redux/types'
 
 const CURRENT_RUN_POLL = 5000
@@ -91,12 +91,13 @@ export function useProtocolReceiptToast(): void {
           protocolNames.forEach(name => {
             makeToast(
               t('protocol_added', {
-                protocol_name: name,
+                protocol_name: truncateString(name, 30),
               }),
               'success',
               {
                 closeButton: true,
                 disableTimeout: true,
+                displayType: 'odd',
               }
             )
           })

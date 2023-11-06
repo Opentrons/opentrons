@@ -1,23 +1,23 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import {
+  FLEX_ROBOT_TYPE,
+  PrepareToAspirateRunTimeCommand,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
 
-import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/gantry'
 import type {
   BlowoutRunTimeCommand,
-  DispenseRunTimeCommand,
   ConfigureForVolumeRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
-import type {
+  DispenseRunTimeCommand,
+  DropTipRunTimeCommand,
+  LabwareDefinition2,
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import {
-  LabwareDefinition2,
+  MoveToWellRunTimeCommand,
   RunTimeCommand,
-  DropTipRunTimeCommand,
 } from '@opentrons/shared-data'
 
 describe('CommandText', () => {
@@ -30,6 +30,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
@@ -48,6 +49,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
@@ -73,6 +75,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={pushOutDispenseCommand}
         />,
         { i18nInstance: i18n }
@@ -95,6 +98,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={blowoutCommand}
         />,
         { i18nInstance: i18n }
@@ -117,6 +121,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={moveToWellCommand}
         />,
         { i18nInstance: i18n }
@@ -136,11 +141,30 @@ describe('CommandText', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
         command={command}
       />,
       { i18nInstance: i18n }
     )[0]
     getByText('Configure P300 Single-Channel GEN1 to aspirate 1 µL')
+  })
+  it('renders correct text for prepareToAspirate', () => {
+    const command = {
+      commandType: 'prepareToAspirate',
+      params: {
+        pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+      },
+    } as PrepareToAspirateRunTimeCommand
+
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={command}
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Preparing P300 Single-Channel GEN1 to aspirate')
   })
   it('renders correct text for dropTip', () => {
     const command = mockRobotSideAnalysis.commands.find(
@@ -151,6 +175,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
@@ -162,6 +187,7 @@ describe('CommandText', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
         command={
           {
             commandType: 'dropTip',
@@ -187,6 +213,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
@@ -205,6 +232,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
@@ -221,6 +249,7 @@ describe('CommandText', () => {
       const { getByText } = renderWithProviders(
         <CommandText
           robotSideAnalysis={mockRobotSideAnalysis}
+          robotType={FLEX_ROBOT_TYPE}
           command={command}
         />,
         { i18nInstance: i18n }
@@ -236,6 +265,7 @@ describe('CommandText', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
         command={loadLabwareCommand}
       />,
       { i18nInstance: i18n }
@@ -250,6 +280,7 @@ describe('CommandText', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
         command={loadTipRackCommand}
       />,
       { i18nInstance: i18n }
@@ -264,6 +295,7 @@ describe('CommandText', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
         command={loadOnModuleCommand}
       />,
       { i18nInstance: i18n }
@@ -301,6 +333,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -324,6 +357,7 @@ describe('CommandText', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
         command={loadOffDeckCommand}
       />,
       { i18nInstance: i18n }
@@ -364,6 +398,7 @@ describe('CommandText', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={analysisWithLiquids}
+        robotType={FLEX_ROBOT_TYPE}
         command={loadLiquidCommand}
       />,
       { i18nInstance: i18n }
@@ -386,6 +421,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -409,6 +445,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -431,6 +468,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -454,6 +492,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -479,6 +518,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -502,6 +542,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -528,6 +569,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -554,6 +596,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -578,6 +621,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -600,6 +644,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -622,6 +667,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -674,6 +720,7 @@ describe('CommandText', () => {
               } as RunTimeCommand
             }
             robotSideAnalysis={mockRobotSideAnalysis}
+            robotType={FLEX_ROBOT_TYPE}
           />,
           {
             i18nInstance: i18n,
@@ -699,6 +746,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -721,6 +769,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -743,6 +792,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -765,6 +815,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -787,6 +838,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -809,6 +861,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -831,6 +884,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -853,6 +907,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -875,6 +930,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -901,6 +957,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -929,6 +986,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -957,6 +1015,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -985,6 +1044,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,
@@ -1013,6 +1073,7 @@ describe('CommandText', () => {
           completedAt: null,
         }}
         robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
       />,
       {
         i18nInstance: i18n,

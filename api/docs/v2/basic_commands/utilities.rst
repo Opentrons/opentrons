@@ -34,6 +34,8 @@ Call the :py:meth:`.ProtocolContext.pause` method to stop a protocol at a specif
 
 .. versionadded:: 2.0
 
+.. _utility-homing:
+
 Homing
 ======
 

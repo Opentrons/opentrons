@@ -4,7 +4,6 @@ import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
-import { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 import { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,
@@ -13,7 +12,8 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-import { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
+import type { CreateCommand } from '@opentrons/shared-data'
+import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
@@ -147,7 +147,6 @@ export const substepTimelineMultiChannel = (
         const wellsForTips =
           channels &&
           labwareDef &&
-          // @ts-expect-error 96 channels not yet supported
           getWellsForTips(channels, labwareDef, wellName).wellsForTips
         const wellInfo = {
           labwareId,

@@ -18,11 +18,15 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.types import Point, DeckSlotName
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
+
+from ..._waste_chute import WasteChute
+from ... import _waste_chute_dimensions
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -373,6 +377,56 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
+    def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
+        self._engine_client.drop_tip_in_place(
+            pipette_id=self._pipette_id,
+            home_after=home_after,
+        )
+
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        # TODO: Can we get away with implementing this in two steps like this,
+        # or does drop_tip() need to take the waste chute location because the z-height
+        # depends on the intent of dropping tip? How would Protocol Designer want to implement
+        # this?
+        self._move_to_waste_chute(
+            waste_chute,
+            force_direct=False,
+            speed=None,
+        )
+        self._drop_tip_in_place(home_after=home_after)
+
+    def _move_to_waste_chute(
+        self,
+        waste_chute: WasteChute,
+        force_direct: bool,
+        speed: Optional[float],
+    ) -> None:
+        if self.get_channels() == 96:
+            slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_96_TIP_A1
+        else:
+            slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
+
+        # TODO: All of this logic to compute the destination coordinate belongs in Protocol Engine.
+        slot_d3 = self._protocol_core.get_slot_definition(DeckSlotName.SLOT_D3)
+        slot_d3_origin = Point(*slot_d3["position"])
+        destination_point = slot_d3_origin + slot_origin_to_tip_a1
+
+        # Normally, we use a 10 mm margin. (DEFAULT_GENERAL_ARC_Z_MARGIN.) Unfortunately, with
+        # 1000µL tips, we have slightly not enough room to meet that margin. We can make the margin
+        # as big as 7.5 mm before the motion planner raises an error. So, use that reduced margin,
+        # with a little more subtracted in order to leave wiggle room for pipette calibration.
+        minimum_z = _waste_chute_dimensions.ENVELOPE_HEIGHT + 5.0
+
+        self.move_to(
+            Location(destination_point, labware=None),
+            well_core=None,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z,
+            speed=speed,
+        )
+
     def home(self) -> None:
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         plunger_axis = self._engine_client.state.pipettes.get_plunger_axis(
@@ -394,7 +448,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
-
         if well_core is not None:
             labware_id = well_core.labware_id
             well_name = well_core.get_name()
@@ -531,3 +584,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._engine_client.configure_for_volume(
             pipette_id=self._pipette_id, volume=volume
         )
+
+    def prepare_to_aspirate(self) -> None:
+        self._engine_client.prepare_to_aspirate(pipette_id=self._pipette_id)

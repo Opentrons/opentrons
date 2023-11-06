@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
   Flex,
   Icon,
+  Link,
   NewPrimaryBtn,
   NewSecondaryBtn,
   JUSTIFY_FLEX_END,
@@ -22,15 +23,204 @@ import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { ProgressBar } from '../../../../atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
-  clearRobotUpdateSession,
   startRobotUpdate,
+  clearRobotUpdateSession,
+  getRobotSessionIsManualFile,
 } from '../../../../redux/robot-update'
+import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
+import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
-import type { Dispatch } from '../../../../redux/types'
-import type { UpdateStep } from '.'
-import type { RobotUpdateAction } from '../../../../redux/robot-update/types'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import type { State } from '../../../../redux/types'
+import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
+import type { UpdateStep } from './useRobotUpdateInfo'
+
+const UPDATE_PROGRESS_BAR_STYLE = css`
+  margin-top: ${SPACING.spacing24};
+  margin-bottom: ${SPACING.spacing24};
+  border-radius: ${BORDERS.borderRadiusSize3};
+  background: ${COLORS.medGreyEnabled};
+  width: 17.12rem;
+`
+const UPDATE_TEXT_STYLE = css`
+  color: ${COLORS.darkGreyEnabled};
+  font-size: 0.8rem;
+`
+const TRY_RESTART_STYLE = css`
+  color: ${COLORS.blueEnabled};
+  font-size: 0.8rem;
+`
+const HIDDEN_CSS = css`
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+`
+
+interface RobotUpdateProgressModalProps {
+  robotName: string
+  session: RobotUpdateSession | null
+  closeUpdateBuildroot?: () => void
+}
+
+export function RobotUpdateProgressModal({
+  robotName,
+  session,
+  closeUpdateBuildroot,
+}: RobotUpdateProgressModalProps): JSX.Element {
+  const dispatch = useDispatch()
+  const { t } = useTranslation('device_settings')
+  const [showFileSelect, setShowFileSelect] = React.useState<boolean>(false)
+  const installFromFileRef = React.useRef<HTMLInputElement>(null)
+  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const manualFileUsedForUpdate = useSelector((state: State) =>
+    getRobotSessionIsManualFile(state)
+  )
+  const completeRobotUpdateHandler = (): void => {
+    if (closeUpdateBuildroot != null) closeUpdateBuildroot()
+  }
+  const reinstallUpdate = React.useCallback(() => {
+    dispatchStartRobotUpdate(robotName)
+  }, [robotName])
+
+  const { error } = session || { error: null }
+  const { updateStep, progressPercent } = useRobotUpdateInfo(session)
+  useStatusBarAnimation(error != null)
+  useCleanupRobotUpdateSessionOnDismount()
+
+  const handleFileSelect: React.ChangeEventHandler<HTMLInputElement> = event => {
+    const { files } = event.target
+    if (files?.length === 1) {
+      dispatch(startRobotUpdate(robotName, files[0].path))
+    }
+    setShowFileSelect(false)
+  }
+  React.useEffect(() => {
+    if (showFileSelect && installFromFileRef.current)
+      installFromFileRef.current.click()
+  }, [showFileSelect])
+
+  const hasStoppedUpdating = error || updateStep === 'finished'
+  const letUserExitUpdate = useAllowExitIfUpdateStalled(
+    updateStep,
+    progressPercent
+  )
+
+  let modalBodyText = t('installing_update')
+  let subProgressBarText = t('do_not_turn_off')
+  if (updateStep === 'restart') modalBodyText = t('restarting_robot')
+  if (updateStep === 'restart' && letUserExitUpdate) {
+    subProgressBarText = t('restart_taking_too_long', { robotName })
+  }
+
+  return (
+    <LegacyModal
+      title={`${t('updating')} ${robotName}`}
+      width="40rem"
+      textAlign="center"
+      onClose={
+        hasStoppedUpdating || letUserExitUpdate
+          ? completeRobotUpdateHandler
+          : undefined
+      }
+      footer={
+        hasStoppedUpdating ? (
+          <RobotUpdateProgressFooter
+            robotName={robotName}
+            installRobotUpdate={dispatchStartRobotUpdate}
+            errorMessage={error}
+            closeUpdateBuildroot={completeRobotUpdateHandler}
+          />
+        ) : null
+      }
+    >
+      {hasStoppedUpdating ? (
+        <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+          <SuccessOrError errorMessage={error} />
+        </Flex>
+      ) : (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          alignItems={ALIGN_CENTER}
+          padding={SPACING.spacing48}
+        >
+          <StyledText>{modalBodyText}</StyledText>
+          <ProgressBar
+            percentComplete={progressPercent}
+            outerStyles={UPDATE_PROGRESS_BAR_STYLE}
+          />
+          <StyledText css={UPDATE_TEXT_STYLE}>
+            {letUserExitUpdate && updateStep !== 'restart' ? (
+              <>
+                {t('problem_during_update')}{' '}
+                <Link
+                  css={TRY_RESTART_STYLE}
+                  onClick={
+                    !manualFileUsedForUpdate
+                      ? reinstallUpdate
+                      : () => setShowFileSelect(true)
+                  }
+                >
+                  {t('try_restarting_the_update')}
+                </Link>
+                {showFileSelect && (
+                  <input
+                    ref={installFromFileRef}
+                    type="file"
+                    onChange={handleFileSelect}
+                    css={HIDDEN_CSS}
+                  />
+                )}
+              </>
+            ) : (
+              subProgressBarText
+            )}
+          </StyledText>
+        </Flex>
+      )}
+    </LegacyModal>
+  )
+}
+
+interface RobotUpdateProgressFooterProps {
+  robotName: string
+  installRobotUpdate: (robotName: string) => void
+  errorMessage?: string | null
+  closeUpdateBuildroot?: () => void
+}
+
+function RobotUpdateProgressFooter({
+  robotName,
+  installRobotUpdate,
+  errorMessage,
+  closeUpdateBuildroot,
+}: RobotUpdateProgressFooterProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const installUpdate = React.useCallback(() => {
+    installRobotUpdate(robotName)
+  }, [robotName])
+
+  return (
+    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
+      {errorMessage && (
+        <NewSecondaryBtn
+          onClick={installUpdate}
+          marginRight={SPACING.spacing8}
+          css={FOOTER_BUTTON_STYLE}
+          border="none"
+        >
+          {t('try_again')}
+        </NewSecondaryBtn>
+      )}
+      <NewPrimaryBtn
+        onClick={closeUpdateBuildroot}
+        marginRight={SPACING.spacing12}
+        css={FOOTER_BUTTON_STYLE}
+      >
+        {t('exit')}
+      </NewPrimaryBtn>
+    </Flex>
+  )
+}
 
 interface SuccessOrErrorProps {
   errorMessage?: string | null
@@ -64,100 +254,55 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   )
 }
 
-interface RobotUpdateProgressFooterProps {
-  robotName: string
-  errorMessage?: string | null
-  closeUpdateBuildroot?: () => void
-}
+export const TIME_BEFORE_ALLOWING_EXIT_MS = 600000 // 10 mins
 
-function RobotUpdateProgressFooter({
-  robotName,
-  errorMessage,
-  closeUpdateBuildroot,
-}: RobotUpdateProgressFooterProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
-  const installUpdate = React.useCallback(() => {
-    dispatch(clearRobotUpdateSession())
-    dispatch(startRobotUpdate(robotName))
-  }, [robotName])
-
-  const { createLiveCommand } = useCreateLiveCommandMutation()
-  const idleCommand: SetStatusBarCreateCommand = {
-    commandType: 'setStatusBar',
-    params: { animation: 'idle' },
-  }
-
-  // Called if the update fails
-  const startIdleAnimationIfFailed = (): void => {
-    if (errorMessage) {
-      createLiveCommand({
-        command: idleCommand,
-        waitUntilComplete: false,
-      }).catch((e: Error) =>
-        console.warn(`cannot run status bar animation: ${e.message}`)
-      )
-    }
-  }
-
-  React.useEffect(startIdleAnimationIfFailed, [])
-
-  return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
-      {errorMessage && (
-        <NewSecondaryBtn
-          onClick={installUpdate}
-          marginRight={SPACING.spacing8}
-          css={FOOTER_BUTTON_STYLE}
-          border="none"
-        >
-          {t('try_again')}
-        </NewSecondaryBtn>
-      )}
-      <NewPrimaryBtn
-        onClick={closeUpdateBuildroot}
-        marginRight={SPACING.spacing12}
-        css={FOOTER_BUTTON_STYLE}
-      >
-        {t('exit')}
-      </NewPrimaryBtn>
-    </Flex>
+function useAllowExitIfUpdateStalled(
+  updateStep: UpdateStep,
+  progressPercent: number
+): boolean {
+  const [letUserExitUpdate, setLetUserExitUpdate] = React.useState<boolean>(
+    false
   )
+  const prevSeenUpdateProgress = React.useRef<number | null>(null)
+  const exitTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  React.useEffect(() => {
+    if (updateStep === 'initial' && prevSeenUpdateProgress.current !== null) {
+      prevSeenUpdateProgress.current = null
+    } else if (updateStep === 'finished' && exitTimeoutRef.current) {
+      clearTimeout(exitTimeoutRef.current)
+      setLetUserExitUpdate(false)
+    } else if (progressPercent !== prevSeenUpdateProgress.current) {
+      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current)
+      exitTimeoutRef.current = setTimeout(() => {
+        setLetUserExitUpdate(true)
+      }, TIME_BEFORE_ALLOWING_EXIT_MS)
+
+      prevSeenUpdateProgress.current = progressPercent
+      setLetUserExitUpdate(false)
+    }
+  }, [progressPercent, updateStep])
+
+  React.useEffect(() => {
+    return () => {
+      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current)
+    }
+  }, [])
+
+  return letUserExitUpdate
 }
 
-interface RobotUpdateProgressModalProps {
-  robotName: string
-  updateStep: UpdateStep
-  stepProgress: number | null
-  error?: string | null
-  closeUpdateBuildroot?: () => void
-}
-
-export function RobotUpdateProgressModal({
-  robotName,
-  updateStep,
-  stepProgress,
-  error,
-  closeUpdateBuildroot,
-}: RobotUpdateProgressModalProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch()
-  const progressPercent = React.useRef<number>(0)
-  const [previousUpdateStep, setPreviousUpdateStep] = React.useState<
-    string | null
-  >(null)
-  const completeRobotUpdateHandler = (): RobotUpdateAction => {
-    if (closeUpdateBuildroot != null) closeUpdateBuildroot()
-    return dispatch(clearRobotUpdateSession())
-  }
-
+function useStatusBarAnimation(isError: boolean): void {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const updatingCommand: SetStatusBarCreateCommand = {
     commandType: 'setStatusBar',
     params: { animation: 'updating' },
   }
+  const idleCommand: SetStatusBarCreateCommand = {
+    commandType: 'setStatusBar',
+    params: { animation: 'idle' },
+  }
 
-  // Called when the first step of the update begins
   const startUpdatingAnimation = (): void => {
     createLiveCommand({
       command: updatingCommand,
@@ -167,83 +312,26 @@ export function RobotUpdateProgressModal({
     )
   }
 
-  let modalBodyText = t('installing_update')
-  if (updateStep === 'restart') modalBodyText = t('restarting_robot')
-
-  // Make sure to start the animation when this modal first pops up
-  React.useEffect(startUpdatingAnimation, [])
-
-  // Account for update methods that do not require download & decreasing percent oddities.
-  React.useEffect(() => {
-    const explicitStepProgress = stepProgress || 0
-    if (previousUpdateStep === null) {
-      if (updateStep === 'install')
-        progressPercent.current = Math.max(
-          progressPercent.current,
-          explicitStepProgress
-        )
-      else if (updateStep === 'download') {
-        progressPercent.current = Math.max(
-          progressPercent.current,
-          Math.floor(explicitStepProgress / 2)
-        )
-        if (progressPercent.current === 50) setPreviousUpdateStep('download')
-      } else progressPercent.current = 100
-    } else {
-      progressPercent.current = Math.max(
-        progressPercent.current,
-        50 + Math.floor(explicitStepProgress / 2)
+  const startIdleAnimationIfFailed = (): void => {
+    if (isError) {
+      createLiveCommand({
+        command: idleCommand,
+        waitUntilComplete: false,
+      }).catch((e: Error) =>
+        console.warn(`cannot run status bar animation: ${e.message}`)
       )
     }
-  }, [updateStep, stepProgress, previousUpdateStep])
+  }
 
-  const completedUpdating = error || updateStep === 'finished'
+  React.useEffect(startUpdatingAnimation, [])
+  React.useEffect(startIdleAnimationIfFailed, [isError])
+}
 
-  const UPDATE_PROGRESS_BAR_STYLE = css`
-    margin-top: ${SPACING.spacing24};
-    margin-bottom: ${SPACING.spacing24};
-    border-radius: ${BORDERS.borderRadiusSize3};
-    background: ${COLORS.medGreyEnabled};
-  `
-  const dontTurnOffMessage = css`
-    color: ${COLORS.darkGreyEnabled};
-  `
-
-  return (
-    <LegacyModal
-      title={`${t('updating')} ${robotName}`}
-      width="40rem"
-      onClose={completedUpdating ? completeRobotUpdateHandler : undefined}
-      footer={
-        completedUpdating ? (
-          <RobotUpdateProgressFooter
-            robotName={robotName}
-            errorMessage={error}
-            closeUpdateBuildroot={completeRobotUpdateHandler}
-          />
-        ) : null
-      }
-    >
-      {completedUpdating ? (
-        <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
-          <SuccessOrError errorMessage={error} />
-        </Flex>
-      ) : (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_CENTER}
-          padding={SPACING.spacing48}
-        >
-          <StyledText>{modalBodyText}</StyledText>
-          <ProgressBar
-            percentComplete={progressPercent.current}
-            outerStyles={UPDATE_PROGRESS_BAR_STYLE}
-          />
-          <StyledText css={dontTurnOffMessage}>
-            {t('do_not_turn_off')}
-          </StyledText>
-        </Flex>
-      )}
-    </LegacyModal>
-  )
+function useCleanupRobotUpdateSessionOnDismount(): void {
+  const dispatch = useDispatch()
+  React.useEffect(() => {
+    return () => {
+      dispatch(clearRobotUpdateSession())
+    }
+  }, [])
 }

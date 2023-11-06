@@ -1,0 +1,651 @@
+test_name: Upload and analyze a JSONv8 protocol
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload simple v8 protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: '../shared-data/protocol/fixtures/8/simpleV8.json'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: json
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+  - name: Retry until analyses status is completed.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{protocol_id}'
+            analysisSummaries:
+              - id: '{analysis_id}'
+                status: completed
+  - name: Get protocol by ID
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          id: '{protocol_id}'
+          createdAt: !anystr
+          files:
+            - name: simpleV8.json
+              role: main
+          protocolType: json
+          robotType: OT-2 Standard
+          metadata:
+            tags:
+              - unitTest
+            created: !anyint
+            description: A short test protocol
+            author: engineering <engineering@opentrons.com>
+            protocolName: Simple test protocol
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+        links: 
+          referencingRuns: []
+  - name: Get protocol analysis by ID
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        meta:
+          cursor: 0
+          totalLength: 1
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
+            pipettes:
+              - id: pipetteId
+                pipetteName: p10_single
+                mount: left
+            labware:
+              - id: sourcePlateId
+                loadName: armadillo_96_wellplate_200ul_pcr_full_skirt
+                definitionUri: opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
+                displayName: Source Plate
+                location:
+                  moduleId: temperatureModuleId
+              - id: destPlateId
+                loadName: armadillo_96_wellplate_200ul_pcr_full_skirt
+                definitionUri: opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
+                displayName: Sample Collection Plate
+                location:
+                  moduleId: magneticModuleId
+              - id: tipRackId
+                loadName: opentrons_96_tiprack_10ul
+                definitionUri: opentrons/opentrons_96_tiprack_10ul/1
+                displayName: Opentrons 96 Tip Rack 10 µL
+                location:
+                  slotName: '8'
+              - id: fixedTrash
+                loadName: opentrons_1_trash_1100ml_fixed
+                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                displayName: Trash
+                location:
+                  slotName: '12'
+            modules:
+              - id: magneticModuleId
+                serialNumber: !anystr
+                model: magneticModuleV2
+                location:
+                  slotName: '3'
+              - id: temperatureModuleId
+                serialNumber: !anystr
+                model: temperatureModuleV2
+                location:
+                  slotName: '1'
+            commands:
+              # Initial home
+              - id: !anystr
+                createdAt: !anystr
+                commandType: home
+                key: !anystr
+                status: succeeded
+                params: { }
+                result: { }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadPipette
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteName: p10_single
+                  mount: left
+                  pipetteId: pipetteId
+                result:
+                  pipetteId: pipetteId
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadModule
+                key: !anystr
+                status: succeeded
+                params:
+                  model: magneticModuleV2
+                  location:
+                    slotName: '3'
+                  moduleId: magneticModuleId
+                result:
+                  moduleId: magneticModuleId
+                  definition: !anydict
+                  model: magneticModuleV2
+                  serialNumber: !anystr
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadModule
+                key: !anystr
+                status: succeeded
+                params:
+                  model: temperatureModuleV2
+                  location:
+                    slotName: '1'
+                  moduleId: temperatureModuleId
+                result:
+                  moduleId: temperatureModuleId
+                  definition: !anydict
+                  model: temperatureModuleV2
+                  serialNumber: !anystr
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadLabware
+                key: !anystr
+                status: succeeded
+                params:
+                  location:
+                    moduleId: temperatureModuleId
+                  loadName: armadillo_96_wellplate_200ul_pcr_full_skirt
+                  namespace: opentrons
+                  version: 1
+                  labwareId: sourcePlateId
+                  displayName: Source Plate
+                result:
+                  labwareId: sourcePlateId
+                  definition: !anydict
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadLabware
+                key: !anystr
+                status: succeeded
+                params:
+                  location:
+                    moduleId: magneticModuleId
+                  loadName: armadillo_96_wellplate_200ul_pcr_full_skirt
+                  namespace: opentrons
+                  version: 1
+                  labwareId: destPlateId
+                  displayName: Sample Collection Plate
+                result:
+                  labwareId: destPlateId
+                  definition: !anydict
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadLabware
+                key: !anystr
+                status: succeeded
+                params:
+                  location:
+                    slotName: '8'
+                  loadName: opentrons_96_tiprack_10ul
+                  namespace: opentrons
+                  version: 1
+                  labwareId: tipRackId
+                  displayName: Opentrons 96 Tip Rack 10 µL
+                result:
+                  labwareId: tipRackId
+                  definition: !anydict
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadLabware
+                key: !anystr
+                status: succeeded
+                params:
+                  location:
+                    slotName: '12'
+                  loadName: opentrons_1_trash_1100ml_fixed
+                  namespace: opentrons
+                  version: 1
+                  labwareId: fixedTrash
+                  displayName: Trash
+                result:
+                  labwareId: fixedTrash
+                  definition: !anydict
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadLiquid
+                key: !anystr
+                status: succeeded
+                params:
+                  liquidId: 'waterId'
+                  labwareId: 'sourcePlateId'
+                  volumeByWell:
+                    A1: 100.0
+                    B1: 100.0
+                result: {}
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: home
+                key: !anystr
+                status: succeeded
+                params: {}
+                result: {}
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: pickUpTip
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: tipRackId
+                  wellName: B1
+                  wellLocation:
+                    origin: top
+                    offset:
+                      x: 0
+                      y: 0
+                      z: 0
+                result:
+                  position: { 'x': 146.88, 'y': 246.24, 'z': 64.69 }
+                  tipVolume: 10.0
+                  tipLength: 35.910000000000004
+                  tipDiameter: 3.27
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: aspirate
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: sourcePlateId
+                  wellName: A1
+                  wellLocation:
+                    origin: bottom
+                    offset:
+                      x: 0.0
+                      y: 0.0
+                      z: 2.0
+                  volume: 5.0
+                  flowRate: 3.0
+                result:
+                  position: { 'x': 12.930000000000001, 'y': 74.08999999999999, 'z': 83.14 }
+                  volume: 5.0
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: waitForDuration
+                key: !anystr
+                status: succeeded
+                params:
+                  seconds: 42.0
+                result: {}
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: dispense
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: destPlateId
+                  wellName: B1
+                  wellLocation:
+                    origin: bottom
+                    offset:
+                      x: 0.0
+                      y: 0.0
+                      z: 1.0
+                  volume: 4.5
+                  flowRate: 2.5
+                result:
+                  position: { 'x': 280.805, 'y': 65.115, 'z': 84.3 }
+                  volume: 4.5
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: touchTip
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: destPlateId
+                  wellName: B1
+                  wellLocation:
+                    origin: bottom
+                    offset:
+                      x: 0.0
+                      y: 0.0
+                      z: 11.0
+                  radius: 1.0
+                result:
+                  position: { 'x': 280.805, 'y': 65.115, 'z': 94.3 }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: blowout
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: destPlateId
+                  wellName: B1
+                  wellLocation:
+                    origin: bottom
+                    offset:
+                      x: 0.0
+                      y: 0.0
+                      z: 12.0
+                  flowRate: 2.0
+                result:
+                  position: { 'x': 280.805, 'y': 65.115, 'z': 95.3 }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: moveToCoordinates
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  coordinates:
+                    x: 100.0
+                    y: 100.0
+                    z: 100.0
+                  forceDirect: false
+                result:
+                  position: {'x': 100.0, 'y': 100.0, 'z': 100.0}
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: moveToWell
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: destPlateId
+                  wellName: B2
+                  wellLocation:
+                    origin: top
+                    offset:
+                      x: 0
+                      y: 0
+                      z: 0
+                  forceDirect: false
+                result:
+                  position:
+                    { 'x': 289.805, 'y': 65.115, 'z': 98.25 }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: moveToWell
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: destPlateId
+                  wellName: B2
+                  wellLocation:
+                    origin: bottom
+                    offset:
+                      x: 2.0
+                      y: 3.0
+                      z: 10.0
+                  minimumZHeight: 35.0
+                  forceDirect: true
+                result:
+                  position:
+                    { 'x': 291.805, 'y': 68.115, 'z': 93.3 }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: dropTip
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  labwareId: fixedTrash
+                  wellName: A1
+                  wellLocation:
+                    origin: default
+                    offset:
+                      x: 0
+                      y: 0
+                      z: 0
+                  alternateDropLocation: false
+                result:
+                  position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: waitForResume
+                key: !anystr
+                status: succeeded
+                params:
+                  message: pause command
+                result: {}
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: moveToCoordinates
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  coordinates:
+                    x: 0.0
+                    y: 0.0
+                    z: 0.0
+                  minimumZHeight: 35.0
+                  forceDirect: true
+                result:
+                  position: { 'x': 0.0, 'y': 0.0, 'z': 0.0 }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: moveRelative
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  axis: x
+                  distance: 1.0
+                result:
+                  position:
+                    x: !anyfloat
+                    y: !anyfloat
+                    z: !anyfloat
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: moveRelative
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  axis: y
+                  distance: 0.1
+                result:
+                  position:
+                    x: !anyfloat
+                    y: !anyfloat
+                    z: !anyfloat
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: savePosition
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                result:
+                  positionId: !anystr
+                  position:
+                    x: !anyfloat
+                    y: !anyfloat
+                    z: !anyfloat
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: moveRelative
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  axis: z
+                  distance: 10.0
+                result:
+                  position:
+                    x: !anyfloat
+                    y: !anyfloat
+                    z: !anyfloat
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: savePosition
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  positionId: positionId
+                result:
+                  positionId: positionId
+                  position:
+                    x: !anyfloat
+                    y: !anyfloat
+                    z: !anyfloat
+                startedAt: !anystr
+                completedAt: !anystr
+            errors: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'
+
+---
+test_name: Upload and analyze a JSONv8 protocol, with liquids
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload simple v8 protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: '../shared-data/protocol/fixtures/8/simpleV8.json'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: json
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+  - name: Retry until analyses status is completed.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{protocol_id}'
+            analysisSummaries:
+              - id: '{analysis_id}'
+                status: completed
+  - name: Get protocol analysis by ID
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
+            errors: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'

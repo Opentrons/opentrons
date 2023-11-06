@@ -1,7 +1,7 @@
 {
   "additional_equipment_display_names": {
     "gripper": "Flex Gripper",
-    "stagingAreas": "Staging Areas",
+    "stagingAreas": "Staging Area Slots",
     "trashBin": "Trash Bin",
     "wasteChute": "Waste Chute"
   },

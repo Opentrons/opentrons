@@ -11,7 +11,7 @@ interface SingleSlotFixtureProps extends React.SVGProps<SVGGElement> {
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
   slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
-  showExtensions?: boolean
+  showExpansion?: boolean
 }
 
 export function SingleSlotFixture(
@@ -22,7 +22,7 @@ export function SingleSlotFixture(
     deckDefinition,
     fixtureBaseColor,
     slotClipColor,
-    showExtensions,
+    showExpansion = false,
     ...restProps
   } = props
 
@@ -42,7 +42,7 @@ export function SingleSlotFixture(
   } = {
     A1: (
       <>
-        {showExtensions ? (
+        {showExpansion ? (
           <SlotBase
             fill={fixtureBaseColor}
             d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"

@@ -71,6 +71,7 @@ const LABWARE_RENDER_INFO = {
     x: SLOT_2_COORDS[0],
     y: SLOT_2_COORDS[1],
     z: SLOT_2_COORDS[2],
+    slotName: '2',
   },
   // slot 3 has temp mod
   // slot 4
@@ -80,6 +81,7 @@ const LABWARE_RENDER_INFO = {
     x: SLOT_4_COORDS[0],
     y: SLOT_4_COORDS[1],
     z: SLOT_4_COORDS[2],
+    slotName: '4',
   },
   // slot 5
   [CORNING_24_WELLPLATE_2_ID]: {
@@ -88,6 +90,7 @@ const LABWARE_RENDER_INFO = {
     x: SLOT_5_COORDS[0],
     y: SLOT_5_COORDS[1],
     z: SLOT_5_COORDS[2],
+    slotName: '5',
   },
   // slot 6
   [CORNING_24_WELLPLATE_1_ID]: {
@@ -96,6 +99,7 @@ const LABWARE_RENDER_INFO = {
     x: SLOT_6_COORDS[0],
     y: SLOT_6_COORDS[1],
     z: SLOT_6_COORDS[2],
+    slotName: '6',
   },
   // slot 7 has TC
   // slot 9
@@ -105,6 +109,7 @@ const LABWARE_RENDER_INFO = {
     x: SLOT_9_COORDS[0],
     y: SLOT_9_COORDS[1],
     z: SLOT_9_COORDS[2],
+    slotName: '9',
   },
   // slot 10
   abc123: {
@@ -113,6 +118,7 @@ const LABWARE_RENDER_INFO = {
     x: SLOT_10_COORDS[0],
     y: SLOT_10_COORDS[1],
     z: SLOT_10_COORDS[2],
+    slotName: '10',
   },
 }
 

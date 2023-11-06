@@ -426,14 +426,19 @@ def test_parse_python_details(
     assert parsed.text == protocol_source
     assert isinstance(parsed.text, str)
 
-    fname = filename if filename is not None else "<protocol>"
-
-    assert parsed.filename == fname
+    assert parsed.filename == filename
+    assert parsed.contents.co_filename == (
+        filename if filename is not None else "<protocol>"
+    )
 
     assert parsed.api_level == expected_api_level
     assert expected_robot_type == expected_robot_type
     assert parsed.metadata == expected_metadata
-    assert parsed.contents == compile(protocol_source, filename=fname, mode="exec")
+    assert parsed.contents == compile(
+        protocol_source,
+        filename="<Python ignores this filename in this comparison>",
+        mode="exec",
+    )
 
 
 @pytest.mark.parametrize(
@@ -481,7 +486,7 @@ def test_parse_bundle_details(get_bundle_fixture: Callable[..., Any]) -> None:
     parsed = parse(fixture["binary_zipfile"], filename)
 
     assert isinstance(parsed, PythonProtocol)
-    assert parsed.filename == "protocol.ot2.py"
+    assert parsed.filename == filename
     assert parsed.bundled_labware == fixture["bundled_labware"]
     assert parsed.bundled_python == fixture["bundled_python"]
     assert parsed.bundled_data == fixture["bundled_data"]

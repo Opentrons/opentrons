@@ -4,13 +4,13 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from './getModuleInitialLoadInfo'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import type {
+  CompletedProtocolAnalysis,
   DeckDefinition,
   LabwareDefinition2,
+  LoadLabwareRunTimeCommand,
   ModuleDefinition,
   ProtocolAnalysisOutput,
-  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 
 export interface ProtocolModuleInfo {

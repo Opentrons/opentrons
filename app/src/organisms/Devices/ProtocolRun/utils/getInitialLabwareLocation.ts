@@ -1,9 +1,9 @@
 import { FIXED_TRASH_ID } from '@opentrons/shared-data/js'
-import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LoadLabwareRunTimeCommand,
   LabwareLocation,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export const getInitialLabwareLocation = (
   labwareId: string,

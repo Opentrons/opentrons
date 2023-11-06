@@ -4,10 +4,11 @@ import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { WASTE_CHUTE_LOAD_NAME } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
-import { useFeatureFlag } from '../../../../../redux/config'
 import {
+  useIsFlex,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
+  useModuleCalibrationStatus,
 } from '../../../hooks'
 import { SetupModuleAndDeck } from '../index'
 import { SetupModulesList } from '../SetupModulesList'
@@ -38,11 +39,15 @@ jest.mock('../SetupModulesMap')
 jest.mock('../SetupFixtureList')
 jest.mock('../../../../../redux/config')
 
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
+>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
 >
 const mockSetupModulesList = SetupModulesList as jest.MockedFunction<
   typeof SetupModulesList
@@ -52,9 +57,6 @@ const mockSetupFixtureList = SetupFixtureList as jest.MockedFunction<
 >
 const mockSetupModulesMap = SetupModulesMap as jest.MockedFunction<
   typeof SetupModulesMap
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
 >
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'
@@ -85,9 +87,10 @@ describe('SetupModuleAndDeck', () => {
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
+    when(mockUseModuleCalibrationStatus)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({ complete: true })
+    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(false)
   })
 
   it('renders the list and map view buttons', () => {
@@ -118,6 +121,17 @@ describe('SetupModuleAndDeck', () => {
     expect(button).toBeDisabled()
   })
 
+  it('should render a disabled Proceed to labware setup CTA if the protocol requests modules they are not all calibrated', () => {
+    when(mockUseModuleCalibrationStatus)
+      .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
+      .mockReturnValue({ complete: false })
+    const { getByRole } = render(props)
+    const button = getByRole('button', {
+      name: 'Proceed to labware position check',
+    })
+    expect(button).toBeDisabled()
+  })
+
   it('should render the SetupModulesList component when clicking List View', () => {
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'List View' })
@@ -125,10 +139,8 @@ describe('SetupModuleAndDeck', () => {
     getByText('Mock setup modules list')
   })
 
-  it('should render the SetupModulesList and SetupFixtureList component when clicking List View and ff is on', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
+  it('should render the SetupModulesList and SetupFixtureList component when clicking List View for Flex', () => {
+    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(true)
     props.loadedFixturesBySlot = mockLoadedFixturesBySlot
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'List View' })
