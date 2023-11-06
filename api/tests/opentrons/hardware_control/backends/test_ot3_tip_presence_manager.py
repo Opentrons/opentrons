@@ -58,7 +58,7 @@ def tip_detector_controller(
 
 @pytest.fixture
 async def subject(
-    can_messenger: can_bus.CanMessenger,
+    can_messenger: CanMessenger,
     tip_detector: TipDetector,
 ) -> AsyncIterator[TipPresenceManager]:
     """Build a test subject using decoyed can messenger and tip detector."""
