@@ -45,7 +45,11 @@ import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
-import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
+import {
+  useCurrentRunRoute,
+  useProtocolReceiptToast,
+  useSoftwareUpdatePoll,
+} from './hooks'
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
@@ -219,6 +223,7 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
 const TURN_OFF_BACKLIGHT = '7'
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  useSoftwareUpdatePoll()
   const { brightness: userSetBrightness, sleepMs } = useSelector(
     getOnDeviceDisplaySettings
   )
