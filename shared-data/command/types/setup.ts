@@ -39,19 +39,6 @@ export interface MoveLabwareRunTimeCommand
     MoveLabwareCreateCommand {
   result?: MoveLabwareResult
 }
-
-export interface MoveToAddressableAreaCreateCommand
-  extends CommonCommandCreateInfo {
-  commandType: 'moveToAddressableArea'
-  params: MoveToAddressableAreaParams
-}
-export interface MoveToAddressableAreaRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    MoveToAddressableAreaCreateCommand {
-  //  TODO(jr, 11/3/23): add to result type
-  result?: {}
-}
-
 export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadModule'
   params: LoadModuleParams
@@ -91,7 +78,6 @@ export type SetupRunTimeCommand =
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
-  | MoveToAddressableAreaRunTimeCommand
 
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
@@ -100,7 +86,6 @@ export type SetupCreateCommand =
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
-  | MoveToAddressableAreaCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
@@ -152,13 +137,6 @@ interface MoveLabwareResult {
   offsetId: string
 }
 
-export interface MoveToAddressableAreaParams {
-  pipetteId: string
-  addressableAreaName: string
-  speed?: number
-  minimumZHeight?: number
-  forceDirect?: boolean
-}
 interface LoadModuleParams {
   moduleId?: string
   location: ModuleLocation
