@@ -36,10 +36,11 @@ import type {
 
 interface DeckThumbnailProps extends StyleProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
+  showSlotLabels?: boolean
 }
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
-  const { protocolAnalysis, ...styleProps } = props
+  const { protocolAnalysis, showSlotLabels = false, ...styleProps } = props
   const attachedModules = useAttachedModules()
   const [hoverLabwareId, setHoverLabwareId] = React.useState<string>('')
 
@@ -252,7 +253,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
           )
         }
       )}
-      <SlotLabels robotType={robotType} />
+      {showSlotLabels ? <SlotLabels robotType={robotType} /> : null}
     </BaseDeck>
   )
 }
