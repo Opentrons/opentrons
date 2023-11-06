@@ -4,13 +4,14 @@ import { COLUMN_4_SLOTS } from '../../constants'
 import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
-  getLabwareSlot,
-  reduceCommandCreators,
-  modulePipetteCollision,
-  uuid,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsTallLabwareWestOf96Channel,
+  getLabwareSlot,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  reduceCommandCreators,
+  uuid,
   wasteChuteCommandsUtil,
 } from '../../utils'
 import { dropTip } from './dropTip'
@@ -88,7 +89,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   if (
     nextTiprack == null &&
     channels === 96 &&
-    args.nozzles === 'full' &&
+    nozzles === 'full' &&
     hasMoreTipracksOnDeck
   ) {
     return {
@@ -97,7 +98,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   } else if (
     nextTiprack == null &&
     channels === 96 &&
-    args.nozzles === 'column' &&
+    nozzles === 'column' &&
     hasMoreTipracksOnDeck
   ) {
     return {
@@ -151,6 +152,26 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
+  if (
+    channels === 96 &&
+    nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      nextTiprack.tiprackId
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          labware:
+            invariantContext.labwareEntities[nextTiprack.tiprackId].def.metadata
+              .displayName,
+        }),
+      ],
+    }
+  }
+
   if (
     modulePipetteCollision({
       pipette,

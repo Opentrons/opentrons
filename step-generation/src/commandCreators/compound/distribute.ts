@@ -13,6 +13,7 @@ import {
   wasteChuteCommandsUtil,
   getDispenseAirGapLocation,
   getConfigureNozzleLayoutCommandReset,
+  getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import {
   aspirate,
@@ -51,6 +52,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
@@ -79,6 +82,42 @@ export const distribute: CommandCreator<DistributeArgs> = (
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.sourceLabware
+    )
+  ) {
+    errors.push(
+      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        labware:
+          invariantContext.labwareEntities[args.sourceLabware].def.metadata
+            .displayName,
+      })
+    )
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.destLabware
+    )
+  ) {
+    errors.push(
+      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        labware:
+          invariantContext.labwareEntities[args.destLabware].def.metadata
+            .displayName,
+      })
+    )
   }
 
   if (errors.length > 0)
@@ -404,9 +443,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
       const configureNozzleLayoutCommand: CurriedCommandCreator[] =
         //  only emit the command if previous nozzle state is different
-        invariantContext.pipetteEntities[args.pipette].name === 'p1000_96' &&
-        args.nozzles != null &&
-        nozzles !== prevNozzles
+        is96Channel && args.nozzles != null && nozzles !== prevNozzles
           ? [
               curryCommandCreator(configureNozzleLayout, {
                 nozzles: args.nozzles,

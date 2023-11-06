@@ -6,6 +6,7 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   getConfigureNozzleLayoutCommandReset,
+  getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {
@@ -121,6 +122,9 @@ export const mix: CommandCreator<MixArgs> = (
     dropTipLocation,
   } = data
 
+  const is96Channel =
+    invariantContext.pipetteEntities[pipette].spec.channels === 96
+
   // Errors
   if (
     !prevRobotState.pipettes[pipette] ||
@@ -154,13 +158,26 @@ export const mix: CommandCreator<MixArgs> = (
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
+
+  if (
+    is96Channel &&
+    data.nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(prevRobotState, invariantContext, labware)
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          labware:
+            invariantContext.labwareEntities[labware].def.metadata.displayName,
+        }),
+      ],
+    }
+  }
   const nozzles = prevRobotState.pipettes[pipette].nozzles
   const prevNozzles = prevRobotState.pipettes[pipette].prevNozzles
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
-    invariantContext.pipetteEntities[pipette].name === 'p1000_96' &&
-    data.nozzles != null &&
-    nozzles !== prevNozzles
+    is96Channel && data.nozzles != null && nozzles !== prevNozzles
       ? [
           curryCommandCreator(configureNozzleLayout, {
             nozzles: data.nozzles,

@@ -15,6 +15,7 @@ import {
   dispenseLocationHelper,
   moveHelper,
   getConfigureNozzleLayoutCommandReset,
+  getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import {
   aspirate,
@@ -53,6 +54,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   */
   const actionName = 'consolidate'
   const pipetteData = prevRobotState.pipettes[args.pipette]
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
 
   if (!pipetteData) {
     // bail out before doing anything else
@@ -79,6 +82,46 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.sourceLabware
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          labware:
+            invariantContext.labwareEntities[args.sourceLabware].def.metadata
+              .displayName,
+        }),
+      ],
+    }
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.destLabware
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          labware:
+            invariantContext.labwareEntities[args.destLabware].def.metadata
+              .displayName,
+        }),
+      ],
+    }
   }
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
@@ -419,9 +462,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
       const configureNozzleLayoutCommand: CurriedCommandCreator[] =
         //  only emit the command if previous nozzle state is different
-        invariantContext.pipetteEntities[args.pipette].name === 'p1000_96' &&
-        args.nozzles != null &&
-        nozzles !== prevNozzles
+        is96Channel && args.nozzles != null && nozzles !== prevNozzles
           ? [
               curryCommandCreator(configureNozzleLayout, {
                 nozzles: args.nozzles,

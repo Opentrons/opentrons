@@ -168,11 +168,12 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
-//  TODO(Jr, 11/3/23): plug this into pickUpTip and aspirate
-export const tallLabwareEastOf96ChannelPipetteLabware = (): CommandCreatorError => {
+export const tallLabwareWestOf96ChannelPipetteLabware = (args: {
+  labware: string
+}): CommandCreatorError => {
   return {
-    type: 'TALL_LABWARE_EAST_OF_96_CHANNEL_LABWARE',
-    message: `Labware over <MM> mm is left of the 96-channel's tiprack or labware`,
+    type: 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE',
+    message: `Labware to the left of the ${args.labware} is too tall and will collide with the 96-channel.`,
   }
 }
 

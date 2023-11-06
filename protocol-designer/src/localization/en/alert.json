@@ -171,10 +171,6 @@
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
         "title": "Remove 96-channel tip rack adapter",
         "body": "The tip rack cannot be placed in an adapter when pick up partial 96 tips."
-      },
-      "TALL_LABWARE_EAST_OF_96_CHANNEL_LABWARE": {
-        "title": "Labware to the left will collide with the 96-channel",
-        "body": "The labware to the left of the 96-channel is too tall. Please remove it in order to continue."
       }
     },
     "warning": {

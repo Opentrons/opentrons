@@ -15,6 +15,7 @@ import {
   dispenseLocationHelper,
   moveHelper,
   getConfigureNozzleLayoutCommandReset,
+  getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import {
   aspirate,
@@ -83,6 +84,8 @@ export const transfer: CommandCreator<TransferArgs> = (
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
 
   if (
     !prevRobotState.pipettes[args.pipette] ||
@@ -119,6 +122,43 @@ export const transfer: CommandCreator<TransferArgs> = (
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
+
+  if (
+    is96Channel &&
+    args.nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.sourceLabware
+    )
+  ) {
+    errors.push(
+      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        labware:
+          invariantContext.labwareEntities[args.sourceLabware].def.metadata
+            .displayName,
+      })
+    )
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === 'column' &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.destLabware
+    )
+  ) {
+    errors.push(
+      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        labware:
+          invariantContext.labwareEntities[args.destLabware].def.metadata
+            .displayName,
+      })
+    )
+  }
+
   if (errors.length > 0)
     return {
       errors,
@@ -231,10 +271,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
           const configureNozzleLayoutCommand: CurriedCommandCreator[] =
             //  only emit the command if previous nozzle state is different
-            invariantContext.pipetteEntities[args.pipette].name ===
-              'p1000_96' &&
-            args.nozzles != null &&
-            nozzles !== prevNozzles
+            is96Channel && args.nozzles != null && nozzles !== prevNozzles
               ? [
                   curryCommandCreator(configureNozzleLayout, {
                     nozzles: args.nozzles,
