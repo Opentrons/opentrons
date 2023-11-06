@@ -90,7 +90,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
-      args.sourceLabware
+      args.sourceLabware,
+      args.pipette
     )
   ) {
     errors.push(
@@ -108,7 +109,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
-      args.destLabware
+      args.destLabware,
+      args.pipette
     )
   ) {
     errors.push(

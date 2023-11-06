@@ -90,7 +90,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
-      args.sourceLabware
+      args.sourceLabware,
+      args.pipette
     )
   ) {
     return {
@@ -110,7 +111,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
-      args.destLabware
+      args.destLabware,
+      args.pipette
     )
   ) {
     return {

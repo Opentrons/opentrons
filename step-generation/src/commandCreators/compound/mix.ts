@@ -162,7 +162,12 @@ export const mix: CommandCreator<MixArgs> = (
   if (
     is96Channel &&
     data.nozzles === 'column' &&
-    getIsTallLabwareWestOf96Channel(prevRobotState, invariantContext, labware)
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      labware,
+      pipette
+    )
   ) {
     return {
       errors: [

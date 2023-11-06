@@ -1,14 +1,24 @@
 import { FLEX_TRASH_DEF_URI } from '../constants'
 import type { RobotState, InvariantContext } from '../types'
 
+const SAFETY_MARGIN = 10
+
 export const getIsTallLabwareWestOf96Channel = (
   robotState: RobotState,
   invariantContext: InvariantContext,
-  sourceLabwareId: string
+  sourceLabwareId: string,
+  pipetteId: string
 ): boolean => {
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
-  const { labware: labwareState } = robotState
-
+  const {
+    labwareEntities,
+    additionalEquipmentEntities,
+    pipetteEntities,
+  } = invariantContext
+  const { labware: labwareState, tipState } = robotState
+  const pipetteHasTip = tipState.pipettes[pipetteId]
+  const tipLength = pipetteHasTip
+    ? pipetteEntities[pipetteId].tiprackLabwareDef.parameters.tipLength ?? 0
+    : 0
   // early exit if source labware is the waste chute since there
   // are no collision warnings with the waste chute
   if (additionalEquipmentEntities[sourceLabwareId] != null) {
@@ -43,9 +53,10 @@ export const getIsTallLabwareWestOf96Channel = (
           labwareEntities[westLabwareId].def.dimensions.zDimension
         const sourceLabwareHeight =
           labwareEntities[sourceLabwareId].def.dimensions.zDimension
-        const heightDifferences = sourceLabwareHeight - westLabwareHeight
         //  TODO(jr, 11/6/23): update height differences when we know
-        return heightDifferences < 10
+        return (
+          westLabwareHeight > sourceLabwareHeight + tipLength - SAFETY_MARGIN
+        )
       }
     }
   }

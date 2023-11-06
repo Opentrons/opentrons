@@ -7,6 +7,7 @@ let robotState: RobotState
 
 const mockSourceId = 'sourceId'
 const mockWestId = 'westId'
+const mockPipetteId = 'pipetteId'
 const mockSourceDef: LabwareDefinition2 = {
   dimensions: { zDimension: 100 },
 } as any
@@ -15,6 +16,9 @@ const mockWestDef: LabwareDefinition2 = {
 } as any
 const mockWestDefTall: LabwareDefinition2 = {
   dimensions: { zDimension: 101 },
+} as any
+const mockTiprackDefinition: LabwareDefinition2 = {
+  parameters: { tipLength: 10 },
 } as any
 describe('getIsTallLabwareWestOf96Channel ', () => {
   beforeEach(() => {
@@ -29,13 +33,21 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
       additionalEquipmentEntities: {},
       moduleEntities: {},
       config: {} as any,
-      pipetteEntities: {},
+      pipetteEntities: {
+        [mockPipetteId]: {
+          name: 'p1000_96',
+          id: mockPipetteId,
+          tiprackDefURI: 'mockUri',
+          tiprackLabwareDef: mockTiprackDefinition,
+          spec: {} as any,
+        },
+      },
     }
     robotState = {
       labware: { [mockSourceId]: { slot: 'A1' } },
       pipettes: {},
       modules: {},
-      tipState: {} as any,
+      tipState: { pipettes: { [mockPipetteId]: false } } as any,
       liquidState: {} as any,
     }
   })
@@ -44,7 +56,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
       getIsTallLabwareWestOf96Channel(
         robotState,
         invariantContext,
-        mockSourceId
+        mockSourceId,
+        mockPipetteId
       )
     ).toBe(false)
   })
@@ -63,7 +76,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
       getIsTallLabwareWestOf96Channel(
         robotState,
         invariantContext,
-        mockSourceId
+        mockSourceId,
+        mockPipetteId
       )
     ).toBe(false)
   })
@@ -73,7 +87,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
       getIsTallLabwareWestOf96Channel(
         robotState,
         invariantContext,
-        mockSourceId
+        mockSourceId,
+        mockPipetteId
       )
     ).toBe(false)
   })
@@ -94,7 +109,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
       getIsTallLabwareWestOf96Channel(
         robotState,
         invariantContext,
-        mockSourceId
+        mockSourceId,
+        mockPipetteId
       )
     ).toBe(false)
   })
@@ -115,7 +131,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
       getIsTallLabwareWestOf96Channel(
         robotState,
         invariantContext,
-        mockSourceId
+        mockSourceId,
+        mockPipetteId
       )
     ).toBe(true)
   })

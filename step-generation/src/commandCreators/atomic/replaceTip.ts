@@ -158,7 +158,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
-      nextTiprack.tiprackId
+      nextTiprack.tiprackId,
+      pipette
     )
   ) {
     return {

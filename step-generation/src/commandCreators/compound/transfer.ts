@@ -129,7 +129,8 @@ export const transfer: CommandCreator<TransferArgs> = (
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
-      args.sourceLabware
+      args.sourceLabware,
+      args.pipette
     )
   ) {
     errors.push(
@@ -147,7 +148,8 @@ export const transfer: CommandCreator<TransferArgs> = (
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
-      args.destLabware
+      args.destLabware,
+      args.pipette
     )
   ) {
     errors.push(
