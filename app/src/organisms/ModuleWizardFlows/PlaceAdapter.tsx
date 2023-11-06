@@ -171,8 +171,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     )
   return (
     <GenericWizardTile
-      header={t('place_adapter', { module: moduleDisplayName })}
-      // TODO: swap this out with the right animation
+      header={t('install_adapter', { module: moduleDisplayName })}
       rightHandBody={placeAdapterVid}
       bodyText={bodyText}
       proceedButtonText={t('confirm_placement')}

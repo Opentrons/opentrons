@@ -14,6 +14,8 @@ import {
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
+import { OPENTRONS_USB } from '../../redux/discovery'
+import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
@@ -82,7 +84,13 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         })
       },
     },
-    selectedRobot != null ? { hostname: selectedRobot.ip } : null,
+    selectedRobot != null
+      ? {
+          hostname: selectedRobot.ip,
+          requestor:
+            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+        }
+      : null,
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
           vector,

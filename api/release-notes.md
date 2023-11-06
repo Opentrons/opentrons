@@ -4,6 +4,15 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+
+## Opentrons Robot Software Changes in 7.0.2
+
+The 7.0.2 hotfix release does not contain any changes to the robot software
+
+### Known Issues
+
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool
+
 ---
 
 ## Opentrons Robot Software Changes in 7.0.1

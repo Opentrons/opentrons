@@ -12,6 +12,7 @@
   "are_you_sure_you_want_to_disconnect": "Are you sure you want to disconnect from {{ssid}}?",
   "attach_a_pipette_before_calibrating": "Attach a pipette in order to perform calibration",
   "boot_scripts": "Boot scripts",
+  "both": "Both",
   "browse_file_system": "Browse file system",
   "bug_fixes": "Bug Fixes",
   "calibrate_deck": "Calibrate deck",
