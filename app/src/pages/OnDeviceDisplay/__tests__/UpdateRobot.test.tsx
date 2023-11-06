@@ -6,6 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
 import * as RobotUpdate from '../../../redux/robot-update'
+import type { RobotUpdateSession } from '../../../redux/robot-update/types'
 import { getLocalRobot } from '../../../redux/discovery'
 
 import { UpdateRobot } from '../UpdateRobot'
@@ -60,7 +61,7 @@ const mockRobot = {
   serverHealthStatus: null,
 } as any
 
-const mockSession = {
+const mockSession: RobotUpdateSession = {
   robotName: mockRobot.name,
   fileInfo: null,
   token: null,

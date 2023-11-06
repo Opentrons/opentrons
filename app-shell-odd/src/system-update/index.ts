@@ -353,9 +353,12 @@ export function getCachedSystemUpdateFiles(
 
 function getInfoFromUpdateSet(
   filepaths: ReleaseSetFilepaths
-): Promise<{ version: string; releaseNotes: string }> {
+): Promise<{ version: string; releaseNotes: string | null }> {
   const version = getLatestVersion()
-  return readFile(filepaths.releaseNotes, 'utf8')
+  const releaseNotesContentPromise = filepaths.releaseNotes
+    ? readFile(filepaths.releaseNotes, 'utf8')
+    : new Promise<string | null>(resolve => resolve(null))
+  return releaseNotesContentPromise
     .then(releaseNotes => ({
       version: version,
       releaseNotes,
@@ -365,7 +368,7 @@ function getInfoFromUpdateSet(
 
 function cacheUpdateSet(
   filepaths: ReleaseSetFilepaths
-): Promise<{ version: string; releaseNotes: string }> {
+): Promise<{ version: string; releaseNotes: string | null }> {
   systemUpdateSet = filepaths
   return getInfoFromUpdateSet(systemUpdateSet)
 }

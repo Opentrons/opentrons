@@ -10,12 +10,14 @@ export const INITIAL_STATE: RobotUpdateState = {
     releaseNotes: null,
     downloadProgress: null,
     downloadError: null,
+    force: false,
   },
   ot2: {
     version: null,
     releaseNotes: null,
     downloadProgress: null,
     downloadError: null,
+    force: false,
   },
   session: null,
 }
@@ -46,7 +48,7 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
           [action.payload.target]: {
             ...state[action.payload.target],
             version: action.payload.version,
-            force: action.payload.force ?? false,
+            force: action.payload?.force ?? false,
           },
         },
       }
@@ -60,7 +62,6 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
             ...state[action.payload.target],
             version: action.payload.version,
             releaseNotes: action.payload.releaseNotes,
-            force: action.payload.force ?? false,
           },
         },
       }
