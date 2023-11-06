@@ -37,7 +37,7 @@ import {
   forBlowOutInPlace,
   forDispenseInPlace,
   forDropTipInPlace,
-} from './InPlaceCommandUpdates'
+} from './inPlaceCommandUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
