@@ -1,4 +1,6 @@
 import * as React from 'react'
+import isEmpty from 'lodash/isEmpty'
+
 import {
   RobotType,
   getDeckDefFromRobotType,
@@ -35,12 +37,14 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { TrashLocation } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 import type { WasteChuteLocation } from './WasteChuteFixture'
+import type { WellFill } from '../Labware'
 
 interface BaseDeckProps {
   robotType: RobotType
   labwareLocations: Array<{
     labwareLocation: LabwareLocation
     definition: LabwareDefinition2
+    wellFill?: WellFill
     // generic prop to render self-positioned children for each labware
     labwareChildren?: React.ReactNode
     onLabwareClick?: () => void
@@ -49,6 +53,7 @@ interface BaseDeckProps {
     moduleModel: ModuleModel
     moduleLocation: ModuleLocation
     nestedLabwareDef?: LabwareDefinition2 | null
+    nestedLabwareWellFill?: WellFill
     innerProps?: React.ComponentProps<typeof Module>['innerProps']
     // generic prop to render self-positioned children for each module
     moduleChildren?: React.ReactNode
@@ -150,6 +155,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           moduleModel,
           moduleLocation,
           nestedLabwareDef,
+          nestedLabwareWellFill,
           innerProps,
           moduleChildren,
           onLabwareClick,
@@ -173,6 +179,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 <LabwareRender
                   definition={nestedLabwareDef}
                   onLabwareClick={onLabwareClick}
+                  wellFill={nestedLabwareWellFill}
                 />
               ) : null}
               {moduleChildren}
@@ -181,21 +188,30 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         }
       )}
       {labwareLocations.map(
-        ({ labwareLocation, definition, labwareChildren, onLabwareClick }) => {
+        ({
+          labwareLocation,
+          definition,
+          labwareChildren,
+          wellFill,
+          onLabwareClick,
+        }) => {
           const slotDef = deckDef.locations.orderedSlots.find(
             s =>
               labwareLocation !== 'offDeck' &&
               'slotName' in labwareLocation &&
               s.id === labwareLocation.slotName
           )
+          const labwareHasLiquid = !isEmpty(wellFill)
           return slotDef != null ? (
             <g
               key={slotDef.id}
               transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
+              cursor={labwareHasLiquid ? 'pointer' : ''}
             >
               <LabwareRender
                 definition={definition}
                 onLabwareClick={onLabwareClick}
+                wellFill={wellFill ?? undefined}
               />
               {labwareChildren}
             </g>
