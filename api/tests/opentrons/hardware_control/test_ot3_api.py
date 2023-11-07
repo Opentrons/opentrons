@@ -1458,6 +1458,7 @@ async def test_save_instrument_offset(
             converted_mount, Point(1, 1, 1)
         )
 
+
 @pytest.mark.xfail()
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
@@ -1472,7 +1473,9 @@ async def test_pick_up_tip_full_tiprack(
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend
     instr_mock = AsyncMock(spec=Pipette)
-    instr_mock.nozzle_manager.current_configruation.configuration.return_value = NozzleConfigurationType.FULL
+    instr_mock.nozzle_manager.current_configruation.configuration.return_value = (
+        NozzleConfigurationType.FULL
+    )
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
