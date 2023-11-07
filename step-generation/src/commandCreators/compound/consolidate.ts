@@ -10,12 +10,14 @@ import {
   reduceCommandCreators,
   wasteChuteCommandsUtil,
   getWasteChuteOrLabware,
+  airGapHelper,
+  dispenseLocationHelper,
+  moveHelper,
 } from '../../utils'
 import { configureForVolume } from '../atomic/configureForVolume'
 import {
   aspirate,
   delay,
-  dispense,
   dropTip,
   moveToWell,
   replaceTip,
@@ -99,7 +101,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     args.destLabware
   )
   const destinationWell =
-    wasteChuteOrLabware === 'labware' ? args.destWell : 'A1'
+    wasteChuteOrLabware === 'labware' ? args.destWell : null
 
   const destLabwareDef =
     wasteChuteOrLabware === 'labware'
@@ -191,7 +193,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   }),
                 ]
               : []
-          const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
+          const touchTipAfterAspirateCommand = args.touchTipAfterDispense
             ? [
                 curryCommandCreator(touchTip, {
                   pipette: args.pipette,
@@ -230,17 +232,19 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           }),
         ]
       }
-
-      const touchTipAfterDispenseCommands: CurriedCommandCreator[] = args.touchTipAfterDispense
-        ? [
-            curryCommandCreator(touchTip, {
-              pipette: args.pipette,
-              labware: args.destLabware,
-              well: destinationWell,
-              offsetFromBottomMm: args.touchTipAfterDispenseOffsetMmFromBottom,
-            }),
-          ]
-        : []
+      //  can not touch tip in a waste chute
+      const touchTipAfterDispenseCommands: CurriedCommandCreator[] =
+        args.touchTipAfterDispense && destinationWell != null
+          ? [
+              curryCommandCreator(touchTip, {
+                pipette: args.pipette,
+                labware: args.destLabware,
+                well: destinationWell,
+                offsetFromBottomMm:
+                  args.touchTipAfterDispenseOffsetMmFromBottom,
+              }),
+            ]
+          : []
       const mixBeforeCommands =
         mixFirstAspirate != null
           ? mixUtil({
@@ -272,8 +276,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             dispenseDelaySeconds: dispenseDelay?.seconds,
           })
         : []
+      //  can not mix in a waste chute
       const mixAfterCommands =
-        mixInDestination != null
+        mixInDestination != null && destinationWell != null
           ? mixUtil({
               pipette: args.pipette,
               labware: args.destLabware,
@@ -291,15 +296,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const delayAfterDispenseCommands =
         dispenseDelay != null
           ? [
-              curryCommandCreator(moveToWell, {
-                pipette: args.pipette,
-                labware: args.destLabware,
-                well: destinationWell,
-                offset: {
-                  x: 0,
-                  y: 0,
-                  z: dispenseDelay.mmFromBottom,
-                },
+              curryCommandCreator(moveHelper, {
+                pipetteId: args.pipette,
+                destinationId: args.destLabware,
+                well: destinationWell ?? undefined,
+                zOffset: dispenseDelay.mmFromBottom,
               }),
               curryCommandCreator(delay, {
                 commandCreatorFnName: 'delay',
@@ -314,14 +315,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [
-              curryCommandCreator(aspirate, {
-                pipette: args.pipette,
+              curryCommandCreator(airGapHelper, {
+                pipetteId: args.pipette,
                 volume: dispenseAirGapVolume,
-                labware: args.destLabware,
-                well: destinationWell,
+                destinationId: args.destLabware,
+                destWell: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
-                isAirGap: true,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -371,13 +371,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
         ...configureForVolumeCommand,
         ...aspirateCommands,
-        curryCommandCreator(dispense, {
-          pipette: args.pipette,
+        curryCommandCreator(dispenseLocationHelper, {
+          pipetteId: args.pipette,
           volume:
             args.volume * sourceWellChunk.length +
             aspirateAirGapVolume * sourceWellChunk.length,
-          labware: args.destLabware,
-          well: destinationWell,
+          destinationId: args.destLabware,
+          well: destinationWell ?? undefined,
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),

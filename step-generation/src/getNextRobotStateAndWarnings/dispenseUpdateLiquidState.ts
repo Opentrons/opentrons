@@ -17,12 +17,12 @@ type LiquidState = RobotState['liquidState']
 export interface DispenseUpdateLiquidStateArgs {
   invariantContext: InvariantContext
   prevLiquidState: LiquidState
-  labwareId: string
   pipetteId: string
-  wellName: string
-  volume?: number
   // volume value is required when useFullVolume is false
   useFullVolume: boolean
+  wellName?: string
+  labwareId?: string
+  volume?: number
 }
 
 /** This is a helper to do dispense/blowout liquid state updates. */
@@ -39,24 +39,25 @@ export function dispenseUpdateLiquidState(
     wellName,
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
+  const wasteChuteId = Object.values(
+    invariantContext.additionalEquipmentEntities
+  ).find(aE => aE.name === 'wasteChute')?.id
+  const sourceId =
+    labwareId != null
+      ? invariantContext.labwareEntities[labwareId].id
+      : wasteChuteId ?? ''
 
-  let wasteChuteOrLabware: 'wasteChute' | 'labware' | null
-  let well: string = wellName
-  if (invariantContext.labwareEntities[labwareId] != null) {
-    wasteChuteOrLabware = 'labware'
-  } else if (invariantContext.additionalEquipmentEntities[labwareId] != null) {
-    wasteChuteOrLabware = 'wasteChute'
-    well = 'A1'
-  } else {
+  if (sourceId === '') {
     console.error(
-      `expected to determine if dest labware is a labware or waste chute with destLabware ${labwareId} but could not`
+      `expected to find a waste chute entity id but could not, with wasteChuteId ${wasteChuteId}`
     )
-    wasteChuteOrLabware = null
   }
+
+  //  stubbing in A1 for waste chute well to track liquid state
+  const well = wellName ?? 'A1'
+
   const labwareDef =
-    wasteChuteOrLabware === 'labware'
-      ? invariantContext.labwareEntities[labwareId].def
-      : null
+    labwareId != null ? invariantContext.labwareEntities[labwareId].def : null
 
   assert(
     !(useFullVolume && typeof volume === 'number'),
@@ -67,14 +68,14 @@ export function dispenseUpdateLiquidState(
     'in dispenseUpdateLiquidState, either volume or useFullVolume are required'
   )
   const { wellsForTips, allWellsShared } =
-    labwareDef != null
+    labwareDef != null && wellName != null
       ? getWellsForTips(pipetteSpec.channels, labwareDef, wellName)
       : //  special-casing waste chute info
         { wellsForTips: ['A1'], allWellsShared: true }
 
   const liquidLabware =
-    prevLiquidState.labware[labwareId] ??
-    prevLiquidState.additionalEquipment[labwareId]
+    prevLiquidState.labware[sourceId] ??
+    prevLiquidState.additionalEquipment[sourceId]
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
@@ -123,13 +124,13 @@ export function dispenseUpdateLiquidState(
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
-  if (prevLiquidState.additionalEquipment[labwareId] != null) {
-    prevLiquidState.additionalEquipment[labwareId] = Object.assign(
+  if (prevLiquidState.additionalEquipment[sourceId] != null) {
+    prevLiquidState.additionalEquipment[sourceId] = Object.assign(
       liquidLabware,
       labwareLiquidState
     )
-  } else if (prevLiquidState.labware[labwareId] != null) {
-    prevLiquidState.labware[labwareId] = Object.assign(
+  } else if (prevLiquidState.labware[sourceId] != null) {
+    prevLiquidState.labware[sourceId] = Object.assign(
       liquidLabware,
       labwareLiquidState
     )

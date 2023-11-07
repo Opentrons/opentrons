@@ -2,6 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { i18n } from '../../../../localization'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import {
   VolumeField,
@@ -22,12 +23,21 @@ import type { StepFormProps } from '../../types'
 export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
   const allLabware = useSelector(getLabwareDefsByURI)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
 
   const toggleCollapsed = (): void => _setCollapsed(!collapsed)
 
   const { propsForFields, formData } = props
   const { stepType, path } = formData
 
+  const wasteChuteDestLabware =
+    formData.dispense_labware != null
+      ? additionalEquipmentEntities[formData.dispense_labware]
+      : null
+  const destWell =
+    wasteChuteDestLabware != null ? ['A1'] : formData.dispense_wells
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -95,7 +105,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
           <ChangeTipField
             {...propsForFields.changeTip}
             aspirateWells={formData.aspirate_wells}
-            dispenseWells={formData.dispense_wells}
+            dispenseWells={destWell}
             path={formData.path}
             stepType={formData.stepType}
           />
@@ -105,7 +115,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
             aspirate_airGap_volume={formData.aspirate_airGap_volume}
             aspirate_wells={formData.aspirate_wells}
             changeTip={formData.changeTip}
-            dispense_wells={formData.dispense_wells}
+            dispense_wells={destWell}
             pipette={formData.pipette}
             volume={formData.volume}
           />
