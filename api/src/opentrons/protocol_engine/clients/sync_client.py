@@ -23,6 +23,7 @@ from ..types import (
     LabwareOffsetVector,
     MotorAxis,
     Liquid,
+    NozzleLayoutConfigurationType,
 )
 from .transports import ChildThreadTransport
 
@@ -291,6 +292,20 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.PrepareToAspirateResult, result)
+
+    def configure_nozzle_layout(
+        self,
+        pipette_id: str,
+        configuration_params: NozzleLayoutConfigurationType,
+    ) -> commands.ConfigureNozzleLayoutResult:
+        """Execute a ConfigureForVolume command."""
+        request = commands.ConfigureNozzleLayoutCreate(
+            params=commands.ConfigureNozzleLayoutParams(
+                pipetteId=pipette_id, configuration_params=configuration_params
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ConfigureNozzleLayoutResult, result)
 
     def aspirate(
         self,

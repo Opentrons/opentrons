@@ -364,3 +364,4 @@ class TransferTipPolicy(enum.Enum):
 
 
 DeckLocation = Union[int, str]
+ALLOWED_PRIMARY_NOZZLES = ["A1", "H1", "A12", "H12"]

@@ -22,6 +22,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from ..._waste_chute import WasteChute
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from ..instrument import AbstractInstrument
 
@@ -433,5 +434,14 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
             )
 
     def configure_for_volume(self, volume: float) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass
+
+    def configure_nozzle_layout(
+        self,
+        style: NozzleLayout,
+        primary_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
         """This will never be called because it was added in API 2.15."""
         pass

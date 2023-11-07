@@ -15,6 +15,9 @@
       "$ref": "#/definitions/ConfigureForVolumeCreate"
     },
     {
+      "$ref": "#/definitions/ConfigureNozzleLayoutCreate"
+    },
+    {
       "$ref": "#/definitions/CustomCreate"
     },
     {
@@ -422,6 +425,168 @@
         },
         "params": {
           "$ref": "#/definitions/ConfigureForVolumeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "EmptyNozzleLayoutConfiguration": {
+      "title": "EmptyNozzleLayoutConfiguration",
+      "description": "Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default.",
+      "type": "object",
+      "properties": {
+        "style": {
+          "title": "Style",
+          "default": "EMPTY",
+          "enum": ["EMPTY"],
+          "type": "string"
+        }
+      }
+    },
+    "SingleNozzleLayoutConfiguration": {
+      "title": "SingleNozzleLayoutConfiguration",
+      "description": "Minimum information required for a new nozzle configuration.",
+      "type": "object",
+      "properties": {
+        "style": {
+          "title": "Style",
+          "default": "SINGLE",
+          "enum": ["SINGLE"],
+          "type": "string"
+        },
+        "primary_nozzle": {
+          "title": "Primary Nozzle",
+          "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+          "enum": ["A1", "H1", "A12", "H12"],
+          "type": "string"
+        }
+      },
+      "required": ["primary_nozzle"]
+    },
+    "RowNozzleLayoutConfiguration": {
+      "title": "RowNozzleLayoutConfiguration",
+      "description": "Minimum information required for a new nozzle configuration.",
+      "type": "object",
+      "properties": {
+        "style": {
+          "title": "Style",
+          "default": "ROW",
+          "enum": ["ROW"],
+          "type": "string"
+        },
+        "primary_nozzle": {
+          "title": "Primary Nozzle",
+          "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+          "enum": ["A1", "H1", "A12", "H12"],
+          "type": "string"
+        }
+      },
+      "required": ["primary_nozzle"]
+    },
+    "ColumnNozzleLayoutConfiguration": {
+      "title": "ColumnNozzleLayoutConfiguration",
+      "description": "Information required for nozzle configurations of type ROW and COLUMN.",
+      "type": "object",
+      "properties": {
+        "style": {
+          "title": "Style",
+          "default": "COLUMN",
+          "enum": ["COLUMN"],
+          "type": "string"
+        },
+        "primary_nozzle": {
+          "title": "Primary Nozzle",
+          "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+          "enum": ["A1", "H1", "A12", "H12"],
+          "type": "string"
+        }
+      },
+      "required": ["primary_nozzle"]
+    },
+    "QuadrantNozzleLayoutConfiguration": {
+      "title": "QuadrantNozzleLayoutConfiguration",
+      "description": "Information required for nozzle configurations of type QUADRANT.",
+      "type": "object",
+      "properties": {
+        "style": {
+          "title": "Style",
+          "default": "QUADRANT",
+          "enum": ["QUADRANT"],
+          "type": "string"
+        },
+        "primary_nozzle": {
+          "title": "Primary Nozzle",
+          "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+          "enum": ["A1", "H1", "A12", "H12"],
+          "type": "string"
+        },
+        "front_right_nozzle": {
+          "title": "Front Right Nozzle",
+          "description": "The front right nozzle in your configuration.",
+          "pattern": "[A-Z][0-100]",
+          "type": "string"
+        }
+      },
+      "required": ["primary_nozzle", "front_right_nozzle"]
+    },
+    "ConfigureNozzleLayoutParams": {
+      "title": "ConfigureNozzleLayoutParams",
+      "description": "Parameters required to configure the nozzle layout for a specific pipette.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "configuration_params": {
+          "title": "Configuration Params",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/EmptyNozzleLayoutConfiguration"
+            },
+            {
+              "$ref": "#/definitions/SingleNozzleLayoutConfiguration"
+            },
+            {
+              "$ref": "#/definitions/RowNozzleLayoutConfiguration"
+            },
+            {
+              "$ref": "#/definitions/ColumnNozzleLayoutConfiguration"
+            },
+            {
+              "$ref": "#/definitions/QuadrantNozzleLayoutConfiguration"
+            }
+          ]
+        }
+      },
+      "required": ["pipetteId", "configuration_params"]
+    },
+    "ConfigureNozzleLayoutCreate": {
+      "title": "ConfigureNozzleLayoutCreate",
+      "description": "Configure nozzle layout creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "configureNozzleLayout",
+          "enum": ["configureNozzleLayout"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/ConfigureNozzleLayoutParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
