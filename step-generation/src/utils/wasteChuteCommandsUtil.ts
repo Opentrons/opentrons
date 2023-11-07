@@ -111,8 +111,6 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     }
   }
 
-  console.log('🚀 ~ file: wasteChuteCommandsUtil.ts:64 ~ commands:', commands)
-
   if (errors.length > 0)
     return {
       errors,

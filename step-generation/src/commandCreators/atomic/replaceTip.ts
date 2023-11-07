@@ -101,7 +101,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
 
   const isWasteChute =
     invariantContext.additionalEquipmentEntities[dropTipLocation] != null
-  console.log('🚀 ~ file: replaceTip.ts:103 ~ isWasteChute:', isWasteChute)
+
   if (!labwareDef) {
     return {
       errors: [
