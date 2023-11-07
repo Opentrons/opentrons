@@ -10,6 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
@@ -47,6 +48,16 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipetteName = pipette?.pipetteName
   const pipetteChannels =
     pipetteName != null ? getPipetteNameSpecs(pipetteName)?.channels ?? 1 : 1
+  let probeVideoSrc = attachProbe1
+  let probeLocation = ''
+  if (pipetteChannels === 8) {
+    probeLocation = t('backmost')
+    probeVideoSrc = attachProbe8
+  } else if (pipetteChannels === 96) {
+    probeLocation = t('ninety_six_probe_location')
+    probeVideoSrc = attachProbe96
+  }
+
   const pipetteMount = pipette?.mount
   if (pipetteName == null || pipetteMount == null) return null
 
@@ -89,7 +100,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   return (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
-      //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
       rightHandBody={
         <video
           css={css`
@@ -101,28 +111,22 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           loop={true}
           controls={false}
         >
-          <source src={pipetteChannels > 1 ? attachProbe8 : attachProbe1} />
+          <source src={probeVideoSrc} />
         </video>
       }
       bodyText={
-        pipetteChannels > 1 ? (
+        <StyledText css={BODY_STYLE}>
           <Trans
             t={t}
-            i18nKey={
-              pipetteChannels === 8
-                ? 'install_probe_8_channel'
-                : 'install_probe_96_channel'
-            }
+            i18nKey={'install_probe'}
+            values={{ location: probeLocation }}
             components={{
-              strong: <strong />,
-              block: <StyledText css={BODY_STYLE} />,
+              bold: <strong />,
             }}
           />
-        ) : (
-          <StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>
-        )
+        </StyledText>
       }
-      proceedButtonText={t('begin_calibration')}
+      proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
       proceed={handleProbeAttached}
     />
   )
