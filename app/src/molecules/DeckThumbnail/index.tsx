@@ -47,15 +47,9 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
     protocolAnalysis.commands
   )
   const liquids = protocolAnalysis.liquids
+  const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
+  const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
-  const labwareRenderInfo =
-    protocolAnalysis != null
-      ? getLabwareRenderInfo(protocolAnalysis, deckDef)
-      : {}
-  const protocolModulesInfo =
-    protocolAnalysis != null
-      ? getProtocolModulesInfo(protocolAnalysis, deckDef)
-      : []
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
     protocolModulesInfo
