@@ -535,6 +535,7 @@ class OT3Controller:
         origin: Coordinates[Axis, float],
         moves: List[Move[Axis]],
         stop_condition: MoveStopCondition = MoveStopCondition.none,
+        nodes_in_moves_only: bool = True,
     ) -> None:
         """Move to a position.
 
@@ -542,11 +543,24 @@ class OT3Controller:
             origin: The starting point of the move
             moves: List of moves.
             stop_condition: The stop condition.
+            nodes_in_moves_only: Default is True. If False, also send empty moves to
+                                 nodes that are present but not defined in moves.
+
+        .. caution::
+            Setting `nodes_in_moves_only` to False will enable *all* present motors in
+            the system. DO NOT USE when you want to keep one of the axes disabled.
 
         Returns:
             None
         """
-        group = create_move_group(origin, moves, self._motor_nodes(), stop_condition)
+        ordered_nodes = self._motor_nodes()
+        if nodes_in_moves_only:
+            moving_axes = {
+                axis_to_node(ax) for move in moves for ax in move.unit_vector.keys()
+            }
+            ordered_nodes = ordered_nodes.intersection(moving_axes)
+
+        group = create_move_group(origin, moves, ordered_nodes, stop_condition)
         move_group, _ = group
         runner = MoveGroupRunner(
             move_groups=[move_group],
