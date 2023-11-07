@@ -12,6 +12,8 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = 
 ) => {
   const { pipetteId, addressableAreaName } = args
 
+  console.log('MOVE TO ADDRESSABLE')
+
   const commands = [
     {
       commandType: 'moveToAddressableArea' as const,
