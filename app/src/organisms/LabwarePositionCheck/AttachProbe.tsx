@@ -1,13 +1,15 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { css } from 'styled-components'
-import { StyledText } from '../../atoms/text'
-import { RobotMotionLoader } from './RobotMotionLoader'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
+import { css } from 'styled-components'
+import { StyledText } from '../../atoms/text'
+import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
+import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
@@ -20,7 +22,7 @@ import type {
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { LabwareOffset, PipetteData } from '@opentrons/api-client'
 
 interface AttachProbeProps extends AttachProbeStep {
   protocolData: CompletedProtocolAnalysis
@@ -32,7 +34,9 @@ interface AttachProbeProps extends AttachProbeStep {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
+  isOnDevice: boolean
 }
+
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const {
@@ -42,7 +46,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     chainRunCommands,
     isRobotMoving,
     setFatalError,
+    isOnDevice,
   } = props
+  const [isPending, setIsPending] = React.useState<boolean>(false)
+  const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
+    false
+  )
 
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
@@ -59,6 +68,16 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteMount = pipette?.mount
+  const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
+    enabled: false,
+    onSettled: () => {
+      setIsPending(false)
+    },
+  })
+  const attachedPipette = attachedInstrumentsData?.data.find(
+    (instrument): instrument is PipetteData =>
+      instrument.ok && instrument.mount === pipetteMount
+  )
 
   React.useEffect(() => {
     // move into correct position for probe attach on mount
@@ -81,36 +100,56 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
   const handleProbeAttached = (): void => {
-    chainRunCommands(
-      [
-        {
-          commandType: 'retractAxis' as const,
-          params: {
-            axis: pipetteZMotorAxis,
-          },
-        },
-        {
-          commandType: 'retractAxis' as const,
-          params: { axis: 'x' },
-        },
-        {
-          commandType: 'retractAxis' as const,
-          params: { axis: 'y' },
-        },
-      ],
-      false
-    )
-      .then(() => proceed())
-      .catch((e: Error) => {
-        setFatalError(
-          `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
-        )
+    setIsPending(true)
+    refetch()
+      .then(() => {
+        if (attachedPipette?.state?.tipDetected) {
+          chainRunCommands(
+            [
+              {
+                commandType: 'retractAxis' as const,
+                params: {
+                  axis: pipetteZMotorAxis,
+                },
+              },
+              {
+                commandType: 'retractAxis' as const,
+                params: { axis: 'x' },
+              },
+              {
+                commandType: 'retractAxis' as const,
+                params: { axis: 'y' },
+              },
+            ],
+            false
+          )
+            .then(() => proceed())
+            .catch((e: Error) => {
+              setFatalError(
+                `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
+              )
+            })
+        } else {
+          setShowUnableToDetect(true)
+        }
+      })
+      .catch(error => {
+        setFatalError(error.message)
       })
   }
 
   if (isRobotMoving)
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
+  else if (showUnableToDetect)
+    return (
+      <ProbeNotAttached
+        handleOnClick={handleProbeAttached}
+        setShowUnableToDetect={setShowUnableToDetect}
+        isOnDevice={isOnDevice}
+        isPending={isPending}
+      />
     )
 
   return (

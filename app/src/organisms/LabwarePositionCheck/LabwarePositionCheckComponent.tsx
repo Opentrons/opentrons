@@ -363,7 +363,13 @@ export const LabwarePositionCheckComponent = (
       />
     )
   } else if (currentStep.section === 'ATTACH_PROBE') {
-    modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <AttachProbe
+        {...currentStep}
+        {...movementStepProps}
+        isOnDevice={isOnDevice}
+      />
+    )
   } else if (currentStep.section === 'DETACH_PROBE') {
     modalContent = <DetachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
