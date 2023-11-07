@@ -48,12 +48,11 @@ describe('robot update reducer', () => {
       },
     },
     {
-      name: 'handles forced robotUpdate:UPDATE_INFO for flex',
+      name: 'handles forced robotUpdate:UPDATE_VERSION for flex',
       action: {
-        type: 'robotUpdate:UPDATE_INFO',
+        type: 'robotUpdate:UPDATE_VERSION',
         payload: {
           version: '1.0.0',
-          releaseNotes: 'release notes',
           target: 'flex',
           force: true,
         },
@@ -63,7 +62,6 @@ describe('robot update reducer', () => {
         ...{
           flex: {
             ...INITIAL_STATE.flex,
-            releaseNotes: null,
             version: null,
             force: true,
           },
@@ -74,7 +72,6 @@ describe('robot update reducer', () => {
         flex: {
           ...INITIAL_STATE.flex,
           version: '1.0.0',
-          releaseNotes: 'release notes',
           force: true,
         },
       },
@@ -112,12 +109,11 @@ describe('robot update reducer', () => {
       },
     },
     {
-      name: 'handles robotUpdate:UPDATE_INFO for ot2',
+      name: 'handles forced robotUpdate:UPDATE_VERSION for ot2',
       action: {
-        type: 'robotUpdate:UPDATE_INFO',
+        type: 'robotUpdate:UPDATE_VERSION',
         payload: {
           version: '1.0.0',
-          releaseNotes: 'release notes',
           target: 'ot2',
           force: true,
         },
@@ -127,7 +123,6 @@ describe('robot update reducer', () => {
         ...{
           ot2: {
             ...INITIAL_STATE.ot2,
-            releaseNotes: null,
             version: null,
             force: false,
           },
@@ -138,7 +133,6 @@ describe('robot update reducer', () => {
         ot2: {
           ...INITIAL_STATE.ot2,
           version: '1.0.0',
-          releaseNotes: 'release notes',
           force: true,
         },
       },
