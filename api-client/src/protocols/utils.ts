@@ -226,6 +226,25 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
+export interface LoadedFixturesBySlot {
+  [slotName: string]: LoadFixtureRunTimeCommand
+}
+export function parseInitialLoadedFixturesByCutout(
+  commands: RunTimeCommand[]
+): LoadedFixturesBySlot {
+  const loadFixtureCommandsReversed = commands
+    .filter(
+      (command): command is LoadFixtureRunTimeCommand =>
+        command.commandType === 'loadFixture'
+    )
+    .reverse()
+  return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
+    loadFixtureCommandsReversed,
+    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
+    {}
+  )
+}
+
 export function parseAllAddressableAreas(commands: RunTimeCommand[]): AddressableAreaName[] {
   return commands.reduce<AddressableAreaName[]>((acc, command) => {
     if (

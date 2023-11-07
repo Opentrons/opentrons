@@ -296,7 +296,6 @@ export interface DeckLocations {
   orderedSlots: DeckSlot[]
   calibrationPoints: DeckCalibrationPoint[]
   fixtures: DeckFixture[]
-  cutoutFixtures: CutoutFixture[]
 }
 
 export interface DeckMetadata {
@@ -309,6 +308,7 @@ export interface DeckDefinition {
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple
   robot: DeckRobot
+  cutoutFixtures: CutoutFixture[]
   locations: DeckLocations
   metadata: DeckMetadata
   layers: INode[]

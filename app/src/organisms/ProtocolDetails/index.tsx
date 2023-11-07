@@ -79,6 +79,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
+import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
 
 const GRID_STYLE = css`
   display: grid;
@@ -227,6 +228,7 @@ export function ProtocolDetails(
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
 
+      getDeckConfigFromProtocolCommands(mostRecentAnalysis.commands)
   const requiredExtensionInstrumentName =
     mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis)
       ? getGripperDisplayName('gripperV1')
