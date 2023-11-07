@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -17,9 +16,13 @@ import {
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 
-export function NoUpdateFound(): JSX.Element {
+export interface NoUpdateFoundProps {
+  onContinue: () => void
+}
+
+export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
+  const { onContinue } = props
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -48,7 +51,7 @@ export function NoUpdateFound(): JSX.Element {
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-        onClick={() => history.push('/emergency-stop')}
+        onClick={onContinue}
       />
     </Flex>
   )

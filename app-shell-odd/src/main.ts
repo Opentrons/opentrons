@@ -21,6 +21,7 @@ import {
   ODD_DIR,
 } from './config'
 import systemd from './systemd'
+import { watchForMassStorage } from './usb'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -106,6 +107,8 @@ function startUp(): void {
   ipcMain.once('dispatch', () => {
     systemd.sendStatus('started')
     systemd.ready()
+    const stopWatching = watchForMassStorage(dispatch)
+    ipcMain.once('quit', stopWatching)
   })
 }
 
