@@ -1,4 +1,4 @@
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -44,7 +44,7 @@ describe('wasteChuteCommandsUtil', () => {
       additionalEquipmentEntities: {
         [mockWasteChuteId]: {
           name: 'wasteChute',
-          location: WASTE_CHUTE_SLOT,
+          location: WASTE_CHUTE_CUTOUT,
           id: 'mockId',
         },
       },

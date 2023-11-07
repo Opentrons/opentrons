@@ -44,7 +44,8 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
       height="100px"
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {deckDef.locations.orderedSlots.map(slotDef => (
+      {deckDef.locations.cutouts.map(slotDef => (
+        // TODO(bh, 2023-11-07): map selected slots to cutouts or otherwise adjust
         <DeckSlotLocation
           key={slotDef.id}
           slotName={slotDef.id}
@@ -54,7 +55,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
         />
       ))}
       {selectedSlots.map((selectedSlot, index) => {
-        const slot = deckDef.locations.orderedSlots.find(
+        const slot = deckDef.locations.cutouts.find(
           slot => slot.id === selectedSlot
         )
         const [xSlotPosition = 0, ySlotPosition = 0] = slot?.position ?? []

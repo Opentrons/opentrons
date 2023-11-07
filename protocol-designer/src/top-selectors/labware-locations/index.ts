@@ -108,7 +108,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
-    const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
+    const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
 
     if (robotState == null) return null
