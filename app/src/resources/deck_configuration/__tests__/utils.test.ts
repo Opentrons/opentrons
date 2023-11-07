@@ -10,7 +10,6 @@ const RUN_TIME_COMMAND_STUB_MIXIN: Pick<RunTimeCommand, 'id' | 'createdAt' | 'st
   status: 'succeeded',
 }
 
-
 describe('getAllCutoutConfigsFromProtocolCommands', () => {
   it('returns simplest deck if no commands alter addressable areas', () => {
     expect(getAllCutoutConfigsFromProtocolCommands([])).toEqual(FLEX_SIMPLEST_DECK_CONFIG)
@@ -60,10 +59,53 @@ describe('getAllCutoutConfigsFromProtocolCommands', () => {
     ])
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 8),
-      {cutoutId: 'cutoutA3', cutoutFixtureId: 'stagingAreaRightSlot'},
-      {cutoutId: 'cutoutB3', cutoutFixtureId: 'stagingAreaRightSlot'},
-      {cutoutId: 'cutoutC3', cutoutFixtureId: 'stagingAreaRightSlot'},
-      {cutoutId: 'cutoutD3', cutoutFixtureId: 'stagingAreaRightSlot'},
+      { cutoutId: 'cutoutA3', cutoutFixtureId: 'stagingAreaRightSlot' },
+      { cutoutId: 'cutoutB3', cutoutFixtureId: 'stagingAreaRightSlot' },
+      { cutoutId: 'cutoutC3', cutoutFixtureId: 'stagingAreaRightSlot' },
+      { cutoutId: 'cutoutD3', cutoutFixtureId: 'stagingAreaRightSlot' },
+    ])
+  })
+  it('returns simplest cutout fixture where many are possible', () => {
+    const cutoutConfigs = getAllCutoutConfigsFromProtocolCommands([
+      {
+        ...RUN_TIME_COMMAND_STUB_MIXIN,
+        commandType: 'moveLabware',
+        params: {
+          newLocation: { addressableAreaName: 'gripperWasteChute' },
+          labwareId: 'fake_labwareId',
+          strategy: 'usingGripper'
+        },
+      },
+    ])
+    expect(cutoutConfigs).toEqual([
+      ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 11),
+      { cutoutId: 'cutoutD3', cutoutFixtureId: 'wasteChuteRightAdapterNoCover' },
+    ])
+  })
+  it.only('returns compatible cutout fixture where multiple addressable requirements present', () => {
+    const cutoutConfigs = getAllCutoutConfigsFromProtocolCommands([
+      {
+        ...RUN_TIME_COMMAND_STUB_MIXIN,
+        commandType: 'moveLabware',
+        params: {
+          newLocation: { addressableAreaName: 'gripperWasteChute' },
+          labwareId: 'fake_labwareId',
+          strategy: 'usingGripper'
+        },
+      },
+      {
+        ...RUN_TIME_COMMAND_STUB_MIXIN,
+        commandType: 'moveLabware',
+        params: {
+          newLocation: { addressableAreaName: 'D4' },
+          labwareId: 'fake_labwareId',
+          strategy: 'usingGripper'
+        },
+      },
+    ])
+    expect(cutoutConfigs).toEqual([
+      ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 11),
+      { cutoutId: 'cutoutD3', cutoutFixtureId: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' },
     ])
   })
 })

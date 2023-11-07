@@ -92,6 +92,7 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
+  | { addressableAreaName: string }
 
 export type NonStackedLocation =
   | 'offDeck'
