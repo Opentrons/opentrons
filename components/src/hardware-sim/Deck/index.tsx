@@ -1,4 +1,4 @@
-export * from './DeckFromData'
+export * from './DeckFromLayers'
 export * from './FlexTrash'
 export * from './getDeckDefinitions'
 export * from './MoveLabwareOnDeck'

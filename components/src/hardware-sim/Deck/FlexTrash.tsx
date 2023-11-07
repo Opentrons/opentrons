@@ -1,5 +1,10 @@
 import * as React from 'react'
 
+import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
+
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
@@ -8,7 +13,7 @@ import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import trashDef from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 
-import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 
 // only allow edge cutout locations (columns 1 and 3)
 export type TrashLocation =
@@ -22,7 +27,6 @@ export type TrashLocation =
   | 'cutoutD3'
 
 interface FlexTrashProps {
-  deckDefinition: DeckDefinition
   robotType: RobotType
   trashIconColor: string
   backgroundColor: string
@@ -34,14 +38,15 @@ interface FlexTrashProps {
  * For use as a RobotWorkspace child component
  */
 export const FlexTrash = ({
-  deckDefinition,
   robotType,
   trashIconColor,
   backgroundColor,
   trashLocation,
 }: FlexTrashProps): JSX.Element | null => {
   // be sure we don't try to render for an OT-2
-  if (robotType !== 'OT-3 Standard') return null
+  if (robotType !== FLEX_ROBOT_TYPE) return null
+
+  const deckDefinition = getDeckDefFromRobotType(robotType)
 
   const trashSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === trashLocation

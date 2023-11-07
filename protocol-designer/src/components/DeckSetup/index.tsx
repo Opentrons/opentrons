@@ -14,7 +14,7 @@ import {
   StagingAreaFixture,
   StagingAreaLocation,
   SingleSlotFixture,
-  DeckFromData,
+  DeckFromLayers,
 } from '@opentrons/components'
 import {
   AdditionalEquipmentEntity,
@@ -526,7 +526,7 @@ export const DeckSetup = (): JSX.Element => {
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
-                <DeckFromData def={deckDef} layerBlocklist={[]} />
+                <DeckFromLayers robotType={robotType} layerBlocklist={[]} />
               ) : (
                 <>
                   {filteredSlots.map(fixture => (
@@ -558,7 +558,6 @@ export const DeckSetup = (): JSX.Element => {
                             fixtureBaseColor={lightFill}
                           />
                           <FlexTrash
-                            deckDefinition={deckDef}
                             robotType={robotType}
                             trashIconColor={lightFill}
                             trashLocation={

@@ -601,6 +601,20 @@ export type Cutout =
   | 'cutoutC3'
   | 'cutoutD3'
 
+export type OT2Cutout =
+  | 'cutout1'
+  | 'cutout2'
+  | 'cutout3'
+  | 'cutout4'
+  | 'cutout5'
+  | 'cutout6'
+  | 'cutout7'
+  | 'cutout8'
+  | 'cutout9'
+  | 'cutout10'
+  | 'cutout11'
+  | 'cutout12'
+
 export type FlexSlot =
   | 'A1'
   | 'B1'

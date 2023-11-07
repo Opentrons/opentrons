@@ -4,7 +4,7 @@ import {
   getModuleDef2,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
-  // OT2_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
   STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
   TRASH_BIN_LOAD_NAME,
@@ -16,7 +16,7 @@ import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module } from '../Module'
 import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
-// import { DeckFromData } from '../Deck/DeckFromData'
+import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../ui-style-constants'
 
@@ -74,7 +74,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     labwareLocations,
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
-    // deckLayerBlocklist = [],
+    deckLayerBlocklist = [],
     // TODO(bh, 2023-10-09): remove deck config fixture for Flex after migration to v4
     // deckConfig = EXTENDED_DECK_CONFIG_FIXTURE,
     deckConfig = STANDARD_SLOT_DECK_CONFIG_FIXTURE,
@@ -82,12 +82,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     children,
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
-
-  // TODO: shift to V4 for OT-2
-  // const deckDef =
-  //   robotType === OT2_ROBOT_TYPE
-  //     ? getDeckDefFromRobotType(robotType)
-  //     : ((ot3DeckDefV4 as unknown) as DeckDefinitionV4)
 
   const singleSlotFixtures = deckConfig.filter(
     fixture => fixture.loadName === STANDARD_SLOT_LOAD_NAME
@@ -108,128 +102,137 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {/* {robotType === OT2_ROBOT_TYPE && 'layers' in deckDef ? (
-        // TODO: migrate OT-2 to v4 deck definition
-        <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
-      ) : */}
-      <>
-        {singleSlotFixtures.map(fixture => (
-          <SingleSlotFixture
-            key={fixture.fixtureId}
-            cutoutLocation={fixture.fixtureLocation}
-            deckDefinition={deckDef}
-            slotClipColor={darkFill}
-            fixtureBaseColor={lightFill}
-            showExpansion={showExpansion}
-          />
-        ))}
-        {stagingAreaFixtures.map(fixture => (
-          <StagingAreaFixture
-            key={fixture.fixtureId}
-            // TODO(bh, 2023-10-09): typeguard fixture location
-            cutoutLocation={fixture.fixtureLocation as StagingAreaLocation}
-            deckDefinition={deckDef}
-            slotClipColor={darkFill}
-            fixtureBaseColor={lightFill}
-          />
-        ))}
-        {trashBinFixtures.map(fixture => (
-          <React.Fragment key={fixture.fixtureId}>
+      {robotType === OT2_ROBOT_TYPE ? (
+        <DeckFromLayers
+          robotType={robotType}
+          layerBlocklist={deckLayerBlocklist}
+        />
+      ) : (
+        <>
+          {singleSlotFixtures.map(fixture => (
             <SingleSlotFixture
+              key={fixture.fixtureId}
               cutoutLocation={fixture.fixtureLocation}
               deckDefinition={deckDef}
-              slotClipColor={COLORS.transparent}
+              slotClipColor={darkFill}
+              fixtureBaseColor={lightFill}
+              showExpansion={showExpansion}
+            />
+          ))}
+          {stagingAreaFixtures.map(fixture => (
+            <StagingAreaFixture
+              key={fixture.fixtureId}
+              // TODO(bh, 2023-10-09): typeguard fixture location
+              cutoutLocation={fixture.fixtureLocation as StagingAreaLocation}
+              deckDefinition={deckDef}
+              slotClipColor={darkFill}
               fixtureBaseColor={lightFill}
             />
-            <FlexTrash
-              deckDefinition={deckDef}
-              robotType={robotType}
-              trashIconColor={lightFill}
+          ))}
+          {trashBinFixtures.map(fixture => (
+            <React.Fragment key={fixture.fixtureId}>
+              <SingleSlotFixture
+                cutoutLocation={fixture.fixtureLocation}
+                deckDefinition={deckDef}
+                slotClipColor={COLORS.transparent}
+                fixtureBaseColor={lightFill}
+              />
+              <FlexTrash
+                robotType={robotType}
+                trashIconColor={lightFill}
+                // TODO(bh, 2023-10-09): typeguard fixture location
+                trashLocation={fixture.fixtureLocation as TrashLocation}
+                backgroundColor={darkFill}
+              />
+            </React.Fragment>
+          ))}
+          {wasteChuteFixtures.map(fixture => (
+            <WasteChuteFixture
+              key={fixture.fixtureId}
               // TODO(bh, 2023-10-09): typeguard fixture location
-              trashLocation={fixture.fixtureLocation as TrashLocation}
-              backgroundColor={darkFill}
+              cutoutLocation={
+                fixture.fixtureLocation as typeof WASTE_CHUTE_CUTOUT
+              }
+              deckDefinition={deckDef}
+              slotClipColor={darkFill}
+              fixtureBaseColor={lightFill}
             />
-          </React.Fragment>
-        ))}
-        {wasteChuteFixtures.map(fixture => (
-          <WasteChuteFixture
-            key={fixture.fixtureId}
-            // TODO(bh, 2023-10-09): typeguard fixture location
-            cutoutLocation={
-              fixture.fixtureLocation as typeof WASTE_CHUTE_CUTOUT
-            }
-            deckDefinition={deckDef}
-            slotClipColor={darkFill}
-            fixtureBaseColor={lightFill}
-          />
-        ))}
-      </>
-      {moduleLocations.map(
-        ({
-          moduleModel,
-          moduleLocation,
-          nestedLabwareDef,
-          innerProps,
-          moduleChildren,
-          onLabwareClick,
-        }) => {
-          const slotPosition = getPositionFromSlotId(
-            moduleLocation.slotName,
-            deckDef
-          )
+          ))}
+        </>
+      )}
+      <>
+        {moduleLocations.map(
+          ({
+            moduleModel,
+            moduleLocation,
+            nestedLabwareDef,
+            innerProps,
+            moduleChildren,
+            onLabwareClick,
+          }) => {
+            const slotPosition = getPositionFromSlotId(
+              moduleLocation.slotName,
+              deckDef
+            )
 
-          const moduleDef = getModuleDef2(moduleModel)
-          return slotPosition != null ? (
-            <Module
-              key={`${moduleModel} ${moduleLocation.slotName}`}
-              def={moduleDef}
-              x={slotPosition[0]}
-              y={slotPosition[1]}
-              orientation={inferModuleOrientationFromXCoordinate(
-                slotPosition[0]
-              )}
-              innerProps={innerProps}
-            >
-              {nestedLabwareDef != null ? (
+            const moduleDef = getModuleDef2(moduleModel)
+            return slotPosition != null ? (
+              <Module
+                key={`${moduleModel} ${moduleLocation.slotName}`}
+                def={moduleDef}
+                x={slotPosition[0]}
+                y={slotPosition[1]}
+                orientation={inferModuleOrientationFromXCoordinate(
+                  slotPosition[0]
+                )}
+                innerProps={innerProps}
+              >
+                {nestedLabwareDef != null ? (
+                  <LabwareRender
+                    definition={nestedLabwareDef}
+                    onLabwareClick={onLabwareClick}
+                  />
+                ) : null}
+                {moduleChildren}
+              </Module>
+            ) : null
+          }
+        )}
+        {labwareLocations.map(
+          ({
+            labwareLocation,
+            definition,
+            labwareChildren,
+            onLabwareClick,
+          }) => {
+            if (
+              labwareLocation === 'offDeck' ||
+              !('slotName' in labwareLocation)
+            ) {
+              return null
+            }
+
+            const slotPosition = getPositionFromSlotId(
+              labwareLocation.slotName,
+              deckDef
+            )
+
+            return slotPosition != null ? (
+              <g
+                key={labwareLocation.slotName}
+                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
+              >
                 <LabwareRender
-                  definition={nestedLabwareDef}
+                  definition={definition}
                   onLabwareClick={onLabwareClick}
                 />
-              ) : null}
-              {moduleChildren}
-            </Module>
-          ) : null
-        }
-      )}
-      {labwareLocations.map(
-        ({ labwareLocation, definition, labwareChildren, onLabwareClick }) => {
-          if (
-            labwareLocation === 'offDeck' ||
-            !('slotName' in labwareLocation)
-          ) {
-            return null
+                {labwareChildren}
+              </g>
+            ) : null
           }
-
-          const slotPosition = getPositionFromSlotId(
-            labwareLocation.slotName,
-            deckDef
-          )
-
-          return slotPosition != null ? (
-            <g
-              key={labwareLocation.slotName}
-              transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
-            >
-              <LabwareRender
-                definition={definition}
-                onLabwareClick={onLabwareClick}
-              />
-              {labwareChildren}
-            </g>
-          ) : null
-        }
-      )}
-      <SlotLabels robotType={robotType} color={darkFill} />
+        )}
+        <SlotLabels robotType={robotType} color={darkFill} />
+      </>
       {children}
     </RobotCoordinateSpace>
   )

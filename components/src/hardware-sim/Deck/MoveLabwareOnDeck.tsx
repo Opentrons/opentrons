@@ -216,9 +216,9 @@ export function MoveLabwareOnDeck(
       {deckDef != null && (
         // TODO(bh, 2023-11-06): change reference to BaseDeck, pass in deck config as prop, render animation as children
         <StyledDeck
-          def={deckDef}
           deckFill={deckFill}
           layerBlocklist={[]}
+          robotType={robotType}
           trashLocation={trashLocation}
         />
       )}
