@@ -125,10 +125,10 @@ function createReadStreamWithSize(
     }
 
     readStream.once('error', handleError)
-    readStream.on('data', onData)
 
     function handleSuccess(): void {
       resolve(readStream)
+      readStream.removeListener('error', handleError)
     }
 
     function handleError(error: Error): void {

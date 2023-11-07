@@ -78,14 +78,17 @@ class TipPresenceManager:
                 unsub()
                 self.set_unsub(mount, None)
 
-        detector = self.get_detector(mount)
-        if detector:
-            _unsubscribe()
+        try:
+            detector = self.get_detector(mount)
             detector.cleanup()
+        except TipDetectorNotFound:
+            pass
+        finally:
+            _unsubscribe()
             self.set_detector(mount, None)
 
     async def build_detector(self, mount: OT3Mount, sensor_count: int) -> None:
-        assert self.get_detector(mount) is None
+        assert self._detectors.get(self._get_key(mount), None) is None
         # set up and subscribe to the detector
         d = TipDetector(self._messenger, _mount_to_node(mount), sensor_count)
         # listens to the detector so we can immediately notify listeners
@@ -106,7 +109,7 @@ class TipPresenceManager:
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
         state = self._last_state[self._get_key(mount)]
         if state is None:
-            log.warning("Tip state for {mount} is unknown")
+            log.warning(f"Tip state for {mount} is unknown")
         return state
 
     @staticmethod

@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import {
   getDeckDefFromRobotType,
   getModuleDef2,
@@ -39,13 +40,14 @@ import type {
 } from '@opentrons/shared-data'
 import type { TrashLocation } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
-// import type { WasteChuteLocation } from './WasteChuteFixture'
+import type { WellFill } from '../Labware'
 
 interface BaseDeckProps {
   robotType: RobotType
   labwareLocations: Array<{
     labwareLocation: LabwareLocation
     definition: LabwareDefinition2
+    wellFill?: WellFill
     // generic prop to render self-positioned children for each labware
     labwareChildren?: React.ReactNode
     onLabwareClick?: () => void
@@ -54,6 +56,7 @@ interface BaseDeckProps {
     moduleModel: ModuleModel
     moduleLocation: ModuleLocation
     nestedLabwareDef?: LabwareDefinition2 | null
+    nestedLabwareWellFill?: WellFill
     innerProps?: React.ComponentProps<typeof Module>['innerProps']
     // generic prop to render self-positioned children for each module
     moduleChildren?: React.ReactNode
@@ -65,6 +68,7 @@ interface BaseDeckProps {
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode
+  showSlotLabels?: boolean
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
@@ -80,6 +84,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     deckConfig = STANDARD_SLOT_DECK_CONFIG_FIXTURE,
     showExpansion = true,
     children,
+    showSlotLabels = false,
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -166,6 +171,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             moduleModel,
             moduleLocation,
             nestedLabwareDef,
+            nestedLabwareWellFill,
             innerProps,
             moduleChildren,
             onLabwareClick,
@@ -191,6 +197,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   <LabwareRender
                     definition={nestedLabwareDef}
                     onLabwareClick={onLabwareClick}
+                    wellFill={nestedLabwareWellFill}
                   />
                 ) : null}
                 {moduleChildren}
@@ -203,6 +210,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             labwareLocation,
             definition,
             labwareChildren,
+            wellFill,
             onLabwareClick,
           }) => {
             if (
@@ -221,17 +229,21 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               <g
                 key={labwareLocation.slotName}
                 transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
+                cursor={onLabwareClick != null ? 'pointer' : ''}
               >
                 <LabwareRender
                   definition={definition}
                   onLabwareClick={onLabwareClick}
+                  wellFill={wellFill ?? undefined}
                 />
                 {labwareChildren}
               </g>
             ) : null
           }
         )}
-        <SlotLabels robotType={robotType} color={darkFill} />
+        {showSlotLabels ? (
+          <SlotLabels robotType={robotType} color={darkFill} />
+        ) : null}
       </>
       {children}
     </RobotCoordinateSpace>

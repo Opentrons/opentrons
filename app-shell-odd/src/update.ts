@@ -58,11 +58,13 @@ export const updateLatestVersion = (): Promise<string> => {
           return -1
         })
         .find(verson => channelFinder(verson, channel))
-
+      const changed = LATEST_OT_SYSTEM_VERSION !== latestAvailableVersion
       LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? _PKG_VERSION_
-      log.info(
-        `Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`
-      )
+      if (changed) {
+        log.info(
+          `Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`
+        )
+      }
       return LATEST_OT_SYSTEM_VERSION
     })
     .catch((e: Error) => {
