@@ -346,6 +346,7 @@ export const LabwarePositionCheckComponent = (
         {...movementStepProps}
         {...{ existingOffsets }}
         protocolName={protocolName}
+        shouldUseMetalProbe={shouldUseMetalProbe}
       />
     )
   } else if (
