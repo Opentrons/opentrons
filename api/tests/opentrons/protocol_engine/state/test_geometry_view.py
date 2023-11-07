@@ -1126,7 +1126,7 @@ def test_ensure_location_not_occupied_raises(
         subject.ensure_location_not_occupied(location=slot_location)
 
     # Raise if module in location
-    module_location = ModuleLocation(moduleId="module-id")
+    module_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     decoy.when(labware_view.raise_if_labware_in_location(module_location)).then_return(
         None
     )
@@ -1312,49 +1312,25 @@ def test_get_slot_item(
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
-    allowed_labware_ids = {"foo", "bar"}
-    allowed_module_ids = {"fizz", "buzz"}
     labware = LoadedLabware.construct(id="cool-labware")  # type: ignore[call-arg]
     module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
 
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_1, allowed_labware_ids)
-    ).then_return(None)
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_2, allowed_labware_ids)
-    ).then_return(labware)
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_3, allowed_labware_ids)
-    ).then_return(None)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
 
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_1, allowed_module_ids)
-    ).then_return(None)
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_2, allowed_module_ids)
-    ).then_return(None)
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_3, allowed_module_ids)
-    ).then_return(module)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(None)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(module)
 
     assert (
         subject.get_slot_item(
-            DeckSlotName.SLOT_1, allowed_labware_ids, allowed_module_ids
+            DeckSlotName.SLOT_1,
         )
         is None
     )
-    assert (
-        subject.get_slot_item(
-            DeckSlotName.SLOT_2, allowed_labware_ids, allowed_module_ids
-        )
-        == labware
-    )
-    assert (
-        subject.get_slot_item(
-            DeckSlotName.SLOT_3, allowed_labware_ids, allowed_module_ids
-        )
-        == module
-    )
+    assert subject.get_slot_item(DeckSlotName.SLOT_2) == labware
+    assert subject.get_slot_item(DeckSlotName.SLOT_3) == module
 
 
 @pytest.mark.parametrize(

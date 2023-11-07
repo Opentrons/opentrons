@@ -1,7 +1,7 @@
 """Geometry state getters."""
 import enum
 from numpy import array, dot
-from typing import Optional, List, Set, Tuple, Union, cast
+from typing import Optional, List, Tuple, Union, cast, TypeVar
 
 from opentrons.types import Point, DeckSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -53,6 +53,9 @@ class _GripperMoveType(enum.Enum):
 
     PICK_UP_LABWARE = enum.auto()
     DROP_LABWARE = enum.auto()
+
+
+_LabwareLocation = TypeVar("_LabwareLocation", bound=LabwareLocation)
 
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
@@ -454,13 +457,15 @@ class GeometryView:
         return slot_name
 
     def ensure_location_not_occupied(
-        self, location: LabwareLocation
-    ) -> LabwareLocation:
+        self, location: _LabwareLocation
+    ) -> _LabwareLocation:
         """Ensure that the location does not already have equipment in it."""
-        if isinstance(location, (DeckSlotLocation, ModuleLocation)):
+        # TODO (spp, 2023-11-07): update to include addressable areas
+        if isinstance(location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)):
             self._labware.raise_if_labware_in_location(location)
+        if isinstance(location, DeckSlotLocation):
             self._modules.raise_if_module_in_location(location)
-        return location
+        return cast(_LabwareLocation, location)
 
     def get_labware_grip_point(
         self,
@@ -529,17 +534,13 @@ class GeometryView:
     def get_slot_item(
         self,
         slot_name: DeckSlotName,
-        allowed_labware_ids: Set[str],
-        allowed_module_ids: Set[str],
     ) -> Union[LoadedLabware, LoadedModule, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
-            allowed_ids=allowed_labware_ids,
         )
         maybe_module = self._modules.get_by_slot(
             slot_name=slot_name,
-            allowed_ids=allowed_module_ids,
         )
 
         return maybe_labware or maybe_module or None

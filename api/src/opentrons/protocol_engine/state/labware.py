@@ -9,8 +9,6 @@ from typing import (
     Mapping,
     Optional,
     Sequence,
-    Set,
-    Union,
     Tuple,
     NamedTuple,
     cast,
@@ -47,6 +45,7 @@ from ..types import (
     ModuleModel,
     OverlapOffset,
     LabwareMovementOffsetData,
+    OnDeckLabwareLocation,
 )
 from ..actions import (
     Action,
@@ -275,11 +274,9 @@ class LabwareView(HasState[LabwareState]):
                     f"Cannot move to labware {labware_id}, labware has other labware stacked on top."
                 )
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_by_slot(
-        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+        self,
+        slot_name: DeckSlotName,
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
         loaded_labware = reversed(list(self._state.labware_by_id.values()))
@@ -288,7 +285,6 @@ class LabwareView(HasState[LabwareState]):
             if (
                 isinstance(labware.location, DeckSlotLocation)
                 and labware.location.slotName == slot_name
-                and labware.id in allowed_ids
             ):
                 return labware
 
@@ -729,9 +725,7 @@ class LabwareView(HasState[LabwareState]):
         """Check if labware is fixed trash."""
         return self.get_fixed_trash_id() == labware_id
 
-    def raise_if_labware_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
-    ) -> None:
+    def raise_if_labware_in_location(self, location: OnDeckLabwareLocation) -> None:
         """Raise an error if the specified location has labware in it."""
         for labware in self.get_all():
             if labware.location == location:

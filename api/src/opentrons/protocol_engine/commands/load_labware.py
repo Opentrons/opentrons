@@ -105,21 +105,24 @@ class LoadLabwareImplementation(
                 f"{params.loadName} is not allowed in slot {params.location.slotName}"
             )
 
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location
+        )
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
             namespace=params.namespace,
             version=params.version,
-            location=params.location,
+            location=verified_location,
             labware_id=params.labwareId,
         )
 
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
         #   on the definition. In practice this will not cause any issues since they will raise protocol ending
         #   exception, but for correctness should be refactored to do this check beforehand.
-        if isinstance(params.location, OnLabwareLocation):
+        if isinstance(verified_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=loaded_labware.definition,
-                bottom_labware_id=params.location.labwareId,
+                bottom_labware_id=verified_location.labwareId,
             )
 
         return LoadLabwareResult(

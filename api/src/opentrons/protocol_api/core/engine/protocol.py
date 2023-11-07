@@ -556,9 +556,7 @@ class ProtocolCore(
     ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
-            slot_name=slot_name,
-            allowed_labware_ids=set(self._labware_cores_by_id.keys()),
-            allowed_module_ids=set(self._module_cores_by_id.keys()),
+            slot_name=slot_name
         )
 
         if isinstance(loaded_item, LoadedLabware):
