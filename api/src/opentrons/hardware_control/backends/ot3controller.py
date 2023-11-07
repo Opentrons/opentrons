@@ -555,7 +555,9 @@ class OT3Controller:
         """
         ordered_nodes = self._motor_nodes()
         if nodes_in_moves_only:
-            moving_axes = {axis_to_node(ax) for move in moves for ax in move.unit_vector.keys()}
+            moving_axes = {
+                axis_to_node(ax) for move in moves for ax in move.unit_vector.keys()
+            }
             ordered_nodes = ordered_nodes.intersection(moving_axes)
 
         group = create_move_group(origin, moves, ordered_nodes, stop_condition)
