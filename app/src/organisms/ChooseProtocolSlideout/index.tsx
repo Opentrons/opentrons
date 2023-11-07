@@ -36,6 +36,7 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -162,6 +163,7 @@ export function ChooseProtocolSlideoutComponent(
           }}
           robotName={robot.name}
           {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
+          protocolAnalysis={selectedProtocol?.mostRecentAnalysis}
         />
       ) : null}
     </Slideout>
@@ -180,6 +182,7 @@ interface StoredProtocolListProps {
   runCreationError: string | null
   runCreationErrorCode: number | null
   robotName: string
+  protocolAnalysis?: ProtocolAnalysisOutput | null
 }
 
 function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
@@ -189,6 +192,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
     runCreationError,
     runCreationErrorCode,
     robotName,
+    protocolAnalysis,
   } = props
   const { t } = useTranslation(['device_details', 'shared'])
   const storedProtocols = useSelector((state: State) =>
@@ -223,12 +227,9 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     height="4.25rem"
                     width="4.75rem"
                   >
-                    <DeckThumbnail
-                      commands={
-                        storedProtocol.mostRecentAnalysis?.commands ?? []
-                      }
-                      labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
-                    />
+                    {protocolAnalysis != null ? (
+                      <DeckThumbnail protocolAnalysis={protocolAnalysis} />
+                    ) : null}
                   </Box>
                   <StyledText
                     as="p"

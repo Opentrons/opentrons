@@ -1,179 +1,128 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 
+import { BaseDeck } from '@opentrons/components'
 import {
-  RobotWorkSpace,
-  Module,
-  LabwareRender,
-  SlotLabels,
-  COLORS,
-} from '@opentrons/components'
-import {
-  inferModuleOrientationFromXCoordinate,
-  getModuleDef2,
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
-  parseInitialLoadedLabwareBySlot,
-  parseInitialLoadedLabwareByModuleId,
-  parseInitialLoadedModulesBySlot,
-  parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
   parseInitialLoadedLabwareByAdapter,
+  parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
-import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import { getIsOnDevice } from '../../redux/config'
+
 import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
-import { getStandardDeckViewBox } from './utils/getStandardViewBox'
+import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
+import { getLabwareRenderInfo } from '../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
+import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { useAttachedModules } from '../../organisms/Devices/hooks'
+import { getAttachedProtocolModuleMatches } from '../../organisms/ProtocolSetupModulesAndDeck/utils'
+import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 
 import type { StyleProps } from '@opentrons/components'
 import type {
-  DeckSlot,
-  Liquid,
-  LoadedLabware,
-  RunTimeCommand,
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps extends StyleProps {
-  commands: RunTimeCommand[]
-  labware: LoadedLabware[]
-  liquids?: Liquid[]
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   showSlotLabels?: boolean
 }
 
-export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const {
-    commands,
-    liquids,
-    labware = [],
-    showSlotLabels = false,
-    ...styleProps
-  } = props
-  const robotType = getRobotTypeFromLoadedLabware(labware)
+export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
+  const { protocolAnalysis, showSlotLabels = false, ...styleProps } = props
+  const attachedModules = useAttachedModules()
+
+  if (protocolAnalysis == null) return null
+
+  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
-  const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
-    commands
+    protocolAnalysis.commands
   )
-  const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
-  const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
-    commands
+
+  const deckConfig = getDeckConfigFromProtocolCommands(
+    protocolAnalysis.commands
   )
-  const liquidsInLoadOrder = parseLiquidsInLoadOrder(
-    liquids != null ? liquids : [],
-    commands
+  const liquids = protocolAnalysis.liquids
+
+  const labwareRenderInfo =
+    protocolAnalysis != null
+      ? getLabwareRenderInfo(protocolAnalysis, deckDef)
+      : {}
+  const protocolModulesInfo =
+    protocolAnalysis != null
+      ? getProtocolModulesInfo(protocolAnalysis, deckDef)
+      : []
+  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
+    attachedModules,
+    protocolModulesInfo
   )
-  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
-  const isOnDevice = useSelector(getIsOnDevice)
-  // TODO(bh, 2023-7-12): replace with color constant when added to design system
-  const deckFill = isOnDevice ? COLORS.light1 : '#e6e6e6'
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(
+    protocolAnalysis.commands
+  )
+
+  const moduleLocations = attachedProtocolModuleMatches.map(module => {
+    const labwareInAdapterInMod =
+      module.nestedLabwareId != null
+        ? initialLoadedLabwareByAdapter[module.nestedLabwareId]
+        : null
+    //  only rendering the labware on top most layer so
+    //  either the adapter or the labware are rendered but not both
+    const topLabwareDefinition =
+      labwareInAdapterInMod?.result?.definition ?? module.nestedLabwareDef
+    const nestedLabwareWellFill = getWellFillFromLabwareId(
+      module.nestedLabwareId ?? '',
+      liquids,
+      labwareByLiquidId
+    )
+    // const labwareHasLiquid = !isEmpty(wellFill)
+    return {
+      moduleModel: module.moduleDef.model,
+      moduleLocation: { slotName: module.slotName },
+      nestedLabwareWellFill,
+      innerProps:
+        module.moduleDef.model === THERMOCYCLER_MODULE_V1
+          ? { lidMotorState: 'open' }
+          : {},
+      nestedLabwareDef: topLabwareDefinition,
+    }
+  })
+
+  const labwareLocations = map(
+    labwareRenderInfo,
+    ({ labwareDef, displayName, slotName }, labwareId) => {
+      const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
+      //  only rendering the labware on top most layer so
+      //  either the adapter or the labware are rendered but not both
+      const topLabwareDefinition =
+        labwareInAdapter?.result?.definition ?? labwareDef
+      const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
+
+      const wellFill = getWellFillFromLabwareId(
+        topLabwareId ?? '',
+        liquids,
+        labwareByLiquidId
+      )
+      return {
+        labwareLocation: { slotName },
+        definition: topLabwareDefinition,
+        wellFill: wellFill,
+      }
+    }
+  )
 
   return (
-    // PR #10488 changed size
-    // revert the height
-    // Note add offset 18px to right and left
-    <RobotWorkSpace
+    <BaseDeck
+      deckConfig={deckConfig}
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
-      deckDef={deckDef}
-      deckFill={deckFill}
-      trashSlotName="A3"
-      viewBox={getStandardDeckViewBox(robotType)}
+      robotType={robotType}
+      labwareLocations={labwareLocations}
+      moduleLocations={moduleLocations}
+      showSlotLabels={showSlotLabels}
       {...styleProps}
-    >
-      {({ deckSlotsById }) => (
-        <>
-          {map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
-            if (slot.matingSurfaceUnitVector == null) return null // if slot has no mating surface, don't render anything in it
-
-            const moduleInSlot =
-              slotId in initialLoadedModulesBySlot
-                ? initialLoadedModulesBySlot[slotId]
-                : null
-            const labwareInSlot =
-              slotId in initialLoadedLabwareBySlot
-                ? initialLoadedLabwareBySlot[slotId]
-                : null
-            const labwareInModule =
-              moduleInSlot?.result?.moduleId != null &&
-              moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
-                ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
-                : null
-
-            let labwareId =
-              labwareInSlot != null ? labwareInSlot.result?.labwareId : null
-            let labwareInAdapter = null
-
-            if (labwareInModule != null) {
-              if (
-                labwareInModule?.result != null &&
-                'labwareId' in labwareInModule.result &&
-                labwareInModule.result.labwareId in
-                  initialLoadedLabwareByAdapter
-              ) {
-                labwareInAdapter =
-                  initialLoadedLabwareByAdapter[
-                    labwareInModule?.result.labwareId
-                  ]
-                labwareId = labwareInAdapter.result?.labwareId
-              } else {
-                labwareId = labwareInModule.params.labwareId
-              }
-            }
-            const wellFill =
-              labwareId != null && liquids != null
-                ? getWellFillFromLabwareId(
-                    labwareId,
-                    liquidsInLoadOrder,
-                    labwareByLiquidId
-                  )
-                : null
-            return (
-              <React.Fragment key={slotId}>
-                {moduleInSlot != null ? (
-                  <Module
-                    x={slot.position[0]}
-                    y={slot.position[1]}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      slot.position[0]
-                    )}
-                    def={getModuleDef2(moduleInSlot.params.model)}
-                    innerProps={
-                      moduleInSlot.params.model === THERMOCYCLER_MODULE_V1
-                        ? { lidMotorState: 'open' }
-                        : {}
-                    }
-                  >
-                    {labwareInModule?.result?.definition != null ? (
-                      <LabwareRender
-                        definition={
-                          labwareInAdapter?.result != null
-                            ? labwareInAdapter?.result?.definition
-                            : labwareInModule?.result?.definition
-                        }
-                        wellFill={wellFill ?? undefined}
-                      />
-                    ) : null}
-                  </Module>
-                ) : null}
-                {labwareInSlot?.result?.definition != null ? (
-                  <g
-                    transform={`translate(${slot.position[0]},${slot.position[1]})`}
-                  >
-                    <LabwareRender
-                      definition={labwareInSlot.result.definition}
-                      wellFill={wellFill ?? undefined}
-                    />
-                  </g>
-                ) : null}
-              </React.Fragment>
-            )
-          })}
-          {showSlotLabels ? <SlotLabels robotType={robotType} /> : null}
-        </>
-      )}
-    </RobotWorkSpace>
+    ></BaseDeck>
   )
 }

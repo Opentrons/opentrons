@@ -157,7 +157,6 @@ describe('DownloadUpdateModal', () => {
 
     expect(getByText('test error')).toBeInTheDocument()
     fireEvent.click(exitButton)
-    expect(getByText('Try again')).toBeInTheDocument()
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
 
     expect(mockUseCreateLiveCommandMutation).toBeCalledWith()

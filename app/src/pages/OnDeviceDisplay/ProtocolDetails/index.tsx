@@ -19,6 +19,7 @@ import {
   truncateString,
   TYPOGRAPHY,
   POSITION_STICKY,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -267,7 +268,14 @@ const ProtocolSectionContent = ({
       protocolSection = <Deck protocolId={protocolId} />
       break
   }
-  return <Flex margin={SPACING.spacing16}>{protocolSection}</Flex>
+  return (
+    <Flex
+      margin={SPACING.spacing16}
+      justifyContent={currentOption === 'Deck' ? JUSTIFY_CENTER : undefined}
+    >
+      {protocolSection}
+    </Flex>
+  )
 }
 
 export function ProtocolDetails(): JSX.Element | null {

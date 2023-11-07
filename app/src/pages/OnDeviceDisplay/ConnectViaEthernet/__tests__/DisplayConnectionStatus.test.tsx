@@ -67,6 +67,8 @@ describe('DisplayConnectionStatus', () => {
   it('should call a mock push when tapping continue button', () => {
     const [{ getByText }] = render(props)
     getByText('Continue').click()
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
+    expect(mockPush).toHaveBeenCalledWith(
+      '/robot-settings/update-robot-during-onboarding'
+    )
   })
 })
