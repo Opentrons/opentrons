@@ -6,7 +6,7 @@ from functools import lru_cache
 from typing import Any, Dict, List, Optional, cast
 
 import sqlalchemy
-from pydantic import parse_obj_as
+from pydantic import parse_obj_as, ValidationError
 
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
@@ -256,11 +256,14 @@ class RunStore:
         with self._sql_engine.begin() as transaction:
             row = transaction.execute(select_run_data).one()
 
-        return (
-            StateSummary.parse_obj(row.state_summary)
-            if row.state_summary is not None
-            else None
-        )
+        try:
+            return (
+                StateSummary.parse_obj(row.state_summary)
+                if row.state_summary is not None
+                else None
+            )
+        except ValidationError:
+            return None
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def _get_all_unparsed_commands(self, run_id: str) -> List[Dict[str, Any]]:
