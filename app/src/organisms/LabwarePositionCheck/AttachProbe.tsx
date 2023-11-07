@@ -59,6 +59,22 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteMount = pipette?.mount
+
+  React.useEffect(() => {
+    // move into correct position for probe attach on mount
+    chainRunCommands(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: pipetteMount,
+          },
+        },
+      ],
+      false
+    ).catch(error => setFatalError(error.message))
+  }, [])
+
   if (pipetteName == null || pipetteMount == null) return null
 
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =

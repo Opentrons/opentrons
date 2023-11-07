@@ -55,6 +55,22 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
     probeVideoSrc = detachProbe96
   }
   const pipetteMount = pipette?.mount
+
+  React.useEffect(() => {
+    // move into correct position for probe detach on mount
+    chainRunCommands(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: pipetteMount,
+          },
+        },
+      ],
+      false
+    ).catch(error => setFatalError(error.message))
+  }, [])
+
   if (pipetteName == null || pipetteMount == null) return null
 
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
@@ -83,7 +99,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
       .then(() => proceed())
       .catch((e: Error) => {
         setFatalError(
-          `DetachProbe failed to move to safe location after probe attach with message: ${e.message}`
+          `DetachProbe failed to move to safe location after probe detach with message: ${e.message}`
         )
       })
   }

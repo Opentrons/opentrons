@@ -338,6 +338,7 @@ export const LabwarePositionCheckComponent = (
       <ExitConfirmation
         onGoBack={cancelExitLPC}
         onConfirmExit={confirmExitLPC}
+        shouldUseMetalProbe={shouldUseMetalProbe}
       />
     )
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
