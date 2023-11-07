@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, SPACING, DIRECTION_ROW } from '@opentrons/components'
 
+import { useDispatchStartRobotUpdate } from '../../redux/robot-update/hooks'
+
 import { getLocalRobot } from '../../redux/discovery'
 import {
   getRobotUpdateAvailable,
-  startRobotUpdate,
+  clearRobotUpdateSession,
 } from '../../redux/robot-update'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import {
@@ -34,7 +36,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
   ] = React.useState<boolean>(true)
   const history = useHistory()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-
+  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotUpdateType = useSelector((state: State) => {
@@ -82,11 +84,14 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
               flex="1"
               buttonType="secondary"
               buttonText={t('proceed_without_updating')}
-              onClick={() => history.push('/emergency-stop')}
+              onClick={() => {
+                dispatch(clearRobotUpdateSession())
+                history.push('/emergency-stop')
+              }}
             />
             <MediumButton
               flex="1"
-              onClick={() => dispatch(startRobotUpdate(robotName))}
+              onClick={() => dispatchStartRobotUpdate(robotName)}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
           </Flex>

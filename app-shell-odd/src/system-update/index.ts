@@ -141,8 +141,15 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
           massStorageUpdateSet !== null &&
           massStorageUpdateSet.system.startsWith(action.payload.rootPath)
         ) {
+          console.log(
+            `Mass storage device ${action.payload.rootPath} removed, reverting to non-usb updates`
+          )
           massStorageUpdateSet = null
           getCachedSystemUpdateFiles(dispatch)
+        } else {
+          console.log(
+            `Mass storage device ${action.payload.rootPath} removed but this was not an update source`
+          )
         }
         break
     }

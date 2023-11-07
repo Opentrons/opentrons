@@ -8,8 +8,9 @@ import { Flex, SPACING, DIRECTION_ROW } from '@opentrons/components'
 import { getLocalRobot } from '../../redux/discovery'
 import {
   getRobotUpdateAvailable,
-  startRobotUpdate,
+  clearRobotUpdateSession,
 } from '../../redux/robot-update'
+import { useDispatchStartRobotUpdate } from '../../redux/robot-update/hooks'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 
 import { MediumButton } from '../../atoms/buttons'
@@ -24,8 +25,6 @@ import type { State, Dispatch } from '../../redux/types'
 export function UpdateRobot(): JSX.Element {
   const history = useHistory()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const dispatch = useDispatch<Dispatch>()
-
   const localRobot = useSelector(getLocalRobot)
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
@@ -33,6 +32,8 @@ export function UpdateRobot(): JSX.Element {
       : null
   })
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const dispatch = useDispatch<Dispatch>()
 
   const [errorString, setErrorString] = React.useState<string | null>(null)
 
@@ -45,11 +46,17 @@ export function UpdateRobot(): JSX.Element {
               flex="1"
               buttonType="secondary"
               buttonText={t('cancel_software_update')}
-              onClick={() => history.goBack()}
+              onClick={() => {
+                dispatch(clearRobotUpdateSession())
+                history.goBack()
+              }}
             />
             <MediumButton
               flex="1"
-              onClick={() => dispatch(startRobotUpdate(robotName))}
+              onClick={() => {
+                setErrorString(null)
+                dispatchStartRobotUpdate(robotName)
+              }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
           </Flex>
