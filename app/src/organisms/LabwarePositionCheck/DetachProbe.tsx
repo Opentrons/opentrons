@@ -63,7 +63,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
         {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
-            mount: pipetteMount,
+            mount: pipetteMount ?? 'left',
           },
         },
       ],

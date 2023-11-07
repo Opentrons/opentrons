@@ -86,7 +86,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
-            mount: pipetteMount,
+            mount: pipetteMount ?? 'left',
           },
         },
       ],

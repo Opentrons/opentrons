@@ -424,6 +424,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           handleJog={handleJog}
           initialPosition={initialPosition}
           existingOffset={existingOffset}
+          shouldUseMetalProbe={false}
         />
       ) : (
         <PrepareSpace

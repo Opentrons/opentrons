@@ -61,7 +61,6 @@ export const ProbeNotAttached = (
         ) : (
           <PrimaryButton
             disabled={isPending}
-            o
             onClick={() => {
               setNumberOfTryAgains(numberOfTryAgains + 1)
               handleOnClick()
