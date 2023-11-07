@@ -67,7 +67,8 @@ export const generateRobotStateTimeline = (
           // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette.changeTip === 'never'
 
-        const isWasteChute = true
+        const isWasteChute =
+          invariantContext.additionalEquipmentEntities[dropTipLocation] != null
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
 
