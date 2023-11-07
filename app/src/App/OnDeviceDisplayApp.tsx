@@ -36,6 +36,7 @@ import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
 import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
 import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
+import { UpdateRobotDuringOnboarding } from '../pages/OnDeviceDisplay/UpdateRobotDuringOnboarding'
 import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
 import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
@@ -45,7 +46,11 @@ import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
-import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
+import {
+  useCurrentRunRoute,
+  useProtocolReceiptToast,
+  useSoftwareUpdatePoll,
+} from './hooks'
 
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
@@ -186,6 +191,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/robot-settings/update-robot',
   },
   {
+    Component: UpdateRobotDuringOnboarding,
+    exact: true,
+    name: 'Update Robot During Onboarding',
+    path: '/robot-settings/update-robot-during-onboarding',
+  },
+  {
     Component: EmergencyStop,
     exact: true,
     name: 'Emergency Stop',
@@ -219,6 +230,7 @@ const onDeviceDisplayEvents: Array<keyof DocumentEventMap> = [
 const TURN_OFF_BACKLIGHT = '7'
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  useSoftwareUpdatePoll()
   const { brightness: userSetBrightness, sleepMs } = useSelector(
     getOnDeviceDisplaySettings
   )

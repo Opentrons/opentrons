@@ -9,15 +9,15 @@ from opentrons_hardware.hardware_control.tip_presence import (
     types as tp_types,
 )
 from opentrons_hardware.firmware_bindings.constants import SensorId
-from opentrons_hardware.drivers import can_bus
+from opentrons_hardware.drivers.can_bus import CanMessenger
 
 from opentrons_shared_data.errors.exceptions import UnmatchedTipPresenceStates
 
 
 @pytest.fixture
-def can_messenger(decoy: Decoy) -> can_bus.CanMessenger:
+def can_messenger(decoy: Decoy) -> CanMessenger:
     """Build a decoyed can messenger."""
-    return decoy.mock(cls=can_bus.CanMessenger)
+    return decoy.mock(cls=CanMessenger)
 
 
 @pytest.fixture
@@ -58,7 +58,7 @@ def tip_detector_controller(
 
 @pytest.fixture
 async def subject(
-    can_messenger: can_bus.CanMessenger,
+    can_messenger: CanMessenger,
     tip_detector: TipDetector,
 ) -> AsyncIterator[TipPresenceManager]:
     """Build a test subject using decoyed can messenger and tip detector."""

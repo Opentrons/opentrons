@@ -54,7 +54,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveTarget,
     ZeroLengthMoveError,
 )
-
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
@@ -1460,6 +1460,7 @@ class OT3API(
                     self._log.warning(
                         f"Stall on {axis} during fast home, encoder may have missed an overflow"
                     )
+                    await self.refresh_positions()
 
             await self._backend.home([axis], self.gantry_load)
         else:
@@ -2043,8 +2044,11 @@ class OT3API(
             instrument.set_current_volume(0)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
-
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and instrument.nozzle_manager.current_configuration.configuration
+            == NozzleConfigurationType.FULL
+        ):
             spec = self._pipette_handler.plan_ht_pick_up_tip()
             if spec.z_distance_to_tiprack:
                 await self.move_rel(
@@ -2363,6 +2367,41 @@ class OT3API(
         )
 
         return pos_at_home[Axis.by_mount(mount)] - self._config.z_retract_distance
+
+    async def update_nozzle_configuration_for_mount(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        back_left_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        The expectation of this function is that the back_left_nozzle/front_right_nozzle are the two corners
+        of a rectangle of nozzles. A call to this function that does not follow that schema will result
+        in an error.
+
+        :param mount: A robot mount that the instrument is on.
+        :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
+        of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
+        none is provided.
+        :return: None.
+
+        If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
+        """
+        if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
+            await self._pipette_handler.reset_nozzle_configuration(
+                OT3Mount.from_mount(mount)
+            )
+        else:
+            assert back_left_nozzle and front_right_nozzle
+            await self._pipette_handler.update_nozzle_configuration(
+                OT3Mount.from_mount(mount),
+                back_left_nozzle,
+                front_right_nozzle,
+                starting_nozzle,
+            )
 
     async def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float

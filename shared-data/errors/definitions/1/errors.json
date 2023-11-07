@@ -213,6 +213,10 @@
     "4006": {
       "detail": "Invalid Protocol Data",
       "category": "generalError"
+    },
+    "4007": {
+      "detail": "API Command is misconfigured",
+      "category": "generalError"
     }
   }
 }

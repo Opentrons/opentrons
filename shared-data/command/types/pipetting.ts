@@ -1,27 +1,29 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
   | AspirateRunTimeCommand
-  | DispenseRunTimeCommand
-  | BlowoutRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
-  | TouchTipRunTimeCommand
-  | PickUpTipRunTimeCommand
-  | DropTipRunTimeCommand
-  | DropTipInPlaceRunTimeCommand
+  | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
+  | DispenseInPlaceRunTimeCommand
+  | DispenseRunTimeCommand
+  | DropTipInPlaceRunTimeCommand
+  | DropTipRunTimeCommand
+  | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
+  | TouchTipRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
-  | DispenseCreateCommand
   | BlowoutCreateCommand
   | BlowoutInPlaceCreateCommand
-  | TouchTipCreateCommand
-  | PickUpTipCreateCommand
+  | ConfigureForVolumeCreateCommand
+  | DispenseCreateCommand
+  | DispenseInPlaceCreateCommand
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
-  | ConfigureForVolumeCreateCommand
+  | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
+  | TouchTipCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -58,6 +60,17 @@ export interface DispenseRunTimeCommand
     DispenseCreateCommand {
   result?: BasicLiquidHandlingResult
 }
+
+export interface DispenseInPlaceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'dispenseInPlace'
+  params: DispenseInPlaceParams
+}
+export interface DispenseInPlaceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    DispenseInPlaceCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
+
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'blowout'
   params: BlowoutParams
@@ -152,6 +165,13 @@ export interface DropTipInPlaceParams {
 export interface BlowoutInPlaceParams {
   pipetteId: string
   flowRate: number // µL/s
+}
+
+export interface DispenseInPlaceParams {
+  pipetteId: string
+  volume: number
+  flowRate: number // µL/s
+  pushOut?: number
 }
 
 interface FlowRateParams {

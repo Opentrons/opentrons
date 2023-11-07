@@ -92,7 +92,9 @@ export function WifiConnectionDetails({
             <MediumButton
               flex="1"
               buttonText={i18n.format(t('continue'), 'capitalize')}
-              onClick={() => history.push('/robot-settings/update-robot')}
+              onClick={() =>
+                history.push('/robot-settings/update-robot-during-onboarding')
+              }
             />
           </Flex>
         </Flex>

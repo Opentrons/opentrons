@@ -91,6 +91,8 @@ describe('WifiConnectionDetails', () => {
   it('when clicking Check for updates button, should call mock function', () => {
     const [{ getByText }] = render(props)
     getByText('Continue').click()
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
+    expect(mockPush).toHaveBeenCalledWith(
+      '/robot-settings/update-robot-during-onboarding'
+    )
   })
 })

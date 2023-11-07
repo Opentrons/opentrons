@@ -170,12 +170,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
             loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
             error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
-            complete: (
-              <DeckThumbnail
-                commands={mostRecentAnalysis?.commands ?? []}
-                labware={mostRecentAnalysis?.labware ?? []}
-              />
-            ),
+            complete:
+              mostRecentAnalysis != null ? (
+                <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
+              ) : (
+                <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />
+              ),
           }[analysisStatus]
         }
       </Box>

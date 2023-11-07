@@ -90,20 +90,28 @@ export function postFile(
   name: string,
   source: string
 ): Promise<Response> {
-  return createReadStream(source).then(readStream => {
-    const body = new FormData()
-    body.append(name, readStream)
-    return fetch(input, { body, method: 'POST' })
+  return new Promise<Response>((resolve, reject) => {
+    createReadStream(source, reject).then(readStream =>
+      new Promise<Response>(resolve => {
+        const body = new FormData()
+        body.append(name, readStream)
+        resolve(fetch(input, { body, method: 'POST' }))
+      }).then(resolve)
+    )
   })
 }
 
 // create a read stream, handling errors that `fetch` is unable to catch
-function createReadStream(source: string): Promise<Readable> {
+function createReadStream(
+  source: string,
+  onError: (error: unknown) => unknown
+): Promise<Readable> {
   return new Promise((resolve, reject) => {
     const readStream = fs.createReadStream(source)
     const scheduledResolve = setTimeout(handleSuccess, 0)
 
     readStream.once('error', handleError)
+    readStream.once('error', onError)
 
     function handleSuccess(): void {
       readStream.removeListener('error', handleError)

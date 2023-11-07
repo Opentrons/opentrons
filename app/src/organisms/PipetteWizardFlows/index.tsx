@@ -65,8 +65,11 @@ export const PipetteWizardFlows = (
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
-  const isGantryEmpty =
-    attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
+  const isGantryEmpty = React.useMemo(
+    () => attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null,
+    []
+  )
+
   const pipetteWizardSteps = React.useMemo(
     () =>
       memoizedPipetteInfo == null
