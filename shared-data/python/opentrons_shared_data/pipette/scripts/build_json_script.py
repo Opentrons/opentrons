@@ -111,14 +111,18 @@ def _build_motor_configurations(
 def _build_partial_tip_configurations(channels: int) -> PartialTipDefinition:
     if channels == 8:
         return PartialTipDefinition(
-            partialTipSupported=True, availableConfigurations=[1, 2, 3, 4, 5, 6, 7, 8]
+            partialTipSupported=True,
+            availableConfigurations=[1, 2, 3, 4, 5, 6, 7, 8],
+            perTipPickupCurrent={},
         )
     elif channels == 96:
         return PartialTipDefinition(
-            partialTipSupported=True, availableConfigurations=[1, 8, 12, 96]
+            partialTipSupported=True,
+            availableConfigurations=[1, 8, 12, 96],
+            perTipPickupCurrent={},
         )
     else:
-        return PartialTipDefinition(partialTipSupported=False)
+        return PartialTipDefinition(partialTipSupported=False, perTipPickupCurrent={})
 
 
 def build_geometry_model_v2(

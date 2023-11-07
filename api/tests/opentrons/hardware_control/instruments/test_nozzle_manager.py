@@ -1,8 +1,22 @@
-{
-  "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
-  "pathTo3D": "pipette/definitions/2/geometry/ninety_six_channel/p1000/placeholder.gltf",
-  "nozzleOffset": [-36.0, -25.5, -259.15],
-  "nozzleMap": {
+import pytest
+from typing import Dict, List, ContextManager, Tuple
+
+from contextlib import nullcontext as does_not_raise
+from opentrons.hardware_control import nozzle_manager
+
+from opentrons.types import Point
+from opentrons.hardware_control.types import CriticalPoint
+
+
+def build_nozzle_manger(
+    nozzle_map: Dict[str, List[float]]
+) -> nozzle_manager.NozzleConfigurationManager:
+    return nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
+        nozzle_map, pick_up_current_map={1: 0.1}
+    )
+
+
+NINETY_SIX_CHANNEL_MAP = {
     "A1": [-36.0, -25.5, -259.15],
     "A2": [-27.0, -25.5, -259.15],
     "A3": [-18.0, -25.5, -259.15],
@@ -98,6 +112,88 @@
     "H9": [36.0, -88.5, -259.15],
     "H10": [45.0, -88.5, -259.15],
     "H11": [54.0, -88.5, -259.15],
-    "H12": [63.0, -88.5, -259.15]
-  }
+    "H12": [63.0, -88.5, -259.15],
 }
+
+
+@pytest.mark.parametrize(
+    argnames=["nozzle_map", "critical_point_configuration", "expected"],
+    argvalues=[
+        [
+            {
+                "A1": [-8.0, -16.0, -259.15],
+                "B1": [-8.0, -25.0, -259.15],
+                "C1": [-8.0, -34.0, -259.15],
+                "D1": [-8.0, -43.0, -259.15],
+                "E1": [-8.0, -52.0, -259.15],
+                "F1": [-8.0, -61.0, -259.15],
+                "G1": [-8.0, -70.0, -259.15],
+                "H1": [-8.0, -79.0, -259.15],
+            },
+            CriticalPoint.XY_CENTER,
+            Point(-8.0, -47.5, -259.15),
+        ],
+        [
+            NINETY_SIX_CHANNEL_MAP,
+            CriticalPoint.XY_CENTER,
+            Point(13.5, -57.0, -259.15),
+        ],
+        [
+            {"A1": [1, 1, 1]},
+            CriticalPoint.FRONT_NOZZLE,
+            Point(1, 1, 1),
+        ],
+    ],
+)
+def test_update_nozzles_with_critical_points(
+    nozzle_map: Dict[str, List[float]],
+    critical_point_configuration: CriticalPoint,
+    expected: List[float],
+) -> None:
+    subject = build_nozzle_manger(nozzle_map)
+    new_cp = subject.critical_point_with_tip_length(critical_point_configuration)
+    assert new_cp == expected
+
+
+@pytest.mark.parametrize(
+    argnames=["nozzle_map", "updated_nozzle_configuration", "exception", "expected_cp"],
+    argvalues=[
+        [
+            {
+                "A1": [0.0, 31.5, 0.8],
+                "B1": [0.0, 22.5, 0.8],
+                "C1": [0.0, 13.5, 0.8],
+                "D1": [0.0, 4.5, 0.8],
+                "E1": [0.0, -4.5, 0.8],
+                "F1": [0.0, -13.5, 0.8],
+                "G1": [0.0, -22.5, 0.8],
+                "H1": [0.0, -31.5, 0.8],
+            },
+            ("D1", "H1"),
+            does_not_raise(),
+            Point(0.0, 4.5, 0.8),
+        ],
+        [
+            {"A1": [1, 1, 1]},
+            ("A1", "D1"),
+            pytest.raises(nozzle_manager.IncompatibleNozzleConfiguration),
+            Point(1, 1, 1),
+        ],
+        [
+            NINETY_SIX_CHANNEL_MAP,
+            ("A12", "H12"),
+            does_not_raise(),
+            Point(x=63.0, y=-25.5, z=-259.15),
+        ],
+    ],
+)
+def test_update_nozzle_configuration(
+    nozzle_map: Dict[str, List[float]],
+    updated_nozzle_configuration: Tuple[str, str],
+    exception: ContextManager[None],
+    expected_cp: List[float],
+) -> None:
+    subject = build_nozzle_manger(nozzle_map)
+    with exception:
+        subject.update_nozzle_configuration(*updated_nozzle_configuration)
+    assert subject.starting_nozzle_offset == expected_cp

@@ -1,13 +1,23 @@
 import * as React from 'react'
-import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
+import { when, resetAllWhenMocks } from 'jest-when'
+
 import {
+  DeckConfigurator,
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components'
+import {
+  useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../i18n'
 import { useRunStatuses } from '../../Devices/hooks'
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
 import { DeviceDetailsDeckConfiguration } from '../'
+
+import type { MaintenanceRun } from '@opentrons/api-client'
 
 jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
 jest.mock('@opentrons/react-api-client')
@@ -22,6 +32,9 @@ const RUN_STATUSES = {
   isRunTerminal: false,
   isRunIdle: false,
 }
+const mockCurrnetMaintenanceRun = {
+  data: { id: 'mockMaintenanceRunId' },
+} as MaintenanceRun
 
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery
@@ -37,6 +50,9 @@ const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
+>
+const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useCurrentMaintenanceRun
 >
 
 const render = (
@@ -61,8 +77,15 @@ describe('DeviceDetailsDeckConfiguration', () => {
     mockDeckFixtureSetupInstructionsModal.mockReturnValue(
       <div>mock DeckFixtureSetupInstructionsModal</div>
     )
-    mockDeckConfigurator.mockReturnValue(<div>mock DeckConfigurator</div>)
+    when(mockDeckConfigurator).mockReturnValue(<div>mock DeckConfigurator</div>)
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
+    mockUseCurrentMaintenanceRun.mockReturnValue({
+      data: {},
+    } as any)
+  })
+
+  afterEach(() => {
+    resetAllWhenMocks()
   })
 
   it('should render text and button', () => {
@@ -83,9 +106,23 @@ describe('DeviceDetailsDeckConfiguration', () => {
   it('should render banner and make deck configurator disabled when running', () => {
     RUN_STATUSES.isRunRunning = true
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
-    const [{ getByText, queryAllByRole }] = render(props)
+    when(mockDeckConfigurator)
+      .calledWith(partialComponentPropsMatcher({ readOnly: true }))
+      .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
+    const [{ getByText }] = render(props)
     getByText('Deck configuration is not available when run is in progress')
-    // Note (kk:10/27/2023) detects Setup Instructions buttons
-    expect(queryAllByRole('button').length).toBe(1)
+    getByText('disabled mock DeckConfigurator')
+  })
+
+  it('should render banner and make deck configurator disabled when a maintenance run exists', () => {
+    mockUseCurrentMaintenanceRun.mockReturnValue({
+      data: mockCurrnetMaintenanceRun,
+    } as any)
+    when(mockDeckConfigurator)
+      .calledWith(partialComponentPropsMatcher({ readOnly: true }))
+      .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
+    const [{ getByText }] = render(props)
+    getByText('Deck configuration is not available when the robot is busy')
+    getByText('disabled mock DeckConfigurator')
   })
 })
