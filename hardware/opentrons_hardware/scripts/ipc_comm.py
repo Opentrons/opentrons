@@ -3,9 +3,11 @@ import json
 import argparse
 import asyncio
 
-from ipc_messenger import ipc_dispatcher
-from ipc_messenger import IPCMessenger
-from ipc_messenger.types import (
+from opentrons_hardware.ipc import (
+    ipc_dispatcher,
+    IPCMessenger,
+)
+from opentrons_hardware.ipc.types import (
     IPCProcess,
     JSONRPCRequest,
     JSONRPCBatchRequest,

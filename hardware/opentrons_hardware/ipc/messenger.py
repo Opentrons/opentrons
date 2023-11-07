@@ -20,7 +20,7 @@ from .types import (
 )
 
 log = logging.getLogger(__name__)
-init_logging("DEBUG")
+#init_logging("DEBUG")
 
 
 class IPCMessenger:
