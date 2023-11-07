@@ -110,7 +110,7 @@ def invalid_state_summary() -> StateSummary:
     analysis_error = pe_errors.ErrorOccurrence.construct(
         id="error-id",
         # Invalid value here should fail analysis
-        createdAt=MountType.LEFT,
+        createdAt=MountType.LEFT,  # type: ignore
         errorType="BadError",
         detail="oh no",
     )
@@ -410,7 +410,7 @@ def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> No
 def test_get_state_summary_failure(
     subject: RunStore, invalid_state_summary: StateSummary
 ) -> None:
-    """It should return None"""
+    """It should return None."""
     subject.insert(
         run_id="run-id",
         protocol_id=None,
