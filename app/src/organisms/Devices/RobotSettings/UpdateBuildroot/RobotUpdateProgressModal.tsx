@@ -99,12 +99,26 @@ export function RobotUpdateProgressModal({
   )
 
   let modalBodyText = ''
-  if (updateStep === 'download') modalBodyText = t('downloading_update')
-  if (updateStep === 'install') modalBodyText = t('installing_update')
   let subProgressBarText = t('do_not_turn_off')
-  if (updateStep === 'restart') modalBodyText = t('restarting_robot')
-  if (updateStep === 'restart' && letUserExitUpdate) {
-    subProgressBarText = t('restart_taking_too_long', { robotName })
+  switch (updateStep) {
+    case 'initial':
+    case 'error':
+      modalBodyText = ''
+      break
+    case 'download':
+      modalBodyText = t('downloading_update')
+      break
+    case 'install':
+      modalBodyText = t('installing_update')
+      break
+    case 'restart':
+      modalBodyText = t('restarting_robot')
+      if (letUserExitUpdate) {
+        subProgressBarText = t('restart_taking_too_long', { robotName })
+      }
+      break
+    default:
+      modalBodyText = t('installing_update')
   }
 
   return (
