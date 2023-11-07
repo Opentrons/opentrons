@@ -26,7 +26,7 @@
   "confirm_position_and_return_tip": "Confirm position, return tip to Slot {{next_slot}} and home",
   "detach_probe": "Remove calibration probe",
   "ensure_nozzle_position_odd": "<block>Ensure that the {{tip_type}} is centered above and level with {{item_location}}. If it isn't, tap <bold>Move pipette</bold> and then jog the pipette until it is properly aligned.</block>",
-  "ensure_nozzle_position_desktop": "<block>Ensure that the {{tip_type}} is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned.</block>",
+  "ensure_nozzle_position_desktop": "<block>Ensure that the {{tip_type}} is centered above and level with {{item_location}}. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned.</block>",
   "error_modal_header": "Something went wrong",
   "error_modal_problem_in_app": "There was an error performing Labware Position Check. Please restart the app. If the problem persists, please contact Opentrons Support",
   "error_modal_problem_on_robot": "There was an error processing your request on the robot",

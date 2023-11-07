@@ -106,6 +106,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         if (attachedPipette?.state?.tipDetected) {
           chainRunCommands(
             [
+              { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
               {
                 commandType: 'retractAxis' as const,
                 params: {
