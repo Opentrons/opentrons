@@ -533,7 +533,9 @@ async def test_pickup_moves(
             gantry_load = GantryLoad.LOW_THROUGHPUT
 
     await ot3_hardware.set_gantry_load(gantry_load)
-
+    pipette_handler.get_pipette(
+        OT3Mount.LEFT
+    ).nozzle_manager.current_configuration.configuration = NozzleConfigurationType.FULL
     z_tiprack_distance = 8.0
     end_z_retract_dist = 9.0
     move_plan_return_val = TipActionSpec(
