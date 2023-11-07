@@ -1,7 +1,7 @@
 import * as React from 'react'
 import map from 'lodash/map'
 
-import { BaseDeck, SlotLabels } from '@opentrons/components'
+import { BaseDeck } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
@@ -121,9 +121,8 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
       robotType={robotType}
       labwareLocations={labwareLocations}
       moduleLocations={moduleLocations}
+      showSlotLabels={showSlotLabels}
       {...styleProps}
-    >
-      {showSlotLabels ? <SlotLabels robotType={robotType} /> : null}
-    </BaseDeck>
+    ></BaseDeck>
   )
 }

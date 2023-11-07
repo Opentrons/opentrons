@@ -1,5 +1,4 @@
 import * as React from 'react'
-import isEmpty from 'lodash/isEmpty'
 
 import {
   RobotType,
@@ -65,6 +64,7 @@ interface BaseDeckProps {
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode
+  showSlotLabels?: boolean
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
@@ -80,6 +80,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     deckConfig = STANDARD_SLOT_DECK_CONFIG_FIXTURE,
     showExpansion = true,
     children,
+    showSlotLabels = false,
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -204,12 +205,11 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               'slotName' in labwareLocation &&
               s.id === labwareLocation.slotName
           )
-          const labwareHasLiquid = !isEmpty(wellFill)
           return slotDef != null ? (
             <g
               key={slotDef.id}
               transform={`translate(${slotDef.position[0]},${slotDef.position[1]})`}
-              cursor={labwareHasLiquid ? 'pointer' : ''}
+              cursor={onLabwareClick != null ? 'pointer' : ''}
             >
               <LabwareRender
                 definition={definition}
@@ -221,7 +221,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ) : null
         }
       )}
-      <SlotLabels robotType={robotType} color={darkFill} />
+      {showSlotLabels ? (
+        <SlotLabels robotType={robotType} color={darkFill} />
+      ) : null}
       {children}
     </RobotCoordinateSpace>
   )
