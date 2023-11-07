@@ -25,7 +25,7 @@ from typing import (
     Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import gripper_config, feature_flags as ff
+from opentrons.config import gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -130,6 +130,7 @@ from opentrons.hardware_control.types import (
     FailedTipStateCheck,
     EstopState,
     GripperJawState,
+    HardwareFeatureFlags,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -213,7 +214,7 @@ def requires_estop(func: Wrapped) -> Wrapped:
     @wraps(func)
     async def wrapper(self: OT3Controller, *args: Any, **kwargs: Any) -> Any:
         state = self._estop_state_machine.state
-        if state == EstopState.NOT_PRESENT and ff.require_estop():
+        if state == EstopState.NOT_PRESENT and self._feature_flags.require_estop:
             raise EStopNotPresentError(
                 message="An Estop must be plugged in to move the robot."
             )
@@ -243,7 +244,11 @@ class OT3Controller:
 
     @classmethod
     async def build(
-        cls, config: OT3Config, use_usb_bus: bool = False, check_updates: bool = True
+        cls,
+        config: OT3Config,
+        use_usb_bus: bool = False,
+        check_updates: bool = True,
+        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
     ) -> OT3Controller:
         """Create the OT3Controller instance.
 
@@ -264,7 +269,11 @@ class OT3Controller:
                 )
                 raise e
         inst = cls(
-            config, driver=driver, usb_driver=usb_driver, check_updates=check_updates
+            config,
+            driver=driver,
+            usb_driver=usb_driver,
+            check_updates=check_updates,
+            feature_flags=feature_flags,
         )
         await inst._subsystem_manager.start()
         return inst
@@ -276,6 +285,7 @@ class OT3Controller:
         usb_driver: Optional[SerialUsbDriver] = None,
         eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
+        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
     ) -> None:
         """Construct.
 
@@ -290,6 +300,7 @@ class OT3Controller:
         self._drivers = self._build_system_hardware(
             self._messenger, usb_driver, eeprom_driver
         )
+        self._feature_flags = feature_flags
         self._usb_messenger = self._drivers.usb_messenger
         self._gpio_dev = self._drivers.gpio_dev
         self._subsystem_manager = SubsystemManager(
@@ -516,7 +527,7 @@ class OT3Controller:
             # "encoder_ok" flag staying set (it will only be False if the motor axis has not been
             # homed since a power cycle)
             motor_ok_latch = (
-                (not ff.stall_detection_enabled())
+                (not self._feature_flags.stall_detection_enabled)
                 and ((axis in self._motor_status) and self._motor_status[axis].motor_ok)
                 and self._motor_status[axis].encoder_ok
             )
@@ -551,7 +562,9 @@ class OT3Controller:
         move_group, _ = group
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+            ignore_stalls=True
+            if not self._feature_flags.stall_detection_enabled
+            else False,
         )
         mounts_moving = [
             k
@@ -701,7 +714,9 @@ class OT3Controller:
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+            ignore_stalls=True
+            if not self._feature_flags.stall_detection_enabled
+            else False,
         )
         positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
@@ -719,7 +734,9 @@ class OT3Controller:
 
         runner = MoveGroupRunner(
             move_groups=[move_group],
-            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+            ignore_stalls=True
+            if not self._feature_flags.stall_detection_enabled
+            else False,
         )
         positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
@@ -1154,7 +1171,7 @@ class OT3Controller:
     @asynccontextmanager
     async def _monitor_overpressure(self, mounts: List[NodeId]) -> AsyncIterator[None]:
         msg = "The pressure sensor on the {} mount has exceeded operational limits."
-        if ff.overpressure_detection_enabled() and mounts:
+        if self._feature_flags.overpressure_detection_enabled and mounts:
             tools_with_id = map_pipette_type_to_sensor_id(
                 mounts, self._subsystem_manager.device_info
             )

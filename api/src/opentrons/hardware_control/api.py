@@ -57,6 +57,7 @@ from .types import (
     EstopState,
     SubSystem,
     SubSystemState,
+    HardwareFeatureFlags,
 )
 from . import modules
 from .robot_calibration import (
@@ -111,6 +112,7 @@ class API(
         backend: Union[Controller, Simulator],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
+        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
     ) -> None:
         """Initialize an API instance.
 
@@ -122,6 +124,7 @@ class API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        self._feature_flags = feature_flags
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -166,6 +169,7 @@ class API(
     @classmethod  # noqa: C901
     async def build_hardware_controller(
         cls,
+        feature_flags: HardwareFeatureFlags,
         config: Union[RobotConfig, OT3Config, None] = None,
         port: Optional[str] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -221,7 +225,12 @@ class API(
                 mod_log.error(msg)
                 raise RuntimeError(msg)
 
-            api_instance = cls(backend, loop=checked_loop, config=checked_config)
+            api_instance = cls(
+                backend,
+                loop=checked_loop,
+                config=checked_config,
+                feature_flags=feature_flags,
+            )
             await api_instance.cache_instruments()
             module_controls = await AttachedModulesControl.build(
                 api_instance, board_revision=backend.board_revision
@@ -435,6 +444,7 @@ class API(
                 req_instr,
                 pip_id,
                 pip_offset_cal,
+                self._feature_flags.use_old_aspiration_functions,
             )
             self._attached_instruments[mount] = p
             if req_instr and p:

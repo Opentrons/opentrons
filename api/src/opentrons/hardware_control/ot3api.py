@@ -39,7 +39,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, feature_flags as ff
+from opentrons.config import robot_configs
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -112,6 +112,7 @@ from .types import (
     EstopAttachLocation,
     EstopStateNotification,
     EstopState,
+    HardwareFeatureFlags,
 )
 from .errors import (
     UpdateOngoingError,
@@ -219,6 +220,7 @@ class OT3API(
         backend: Union[OT3Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: OT3Config,
+        feature_flags: HardwareFeatureFlags,
     ) -> None:
         """Initialize an API instance.
 
@@ -234,6 +236,7 @@ class OT3API(
         def estop_cb(event: HardwareEvent) -> None:
             self._update_estop_state(event)
 
+        self._feature_flags = feature_flags
         backend.estop_state_machine.add_listener(estop_cb)
 
         self._callbacks: Set[HardwareEventHandler] = set()
@@ -367,6 +370,7 @@ class OT3API(
     @classmethod
     async def build_hardware_controller(
         cls,
+        feature_flags: HardwareFeatureFlags,
         attached_instruments: Optional[
             Dict[Union[top_types.Mount, OT3Mount], Dict[str, Optional[str]]]
         ] = None,
@@ -385,10 +389,18 @@ class OT3API(
         else:
             checked_config = config
         backend = await OT3Controller.build(
-            checked_config, use_usb_bus, check_updates=update_firmware
+            checked_config,
+            use_usb_bus,
+            check_updates=update_firmware,
+            feature_flags=feature_flags,
         )
 
-        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(
+            backend,
+            loop=checked_loop,
+            config=checked_config,
+            feature_flags=feature_flags,
+        )
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
@@ -416,6 +428,7 @@ class OT3API(
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
     ) -> "OT3API":
         """Build a simulating hardware controller.
 
@@ -439,7 +452,12 @@ class OT3API(
             checked_loop,
             strict_attached_instruments,
         )
-        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(
+            backend,
+            loop=checked_loop,
+            config=checked_config,
+            feature_flags=feature_flags,
+        )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -600,6 +618,7 @@ class OT3API(
             req_instr,
             pip_id,
             pip_offset_cal,
+            self._feature_flags.use_old_aspiration_functions,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         # TODO (lc 12-5-2022) Properly support backwards compatibility
@@ -2043,7 +2062,7 @@ class OT3API(
 
         if (
             self.gantry_load != GantryLoad.HIGH_THROUGHPUT
-            and ff.tip_presence_detection_enabled()
+            and self._feature_flags.tip_presence_detection_enabled
         ):
             await self._backend.check_for_tip_presence(realmount, TipStateType.PRESENT)
 
@@ -2107,7 +2126,7 @@ class OT3API(
         # TODO: implement tip-detection sequence during drop-tip for 96ch
         if (
             self.gantry_load != GantryLoad.HIGH_THROUGHPUT
-            and ff.tip_presence_detection_enabled()
+            and self._feature_flags.tip_presence_detection_enabled
         ):
             await self._backend.check_for_tip_presence(realmount, TipStateType.ABSENT)
 

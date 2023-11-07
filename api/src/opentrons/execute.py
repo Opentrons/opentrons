@@ -35,6 +35,7 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
@@ -664,9 +665,9 @@ def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardw
             # Conditional import because this isn't installed on OT-2s.
             from opentrons.hardware_control.ot3api import OT3API
 
-            _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
+            _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller, feature_flags=HardwareFeatureFlags.build_from_ff())
         else:
-            _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller)
+            _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller, feature_flags=HardwareFeatureFlags.build_from_ff())
 
     return _THREAD_MANAGED_HW
 
