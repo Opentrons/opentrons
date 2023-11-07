@@ -25,7 +25,7 @@ class InvalidPipetteName(InvalidInstrumentData):
     def __init__(self, name: int, mount: str) -> None:
         super().__init__(
             message=f"Invalid pipette name key {name} on mount {mount}",
-            detail={"mount": mount, "name": name},
+            detail={"mount": mount, "name": str(name)},
         )
 
 
