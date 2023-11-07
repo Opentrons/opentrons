@@ -8,7 +8,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
 import { getDiscoverableRobotByName } from '../../../../../redux/discovery'
-import { UpdateRobotModal } from '../UpdateRobotModal'
+import { UpdateRobotModal, RELEASE_NOTES_URL } from '../UpdateRobotModal'
 import type { Store } from 'redux'
 
 import type { State } from '../../../../../redux/types'
@@ -91,6 +91,13 @@ describe('UpdateRobotModal', () => {
     expect(updateNow).toBeDisabled()
     fireEvent.click(remindMeLater)
     expect(props.closeModal).toHaveBeenCalled()
+  })
+
+  it('renders a release notes link pointing to the Github releases page', () => {
+    const [{ getByText }] = render(props)
+
+    const link = getByText('Release notes')
+    expect(link).toHaveAttribute('href', RELEASE_NOTES_URL)
   })
 
   it('renders proper text when reinstalling', () => {

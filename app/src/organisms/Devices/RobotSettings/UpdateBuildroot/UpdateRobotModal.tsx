@@ -7,7 +7,8 @@ import {
   useHoverTooltip,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_SPACE_AROUND,
   SPACING,
   Flex,
   NewPrimaryBtn,
@@ -23,6 +24,7 @@ import {
   REINSTALL,
   DOWNGRADE,
 } from '../../../../redux/robot-update'
+import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
 import { Tooltip } from '../../../../atoms/Tooltip'
@@ -32,6 +34,9 @@ import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hook
 
 import type { State, Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/robot-update/types'
+
+export const RELEASE_NOTES_URL =
+  'https://github.com/Opentrons/opentrons/releases'
 
 const UpdateAppBanner = styled(Banner)`
   border: none;
@@ -98,28 +103,40 @@ export function UpdateRobotModal({
   }
 
   const robotUpdateFooter = (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
-      <NewSecondaryBtn
-        onClick={closeModal}
-        marginRight={SPACING.spacing8}
-        css={FOOTER_BUTTON_STYLE}
+    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <ExternalLink
+        href={RELEASE_NOTES_URL}
+        css={css`
+          font-size: 0.875rem;
+        `}
+        id="SoftwareUpdateReleaseNotesLink"
+        marginLeft={SPACING.spacing32}
       >
-        {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
-      </NewSecondaryBtn>
-      <NewPrimaryBtn
-        onClick={() => dispatchStartRobotUpdate(robotName)}
-        marginRight={SPACING.spacing12}
-        css={FOOTER_BUTTON_STYLE}
-        disabled={updateDisabled}
-        {...updateButtonProps}
-      >
-        {t('update_robot_now')}
-      </NewPrimaryBtn>
-      {updateDisabled && (
-        <Tooltip tooltipProps={updateButtonTooltipProps}>
-          {disabledReason}
-        </Tooltip>
-      )}
+        {t('release_notes')}
+      </ExternalLink>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_AROUND}>
+        <NewSecondaryBtn
+          onClick={closeModal}
+          marginRight={SPACING.spacing8}
+          css={FOOTER_BUTTON_STYLE}
+        >
+          {updateType === UPGRADE ? t('remind_me_later') : t('not_now')}
+        </NewSecondaryBtn>
+        <NewPrimaryBtn
+          onClick={() => dispatchStartRobotUpdate(robotName)}
+          marginRight={SPACING.spacing12}
+          css={FOOTER_BUTTON_STYLE}
+          disabled={updateDisabled}
+          {...updateButtonProps}
+        >
+          {t('update_robot_now')}
+        </NewPrimaryBtn>
+        {updateDisabled && (
+          <Tooltip tooltipProps={updateButtonTooltipProps}>
+            {disabledReason}
+          </Tooltip>
+        )}
+      </Flex>
     </Flex>
   )
 
