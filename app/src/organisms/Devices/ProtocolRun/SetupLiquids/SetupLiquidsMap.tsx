@@ -76,35 +76,6 @@ export function SetupLiquidsMap(
   )
   const deckLayerBlocklist = getStandardDeckViewLayerBlockList(robotType)
 
-  const labwareLocations = map(
-    labwareRenderInfo,
-    ({ x, y, labwareDef, displayName, slotName }, labwareId) => {
-      const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
-      //  only rendering the labware on top most layer so
-      //  either the adapter or the labware are rendered but not both
-      const topLabwareDefinition =
-        labwareInAdapter?.result?.definition ?? labwareDef
-      const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
-      const topLabwareDisplayName =
-        labwareInAdapter?.params.displayName ?? displayName
-
-      return {
-        labwareLocation: { slotName },
-        definition: topLabwareDefinition,
-        topLabwareId,
-        topLabwareDisplayName,
-        labwareChildren: (
-          <LabwareInfoOverlay
-            definition={topLabwareDefinition}
-            labwareId={topLabwareId}
-            displayName={topLabwareDisplayName}
-            runId={runId}
-          />
-        ),
-      }
-    }
-  )
-
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
@@ -162,7 +133,7 @@ export function SetupLiquidsMap(
         deckConfig={deckConfig}
         deckLayerBlocklist={deckLayerBlocklist}
         robotType={robotType}
-        labwareLocations={labwareLocations}
+        labwareLocations={[]}
         moduleLocations={moduleLocations}
       >
         {map(
@@ -216,7 +187,6 @@ export function SetupLiquidsMap(
             )
           }
         )}
-        <SlotLabels robotType={robotType} />
       </BaseDeck>
       {liquidDetailsLabwareId != null && (
         <LiquidsLabwareDetailsModal
