@@ -131,7 +131,11 @@ export function DeviceDetailsDeckConfiguration({
           gridGap={SPACING.spacing16}
           paddingX={SPACING.spacing16}
           paddingBottom={SPACING.spacing32}
-          paddingTop={isRunRunning ? undefined : SPACING.spacing32}
+          paddingTop={
+            isRunRunning || isMaintenanceRunExisting
+              ? undefined
+              : SPACING.spacing32
+          }
           width="100%"
           flexDirection={DIRECTION_COLUMN}
         >

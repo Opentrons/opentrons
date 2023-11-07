@@ -84,6 +84,10 @@ describe('DeviceDetailsDeckConfiguration', () => {
     } as any)
   })
 
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+
   it('should render text and button', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('otie deck configuration')
