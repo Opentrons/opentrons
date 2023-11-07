@@ -6,6 +6,17 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.0.2
+
+Welcome to the v7.0.2 release of the Opentrons App!
+
+### Bug Fixes
+
+- Fixes an issue where robot system updates over USB were stalling
+- Fixes an issue where app protocol analysis would fail if you had Python 3.10 installed on your computer and installed the opentrons package there
+
+---
+
 ## Opentrons App Changes in 7.0.1
 
 Welcome to the v7.0.1 release of the Opentrons App! This release builds on the major release that added support for Opentrons Flex.

@@ -1,14 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
   Flex,
   Icon,
-  Link,
   NewPrimaryBtn,
-  NewSecondaryBtn,
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   COLORS,
@@ -25,14 +23,11 @@ import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
   startRobotUpdate,
   clearRobotUpdateSession,
-  getRobotSessionIsManualFile,
 } from '../../../../redux/robot-update'
-import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
-import type { State } from '../../../../redux/types'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
 
@@ -45,10 +40,6 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
 `
 const UPDATE_TEXT_STYLE = css`
   color: ${COLORS.darkGreyEnabled};
-  font-size: 0.8rem;
-`
-const TRY_RESTART_STYLE = css`
-  color: ${COLORS.blueEnabled};
   font-size: 0.8rem;
 `
 const HIDDEN_CSS = css`
@@ -71,17 +62,10 @@ export function RobotUpdateProgressModal({
   const { t } = useTranslation('device_settings')
   const [showFileSelect, setShowFileSelect] = React.useState<boolean>(false)
   const installFromFileRef = React.useRef<HTMLInputElement>(null)
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
-  const manualFileUsedForUpdate = useSelector((state: State) =>
-    getRobotSessionIsManualFile(state)
-  )
+
   const completeRobotUpdateHandler = (): void => {
     if (closeUpdateBuildroot != null) closeUpdateBuildroot()
   }
-  const reinstallUpdate = React.useCallback(() => {
-    dispatchStartRobotUpdate(robotName)
-  }, [robotName])
-
   const { error } = session || { error: null }
   const { updateStep, progressPercent } = useRobotUpdateInfo(session)
   useStatusBarAnimation(error != null)
@@ -125,9 +109,6 @@ export function RobotUpdateProgressModal({
       footer={
         hasStoppedUpdating ? (
           <RobotUpdateProgressFooter
-            robotName={robotName}
-            installRobotUpdate={dispatchStartRobotUpdate}
-            errorMessage={error}
             closeUpdateBuildroot={completeRobotUpdateHandler}
           />
         ) : null
@@ -151,17 +132,7 @@ export function RobotUpdateProgressModal({
           <StyledText css={UPDATE_TEXT_STYLE}>
             {letUserExitUpdate && updateStep !== 'restart' ? (
               <>
-                {t('problem_during_update')}{' '}
-                <Link
-                  css={TRY_RESTART_STYLE}
-                  onClick={
-                    !manualFileUsedForUpdate
-                      ? reinstallUpdate
-                      : () => setShowFileSelect(true)
-                  }
-                >
-                  {t('try_restarting_the_update')}
-                </Link>
+                {t('problem_during_update')} {t('try_restarting_the_update')}
                 {showFileSelect && (
                   <input
                     ref={installFromFileRef}
@@ -182,35 +153,16 @@ export function RobotUpdateProgressModal({
 }
 
 interface RobotUpdateProgressFooterProps {
-  robotName: string
-  installRobotUpdate: (robotName: string) => void
-  errorMessage?: string | null
   closeUpdateBuildroot?: () => void
 }
 
 function RobotUpdateProgressFooter({
-  robotName,
-  installRobotUpdate,
-  errorMessage,
   closeUpdateBuildroot,
 }: RobotUpdateProgressFooterProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const installUpdate = React.useCallback(() => {
-    installRobotUpdate(robotName)
-  }, [robotName])
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
-      {errorMessage && (
-        <NewSecondaryBtn
-          onClick={installUpdate}
-          marginRight={SPACING.spacing8}
-          css={FOOTER_BUTTON_STYLE}
-          border="none"
-        >
-          {t('try_again')}
-        </NewSecondaryBtn>
-      )}
       <NewPrimaryBtn
         onClick={closeUpdateBuildroot}
         marginRight={SPACING.spacing12}

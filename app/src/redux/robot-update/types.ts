@@ -7,6 +7,12 @@ export type RobotSystemType = 'ot2-balena' | 'ot2-buildroot' | 'flex'
 
 export type RobotUpdateTarget = 'ot2' | 'flex'
 
+export interface RobotUpdateInfoPayload {
+  version: string | null
+  target: RobotUpdateTarget
+  releaseNotes: string | null
+}
+
 export interface RobotUpdateInfo {
   version: string
   target: RobotUpdateTarget
@@ -57,6 +63,7 @@ export interface PerTargetRobotUpdateState {
   downloadError: string | null
   version: string | null
   releaseNotes: string | null
+  force: boolean
 }
 
 export type RobotUpdateState = Record<
@@ -122,14 +129,16 @@ export interface RobotUpdateDownloadErrorAction {
 export interface RobotUpdateAvailableAction {
   type: 'robotUpdate:UPDATE_VERSION'
   payload: {
-    version: string
+    version: string | null
     target: RobotUpdateTarget
+    force?: boolean
   }
 }
 
 export interface RobotUpdateFileInfoAction {
   type: 'robotUpdate:FILE_INFO'
   payload: RobotUpdateFileInfo
+  force?: boolean
 }
 
 export type RobotUpdateAction =
@@ -141,7 +150,7 @@ export type RobotUpdateAction =
   | RobotUpdateDownloadProgressAction
   | RobotUpdateDownloadErrorAction
   | RobotUpdateAvailableAction
-  | { type: 'robotUpdate:UPDATE_INFO'; payload: RobotUpdateInfo }
+  | { type: 'robotUpdate:UPDATE_INFO'; payload: RobotUpdateInfoPayload }
   | RobotUpdateFileInfoAction
   | { type: 'robotUpdate:CHANGELOG_SEEN'; meta: { robotName: string } }
   | { type: 'robotUpdate:UPDATE_IGNORED'; meta: { robotName: string } }

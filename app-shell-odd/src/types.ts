@@ -3,7 +3,6 @@ import type {
   Action,
   Error as PlainError,
 } from '@opentrons/app/src/redux/types'
-
 import type { Logger } from '@opentrons/app/src/logger'
 export type { Action, PlainError }
 

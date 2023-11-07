@@ -57,9 +57,12 @@ function useFindProgressPercentFrom(
 
   const stepAndStage = `${sessionStep}-${sessionStage}`
   // Ignored because 0-100 is too fast to be worth recording.
-  const IGNORED_STEPS_AND_STAGES = ['processFile-awaiting-file']
+  const IGNORED_STEPS_AND_STAGES = [
+    'processFile-awaiting-file',
+    'uploadFile-awaiting-file',
+  ]
   // Each stepAndStage is an equal fraction of the total steps.
-  const TOTAL_STEPS_WITH_PROGRESS = 3
+  const TOTAL_STEPS_WITH_PROGRESS = 2
 
   const isNewStateWithProgress =
     prevSeenUpdateStep.current !== stepAndStage &&
