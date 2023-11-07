@@ -13,7 +13,6 @@ import {
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
-  SlotLabels,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
