@@ -104,6 +104,46 @@ def state_summary() -> StateSummary:
     )
 
 
+@pytest.fixture
+def invalid_state_summary() -> StateSummary:
+    """Should fail pydantic validation."""
+    analysis_error = pe_errors.ErrorOccurrence.construct(
+        id="error-id",
+        # Invalid value here should fail analysis
+        createdAt=MountType.LEFT,  # type: ignore
+        errorType="BadError",
+        detail="oh no",
+    )
+
+    analysis_labware = pe_types.LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="namespace/load-name/42",
+        location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        offsetId=None,
+    )
+
+    analysis_pipette = pe_types.LoadedPipette(
+        id="pipette-id",
+        pipetteName=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+
+    liquids = [Liquid(id="some-id", displayName="water", description="water desc")]
+
+    return StateSummary(
+        errors=[analysis_error],
+        labware=[analysis_labware],
+        pipettes=[analysis_pipette],
+        # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
+        modules=[],
+        # TODO (tz 22-4-19): added the field to class. make sure what to initialize
+        labwareOffsets=[],
+        status=EngineStatus.IDLE,
+        liquids=liquids,
+    )
+
+
 def test_update_run_state(
     subject: RunStore,
     state_summary: StateSummary,
@@ -365,6 +405,22 @@ def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> No
     subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
+
+
+def test_get_state_summary_failure(
+    subject: RunStore, invalid_state_summary: StateSummary
+) -> None:
+    """It should return None."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id", summary=invalid_state_summary, commands=[]
+    )
+    result = subject.get_state_summary(run_id="run-id")
+    assert result is None
 
 
 def test_get_state_summary_none(subject: RunStore) -> None:

@@ -1166,7 +1166,7 @@ class OT3Controller:
                         mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
                         raise PipetteOverpressureError(
                             message=msg.format(str(mount)),
-                            detail={"mount": mount},
+                            detail={"mount": str(mount)},
                         )
         else:
             yield
