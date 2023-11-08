@@ -118,7 +118,7 @@ function parseGravimetricCSV(CSVData, retData) {
 
 window.addEventListener('load', function (evt) {
   const _updateTimeoutMillis = 100
-  const _reloadTimeoutMillis = 1000
+  const _reloadTimeoutMillis = 1000 * 10
   let _timeout
   let _timeoutReload
   const layout = {
@@ -192,6 +192,7 @@ window.addEventListener('load', function (evt) {
   }
 
   function _onServerError(evt) {
+    clearTimeout()
     document.body.style.backgroundColor = 'red'
     document.body.innerHTML = '<h1>Lost Connection (refresh)</h1>'
     location.reload()
@@ -202,6 +203,7 @@ window.addEventListener('load', function (evt) {
     const oReq = new XMLHttpRequest()
     oReq.addEventListener('error', _onServerError)
     oReq.addEventListener('load', function () {
+      _clearTimeout()
       const responseData = JSON.parse(this.responseText)
       let newData = getEmptyPlotlyData()
       newData = parseGravimetricCSV(responseData.latest.csv, newData)

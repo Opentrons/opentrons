@@ -6,12 +6,8 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
 import * as RobotUpdate from '../../../redux/robot-update'
+import type { RobotUpdateSession } from '../../../redux/robot-update/types'
 import { getLocalRobot } from '../../../redux/discovery'
-import { CheckUpdates } from '../../../organisms/UpdateRobotSoftware/CheckUpdates'
-import { CompleteUpdateSoftware } from '../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
-import { ErrorUpdateSoftware } from '../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware'
-import { NoUpdateFound } from '../../../organisms/UpdateRobotSoftware/NoUpdateFound'
-import { UpdateSoftware } from '../../../organisms/UpdateRobotSoftware/UpdateSoftware'
 
 import { UpdateRobot } from '../UpdateRobot'
 
@@ -19,27 +15,7 @@ import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-update')
-jest.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
-jest.mock('../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
-jest.mock('../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
-jest.mock('../../../organisms/UpdateRobotSoftware/NoUpdateFound')
-jest.mock('../../../organisms/UpdateRobotSoftware/UpdateSoftware')
 
-const mockCheckUpdates = CheckUpdates as jest.MockedFunction<
-  typeof CheckUpdates
->
-const mockCompleteUpdateSoftware = CompleteUpdateSoftware as jest.MockedFunction<
-  typeof CompleteUpdateSoftware
->
-const mockErrorUpdateSoftware = ErrorUpdateSoftware as jest.MockedFunction<
-  typeof ErrorUpdateSoftware
->
-const mockNoUpdateFound = NoUpdateFound as jest.MockedFunction<
-  typeof NoUpdateFound
->
-const mockUpdateSoftware = UpdateSoftware as jest.MockedFunction<
-  typeof UpdateSoftware
->
 const mockGetRobotUpdateUpdateAvailable = RobotUpdate.getRobotUpdateAvailable as jest.MockedFunction<
   typeof RobotUpdate.getRobotUpdateAvailable
 >
@@ -85,14 +61,14 @@ const mockRobot = {
   serverHealthStatus: null,
 } as any
 
-const mockSession = {
+const mockSession: RobotUpdateSession = {
   robotName: mockRobot.name,
   fileInfo: null,
   token: null,
   pathPrefix: null,
-  step: null,
+  step: 'restarting',
   stage: null,
-  progress: null,
+  progress: 10,
   error: null,
 }
 
@@ -110,35 +86,13 @@ const render = () => {
 
 describe('UpdateRobot', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.UPGRADE)
     when(mockGetLocalRobot).calledWith(MOCK_STATE).mockReturnValue(mockRobot)
-    mockCheckUpdates.mockReturnValue(<div>mock CheckUpdates</div>)
-    mockCompleteUpdateSoftware.mockReturnValue(
-      <div>mock CompleteUpdateSoftware</div>
-    )
-    mockErrorUpdateSoftware.mockReturnValue(<div>mock ErrorUpdateSoftware</div>)
-    mockNoUpdateFound.mockReturnValue(<div>mock NoUpdateFound</div>)
-    mockUpdateSoftware.mockReturnValue(<div>mock UpdateSoftware</div>)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
-  })
-
-  it('should render mock CheckUpdates', () => {
-    const [{ getByText }] = render()
-    getByText('mock CheckUpdates')
-  })
-
-  it('mock CheckUpdates should disappear after 10 sec', () => {
-    const [{ getByText }] = render()
-    const checkUpdates = getByText('mock CheckUpdates')
-    jest.advanceTimersByTime(1000)
-    expect(checkUpdates).toBeInTheDocument()
-    jest.advanceTimersByTime(11000)
-    expect(checkUpdates).not.toBeInTheDocument()
   })
 
   it('should render mock Update Software for downloading', () => {
@@ -148,67 +102,19 @@ describe('UpdateRobot', () => {
     }
     mockGetRobotUpdateSession.mockReturnValue(mockDownloadSession)
     const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
+    getByText('Downloading software...')
   })
 
-  it('should render mock Update Software for sending file', () => {
-    const mockSendingFileSession = {
-      ...mockSession,
-      step: RobotUpdate.GET_TOKEN,
-      stage: RobotUpdate.VALIDATING,
-    }
-    mockGetRobotUpdateSession.mockReturnValue(mockSendingFileSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
-  })
-
-  it('should render mock Update Software for validating', () => {
-    const mockValidatingSession = {
-      ...mockSession,
-      step: RobotUpdate.PROCESS_FILE,
-    }
-    mockGetRobotUpdateSession.mockReturnValue(mockValidatingSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
-  })
-
-  it('should render mock Update Software for installing', () => {
-    const mockInstallingSession = {
-      ...mockSession,
-      step: RobotUpdate.COMMIT_UPDATE,
-    }
-    mockGetRobotUpdateSession.mockReturnValue(mockInstallingSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock UpdateSoftware')
-  })
-
-  it('should render mock NoUpdate found when there is no upgrade - reinstall', () => {
+  it('should render NoUpdateFound when there is no upgrade - reinstall', () => {
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
     const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock NoUpdateFound')
+    getByText('Your software is already up to date!')
   })
 
   it('should render mock NoUpdate found when there is no upgrade - downgrade', () => {
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.DOWNGRADE)
     const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock NoUpdateFound')
-  })
-
-  it('should render mock CompleteUpdateSoftware when the step is finished', () => {
-    const mockCompleteSession = {
-      ...mockSession,
-      step: RobotUpdate.FINISHED,
-    }
-    mockGetRobotUpdateSession.mockReturnValue(mockCompleteSession)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock CompleteUpdateSoftware')
+    getByText('Your software is already up to date!')
   })
 
   it('should render mock ErrorUpdateSoftware when an error occurs', () => {
@@ -218,9 +124,9 @@ describe('UpdateRobot', () => {
     }
     mockGetRobotUpdateSession.mockReturnValue(mockErrorSession)
     const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('mock ErrorUpdateSoftware')
+    getByText('Software update error')
+    getByText('mock error')
+    getByText('Try again')
+    getByText('Cancel software update')
   })
-
-  it.todo('add test for targetPath in a following PR')
 })

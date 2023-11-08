@@ -27,6 +27,7 @@ update-server/**
 robot-server/**
 notify-server/**
 shared-data/python/**
+hardware-testing/**
 
 # app-testing don't format the json protocols
 app-testing/files

@@ -53,6 +53,11 @@ from .types import (
     ModuleModel,
     ModuleDefinition,
     Liquid,
+    EmptyNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
 )
 
 
@@ -107,6 +112,11 @@ __all__ = [
     "ModuleModel",
     "ModuleDefinition",
     "Liquid",
+    "EmptyNozzleLayoutConfiguration",
+    "SingleNozzleLayoutConfiguration",
+    "RowNozzleLayoutConfiguration",
+    "ColumnNozzleLayoutConfiguration",
+    "QuadrantNozzleLayoutConfiguration",
     # plugins
     "AbstractPlugin",
 ]

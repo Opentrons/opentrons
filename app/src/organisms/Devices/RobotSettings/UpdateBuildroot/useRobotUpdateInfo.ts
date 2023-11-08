@@ -1,16 +1,20 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+
+import { getRobotUpdateDownloadProgress } from '../../../../redux/robot-update'
+
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
+import type { State } from '../../../../redux/types'
 
 export function useRobotUpdateInfo(
+  robotName: string,
   session: RobotUpdateSession | null
-): { updateStep: UpdateStep; progressPercent: number } {
-  const progressPercent = useFindProgressPercentFrom(session)
+): { updateStep: UpdateStep | null; progressPercent: number } {
+  const progressPercent = useFindProgressPercentFrom(robotName, session)
 
-  const shellReportedUpdateStep = React.useMemo(
-    () => getShellReportedUpdateStep(session),
-    [session]
-  )
-  const updateStep = useTransitionUpdateStepFrom(shellReportedUpdateStep)
+  const updateStep = React.useMemo(() => determineUpdateStepFrom(session), [
+    session,
+  ])
 
   return {
     updateStep,
@@ -19,22 +23,35 @@ export function useRobotUpdateInfo(
 }
 
 function useFindProgressPercentFrom(
+  robotName: string,
   session: RobotUpdateSession | null
 ): number {
   const [progressPercent, setProgressPercent] = React.useState<number>(0)
+  const hasSeenDownloadFileStep = React.useRef<boolean>(false)
   const prevSeenUpdateStep = React.useRef<string | null>(null)
   const prevSeenStepProgress = React.useRef<number>(0)
   const currentStepWithProgress = React.useRef<number>(-1)
 
-  if (session == null) return progressPercent
+  const downloadProgress = useSelector((state: State) =>
+    getRobotUpdateDownloadProgress(state, robotName)
+  )
 
-  const {
+  if (session == null) {
+    if (progressPercent !== 0) {
+      setProgressPercent(0)
+      prevSeenStepProgress.current = 0
+      hasSeenDownloadFileStep.current = false
+    }
+    return progressPercent
+  }
+
+  let {
     step: sessionStep,
     stage: sessionStage,
     progress: stepProgress,
   } = session
 
-  if (sessionStep === 'getToken') {
+  if (sessionStep == null && sessionStage == null) {
     if (progressPercent !== 0) {
       setProgressPercent(0)
       prevSeenStepProgress.current = 0
@@ -46,27 +63,30 @@ function useFindProgressPercentFrom(
       prevSeenStepProgress.current = 100
     }
     return progressPercent
-  } else if (
-    sessionStage === 'error' ||
-    sessionStage === null ||
-    stepProgress == null ||
-    sessionStep == null
-  ) {
+  } else if (sessionStage === 'error') {
     return progressPercent
   }
 
   const stepAndStage = `${sessionStep}-${sessionStage}`
-  // Ignored because 0-100 is too fast to be worth recording.
+  // Ignored because 0-100 is too fast to be worth recording or currently unsupported.
   const IGNORED_STEPS_AND_STAGES = [
     'processFile-awaiting-file',
     'uploadFile-awaiting-file',
   ]
+
+  if (sessionStep === 'downloadFile') {
+    hasSeenDownloadFileStep.current = true
+    stepProgress = downloadProgress
+  }
+
+  stepProgress = stepProgress ?? 0
+
   // Each stepAndStage is an equal fraction of the total steps.
-  const TOTAL_STEPS_WITH_PROGRESS = 2
+  const TOTAL_STEPS_WITH_PROGRESS = hasSeenDownloadFileStep.current ? 3 : 2
 
   const isNewStateWithProgress =
     prevSeenUpdateStep.current !== stepAndStage &&
-    stepProgress > 0 && // Accomodate for shell progress oddities.
+    stepProgress > 0 && // Accommodate for shell progress oddities.
     stepProgress < 100
 
   // Proceed to next fraction of progress bar.
@@ -79,7 +99,7 @@ function useFindProgressPercentFrom(
       (100 * currentStepWithProgress.current) / TOTAL_STEPS_WITH_PROGRESS
     prevSeenStepProgress.current = 0
     prevSeenUpdateStep.current = stepAndStage
-    setProgressPercent(completedStepsWithProgress + stepProgress)
+    setProgressPercent(completedStepsWithProgress)
   }
   // Proceed with current fraction of progress bar.
   else if (
@@ -87,12 +107,13 @@ function useFindProgressPercentFrom(
     !IGNORED_STEPS_AND_STAGES.includes(stepAndStage)
   ) {
     const currentStepProgress =
-      progressPercent +
       (stepProgress - prevSeenStepProgress.current) / TOTAL_STEPS_WITH_PROGRESS
+
     const nonBacktrackedProgressPercent = Math.max(
       progressPercent,
-      currentStepProgress
+      currentStepProgress + progressPercent
     )
+
     prevSeenStepProgress.current = stepProgress
     setProgressPercent(nonBacktrackedProgressPercent)
   }
@@ -108,18 +129,19 @@ export type UpdateStep =
   | 'finished'
   | 'error'
 
-function getShellReportedUpdateStep(
+function determineUpdateStepFrom(
   session: RobotUpdateSession | null
 ): UpdateStep | null {
   if (session == null) return null
   const { step: sessionStep, stage: sessionStage, error } = session
 
-  // TODO(jh, 09-14-2023: add download logic to app-shell/redux/progress bar.
   let reportedUpdateStep: UpdateStep
   if (error != null) {
     reportedUpdateStep = 'error'
   } else if (sessionStep == null && sessionStage == null) {
     reportedUpdateStep = 'initial'
+  } else if (sessionStep === 'downloadFile') {
+    reportedUpdateStep = 'download'
   } else if (sessionStep === 'finished') {
     reportedUpdateStep = 'finished'
   } else if (
@@ -133,45 +155,4 @@ function getShellReportedUpdateStep(
   }
 
   return reportedUpdateStep
-}
-
-// Shell steps have the potential to backtrack, so use guarded transitions.
-function useTransitionUpdateStepFrom(
-  reportedUpdateStep: UpdateStep | null
-): UpdateStep {
-  const [updateStep, setUpdateStep] = React.useState<UpdateStep>('initial')
-  const prevUpdateStep = React.useRef<UpdateStep | null>(null)
-
-  switch (reportedUpdateStep) {
-    case 'initial':
-      if (updateStep !== 'initial') {
-        setUpdateStep('initial')
-        prevUpdateStep.current = null
-      }
-      break
-    case 'error':
-      if (updateStep !== 'error') {
-        setUpdateStep('error')
-      }
-      break
-    case 'install':
-      if (updateStep === 'initial' && prevUpdateStep.current == null) {
-        setUpdateStep('install')
-        prevUpdateStep.current = 'initial'
-      }
-      break
-    case 'restart':
-      if (updateStep === 'install' && prevUpdateStep.current === 'initial') {
-        setUpdateStep('restart')
-        prevUpdateStep.current = 'install'
-      }
-      break
-    case 'finished':
-      if (updateStep === 'restart' && prevUpdateStep.current === 'install') {
-        setUpdateStep('finished')
-        prevUpdateStep.current = 'restart'
-      }
-      break
-  }
-  return updateStep
 }

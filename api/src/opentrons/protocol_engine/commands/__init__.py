@@ -282,6 +282,14 @@ from .prepare_to_aspirate import (
     PrepareToAspirateCommandType,
 )
 
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -491,4 +499,10 @@ __all__ = [
     "PrepareToAspirateParams",
     "PrepareToAspirateResult",
     "PrepareToAspirateCommandType",
+    # configure nozzle layout command bundle
+    "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutCreate",
+    "ConfigureNozzleLayoutParams",
+    "ConfigureNozzleLayoutResult",
+    "ConfigureNozzleLayoutCommandType",
 ]

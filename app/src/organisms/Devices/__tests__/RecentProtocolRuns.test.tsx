@@ -8,6 +8,7 @@ import { RecentProtocolRuns } from '../RecentProtocolRuns'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 
 import type { Runs } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
@@ -57,7 +58,7 @@ describe('RecentProtocolRuns', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseAllRunsQuery.mockReturnValue({
       data: {},
-    } as UseQueryResult<Runs, Error>)
+    } as UseQueryResult<Runs, AxiosError>)
     const [{ getByText }] = render()
 
     getByText('No protocol runs yet!')
@@ -76,7 +77,7 @@ describe('RecentProtocolRuns', () => {
           },
         ],
       },
-    } as UseQueryResult<Runs, Error>)
+    } as UseQueryResult<Runs, AxiosError>)
     const [{ getByText }] = render()
     getByText('Recent Protocol Runs')
     getByText('Run')

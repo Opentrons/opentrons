@@ -16,6 +16,7 @@ import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { LEFT } from '../../../redux/pipettes'
 import {
   useAttachedPipettes,
   useIsFlex,
@@ -66,10 +67,13 @@ export function PipetteOffsetCalibrationItems({
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
   const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
   const isFlex = useIsFlex(robotName)
-  const attachedPipettes = Boolean(isFlex)
+  const attachedPipettes = isFlex
     ? attachedPipetteFromInstrumentQuery
     : attachedPipettesFromPipetteQuery
 
+  const is96Attached =
+    // @ts-expect-error isFlex is a type narrower but not recognized as one
+    isFlex && attachedPipettes?.[LEFT]?.instrumentName === 'p1000_96'
   return (
     <StyledTable>
       <thead>
@@ -97,7 +101,7 @@ export function PipetteOffsetCalibrationItems({
                     as="p"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                   >
-                    {calibration.mount}
+                    {is96Attached ? t('both') : calibration.mount}
                   </StyledText>
                 </StyledTableCell>
                 {isFlex ? null : (

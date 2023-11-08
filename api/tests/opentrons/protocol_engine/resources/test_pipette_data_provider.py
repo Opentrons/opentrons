@@ -125,6 +125,20 @@ def test_load_virtual_pipette_by_model_string(
     )
 
 
+def test_load_virtual_pipette_nozzle_layout(
+    subject_instance: VirtualPipetteDataProvider,
+) -> None:
+    """It should return a NozzleMap object."""
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-pipette", "p300_multi_v2.1", "A1", "E1", "A1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-pipette")
+    assert result.configuration.value == "COLUMN"
+    assert result.starting_nozzle == "A1"
+    assert result.front_right == "E1"
+    assert result.back_left == "A1"
+
+
 def test_get_pipette_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
@@ -164,6 +178,7 @@ def test_get_pipette_static_config(
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_push_out_volume": 3,
         "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
+        "current_nozzle_map": None,
     }
 
     result = subject.get_pipette_static_config(pipette_dict)

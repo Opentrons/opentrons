@@ -10,11 +10,15 @@ import {
   useRunQuery,
   useProtocolQuery,
   useDoorQuery,
+  useModulesQuery,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  STAGING_AREA_LOAD_NAME,
 } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
@@ -45,7 +49,12 @@ import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/ho
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ProtocolSetup } from '..'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type {
+  DeckConfiguration,
+  CompletedProtocolAnalysis,
+  Fixture,
+} from '@opentrons/shared-data'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
@@ -141,6 +150,12 @@ const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
 const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
   typeof useDoorQuery
 >
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
+>
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
 const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
 const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
   typeof useModuleCalibrationStatus
@@ -214,6 +229,12 @@ const mockDoorStatus = {
     doorRequiredClosedForProtocol: true,
   },
 }
+const mockFixture = {
+  fixtureId: 'mockId',
+  fixtureLocation: 'D1',
+  loadName: STAGING_AREA_LOAD_NAME,
+} as Fixture
+
 const MOCK_MAKE_SNACKBAR = jest.fn()
 
 describe('ProtocolSetup', () => {
@@ -300,6 +321,12 @@ describe('ProtocolSetup', () => {
       <div>mock ConfirmAttachedModal</div>
     )
     mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
     when(mockUseToaster)
       .calledWith()
       .mockReturnValue(({
