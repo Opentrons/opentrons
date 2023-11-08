@@ -84,7 +84,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     deckConfig = STANDARD_SLOT_DECK_CONFIG_FIXTURE,
     showExpansion = true,
     children,
-    showSlotLabels = false,
+    showSlotLabels = true,
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
