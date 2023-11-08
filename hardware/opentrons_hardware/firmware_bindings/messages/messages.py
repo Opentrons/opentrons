@@ -45,6 +45,7 @@ MessageDefinition = Union[
     defs.ReadMotorDriverErrorRequest,
     defs.ReadMotorDriverErrorResponse,
     defs.ResetMotorDriverErrorHandling,
+    defs.MotorDriverInErrorState,
     defs.WriteMotorCurrentRequest,
     defs.SetBrushedMotorVrefRequest,
     defs.SetBrushedMotorPwmRequest,

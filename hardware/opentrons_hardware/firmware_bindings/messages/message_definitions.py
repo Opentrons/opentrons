@@ -357,6 +357,17 @@ class ResetMotorDriverErrorHandling(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class MotorDriverInErrorState(BaseMessage):  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[
+        payloads.EmptyPayload
+    ] = payloads.EmptyPayload
+    message_id: Literal[
+        MessageId.motor_driver_in_error_state
+    ] = MessageId.motor_driver_in_error_state
+
+
+@dataclass
 class ReadMotorDriverErrorRequest(BaseMessage):  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[
