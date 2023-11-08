@@ -32,4 +32,5 @@ export interface CalibrationPanelProps {
   supportedCommands?: SessionCommandString[] | null
   defaultTipracks?: LabwareDefinition2[] | null
   calInvalidationHandler?: () => void
+  allowChangeTipRack?: boolean
 }
