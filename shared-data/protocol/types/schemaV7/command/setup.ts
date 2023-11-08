@@ -91,11 +91,13 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
+  | { addressableAreaName: string }
 
 export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
+  | { addressableAreaName: string }
 
 export interface ModuleLocation {
   slotName: string

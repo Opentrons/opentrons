@@ -228,7 +228,7 @@ export function ProtocolDetails(
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
 
-      getDeckConfigFromProtocolCommands(mostRecentAnalysis.commands)
+  getDeckConfigFromProtocolCommands(mostRecentAnalysis.commands)
   const requiredExtensionInstrumentName =
     mostRecentAnalysis != null && getProtocolUsesGripper(mostRecentAnalysis)
       ? getGripperDisplayName('gripperV1')

@@ -94,6 +94,17 @@ function getLabwareCoordinates({
           z: loadedAdapterSlot.position[2],
         }
       : null
+  } else if ('addressableAreaName' in location) {
+    const slotCoordinateTuple =
+      orderedSlots.find(s => s.id === location.addressableAreaName)?.position ??
+      null
+    return slotCoordinateTuple != null
+      ? {
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
+        }
+      : null
   } else if ('slotName' in location) {
     const slotCoordinateTuple =
       orderedSlots.find(s => s.id === location.slotName)?.position ?? null

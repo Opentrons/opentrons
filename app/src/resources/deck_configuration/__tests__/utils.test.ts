@@ -1,8 +1,13 @@
-import { RunTimeCommand } from "@opentrons/shared-data"
-import { FLEX_SIMPLEST_DECK_CONFIG, getAllCutoutConfigsFromProtocolCommands } from "../utils"
+import { RunTimeCommand } from '@opentrons/shared-data'
+import {
+  FLEX_SIMPLEST_DECK_CONFIG,
+  getSimplestDeckConfigForProtocolCommands,
+} from '../utils'
 
-
-const RUN_TIME_COMMAND_STUB_MIXIN: Pick<RunTimeCommand, 'id' | 'createdAt' | 'startedAt' | 'completedAt' | 'status'> = {
+const RUN_TIME_COMMAND_STUB_MIXIN: Pick<
+  RunTimeCommand,
+  'id' | 'createdAt' | 'startedAt' | 'completedAt' | 'status'
+> = {
   id: 'fake_id',
   createdAt: 'fake_createdAt',
   startedAt: 'fake_startedAt',
@@ -10,12 +15,14 @@ const RUN_TIME_COMMAND_STUB_MIXIN: Pick<RunTimeCommand, 'id' | 'createdAt' | 'st
   status: 'succeeded',
 }
 
-describe('getAllCutoutConfigsFromProtocolCommands', () => {
+describe('getSimplestDeckConfigForProtocolCommands', () => {
   it('returns simplest deck if no commands alter addressable areas', () => {
-    expect(getAllCutoutConfigsFromProtocolCommands([])).toEqual(FLEX_SIMPLEST_DECK_CONFIG)
+    expect(getSimplestDeckConfigForProtocolCommands([])).toEqual(
+      FLEX_SIMPLEST_DECK_CONFIG
+    )
   })
   it('returns staging area fixtures if commands address column 4 areas', () => {
-    const cutoutConfigs = getAllCutoutConfigsFromProtocolCommands([
+    const cutoutConfigs = getSimplestDeckConfigForProtocolCommands([
       {
         ...RUN_TIME_COMMAND_STUB_MIXIN,
         commandType: 'loadLabware',
@@ -55,42 +62,62 @@ describe('getAllCutoutConfigsFromProtocolCommands', () => {
           version: 1,
           namespace: 'fake_namespace',
         },
-      }
+      },
     ])
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 8),
-      { cutoutId: 'cutoutA3', cutoutFixtureId: 'stagingAreaRightSlot' },
-      { cutoutId: 'cutoutB3', cutoutFixtureId: 'stagingAreaRightSlot' },
-      { cutoutId: 'cutoutC3', cutoutFixtureId: 'stagingAreaRightSlot' },
-      { cutoutId: 'cutoutD3', cutoutFixtureId: 'stagingAreaRightSlot' },
+      {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: 'stagingAreaRightSlot',
+        requiredAddressableAreas: ['A4'],
+      },
+      {
+        cutoutId: 'cutoutB3',
+        cutoutFixtureId: 'stagingAreaRightSlot',
+        requiredAddressableAreas: ['B4'],
+      },
+      {
+        cutoutId: 'cutoutC3',
+        cutoutFixtureId: 'stagingAreaRightSlot',
+        requiredAddressableAreas: ['C4'],
+      },
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: 'stagingAreaRightSlot',
+        requiredAddressableAreas: ['D4'],
+      },
     ])
   })
   it('returns simplest cutout fixture where many are possible', () => {
-    const cutoutConfigs = getAllCutoutConfigsFromProtocolCommands([
+    const cutoutConfigs = getSimplestDeckConfigForProtocolCommands([
       {
         ...RUN_TIME_COMMAND_STUB_MIXIN,
         commandType: 'moveLabware',
         params: {
           newLocation: { addressableAreaName: 'gripperWasteChute' },
           labwareId: 'fake_labwareId',
-          strategy: 'usingGripper'
+          strategy: 'usingGripper',
         },
       },
     ])
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 11),
-      { cutoutId: 'cutoutD3', cutoutFixtureId: 'wasteChuteRightAdapterNoCover' },
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
+        requiredAddressableAreas: ['gripperWasteChute'],
+      },
     ])
   })
-  it.only('returns compatible cutout fixture where multiple addressable requirements present', () => {
-    const cutoutConfigs = getAllCutoutConfigsFromProtocolCommands([
+  it('returns compatible cutout fixture where multiple addressable requirements present', () => {
+    const cutoutConfigs = getSimplestDeckConfigForProtocolCommands([
       {
         ...RUN_TIME_COMMAND_STUB_MIXIN,
         commandType: 'moveLabware',
         params: {
           newLocation: { addressableAreaName: 'gripperWasteChute' },
           labwareId: 'fake_labwareId',
-          strategy: 'usingGripper'
+          strategy: 'usingGripper',
         },
       },
       {
@@ -99,13 +126,17 @@ describe('getAllCutoutConfigsFromProtocolCommands', () => {
         params: {
           newLocation: { addressableAreaName: 'D4' },
           labwareId: 'fake_labwareId',
-          strategy: 'usingGripper'
+          strategy: 'usingGripper',
         },
       },
     ])
     expect(cutoutConfigs).toEqual([
       ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 11),
-      { cutoutId: 'cutoutD3', cutoutFixtureId: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' },
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover',
+        requiredAddressableAreas: ['gripperWasteChute', 'D4'],
+      },
     ])
   })
 })

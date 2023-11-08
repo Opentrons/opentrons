@@ -16,7 +16,7 @@ import type {
   ModuleModel,
   PipetteName,
   RunTimeCommand,
-  AddressableAreaName
+  AddressableAreaName,
 } from '@opentrons/shared-data'
 
 interface PipetteNamesByMount {
@@ -175,7 +175,7 @@ export function parseInitialLoadedLabwareByModuleId(
     loadLabwareCommandsReversed,
     (acc, command) =>
       typeof command.params.location === 'object' &&
-        'moduleId' in command.params.location
+      'moduleId' in command.params.location
         ? { ...acc, [command.params.location.moduleId]: command }
         : acc,
     {}
@@ -245,35 +245,52 @@ export function parseInitialLoadedFixturesByCutout(
   )
 }
 
-export function parseAllAddressableAreas(commands: RunTimeCommand[]): AddressableAreaName[] {
+export function parseAllAddressableAreas(
+  commands: RunTimeCommand[]
+): AddressableAreaName[] {
   return commands.reduce<AddressableAreaName[]>((acc, command) => {
     if (
-      command.commandType === 'moveLabware'
-      && command.params.newLocation !== 'offDeck'
-      && 'slotName' in command.params.newLocation 
-      && !acc.includes(command.params.newLocation.slotName)
+      command.commandType === 'moveLabware' &&
+      command.params.newLocation !== 'offDeck' &&
+      'slotName' in command.params.newLocation &&
+      !acc.includes(command.params.newLocation.slotName as AddressableAreaName)
     ) {
-      return [...acc, command.params.newLocation.slotName]
+      return [
+        ...acc,
+        command.params.newLocation.slotName as AddressableAreaName,
+      ]
     } else if (
-      command.commandType === 'moveLabware'
-      && command.params.newLocation !== 'offDeck'
-      && 'addressableAreaName' in command.params.newLocation
-      && !acc.includes(command.params.newLocation.addressableAreaName)) {
-      return [...acc, command.params.newLocation.addressableAreaName]
-    } else if (
-      (command.commandType === 'loadLabware' || command.commandType === 'loadModule')
-      && command.params.location !== 'offDeck'
-      && 'slotName' in command.params.location
-      && !acc.includes(command.params.location.slotName)
+      command.commandType === 'moveLabware' &&
+      command.params.newLocation !== 'offDeck' &&
+      'addressableAreaName' in command.params.newLocation &&
+      !acc.includes(
+        command.params.newLocation.addressableAreaName as AddressableAreaName
+      )
     ) {
-      return [...acc, command.params.location.slotName]
+      return [
+        ...acc,
+        command.params.newLocation.addressableAreaName as AddressableAreaName,
+      ]
     } else if (
-      (command.commandType === 'loadLabware')
-      && command.params.location !== 'offDeck'
-      && 'addressableArea' in command.params.location
-      && !acc.includes(command.params.location.addressableArea)
+      (command.commandType === 'loadLabware' ||
+        command.commandType === 'loadModule') &&
+      command.params.location !== 'offDeck' &&
+      'slotName' in command.params.location &&
+      !acc.includes(command.params.location.slotName as AddressableAreaName)
     ) {
-      return [...acc, command.params.location.addressableArea]
+      return [...acc, command.params.location.slotName as AddressableAreaName]
+    } else if (
+      command.commandType === 'loadLabware' &&
+      command.params.location !== 'offDeck' &&
+      'addressableArea' in command.params.location &&
+      !acc.includes(
+        command.params.location.addressableArea as AddressableAreaName
+      )
+    ) {
+      return [
+        ...acc,
+        command.params.location.addressableArea as AddressableAreaName,
+      ]
     }
     // TODO(BC, 11/6/23): once moveToAddressableArea command exists add it back here
     // else if (command.commandType === 'moveToAddressableArea') {
@@ -284,7 +301,6 @@ export function parseAllAddressableAreas(commands: RunTimeCommand[]): Addressabl
     }
   }, [])
 }
-
 
 export interface LiquidsById {
   [liquidId: string]: {
@@ -345,9 +361,9 @@ export function parseLabwareInfoByLiquidId(
   const loadLiquidCommands =
     commands.length !== 0
       ? commands.filter(
-        (command): command is LoadLiquidRunTimeCommand =>
-          command.commandType === 'loadLiquid'
-      )
+          (command): command is LoadLiquidRunTimeCommand =>
+            command.commandType === 'loadLiquid'
+        )
       : []
 
   return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
