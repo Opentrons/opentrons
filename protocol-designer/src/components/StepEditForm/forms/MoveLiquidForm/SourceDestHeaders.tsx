@@ -44,9 +44,12 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
 
   React.useEffect(() => {
     if (isWasteChute) {
+      const updatedPropsForFields = { ...propsForFields }
+      console.log(updatedPropsForFields)
       propsForFields.dispense_wells.updateValue(['A1'])
+      console.log(updatedPropsForFields)
     }
-  })
+  }, [isWasteChute])
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>
       <div className={styles.form_row}>

@@ -52,4 +52,11 @@ export const forDropTipInPlace = (
   const { pipetteId } = params
   const { robotState } = robotStateAndWarnings
   robotState.tipState.pipettes[pipetteId] = false
+
+  dispenseUpdateLiquidState({
+    invariantContext,
+    prevLiquidState: robotState.liquidState,
+    pipetteId,
+    useFullVolume: true,
+  })
 }
