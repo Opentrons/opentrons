@@ -42,6 +42,7 @@ import {
   PipetteEntity,
   InvariantContext,
   LabwareEntities,
+  AdditionalEquipmentEntities,
 } from '@opentrons/step-generation'
 import { StepFieldName } from '../../form-types'
 import type { LabwareLocation } from '@opentrons/shared-data'
@@ -64,6 +65,14 @@ const getIsAdapterLocation = (
     labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
   )
 }
+const getIsAddressableAreaLocation = (
+  newLocation: string,
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+): boolean =>
+  Object.values(additionalEquipmentEntities).find(
+    aE => aE.location === newLocation
+  ) != null
+
 const getLabwareLocation = (
   state: InvariantContext,
   newLocationString: string
@@ -77,6 +86,15 @@ const getLabwareLocation = (
     getIsAdapterLocation(newLocationString, state.labwareEntities)
   ) {
     return { labwareId: newLocationString }
+  } else if (
+    getIsAddressableAreaLocation(
+      newLocationString,
+      state.additionalEquipmentEntities
+    )
+  ) {
+    return {
+      addressableArea: 'gripperWasteChute',
+    }
   } else {
     return { slotName: newLocationString }
   }
