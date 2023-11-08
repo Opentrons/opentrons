@@ -33,7 +33,6 @@ class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
 class MoveToAddressableAreaResult(DestinationPositionResult):
     """Result data from the execution of a MoveToAddressableArea command."""
 
-
     pass
 
 
