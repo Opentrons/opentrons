@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "opentronsPipetteGeometrySchemaV2",
+  "$id": "opentronsPipettePropertiesSchemaV2",
   "definitions": {
     "channels": {
       "enum": [1, 8, 96, 384]
     },
     "displayCategory": {
       "type": "string",
-      "enum": ["GEN1"]
+      "enum": ["GEN1", "GEN2", "FLEX"]
     },
     "positiveNumber": {
       "type": "number",
@@ -17,33 +17,6 @@
       "type": "number",
       "minimum": 0.01,
       "maximum": 2.5
-    },
-    "xyzArray": {
-      "type": "array",
-      "description": "Array of 3 numbers, [x, y, z]",
-      "items": { "type": "number" },
-      "minItems": 3,
-      "maxItems": 3
-    },
-    "linearEquations": {
-      "description": "Array containing any number of 3-arrays. Each inner 3-array describes a line segment: [boundary, slope, intercept]. So [1, 2, 3] would mean 'where (next_boundary > x >= 1), y = 2x + 3'",
-      "type": "array",
-      "items": {
-        "type": "array",
-        "items": { "type": "number" },
-        "minItems": 3,
-        "maxItems": 3
-      }
-    },
-    "liquidHandlingSpecs": {
-      "description": "Object containing linear equations for translating between uL of liquid and mm of plunger travel. There is one linear equation for aspiration and one for dispense",
-      "type": "object",
-      "required": ["aspirate", "dispense"],
-      "additionalProperties": false,
-      "properties": {
-        "aspirate": { "$ref": "#/definitions/linearEquations" },
-        "dispense": { "$ref": "#/definitions/linearEquations" }
-      }
     },
     "editConfigurations": {
       "type": "object",
@@ -56,17 +29,6 @@
         "units": { "type": "string" },
         "type": { "type": "string" },
         "displayName": { "type": "string" }
-      }
-    },
-    "tipConfigurations": {
-      "type": "object",
-      "description": "Object containing configurations specific to tip handling",
-      "required": ["speed"],
-      "properties": {
-        "presses": {},
-        "speed": { "$ref": "#/definitions/editConfigurations" },
-        "increment": {},
-        "distance": {}
       }
     }
   },
@@ -103,20 +65,43 @@
     },
     "channels": { "$ref": "#/definitions/channels" },
     "partialTipConfigurations": {
-      "type": "object",
       "description": "Object containing information on partial tip configurations",
-      "required": ["partialTipSupported"],
-      "properties": {
-        "partialTipSupported": { "type": "boolean" },
-        "availableConfigurations": {
-          "type": "array",
-          "description": "Array of available configurations",
-          "items": {
-            "type": "number",
-            "enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]
+      "$oneof": [
+        {
+          "type": "object",
+          "required": ["partialTipSupported"],
+          "properties": {
+            "partialTipSupported": { "type": "boolean", "value": true }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "partialTipSupported",
+            "availableConfigurations",
+            "perTipPickupCurrent"
+          ],
+          "properties": {
+            "partialTipSupported": { "type": "boolean", "value": false },
+            "availableConfigurations": {
+              "type": "array",
+              "description": "Array of available configurations",
+              "items": {
+                "type": "number",
+                "enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]
+              },
+              "perTipPickupCurrent": {
+                "type": "object",
+                "patternProperties": {
+                  "\\d+": {
+                    "$ref": "#/definitions/positiveNumber"
+                  }
+                }
+              }
+            }
           }
         }
-      }
+      ]
     },
     "availableSensors": {
       "type": "object",
@@ -142,13 +127,20 @@
     },
     "plungerPositionsConfigurations": {
       "type": "object",
-      "description": "Object containing configurations specific to tip handling",
-      "required": ["top", "bottom", "blowout", "drop"],
-      "properties": {
-        "top": { "$ref": "#/definitions/currentRange" },
-        "bottom": {},
-        "blowout": { "$ref": "#/definitions/editConfigurations" },
-        "drop": {}
+      "description": "Key positions of the plunger, by liquid configuration",
+      "required": ["default"],
+      "patternProperties": {
+        "\\w+": {
+          "type": "object",
+          "description": "Plunger positions for this liquid configuration",
+          "required": ["top", "bottom", "blowout", "drop"],
+          "properties": {
+            "top": { "type": "number" },
+            "bottom": { "type": "number" },
+            "blowout": { "type": "number" },
+            "drop": { "type": "number" }
+          }
+        }
       }
     },
     "plungerMotorConfigurations": {
@@ -170,10 +162,27 @@
       }
     },
     "pickUpTipConfigurations": {
-      "$ref": "#/definitions/tipConfigurations"
+      "type": "object",
+      "description": "Object containing configurations for picking up tips common to all partial configurations",
+      "required": ["speed"],
+      "properties": {
+        "presses": { "$ref": "#/definitions/positiveNumber" },
+        "speed": { "$ref": "#/definitions/positiveNumber" },
+        "increment": { "$ref": "#/definitions/positiveNumber" },
+        "distance": { "$ref": "#/definitions/positiveNumber" }
+      }
     },
     "dropTipConfigurations": {
-      "$ref": "#/definitions/tipConfigurations"
+      "type": "object",
+      "description": "Object containing configurations specific to dropping tips",
+      "required": ["current", "speed"],
+      "properties": {
+        "current": { "$ref": "#/definitions/currentRange" },
+        "presses": {},
+        "speed": { "$ref": "#/definitions/positiveNumber" },
+        "increment": {},
+        "distance": {}
+      }
     },
     "displayName": {
       "type": "string",
