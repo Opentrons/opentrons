@@ -72,12 +72,9 @@ describe('ReturnTip', () => {
     )
     getByRole('link', { name: 'Need help?' })
   })
-  it.only('renders correct copy on device', () => {
-    console.log('MOCK BEFORE')
+  it('renders correct copy on device', () => {
     mockGetIsOnDevice.mockReturnValue(true)
-    console.log('RENDER BEFORE')
     const { getByText, getByRole } = render(props)
-    console.log('RENDER AFTER')
     getByRole('heading', { name: 'Return tip rack to Slot D1' })
     getByText('Clear all deck slots of labware')
     getByText(
@@ -85,7 +82,6 @@ describe('ReturnTip', () => {
         'Place the Mock TipRack Definition that you used before back into Slot D1. The pipette will return tips to their original location in the rack.'
       )
     )
-    getByRole('link', { name: 'Need help?' })
   })
   it('executes correct chained commands when CTA is clicked', async () => {
     const { getByRole } = render(props)
