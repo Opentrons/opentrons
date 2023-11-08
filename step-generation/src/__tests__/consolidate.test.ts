@@ -25,7 +25,6 @@ import {
   moveToAddressableAreaHelper,
   dropTipInPlaceHelper,
 } from '../fixtures'
-import { getWasteChuteOrLabware } from '../utils/misc'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type { AspDispAirgapParams, CreateCommand } from '@opentrons/shared-data'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
