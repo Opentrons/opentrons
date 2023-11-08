@@ -261,7 +261,7 @@ export const LabwarePositionCheckComponent = (
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
 
-  const protocolHasModules: boolean = protocolData.modules.length > 0
+  const protocolHasModules = protocolData.modules.length > 0
 
   const handleJog = (
     axis: Axis,
