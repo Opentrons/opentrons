@@ -597,7 +597,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 message=f"Liquid class {class_name} is not valid for {self._config.display_name}",
                 detail={
                     "requested-class-name": class_name,
-                    "pipette-model": self._pipette_model,
+                    "pipette-model": str(self._pipette_model),
                 },
             )
         if (

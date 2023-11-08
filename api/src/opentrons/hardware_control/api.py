@@ -618,7 +618,7 @@ class API(
             if any(unsupported):
                 raise UnsupportedHardwareCommand(
                     message=f"At least one axis in {axes} is not supported on the OT2.",
-                    detail={"unsupported_axes": unsupported},
+                    detail={"unsupported_axes": str(unsupported)},
                 )
         self._reset_last_mount()
         # Initialize/update current_position
@@ -661,14 +661,14 @@ class API(
                 raise PositionUnknownError(
                     message=f"Current position of {str(mount)} pipette is unknown,"
                     " please home.",
-                    detail={"mount": str(mount), "missing_axes": position_axes},
+                    detail={"mount": str(mount), "missing_axes": str(position_axes)},
                 )
             axes_str = [ot2_axis_to_string(a) for a in position_axes]
             if not self._backend.is_homed(axes_str):
                 unhomed = self._backend._unhomed_axes(axes_str)
                 raise PositionUnknownError(
                     message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
-                    detail={"mount": str(mount), "unhomed_axes": unhomed},
+                    detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
                 )
         elif not self._current_position and not refresh:
             raise PositionUnknownError(
@@ -755,7 +755,7 @@ class API(
         """
         raise UnsupportedHardwareCommand(
             message="move_axes is not supported on the OT-2.",
-            detail={"axes_commanded": list(position.keys())},
+            detail={"axes_commanded": str(list(position.keys()))},
         )
 
     async def move_rel(
@@ -781,7 +781,7 @@ class API(
                     " is unknown.",
                     detail={
                         "mount": str(mount),
-                        "fail_on_not_homed": fail_on_not_homed,
+                        "fail_on_not_homed": str(fail_on_not_homed),
                     },
                 )
             else:
@@ -797,7 +797,7 @@ class API(
             unhomed = self._backend._unhomed_axes(axes_str)
             raise PositionUnknownError(
                 message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
-                detail={"mount": str(mount), "unhomed_axes": unhomed},
+                detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
             )
 
         await self._cache_and_maybe_retract_mount(mount)

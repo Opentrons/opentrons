@@ -945,7 +945,7 @@ class OT3API(
             raise PositionUnknownError(
                 message=f"Motor positions for {str(mount)} mount are missing ("
                 f"{mount_axes}); must first home motors.",
-                detail={"mount": str(mount), "missing_axes": mount_axes},
+                detail={"mount": str(mount), "missing_axes": str(mount_axes)},
             )
         self._assert_motor_ok(mount_axes)
 
