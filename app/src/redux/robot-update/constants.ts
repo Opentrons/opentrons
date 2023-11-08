@@ -2,6 +2,7 @@
 
 export const PREMIGRATION: 'premigration' = 'premigration'
 export const PREMIGRATION_RESTART: 'premigrationRestart' = 'premigrationRestart'
+export const DOWNLOAD_FILE: 'downloadFile' = 'downloadFile'
 export const GET_TOKEN: 'getToken' = 'getToken'
 export const UPLOAD_FILE: 'uploadFile' = 'uploadFile'
 export const PROCESS_FILE: 'processFile' = 'processFile'
@@ -32,6 +33,9 @@ export const REINSTALL: 'reinstall' = 'reinstall'
 
 // action types
 
+export const ROBOTUPDATE_CHECKING_FOR_UPDATE: 'robotUpdate:CHECKING_FOR_UPDATE' =
+  'robotUpdate:CHECKING_FOR_UPDATE'
+
 export const ROBOTUPDATE_UPDATE_VERSION: 'robotUpdate:UPDATE_VERSION' =
   'robotUpdate:UPDATE_VERSION'
 
@@ -46,6 +50,9 @@ export const ROBOTUPDATE_DOWNLOAD_PROGRESS: 'robotUpdate:DOWNLOAD_PROGRESS' =
 
 export const ROBOTUPDATE_DOWNLOAD_ERROR: 'robotUpdate:DOWNLOAD_ERROR' =
   'robotUpdate:DOWNLOAD_ERROR'
+
+export const ROBOTUPDATE_DOWNLOAD_DONE: 'robotUpdate:DOWNLOAD_DONE' =
+  'robotUpdate:DOWNLOAD_DONE'
 
 export const ROBOTUPDATE_SET_UPDATE_SEEN: 'robotUpdate:SET_UPDATE_SEEN' =
   'robotUpdate:SET_UPDATE_SEEN'

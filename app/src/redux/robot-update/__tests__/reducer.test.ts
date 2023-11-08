@@ -138,6 +138,69 @@ describe('robot update reducer', () => {
       },
     },
     {
+      name: 'handles robotUpdate:CHECKING_FOR_UPDATE',
+      action: {
+        type: 'robotUpdate:CHECKING_FOR_UPDATE',
+        payload: 'ot2',
+      },
+      initialState: { ...INITIAL_STATE, session: null },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'ot2',
+        },
+      },
+    },
+    {
+      name:
+        'handles robotUpdate:DOWNLOAD_DONE when the target matches the robot type',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_DONE',
+        payload: 'ot2',
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'ot2',
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'done',
+        },
+      },
+    },
+    {
+      name:
+        'handles robotUpdate:DOWNLOAD_DONE when the target does not match the robot type',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_DONE',
+        payload: 'ot2',
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'flex',
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'flex',
+        },
+      },
+    },
+    {
       name: 'handles robotUpdate:FILE_INFO',
       action: {
         type: 'robotUpdate:FILE_INFO',
