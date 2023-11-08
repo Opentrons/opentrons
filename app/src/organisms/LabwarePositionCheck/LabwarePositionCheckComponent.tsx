@@ -261,6 +261,8 @@ export const LabwarePositionCheckComponent = (
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
 
+  const protocolHasModules = protocolData.modules.length > 0
+
   const handleJog = (
     axis: Axis,
     dir: Sign,
@@ -357,7 +359,14 @@ export const LabwarePositionCheckComponent = (
   } else if (currentStep.section === 'DETACH_PROBE') {
     modalContent = <DetachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
-    modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <PickUpTip
+        {...currentStep}
+        {...movementStepProps}
+        protocolHasModules={protocolHasModules}
+        currentStepIndex={currentStepIndex}
+      />
+    )
   } else if (currentStep.section === 'RETURN_TIP') {
     modalContent = (
       <ReturnTip

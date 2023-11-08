@@ -11,6 +11,7 @@
   "check_labware_in_slot_title": "Check Labware {{labware_display_name}} in slot {{slot}}",
   "check_remaining_labware_with_primary_pipette_section": "Check remaining labware with {{primary_mount}} Pipette and tip",
   "clear_all_slots": "Clear all deck slots of labware, leaving modules in place",
+  "clear_all_slots_odd": "Clear all deck slots of labware",
   "cli_ssh": "Command Line Interface (SSH)",
   "close_and_apply_offset_data": "Close and apply labware offset data",
   "confirm_pick_up_tip_modal_title": "Did the pipette pick up a tip successfully?",
