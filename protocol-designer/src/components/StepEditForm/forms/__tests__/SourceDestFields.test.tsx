@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
 import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
@@ -11,11 +12,14 @@ import type { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms')
 jest.mock('../../utils')
+jest.mock('../../../../step-forms/selectors')
 
 const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
   typeof stepFormSelectors.getUnsavedForm
 >
-
+const mockGetAdditionalEquipmentEntities = getAdditionalEquipmentEntities as jest.MockedFunction<
+  typeof getAdditionalEquipmentEntities
+>
 jest.mock('../../fields/', () => {
   const actualFields = jest.requireActual('../../fields')
 
@@ -201,6 +205,7 @@ describe('SourceDestFields', () => {
     getUnsavedFormMock.mockReturnValue({
       stepType: 'moveLiquid',
     } as FormData)
+    mockGetAdditionalEquipmentEntities.mockReturnValue({})
   })
 
   const render = (props: React.ComponentProps<typeof SourceDestFields>) =>

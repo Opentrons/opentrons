@@ -121,6 +121,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
         invariantContext,
         robotStateAndWarnings
       )
+      break
 
     case 'aspirateInPlace':
       forAspirateInPlace(

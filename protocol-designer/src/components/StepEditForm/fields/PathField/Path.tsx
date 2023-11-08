@@ -84,8 +84,7 @@ const PathButton = (buttonProps: ButtonProps): JSX.Element => {
           [styles.selected]: selected,
           [styles.disabled]: disabled,
         })}
-        // @ts-expect-error(sa, 2021-6-22): null is not a valid onClick handler
-        onClick={disabled ? null : onClick}
+        onClick={disabled ? undefined : onClick}
         id={id}
         data-test={pathButtonData}
       >

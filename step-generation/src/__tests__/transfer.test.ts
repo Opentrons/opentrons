@@ -228,16 +228,18 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
   expect(res.commands).toEqual([
     aspirateHelper('A1', 30),
     {
-      commandType: 'dispense',
+      commandType: 'moveToAddressableArea',
+      key: expect.any(String),
+      params: {
+        addressableAreaName: '1and8ChannelWasteChute'
+      }},
+    {
+      commandType: 'dispenseInPlace',
       key: expect.any(String),
       params: {
         flowRate: 2.2,
-        labwareId: mockWasteChuteId,
         pipetteId: 'p300SingleId',
         volume: 30,
-        wellName: 'A1',
-
-        wellLocation: { offset: { z: 3.2 }, origin: 'bottom' },
       },
     },
   ])

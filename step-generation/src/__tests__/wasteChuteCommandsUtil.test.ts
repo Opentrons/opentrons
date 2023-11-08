@@ -8,6 +8,8 @@ import {
 import { wasteChuteCommandsUtil } from '../utils/wasteChuteCommandsUtil'
 import type { InvariantContext, RobotState, PipetteEntities } from '../types'
 
+jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+
 const mockWasteChuteId = 'mockWasteChuteId'
 const mockAddressableAreaName = 'mockName'
 const mockId = 'mockId'

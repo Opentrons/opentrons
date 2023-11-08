@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { i18n } from '../../../../localization'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 
 import {
   BlowoutLocationField,
@@ -37,10 +39,16 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields, allLabware } = props
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const hasWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
-      ? String(propsForFields.dispense_labware.value)?.includes('wasteChute')
+      ? additionalEquipmentEntities[
+          String(propsForFields.dispense_labware.value)
+        ]?.name === 'wasteChute'
       : false
+
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const getDelayFields = (): JSX.Element => (
     <DelayFields
@@ -124,7 +132,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
 
       <div className={styles.checkbox_column}>
         {prefix === 'aspirate' && (
-          <React.Fragment>
+          <>
             <CheckboxRowField
               {...propsForFields.preWetTip}
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
@@ -132,13 +140,13 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             />
             {getMixFields()}
             {getDelayFields()}
-          </React.Fragment>
+          </>
         )}
         {prefix === 'dispense' && (
-          <React.Fragment>
+          <>
             {getDelayFields()}
             {getMixFields()}
-          </React.Fragment>
+          </>
         )}
 
         <CheckboxRowField

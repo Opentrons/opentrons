@@ -100,6 +100,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     invariantContext.additionalEquipmentEntities,
     args.destLabware
   )
+
   const destinationWell =
     wasteChuteOrLabware === 'labware' ? args.destWell : null
 
@@ -193,7 +194,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   }),
                 ]
               : []
-          const touchTipAfterAspirateCommand = args.touchTipAfterDispense
+          const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
             ? [
                 curryCommandCreator(touchTip, {
                   pipette: args.pipette,

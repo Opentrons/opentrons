@@ -240,7 +240,6 @@ export const moveLiquidFormToArgs = (
         sourceWells,
         destWell: destWells[0],
       }
-      console.log('consolidate', consolidateStepArguments)
       return consolidateStepArguments
     }
 

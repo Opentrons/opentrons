@@ -1,6 +1,8 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { StepFieldName } from '../../../../steplist/fieldLevel'
 import { LabwareField, WellSelectionField } from '../../fields'
 import { AspDispSection } from '../AspDispSection'
@@ -32,16 +34,26 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
     formData,
   } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
   const wasteChuteOrLabwareId = formData[addFieldNamePrefix('labware')]
+  const isWasteChute =
+    additionalEquipmentEntities[wasteChuteOrLabwareId]?.name === 'wasteChute'
 
+  React.useEffect(() => {
+    if (isWasteChute) {
+      propsForFields.dispense_wells.updateValue(['A1'])
+    }
+  })
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>
       <div className={styles.form_row}>
         <FormGroup label={labwareLabel}>
           <LabwareField {...propsForFields[addFieldNamePrefix('labware')]} />
         </FormGroup>
-        {wasteChuteOrLabwareId?.includes('wasteChute') ? null : (
+        {isWasteChute ? null : (
           <WellSelectionField
             {...propsForFields[addFieldNamePrefix('wells')]}
             labwareId={wasteChuteOrLabwareId}
