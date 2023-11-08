@@ -258,6 +258,7 @@ class API(
         config: Optional[Union[RobotConfig, OT3Config]] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
     ) -> "API":
         """Build a simulating hardware controller.
 

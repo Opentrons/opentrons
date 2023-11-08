@@ -12,7 +12,7 @@ except (OSError, ModuleNotFoundError):
 
 from opentrons import types, config
 from opentrons.hardware_control import API
-from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 
@@ -336,7 +336,7 @@ async def test_prep_aspirate(sim_and_instr):
 
 async def test_aspirate_new(dummy_instruments):
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop(), feature_flags=HardwareFeatureFlags.build_from_ff()
     )
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -357,7 +357,7 @@ async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instru
     decoy.when(config.feature_flags.use_old_aspiration_functions()).then_return(True)
 
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop(), feature_flags=HardwareFeatureFlags.build_from_ff()
     )
     await hw_api.home()
     await hw_api.cache_instruments()
