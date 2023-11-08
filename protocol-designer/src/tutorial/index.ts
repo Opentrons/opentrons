@@ -10,7 +10,7 @@ type HintKey =  // normal hints
   | 'waste_chute_warning'
   // blocking hints
   | 'custom_labware_with_modules'
-  | 'export_v7_protocol_7_0'
+  | 'export_v8_protocol_7_1'
   | 'change_magnet_module_model'
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
 // 'export_v4_protocol'
@@ -18,5 +18,6 @@ type HintKey =  // normal hints
 // | 'export_v5_protocol_3_20'
 // | 'export_v6_protocol_6_10'
 // | 'export_v6_protocol_6_20'
+// | 'export_v7_protocol_7_0'
 export { actions, rootReducer, selectors }
 export type { RootState, HintKey }
