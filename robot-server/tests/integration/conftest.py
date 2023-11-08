@@ -133,6 +133,7 @@ def _wait_until_ready(base_url: str) -> None:
             time.sleep(0.1)
 
 
+# TODO(mm, 2023-11-02): This should also restore the server's original deck configuration.
 def _clean_server_state(base_url: str) -> None:
     async def _clean_server_state_async() -> None:
         async with RobotClient.make(base_url=base_url, version="*") as robot_client:
