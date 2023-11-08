@@ -130,6 +130,7 @@ test-gravimetric-96:
 test-gravimetric:
 	-$(MAKE) apply-patches-gravimetric
 	$(python) -m hardware_testing.gravimetric.daily_setup --simulate
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate --calibrate
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
 	$(MAKE) test-gravimetric-96
