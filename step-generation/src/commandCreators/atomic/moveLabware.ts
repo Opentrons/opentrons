@@ -87,10 +87,13 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     newLocation !== 'offDeck' && 'labwareId' in newLocation
       ? newLocation.labwareId
       : null
-  const destModuleIdUnderAdapter =
+
+  const destModuleOrSlotUnderAdapterId =
     destAdapterId != null ? prevRobotState.labware[destAdapterId].slot : null
-  const destinationModuleId =
-    destModuleIdUnderAdapter != null ? destModuleIdUnderAdapter : destModuleId
+  const destinationModuleIdOrSlot =
+    destModuleOrSlotUnderAdapterId != null
+      ? destModuleOrSlotUnderAdapterId
+      : destModuleId
 
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
@@ -110,22 +113,24 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     warnings.push(warningCreators.labwareInWasteChuteHasLiquid())
   }
 
-  if (destinationModuleId != null) {
+  if (
+    destinationModuleIdOrSlot != null &&
+    prevRobotState.modules[destinationModuleIdOrSlot] != null
+  ) {
     const destModuleState =
-      prevRobotState.modules[destinationModuleId]?.moduleState ?? null
-    if (destModuleState != null) {
-      if (
-        destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
-        destModuleState.lidOpen !== true
-      ) {
-        errors.push(errorCreators.thermocyclerLidClosed())
-      } else if (destModuleState.type === HEATERSHAKER_MODULE_TYPE) {
-        if (destModuleState.latchOpen !== true) {
-          errors.push(errorCreators.heaterShakerLatchClosed())
-        }
-        if (destModuleState.targetSpeed !== null) {
-          errors.push(errorCreators.heaterShakerIsShaking())
-        }
+      prevRobotState.modules[destinationModuleIdOrSlot].moduleState
+
+    if (
+      destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
+      destModuleState.lidOpen !== true
+    ) {
+      errors.push(errorCreators.thermocyclerLidClosed())
+    } else if (destModuleState.type === HEATERSHAKER_MODULE_TYPE) {
+      if (destModuleState.latchOpen !== true) {
+        errors.push(errorCreators.heaterShakerLatchClosed())
+      }
+      if (destModuleState.targetSpeed !== null) {
+        errors.push(errorCreators.heaterShakerIsShaking())
       }
     }
   }
