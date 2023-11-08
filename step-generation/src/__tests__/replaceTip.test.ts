@@ -7,6 +7,8 @@ import {
   getSuccessResult,
   pickUpTipHelper,
   dropTipHelper,
+  dropTipInPlaceHelper,
+  moveToAddressableAreaHelper,
   DEFAULT_PIPETTE,
 } from '../fixtures'
 import { FIXED_TRASH_ID } from '..'
@@ -17,6 +19,7 @@ const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
+const wasteChuteId = 'wasteChuteId'
 describe('replaceTip', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState
@@ -130,6 +133,44 @@ describe('replaceTip', () => {
         pickUpTipHelper('A1', {
           labwareId: tiprack2Id,
         }),
+      ])
+    })
+    it('Single-channel: dropping tips in waste chute', () => {
+      invariantContext = {
+        ...invariantContext,
+        additionalEquipmentEntities: {
+          wasteChuteId: {
+            name: 'wasteChute',
+            id: wasteChuteId,
+            location: 'D3',
+          },
+        },
+      }
+      const initialTestRobotState = merge({}, initialRobotState, {
+        tipState: {
+          tipracks: {
+            [tiprack1Id]: {
+              A1: false,
+            },
+          },
+          pipettes: {
+            p300SingleId: true,
+          },
+        },
+      })
+      const result = replaceTip(
+        {
+          pipette: p300SingleId,
+          dropTipLocation: 'wasteChuteId',
+        },
+        invariantContext,
+        initialTestRobotState
+      )
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        moveToAddressableAreaHelper(),
+        dropTipInPlaceHelper(),
+        pickUpTipHelper('B1'),
       ])
     })
   })
