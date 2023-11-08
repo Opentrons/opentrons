@@ -146,13 +146,17 @@ class PlungerHomingConfigurations(BaseModel):
     )
     speed: float = Field(
         ...,
-        description="The speed to move the z or plunger axis for tip pickup or drop off.",
+        description="The speed to move the plunger axis for homing.",
     )
 
 
-class TipHandlingConfigurations(PlungerHomingConfigurations):
+class TipHandlingConfigurations(BaseModel):
     presses: int = Field(
         default=0.0, description="The number of tries required to force pick up a tip."
+    )
+    speed: float = Field(
+        ...,
+        description="The speed to move the z or plunger axis for tip pickup or drop off.",
     )
     increment: float = Field(
         default=0.0,
