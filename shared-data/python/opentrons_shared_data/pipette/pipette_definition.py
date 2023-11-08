@@ -142,7 +142,7 @@ class PlungerPositions(BaseModel):
 class PlungerHomingConfigurations(BaseModel):
     current: float = Field(
         default=0.0,
-        description="Either the z motor current needed for picking up tip or the plunger motor current for dropping tip off the nozzle.",
+        description="The current to move the plunger axis for homing.",
     )
     speed: float = Field(
         ...,
@@ -153,6 +153,10 @@ class PlungerHomingConfigurations(BaseModel):
 class TipHandlingConfigurations(BaseModel):
     presses: int = Field(
         default=0.0, description="The number of tries required to force pick up a tip."
+    )
+    current: float = Field(
+        default=0.0,
+        description="The current to use for tip drop-off.",
     )
     speed: float = Field(
         ...,
