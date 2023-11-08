@@ -1,4 +1,5 @@
 """Runs' on-db store."""
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
@@ -17,6 +18,8 @@ from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
+
+log = logging.getLogger(__name__)
 
 _CACHE_ENTRIES = 32
 
@@ -263,6 +266,7 @@ class RunStore:
                 else None
             )
         except ValidationError:
+            log.warn(f"invalid state summary for run ID: {run_id}")
             return None
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
