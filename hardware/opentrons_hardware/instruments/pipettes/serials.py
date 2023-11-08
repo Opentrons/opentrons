@@ -93,6 +93,6 @@ def serial_val_from_parts(name: PipetteName, model: int, serialval: bytes) -> by
     except struct.error as e:
         raise InvalidInstrumentData(
             message="Invalid pipette serial",
-            detail={"name": name, "model": model, "serial": str(serialval)},
+            detail={"name": str(name), "model": str(model), "serial": str(serialval)},
             wrapping=[PythonException(e)],
         )
