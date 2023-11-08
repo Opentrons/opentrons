@@ -37,13 +37,7 @@ interface LabwareLocationUpdate {
 export const migrateFile = (
   appData: ProtocolFileV7<DesignerApplicationData>
 ): ProtocolFile => {
-  const {
-    designerApplication,
-    commands,
-    robot,
-    labwareDefinitions,
-    liquids,
-  } = appData
+  const { designerApplication, commands, robot, liquids } = appData
 
   if (designerApplication == null || designerApplication.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
@@ -135,31 +129,6 @@ export const migrateFile = (
     filteredSavedStepForms
   )
 
-  const loadLabwareCommands: LoadLabwareCreateCommand[] = commands
-    .filter(
-      (command): command is LoadLabwareCreateCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .map(command => {
-      //  protocols that do multiple migrations through 7.0.0 have a loadName === definitionURI
-      //  this ternary below fixes that
-      const loadName =
-        labwareDefinitions[command.params.loadName] != null
-          ? labwareDefinitions[command.params.loadName].parameters.loadName
-          : command.params.loadName
-      return {
-        ...command,
-        params: {
-          ...command.params,
-          loadName,
-        },
-      }
-    })
-
-  const migratedCommandsV8 = commands.filter(
-    command => command.commandType !== 'loadLabware'
-  )
-
   const flexDeckSpec: OT3RobotMixin = {
     robot: {
       model: FLEX_ROBOT_TYPE,
@@ -216,11 +185,7 @@ export const migrateFile = (
 
   const commandv8Mixin: CommandV8Mixin = {
     commandSchemaId: 'opentronsCommandSchemaV8',
-    commands: [
-      ...migratedCommandsV8,
-      ...loadLabwareCommands,
-      ...trashLoadCommand,
-    ],
+    commands: [...commands, ...trashLoadCommand],
   }
 
   const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {
