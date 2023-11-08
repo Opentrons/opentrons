@@ -46,7 +46,7 @@ describe('AddCustomLabwareSlideout', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('Import a Custom Labware Definition')
     getByText('Or choose a file from your computer to upload.')
-    const btn = getByRole('button', { name: 'Choose File' })
+    const btn = getByRole('button', { name: 'Upload' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_ADD_CUSTOM_LABWARE,
