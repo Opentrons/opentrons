@@ -82,6 +82,7 @@ class TipCalibrationUserFlow:
             cast(List[LabwareUri], self.hw_pipette.liquid_class.default_tipracks)
         )
         self._supported_commands = SupportedCommands(namespace="calibration")
+        self._supported_commands.loadLabware = True
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -168,7 +169,13 @@ class TipCalibrationUserFlow:
         self,
         tiprackDefinition: Optional[LabwareDefinition] = None,
     ):
-        pass
+        self._supported_commands.loadLabware = False
+        if tiprackDefinition:
+            verified_definition = labware.verify_definition(tiprackDefinition)
+            self._tip_rack = self._get_tip_rack_lw(verified_definition)
+            if self._deck[TIP_RACK_SLOT]:
+                del self._deck[TIP_RACK_SLOT]
+            self._deck[TIP_RACK_SLOT] = self._tip_rack
 
     async def move_to_tip_rack(self):
         await self._move(Location(self.tip_origin, None))

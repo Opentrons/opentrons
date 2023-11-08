@@ -71,8 +71,10 @@ export function CalibrateTipLength(
     dispatchRequests,
     isJogging,
     offsetInvalidationHandler,
+    allowChangeTipRack = false,
   } = props
-  const { currentStep, instrument, labware } = session?.details ?? {}
+  const { currentStep, instrument, labware, supportedCommands } =
+    session?.details ?? {}
 
   const queryClient = useQueryClient()
   const host = useHost()
@@ -171,7 +173,9 @@ export function CalibrateTipLength(
             calBlock={calBlock}
             currentStep={currentStep}
             sessionType={session.sessionType}
+            supportedCommands={supportedCommands}
             calInvalidationHandler={offsetInvalidationHandler}
+            allowChangeTipRack={allowChangeTipRack}
           />
         )}
       </LegacyModalShell>

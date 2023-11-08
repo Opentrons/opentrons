@@ -136,6 +136,7 @@ export interface MoveLabwareParams {
 interface MoveLabwareResult {
   offsetId: string
 }
+
 interface LoadModuleParams {
   moduleId?: string
   location: ModuleLocation

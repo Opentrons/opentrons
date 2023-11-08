@@ -146,7 +146,7 @@ def build_gravimetric_trials(
                 for trial in range(cfg.trials):
                     d: Optional[float] = None
                     cv: Optional[float] = None
-                    if not cfg.increment:
+                    if not cfg.increment and not cfg.user_volumes:
                         d, cv = config.QC_TEST_MIN_REQUIREMENTS[cfg.pipette_channels][
                             cfg.pipette_volume
                         ][cfg.tip_volume][volume]

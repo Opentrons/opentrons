@@ -89,16 +89,6 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
       </Tooltip>
       <div {...targetProps}>
         <FormGroup label={props.label} className={className}>
-          <WellOrderModal
-            prefix={props.prefix}
-            closeModal={handleClose}
-            isOpen={isModalOpen}
-            updateValues={updateValues}
-            firstValue={firstValue}
-            secondValue={secondValue}
-            firstName={firstName}
-            secondName={secondName}
-          />
           {firstValue != null && secondValue != null ? (
             <img
               onClick={handleOpen}
@@ -128,6 +118,16 @@ export const WellOrderField = (props: WellOrderFieldProps): JSX.Element => {
           )}
         </FormGroup>
       </div>
+      <WellOrderModal
+        prefix={props.prefix}
+        closeModal={handleClose}
+        isOpen={isModalOpen}
+        updateValues={updateValues}
+        firstValue={firstValue}
+        secondValue={secondValue}
+        firstName={firstName}
+        secondName={secondName}
+      />
     </>
   )
 }

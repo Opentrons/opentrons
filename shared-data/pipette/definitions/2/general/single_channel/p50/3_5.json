@@ -4,7 +4,6 @@
   "model": "p50",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
-    "current": 0.2,
     "presses": 1,
     "speed": 10,
     "increment": 0.0,
@@ -45,7 +44,10 @@
     }
   },
   "partialTipConfigurations": {
-    "partialTipSupported": false
+    "partialTipSupported": false,
+    "perTipPickupCurrent": {
+      "1": 0.2
+    }
   },
   "backCompatNames": [],
   "channels": 1,

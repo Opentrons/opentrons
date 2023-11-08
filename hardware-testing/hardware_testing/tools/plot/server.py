@@ -2,6 +2,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from pathlib import Path
+from time import time
 from typing import List, Any
 
 from hardware_testing.data import create_folder_for_test_data
@@ -67,8 +68,9 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
                 for sub_p in sub_dir_paths:
                     _ret.append(sub_p)
         # sort newest to oldest
-        _ret.sort(key=lambda f: f.stem)  # name includes timestamp
-        _ret.reverse()
+        # NOTE: system time on machines in SZ will randomly switch to the wrong time
+        #       so here we can sort relative to whatever the current system time is
+        _ret.sort(key=lambda f: abs(time() - f.stat().st_mtime))
         return _ret
 
     def _respond_to_data_request(self) -> None:

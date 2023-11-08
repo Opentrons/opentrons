@@ -77,23 +77,37 @@ export interface RetractAxisRunTimeCommand
   result?: {}
 }
 
+export interface MoveToAddressableAreaCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'moveToAddressableArea'
+  params: MoveToAddressableAreaParams
+}
+export interface MoveToAddressableAreaRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveToAddressableAreaCreateCommand {
+  //  TODO(jr, 11/6/23): add to result type
+  result?: {}
+}
+
 export type GantryRunTimeCommand =
+  | HomeRunTimeCommand
+  | MoveRelativeRunTimeCommand
+  | MoveToAddressableAreaRunTimeCommand
+  | MoveToCoordinatesRunTimeCommand
   | MoveToSlotRunTimeCommand
   | MoveToWellRunTimeCommand
-  | MoveToCoordinatesRunTimeCommand
-  | MoveRelativeRunTimeCommand
-  | SavePositionRunTimeCommand
-  | HomeRunTimeCommand
   | RetractAxisRunTimeCommand
+  | SavePositionRunTimeCommand
 
 export type GantryCreateCommand =
+  | HomeCreateCommand
+  | MoveRelativeCreateCommand
+  | MoveToAddressableAreaCreateCommand
+  | MoveToCoordinatesCreateCommand
   | MoveToSlotCreateCommand
   | MoveToWellCreateCommand
-  | MoveToCoordinatesCreateCommand
-  | MoveRelativeCreateCommand
-  | SavePositionCreateCommand
-  | HomeCreateCommand
   | RetractAxisCreateCommand
+  | SavePositionCreateCommand
 interface MoveToSlotParams {
   pipetteId: string
   slotName: string
@@ -151,4 +165,12 @@ interface HomeParams {
 
 interface RetractAxisParams {
   axis: MotorAxis
+}
+
+export interface MoveToAddressableAreaParams {
+  pipetteId: string
+  addressableAreaName: string
+  speed?: number
+  minimumZHeight?: number
+  forceDirect?: boolean
 }

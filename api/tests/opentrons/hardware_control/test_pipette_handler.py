@@ -151,7 +151,9 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.pick_up_configurations.increment).then_return(increment)
     decoy.when(mock_pipette_ot3.pick_up_configurations.speed).then_return(5.5)
     decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(10)
-    decoy.when(mock_pipette_ot3.pick_up_configurations.current).then_return(1)
+    decoy.when(
+        mock_pipette_ot3.nozzle_manager.get_tip_configuration_current()
+    ).then_return(1)
     decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)
