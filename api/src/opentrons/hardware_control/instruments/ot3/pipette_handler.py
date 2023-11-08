@@ -613,7 +613,7 @@ class OT3PipetteHandler:
                     message="Cannot push_out on a dispense that does not leave the pipette empty",
                     detail={
                         "command": "dispense",
-                        "remaining-volume": instrument.current_volume - disp_vol,
+                        "remaining-volume": str(instrument.current_volume - disp_vol),
                     },
                 )
             push_out_ul = 0

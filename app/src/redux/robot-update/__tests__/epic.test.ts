@@ -386,6 +386,46 @@ describe('robot update epics', () => {
     })
   })
 
+  describe('startUpdateAfterFileDownload', () => {
+    it('should start the update after file download if the robot is a flex', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        const session: ReturnType<typeof getRobotUpdateSession> = {
+          stage: 'done',
+          step: 'downloadFile',
+        } as any
+
+        getRobotUpdateRobot.mockReturnValue(brRobotFlex)
+        getRobotUpdateSession.mockReturnValue(session)
+
+        const state$ = hot<State>('-a', { a: state })
+        const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readSystemRobotUpdateFile('flex'),
+        })
+      })
+    })
+
+    it('should start the update after file download if the robot is a ot-2', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        const session: ReturnType<typeof getRobotUpdateSession> = {
+          stage: 'done',
+          step: 'downloadFile',
+        } as any
+
+        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
+        getRobotUpdateSession.mockReturnValue(session)
+
+        const state$ = hot<State>('-a', { a: state })
+        const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readSystemRobotUpdateFile('ot2'),
+        })
+      })
+    })
+  })
+
   it('retryAfterPremigrationEpic', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       getRobotUpdateRobot.mockReturnValueOnce(brReadyRobot)
