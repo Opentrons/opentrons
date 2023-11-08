@@ -1,6 +1,5 @@
 """Deck configuration resource provider."""
-from dataclasses import dataclass
-from typing import List, Set, Dict, Tuple, Optional
+from typing import List, Set, Tuple, Optional
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, CutoutFixture
 
@@ -12,81 +11,24 @@ from ..types import (
     AddressableOffsetVector,
     LabwareOffsetVector,
 )
-from ..errors import FixtureDoesNotExistError
+from ..errors import (
+    CutoutDoesNotExistError,
+    FixtureDoesNotExistError,
+    AddressableAreaDoesNotExistError,
+    FixtureDoesNotProvideAreasError,
+)
 
 
-@dataclass(frozen=True)
-class DeckCutoutFixture:
-    """Basic cutout fixture data class."""
-
-    name: str
-    # TODO(jbl 10-30-2023) this is in reference to the cutout ID that is supplied in mayMountTo in the definition.
-    #   We might want to make this not a string.
-    cutout_slot_location: str
-
-
-class DeckConfigurationProvider:
-    """Provider class to ingest deck configuration data and retrieve relevant deck definition data."""
-
-    _configuration: Dict[str, DeckCutoutFixture]
-
-    def __init__(
-        self,
-        deck_definition: DeckDefinitionV4,
-        deck_configuration: List[DeckCutoutFixture],
-    ) -> None:
-        """Initialize a DeckDataProvider."""
-        self._deck_definition = deck_definition
-        self._configuration = {
-            cutout_fixture.cutout_slot_location: cutout_fixture
-            for cutout_fixture in deck_configuration
-        }
-
-    def get_addressable_areas_for_cutout_fixture(
-        self, cutout_fixture_id: str, cutout_id: str
-    ) -> Set[str]:
-        """Get the allowable addressable areas for a cutout fixture loaded on a specific cutout slot."""
-        for cutout_fixture in self._deck_definition["cutoutFixtures"]:
-            if cutout_fixture_id == cutout_fixture["id"]:
-                return set(
-                    cutout_fixture["providesAddressableAreas"].get(cutout_id, [])
-                )
-
-        raise FixtureDoesNotExistError(
-            f'Could not resolve "{cutout_fixture_id}" to a fixture.'
-        )
-
-    def get_configured_addressable_areas(self) -> Set[str]:
-        """Get a list of all addressable areas the robot is configured for."""
-        configured_addressable_areas = set()
-        for cutout_id, cutout_fixture in self._configuration.items():
-            addressable_areas = self.get_addressable_areas_for_cutout_fixture(
-                cutout_fixture.name, cutout_id
-            )
-            configured_addressable_areas.update(addressable_areas)
-        return configured_addressable_areas
-
-    # def get_addressable_area_definition(
-    #     self, addressable_area_name: str
-    # ) -> AddressableArea:
-    #     """Get the addressable area definition from the relevant deck definition."""
-    #     for addressable_area in self._deck_definition["locations"]["addressableAreas"]:
-    #         if addressable_area_name == addressable_area["id"]:
-    #             return addressable_area
-    #
-    #     raise FixtureDoesNotExistError(
-    #         f'Could not resolve "{addressable_area_name}" to a fixture.'
-    #     )
-
-
-def get_cutout_fixtures_by_id(
+def get_cutout_fixture_by_id(
     cutout_fixture_id: str, deck_definition: DeckDefinitionV4
 ) -> CutoutFixture:
     """Gets cutout fixture from deck that matches the cutout fixture ID provided."""
     for cutout_fixture in deck_definition["cutoutFixtures"]:
         if cutout_fixture["id"] == cutout_fixture_id:
             return cutout_fixture
-    raise RuntimeError("Not cutout fixture")
+    raise FixtureDoesNotExistError(
+        f"Could not find cutout fixture with name {cutout_fixture_id}"
+    )
 
 
 def get_potential_cutout_fixtures(
@@ -123,7 +65,7 @@ def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV4) -> De
             position = cutout["position"]
             return DeckPoint(x=position[0], y=position[1], z=position[2])
     else:
-        raise RuntimeError("This shouldn't happen.")
+        raise CutoutDoesNotExistError(f"Could not find cutout with name {cutout_id}")
 
 
 def get_addressable_area_from_name(
@@ -176,7 +118,9 @@ def get_addressable_area_from_name(
                 drop_tip_offset=drop_tips_offset,
                 drop_labware_offset=drop_labware_offset,
             )
-    raise RuntimeError("This shouldn't happen.")
+    raise AddressableAreaDoesNotExistError(
+        f"Could not find addressable area with name {addressable_area_name}"
+    )
 
 
 def get_addressable_areas_from_cutout_and_cutout_fixture(
@@ -188,7 +132,9 @@ def get_addressable_areas_from_cutout_and_cutout_fixture(
     try:
         provided_areas = cutout_fixture["providesAddressableAreas"][cutout_id]
     except KeyError:
-        raise RuntimeError("This also shouldn't happen.")
+        raise FixtureDoesNotProvideAreasError(
+            f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
+        )
 
     return [
         get_addressable_area_from_name(

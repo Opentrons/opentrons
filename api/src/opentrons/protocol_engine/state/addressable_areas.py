@@ -135,7 +135,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         addressable_areas = []
         for cutout_id, cutout_fixture_id in deck_config:
             # TODO potentially make this more performant rather than iterating through cutout fixtures every loop
-            cutout_fixture = deck_configuration_provider.get_cutout_fixtures_by_id(
+            cutout_fixture = deck_configuration_provider.get_cutout_fixture_by_id(
                 cutout_fixture_id, self._deck_definition
             )
             addressable_areas.extend(
