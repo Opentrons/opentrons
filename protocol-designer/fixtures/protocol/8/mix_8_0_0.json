@@ -76,7 +76,8 @@
           "id": "fc4dc7c0-fc3a-11ea-8809-e959e7d61d96",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         }
       },
       "orderedStepIds": [
