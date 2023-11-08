@@ -1,5 +1,6 @@
 """Opentrons helper methods."""
 import asyncio
+from random import random, randint
 from types import MethodType
 from typing import Any, List, Dict, Optional, Tuple
 from statistics import stdev
@@ -320,10 +321,14 @@ def _get_volumes(
         test_volumes = get_volume_increments(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
-    elif user_volumes and not ctx.is_simulating():
-        _inp = input(
-            f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
-        )
+    elif user_volumes:
+        if ctx.is_simulating():
+            rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
+            _inp = ",".join([str(r) for r in rand_vols])
+        else:
+            _inp = input(
+                f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
+            )
         test_volumes = [
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
