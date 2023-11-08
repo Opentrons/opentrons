@@ -57,9 +57,10 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
         />
       ))}
       {selectedSlots.map((selectedSlot, index) => {
-        // TODO(bh, 2023-11-07): map selected slots to cutouts or otherwise adjust
+        // if selected slot is passed as a cutout id, trim to define as slot id
+        const slotFromCutout = selectedSlot.replace('cutout', '')
         const [xSlotPosition = 0, ySlotPosition = 0] =
-          getPositionFromSlotId(selectedSlot, deckDef) ?? []
+          getPositionFromSlotId(slotFromCutout, deckDef) ?? []
 
         const isLeftSideofDeck =
           selectedSlot === 'A1' ||
