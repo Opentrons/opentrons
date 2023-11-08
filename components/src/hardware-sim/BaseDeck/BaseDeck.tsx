@@ -117,7 +117,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {singleSlotFixtures.map(fixture => (
             <SingleSlotFixture
               key={fixture.fixtureId}
-              cutoutLocation={fixture.fixtureLocation}
+              cutoutId={fixture.fixtureLocation}
               deckDefinition={deckDef}
               slotClipColor={darkFill}
               fixtureBaseColor={lightFill}
@@ -128,7 +128,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             <StagingAreaFixture
               key={fixture.fixtureId}
               // TODO(bh, 2023-10-09): typeguard fixture location
-              cutoutLocation={fixture.fixtureLocation as StagingAreaLocation}
+              cutoutId={fixture.fixtureLocation as StagingAreaLocation}
               deckDefinition={deckDef}
               slotClipColor={darkFill}
               fixtureBaseColor={lightFill}
@@ -137,7 +137,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {trashBinFixtures.map(fixture => (
             <React.Fragment key={fixture.fixtureId}>
               <SingleSlotFixture
-                cutoutLocation={fixture.fixtureLocation}
+                cutoutId={fixture.fixtureLocation}
                 deckDefinition={deckDef}
                 slotClipColor={COLORS.transparent}
                 fixtureBaseColor={lightFill}
@@ -155,9 +155,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             <WasteChuteFixture
               key={fixture.fixtureId}
               // TODO(bh, 2023-10-09): typeguard fixture location
-              cutoutLocation={
-                fixture.fixtureLocation as typeof WASTE_CHUTE_CUTOUT
-              }
+              cutoutId={fixture.fixtureLocation as typeof WASTE_CHUTE_CUTOUT}
               deckDefinition={deckDef}
               slotClipColor={darkFill}
               fixtureBaseColor={lightFill}

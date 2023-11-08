@@ -2,18 +2,21 @@ import * as React from 'react'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import { RobotCoordinateSpace } from '@opentrons/components/src/hardware-sim/RobotCoordinateSpace'
-import { DeckSlotLocation } from '@opentrons/components/src/hardware-sim/DeckSlotLocation'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   Flex,
   JUSTIFY_CENTER,
+  RobotCoordinateSpace,
   RobotCoordsForeignObject,
+  SingleSlotFixture,
   SPACING,
 } from '@opentrons/components'
+
+import type { Cutout } from '@opentrons/shared-data'
 
 const X_ADJUSTMENT_LEFT_SIDE = -101.5
 const X_ADJUSTMENT = -17
@@ -44,21 +47,19 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
       height="100px"
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {deckDef.locations.cutouts.map(slotDef => (
-        // TODO(bh, 2023-11-07): map selected slots to cutouts or otherwise adjust
-        <DeckSlotLocation
-          key={slotDef.id}
-          slotName={slotDef.id}
+      {deckDef.locations.cutouts.map(cutout => (
+        <SingleSlotFixture
+          key={cutout.id}
+          cutoutId={cutout.id as Cutout}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
-          slotBaseColor={COLORS.light1}
+          fixtureBaseColor={COLORS.light1}
         />
       ))}
       {selectedSlots.map((selectedSlot, index) => {
-        const slot = deckDef.locations.cutouts.find(
-          slot => slot.id === selectedSlot
-        )
-        const [xSlotPosition = 0, ySlotPosition = 0] = slot?.position ?? []
+        // TODO(bh, 2023-11-07): map selected slots to cutouts or otherwise adjust
+        const [xSlotPosition = 0, ySlotPosition = 0] =
+          getPositionFromSlotId(selectedSlot, deckDef) ?? []
 
         const isLeftSideofDeck =
           selectedSlot === 'A1' ||
@@ -85,7 +86,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
 
         return (
           <RobotCoordsForeignObject
-            key={`${selectedSlot}_${slot?.id}_${index}`}
+            key={`${selectedSlot}_${index}`}
             width={xDimension}
             height={yDimension}
             x={x}

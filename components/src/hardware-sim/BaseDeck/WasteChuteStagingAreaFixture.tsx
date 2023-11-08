@@ -11,7 +11,7 @@ import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 
 interface WasteChuteStagingAreaFixtureProps
   extends React.SVGProps<SVGGElement> {
-  cutoutLocation: typeof WASTE_CHUTE_CUTOUT
+  cutoutId: typeof WASTE_CHUTE_CUTOUT
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
@@ -23,22 +23,22 @@ export function WasteChuteStagingAreaFixture(
   props: WasteChuteStagingAreaFixtureProps
 ): JSX.Element | null {
   const {
-    cutoutLocation,
+    cutoutId,
     deckDefinition,
     fixtureBaseColor = COLORS.light1,
     slotClipColor = COLORS.darkGreyEnabled,
     ...restProps
   } = props
 
-  if (cutoutLocation !== WASTE_CHUTE_CUTOUT) {
+  if (cutoutId !== WASTE_CHUTE_CUTOUT) {
     console.warn(
-      `cannot render WasteChuteStagingAreaFixture in given cutout location ${cutoutLocation}`
+      `cannot render WasteChuteStagingAreaFixture in given cutout location ${cutoutId}`
     )
     return null
   }
 
   const cutoutDef = deckDefinition?.locations.cutouts.find(
-    s => s.id === cutoutLocation
+    s => s.id === cutoutId
   )
   if (cutoutDef == null) {
     console.warn(

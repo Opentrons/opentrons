@@ -84,7 +84,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {deckDef.locations.cutouts.map(slotDef => (
         <SingleSlotFixture
           key={slotDef.id}
-          cutoutLocation={slotDef.id as Cutout}
+          cutoutId={slotDef.id as Cutout}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
           fixtureBaseColor={lightFill}

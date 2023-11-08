@@ -532,7 +532,7 @@ export const DeckSetup = (): JSX.Element => {
                   {filteredSlots.map(fixture => (
                     <SingleSlotFixture
                       key={fixture.fixtureId}
-                      cutoutLocation={fixture.fixtureLocation as Cutout}
+                      cutoutId={fixture.fixtureLocation as Cutout}
                       deckDefinition={deckDef}
                       slotClipColor={darkFill}
                       showExpansion={fixture.fixtureLocation === 'A1'}
@@ -542,7 +542,7 @@ export const DeckSetup = (): JSX.Element => {
                   {stagingAreaFixtures.map(fixture => (
                     <StagingAreaFixture
                       key={fixture.id}
-                      cutoutLocation={fixture.location as StagingAreaLocation}
+                      cutoutId={fixture.location as StagingAreaLocation}
                       deckDefinition={deckDef}
                       slotClipColor={darkFill}
                       fixtureBaseColor={lightFill}
@@ -552,7 +552,7 @@ export const DeckSetup = (): JSX.Element => {
                     ? trashBinFixtures.map(fixture => (
                         <React.Fragment key={fixture.fixtureId}>
                           <SingleSlotFixture
-                            cutoutLocation={fixture.fixtureLocation}
+                            cutoutId={fixture.fixtureLocation}
                             deckDefinition={deckDef}
                             slotClipColor={COLORS.transparent}
                             fixtureBaseColor={lightFill}
@@ -571,9 +571,7 @@ export const DeckSetup = (): JSX.Element => {
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture
                       key={fixture.id}
-                      cutoutLocation={
-                        fixture.location as typeof WASTE_CHUTE_CUTOUT
-                      }
+                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
                       deckDefinition={deckDef}
                       slotClipColor={darkFill}
                       fixtureBaseColor={lightFill}

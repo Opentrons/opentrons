@@ -17,7 +17,7 @@ export function getCutoutDisplayName(cutout: Cutout): string {
 }
 
 // mapping of OT-2 deck slots to cutouts
-const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2Cutout } = {
+export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2Cutout } = {
   1: 'cutout1',
   2: 'cutout2',
   3: 'cutout3',
@@ -32,7 +32,7 @@ const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2Cutout } = {
 }
 
 // mapping of Flex deck slots to cutouts
-const FLEX_CUTOUT_BY_SLOT_ID: { [slotId: string]: Cutout } = {
+export const FLEX_CUTOUT_BY_SLOT_ID: { [slotId: string]: Cutout } = {
   A1: 'cutoutA1',
   A2: 'cutoutA2',
   A3: 'cutoutA3',
@@ -93,3 +93,22 @@ export function getFixtureDisplayName(loadName: FixtureLoadName): string {
     return 'Slot'
   }
 }
+
+const STANDARD_FLEX_SLOTS = [
+  'A1',
+  'A2',
+  'A3',
+  'B1',
+  'B2',
+  'B3',
+  'C1',
+  'C2',
+  'C3',
+  'D1',
+  'D2',
+  'D3',
+]
+
+export const isAddressableAreaStandardSlot = (
+  addressableAreaId: string
+): boolean => STANDARD_FLEX_SLOTS.includes(addressableAreaId)
