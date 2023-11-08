@@ -181,7 +181,7 @@ def get_addressable_area_from_name(
 
 def get_addressable_areas_from_cutout_and_cutout_fixture(
     cutout_id: str, cutout_fixture: CutoutFixture, deck_definition: DeckDefinitionV4
-) -> Set[AddressableArea]:
+) -> List[AddressableArea]:
     """Get all provided addressable areas for a given cutout fixture and associated cutout."""
     base_position = get_cutout_position(cutout_id, deck_definition)
 
@@ -190,9 +190,9 @@ def get_addressable_areas_from_cutout_and_cutout_fixture(
     except KeyError:
         raise RuntimeError("This also shouldn't happen.")
 
-    return {
+    return [
         get_addressable_area_from_name(
             addressable_area_name, base_position, deck_definition
         )
         for addressable_area_name in provided_areas
-    }
+    ]

@@ -30,6 +30,7 @@ class AddressableAreaState:
     loaded_addressable_areas_by_name: Dict[str, AddressableArea]
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
     deck_definition: DeckDefinitionV4
+    deck_config_loaded: bool
 
 
 # TODO make the below some sort of better type
@@ -65,6 +66,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
             deck_definition=deck_definition,
+            deck_config_loaded=self._config.use_virtual_pipettes,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -124,19 +126,19 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     def _load_addressable_areas_from_deck_configuration(
         self, deck_config: DeckConfiguration
-    ) -> Set[AddressableArea]:
+    ) -> List[AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
         # TODO uncomment once execute is hooked up with this properly
         # assert (
         #     len(deck_config) == 12
         # ), f"{len(deck_config)} cutout fixture ids provided."
-        addressable_areas = set()
+        addressable_areas = []
         for cutout_id, cutout_fixture_id in deck_config:
             # TODO potentially make this more performant rather than iterating through cutout fixtures every loop
             cutout_fixture = deck_configuration_provider.get_cutout_fixtures_by_id(
                 cutout_fixture_id, self._deck_definition
             )
-            addressable_areas.update(
+            addressable_areas.extend(
                 deck_configuration_provider.get_addressable_areas_from_cutout_and_cutout_fixture(
                     cutout_id, cutout_fixture, self._deck_definition
                 )
@@ -185,6 +187,13 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             state: Addressable area state dataclass used for all calculations.
         """
         self._state = state
+
+    def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
+        """Get addressable area"""
+        if self._state.deck_config_loaded:
+            return self.get_loaded_addressable_area(addressable_area_name)
+        else:
+            return self.get_addressable_area_for_simulation(addressable_area_name)
 
     def get_loaded_addressable_area(
         self, addressable_area_name: str
