@@ -126,6 +126,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         self, deck_config: DeckConfiguration
     ) -> Set[AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
+        # TODO uncomment once execute is hooked up with this properly
         # assert (
         #     len(deck_config) == 12
         # ), f"{len(deck_config)} cutout fixture ids provided."

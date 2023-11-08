@@ -108,7 +108,9 @@ def get_potential_cutout_fixtures(
     # This following logic is making the assumption that every addressable area can only go on one cutout, though
     # it may have multiple cutout fixtures that supply it on that cutout. If this assumption changes, some of the
     # following logic will have to be readjusted
-    assert potential_fixtures
+    assert (
+        potential_fixtures
+    ), f"No potential fixtures for addressable area {addressable_area_name}"
     cutout_id = potential_fixtures[0].cutout_id
     assert all(cutout_id == fixture.cutout_id for fixture in potential_fixtures)
     return cutout_id, set(potential_fixtures)
