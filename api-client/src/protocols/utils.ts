@@ -282,14 +282,14 @@ export function parseAllAddressableAreas(
     } else if (
       command.commandType === 'loadLabware' &&
       command.params.location !== 'offDeck' &&
-      'addressableArea' in command.params.location &&
+      'addressableAreaName' in command.params.location &&
       !acc.includes(
-        command.params.location.addressableArea as AddressableAreaName
+        command.params.location.addressableAreaName as AddressableAreaName
       )
     ) {
       return [
         ...acc,
-        command.params.location.addressableArea as AddressableAreaName,
+        command.params.location.addressableAreaName as AddressableAreaName,
       ]
     }
     // TODO(BC, 11/6/23): once moveToAddressableArea command exists add it back here

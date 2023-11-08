@@ -98,6 +98,7 @@ export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
+  | { addressableAreaName: string }
 
 export interface ModuleLocation {
   slotName: string

@@ -104,9 +104,9 @@ export function getSimplestDeckConfigForProtocolCommands(
       const cutoutFixturesForCutoutId =
         cutoutIdForAddressableArea != null
           ? getCutoutFixturesForCutoutId(
-            cutoutIdForAddressableArea,
-            deckDef.cutoutFixtures
-          )
+              cutoutIdForAddressableArea,
+              deckDef.cutoutFixtures
+            )
           : null
 
       const existingCutoutConfig = acc.find(
@@ -125,7 +125,9 @@ export function getSimplestDeckConfigForProtocolCommands(
           ({ cutoutId }) => cutoutId === cutoutIdForAddressableArea
         )
         const previousRequiredAAs = acc[accIndex]?.requiredAddressableAreas
-        const allNextRequiredAddressableAreas = previousRequiredAAs.includes(addressableArea)
+        const allNextRequiredAddressableAreas = previousRequiredAAs.includes(
+          addressableArea
+        )
           ? previousRequiredAAs
           : [...previousRequiredAAs, addressableArea]
         const nextCompatibleCutoutFixture = getSimplestFixtureForAddressableAreas(
@@ -137,7 +139,10 @@ export function getSimplestDeckConfigForProtocolCommands(
           ({ id }) => id === nextCompatibleCutoutFixture?.id
         )
 
-        if (nextCompatibleCutoutFixture != null && indexOfCurrentFixture > indexOfExistingFixture) {
+        if (
+          nextCompatibleCutoutFixture != null &&
+          indexOfCurrentFixture > indexOfExistingFixture
+        ) {
           return [
             ...acc.slice(0, accIndex),
             {
@@ -208,11 +213,15 @@ function getCutoutIdForAddressableArea(
 function getSimplestFixtureForAddressableAreas(
   cutoutId: CutoutId,
   requiredAddressableAreas: AddressableAreaName[],
-  allCutoutFixtures: CutoutFixture[],
+  allCutoutFixtures: CutoutFixture[]
 ): CutoutFixture | null {
-  const cutoutFixturesForCutoutId = getCutoutFixturesForCutoutId(cutoutId, allCutoutFixtures)
-  const nextCompatibleCutoutFixtures = getCutoutFixturesForAddressableAreas(requiredAddressableAreas, cutoutFixturesForCutoutId)
+  const cutoutFixturesForCutoutId = getCutoutFixturesForCutoutId(
+    cutoutId,
+    allCutoutFixtures
+  )
+  const nextCompatibleCutoutFixtures = getCutoutFixturesForAddressableAreas(
+    requiredAddressableAreas,
+    cutoutFixturesForCutoutId
+  )
   return nextCompatibleCutoutFixtures?.[0] ?? null
 }
-
-

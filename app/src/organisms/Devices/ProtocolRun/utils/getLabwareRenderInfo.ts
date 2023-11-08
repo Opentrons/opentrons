@@ -75,7 +75,10 @@ export const getLabwareRenderInfo = (
         )
       }
       // TODO(bh, 2023-10-19): convert this to deck definition v4 addressableAreas
-      const slotName = location.slotName.toString()
+      const slotName =
+        'addressableAreaName' in location
+          ? location.addressableAreaName
+          : location.slotName
       // TODO(bh, 2023-10-19): remove slotPosition when render info no longer relies on directly
       const slotPosition = getSlotPosition(deckDef, slotName)
 

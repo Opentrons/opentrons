@@ -85,7 +85,11 @@ function getLabwareCoordinates({
 
     //  adapter on deck
     const loadedAdapterSlot = orderedSlots.find(
-      s => s.id === loadedAdapterLocation.slotName
+      s =>
+        s.id ===
+        ('slotName' in loadedAdapterLocation
+          ? loadedAdapterLocation.slotName
+          : loadedAdapterLocation.addressableAreaName)
     )
     return loadedAdapterSlot != null
       ? {
