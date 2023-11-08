@@ -1,9 +1,6 @@
 import assert from 'assert'
 import { getWellsDepth } from '@opentrons/shared-data'
-import {
-  DEST_WELL_BLOWOUT_DESTINATION,
-  WASTE_CHUTE_STUBBED_DEPTH,
-} from '@opentrons/step-generation'
+import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -114,9 +111,7 @@ export const moveLiquidFormToArgs = (
     }
   }
   const wellDepth =
-    'def' in destLabware
-      ? getWellsDepth(destLabware.def, destWells)
-      : WASTE_CHUTE_STUBBED_DEPTH
+    'def' in destLabware ? getWellsDepth(destLabware.def, destWells) : 0
 
   const disposalVolume = fields.disposalVolume_checkbox
     ? fields.disposalVolume_volume

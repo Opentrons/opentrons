@@ -7,7 +7,6 @@ import {
   useHoverTooltip,
   UseHoverTooltipTargetProps,
 } from '@opentrons/components'
-import { WASTE_CHUTE_STUBBED_DEPTH } from '@opentrons/step-generation'
 import { getWellsDepth } from '@opentrons/shared-data'
 import {
   getIsTouchTipField,
@@ -138,10 +137,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
         : null
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
-    wellDepthMm =
-      labwareDef != null
-        ? getWellsDepth(labwareDef, ['A1'])
-        : WASTE_CHUTE_STUBBED_DEPTH
+    wellDepthMm = labwareDef != null ? getWellsDepth(labwareDef, ['A1']) : 0
   }
 
   return {
