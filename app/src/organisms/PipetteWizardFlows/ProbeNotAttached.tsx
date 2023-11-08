@@ -27,7 +27,7 @@ interface ProbeNotAttachedProps {
 export const ProbeNotAttached = (
   props: ProbeNotAttachedProps
 ): JSX.Element | null => {
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const { isOnDevice, isPending, handleOnClick, setShowUnableToDetect } = props
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
 
@@ -51,7 +51,7 @@ export const ProbeNotAttached = (
         </Btn>
         {isOnDevice ? (
           <SmallButton
-            buttonText={t('try_again')}
+            buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             disabled={isPending}
             onClick={() => {
               setNumberOfTryAgains(numberOfTryAgains + 1)
@@ -66,7 +66,7 @@ export const ProbeNotAttached = (
               handleOnClick()
             }}
           >
-            {t('try_again')}
+            {i18n.format(t('shared:try_again'), 'capitalize')}
           </PrimaryButton>
         )}
       </Flex>
