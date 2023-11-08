@@ -55,7 +55,7 @@ class DeckSlotLocation(BaseModel):
 
 
 class AddressableAreaLocation(BaseModel):
-    """"""
+    """The location of something place in an addressable area. This is a superset of deck slots."""
 
     addressableAreaName: str = Field(
         ..., description="lorem ipsum i don't know the rest it aint real latin"
@@ -406,6 +406,10 @@ class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
 
 
+class AddressableOffsetVector(Vec3f):
+    """Offset, in deck coordinates, from nominal to actual position of an addressable area."""
+
+
 class LabwareMovementOffsetData(BaseModel):
     """Offsets to be used during labware movement."""
 
@@ -651,6 +655,28 @@ class LabwareMovementStrategy(str, Enum):
     USING_GRIPPER = "usingGripper"
     MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
+
+
+@dataclass(frozen=True)
+class PotentialCutoutFixture:
+    """Cutout and cutout fixture id associated with a potential cutout fixture that can be on the deck."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+
+
+@dataclass(frozen=True)
+class AddressableArea:
+    """Addressable area that has been loaded."""
+
+    area_name: str
+    display_name: str
+    bounding_box: Dimensions
+    position: AddressableOffsetVector
+    compatible_module_types: List[ModuleType]
+    # TODO make LabwareOffsetVector a different type? Also do we need "ableToDropLabware" in the definition?
+    drop_tip_offset: Optional[LabwareOffsetVector]
+    drop_labware_offset: Optional[LabwareOffsetVector]
 
 
 class PostRunHardwareState(Enum):
