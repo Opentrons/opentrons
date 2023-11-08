@@ -518,7 +518,6 @@ export const DeckSetup = (): JSX.Element => {
       {drilledDown && <BrowseLabwareModal />}
       <div ref={wrapperRef} className={styles.deck_wrapper}>
         <RobotCoordinateSpaceWithDOMCoords
-          width="100%"
           height="100%"
           deckDef={deckDef}
           viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}

@@ -6,6 +6,7 @@ import {
   JUSTIFY_SPACE_AROUND,
   SPACING,
 } from '@opentrons/components'
+
 import styles from './AnnouncementModal.css'
 
 export interface Announcement {
@@ -215,6 +216,30 @@ export const announcements: Announcement[] = [
         <p>
           All protocols now require Opentrons App version
           <strong> 7.0+ </strong> to run.
+        </p>
+      </>
+    ),
+  },
+  {
+    announcementKey: 'deckConfigAnd96Channel8.0',
+    image: (
+      <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING.spacing8}>
+        <img
+          width="340"
+          src={require('../../../images/deck_configuration.png')}
+        />
+      </Flex>
+    ),
+    heading: "We've updated the Protocol Designer",
+    message: (
+      <>
+        <p>
+          Introducing the Protocol Designer 8.0 with deck configuration and
+          96-channel pipette support!
+        </p>
+        <p>
+          All protocols now require Opentrons App version
+          <strong> 7.1+ </strong> to run.
         </p>
       </>
     ),
