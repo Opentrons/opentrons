@@ -107,7 +107,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         onClick={handleClick}
         id="UploadInput_protocolUploadButton"
       >
-        {t('choose_protocol_file')}
+        {t('upload')}
       </PrimaryButton>
 
       <StyledLabel
