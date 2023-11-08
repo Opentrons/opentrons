@@ -58,7 +58,7 @@ export function RobotDashboard(): JSX.Element {
   // GET runs query will error with 503 if database is initializing
   // this should be momentary, and the type of error to come from this endpoint
   // so, all errors will be mapped to an initializing spinner
-  if (allRunsQueryError != null) {
+  if (allRunsQueryError?.code === '503') {
     contents = <ServerInitializing />
   } else if (recentRunsOfUniqueProtocols.length > 0) {
     contents = (
