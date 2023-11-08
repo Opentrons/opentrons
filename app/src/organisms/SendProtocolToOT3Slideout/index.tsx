@@ -15,6 +15,8 @@ import {
   getProtocolDisplayName,
 } from '../../organisms/ProtocolsLanding/utils'
 import { useToaster } from '../../organisms/ToasterOven'
+import { appShellRequestor } from '../../redux/shell/remote'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 
 import type { AxiosError } from 'axios'
@@ -61,7 +63,13 @@ export function SendProtocolToOT3Slideout(
 
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation(
     {},
-    selectedRobot != null ? { hostname: selectedRobot.ip } : null
+    selectedRobot != null
+      ? {
+          hostname: selectedRobot.ip,
+          requestor:
+            selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+        }
+      : null
   )
 
   const isAnalyzing = useSelector((state: State) =>

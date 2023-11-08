@@ -25,6 +25,10 @@ from .module_contexts import (
 from ._liquid import Liquid
 from ._types import OFF_DECK
 from ._waste_chute import WasteChute
+from ._nozzle_layout import (
+    COLUMN,
+    EMPTY,
+)
 
 from .create_protocol_context import (
     create_protocol_context,
@@ -48,6 +52,8 @@ __all__ = [
     "WasteChute",
     "Well",
     "Liquid",
+    "COLUMN",
+    "EMPTY",
     "OFF_DECK",
     # For internal Opentrons use only:
     "create_protocol_context",

@@ -159,6 +159,10 @@
       "MISSING_96_CHANNEL_TIPRACK_ADAPTER": {
         "title": "Missing 96-channel tip rack adapter",
         "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
+      },
+      "ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST": {
+        "title": "{{additionalEquipment}} does not exist",
+        "body": "Attempting to interact with an unknown entity."
       }
     },
     "warning": {

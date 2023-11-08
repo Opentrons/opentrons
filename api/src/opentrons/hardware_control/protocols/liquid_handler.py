@@ -16,6 +16,30 @@ class LiquidHandler(
     Calibratable[CalibrationType],
     Protocol[CalibrationType],
 ):
+    async def update_nozzle_configuration_for_mount(
+        self,
+        mount: Mount,
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        The expectation of this function is that the back_left_nozzle/front_right_nozzle are the two corners
+        of a rectangle of nozzles. A call to this function that does not follow that schema will result
+        in an error.
+
+        :param mount: A robot mount that the instrument is on.
+        :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
+        of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
+        none is provided.
+
+        If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
+        :return: None.
+        """
+        ...
+
     async def configure_for_volume(self, mount: Mount, volume: float) -> None:
         """
         Configure a pipette to handle the specified volume.

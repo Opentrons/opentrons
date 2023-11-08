@@ -31,17 +31,11 @@ export function useHardwareStatusText(
       })
     }
   } else if (countMissingPipettes > 0 && countMissingModules === 0) {
-    if (countMissingPipettes === 1) {
-      chipText = t('missing_pipette', {
-        num: countMissingPipettes,
-      })
-    } else {
-      chipText = t('missing_pipettes_plural', {
-        count: countMissingPipettes,
-      })
-    }
+    chipText = t('protocol_setup:missing_pipettes', {
+      count: countMissingPipettes,
+    })
   } else if (countMissingPipettes > 0 && countMissingModules > 0) {
-    chipText = t('missing_both')
+    chipText = t('missing_hardware')
   }
   return i18n.format(chipText, 'capitalize')
 }

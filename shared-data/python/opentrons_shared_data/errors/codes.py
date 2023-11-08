@@ -83,6 +83,7 @@ class ErrorCodes(Enum):
     COMMAND_PRECONDITION_VIOLATED = _code_from_dict_entry("4004")
     COMMAND_PARAMETER_LIMIT_VIOLATED = _code_from_dict_entry("4005")
     INVALID_PROTOCOL_DATA = _code_from_dict_entry("4006")
+    API_MISCONFIGURATION = _code_from_dict_entry("4007")
 
     @classmethod
     @lru_cache(25)
