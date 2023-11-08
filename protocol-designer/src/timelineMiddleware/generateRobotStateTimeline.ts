@@ -3,7 +3,7 @@ import * as StepGeneration from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 import { wasteChuteCommandsUtil } from '@opentrons/step-generation'
-import { truncateSync } from 'fs-extra'
+
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
   orderedStepIds: string[]
