@@ -265,8 +265,8 @@ class RunStore:
                 if row.state_summary is not None
                 else None
             )
-        except ValidationError:
-            log.warn(f"invalid state summary for run ID: {run_id}")
+        except ValidationError as e:
+            log.warn(f"Error retrieving state summary for {run_id}: {e}")
             return None
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
