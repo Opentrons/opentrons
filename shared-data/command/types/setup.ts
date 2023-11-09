@@ -84,22 +84,22 @@ export interface ConfigureNozzleLayoutRunTimeCommand
 }
 
 export type SetupRunTimeCommand =
+  | ConfigureNozzleLayoutRunTimeCommand
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
   | LoadFixtureRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
-  | ConfigureNozzleLayoutRunTimeCommand
 
 export type SetupCreateCommand =
+  | ConfigureNozzleLayoutCreateCommand
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
   | LoadFixtureCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
-  | ConfigureNozzleLayoutCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
