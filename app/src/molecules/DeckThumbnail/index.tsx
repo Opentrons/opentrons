@@ -87,7 +87,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
 
   const labwareLocations = map(
     labwareRenderInfo,
-    ({ labwareDef, displayName, slotName }, labwareId) => {
+    ({ labwareDef, slotName }, labwareId) => {
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
       //  only rendering the labware on top most layer so
       //  either the adapter or the labware are rendered but not both
