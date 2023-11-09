@@ -29,8 +29,8 @@ import {
 
 import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
-import levelProbeWithTip from '../../assets/images/lpc_level_probe_with_tip.png'
-import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labware.png'
+import levelProbeWithTip from '../../assets/images/lpc_level_probe_with_tip.svg'
+import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labware.svg'
 import { getIsOnDevice } from '../../redux/config'
 import { Portal } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
