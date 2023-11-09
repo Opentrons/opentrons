@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 
 import {
   getDeckDefFromRobotType,
@@ -71,14 +72,7 @@ export function EmptyConfigFixture(
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={COLORS.mediumBlueEnabled}
-        border={`5px dashed ${COLORS.blueEnabled}`}
-        borderRadius={BORDERS.radiusSoftCorners}
-        justifyContent={JUSTIFY_CENTER}
-        width="100%"
-      >
+      <Flex css={EMPTY_CONFIG_STYLE}>
         <Btn
           display={DISPLAY_FLEX}
           justifyContent={JUSTIFY_CENTER}
@@ -90,3 +84,30 @@ export function EmptyConfigFixture(
     </RobotCoordsForeignObject>
   )
 }
+
+const EMPTY_CONFIG_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  background-color: ${COLORS.mediumBlueEnabled};
+  border: 3px dashed ${COLORS.blueEnabled};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  width: 100%;
+
+  &:active {
+    border: 3px solid ${COLORS.blueEnabled};
+    background-color: ${COLORS.mediumBluePressed};
+  }
+
+  &:focus {
+    border: 3px solid ${COLORS.blueEnabled};
+    background-color: ${COLORS.mediumBluePressed};
+  }
+
+  &:hover {
+    background-color: ${COLORS.mediumBluePressed};
+  }
+
+  &:focus-visible {
+    border: 3px solid ${COLORS.fundamentalsFocus};
+  }
+`

@@ -2,8 +2,10 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
-import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
+import standardOt2DeckDefv3 from '../../deck/definitions/3/ot2_standard.json'
+import standardFlexDeckDefv3 from '../../deck/definitions/3/ot3_standard.json'
+import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
+import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -224,7 +226,7 @@ export const getAreSlotsHorizontallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardDeckDefOt2.locations.orderedSlots
+  const orderedSlots = standardOt2DeckDefv3.locations.orderedSlots
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -260,7 +262,7 @@ export const getAreSlotsVerticallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardDeckDefOt2.locations.orderedSlots
+  const orderedSlots = standardOt2DeckDefv3.locations.orderedSlots
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -349,5 +351,16 @@ export const getDeckDefFromRobotType = (
   robotType: RobotType
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
+  return robotType === 'OT-3 Standard'
+    ? standardFlexDeckDefv3
+    : standardOt2DeckDefv3
+}
+
+export const getDeckDefFromRobotTypeV4 = (
+  robotType: RobotType
+): DeckDefinition => {
+  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
+  return robotType === 'OT-3 Standard'
+    ? standardFlexDeckDef
+    : standardOt2DeckDef
 }

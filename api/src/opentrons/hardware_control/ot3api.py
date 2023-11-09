@@ -39,7 +39,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, feature_flags as ff
+from opentrons.config import robot_configs
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -54,7 +54,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveTarget,
     ZeroLengthMoveError,
 )
-
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
@@ -112,6 +112,7 @@ from .types import (
     EstopAttachLocation,
     EstopStateNotification,
     EstopState,
+    FailedTipStateCheck,
 )
 from .errors import (
     UpdateOngoingError,
@@ -389,7 +390,6 @@ class OT3API(
         )
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
-
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -711,6 +711,25 @@ class OT3API(
         """Configure instruments"""
         await self.set_gantry_load(self._gantry_load_from_instruments())
         await self.refresh_positions()
+        await self.reset_tip_detectors()
+
+    async def reset_tip_detectors(
+        self,
+        refresh_state: bool = True,
+    ) -> None:
+        """Reset tip detector whenever we configure instruments."""
+        for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
+            # rebuild tip detector using the attached instrument
+            self._log.info(f"resetting tip detector for mount {mount}")
+            if self._pipette_handler.has_pipette(mount):
+                await self._backend.update_tip_detector(
+                    mount, self._pipette_handler.get_tip_sensor_count(mount)
+                )
+            else:
+                await self._backend.teardown_tip_detector(mount)
+
+            if refresh_state and self._pipette_handler.has_pipette(mount):
+                await self.get_tip_presence_status(mount)
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(
@@ -926,7 +945,7 @@ class OT3API(
             raise PositionUnknownError(
                 message=f"Motor positions for {str(mount)} mount are missing ("
                 f"{mount_axes}); must first home motors.",
-                detail={"mount": str(mount), "missing_axes": mount_axes},
+                detail={"mount": str(mount), "missing_axes": str(mount_axes)},
             )
         self._assert_motor_ok(mount_axes)
 
@@ -1378,9 +1397,9 @@ class OT3API(
         self, axis: Axis
     ) -> Tuple[OT3AxisMap[float], OT3AxisMap[float]]:
         origin = await self._backend.update_position()
-        target_pos = {ax: pos for ax, pos in origin.items()}
-        target_pos.update({axis: self._backend.home_position()[axis]})
-        return origin, target_pos
+        origin_pos = {axis: origin[axis]}
+        target_pos = {axis: self._backend.home_position()[axis]}
+        return origin_pos, target_pos
 
     @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:
@@ -1441,6 +1460,7 @@ class OT3API(
                     self._log.warning(
                         f"Stall on {axis} during fast home, encoder may have missed an overflow"
                     )
+                    await self.refresh_positions()
 
             await self._backend.home([axis], self.gantry_load)
         else:
@@ -1706,7 +1726,7 @@ class OT3API(
         )
         pip_ax = Axis.of_main_tool_actuator(checked_mount)
         # speed depends on if there is a tip, and which direction to move
-        if instrument.has_tip:
+        if instrument.has_tip_length:
             # using slower aspirate flow-rate, to avoid pulling droplets up
             speed_up = self._pipette_handler.plunger_speed(
                 instrument, instrument.aspirate_flow_rate, "aspirate"
@@ -1913,41 +1933,54 @@ class OT3API(
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
 
-    async def get_tip_presence_status(self, mount: OT3Mount) -> bool:
+    @contextlib.asynccontextmanager
+    async def _high_throughput_check_tip(self) -> AsyncIterator[None]:
+        """Tip action required for high throughput pipettes to get tip status."""
+        instrument = self._pipette_handler.get_pipette(OT3Mount.LEFT)
+        tip_presence_check_target = instrument.tip_presence_check_dist_mm
+
+        # if position is not known, home gear motors before any potential movement
+        if self._backend.gear_motor_position is None:
+            await self.home_gear_motors()
+
+        tip_motor_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+            Axis.of_main_tool_actuator(OT3Mount.LEFT)
+        ]
+
+        # only move tip motors if they are not already below the sensor
+        if tip_motor_pos_float < tip_presence_check_target:
+            clamp_moves = self._build_moves(
+                {Axis.Q: tip_motor_pos_float}, {Axis.Q: tip_presence_check_target}
+            )
+            await self._backend.tip_action(moves=clamp_moves[0])
+        try:
+            yield
+        finally:
+            await self.home_gear_motors()
+
+    async def get_tip_presence_status(
+        self,
+        mount: OT3Mount,
+    ) -> TipStateType:
         """
         Check tip presence status. If a high throughput pipette is present,
         move the tip motors down before checking the sensor status.
         """
-        checked_mount = OT3Mount.from_mount(mount)
-        high_throughput = self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-        if high_throughput:
-            # check if we're already at the tip_presence_check position, if we are dont move
+        async with contextlib.AsyncExitStack() as stack:
+            if (
+                mount == OT3Mount.LEFT
+                and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            ):
+                await stack.enter_async_context(self._high_throughput_check_tip())
+            result = await self._backend.get_tip_status(mount)
+        return result
 
-            instrument = self._pipette_handler.get_pipette(checked_mount)
-            tip_presence_check_target = instrument.tip_presence_check_dist_mm
-
-            # if position is not known, home gear motors before any potential movement
-            if self._backend.gear_motor_position is None:
-                await self.home_gear_motors()
-
-            tip_motor_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-                Axis.of_main_tool_actuator(checked_mount)
-            ]
-
-            # only move tip motors if they are not already below the sensor
-            if tip_motor_pos_float < tip_presence_check_target:
-                clamp_moves = self._build_moves(
-                    {Axis.Q: tip_motor_pos_float}, {Axis.Q: tip_presence_check_target}
-                )
-                await self._backend.tip_action(moves=clamp_moves[0])
-        tip_status = await self._backend.get_tip_present_state(
-            mount=checked_mount, expect_multiple_responses=high_throughput
-        )
-
-        if high_throughput:
-            # return tip motors to neutral position
-            await self.home_gear_motors()
-        return tip_status
+    async def verify_tip_presence(
+        self, mount: OT3Mount, expected: TipStateType
+    ) -> None:
+        status = await self.get_tip_presence_status(mount)
+        if status != expected:
+            raise FailedTipStateCheck(expected, status.value)
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
@@ -2011,8 +2044,11 @@ class OT3API(
             instrument.set_current_volume(0)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
-
-        if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        if (
+            self.gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and instrument.nozzle_manager.current_configuration.configuration
+            == NozzleConfigurationType.FULL
+        ):
             spec = self._pipette_handler.plan_ht_pick_up_tip()
             if spec.z_distance_to_tiprack:
                 await self.move_rel(
@@ -2035,17 +2071,8 @@ class OT3API(
         # can verify if a tip is properly attached
         if spec.ending_z_retract_distance:
             await self.move_rel(
-                realmount, top_types.Point(spec.ending_z_retract_distance)
+                realmount, top_types.Point(z=spec.ending_z_retract_distance)
             )
-
-        # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
-        #       but not with DVT pipettes because those can only detect drops
-
-        if (
-            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
-            and ff.tip_presence_detection_enabled()
-        ):
-            await self._backend.check_for_tip_presence(realmount, TipStateType.PRESENT)
 
         add_tip_to_instr()
 
@@ -2104,12 +2131,6 @@ class OT3API(
 
         for shake in spec.shake_off_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
-        # TODO: implement tip-detection sequence during drop-tip for 96ch
-        if (
-            self.gantry_load != GantryLoad.HIGH_THROUGHPUT
-            and ff.tip_presence_detection_enabled()
-        ):
-            await self._backend.check_for_tip_presence(realmount, TipStateType.ABSENT)
 
         # home mount axis
         if home_after:
@@ -2168,13 +2189,16 @@ class OT3API(
         return self.get_attached_pipettes()
 
     async def get_instrument_state(
-        self, mount: Union[top_types.Mount, OT3Mount]
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
     ) -> PipetteStateDict:
         # TODO we should have a PipetteState that can be returned from
         # this function with additional state (such as critical points)
         realmount = OT3Mount.from_mount(mount)
-        res = await self._backend.get_tip_present_state(realmount)
-        pipette_state_for_mount: PipetteStateDict = {"tip_detected": res}
+        tip_attached = self._backend.current_tip_state(realmount)
+        pipette_state_for_mount: PipetteStateDict = {
+            "tip_detected": tip_attached if tip_attached is not None else False
+        }
         return pipette_state_for_mount
 
     def reset_instrument(
@@ -2343,6 +2367,41 @@ class OT3API(
         )
 
         return pos_at_home[Axis.by_mount(mount)] - self._config.z_retract_distance
+
+    async def update_nozzle_configuration_for_mount(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        back_left_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        The expectation of this function is that the back_left_nozzle/front_right_nozzle are the two corners
+        of a rectangle of nozzles. A call to this function that does not follow that schema will result
+        in an error.
+
+        :param mount: A robot mount that the instrument is on.
+        :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
+        of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
+        none is provided.
+        :return: None.
+
+        If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
+        """
+        if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
+            await self._pipette_handler.reset_nozzle_configuration(
+                OT3Mount.from_mount(mount)
+            )
+        else:
+            assert back_left_nozzle and front_right_nozzle
+            await self._pipette_handler.update_nozzle_configuration(
+                OT3Mount.from_mount(mount),
+                back_left_nozzle,
+                front_right_nozzle,
+                starting_nozzle,
+            )
 
     async def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float

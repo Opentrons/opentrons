@@ -9,7 +9,8 @@ from opentrons_shared_data.pipette import (
     mutable_configurations,
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons.calibration_storage import helpers, types as CSTypes, models
+from opentrons.calibration_storage import helpers, types as CSTypes
+from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api import labware

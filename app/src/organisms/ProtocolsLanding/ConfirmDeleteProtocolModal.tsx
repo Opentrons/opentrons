@@ -27,7 +27,7 @@ export function ConfirmDeleteProtocolModal(
     <LegacyModal
       type="warning"
       onClose={props.cancelDeleteProtocol}
-      title={t('should_delete_this_protocol')}
+      title={t('delete_this_protocol')}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText as="p" marginBottom={SPACING.spacing24}>

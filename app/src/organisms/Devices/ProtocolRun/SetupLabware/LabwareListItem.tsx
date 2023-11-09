@@ -26,16 +26,11 @@ import {
   getModuleDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
-  LabwareDefinition2,
-  LoadModuleRunTimeCommand,
   MAGNETIC_MODULE_TYPE,
-  ModuleType,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
-  RunTimeCommand,
-  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
@@ -45,7 +40,12 @@ import { SecureLabwareModal } from './SecureLabwareModal'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
+  RunTimeCommand,
+  ModuleType,
+  LabwareDefinition2,
+  LoadModuleRunTimeCommand,
+  LoadLabwareRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'

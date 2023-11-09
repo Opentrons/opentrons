@@ -2,20 +2,18 @@ import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getTiprackVolume,
-  LabwareDefinition2,
   getLabwareDefURI,
-  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import type {
-  PickUpTipRunTimeCommand,
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+  LabwareLocation,
   LoadLabwareRunTimeCommand,
-} from '@opentrons/shared-data'
-import type {
+  PickUpTipRunTimeCommand,
   ProtocolAnalysisOutput,
   RunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
-import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+} from '@opentrons/shared-data'
 import type { LabwareToOrder } from '../types'
 
 export const tipRackOrderSort = (
@@ -194,7 +192,10 @@ export const getLabwareIdsInOrder = (
               ).location.slotName
             }
           } else {
-            slot = loc.slotName
+            slot =
+              'addressableAreaName' in loc
+                ? loc.addressableAreaName
+                : loc.slotName
           }
           return [
             ...innerAcc,

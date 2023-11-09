@@ -55,6 +55,11 @@ export function UpdateRobotSoftware({
       dispatchStartRobotUpdate(robotName, files[0].path)
       onUpdateStart()
     }
+    // this is to reset the state of the file picker so users can reselect the same
+    // system image if the upload fails
+    if (inputRef.current?.value != null) {
+      inputRef.current.value = ''
+    }
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {

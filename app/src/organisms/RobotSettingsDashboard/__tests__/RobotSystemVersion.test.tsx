@@ -34,6 +34,7 @@ describe('RobotSystemVersion', () => {
       currentVersion: 'mock7.0.0',
       isUpdateAvailable: false,
       setCurrentOption: mockBack,
+      robotUpdateInfo: null,
     }
     mockRobotSystemVersionModal.mockReturnValue(
       <div>mock RobotSystemVersionModal</div>
@@ -58,6 +59,11 @@ describe('RobotSystemVersion', () => {
     props = {
       ...props,
       isUpdateAvailable: true,
+      robotUpdateInfo: {
+        target: 'flex',
+        version: 'mock1.2.3',
+        releaseNotes: null,
+      },
     }
     const [{ getByText }] = render(props)
     getByText('Update available')

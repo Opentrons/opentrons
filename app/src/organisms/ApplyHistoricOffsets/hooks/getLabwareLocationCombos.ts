@@ -59,7 +59,12 @@ export function getLabwareLocationCombos(
             })
       } else {
         return appendLocationComboIfUniq(acc, {
-          location: command.params.location,
+          location: {
+            slotName:
+              'addressableAreaName' in command.params.location
+                ? command.params.location.addressableAreaName
+                : command.params.location.slotName,
+          },
           definitionUri,
           labwareId: command.result.labwareId,
         })
@@ -107,7 +112,12 @@ export function getLabwareLocationCombos(
             })
       } else {
         return appendLocationComboIfUniq(acc, {
-          location: command.params.newLocation,
+          location: {
+            slotName:
+              'addressableAreaName' in command.params.newLocation
+                ? command.params.newLocation.addressableAreaName
+                : command.params.newLocation.slotName,
+          },
           definitionUri: labwareEntity.definitionUri,
           labwareId: command.params.labwareId,
         })
@@ -191,7 +201,10 @@ function resolveAdapterLocation(
   } else {
     adapterOffsetLocation = {
       definitionUri: labwareDefUri,
-      slotName: labwareEntity.location.slotName,
+      slotName:
+        'addressableAreaName' in labwareEntity.location
+          ? labwareEntity.location.addressableAreaName
+          : labwareEntity.location.slotName,
     }
   }
   return {

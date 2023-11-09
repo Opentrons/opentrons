@@ -27,7 +27,6 @@ import {
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
-import { useFeatureFlag } from '../../redux/config'
 
 import type {
   CompletedProtocolAnalysis,
@@ -51,7 +50,6 @@ export function FixtureTable({
   setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
     id: 'stubbed_load_fixture',
     commandType: 'loadFixture',
@@ -72,7 +70,7 @@ export function FixtureTable({
   ] = React.useState<boolean>(false)
 
   const requiredFixtureDetails =
-    enableDeckConfig && mostRecentAnalysis?.commands != null
+    mostRecentAnalysis?.commands != null
       ? [
           // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
           STUBBED_LOAD_FIXTURE,
@@ -148,7 +146,7 @@ export function FixtureTable({
         }
 
         return (
-          <>
+          <React.Fragment key={fixture.id}>
             {showLocationConflictModal ? (
               <LocationConflictModal
                 onCloseClick={() => setShowLocationConflictModal(false)}
@@ -188,7 +186,7 @@ export function FixtureTable({
                 {chipLabel}
               </Flex>
             </Flex>
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>

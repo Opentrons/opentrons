@@ -8,6 +8,7 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
+import NiceModal from '@ebay/nice-modal-react'
 
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
@@ -104,7 +105,7 @@ export const DesktopApp = (): JSX.Element => {
   ]
 
   return (
-    <>
+    <NiceModal.Provider>
       <Navbar routes={desktopRoutes} />
       <ToasterOven>
         <EmergencyStopContext.Provider
@@ -140,7 +141,7 @@ export const DesktopApp = (): JSX.Element => {
           </Box>
         </EmergencyStopContext.Provider>
       </ToasterOven>
-    </>
+    </NiceModal.Provider>
   )
 }
 

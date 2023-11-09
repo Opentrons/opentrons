@@ -59,6 +59,7 @@ describe('CheckItem', () => {
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
       robotType: FLEX_ROBOT_TYPE,
+      shouldUseMetalProbe: false,
     }
   })
   afterEach(() => {

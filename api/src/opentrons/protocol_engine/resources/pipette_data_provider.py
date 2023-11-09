@@ -1,6 +1,6 @@
 """Pipette config data providers."""
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.pipette import (
@@ -12,6 +12,10 @@ from opentrons_shared_data.pipette import (
 
 
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import (
+    NozzleConfigurationManager,
+    NozzleMap,
+)
 
 from ..types import FlowRates
 
@@ -40,6 +44,39 @@ class VirtualPipetteDataProvider:
     def __init__(self) -> None:
         """Build a VirtualPipetteDataProvider."""
         self._liquid_class_by_id: Dict[str, pip_types.LiquidClasses] = {}
+        self._nozzle_manager_layout_by_id: Dict[str, NozzleConfigurationManager] = {}
+
+    def configure_virtual_pipette_nozzle_layout(
+        self,
+        pipette_id: str,
+        pipette_model_string: str,
+        back_left_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """Emulate update_nozzle_configuration_for_mount."""
+        if pipette_id not in self._nozzle_manager_layout_by_id:
+            config = self._get_virtual_pipette_full_config_by_model_string(
+                pipette_model_string
+            )
+            new_nozzle_manager = NozzleConfigurationManager.build_from_nozzlemap(
+                config.nozzle_map,
+                config.partial_tip_configurations.per_tip_pickup_current,
+            )
+            if back_left_nozzle and front_right_nozzle and starting_nozzle:
+                new_nozzle_manager.update_nozzle_configuration(
+                    back_left_nozzle, front_right_nozzle, starting_nozzle
+                )
+            self._nozzle_manager_layout_by_id[pipette_id] = new_nozzle_manager
+        elif back_left_nozzle and front_right_nozzle and starting_nozzle:
+            # Need to make sure that we pass all the right nozzles here.
+            self._nozzle_manager_layout_by_id[pipette_id].update_nozzle_configuration(
+                back_left_nozzle, front_right_nozzle, starting_nozzle
+            )
+        else:
+            self._nozzle_manager_layout_by_id[
+                pipette_id
+            ].reset_to_default_configuration()
 
     def configure_virtual_pipette_for_volume(
         self, pipette_id: str, volume: float, pipette_model_string: str
@@ -61,6 +98,10 @@ class VirtualPipetteDataProvider:
         )
         self._liquid_class_by_id[pipette_id] = liquid_class
 
+    def get_nozzle_layout_for_pipette(self, pipette_id: str) -> NozzleMap:
+        """Get the current nozzle layout stored for a virtual pipette."""
+        return self._nozzle_manager_layout_by_id[pipette_id].current_configuration
+
     def get_virtual_pipette_static_config_by_model_string(
         self, pipette_model_string: str, pipette_id: str
     ) -> LoadedStaticPipetteData:
@@ -70,6 +111,19 @@ class VirtualPipetteDataProvider:
         )
         return self._get_virtual_pipette_static_config_by_model(
             pipette_model, pipette_id
+        )
+
+    def _get_virtual_pipette_full_config_by_model_string(
+        self, pipette_model_string: str
+    ) -> pipette_definition.PipetteConfigurations:
+        """Get the full pipette config from a model string."""
+        pipette_model = pipette_load_name.convert_pipette_model(
+            PipetteModel(pipette_model_string)
+        )
+        return load_pipette_data.load_definition(
+            pipette_model.pipette_type,
+            pipette_model.pipette_channels,
+            pipette_model.pipette_version,
         )
 
     def _get_virtual_pipette_static_config_by_model(

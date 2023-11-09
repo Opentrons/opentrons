@@ -12,7 +12,8 @@ from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.util.helpers import utc_now
-from opentrons.calibration_storage import types as cal_types, models
+from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage.ot2 import models
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand

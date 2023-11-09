@@ -96,7 +96,7 @@ export const FlexTrash = ({
               transformOrigin="center"
               css={TYPOGRAPHY.bodyTextSemiBold}
             >
-              Trash
+              Trash bin
             </Text>
           ) : null}
           <Icon
@@ -109,7 +109,7 @@ export const FlexTrash = ({
           />
           {rotateDegrees === '0' ? (
             <Text color={trashIconColor} css={TYPOGRAPHY.bodyTextSemiBold}>
-              Trash
+              Trash bin
             </Text>
           ) : null}
         </Flex>

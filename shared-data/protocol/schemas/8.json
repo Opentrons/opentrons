@@ -1,5 +1,5 @@
 {
-  "$id": "opentronsProtocolSchemaV7",
+  "$id": "opentronsProtocolSchemaV8",
   "$schema": "http://json-schema.org/draft-07/schema#",
 
   "definitions": {},
@@ -12,18 +12,18 @@
     "metadata",
     "robot",
     "labwareDefinitions",
-    "labwareDefinitionsSchema",
+    "labwareDefinitionSchemaId",
     "commands",
-    "commandsSchema",
+    "commandSchemaId",
     "commandAnnotations",
-    "commandAnnotationsSchema",
+    "commandAnnotationSchemaId",
     "liquids",
-    "liquidSchemaRef"
+    "liquidSchemaId"
   ],
   "properties": {
     "$otSharedSchema": {
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
-      "enum": ["#/protocol/schemas/7"]
+      "enum": ["#/protocol/schemas/8"]
     },
 
     "schemaVersion": {
@@ -104,58 +104,54 @@
           "enum": ["OT-2 Standard", "OT-3 Standard"]
         },
         "deckId": {
-          "description": "Identifier of physical deck this protocol is written for. This should match a top-level key in shared-data/deck/definitions/3.json",
+          "description": "Identifier of physical deck this protocol is written for. This should match a definition in the shared-data directory matching the schema id",
           "type": "string"
         }
       }
     },
 
-    "labwareDefinitionSchemaRef": {
-      "description": "The schema to use for labware definitions. Looked up as a schema-id in shared-data/labware.",
+    "labwareDefinitionSchemaId": {
+      "description": "The schema to use for labware definitions.",
       "type": "string"
     },
 
     "labwareDefinitions": {
       "description": "All labware definitions used by labware in this protocol, keyed by a unique identifier (definitionId)",
       "patternProperties": {
-        ".+": {
-          "$ref": "#/properties/labwareDefinitionSchemaRef"
-        }
+        ".+": { "type": "object" }
       }
     },
 
-    "liquidSchemaRef": {
-      "description": "The schema to use for liquid definitions. Looked up as a schema-id in shared-data/liquid/schemas.",
+    "liquidSchemaId": {
+      "description": "The schema to use for liquid definitions.",
       "type": "string"
     },
 
     "liquids": {
       "description": "All instances of liquid used in this protocol, keyed by a unique identifier (liquidId)",
       "patternProperties": {
-        ".+": {
-          "$ref": "#/properties/liquidSchemaRef"
-        }
+        ".+": { "type": "object" }
       }
     },
-    "commandSchemaRef": {
-      "description": "The schema to which the commands adhere. The value will be looked up as a schema-id under shared-data/command/schemas/",
+    "commandSchemaId": {
+      "description": "The schema to which the commands adhere.",
       "type": "string"
     },
 
     "commands": {
       "description": "An array of command objects representing steps to be executed on the robot.",
       "type": "array",
-      "items": { "$ref": "#/properties/commandSchemaRef" }
+      "items": { "type": "object" }
     },
 
-    "commandAnnotationSchemaRef": {
-      "description": "The schema to which the command annotations adhere. The value will be looked up as a schema-id under shared-data/commandAnnotation/schemas/",
+    "commandAnnotationSchemaId": {
+      "description": "The schema to which the command annotations adhere.",
       "type": "string"
     },
 
     "commandAnnotations": {
       "type": "array",
-      "items": { "$ref": "#/properties/commandAnnotationSchemaRef" }
+      "items": { "type": "object" }
     }
   }
 }

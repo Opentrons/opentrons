@@ -34,6 +34,11 @@ import {
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
 import { forMoveLabware } from './forMoveLabware'
+import {
+  forBlowOutInPlace,
+  forDispenseInPlace,
+  forDropTipInPlace,
+} from './inPlaceCommandUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -101,6 +106,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'loadModule':
     case 'home': // gantry VVV
     case 'moveRelative':
+    case 'moveToAddressableArea':
     case 'moveToSlot':
     case 'moveToCoordinates':
     case 'moveToWell':
@@ -114,6 +120,22 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'loadLiquid':
       forLoadLiquid(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'dropTipInPlace':
+      forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'blowOutInPlace':
+      forBlowOutInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'dispenseInPlace':
+      forDispenseInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'temperatureModule/setTargetTemperature':

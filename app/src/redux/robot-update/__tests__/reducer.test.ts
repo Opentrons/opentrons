@@ -29,7 +29,12 @@ describe('robot update reducer', () => {
       initialState: {
         ...INITIAL_STATE,
         ...{
-          flex: { ...INITIAL_STATE.flex, releaseNotes: null, version: null },
+          flex: {
+            ...INITIAL_STATE.flex,
+            releaseNotes: null,
+            version: null,
+            force: false,
+          },
         },
       },
       expected: {
@@ -38,9 +43,40 @@ describe('robot update reducer', () => {
           ...INITIAL_STATE.flex,
           version: '1.0.0',
           releaseNotes: 'release notes',
+          force: false,
         },
       },
     },
+    {
+      name: 'handles forced robotUpdate:UPDATE_VERSION for flex',
+      action: {
+        type: 'robotUpdate:UPDATE_VERSION',
+        payload: {
+          version: '1.0.0',
+          target: 'flex',
+          force: true,
+        },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        ...{
+          flex: {
+            ...INITIAL_STATE.flex,
+            version: null,
+            force: true,
+          },
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        flex: {
+          ...INITIAL_STATE.flex,
+          version: '1.0.0',
+          force: true,
+        },
+      },
+    },
+
     {
       name: 'handles robotUpdate:UPDATE_INFO for ot2',
       action: {
@@ -53,7 +89,14 @@ describe('robot update reducer', () => {
       },
       initialState: {
         ...INITIAL_STATE,
-        ...{ ot2: { ...INITIAL_STATE.ot2, releaseNotes: null, version: null } },
+        ...{
+          ot2: {
+            ...INITIAL_STATE.ot2,
+            releaseNotes: null,
+            version: null,
+            force: false,
+          },
+        },
       },
       expected: {
         ...INITIAL_STATE,
@@ -61,6 +104,99 @@ describe('robot update reducer', () => {
           ...INITIAL_STATE.ot2,
           version: '1.0.0',
           releaseNotes: 'release notes',
+          force: false,
+        },
+      },
+    },
+    {
+      name: 'handles forced robotUpdate:UPDATE_VERSION for ot2',
+      action: {
+        type: 'robotUpdate:UPDATE_VERSION',
+        payload: {
+          version: '1.0.0',
+          target: 'ot2',
+          force: true,
+        },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        ...{
+          ot2: {
+            ...INITIAL_STATE.ot2,
+            version: null,
+            force: false,
+          },
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        ot2: {
+          ...INITIAL_STATE.ot2,
+          version: '1.0.0',
+          force: true,
+        },
+      },
+    },
+    {
+      name: 'handles robotUpdate:CHECKING_FOR_UPDATE',
+      action: {
+        type: 'robotUpdate:CHECKING_FOR_UPDATE',
+        payload: 'ot2',
+      },
+      initialState: { ...INITIAL_STATE, session: null },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'ot2',
+        },
+      },
+    },
+    {
+      name:
+        'handles robotUpdate:DOWNLOAD_DONE when the target matches the robot type',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_DONE',
+        payload: 'ot2',
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'ot2',
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'done',
+        },
+      },
+    },
+    {
+      name:
+        'handles robotUpdate:DOWNLOAD_DONE when the target does not match the robot type',
+      action: {
+        type: 'robotUpdate:DOWNLOAD_DONE',
+        payload: 'ot2',
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'flex',
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          step: 'downloadFile',
+          stage: 'writing',
+          target: 'flex',
         },
       },
     },

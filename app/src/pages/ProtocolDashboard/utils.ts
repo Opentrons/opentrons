@@ -7,17 +7,17 @@ const DUMMY_FOR_NO_DATE_CASE = -8640000000000000
 export function sortProtocols(
   sortBy: ProtocolsOnDeviceSortKey,
   protocols: ProtocolResource[],
-  runs: RunData[]
+  allRunsNewestFirst: RunData[]
 ): ProtocolResource[] {
   protocols.sort((a, b) => {
     const aName = a.metadata.protocolName ?? a.files[0].name
     const bName = b.metadata.protocolName ?? b.files[0].name
     const aLastRun = new Date(
-      runs.find(run => run.protocolId === a.id)?.completedAt ??
+      allRunsNewestFirst.find(run => run.protocolId === a.id)?.completedAt ??
         new Date(DUMMY_FOR_NO_DATE_CASE)
     )
     const bLastRun = new Date(
-      runs.find(run => run.protocolId === b.id)?.completedAt ??
+      allRunsNewestFirst.find(run => run.protocolId === b.id)?.completedAt ??
         new Date(DUMMY_FOR_NO_DATE_CASE)
     )
     const aDate = new Date(a.createdAt)

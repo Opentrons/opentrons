@@ -4,12 +4,10 @@ import functools
 import logging
 from collections import UserDict
 from typing import Dict, Optional, List, Union
-from typing_extensions import Protocol
+from typing_extensions import Protocol, Final
 
-from opentrons_shared_data.deck import (
-    DEFAULT_DECK_DEFINITION_VERSION,
-    load as load_deck,
-)
+from opentrons_shared_data.deck import load as load_deck
+
 from opentrons_shared_data.deck.dev_types import SlotDefV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
@@ -34,6 +32,9 @@ ROW_LENGTH = 3
 FIXED_TRASH_ID = "fixedTrash"
 
 
+DEFAULT_LEGACY_DECK_DEFINITION_VERSION: Final = 3
+
+
 class DeckItem(Protocol):
     @property
     def highest_z(self) -> float:
@@ -50,7 +51,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
     def __init__(self, deck_type: str) -> None:
         super().__init__()
         self._definition = load_deck(
-            name=deck_type, version=DEFAULT_DECK_DEFINITION_VERSION
+            name=deck_type, version=DEFAULT_LEGACY_DECK_DEFINITION_VERSION
         )
         self._positions = {}
         for slot in self._definition["locations"]["orderedSlots"]:

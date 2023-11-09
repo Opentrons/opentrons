@@ -15,6 +15,7 @@ from opentrons.hardware_control.modules import (
     TempDeck,
     Thermocycler,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state.module_substates import (
     MagneticModuleId,
     HeaterShakerModuleId,
@@ -386,6 +387,55 @@ class EquipmentHandler:
             volume=volume,
             static_config=static_pipette_config,
         )
+
+    async def configure_nozzle_layout(
+        self,
+        pipette_id: str,
+        primary_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+        back_left_nozzle: Optional[str] = None,
+    ) -> Optional[NozzleMap]:
+        """Ensure the requested nozzle layout is compatible with the current pipette.
+
+        Args:
+            pipette_id: The identifier for the pipette.
+            primary_nozzle: The nozzle which will be used as the
+            front_right_nozzle
+            back_left_nozzle
+
+        Returns:
+            A NozzleMap object or None.
+        """
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
+
+        if not use_virtual_pipettes:
+            mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
+
+            await self._hardware_api.update_nozzle_configuration_for_mount(
+                mount,
+                back_left_nozzle if back_left_nozzle else primary_nozzle,
+                front_right_nozzle if front_right_nozzle else primary_nozzle,
+                primary_nozzle if back_left_nozzle else None,
+            )
+            pipette_dict = self._hardware_api.get_attached_instrument(mount)
+            nozzle_map = pipette_dict["current_nozzle_map"]
+
+        else:
+            model = self._state_store.pipettes.get_model_name(pipette_id)
+            self._virtual_pipette_data_provider.configure_virtual_pipette_nozzle_layout(
+                pipette_id,
+                model,
+                back_left_nozzle if back_left_nozzle else primary_nozzle,
+                front_right_nozzle if front_right_nozzle else primary_nozzle,
+                primary_nozzle if back_left_nozzle else None,
+            )
+            nozzle_map = (
+                self._virtual_pipette_data_provider.get_nozzle_layout_for_pipette(
+                    pipette_id
+                )
+            )
+
+        return nozzle_map
 
     @overload
     def get_module_hardware_api(

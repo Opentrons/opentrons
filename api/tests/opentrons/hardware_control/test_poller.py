@@ -150,3 +150,32 @@ async def test_poller_wait_next_poll_error(
         mock_reader.on_error(matchers.ErrorMatching(RuntimeError, match="oh no")),
         times=1,
     )
+
+
+async def test_poller_cancelled_wait(
+    mock_reader_flow_control: None,
+    subject: Poller,
+    read_started_event: asyncio.Event,
+    ok_to_finish_read_event: asyncio.Event,
+) -> None:
+    """If one waiter is cancelled, other waiters should still work."""
+    asyncio.create_task(subject.start())
+    await read_started_event.wait()
+    read_started_event.clear()
+
+    # Before letting the read complete, set up new wait tasks
+    wait_task_1 = asyncio.create_task(subject.wait_next_poll())
+    wait_task_2 = asyncio.create_task(subject.wait_next_poll())
+    ok_to_finish_read_event.set()
+
+    await read_started_event.wait()
+    read_started_event.clear()
+    wait_task_1.cancel()
+    ok_to_finish_read_event.set()
+
+    assert (
+        subject._poll_forever_task is not None and not subject._poll_forever_task.done()
+    )
+
+    await asyncio.sleep(2 * subject.interval)
+    assert wait_task_2.done() is True
