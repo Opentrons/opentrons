@@ -199,7 +199,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
         """Get addressable area."""
-        if self._state.use_simulated_deck_config:
+        if not self._state.use_simulated_deck_config:
             return self.get_loaded_addressable_area(addressable_area_name)
         else:
             return self.get_addressable_area_for_simulation(addressable_area_name)
