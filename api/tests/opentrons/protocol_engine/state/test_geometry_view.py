@@ -1167,9 +1167,9 @@ def test_get_labware_grip_point(
         labware_view.get_grip_height_from_labware_bottom("labware-id")
     ).then_return(100)
 
-    decoy.when(addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)).then_return(
-        Point(x=101, y=102, z=103)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
+    ).then_return(Point(x=101, y=102, z=103))
     labware_center = subject.get_labware_grip_point(
         labware_id="labware-id", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
@@ -1213,9 +1213,9 @@ def test_get_labware_grip_point_on_labware(
         labware_view.get_labware_overlap_offsets("labware-id", "below-name")
     ).then_return(OverlapOffset(x=0, y=1, z=6))
 
-    decoy.when(addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)).then_return(
-        Point(x=5, y=9, z=10)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(x=5, y=9, z=10))
 
     grip_point = subject.get_labware_grip_point(
         labware_id="labware-id", location=OnLabwareLocation(labwareId="below-id")
@@ -1259,9 +1259,9 @@ def test_get_labware_grip_point_for_labware_on_module(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         )
     )
-    decoy.when(addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)).then_return(
-        Point(100, 200, 300)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(100, 200, 300))
     result_grip_point = subject.get_labware_grip_point(
         labware_id="labware-id", location=ModuleLocation(moduleId="module-id")
     )

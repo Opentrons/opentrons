@@ -3,13 +3,14 @@ from typing import List, Set, Tuple, Optional
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, CutoutFixture
 
+from opentrons.types import Point
+
 from ..types import (
     AddressableArea,
     PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
     AddressableOffsetVector,
-    LabwareOffsetVector,
 )
 from ..errors import (
     CutoutDoesNotExistError,
@@ -101,26 +102,26 @@ def get_addressable_area_from_name(
                 z=addressable_area["boundingBox"]["zDimension"],
             )
             drop_tips_deck_offset = addressable_area.get("dropTipsOffset")
-            drop_tips_offset: Optional[LabwareOffsetVector]
+            drop_tip_location: Optional[Point]
             if drop_tips_deck_offset:
-                drop_tips_offset = LabwareOffsetVector(
+                drop_tip_location = Point(
                     x=drop_tips_deck_offset[0] + cutout_position.x,
                     y=drop_tips_deck_offset[1] + cutout_position.y,
                     z=drop_tips_deck_offset[2] + cutout_position.z,
                 )
             else:
-                drop_tips_offset = None
+                drop_tip_location = None
 
             drop_labware_deck_offset = addressable_area.get("dropLabwareOffset")
-            drop_labware_offset: Optional[LabwareOffsetVector]
+            drop_labware_location: Optional[Point]
             if drop_labware_deck_offset:
-                drop_labware_offset = LabwareOffsetVector(
+                drop_labware_location = Point(
                     x=drop_labware_deck_offset[0] + cutout_position.x,
                     y=drop_labware_deck_offset[1] + cutout_position.y,
                     z=drop_labware_deck_offset[2] + cutout_position.z,
                 )
             else:
-                drop_labware_offset = None
+                drop_labware_location = None
 
             return AddressableArea(
                 area_name=addressable_area["id"],
@@ -128,8 +129,8 @@ def get_addressable_area_from_name(
                 bounding_box=bounding_box,
                 position=position,
                 compatible_module_types=[],  # TODO figure out getting this correct later
-                drop_tip_offset=drop_tips_offset,
-                drop_labware_offset=drop_labware_offset,
+                drop_tip_location=drop_tip_location,
+                drop_labware_location=drop_labware_location,
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"

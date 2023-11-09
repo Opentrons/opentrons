@@ -505,16 +505,12 @@ class GeometryView:
                 gripper_waste_chute = self._addressable_areas.get_addressable_area(
                     location_name
                 )
-                drop_labware_location = gripper_waste_chute.drop_labware_offset
+                drop_labware_location = gripper_waste_chute.drop_labware_location
                 if drop_labware_location is None:
                     raise ValueError(
                         f"{location_name} does not have a drop labware location associated with it"
                     )
-                return Point(
-                    drop_labware_location.x,
-                    drop_labware_location.y,
-                    drop_labware_location.z + grip_height_from_labware_bottom,
-                )
+                return drop_labware_location + Point(z=grip_height_from_labware_bottom)
             # Location should have been pre-validated so this will be a deck/staging area slot
             else:
                 offset = LabwareOffsetVector(x=0, y=0, z=0)

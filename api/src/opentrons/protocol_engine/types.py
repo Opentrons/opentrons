@@ -9,7 +9,7 @@ from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName
+from opentrons.types import MountType, DeckSlotName, Point
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -674,10 +674,9 @@ class AddressableArea:
     bounding_box: Dimensions
     position: AddressableOffsetVector
     compatible_module_types: List[ModuleType]
-    # TODO make LabwareOffsetVector a different type? Also do we need "ableToDropLabware" in the definition?
-    #   ALSO rename these to location, maybe make this type a Point and not vector
-    drop_tip_offset: Optional[LabwareOffsetVector]
-    drop_labware_offset: Optional[LabwareOffsetVector]
+    # TODO do we need "ableToDropLabware" in the definition?
+    drop_tip_location: Optional[Point]
+    drop_labware_location: Optional[Point]
 
 
 class PostRunHardwareState(Enum):
