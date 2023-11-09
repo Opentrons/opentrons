@@ -291,14 +291,20 @@ export interface CutoutFixture {
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
 }
 
+type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'
+
 export interface AddressableArea {
   id: AddressableAreaName
-  areaType: 'slot' | 'movableTrash' | 'fixedTrash' | 'wasteChute'
-  matingSurfaceUnitVector: UnitVectorTuple
-  offsetFromCutoutFixture: UnitVectorTuple
+  areaType: AreaType
+  offsetFromCutoutFixture: CoordinateTuple
   boundingBox: Dimensions
   displayName: string
   compatibleModuleTypes: ModuleType[]
+  ableToDropLabware?: boolean
+  ableToDropTips?: boolean
+  dropLabwareOffset?: CoordinateTuple
+  dropTipsOffset?: CoordinateTuple
+  matingSurfaceUnitVector?: UnitVectorTuple
 }
 
 export interface DeckLocations {
@@ -330,37 +336,12 @@ export interface DeckCutout {
   displayName: string
 }
 
-export interface CutoutFixture {
-  id: string
-  // TODO: cutout ids
-  mayMountTo: string[]
-  displayName: string
-  // TODO: Cutout id keys and addressable area union type values
-  providesAddressableAreas: { [cutoutId: string]: string[] }
-}
-
 export interface LegacyFixture {
   id: string
   // TODO: is this cutout location?
   slot: string
   labware: string
   displayName: string
-}
-
-type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'
-
-export interface AddressableArea {
-  id: string
-  areaType: AreaType
-  offsetFromCutoutFixture: CoordinateTuple
-  boundingBox: Dimensions
-  displayName: string
-  compatibleModuleTypes: ModuleType[]
-  ableToDropLabware?: boolean
-  ableToDropTips?: boolean
-  dropLabwareOffset?: CoordinateTuple
-  dropTipsOffset?: CoordinateTuple
-  matingSurfaceUnitVector?: UnitVectorTuple
 }
 
 export interface DeckLocationsV4 {
