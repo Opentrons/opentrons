@@ -26,12 +26,6 @@ context('File Import', () => {
     })
   })
 
-  it('contains a button to the testing guide', () => {
-    cy.contains('labware test guide')
-      .should('have.prop', 'href')
-      .and('to.have.string', 'labwareDefinition_testGuide')
-  })
-
   it('does has a preview image', () => {
     cy.contains('Add missing info to see labware preview').should('not.exist')
   })

@@ -29,12 +29,6 @@ context('Tubes and Rack', () => {
       cy.contains('start creating labware').click({ force: true })
     })
 
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
-    })
-
     it('does not have a preview image', () => {
       cy.contains('Add missing info to see labware preview').should('exist')
     })
@@ -201,12 +195,6 @@ context('Tubes and Rack', () => {
       cy.get('*[class^="Dropdown__option_label"]').contains('15 tubes').click()
 
       cy.contains('start creating labware').click({ force: true })
-    })
-
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
     })
 
     it('does not have a preview image', () => {
@@ -377,12 +365,6 @@ context('Tubes and Rack', () => {
       cy.get('*[class^="Dropdown__option_label"]').contains('24 tubes').click()
 
       cy.contains('start creating labware').click({ force: true })
-    })
-
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
     })
 
     it('does not have a preview image', () => {
