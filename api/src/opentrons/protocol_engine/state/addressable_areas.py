@@ -52,7 +52,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         self._deck_definition = deck_definition
         self._config = config
 
-        if self._config.use_virtual_pipettes:
+        if self._config.use_simulated_deck_config:
             loaded_addressable_areas_by_name = {}
         else:
             addressable_areas = self._load_addressable_areas_from_deck_configuration(
@@ -66,7 +66,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
             deck_definition=deck_definition,
-            deck_config_loaded=self._config.use_virtual_pipettes,
+            deck_config_loaded=self._config.use_simulated_deck_config,
         )
 
     def handle_action(self, action: Action) -> None:
