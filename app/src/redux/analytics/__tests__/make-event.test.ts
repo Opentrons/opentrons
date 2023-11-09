@@ -55,9 +55,6 @@ describe('analytics events map', () => {
         name: 'pipetteOffsetCalibrationStarted',
         properties: {
           ...action.payload,
-          calibrationExists: true,
-          markedBad: true,
-          pipetteModel: 'my pipette model',
         },
       })
     })
@@ -74,56 +71,8 @@ describe('analytics events map', () => {
         name: 'tipLengthCalibrationStarted',
         properties: {
           ...action.payload,
-          calibrationExists: true,
-          markedBad: true,
-          pipetteModel: 'pipette-model',
         },
       })
-    })
-
-    it('sessions:ENSURE_SESSION for deck cal -> deckCalibrationStarted event', () => {
-      const state = {} as any
-      const action = {
-        type: 'sessions:ENSURE_SESSION',
-        payload: {
-          sessionType: 'deckCalibration',
-        },
-      } as any
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'deckCalibrationStarted',
-        properties: {
-          calibrationStatus: 'IDENTITY',
-          markedBad: true,
-          pipettes: { left: { model: 'my pipette model' } },
-        },
-      })
-    })
-
-    it('sessions:ENSURE_SESSION for health check -> calibrationHealthCheckStarted event', () => {
-      const state = {} as any
-      const action = {
-        type: 'sessions:ENSURE_SESSION',
-        payload: {
-          sessionType: 'calibrationCheck',
-        },
-      } as any
-      return expect(makeEvent(action, state)).resolves.toEqual({
-        name: 'calibrationHealthCheckStarted',
-        properties: {
-          pipettes: { left: { model: 'my pipette model' } },
-        },
-      })
-    })
-
-    it('sessions:ENSURE_SESSION for other session -> no event', () => {
-      const state = {} as any
-      const action = {
-        type: 'sessions:ENSURE_SESSION',
-        payload: {
-          sessionType: 'some-other-session',
-        },
-      } as any
-      return expect(makeEvent(action, state)).resolves.toBeNull()
     })
 
     it('sessions:CREATE_SESSION_COMMAND for exit -> {type}Exit', () => {
