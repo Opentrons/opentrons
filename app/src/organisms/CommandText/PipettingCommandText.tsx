@@ -18,6 +18,7 @@ import {
   getFinalLabwareLocation,
   getWellRange,
 } from './utils'
+import type { PipetteName } from '@opentrons/shared-data'
 
 type PipettingRunTimeCommmand =
   | AspirateRunTimeCommand
@@ -124,16 +125,18 @@ export const PipettingCommandText = ({
     }
     case 'pickUpTip': {
       const pipetteId = command.params.pipetteId
-      const pipetteName = robotSideAnalysis.pipettes.find(
+      const pipetteName:
+        | PipetteName
+        | undefined = robotSideAnalysis.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
 
       return t('pickup_tip', {
         well_range: getWellRange(
           pipetteId,
-          pipetteName,
           allPreviousCommands,
-          wellName
+          wellName,
+          pipetteName
         ),
         labware: getLabwareName(robotSideAnalysis, labwareId),
         labware_location: displayLocation,

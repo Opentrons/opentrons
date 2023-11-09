@@ -12,11 +12,13 @@ import {
  */
 export function getWellRange(
   pipetteId: string,
-  pipetteName: PipetteName,
   commands: RunTimeCommand[],
-  wellName: string
+  wellName: string,
+  pipetteName?: PipetteName
 ): string {
-  const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels ?? 1
+  const pipetteChannels = pipetteName
+    ? getPipetteNameSpecs(pipetteName)?.channels ?? 1
+    : 1
   let usedChannels = pipetteChannels
   if (pipetteChannels === 96) {
     for (const c of commands.reverse()) {
