@@ -5,6 +5,7 @@ import {
   WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type {
+  AddressableArea,
   CoordinateTuple,
   Cutout,
   DeckDefinition,
@@ -66,9 +67,8 @@ export function getPositionFromSlotId(
       ?.position ?? null
 
   // adjust for offset from cutout
-  const offsetFromCutoutFixture = deckDef.locations.addressableAreas.find(
-    addressableArea => addressableArea.id === slotId
-  )?.offsetFromCutoutFixture ?? [0, 0, 0]
+  const offsetFromCutoutFixture = getAddressableAreaFromSlotId(slotId, deckDef)
+    ?.offsetFromCutoutFixture ?? [0, 0, 0]
 
   const slotPosition: CoordinateTuple | null =
     cutoutPosition != null
@@ -80,6 +80,17 @@ export function getPositionFromSlotId(
       : null
 
   return slotPosition
+}
+
+export function getAddressableAreaFromSlotId(
+  slotId: string,
+  deckDef: DeckDefinition
+): AddressableArea | null {
+  return (
+    deckDef.locations.addressableAreas.find(
+      addressableArea => addressableArea.id === slotId
+    ) ?? null
+  )
 }
 
 export function getFixtureDisplayName(loadName: FixtureLoadName): string {

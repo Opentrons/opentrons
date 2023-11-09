@@ -24,7 +24,6 @@ import {
 import {
   getLabwareHasQuirk,
   inferModuleOrientationFromSlot,
-  DeckSlot as DeckDefSlot,
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
   getModuleDef2,
@@ -39,12 +38,9 @@ import {
   STAGING_AREA_LOAD_NAME,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_LOAD_NAME,
+  AddressableAreaName,
 } from '@opentrons/shared-data'
-import {
-  FLEX_TRASH_DEF_URI,
-  OT_2_TRASH_DEF_URI,
-  PSEUDO_DECK_SLOTS,
-} from '../../constants'
+import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
@@ -77,6 +73,11 @@ import { DEFAULT_SLOTS } from './constants'
 import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
 
 import styles from './DeckSetup.css'
+import {
+  getAddressableAreaFromSlotId,
+  getPositionFromSlotId,
+  isAddressableAreaStandardSlot,
+} from '@opentrons/shared-data/js'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -88,7 +89,8 @@ export const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-type ContentsProps = RobotWorkSpaceRenderProps & {
+interface ContentsProps {
+  getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
   activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
@@ -103,7 +105,6 @@ const darkFill = COLORS.darkGreyEnabled
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     activeDeckSetup,
-    deckSlotsById,
     getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
     deckDef,
@@ -140,9 +141,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   )
 
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
-  const deckSlots: DeckDefSlot[] = values(deckSlotsById)
-  // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
-  const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
 
   const allLabware: LabwareOnDeckType[] = Object.keys(
     activeDeckSetup.labware
@@ -156,24 +154,22 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
-  const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
+  const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
     ? compact([
-        (allModules.some(
+        allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '1' &&
-            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
             MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        ) &&
-          deckSlotsById?.['4']) ||
-          null,
-        (allModules.some(
+        )
+          ? deckDef.locations.addressableAreas.find(s => s.id === '4')?.id
+          : null,
+        allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '3' &&
-            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
             MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        ) &&
-          deckSlotsById?.['6']) ||
-          null,
+        )
+          ? deckDef.locations.addressableAreas.find(s => s.id === '6')?.id
+          : null,
       ])
     : []
 
@@ -181,10 +177,13 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     <>
       {/* all modules */}
       {allModules.map(moduleOnDeck => {
-        const slot = moduleParentSlots.find(
-          slot => slot.id === moduleOnDeck.slot
-        )
-        if (slot == null) {
+        // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
+        // const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
+        // const slot = moduleParentSlots.find(
+        //   slot => slot.id === moduleOnDeck.slot
+        // )
+        const slotPosition = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
+        if (slotPosition == null) {
           console.warn(
             `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
           )
@@ -225,17 +224,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         const shouldHideChildren =
           moduleOnDeck.moduleState.type === THERMOCYCLER_MODULE_TYPE &&
           moduleOnDeck.moduleState.lidOpen === false
-        const labwareInterfaceSlotDef: DeckDefSlot = {
-          displayName: `Labware interface on ${moduleOnDeck.model}`,
-          id: moduleOnDeck.id,
-          position: [0, 0, 0], // Module Component already handles nested positioning
-          matingSurfaceUnitVector: [-1, 1, -1],
-          boundingBox: {
-            xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
-            yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
-            zDimension: 0,
-          },
-          compatibleModules: [THERMOCYCLER_MODULE_TYPE],
+        const labwareInterfaceBoundingBox = {
+          xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
+          yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
+          zDimension: 0,
         }
 
         const moduleOrientation = inferModuleOrientationFromSlot(
@@ -246,15 +238,13 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           labwareLoadedOnModule?.def.metadata.displayCategory === 'adapter'
         return (
           <Module
-            key={slot.id}
-            x={slot.position[0]}
-            y={slot.position[1]}
+            key={moduleOnDeck.slot}
+            x={slotPosition[0]}
+            y={slotPosition[1]}
             def={moduleDef}
-            orientation={inferModuleOrientationFromXCoordinate(
-              slot.position[0]
-            )}
+            orientation={inferModuleOrientationFromXCoordinate(slotPosition[0])}
             innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
-            targetSlotId={slot.id}
+            targetSlotId={moduleOnDeck.slot}
             targetDeckId={deckDef.otId}
           >
             {labwareLoadedOnModule != null && !shouldHideChildren ? (
@@ -265,19 +255,19 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   labwareOnDeck={labwareLoadedOnModule}
                 />
                 {isAdapter ? (
-                  //  @ts-expect-error
                   <AdapterControls
                     allLabware={allLabware}
                     onDeck={false}
                     labwareId={labwareLoadedOnModule.id}
-                    key={slot.id}
-                    slot={slot}
+                    key={moduleOnDeck.slot}
+                    slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
+                    slotBoundingBox={labwareInterfaceBoundingBox}
                     selectedTerminalItemId={props.selectedTerminalItemId}
                     handleDragHover={handleHoverEmptySlot}
                   />
                 ) : (
                   <LabwareControls
-                    slot={labwareInterfaceSlotDef}
+                    slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
                     setHoveredLabware={setHoveredLabware}
                     setDraggedLabware={setDraggedLabware}
                     swapBlocked={
@@ -295,10 +285,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             {labwareLoadedOnModule == null &&
             !shouldHideChildren &&
             !isAdapter ? (
-              //  @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
               <SlotControls
-                key={slot.id}
-                slot={labwareInterfaceSlotDef}
+                key={moduleOnDeck.slot}
+                slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
+                slotBoundingBox={labwareInterfaceBoundingBox}
                 selectedTerminalItemId={props.selectedTerminalItemId}
                 moduleType={moduleOnDeck.type}
                 handleDragHover={handleHoverEmptySlot}
@@ -321,35 +311,45 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       })}
 
       {/* on-deck warnings */}
-      {multichannelWarningSlots.map(slot => (
-        <SlotWarning
-          key={slot.id}
-          warningType="gen1multichannel"
-          x={slot.position[0]}
-          y={slot.position[1]}
-          xDimension={slot.boundingBox.xDimension}
-          yDimension={slot.boundingBox.yDimension}
-          orientation={inferModuleOrientationFromSlot(slot.id)}
-        />
-      ))}
+      {multichannelWarningSlotIds.map(slotId => {
+        const slotPosition = getPositionFromSlotId(slotId, deckDef)
+        const slotBoundingBox = getAddressableAreaFromSlotId(slotId, deckDef)
+          ?.boundingBox
+        return slotPosition != null && slotBoundingBox != null ? (
+          <SlotWarning
+            key={slotId}
+            warningType="gen1multichannel"
+            x={slotPosition[0]}
+            y={slotPosition[1]}
+            xDimension={slotBoundingBox.xDimension}
+            yDimension={slotBoundingBox.yDimension}
+            orientation={inferModuleOrientationFromSlot(slotId)}
+          />
+        ) : null
+      })}
 
       {/* SlotControls for all empty deck + module slots */}
-      {deckSlots
+      {deckDef.locations.addressableAreas
+        // only render standard slot fixture components
         .filter(
-          slot =>
-            !slotIdsBlockedBySpanning.includes(slot.id) &&
-            getSlotIsEmpty(activeDeckSetup, slot.id) &&
-            slot.id !== trashSlot
+          addressableArea =>
+            isAddressableAreaStandardSlot(addressableArea.id) &&
+            !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
+            getSlotIsEmpty(activeDeckSetup, addressableArea.id) &&
+            addressableArea.id !== trashSlot
         )
-        .map(slot => {
+        .map(addressableArea => {
           return (
-            // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
             <SlotControls
-              key={slot.id}
-              slot={slot}
+              key={addressableArea.id}
+              slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
+              slotBoundingBox={addressableArea.boundingBox}
+              slotId={addressableArea.id}
               selectedTerminalItemId={props.selectedTerminalItemId}
               // Module slots' ids reference their parent module
-              moduleType={activeDeckSetup.modules[slot.id]?.type || null}
+              moduleType={
+                activeDeckSetup.modules[addressableArea.id]?.type ?? null
+              }
               handleDragHover={handleHoverEmptySlot}
             />
           )
@@ -363,8 +363,14 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           allLabware.some(lab => lab.id === labware.slot)
         )
           return null
-        const slot = deckSlots.find(slot => slot.id === labware.slot)
-        if (slot == null) {
+
+        const slotPosition = getPositionFromSlotId(labware.slot, deckDef)
+        console.log('labawre', labware.slot)
+        const slotBoundingBox = getAddressableAreaFromSlotId(
+          labware.slot,
+          deckDef
+        )?.boundingBox
+        if (slotPosition == null || slotBoundingBox == null) {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
@@ -373,27 +379,25 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
-              x={slot.position[0]}
-              y={slot.position[1]}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
               labwareOnDeck={labware}
             />
             <g>
               {labwareIsAdapter ? (
-                <>
-                  {/* @ts-expect-error */}
-                  <AdapterControls
-                    allLabware={allLabware}
-                    onDeck={true}
-                    labwareId={labware.id}
-                    key={slot.id}
-                    slot={slot}
-                    selectedTerminalItemId={props.selectedTerminalItemId}
-                    handleDragHover={handleHoverEmptySlot}
-                  />
-                </>
+                <AdapterControls
+                  allLabware={allLabware}
+                  onDeck={true}
+                  labwareId={labware.id}
+                  key={labware.slot}
+                  slotPosition={slotPosition}
+                  slotBoundingBox={slotBoundingBox}
+                  selectedTerminalItemId={props.selectedTerminalItemId}
+                  handleDragHover={handleHoverEmptySlot}
+                />
               ) : (
                 <LabwareControls
-                  slot={slot}
+                  slotPosition={slotPosition}
                   setHoveredLabware={setHoveredLabware}
                   setDraggedLabware={setDraggedLabware}
                   swapBlocked={
@@ -417,31 +421,37 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           labware.slot === 'offDeck'
         )
           return null
-        const slotOnDeck = deckSlots.find(slot => slot.id === labware.slot)
-        if (slotOnDeck != null) {
+        if (
+          deckDef.locations.addressableAreas.some(
+            addressableArea => addressableArea.id === labware.slot
+          )
+        ) {
           return null
         }
         const slotForOnTheDeck = allLabware.find(lab => lab.id === labware.slot)
           ?.slot
         const slotForOnMod = allModules.find(mod => mod.id === slotForOnTheDeck)
           ?.slot
-        const deckDefSlot = deckSlots.find(
-          s => s.id === (slotForOnMod ?? slotForOnTheDeck)
-        )
-        if (deckDefSlot == null) {
+        let slotPosition = null
+        if (slotForOnMod != null) {
+          slotPosition = getPositionFromSlotId(slotForOnMod, deckDef)
+        } else if (slotForOnTheDeck != null) {
+          slotPosition = getPositionFromSlotId(slotForOnTheDeck, deckDef)
+        }
+        if (slotPosition == null) {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
         return (
           <React.Fragment key={labware.id}>
             <LabwareOnDeck
-              x={deckDefSlot.position[0]}
-              y={deckDefSlot.position[1]}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
               labwareOnDeck={labware}
             />
             <g>
               <LabwareControls
-                slot={deckDefSlot}
+                slotPosition={slotPosition}
                 setHoveredLabware={setHoveredLabware}
                 setDraggedLabware={setDraggedLabware}
                 swapBlocked={
@@ -522,7 +532,7 @@ export const DeckSetup = (): JSX.Element => {
           deckDef={deckDef}
           viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
-          {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
+          {({ getRobotCoordsFromDOMCoords }) => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
                 <DeckFromLayers robotType={robotType} layerBlocklist={[]} />
@@ -585,7 +595,6 @@ export const DeckSetup = (): JSX.Element => {
                 selectedTerminalItemId={selectedTerminalItemId}
                 {...{
                   deckDef,
-                  deckSlotsById,
                   getRobotCoordsFromDOMCoords,
                   showGen1MultichannelCollisionWarnings,
                 }}
