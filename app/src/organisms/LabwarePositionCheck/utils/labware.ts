@@ -192,7 +192,10 @@ export const getLabwareIdsInOrder = (
               ).location.slotName
             }
           } else {
-            slot = loc.slotName
+            slot =
+              'addressableAreaName' in loc
+                ? loc.addressableAreaName
+                : loc.slotName
           }
           return [
             ...innerAcc,
