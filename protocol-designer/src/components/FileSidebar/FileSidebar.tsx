@@ -256,13 +256,12 @@ export function FileSidebar(props: Props): JSX.Element {
   )
   const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
     labwareOnDeck,
-    // additionalEquipment,
+    additionalEquipment,
     fileData?.commands
   )
 
   const fixtureWithoutStep: Fixture = {
     trashBin: trashBinUnused,
-    //  TODO(jr, 10/30/23): wire this up later when we know waste chute commands
     wasteChute: wasteChuteUnused,
     stagingAreaSlots: getUnusedStagingAreas(
       additionalEquipment,
