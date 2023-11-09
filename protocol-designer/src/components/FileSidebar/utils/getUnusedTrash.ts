@@ -11,9 +11,9 @@ interface UnusedTrash {
   wasteChuteUnused: boolean
 }
 
-//  TODO(jr, 10/30/23): plug in waste chute logic when we know the commands!
 export const getUnusedTrash = (
   labwareOnDeck: InitialDeckSetup['labware'],
+  additionalEquipment: InitialDeckSetup['additionalEquipmentOnDeck'],
   commands?: CreateCommand[]
 ): UnusedTrash => {
   const trashBin = Object.values(labwareOnDeck).find(
@@ -21,7 +21,6 @@ export const getUnusedTrash = (
       labware.labwareDefURI === FLEX_TRASH_DEF_URI ||
       labware.labwareDefURI === OT_2_TRASH_DEF_URI
   )
-
   const hasTrashBinCommands =
     trashBin != null
       ? commands?.some(
@@ -32,8 +31,22 @@ export const getUnusedTrash = (
               command.params.labwareId === trashBin.id)
         )
       : null
+  const wasteChute = Object.values(additionalEquipment).find(
+    aE => aE.name === 'wasteChute'
+  )
+  const hasWasteChuteCommands =
+    wasteChute != null
+      ? commands?.some(
+          command =>
+            command.commandType === 'moveToAddressableArea' &&
+            (command.params.addressableAreaName === '1and8ChannelWasteChute' ||
+              command.params.addressableAreaName === 'gripperWasteChute' ||
+              command.params.addressableAreaName === '96ChannelWasteChute')
+        )
+      : null
+
   return {
     trashBinUnused: trashBin != null && !hasTrashBinCommands,
-    wasteChuteUnused: false,
+    wasteChuteUnused: wasteChute != null && !hasWasteChuteCommands,
   }
 }
