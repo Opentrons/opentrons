@@ -6,11 +6,11 @@ import {
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
+  SINGLE_SLOT_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_LOAD_NAME,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
@@ -37,6 +37,8 @@ import type {
   ModuleLocation,
   ModuleModel,
   RobotType,
+  SingleSlotCutoutFixtureId,
+  WasteChuteCutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { TrashLocation } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
@@ -88,19 +90,22 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const singleSlotFixtures = deckConfig.filter(
-    fixture => fixture.loadName === STANDARD_SLOT_LOAD_NAME
+  const singleSlotFixtures = deckConfig.filter(fixture =>
+    SINGLE_SLOT_FIXTURES.includes(
+      fixture.fixtureId as SingleSlotCutoutFixtureId
+    )
   )
   const stagingAreaFixtures = deckConfig.filter(
-    fixture => fixture.loadName === STAGING_AREA_LOAD_NAME
+    fixture => fixture.fixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
   )
   const trashBinFixtures = deckConfig.filter(
-    fixture => fixture.loadName === TRASH_BIN_LOAD_NAME
+    fixture => fixture.fixtureId === TRASH_BIN_ADAPTER_FIXTURE
   )
   const wasteChuteFixtures = deckConfig.filter(
     fixture =>
-      fixture.loadName === WASTE_CHUTE_LOAD_NAME &&
-      fixture.fixtureLocation === WASTE_CHUTE_CUTOUT
+      WASTE_CHUTE_FIXTURES.includes(
+        fixture.fixtureId as WasteChuteCutoutFixtureId
+      ) && fixture.fixtureLocation === WASTE_CHUTE_CUTOUT
   )
 
   return (
@@ -116,7 +121,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         <>
           {singleSlotFixtures.map(fixture => (
             <SingleSlotFixture
-              key={fixture.fixtureId}
+              key={fixture.fixtureLocation}
               cutoutId={fixture.fixtureLocation}
               deckDefinition={deckDef}
               slotClipColor={darkFill}
@@ -126,7 +131,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ))}
           {stagingAreaFixtures.map(fixture => (
             <StagingAreaFixture
-              key={fixture.fixtureId}
+              key={fixture.fixtureLocation}
               // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.fixtureLocation as StagingAreaLocation}
               deckDefinition={deckDef}
@@ -135,7 +140,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             />
           ))}
           {trashBinFixtures.map(fixture => (
-            <React.Fragment key={fixture.fixtureId}>
+            <React.Fragment key={fixture.fixtureLocation}>
               <SingleSlotFixture
                 cutoutId={fixture.fixtureLocation}
                 deckDefinition={deckDef}
@@ -153,7 +158,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ))}
           {wasteChuteFixtures.map(fixture => (
             <WasteChuteFixture
-              key={fixture.fixtureId}
+              key={fixture.fixtureLocation}
               // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.fixtureLocation as typeof WASTE_CHUTE_CUTOUT}
               deckDefinition={deckDef}
