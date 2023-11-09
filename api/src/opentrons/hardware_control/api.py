@@ -284,7 +284,12 @@ class API(
             checked_loop,
             strict_attached_instruments,
         )
-        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(
+            backend,
+            loop=checked_loop,
+            config=checked_config,
+            feature_flags=feature_flags,
+        )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
