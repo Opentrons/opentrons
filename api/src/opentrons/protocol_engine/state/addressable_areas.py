@@ -30,7 +30,7 @@ class AddressableAreaState:
     loaded_addressable_areas_by_name: Dict[str, AddressableArea]
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
     deck_definition: DeckDefinitionV4
-    deck_config_loaded: bool
+    use_simulated_deck_config: bool
 
 
 # TODO make the below some sort of better type
@@ -66,7 +66,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
             deck_definition=deck_definition,
-            deck_config_loaded=self._config.use_simulated_deck_config,
+            use_simulated_deck_config=self._config.use_simulated_deck_config,
         )
 
     def handle_action(self, action: Action) -> None:
@@ -93,6 +93,34 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         elif isinstance(command.result, MoveToAddressableAreaResult):
             addressable_area_name = command.params.addressableAreaName
             self._check_location_is_addressable_area(addressable_area_name)
+
+    def _load_addressable_areas_from_deck_configuration(
+        self, deck_config: DeckConfiguration
+    ) -> List[AddressableArea]:
+        """Load all provided addressable areas with a valid deck configuration."""
+        # TODO uncomment once execute is hooked up with this properly
+        # assert (
+        #     len(deck_config) == 12
+        # ), f"{len(deck_config)} cutout fixture ids provided."
+        addressable_areas = []
+        for cutout_id, cutout_fixture_id in deck_config:
+            provided_addressable_areas = (
+                deck_configuration_provider.get_provided_addressable_area_names(
+                    cutout_fixture_id, cutout_id, self._deck_definition
+                )
+            )
+            cutout_position = deck_configuration_provider.get_cutout_position(
+                cutout_id, self._deck_definition
+            )
+            for addressable_area_name in provided_addressable_areas:
+                addressable_areas.append(
+                    deck_configuration_provider.get_addressable_area_from_name(
+                        addressable_area_name,
+                        cutout_position,
+                        self._deck_definition,
+                    )
+                )
+        return addressable_areas
 
     def _check_location_is_addressable_area(
         self, location: Union[DeckSlotLocation, AddressableAreaLocation, str]
@@ -123,34 +151,6 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             self._state.loaded_addressable_areas_by_name[
                 addressable_area.area_name
             ] = addressable_area
-
-    def _load_addressable_areas_from_deck_configuration(
-        self, deck_config: DeckConfiguration
-    ) -> List[AddressableArea]:
-        """Load all provided addressable areas with a valid deck configuration."""
-        # TODO uncomment once execute is hooked up with this properly
-        # assert (
-        #     len(deck_config) == 12
-        # ), f"{len(deck_config)} cutout fixture ids provided."
-        addressable_areas = []
-        for cutout_id, cutout_fixture_id in deck_config:
-            provided_addressable_areas = (
-                deck_configuration_provider.get_provided_addressable_area_names(
-                    cutout_fixture_id, cutout_id, self._deck_definition
-                )
-            )
-            cutout_position = deck_configuration_provider.get_cutout_position(
-                cutout_id, self._deck_definition
-            )
-            for addressable_area_name in provided_addressable_areas:
-                addressable_areas.append(
-                    deck_configuration_provider.get_addressable_area_from_name(
-                        addressable_area_name,
-                        cutout_position,
-                        self._deck_definition,
-                    )
-                )
-        return addressable_areas
 
     def _validate_addressable_area_for_simulation(
         self, addressable_area_name: str
@@ -197,7 +197,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
         """Get addressable area."""
-        if self._state.deck_config_loaded:
+        if self._state.use_simulated_deck_config:
             return self.get_loaded_addressable_area(addressable_area_name)
         else:
             return self.get_addressable_area_for_simulation(addressable_area_name)
