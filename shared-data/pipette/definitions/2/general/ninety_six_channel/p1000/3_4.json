@@ -29,17 +29,14 @@
       "distance": 10.0,
       "prep_move_distance": 9.0,
       "prep_move_speed": 10.0,
+      "connectTiprackDistanceMM": 7.0,
+
       "currentByTipCount": {
         "96": 1.5
       }
     }
   },
   "dropTipConfigurations": {
-    "plungerEject": {
-      "current": 1.5,
-      "speed": 5.5,
-      "distance": 10.8
-    },
     "camAction": {
       "current": 1.5,
       "speed": 5.5,
@@ -86,7 +83,6 @@
     "current": 0.8,
     "speed": 5
   },
-  "tipPresenceCheckDistanceMM": "8.0",
-  "connectTiprackDistanceMM": "7.0",
-  "endTipActionRetractDistanceMM": "2.0"
+  "tipPresenceCheckDistanceMM": 8.0,
+  "endTipActionRetractDistanceMM": 2.0
 }

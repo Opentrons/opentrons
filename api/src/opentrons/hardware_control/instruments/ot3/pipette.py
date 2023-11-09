@@ -509,14 +509,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         # TODO: put this in shared-data
         return 2 if self.channels > 8 else 1
 
-    @property
-    def connect_tiprack_distance_mm(self) -> float:
-        return self._config.connect_tiprack_distance_mm
-
-    @property
-    def end_tip_action_retract_distance_mm(self) -> float:
-        return self._config.end_tip_action_retract_distance_mm
-
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)

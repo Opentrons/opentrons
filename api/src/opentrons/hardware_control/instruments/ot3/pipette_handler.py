@@ -757,8 +757,8 @@ class OT3PipetteHandler:
         return TipActionSpec(
             tip_action_moves=tip_motor_moves,
             shake_off_moves=[],
-            z_distance_to_tiprack=(-1 * instrument.connect_tiprack_distance_mm),
-            ending_z_retract_distance=instrument.end_tip_action_retract_distance_mm,
+            z_distance_to_tiprack=(-1 * pick_up_config.connect_tiprack_distance_mm),
+            ending_z_retract_distance=instrument.config.end_tip_action_retract_distance_mm,
         )
 
     def plan_lt_pick_up_tip(

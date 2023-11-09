@@ -176,12 +176,16 @@ class CamActionPickUpTipConfiguration(BaseModel):
         ..., description="How far to move the cams to engage the rack"
     )
     prep_move_speed: float = Field(
-        ..., description="How fast to move the cams when engaging the rack"
+        ..., description="How fast to move the cams when moving to the rack"
     )
     current_by_tip_count: Dict[int, float] = Field(
         ...,
         description="A current dictionary look-up by partial tip configuration.",
         alias="currentByTipCount",
+    )
+    connect_tiprack_distance_mm: float = Field(
+        description="The distance to move the head down to connect with the tiprack before clamping.",
+        alias="connectTiprackDistanceMM",
     )
 
 
@@ -213,7 +217,7 @@ class CamActionDropTipConfiguration(BaseModel):
 
 
 class DropTipConfigurations(BaseModel):
-    plunger_eject: PlungerEjectDropTipConfiguration = Field(
+    plunger_eject: Optional[PlungerEjectDropTipConfiguration] = Field(
         description="Configuration for tip drop via plunger eject", alias="plungerEject"
     )
     cam_action: Optional[CamActionDropTipConfiguration] = Field(
@@ -315,14 +319,10 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance the high throughput tip motors will travel to check tip status.",
         alias="tipPresenceCheckDistanceMM",
     )
-    connect_tiprack_distance_mm: float = Field(
-        default=0,
-        description="The distance to move the head down to connect with the tiprack before clamping.",
-        alias="connectTiprackDistanceMM",
-    )
+
     end_tip_action_retract_distance_mm: float = Field(
-        default=0,
-        description="The distance to move the head up after a tip pickup or dropoff.",
+        default=0.0,
+        description="The distance to move the head up after a tip drop or pickup.",
         alias="endTipActionRetractDistanceMM",
     )
 

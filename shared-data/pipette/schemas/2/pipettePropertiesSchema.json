@@ -209,6 +209,9 @@
                 "distance": { "$ref": "#/definitions/positiveNumber" },
                 "currentByTipCount": {
                   "$ref": "#/definitions/currentByTipCount"
+                },
+                "connectTiprackDistanceMM": {
+                  "$ref": "#/definitions/positiveNumber"
                 }
               }
             }
@@ -268,15 +271,11 @@
       "description": "Display name of the pipette include model and generation number in readable format."
     },
     "tipPresenceCheckDistanceMM": {
-      "type": "string",
+      "$ref": "#/definitions/positiveNumber",
       "description": "The distance to move the gear motors down to check tip presence status."
     },
-    "connectTiprackDistanceMM": {
-      "type": "string",
-      "description": "The distance to move the z stage down to connect with the tiprack before clamping."
-    },
     "endTipActionRetractDistanceMM": {
-      "type": "string",
+      "$ref": "#/definitions/positiveNumber",
       "description": "The distance to move the z stage up after a tip pickup or dropoff."
     },
     "model": {

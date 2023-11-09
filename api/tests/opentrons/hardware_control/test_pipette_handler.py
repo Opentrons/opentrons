@@ -117,8 +117,7 @@ def test_plan_check_pick_up_tip_with_presses_argument(
     decoy.when(mock_pipette.pick_up_configurations.press_fit.distance).then_return(5)
     decoy.when(mock_pipette.pick_up_configurations.press_fit.increment).then_return(0)
     decoy.when(mock_pipette.pick_up_configurations.press_fit.speed).then_return(10)
-    decoy.when(mock_pipette.connect_tiprack_distance_mm).then_return(8)
-    decoy.when(mock_pipette.end_tip_action_retract_distance_mm).then_return(2)
+    decoy.when(mock_pipette.config.end_tip_action_retract_distance_mm).then_return(0)
     decoy.when(
         mock_pipette.pick_up_configurations.press_fit.current_by_tip_count
     ).then_return({1: 1.0})
@@ -166,6 +165,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
             prep_move_distance=19.0,
             prep_move_speed=10,
             currentByTipCount={96: 1.0},
+            connectTiprackDistanceMM=8,
         )
         if channels == 96
         else PressFitPickUpTipConfiguration(
@@ -179,8 +179,9 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.plunger_motor_current.run).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
     decoy.when(mock_pipette_ot3.channels).then_return(channels)
-    decoy.when(mock_pipette_ot3.connect_tiprack_distance_mm).then_return(8)
-    decoy.when(mock_pipette_ot3.end_tip_action_retract_distance_mm).then_return(2)
+    decoy.when(mock_pipette_ot3.config.end_tip_action_retract_distance_mm).then_return(
+        2
+    )
 
     if channels == 96:
         spec = subject_ot3.plan_ht_pick_up_tip(96)

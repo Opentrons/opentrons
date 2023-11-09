@@ -29,6 +29,7 @@
       "distance": 10.0,
       "prep_move_distance": 9.0,
       "prep_move_speed": 10.0,
+      "connectTiprackDistanceMM": 7.0,
       "currentByTipCount": {
         "96": 1.5
       }
@@ -86,7 +87,6 @@
     "current": 2.0,
     "speed": 5
   },
-  "tipPresenceCheckDistanceMM": "8.0",
-  "connectTiprackDistanceMM": "7.0",
-  "endTipActionRetractDistanceMM": "2.0"
+  "tipPresenceCheckDistanceMM": 8.0,
+  "endTipActionRetractDistanceMM": 2.0
 }

@@ -927,6 +927,10 @@ class PipetteHandlerProvider(Generic[MountType]):
     ):
         instrument = self.get_pipette(mount)
 
+        if not instrument.drop_configurations.plunger_eject:
+            raise CommandPreconditionViolated(
+                f"Pipette {instrument.name} on {mount.name} has no plunger eject configuration"
+            )
         bottom = instrument.plunger_positions.bottom
         droptip = instrument.plunger_positions.drop_tip
         speed = instrument.drop_configurations.plunger_eject.speed
