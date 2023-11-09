@@ -338,6 +338,7 @@ export const LabwarePositionCheckComponent = (
       <ExitConfirmation
         onGoBack={cancelExitLPC}
         onConfirmExit={confirmExitLPC}
+        shouldUseMetalProbe={shouldUseMetalProbe}
       />
     )
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
@@ -346,6 +347,7 @@ export const LabwarePositionCheckComponent = (
         {...movementStepProps}
         {...{ existingOffsets }}
         protocolName={protocolName}
+        shouldUseMetalProbe={shouldUseMetalProbe}
       />
     )
   } else if (
@@ -353,9 +355,21 @@ export const LabwarePositionCheckComponent = (
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = <CheckItem {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <CheckItem
+        {...currentStep}
+        {...movementStepProps}
+        shouldUseMetalProbe={shouldUseMetalProbe}
+      />
+    )
   } else if (currentStep.section === 'ATTACH_PROBE') {
-    modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <AttachProbe
+        {...currentStep}
+        {...movementStepProps}
+        isOnDevice={isOnDevice}
+      />
+    )
   } else if (currentStep.section === 'DETACH_PROBE') {
     modalContent = <DetachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {

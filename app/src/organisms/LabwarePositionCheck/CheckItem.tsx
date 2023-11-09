@@ -55,6 +55,7 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   handleJog: Jog
   isRobotMoving: boolean
   robotType: RobotType
+  shouldUseMetalProbe: boolean
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
@@ -73,6 +74,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     existingOffsets,
     setFatalError,
     robotType,
+    shouldUseMetalProbe,
   } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -431,9 +433,17 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
               t={t}
               i18nKey={
                 isOnDevice
-                  ? 'ensure_nozzle_is_above_tip_odd'
-                  : 'ensure_nozzle_is_above_tip_desktop'
+                  ? 'ensure_nozzle_position_odd'
+                  : 'ensure_nozzle_position_desktop'
               }
+              values={{
+                tip_type: shouldUseMetalProbe
+                  ? t('calibration_probe')
+                  : t('pipette_nozzle'),
+                item_location: isTiprack
+                  ? t('check_tip_location')
+                  : t('check_well_location'),
+              }}
               components={{ block: <StyledText as="p" />, bold: <strong /> }}
             />
           }
@@ -444,6 +454,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           handleJog={handleJog}
           initialPosition={initialPosition}
           existingOffset={existingOffset}
+          shouldUseMetalProbe={shouldUseMetalProbe}
         />
       ) : (
         <PrepareSpace
