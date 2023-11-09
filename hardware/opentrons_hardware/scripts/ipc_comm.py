@@ -6,6 +6,7 @@ import asyncio
 from opentrons_hardware.ipc import (
     ipc_dispatcher,
     IPCMessenger,
+    SOCKET_PATHNAMES,
 )
 from opentrons_hardware.ipc.types import (
     IPCProcess,
@@ -16,10 +17,9 @@ from opentrons_hardware.ipc.types import (
 
 def main(args):
     source = IPCProcess(args.process)
-    target = [IPCProcess(dest) for dest in args.target] if args.target else list(IPCProcess)
-    destination = [dest for dest in target if dest != source]
-    print(f"Starting {args.process} on {args.host}:{args.port}")
-    ipc_messenger = IPCMessenger(source, args.host, args.port, ipc_dispatcher)
+    path = args.path or SOCKET_PATHNAMES[source]
+    print(f"Starting {args.process} on {path}")
+    ipc_messenger = IPCMessenger(source, ipc_dispatcher, path=path)
 
     # send direct message if provided
     if args.message:
@@ -38,7 +38,9 @@ def main(args):
                 **args.message,
                 is_notification=args.notify,
             )
-        resp = asyncio.run(ipc_messenger.send(req, destination, notify=args.notify))
+
+        targets = [IPCProcess(proc) for proc in args.target]
+        resp = asyncio.run(ipc_messenger.send(req, targets, notify=args.notify))
         print(f"Resp: {resp}")
     else:
         asyncio.run(ipc_messenger.start())
@@ -46,8 +48,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("process", type=str)
-    parser.add_argument("--host", default='localhost')
-    parser.add_argument("--port", default=3999)
+    parser.add_argument("--path", type=str)
     parser.add_argument("--target", nargs="*")
     parser.add_argument("--message", type=json.loads)
     parser.add_argument("--notify", action='store_true')

@@ -23,7 +23,7 @@ from typing import (
     Awaitable,
 )
 
-from ipc_messenger import IPCProcess, IPCMessenger, ipc_dispatcher, JSONRPCDispatcher
+from opentrons_hardware.ipc import IPCProcess, IPCMessenger, ipc_dispatcher, JSONRPCDispatcher
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
@@ -235,7 +235,7 @@ class OT3API(
         self._loop = loop
 
         # initialize the ipc messenger and register self context
-        self._ipc_messenger = IPCMessenger(IPCProcess.HARDWARE, 'localhost', 4000, ipc_dispatcher)
+        self._ipc_messenger = IPCMessenger(IPCProcess.HARDWARE, ipc_dispatcher)
         self._ipc_messenger.add_context('self', self)
 
         def estop_cb(event: HardwareEvent) -> None:

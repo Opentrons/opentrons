@@ -3,7 +3,7 @@ import json
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union, Tuple, Iterable
 
-from .constants import JSONRPC_VERSION
+from .constants import JSONRPC_VERSION, SOCKET_PATH
 from .errors import (
     JSONRPCError,
     JSONRPCParseError,
@@ -24,12 +24,10 @@ class IPCProcess(Enum):
     SYSTEM_SERVER = "system_server"
 
 
-DESTINATION_PORT: Dict[IPCProcess, int] = {
-    IPCProcess.HARDWARE: 4000,
-    IPCProcess.ROBOT_SERVER: 4001,
-    IPCProcess.SYSTEM_SERVER: 4002,
+SOCKET_PATHNAMES: Dict[IPCProcess, str] = {
+    proc: f"{SOCKET_PATH}/{proc.value}.sock"
+    for proc in list(IPCProcess)
 }
-
 
 class JSONRPCRequest:
 
@@ -295,7 +293,7 @@ class JSONRPCBatchRequest(object):
     @property
     def json(self) -> str:
         """Serialized data for this object."""
-        return json.dumps([r.data for r in self.requests])
+        return json.dumps([r.dict for r in self.requests])
 
     def __iter__(self):
         """Iterator to handle multiple requests"""
@@ -313,7 +311,7 @@ class JSONRPCBatchResponse(object):
     @property
     def data(self) -> List[Any]:
         """The data contained within each response."""
-        return [r.data for r in self.responses]
+        return [r.dict for r in self.responses]
 
     @property
     def json(self) -> str:

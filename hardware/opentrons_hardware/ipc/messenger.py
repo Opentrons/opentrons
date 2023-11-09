@@ -16,7 +16,7 @@ from .types import (
     JSONRPCRequest,
     JSONRPCBatchRequest,
     JSONRPCResponse,
-    DESTINATION_PORT,
+    SOCKET_PATHNAMES,
 )
 
 log = logging.getLogger(__name__)
@@ -39,18 +39,15 @@ class IPCMessenger:
     def __init__(
         self,
         source: IPCProcess,
-        host: str,
-        port: int,
         dispatcher: JSONRPCDispatcher,
+        path: Optional[str] = None,
         context = None,
         target: Optional[IPCProcess] = None
     ) -> None:
         """Constructor."""
         self._source = source
-        self._host = host
-        self._port = port
         self._context = context
-        self._target = target or list(IPCProcess)
+        self._path = path or SOCKET_PATHNAMES[source]
 
         # register helper with the dispatcher
         self._dispatcher = dispatcher
@@ -60,8 +57,65 @@ class IPCMessenger:
 
         # state variables
         self._req_id = 0
+        self._clients: Dict[IPCProcess, Tuple[Any]] = {}
         self._server: Optional[asyncio.base_events.Server] = None
         self._online_process: Set[IPCProcess] = set()
+
+    @property
+    def clients(self) -> Set[IPCProcess]:
+        """IPCProcesses that are responding to ipc messages."""
+        return set(self._clients)
+
+    async def start(self) -> None:
+        """Creates and starts the ipc listener server."""
+        self._server = await asyncio.start_unix_server(self._on_connected, path=self._path)
+        # update list of online ipc processes and start the server
+        # await self.request_health()
+        await self._server.serve_forever()
+
+    async def _on_connected(
+        self,
+        reader: asyncio.StreamReader,
+        writer: asyncio.StreamWriter
+    ) -> None:
+        """Handler for data sent over asyncio sockets."""
+
+        # client sends its name when it connects
+        data = await reader.readline()
+        name = data.decode().strip()
+        logger.info(f"Client connected: {name}")
+        self._clients[name] = (reader, writer)
+        # writer.write("\n".encode())
+        await writer.drain()
+        await asyncio.sleep(2)
+
+        # monitor incoming
+        while True:
+            data = await reader.readline()
+            message = data.decode().strip()
+            if data:
+                # received a message, handle and respond
+                logger.info(f"Received IPC message: {message}")
+                response = await self._handler.handle(message)
+                if response:
+                    logger.debug(f"Sending IPC response: {response.json}")
+                    writer.write(response.json.encode() + b'\n')
+                    await writer.drain()
+            else:
+                # check if the connection is closed
+                try:
+                    writer.write("\n".encode())
+                    await writer.drain()
+                except ConnectionResetError:
+                    break
+                await asyncio.sleep(2)
+
+        # The client got disconnected
+        logger.info(f"Client disconnected: {name}")
+        writer.close()
+
+        # remove the client from list
+        del self._clients[name]
 
     def add_context(self, context_arg: str, context_obj: Any) -> Any:
         """Register a new context arg and its corresponding object."""
@@ -70,37 +124,6 @@ class IPCMessenger:
     def remove_context(self, context_arg: str) -> Optional[Any]:
         """Unregister a context arg."""
         return self._handler.remove_context(context_arg)
-
-    @property
-    def online_procs(self) -> Set[IPCProcess]:
-        """IPCProcesses that are responding to ipc messages."""
-        return self._online_process
-
-    async def start(self) -> None:
-        """Creates and starts the ipc listener server."""
-        self._server = await asyncio.start_server(self._handle_incoming, self._host, self._port)
-        # update list of online ipc processes and start the server
-        await self.request_health()
-        await self._server.serve_forever()
-
-    async def _handle_incoming(
-        self,
-        reader: asyncio.StreamReader,
-        writer: asyncio.StreamWriter
-    ) -> None:
-        """Handler for data sent over asyncio sockets."""
-        data = await reader.read()
-        message = data.decode()
-
-        # received a message, handle and respond
-        log.debug(f"Received IPC message: {message}")
-        response = await self._handler.handle(message)
-        if response:
-            log.debug(f"Sending IPC response: {response.json}")
-            writer.write(response.json.encode())
-            await writer.drain()
-        writer.close()
-        await writer.wait_closed()
 
     def __getattr__(self, method) -> Any:
         """This will let us call an IPC function as if it were part of this class."""
@@ -179,32 +202,38 @@ class IPCMessenger:
         self._req_id = self._req_id % 255
 
         response: Optional[JSONRPCResponse] = None
-        port = DESTINATION_PORT[target]
-        log.debug(f"Sending: {self._source.name} ({self._host}:{self._port}) -> {target.name} ({self._host}:{port})\n{request}")
+        # port = DESTINATION_PORT[target]
+        path = SOCKET_PATHNAMES[target]
+        logger.debug(f"Sending: {self._source.name} -> {target.name} \n{request}")
+
         try:
-            # open connection to the corresponding port
-            reader, writer = await asyncio.open_connection(self._host, port)
+            client = self._clients.get(target)
+            if client is None:
+                logger.debug(f"Re-connecting to {target}")
+                reader, writer = await asyncio.open_unix_connection(path=path)
+                msg = f"{self._source.value}\n"
+                writer.write(msg.encode())
+                await writer.drain()
+                await asyncio.sleep(1)
+            else:
+                # open connection to the corresponding port
+                reader, writer = client
 
             # send out message
-            writer.write(request.json.encode())
-
-            # we are done sending data so write EOF
-            writer.write_eof()
+            writer.write(request.json.encode() + b'\n')
             await writer.drain()
 
             # wait for the response if any
-            data = await reader.read()
-
-            # close the socket
-            writer.close()
-            await writer.wait_closed()
+            data = await reader.readline()
 
             # return the response
-            log.debug(f"Received IPC response: {data.decode()}")
+            logger.debug(f"Received IPC response: {data.decode()}")
+
+            # todo: deal with batch response
             response = JSONRPCResponse.from_json(data)
             response.request = request
         except OSError:
-            log.warning(f"{self._host}:{port} is probably offline")
+            log.warning(f"{target} is probably offline")
         except json.JSONDecodeError:
             log.error("Received invalid IPC response.")
         except Exception as e:

@@ -5,7 +5,7 @@ from .manager import JSONRPCResponseManager
 from .messenger import IPCMessenger
 from .types import (
     IPCProcess,
-    DESTINATION_PORT,
+    SOCKET_PATHNAMES,
     JSONRPCRequest,
     JSONRPCResponse,
 )
@@ -24,7 +24,7 @@ __all__ = [
     "JSONRPCResponseManager",
     "IPCMessenger",
     "IPCProcess",
-    "DESTINATION_PORT",
+    "SOCKET_PATHNAMES",
     "JSONRPCRequest",
     "JSONRPCResponse",
     "JSONRPCError",
