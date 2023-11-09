@@ -1,7 +1,7 @@
 """Control an active run with Actions."""
 import logging
 from datetime import datetime
-
+from typing import Optional
 from opentrons.protocol_engine import ProtocolEngineError
 from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
@@ -39,6 +39,7 @@ class RunController:
         action_id: str,
         action_type: RunActionType,
         created_at: datetime,
+        action_payload: Optional[DeckConfigurationType],
     ) -> RunAction:
         """Create a run action.
 
@@ -69,7 +70,12 @@ class RunController:
                     # TODO(mc, 2022-05-13): engine_store.runner.run could raise
                     # the same errors as runner.play, but we are unable to catch them.
                     # This unlikely to occur in production, but should be addressed.
-                    self._task_runner.run(self._run_protocol_and_insert_result)
+                    assert isinstance(
+                        action_payload, DeckConfigurationType
+                    ), "Received invalid deck configuration"
+                    self._task_runner.run(
+                        self._run_protocol_and_insert_result, action_payload
+                    )
 
             elif action_type == RunActionType.PAUSE:
                 log.info(f'Pausing run "{self._run_id}".')
@@ -84,10 +90,15 @@ class RunController:
 
         self._run_store.insert_action(run_id=self._run_id, action=action)
 
+        # TODO (spp, 2023-11-09): I think the response should also containt the action payload
         return action
 
-    async def _run_protocol_and_insert_result(self) -> None:
-        result = await self._engine_store.runner.run()
+    async def _run_protocol_and_insert_result(
+        self, deck_configuration: DeckConfigurationType
+    ) -> None:
+        result = await self._engine_store.runner.run(
+            deck_configuration=deck_configuration
+        )
         self._run_store.update_run_state(
             run_id=self._run_id,
             summary=result.state_summary,

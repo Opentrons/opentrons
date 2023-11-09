@@ -27,12 +27,10 @@ class DeckConfigurationStore:
         return models.DeckConfigurationResponse.construct(
             cutoutFixtures=self._cutoutFixtures, lastUpdatedAt=self._last_updated_at
         )
+
     def get_cutoutFixtures(self) -> DeckConfigurationType:
         """Get the robot's current deck configuration in an expected typing."""
         deck_configuration: DeckConfigurationType = []
         for item in self._cutoutFixtures:
             deck_configuration.append(Tuple[item.cutoutFixtureId, item.cutoutId])
         return deck_configuration
-
-
-

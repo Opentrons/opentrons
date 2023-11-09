@@ -18,7 +18,6 @@ from .addressable_areas import (
     AddressableAreaState,
     AddressableAreaStore,
     AddressableAreaView,
-    DeckConfiguration,
 )
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
@@ -29,6 +28,7 @@ from .geometry import GeometryView
 from .motion import MotionView
 from .config import Config
 from .state_summary import StateSummary
+from ..types import DeckConfigurationType
 
 ReturnT = TypeVar("ReturnT")
 
@@ -145,7 +145,7 @@ class StateStore(StateView, ActionHandler):
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
-        deck_configuration: Optional[DeckConfiguration] = None,
+        deck_configuration: Optional[DeckConfigurationType] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 

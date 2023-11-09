@@ -41,7 +41,9 @@ from ..engine_store import EngineConflictError
 from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..dependencies import get_run_data_manager, get_run_auto_deleter
 
-from robot_server.deck_configuration.fastapi_dependencies import get_deck_configuration_store
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
 
@@ -138,7 +140,9 @@ async def create_run(
     created_at: datetime = Depends(get_current_time),
     run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
     check_estop: bool = Depends(require_estop_in_good_state),
-    deck_configuration_store: DeckConfigurationStore = Depends(get_deck_configuration_store)
+    deck_configuration_store: DeckConfigurationStore = Depends(
+        get_deck_configuration_store
+    ),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 

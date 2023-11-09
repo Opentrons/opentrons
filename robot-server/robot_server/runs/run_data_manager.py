@@ -22,6 +22,7 @@ from .run_models import Run
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
+
 def _build_run(
     run_resource: RunResource,
     state_summary: Optional[StateSummary],

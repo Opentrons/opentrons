@@ -10,10 +10,7 @@ from opentrons.util.async_helpers import async_context_manager_in_thread
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, ModuleDataProvider
 from .state import Config, StateStore
-from .types import PostRunHardwareState
-
-# TODO move this type to a better location
-from .state.addressable_areas import DeckConfiguration
+from .types import PostRunHardwareState, DeckConfigurationType
 
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
@@ -22,7 +19,7 @@ async def create_protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
     load_fixed_trash: bool = False,
-    deck_configuration: typing.Optional[DeckConfiguration] = None,
+    deck_configuration: typing.Optional[DeckConfigurationType] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 

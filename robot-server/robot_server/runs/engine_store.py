@@ -33,8 +33,9 @@ from opentrons.protocol_engine import (
 
 from robot_server.protocols import ProtocolResource
 
-#tbd cleanup this import
+# tbd cleanup this import
 from opentrons.protocol_engine.types import DeckConfigurationType
+
 
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
@@ -174,7 +175,7 @@ class EngineStore:
         else:
             load_fixed_trash = False
 
-        #convert the robot server deck config type to a list of tupled strings and pass to create protocol engine
+        # convert the robot server deck config type to a list of tupled strings and pass to create protocol engine
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(

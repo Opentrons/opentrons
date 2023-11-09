@@ -11,6 +11,10 @@ from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.robot.control.dependencies import require_estop_in_good_state
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
 
 from ..engine_store import EngineStore
 from ..run_store import RunStore
@@ -82,11 +86,15 @@ async def get_run_controller(
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
+    engine_store: EngineStore = Depends(get_engine_store),
     run_controller: RunController = Depends(get_run_controller),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
     maintenance_engine_store: MaintenanceEngineStore = Depends(
         get_maintenance_engine_store
+    ),
+    deck_configuration_store: DeckConfigurationStore = Depends(
+        get_deck_configuration_store
     ),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[RunAction]]:
@@ -103,6 +111,7 @@ async def create_run_action(
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
         maintenance_engine_store: The maintenance run's EngineStore
+        deck_configuration_store: The deck configuration store
         check_estop: Dependency to verify the estop is in a valid state.
     """
     action_type = request_body.data.actionType
@@ -112,10 +121,13 @@ async def create_run_action(
     ):
         await maintenance_engine_store.clear()
     try:
+        if action_type == RunActionType.PLAY:
+            deck_configuration = get_deck_configuration_store().get_cutoutFixtures()
         action = run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
+            action_payload=deck_configuration,
         )
 
     except RunActionNotAllowedError as e:

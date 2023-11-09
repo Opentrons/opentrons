@@ -23,6 +23,7 @@ class PlayAction:
     """Start or resume processing commands in the engine."""
 
     requested_at: datetime
+    deck_configuration: Optional[DeckConfigurationType]
 
 
 class PauseSource(str, Enum):
@@ -138,10 +139,10 @@ class AddLabwareOffsetAction:
     request: LabwareOffsetCreate
 
 
-class UpdateDeckConfigurationAction:
-    """Update the existing deck configuration."""
-    deck_configuration: DeckConfigurationType
-    created_at: datetime
+# class UpdateDeckConfigurationAction:
+#     """Update the existing deck configuration."""
+#     deck_configuration: DeckConfigurationType
+#     created_at: datetime
 
 
 @dataclass(frozen=True)
