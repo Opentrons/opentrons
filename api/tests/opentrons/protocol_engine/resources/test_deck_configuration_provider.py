@@ -1,5 +1,5 @@
 """Test deck configuration provider."""
-from typing import Set
+from typing import List, Set
 
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
@@ -11,6 +11,7 @@ from opentrons.protocol_engine.errors import (
     FixtureDoesNotExistError,
     CutoutDoesNotExistError,
     AddressableAreaDoesNotExistError,
+    FixtureDoesNotProvideAreasError,
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
@@ -48,6 +49,44 @@ def ot3_standard_deck_def() -> DeckDefinitionV4:
 
 
 @pytest.mark.parametrize(
+    ("cutout_id", "expected_deck_point", "deck_def"),
+    [
+        (
+            "cutout5",
+            DeckPoint(x=132.5, y=90.5, z=0.0),
+            lazy_fixture("ot2_standard_deck_def"),
+        ),
+        (
+            "cutout5",
+            DeckPoint(x=132.5, y=90.5, z=0.0),
+            lazy_fixture("ot2_short_trash_deck_def"),
+        ),
+        (
+            "cutoutC2",
+            DeckPoint(x=164.0, y=107, z=0.0),
+            lazy_fixture("ot3_standard_deck_def"),
+        ),
+    ],
+)
+def test_get_cutout_position(
+    cutout_id: str,
+    expected_deck_point: DeckPoint,
+    deck_def: DeckDefinitionV4,
+) -> None:
+    """It should get the deck position for the requested cutout id."""
+    cutout_position = subject.get_cutout_position(cutout_id, deck_def)
+    assert cutout_position == expected_deck_point
+
+
+def test_get_cutout_position_raises(
+    ot3_standard_deck_def: DeckDefinitionV4,
+) -> None:
+    """It should raise if there is no cutout with that ID in the deck definition."""
+    with pytest.raises(CutoutDoesNotExistError):
+        subject.get_cutout_position("theFunCutout", ot3_standard_deck_def)
+
+
+@pytest.mark.parametrize(
     ("cutout_fixture_id", "expected_display_name", "deck_def"),
     [
         ("singleStandardSlot", "Standard Slot", lazy_fixture("ot2_standard_deck_def")),
@@ -63,22 +102,68 @@ def ot3_standard_deck_def() -> DeckDefinitionV4:
         ),
     ],
 )
-def test_get_cutout_fixture_by_id(
+def test_get_cutout_fixture(
     cutout_fixture_id: str,
     expected_display_name: str,
     deck_def: DeckDefinitionV4,
 ) -> None:
     """It should get the cutout fixture given the cutout fixture id."""
-    cutout_fixture = subject.get_cutout_fixture_by_id(cutout_fixture_id, deck_def)
+    cutout_fixture = subject.get_cutout_fixture(cutout_fixture_id, deck_def)
     assert cutout_fixture["displayName"] == expected_display_name
 
 
-def test_get_cutout_fixture_by_id_raises(
+def test_get_cutout_fixture_raises(
     ot3_standard_deck_def: DeckDefinitionV4,
 ) -> None:
     """It should raise if the given cutout fixture id does not exist."""
     with pytest.raises(FixtureDoesNotExistError):
-        subject.get_cutout_fixture_by_id("the_fun_fixture", ot3_standard_deck_def)
+        subject.get_cutout_fixture("theFunFixture", ot3_standard_deck_def)
+
+
+@pytest.mark.parametrize(
+    ("cutout_fixture_id", "cutout_id", "expected_areas", "deck_def"),
+    [
+        (
+            "singleStandardSlot",
+            "cutout1",
+            ["1"],
+            lazy_fixture("ot2_standard_deck_def"),
+        ),
+        (
+            "singleStandardSlot",
+            "cutout1",
+            ["1"],
+            lazy_fixture("ot2_short_trash_deck_def"),
+        ),
+        (
+            "stagingAreaRightSlot",
+            "cutoutD3",
+            ["D3", "D4"],
+            lazy_fixture("ot3_standard_deck_def"),
+        ),
+    ],
+)
+def test_get_provided_addressable_area_names(
+    cutout_fixture_id: str,
+    cutout_id: str,
+    expected_areas: List[str],
+    deck_def: DeckDefinitionV4,
+) -> None:
+    """It should get the provided addressable area for the cutout fixture and cutout."""
+    provided_addressable_areas = subject.get_provided_addressable_area_names(
+        cutout_fixture_id, cutout_id, deck_def
+    )
+    assert provided_addressable_areas == expected_areas
+
+
+def test_get_provided_addressable_area_raises(
+    ot3_standard_deck_def: DeckDefinitionV4,
+) -> None:
+    """It should raise if the cutout fixture does not provide areas for the given cutout id."""
+    with pytest.raises(FixtureDoesNotProvideAreasError):
+        subject.get_provided_addressable_area_names(
+            "singleRightSlot", "theFunCutout", ot3_standard_deck_def
+        )
 
 
 @pytest.mark.parametrize(
@@ -145,45 +230,7 @@ def test_get_potential_cutout_fixtures_raises(
 ) -> None:
     """It should raise if there is no fixtures that provide the requested area."""
     with pytest.raises(AssertionError):
-        subject.get_potential_cutout_fixtures("the_fun_area", ot3_standard_deck_def)
-
-
-@pytest.mark.parametrize(
-    ("cutout_id", "expected_deck_point", "deck_def"),
-    [
-        (
-            "cutout5",
-            DeckPoint(x=132.5, y=90.5, z=0.0),
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "cutout5",
-            DeckPoint(x=132.5, y=90.5, z=0.0),
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "cutoutC2",
-            DeckPoint(x=164.0, y=107, z=0.0),
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
-def test_get_cutout_position(
-    cutout_id: str,
-    expected_deck_point: DeckPoint,
-    deck_def: DeckDefinitionV4,
-) -> None:
-    """It should get the deck position for the requested cutout id."""
-    cutout_position = subject.get_cutout_position(cutout_id, deck_def)
-    assert cutout_position == expected_deck_point
-
-
-def test_get_cutout_position_raises(
-    ot3_standard_deck_def: DeckDefinitionV4,
-) -> None:
-    """It should raise if there is no cutout with that ID in the deck definition."""
-    with pytest.raises(CutoutDoesNotExistError):
-        subject.get_cutout_position("the_fun_cutout", ot3_standard_deck_def)
+        subject.get_potential_cutout_fixtures("theFunArea", ot3_standard_deck_def)
 
 
 # TODO put in fixed trash for OT2 decks
@@ -275,5 +322,5 @@ def test_get_addressable_area_from_name_raises(
     """It should raise if there is no addressable area by that name in the deck."""
     with pytest.raises(AddressableAreaDoesNotExistError):
         subject.get_addressable_area_from_name(
-            "the_fun_area", DeckPoint(x=1, y=2, z=3), ot3_standard_deck_def
+            "theFunArea", DeckPoint(x=1, y=2, z=3), ot3_standard_deck_def
         )

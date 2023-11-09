@@ -19,7 +19,17 @@ from ..errors import (
 )
 
 
-def get_cutout_fixture_by_id(
+def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV4) -> DeckPoint:
+    """Get the base position of a cutout on the deck."""
+    for cutout in deck_definition["locations"]["cutouts"]:
+        if cutout_id == cutout["id"]:
+            position = cutout["position"]
+            return DeckPoint(x=position[0], y=position[1], z=position[2])
+    else:
+        raise CutoutDoesNotExistError(f"Could not find cutout with name {cutout_id}")
+
+
+def get_cutout_fixture(
     cutout_fixture_id: str, deck_definition: DeckDefinitionV4
 ) -> CutoutFixture:
     """Gets cutout fixture from deck that matches the cutout fixture ID provided."""
@@ -29,6 +39,19 @@ def get_cutout_fixture_by_id(
     raise FixtureDoesNotExistError(
         f"Could not find cutout fixture with name {cutout_fixture_id}"
     )
+
+
+def get_provided_addressable_area_names(
+    cutout_fixture_id: str, cutout_id: str, deck_definition: DeckDefinitionV4
+) -> List[str]:
+    """Gets a list of the addressable areas provided by the cutout fixture on the cutout."""
+    cutout_fixture = get_cutout_fixture(cutout_fixture_id, deck_definition)
+    try:
+        return cutout_fixture["providesAddressableAreas"][cutout_id]
+    except KeyError:
+        raise FixtureDoesNotProvideAreasError(
+            f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
+        )
 
 
 def get_potential_cutout_fixtures(
@@ -56,16 +79,6 @@ def get_potential_cutout_fixtures(
     cutout_id = potential_fixtures[0].cutout_id
     assert all(cutout_id == fixture.cutout_id for fixture in potential_fixtures)
     return cutout_id, set(potential_fixtures)
-
-
-def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV4) -> DeckPoint:
-    """Get the base position of a cutout on the deck."""
-    for cutout in deck_definition["locations"]["cutouts"]:
-        if cutout_id == cutout["id"]:
-            position = cutout["position"]
-            return DeckPoint(x=position[0], y=position[1], z=position[2])
-    else:
-        raise CutoutDoesNotExistError(f"Could not find cutout with name {cutout_id}")
 
 
 def get_addressable_area_from_name(
@@ -121,24 +134,3 @@ def get_addressable_area_from_name(
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"
     )
-
-
-def get_addressable_areas_from_cutout_and_cutout_fixture(
-    cutout_id: str, cutout_fixture: CutoutFixture, deck_definition: DeckDefinitionV4
-) -> List[AddressableArea]:
-    """Get all provided addressable areas for a given cutout fixture and associated cutout."""
-    base_position = get_cutout_position(cutout_id, deck_definition)
-
-    try:
-        provided_areas = cutout_fixture["providesAddressableAreas"][cutout_id]
-    except KeyError:
-        raise FixtureDoesNotProvideAreasError(
-            f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
-        )
-
-    return [
-        get_addressable_area_from_name(
-            addressable_area_name, base_position, deck_definition
-        )
-        for addressable_area_name in provided_areas
-    ]

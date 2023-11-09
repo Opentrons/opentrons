@@ -134,15 +134,22 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         # ), f"{len(deck_config)} cutout fixture ids provided."
         addressable_areas = []
         for cutout_id, cutout_fixture_id in deck_config:
-            # TODO potentially make this more performant rather than iterating through cutout fixtures every loop
-            cutout_fixture = deck_configuration_provider.get_cutout_fixture_by_id(
-                cutout_fixture_id, self._deck_definition
-            )
-            addressable_areas.extend(
-                deck_configuration_provider.get_addressable_areas_from_cutout_and_cutout_fixture(
-                    cutout_id, cutout_fixture, self._deck_definition
+            provided_addressable_areas = (
+                deck_configuration_provider.get_provided_addressable_area_names(
+                    cutout_fixture_id, cutout_id, self._deck_definition
                 )
             )
+            cutout_position = deck_configuration_provider.get_cutout_position(
+                cutout_id, self._deck_definition
+            )
+            for addressable_area_name in provided_addressable_areas:
+                addressable_areas.append(
+                    deck_configuration_provider.get_addressable_area_from_name(
+                        addressable_area_name,
+                        cutout_position,
+                        self._deck_definition,
+                    )
+                )
         return addressable_areas
 
     def _validate_addressable_area_for_simulation(
