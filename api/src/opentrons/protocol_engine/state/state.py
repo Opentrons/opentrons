@@ -18,6 +18,7 @@ from .addressable_areas import (
     AddressableAreaState,
     AddressableAreaStore,
     AddressableAreaView,
+    DeckConfiguration,
 )
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
@@ -144,6 +145,7 @@ class StateStore(StateView, ActionHandler):
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
+        deck_configuration: Optional[DeckConfiguration] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -159,8 +161,10 @@ class StateStore(StateView, ActionHandler):
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
+        if deck_configuration is None:
+            deck_configuration = []
         self._addressable_area_store = AddressableAreaStore(
-            deck_configuration=[],  # TODO feed this the real list of cutouts/cutout fixtures later
+            deck_configuration=deck_configuration,
             config=config,
             deck_definition=deck_definition,
         )
