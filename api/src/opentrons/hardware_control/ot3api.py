@@ -371,7 +371,6 @@ class OT3API(
     @classmethod
     async def build_hardware_controller(
         cls,
-        feature_flags: HardwareFeatureFlags,
         attached_instruments: Optional[
             Dict[Union[top_types.Mount, OT3Mount], Dict[str, Optional[str]]]
         ] = None,
@@ -382,6 +381,7 @@ class OT3API(
         use_usb_bus: bool = False,
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
+        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)

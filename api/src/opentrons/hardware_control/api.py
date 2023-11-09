@@ -169,11 +169,11 @@ class API(
     @classmethod  # noqa: C901
     async def build_hardware_controller(
         cls,
-        feature_flags: HardwareFeatureFlags,
         config: Union[RobotConfig, OT3Config, None] = None,
         port: Optional[str] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         firmware: Optional[Tuple[pathlib.Path, str]] = None,
+        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
     ) -> "API":
         """Build a hardware controller that will actually talk to hardware.
 

@@ -191,7 +191,10 @@ async def test_cache_instruments_hc(
     is_robot,
     cntrlr_mock_connect,
 ):
-    hw_api_cntrlr = await API.build_hardware_controller(loop=asyncio.get_running_loop())
+    hw_api_cntrlr = await API.build_hardware_controller(
+        loop=asyncio.get_running_loop(),
+        feature_flags=HardwareFeatureFlags.build_from_ff(),
+    )
 
     async def mock_driver_model(mount):
         attached_pipette = {"left": LEFT_PIPETTE_MODEL, "right": None}
