@@ -93,7 +93,7 @@ const getLabwareLocation = (
     )
   ) {
     return {
-      addressableArea: 'gripperWasteChute',
+      addressableAreaName: 'gripperWasteChute',
     }
   } else {
     return { slotName: newLocationString }

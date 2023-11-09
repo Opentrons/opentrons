@@ -3,7 +3,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   LabwareMovementStrategy,
   THERMOCYCLER_MODULE_TYPE,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import * as warningCreators from '../../warningCreators'
