@@ -310,25 +310,3 @@ export const pickUpTipHelper = (
     wellName: typeof tip === 'string' ? tip : tiprackWellNamesFlat[tip],
   },
 })
-export const dropTipInPlaceHelper = (params?: {
-  pipetteId?: string
-}): CreateCommand => ({
-  commandType: 'dropTipInPlace',
-  key: expect.any(String),
-  params: {
-    pipetteId: DEFAULT_PIPETTE,
-    ...params,
-  },
-})
-export const moveToAddressableAreaHelper = (params?: {
-  pipetteId?: string
-  addressableAreaName: string
-}): CreateCommand => ({
-  commandType: 'moveToAddressableArea',
-  key: expect.any(String),
-  params: {
-    pipetteId: DEFAULT_PIPETTE,
-    addressableAreaName: '1and8ChannelWasteChute',
-    ...params,
-  },
-})

@@ -10,7 +10,6 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
-  wasteChuteCommandsUtil,
 } from '../../utils'
 import type {
   CommandCreatorError,
@@ -99,9 +98,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[dropTipLocation] != null
-
   if (!labwareDef) {
     return {
       errors: [
@@ -162,35 +158,17 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const addressableAreaName =
-    pipetteSpec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
-
-  const commandCreators: CurriedCommandCreator[] = isWasteChute
-    ? [
-        curryCommandCreator(wasteChuteCommandsUtil, {
-          type: 'dropTip',
-          pipetteId: pipette,
-          addressableAreaName,
-        }),
-        curryCommandCreator(_pickUpTip, {
-          pipette,
-          tiprack: nextTiprack.tiprackId,
-          well: nextTiprack.well,
-        }),
-      ]
-    : [
-        curryCommandCreator(dropTip, {
-          pipette,
-          dropTipLocation,
-        }),
-        curryCommandCreator(_pickUpTip, {
-          pipette,
-          tiprack: nextTiprack.tiprackId,
-          well: nextTiprack.well,
-        }),
-      ]
+  const commandCreators: CurriedCommandCreator[] = [
+    curryCommandCreator(dropTip, {
+      pipette,
+      dropTipLocation,
+    }),
+    curryCommandCreator(_pickUpTip, {
+      pipette,
+      tiprack: nextTiprack.tiprackId,
+      well: nextTiprack.well,
+    }),
+  ]
 
   return reduceCommandCreators(
     commandCreators,
