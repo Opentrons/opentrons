@@ -64,7 +64,7 @@ describe('getUnusedTrash', () => {
           commandType: 'moveToAddressableArea',
           params: {
             pipetteId: 'mockId',
-            addressableAreaName: '1andChannel8WasteChute',
+            addressableAreaName: '1and8ChannelWasteChute',
           },
         },
       },

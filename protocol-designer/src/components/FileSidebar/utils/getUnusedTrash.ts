@@ -39,7 +39,7 @@ export const getUnusedTrash = (
       ? commands?.some(
           command =>
             command.commandType === 'moveToAddressableArea' &&
-            (command.params.addressableAreaName === '1andChannel8WasteChute' ||
+            (command.params.addressableAreaName === '1and8ChannelWasteChute' ||
               command.params.addressableAreaName === 'gripperWasteChute' ||
               command.params.addressableAreaName === '96ChannelWasteChute')
         )
