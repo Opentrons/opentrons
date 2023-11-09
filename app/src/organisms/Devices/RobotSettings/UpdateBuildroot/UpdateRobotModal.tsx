@@ -23,6 +23,7 @@ import {
   UPGRADE,
   REINSTALL,
   DOWNGRADE,
+  getRobotUpdateVersion,
 } from '../../../../redux/robot-update'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
@@ -35,8 +36,8 @@ import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hook
 import type { State, Dispatch } from '../../../../redux/types'
 import type { RobotSystemType } from '../../../../redux/robot-update/types'
 
-export const RELEASE_NOTES_URL =
-  'https://github.com/Opentrons/opentrons/releases'
+export const RELEASE_NOTES_URL_BASE =
+  'https://github.com/Opentrons/opentrons/releases/tag/v'
 
 const UpdateAppBanner = styled(Banner)`
   border: none;
@@ -78,6 +79,10 @@ export function UpdateRobotModal({
     return getRobotUpdateDisplayInfo(state, robotName)
   })
   const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const robotUpdateVersion = useSelector((state: State) => {
+    return getRobotUpdateVersion(state, robotName) ?? ''
+  })
+
   const isRobotBusy = useIsRobotBusy()
   const updateDisabled = updateFromFileDisabledReason !== null || isRobotBusy
 
@@ -105,7 +110,7 @@ export function UpdateRobotModal({
   const robotUpdateFooter = (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <ExternalLink
-        href={RELEASE_NOTES_URL}
+        href={`${RELEASE_NOTES_URL_BASE}${robotUpdateVersion}`}
         css={css`
           font-size: 0.875rem;
         `}

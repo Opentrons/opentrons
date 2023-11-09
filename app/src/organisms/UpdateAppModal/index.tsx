@@ -19,6 +19,7 @@ import {
 
 import {
   getShellUpdateState,
+  getAvailableShellUpdate,
   downloadShellUpdate,
   applyShellUpdate,
 } from '../../redux/shell'
@@ -58,8 +59,8 @@ const PlaceholderError = ({
     </>
   )
 }
-export const RELEASE_NOTES_URL =
-  'https://github.com/Opentrons/opentrons/releases'
+export const RELEASE_NOTES_URL_BASE =
+  'https://github.com/Opentrons/opentrons/releases/tag/v'
 const UPDATE_ERROR = 'Update Error'
 const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
@@ -108,6 +109,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { t } = useTranslation('app_settings')
   const history = useHistory()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
+  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
 
   if (downloaded)
     setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
@@ -122,7 +124,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const appUpdateFooter = (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <ExternalLink
-        href={RELEASE_NOTES_URL}
+        href={`${RELEASE_NOTES_URL_BASE}${availableAppUpdateVersion}`}
         css={css`
           font-size: 0.875rem;
         `}

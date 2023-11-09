@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import * as Shell from '../../../redux/shell'
 import { useRemoveActiveAppUpdateToast } from '../../Alerts'
-import { UpdateAppModal, UpdateAppModalProps, RELEASE_NOTES_URL } from '..'
+import { UpdateAppModal, UpdateAppModalProps, RELEASE_NOTES_URL_BASE } from '..'
 
 import type { State } from '../../../redux/types'
 import type { ShellUpdateState } from '../../../redux/shell/types'
@@ -35,6 +35,9 @@ const mockUseRemoveActiveAppUpdateToast = useRemoveActiveAppUpdateToast as jest.
 const render = (props: React.ComponentProps<typeof UpdateAppModal>) => {
   return renderWithProviders(<UpdateAppModal {...props} />, {
     i18nInstance: i18n,
+    initialState: {
+      shell: { update: { info: { version: '7.0.0' }, available: true } },
+    },
   })
 }
 
@@ -83,7 +86,7 @@ describe('UpdateAppModal', () => {
     const [{ getByText }] = render(props)
 
     const link = getByText('Release notes')
-    expect(link).toHaveAttribute('href', RELEASE_NOTES_URL)
+    expect(link).toHaveAttribute('href', RELEASE_NOTES_URL_BASE + '7.0.0')
   })
 
   it('shows error modal on error', () => {
