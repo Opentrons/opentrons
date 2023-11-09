@@ -4,6 +4,8 @@ from typing import Dict, Set, Union, List, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
+from opentrons.types import Point
+
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -34,7 +36,7 @@ class AddressableAreaState:
 
 
 # TODO make the below some sort of better type
-DeckConfiguration = List[Tuple[str, str]]
+DeckConfiguration = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id
 
 
 class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
@@ -241,4 +243,15 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         )
         return deck_configuration_provider.get_addressable_area_from_name(
             addressable_area_name, cutout_position, self._state.deck_definition
+        )
+
+    def get_addressable_area_center(self, addressable_area_name: str) -> Point:
+        """Get the (x, y, z) position of the center of the area."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        position = addressable_area.position
+        bounding_box = addressable_area.bounding_box
+        return Point(
+            x=position.x + bounding_box.x / 2,
+            y=position.y + bounding_box.y / 2,
+            z=position.z,
         )

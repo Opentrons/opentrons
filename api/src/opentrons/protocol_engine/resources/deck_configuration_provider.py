@@ -91,9 +91,9 @@ def get_addressable_area_from_name(
         if addressable_area["id"] == addressable_area_name:
             area_offset = addressable_area["offsetFromCutoutFixture"]
             position = AddressableOffsetVector(
-                x=cutout_position.x + area_offset[0],
-                y=cutout_position.y + area_offset[1],
-                z=cutout_position.z + area_offset[2],
+                x=area_offset[0] + cutout_position.x,
+                y=area_offset[1] + cutout_position.y,
+                z=area_offset[2] + cutout_position.z,
             )
             bounding_box = Dimensions(
                 x=addressable_area["boundingBox"]["xDimension"],
@@ -104,9 +104,9 @@ def get_addressable_area_from_name(
             drop_tips_offset: Optional[LabwareOffsetVector]
             if drop_tips_deck_offset:
                 drop_tips_offset = LabwareOffsetVector(
-                    x=drop_tips_deck_offset[0],
-                    y=drop_tips_deck_offset[1],
-                    z=drop_tips_deck_offset[2],
+                    x=drop_tips_deck_offset[0] + cutout_position.x,
+                    y=drop_tips_deck_offset[1] + cutout_position.y,
+                    z=drop_tips_deck_offset[2] + cutout_position.z,
                 )
             else:
                 drop_tips_offset = None
@@ -115,9 +115,9 @@ def get_addressable_area_from_name(
             drop_labware_offset: Optional[LabwareOffsetVector]
             if drop_labware_deck_offset:
                 drop_labware_offset = LabwareOffsetVector(
-                    x=drop_labware_deck_offset[0],
-                    y=drop_labware_deck_offset[1],
-                    z=drop_labware_deck_offset[2],
+                    x=drop_labware_deck_offset[0] + cutout_position.x,
+                    y=drop_labware_deck_offset[1] + cutout_position.y,
+                    z=drop_labware_deck_offset[2] + cutout_position.z,
                 )
             else:
                 drop_labware_offset = None

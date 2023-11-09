@@ -40,6 +40,7 @@ from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.pipettes import PipetteView, StaticPipetteConfig
+from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 
 
@@ -61,6 +62,12 @@ def mock_pipette_view(decoy: Decoy) -> PipetteView:
     return decoy.mock(cls=PipetteView)
 
 
+@pytest.fixture
+def mock_addressable_area_view(decoy: Decoy) -> AddressableAreaView:
+    """Get a mock in the shape of a AddressableAreaView."""
+    return decoy.mock(cls=AddressableAreaView)
+
+
 @pytest.fixture(autouse=True)
 def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock out move_types.py functions."""
@@ -70,7 +77,10 @@ def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 @pytest.fixture
 def subject(
-    labware_view: LabwareView, module_view: ModuleView, mock_pipette_view: PipetteView
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    mock_pipette_view: PipetteView,
+    mock_addressable_area_view: AddressableAreaView,
 ) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
     return GeometryView(
@@ -81,6 +91,7 @@ def subject(
         labware_view=labware_view,
         module_view=module_view,
         pipette_view=mock_pipette_view,
+        addressable_area_view=mock_addressable_area_view,
     )
 
 

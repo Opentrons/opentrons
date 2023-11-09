@@ -675,6 +675,7 @@ class AddressableArea:
     position: AddressableOffsetVector
     compatible_module_types: List[ModuleType]
     # TODO make LabwareOffsetVector a different type? Also do we need "ableToDropLabware" in the definition?
+    #   ALSO rename these to location, maybe make this type a Point and not vector
     drop_tip_offset: Optional[LabwareOffsetVector]
     drop_labware_offset: Optional[LabwareOffsetVector]
 
