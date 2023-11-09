@@ -1162,6 +1162,11 @@ export const labwareInvariantProperties: Reducer<
                 labwareDef.namespace === namespace &&
                 labwareDef.version === version
             )
+            if (labwareDefinitionMatch == null) {
+              console.error(
+                `expected to find labware definition match with loadname ${loadName} but could not`
+              )
+            }
             const labwareDefURI =
               labwareDefinitionMatch != null ? labwareDefinitionMatch[0] : ''
             const id = labwareId ?? ''

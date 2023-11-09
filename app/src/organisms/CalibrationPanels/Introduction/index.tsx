@@ -35,6 +35,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     instruments,
     supportedCommands,
     calInvalidationHandler,
+    allowChangeTipRack = false,
   } = props
   const { t } = useTranslation('robot_calibration')
 
@@ -167,7 +168,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       >
         <NeedHelpLink />
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ? (
+          {allowChangeTipRack ? (
             <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
               {t('change_tip_rack')}
             </SecondaryButton>

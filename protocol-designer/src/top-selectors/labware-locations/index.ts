@@ -132,7 +132,6 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         const labwareOnAdapter = Object.values(labware).find(
           temporalProperties => temporalProperties.slot === labwareId
         )
-
         const adapterSlot = labwareOnDeck.slot
         const modIdWithAdapter = Object.keys(modules).find(
           modId => modId === labwareOnDeck.slot

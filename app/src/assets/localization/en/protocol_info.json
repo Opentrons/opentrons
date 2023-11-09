@@ -3,7 +3,6 @@
   "browse_protocol_library": "Open Protocol Library",
   "cancel_run": "Cancel Run",
   "choose_file": "Choose File...",
-  "choose_protocol_file": "Choose File",
   "choose_snippet_type": "Choose the Labware Offset Data Python Snippet based on target execution environment.",
   "continue_proceed_to_calibrate": "Proceed to Calibrate",
   "continue_verify_calibrations": "Verify pipette and labware calibrations",
@@ -86,6 +85,7 @@
   "unpin_protocol": "Unpin protocol",
   "unpinned_protocol": "Unpinned protocol",
   "update_robot_for_custom_labware": "You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols",
+  "upload": "Upload",
   "upload_and_simulate": "Open a protocol to run on {{robot_name}}",
   "valid_file_types": "Valid file types: Python files (.py) or Protocol Designer files (.json)"
 }

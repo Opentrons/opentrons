@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
 import { Btn, Flex, Text } from '../../primitives'
@@ -58,15 +59,7 @@ export function WasteChuteConfigFixture(
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={COLORS.grey2}
-        borderRadius={BORDERS.radiusSoftCorners}
-        color={COLORS.white}
-        gridGap={SPACING.spacing8}
-        justifyContent={JUSTIFY_CENTER}
-        width="100%"
-      >
+      <Flex css={WASTE_CHUTE_CONFIG_STYLE}>
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
           {wasteChuteDef.metadata.displayName}
         </Text>
@@ -83,3 +76,25 @@ export function WasteChuteConfigFixture(
     </RobotCoordsForeignObject>
   )
 }
+
+const WASTE_CHUTE_CONFIG_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  background-color: ${COLORS.grey2};
+  border-radius: ${BORDERS.borderRadiusSize1};
+  color: ${COLORS.white};
+  justify-content: ${JUSTIFY_CENTER};
+  grid-gap: ${SPACING.spacing8};
+  width: 100%;
+
+  &:active {
+    background-color: ${COLORS.darkBlack90};
+  }
+
+  &:hover {
+    background-color: ${COLORS.grey1};
+  }
+
+  &:focus-visible {
+    border: 3px solid ${COLORS.fundamentalsFocus};
+  }
+`
