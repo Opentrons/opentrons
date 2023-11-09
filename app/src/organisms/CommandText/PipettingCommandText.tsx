@@ -26,8 +26,14 @@ export const PipettingCommandText = ({
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
-  const labwareId = command.params.labwareId ?? null
-  const wellName = command.params.wellId ?? null
+  let labwareId = ''
+  let wellName = ''
+  if ('labwareId' in command.params) {
+    labwareId = command.params.labwareId
+  }
+  if ('wellName' in command.params) {
+    wellName = command.params.wellName
+  }
 
   const allPreviousCommands = robotSideAnalysis.commands.slice(
     0,
