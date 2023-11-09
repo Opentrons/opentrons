@@ -27,7 +27,7 @@ from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
-from ..resources import DeckFixedLabware, labware_validation
+from ..resources import DeckFixedLabware, labware_validation, fixture_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -36,6 +36,7 @@ from ..commands import (
 from ..types import (
     DeckSlotLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     NonStackedLocation,
     Dimensions,
     LabwareOffset,
@@ -47,6 +48,7 @@ from ..types import (
     ModuleModel,
     OverlapOffset,
     LabwareMovementOffsetData,
+    OFF_DECK_LOCATION,
 )
 from ..actions import (
     Action,
@@ -203,6 +205,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             new_offset_id = command.result.offsetId
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
+            if isinstance(
+                new_location, AddressableAreaLocation
+            ) and fixture_validation.is_gripper_waste_chute(
+                new_location.addressableAreaName
+            ):
+                # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+                new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
@@ -730,7 +739,7 @@ class LabwareView(HasState[LabwareState]):
         return self.get_fixed_trash_id() == labware_id
 
     def raise_if_labware_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
+        self, location: Union[DeckSlotLocation, ModuleLocation, AddressableAreaLocation]
     ) -> None:
         """Raise an error if the specified location has labware in it."""
         for labware in self.get_all():

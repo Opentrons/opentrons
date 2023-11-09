@@ -40,6 +40,7 @@ from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.pipettes import PipetteView, StaticPipetteConfig
+from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 
 
@@ -61,6 +62,12 @@ def mock_pipette_view(decoy: Decoy) -> PipetteView:
     return decoy.mock(cls=PipetteView)
 
 
+@pytest.fixture
+def addressable_area_view(decoy: Decoy) -> AddressableAreaView:
+    """Get a mock in the shape of a AddressableAreaView."""
+    return decoy.mock(cls=AddressableAreaView)
+
+
 @pytest.fixture(autouse=True)
 def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock out move_types.py functions."""
@@ -70,7 +77,10 @@ def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 @pytest.fixture
 def subject(
-    labware_view: LabwareView, module_view: ModuleView, mock_pipette_view: PipetteView
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    mock_pipette_view: PipetteView,
+    addressable_area_view: AddressableAreaView,
 ) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
     return GeometryView(
@@ -81,6 +91,7 @@ def subject(
         labware_view=labware_view,
         module_view=module_view,
         pipette_view=mock_pipette_view,
+        addressable_area_view=addressable_area_view,
     )
 
 
@@ -1147,6 +1158,7 @@ def test_get_labware_grip_point(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     ot2_standard_deck_def: DeckDefinitionV4,
     subject: GeometryView,
 ) -> None:
@@ -1155,9 +1167,9 @@ def test_get_labware_grip_point(
         labware_view.get_grip_height_from_labware_bottom("labware-id")
     ).then_return(100)
 
-    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_1)).then_return(
-        Point(x=101, y=102, z=103)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_1.id)
+    ).then_return(Point(x=101, y=102, z=103))
     labware_center = subject.get_labware_grip_point(
         labware_id="labware-id", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
@@ -1169,6 +1181,7 @@ def test_get_labware_grip_point_on_labware(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     ot2_standard_deck_def: DeckDefinitionV4,
     subject: GeometryView,
 ) -> None:
@@ -1200,9 +1213,9 @@ def test_get_labware_grip_point_on_labware(
         labware_view.get_labware_overlap_offsets("labware-id", "below-name")
     ).then_return(OverlapOffset(x=0, y=1, z=6))
 
-    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_4)).then_return(
-        Point(x=5, y=9, z=10)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(x=5, y=9, z=10))
 
     grip_point = subject.get_labware_grip_point(
         labware_id="labware-id", location=OnLabwareLocation(labwareId="below-id")
@@ -1215,6 +1228,7 @@ def test_get_labware_grip_point_for_labware_on_module(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     ot2_standard_deck_def: DeckDefinitionV4,
     subject: GeometryView,
 ) -> None:
@@ -1245,9 +1259,9 @@ def test_get_labware_grip_point_for_labware_on_module(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         )
     )
-    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_4)).then_return(
-        Point(100, 200, 300)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_center(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(100, 200, 300))
     result_grip_point = subject.get_labware_grip_point(
         labware_id="labware-id", location=ModuleLocation(moduleId="module-id")
     )
