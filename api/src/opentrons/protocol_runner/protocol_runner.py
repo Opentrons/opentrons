@@ -120,6 +120,8 @@ class PythonAndLegacyRunner(AbstractRunner):
         legacy_file_reader: Optional[LegacyFileReader] = None,
         legacy_context_creator: Optional[LegacyContextCreator] = None,
         legacy_executor: Optional[LegacyExecutor] = None,
+        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+        drop_tips_after_run: bool = True,
     ) -> None:
         """Initialize the PythonAndLegacyRunner with its dependencies."""
         super().__init__(protocol_engine)
@@ -132,7 +134,20 @@ class PythonAndLegacyRunner(AbstractRunner):
         self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
-        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._task_queue = (
+            task_queue or TaskQueue()
+        )  # cleanup_func=protocol_engine.finish))
+        self._task_queue.set_cleanup_func(
+            func=protocol_engine.finish,
+            drop_tips_after_run=drop_tips_after_run,
+            post_run_hardware_state=post_run_hardware_state,
+        )
+        # self._task_queue.set_post_hardware_run_state(
+        #     post_run_hardware_state=post_run_hardware_state
+        # )
+        # self._task_queue.set_drop_tips_after_run(
+        #     drop_tips_after_run=drop_tips_after_run
+        # )
 
     async def load(
         self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode
@@ -212,6 +227,8 @@ class JsonRunner(AbstractRunner):
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
         json_translator: Optional[JsonTranslator] = None,
+        post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+        drop_tips_after_run: bool = True,
     ) -> None:
         """Initialize the JsonRunner with its dependencies."""
         super().__init__(protocol_engine)
@@ -221,7 +238,21 @@ class JsonRunner(AbstractRunner):
         self._json_translator = json_translator or JsonTranslator()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
-        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._task_queue = (
+            task_queue or TaskQueue()
+        )  # cleanup_func=protocol_engine.finish))
+        self._task_queue.set_cleanup_func(
+            func=protocol_engine.finish,
+            drop_tips_after_run=drop_tips_after_run,
+            post_run_hardware_state=post_run_hardware_state,
+        )
+        # self._task_queue.set_post_hardware_run_state(
+        #     post_run_hardware_state=post_run_hardware_state
+        # )
+        # self._task_queue.set_drop_tips_after_run(
+        #     drop_tips_after_run=drop_tips_after_run
+        # )
+
         self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     async def load(self, protocol_source: ProtocolSource) -> None:
@@ -309,7 +340,11 @@ class LiveRunner(AbstractRunner):
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._hardware_api = hardware_api
-        self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._task_queue = (
+            task_queue or TaskQueue()
+        )  # cleanup_func=protocol_engine.finish)
+        self._task_queue.set_cleanup_func(func=protocol_engine.finish)
+
         self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     def prepare(self) -> None:
@@ -344,6 +379,8 @@ def create_protocol_runner(
     legacy_file_reader: Optional[LegacyFileReader] = None,
     legacy_context_creator: Optional[LegacyContextCreator] = None,
     legacy_executor: Optional[LegacyExecutor] = None,
+    post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+    drop_tips_after_run: bool = True,
 ) -> AnyRunner:
     """Create a protocol runner."""
     if protocol_config:
@@ -357,6 +394,8 @@ def create_protocol_runner(
                 json_file_reader=json_file_reader,
                 json_translator=json_translator,
                 task_queue=task_queue,
+                post_run_hardware_state=post_run_hardware_state,
+                drop_tips_after_run=drop_tips_after_run,
             )
         else:
             return PythonAndLegacyRunner(
@@ -366,6 +405,8 @@ def create_protocol_runner(
                 legacy_file_reader=legacy_file_reader,
                 legacy_context_creator=legacy_context_creator,
                 legacy_executor=legacy_executor,
+                post_run_hardware_state=post_run_hardware_state,
+                drop_tips_after_run=drop_tips_after_run,
             )
 
     return LiveRunner(

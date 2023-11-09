@@ -504,7 +504,6 @@ async def test_finish_with_error(
     door_watcher: DoorWatcher,
     state_store: StateStore,
     stopped_by_estop: bool,
-    expected_home: bool,
     expected_drop_tips: bool,
     expected_end_state: PostRunHardwareState,
 ) -> None:

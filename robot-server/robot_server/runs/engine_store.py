@@ -169,10 +169,20 @@ class EngineStore:
                 ),
             ),
         )
+
+        # TODO: Replace this robot type based logic with a settings flag controlled feature to toggle end-state behavior
+        post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
+        drop_tips_after_run = True
+        if self._robot_type == "OT-3 Standard":
+            post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
+            drop_tips_after_run = False
+
         runner = create_protocol_runner(
             protocol_engine=engine,
             hardware_api=self._hardware_api,
             protocol_config=protocol.source.config if protocol else None,
+            post_run_hardware_state=post_run_hardware_state,
+            drop_tips_after_run=drop_tips_after_run,
         )
 
         if self._runner_engine_pair is not None:

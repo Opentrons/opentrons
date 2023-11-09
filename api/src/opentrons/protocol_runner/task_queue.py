@@ -5,14 +5,16 @@ from functools import partial
 from typing import Any, Awaitable, Callable, Optional
 from typing_extensions import Protocol as Callback
 
-
 log = logging.getLogger(__name__)
 
 
 class CleanupFunc(Callback):
     """Expected cleanup function signature."""
 
-    def __call__(self, error: Optional[Exception]) -> Any:
+    def __call__(
+        self,
+        error: Optional[Exception],
+    ) -> Any:
         """Cleanup, optionally taking an error thrown.
 
         Return value will not be used.
@@ -26,18 +28,34 @@ class TaskQueue:
     Once started, a TaskQueue may not be re-used.
     """
 
-    def __init__(self, cleanup_func: CleanupFunc) -> None:
+    def __init__(
+        self,
+        # cleanup_func: CleanupFunc,
+    ) -> None:
         """Initialize the TaskQueue.
 
         Args:
             cleanup_func: A function to call at run function completion
                 with any error raised by the run function.
         """
-        self._cleanup_func: CleanupFunc = cleanup_func
+        self._cleanup_func: Optional[
+            Callable[[Optional[Exception]], Any]
+        ] = None  # CleanupFunc = cleanup_func
 
         self._run_func: Optional[Callable[[], Any]] = None
         self._run_task: Optional["asyncio.Task[None]"] = None
         self._ok_to_join_event: asyncio.Event = asyncio.Event()
+
+    def set_cleanup_func(
+        self,
+        func: Callable[..., Awaitable[Any]],
+        **kwargs: Any,
+    ) -> None:
+        """Add the protocol cleanup task to the queue.
+
+        The "cleanup" task will be run after the "run" task.
+        """
+        self._cleanup_func = partial(func, **kwargs)
 
     def set_run_func(
         self,
@@ -74,4 +92,11 @@ class TaskQueue:
             log.exception("Exception raised by protocol")
             error = e
 
-        await self._cleanup_func(error=error)
+        if self._cleanup_func is not None:
+            await self._cleanup_func(error)
+
+        # await self._cleanup_func(
+        #     error=error,
+        #     drop_tips_after_run=self._drop_tips_after_run,
+        #     post_run_hardware_state=self._post_hardware_run_state,
+        # )

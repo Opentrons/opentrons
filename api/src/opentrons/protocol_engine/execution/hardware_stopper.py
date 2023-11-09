@@ -14,6 +14,7 @@ from .movement import MovementHandler
 from .gantry_mover import HardwareGantryMover
 from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
+from opentrons.types import Mount
 
 log = logging.getLogger(__name__)
 
@@ -103,33 +104,32 @@ class HardwareStopper:
         drop_tips_after_run: bool = False,
     ) -> None:
         """Stop and reset the HardwareAPI, homing and dropping tips independently if specified."""
+        if drop_tips_after_run:
+            await self._drop_tip()
+
         home_after_stop = post_run_hardware_state in (
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,
         )
-        if home_after_stop:
-            if drop_tips_after_run:
-                # Drop the tips and then stop and home based on conditions post run states
-                await self._drop_tip()
-                await self._hardware_api.stop(home_after=home_after_stop)
-            else:
-                # Stop and home without dropping tips and without homing the plungers
-                instrs = self._hardware_api.get_attached_instruments()
-                try:
-                    if instrs.get(OT3Mount.GRIPPER) is not None:
-                        await self._movement_handler.home(
-                            axes=[MotorAxis.EXTENSION_Z, MotorAxis.EXTENSION_JAW]
-                        )
-                except:
-                    pass
-                await self._movement_handler.home(
-                    axes=[
-                        MotorAxis.X,
-                        MotorAxis.Y,
-                        MotorAxis.LEFT_Z,
-                        MotorAxis.RIGHT_Z,
-                    ]
-                )
-        else:
-            # Stop without homing or dropping tips
-            await self._hardware_api.stop(home_after=False)
+        # if home_after_stop:
+        #     if None in self._state_store.pipettes.get_all_attached_tips():
+        #         await self._hardware_api.stop(home_after=home_after_stop)
+        #     else:
+        #         instrs = self._hardware_api.get_attached_instruments()
+        #         if instrs.get(Mount.EXTENSION) is not None:
+        #             await self._movement_handler.home(
+        #                 axes=[MotorAxis.EXTENSION_Z, MotorAxis.EXTENSION_JAW]
+        #             )
+
+        #         await self._movement_handler.home(
+        #             axes=[
+        #                 MotorAxis.X,
+        #                 MotorAxis.Y,
+        #                 MotorAxis.LEFT_Z,
+        #                 MotorAxis.RIGHT_Z,
+        #             ]
+        #         )
+
+        # else:
+
+        await self._hardware_api.stop(home_after=home_after_stop)
