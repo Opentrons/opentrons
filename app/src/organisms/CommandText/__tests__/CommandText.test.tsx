@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  DropTipInPlaceRunTimeCommand,
   FLEX_ROBOT_TYPE,
   PrepareToAspirateRunTimeCommand,
 } from '@opentrons/shared-data'
@@ -203,6 +204,24 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )[0]
     getByText('Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9')
+  })
+  it('renders correct text for dropTipInPlace', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          {
+            commandType: 'dropTipInPlace',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+            },
+          } as DropTipInPlaceRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Dropping tip in place')
   })
   it('renders correct text for pickUpTip', () => {
     const command = mockRobotSideAnalysis.commands.find(
