@@ -25,6 +25,7 @@ interface WasteChuteCommandArgs {
   type: WasteChuteCommandsTypes
   pipetteId: string
   addressableAreaName: string
+  isGantryAtAddressableArea: boolean
   volume?: number
   flowRate?: number
 }
@@ -34,12 +35,28 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, addressableAreaName, type, volume, flowRate } = args
+  const {
+    pipetteId,
+    addressableAreaName,
+    type,
+    isGantryAtAddressableArea,
+    volume,
+    flowRate,
+  } = args
   const errors: CommandCreatorError[] = []
   const pipetteName = invariantContext.pipetteEntities[pipetteId]?.name
   const hasWasteChute = getHasWasteChute(
     invariantContext.additionalEquipmentEntities
   )
+
+  const addressableAreaCommand: CurriedCommandCreator[] = isGantryAtAddressableArea
+    ? []
+    : [
+        curryCommandCreator(moveToAddressableArea, {
+          pipetteId,
+          addressableAreaName,
+        }),
+      ]
 
   let actionName = 'dispense'
   if (type === 'blowOut') {
@@ -66,16 +83,12 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     )
   }
 
-  let commands: CurriedCommandCreator[] = []
+  let inPlaceCommands: CurriedCommandCreator[] = []
   switch (type) {
     case 'dropTip': {
-      commands = !prevRobotState.tipState.pipettes[pipetteId]
+      inPlaceCommands = !prevRobotState.tipState.pipettes[pipetteId]
         ? []
         : [
-            curryCommandCreator(moveToAddressableArea, {
-              pipetteId,
-              addressableAreaName,
-            }),
             curryCommandCreator(dropTipInPlace, {
               pipetteId,
             }),
@@ -84,13 +97,9 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
       break
     }
     case 'dispense': {
-      commands =
+      inPlaceCommands =
         flowRate != null && volume != null
           ? [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
               curryCommandCreator(dispenseInPlace, {
                 pipetteId,
                 volume,
@@ -101,13 +110,9 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
       break
     }
     case 'blowOut': {
-      commands =
+      inPlaceCommands =
         flowRate != null
           ? [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
               curryCommandCreator(blowOutInPlace, {
                 pipetteId,
                 flowRate,
@@ -117,13 +122,9 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
       break
     }
     case 'airGap': {
-      commands =
+      inPlaceCommands =
         flowRate != null && volume != null
           ? [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
               curryCommandCreator(aspirateInPlace, {
                 pipetteId,
                 volume,
@@ -139,6 +140,6 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     return {
       errors,
     }
-
-  return reduceCommandCreators(commands, invariantContext, prevRobotState)
+  const allCommands = [...addressableAreaCommand, ...inPlaceCommands]
+  return reduceCommandCreators(allCommands, invariantContext, prevRobotState)
 }

@@ -18,6 +18,7 @@ const args = {
   addressableAreaName: 'mockName',
   volume: 10,
   flowRate: 10,
+  isGantryAtAddressableArea: false,
 }
 const mockMoveToAddressableArea = {
   commandType: 'moveToAddressableArea',
@@ -61,6 +62,25 @@ describe('wasteChuteCommandsUtil', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       mockMoveToAddressableArea,
+      {
+        commandType: 'dispenseInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: mockId,
+          volume: 10,
+          flowRate: 10,
+        },
+      },
+    ])
+  })
+  it('returns only 1 command for dispensing when already at area', () => {
+    const result = wasteChuteCommandsUtil(
+      { ...args, type: 'dispense', isGantryAtAddressableArea: true },
+      invariantContext,
+      initialRobotState
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       {
         commandType: 'dispenseInPlace',
         key: expect.any(String),
@@ -146,6 +166,7 @@ describe('wasteChuteCommandsUtil', () => {
         pipetteId: 'badPip',
         addressableAreaName: 'mockName',
         type: 'dispense',
+        isGantryAtAddressableArea: false,
       },
       invariantContext,
       initialRobotState

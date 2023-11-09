@@ -221,6 +221,7 @@ export const blowoutUtil = (args: {
   offsetFromTopMm: number
   invariantContext: InvariantContext
   destWell: BlowoutParams['well'] | null
+  isGantryAtAddressableArea: boolean
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -232,6 +233,7 @@ export const blowoutUtil = (args: {
     flowRate,
     offsetFromTopMm,
     invariantContext,
+    isGantryAtAddressableArea,
   } = args
   if (!blowoutLocation) return []
   const addressableAreaName =
@@ -244,9 +246,8 @@ export const blowoutUtil = (args: {
     invariantContext.additionalEquipmentEntities,
     destLabwareId
   )
-  let labware
-  let well
-
+  let labware: LabwareEntity | AdditionalEquipmentEntity | null = null
+  let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
     labware = invariantContext.labwareEntities[sourceLabwareId]
     well = sourceWell
@@ -263,7 +264,7 @@ export const blowoutUtil = (args: {
       invariantContext.additionalEquipmentEntities[blowoutLocation]
     well = wasteChuteOrLabware === 'labware' ? 'A1' : null
 
-    if (!labware) {
+    if (labware == null) {
       assert(
         false,
         `expected a labwareId for blowoutUtil's "blowoutLocation", got ${blowoutLocation}`
@@ -275,7 +276,7 @@ export const blowoutUtil = (args: {
     'def' in labware && well != null ? getWellsDepth(labware.def, [well]) : 0
 
   const offsetFromBottomMm = wellDepth + offsetFromTopMm
-  return wasteChuteOrLabware === 'labware' && well != null
+  return well != null
     ? [
         curryCommandCreator(blowout, {
           pipette: pipette,
@@ -291,6 +292,7 @@ export const blowoutUtil = (args: {
           type: 'blowOut',
           flowRate,
           addressableAreaName,
+          isGantryAtAddressableArea,
         }),
       ]
 }
@@ -445,6 +447,7 @@ interface DispenseLocationHelperArgs {
   pipetteId: string
   volume: number
   flowRate: number
+  isGantryAtAddressableArea: boolean
   offsetFromBottomMm?: number
   well?: string
 }
@@ -460,6 +463,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     flowRate,
     offsetFromBottomMm,
     well,
+    isGantryAtAddressableArea,
   } = args
 
   const wasteChuteOrLabware = getWasteChuteOrLabware(
@@ -489,6 +493,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = [
       curryCommandCreator(wasteChuteCommandsUtil, {
+        isGantryAtAddressableArea,
         type: 'dispense',
         pipetteId,
         volume,
@@ -509,6 +514,7 @@ interface MoveHelperArgs {
   destinationId: string
   pipetteId: string
   zOffset: number
+  isGantryAtAddressableArea: boolean
   well?: string
 }
 export const moveHelper: CommandCreator<MoveHelperArgs> = (
@@ -516,7 +522,13 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { destinationId, pipetteId, zOffset, well } = args
+  const {
+    destinationId,
+    pipetteId,
+    zOffset,
+    well,
+    isGantryAtAddressableArea,
+  } = args
 
   const wasteChuteOrLabware = getWasteChuteOrLabware(
     invariantContext.labwareEntities,
@@ -538,15 +550,17 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   } else {
     const pipetteChannels =
       invariantContext.pipetteEntities[pipetteId].spec.channels
-    commands = [
-      curryCommandCreator(moveToAddressableArea, {
-        pipetteId,
-        addressableAreaName:
-          pipetteChannels === 96
-            ? '96ChannelWasteChute'
-            : '1and8ChannelWasteChute',
-      }),
-    ]
+    commands = isGantryAtAddressableArea
+      ? []
+      : [
+          curryCommandCreator(moveToAddressableArea, {
+            pipetteId,
+            addressableAreaName:
+              pipetteChannels === 96
+                ? '96ChannelWasteChute'
+                : '1and8ChannelWasteChute',
+          }),
+        ]
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
@@ -560,6 +574,7 @@ interface AirGapArgs {
   offsetFromBottomMm: number
   pipetteId: string
   volume: number
+  isGantryAtAddressableArea: boolean
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
@@ -579,6 +594,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     sourceId,
     sourceWell,
     volume,
+    isGantryAtAddressableArea,
   } = args
 
   const wasteChuteOrLabware = getWasteChuteOrLabware(
@@ -632,6 +648,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = [
       curryCommandCreator(wasteChuteCommandsUtil, {
+        isGantryAtAddressableArea,
         type: 'airGap',
         pipetteId,
         volume,
@@ -645,4 +662,50 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+interface gantryIsAtAddressableAreaType {
+  prevCommands: CurriedCommandCreator[]
+  invariantContext: InvariantContext
+  prevRobotState: RobotState
+}
+export function gantryIsAtAddressableArea(
+  props: gantryIsAtAddressableAreaType
+): boolean {
+  const { prevCommands, invariantContext, prevRobotState } = props
+
+  for (let i = 0; i < prevCommands.length; i++) {
+    const curriedCommand = prevCommands[i]
+    const result = curriedCommand(invariantContext, prevRobotState)
+
+    if ('commands' in result) {
+      const commandIndex = result.commands.findIndex(
+        command => command.commandType === 'moveToAddressableArea'
+      )
+
+      // If the commandType is found in 'result.commands'
+      if (commandIndex !== -1) {
+        const lengthOfCommands = result.commands.length
+        // Check if the command is the last command
+        if (lengthOfCommands === commandIndex) {
+          return true
+        } else {
+          // Check if following commands move out of the addressable area
+          const followingCommandsMoveOutOfArea = result.commands.some(
+            command =>
+              ![
+                'dispenseInPlace',
+                'dropTipInPlace',
+                'aspirateInPlace',
+                'blowOutInPlace',
+              ].includes(command.commandType)
+          )
+
+          // Return true if there are no following commands that move out of addressable area
+          return !followingCommandsMoveOutOfArea
+        }
+      }
+    }
+  }
+  return false
 }

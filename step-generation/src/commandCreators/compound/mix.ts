@@ -191,6 +191,7 @@ export const mix: CommandCreator<MixArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
+        isGantryAtAddressableArea: false,
       })
       const mixCommands = mixUtil({
         pipette,

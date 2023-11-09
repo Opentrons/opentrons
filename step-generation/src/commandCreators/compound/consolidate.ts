@@ -13,6 +13,7 @@ import {
   airGapHelper,
   dispenseLocationHelper,
   moveHelper,
+  gantryIsAtAddressableArea,
 } from '../../utils'
 import { configureForVolume } from '../atomic/configureForVolume'
 import {
@@ -129,6 +130,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         type: 'dropTip',
         pipetteId: args.pipette,
         addressableAreaName,
+        isGantryAtAddressableArea: false,
       })
     : curryCommandCreator(dropTip, {
         pipette: args.pipette,
@@ -294,6 +296,43 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               dispenseDelaySeconds: dispenseDelay?.seconds,
             })
           : []
+
+      const configureForVolumeCommand: CurriedCommandCreator[] =
+        invariantContext.pipetteEntities[args.pipette].name ===
+          'p50_single_flex' ||
+        invariantContext.pipetteEntities[args.pipette].name === 'p50_multi_flex'
+          ? [
+              curryCommandCreator(configureForVolume, {
+                pipetteId: args.pipette,
+                volume:
+                  args.volume * sourceWellChunk.length +
+                  aspirateAirGapVolume * sourceWellChunk.length,
+              }),
+            ]
+          : []
+      const dispenseCommands = [
+        curryCommandCreator(dispenseLocationHelper, {
+          pipetteId: args.pipette,
+          volume:
+            args.volume * sourceWellChunk.length +
+            aspirateAirGapVolume * sourceWellChunk.length,
+          destinationId: args.destLabware,
+          well: destinationWell ?? undefined,
+          flowRate: dispenseFlowRateUlSec,
+          offsetFromBottomMm: dispenseOffsetFromBottomMm,
+          isGantryAtAddressableArea: false,
+        }),
+      ]
+
+      const prevDelayCommands = [
+        ...tipCommands,
+        ...mixBeforeCommands,
+        ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
+        ...configureForVolumeCommand,
+        ...aspirateCommands,
+        ...dispenseCommands,
+      ]
+
       const delayAfterDispenseCommands =
         dispenseDelay != null
           ? [
@@ -302,6 +341,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destinationId: args.destLabware,
                 well: destinationWell ?? undefined,
                 zOffset: dispenseDelay.mmFromBottom,
+                isGantryAtAddressableArea: gantryIsAtAddressableArea({
+                  prevCommands: prevDelayCommands,
+                  invariantContext,
+                  prevRobotState,
+                }),
               }),
               curryCommandCreator(delay, {
                 commandCreatorFnName: 'delay',
@@ -312,6 +356,33 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               }),
             ]
           : []
+
+      const prevBlowOutCommands = [
+        ...prevDelayCommands,
+        ...delayAfterDispenseCommands,
+        ...mixAfterCommands,
+        ...touchTipAfterDispenseCommands,
+      ]
+
+      const blowoutCommand = blowoutUtil({
+        pipette: args.pipette,
+        sourceLabwareId: args.sourceLabware,
+        sourceWell: sourceWellChunk[0],
+        destLabwareId: args.destLabware,
+        destWell: destinationWell,
+        blowoutLocation: args.blowoutLocation,
+        flowRate: blowoutFlowRateUlSec,
+        offsetFromTopMm: blowoutOffsetFromTopMm,
+        invariantContext,
+        isGantryAtAddressableArea: gantryIsAtAddressableArea({
+          prevCommands: prevBlowOutCommands,
+          invariantContext,
+          prevRobotState,
+        }),
+      })
+
+      const prevAirGapCommands = [...prevBlowOutCommands, ...blowoutCommand]
+
       const willReuseTip = args.changeTip !== 'always' && !isLastChunk
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
@@ -323,6 +394,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destWell: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
+                isGantryAtAddressableArea: gantryIsAtAddressableArea({
+                  prevCommands: prevAirGapCommands,
+                  invariantContext,
+                  prevRobotState,
+                }),
               }),
               ...(aspirateDelay != null
                 ? [
@@ -340,6 +416,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       // if using dispense > air gap, drop or change the tip at the end
       const dropTipAfterDispenseAirGap =
         airGapAfterDispenseCommands.length > 0 ? [dropTipCommand] : []
+
       const blowoutCommand = blowoutUtil({
         pipette: args.pipette,
         sourceLabwareId: args.sourceLabware,
@@ -367,25 +444,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           : []
 
       return [
-        ...tipCommands,
-        ...mixBeforeCommands,
-        ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
-        ...configureForVolumeCommand,
-        ...aspirateCommands,
-        curryCommandCreator(dispenseLocationHelper, {
-          pipetteId: args.pipette,
-          volume:
-            args.volume * sourceWellChunk.length +
-            aspirateAirGapVolume * sourceWellChunk.length,
-          destinationId: args.destLabware,
-          well: destinationWell ?? undefined,
-          flowRate: dispenseFlowRateUlSec,
-          offsetFromBottomMm: dispenseOffsetFromBottomMm,
-        }),
-        ...delayAfterDispenseCommands,
-        ...mixAfterCommands,
-        ...touchTipAfterDispenseCommands,
-        ...blowoutCommand,
+        ...prevAirGapCommands,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
       ]
