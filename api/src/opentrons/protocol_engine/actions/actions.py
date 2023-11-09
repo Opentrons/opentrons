@@ -15,7 +15,7 @@ from opentrons.hardware_control.modules import LiveData
 from opentrons_shared_data.errors import EnumeratedError
 
 from ..commands import Command, CommandCreate, CommandPrivateResult
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid, DeckConfigurationType
 
 
 @dataclass(frozen=True)
@@ -136,6 +136,12 @@ class AddLabwareOffsetAction:
     labware_offset_id: str
     created_at: datetime
     request: LabwareOffsetCreate
+
+
+class UpdateDeckConfigurationAction:
+    """Update the existing deck configuration."""
+    deck_configuration: DeckConfigurationType
+    created_at: datetime
 
 
 @dataclass(frozen=True)

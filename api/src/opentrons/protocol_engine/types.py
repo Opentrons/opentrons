@@ -768,3 +768,6 @@ NozzleLayoutConfigurationType = Union[
     RowNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
 ]
+
+# TODO make the below some sort of better type
+DeckConfigurationType = List[Tuple[str, str]]

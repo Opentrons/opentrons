@@ -17,8 +17,9 @@ from ..types import (
     AddressableAreaLocation,
     AddressableArea,
     PotentialCutoutFixture,
+    DeckConfigurationType,
 )
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, UpdateCommandAction, UpdateDeckConfigurationAction
 from .config import Config
 from .abstract_store import HasState, HandlesActions
 
@@ -33,10 +34,6 @@ class AddressableAreaState:
     use_simulated_deck_config: bool
 
 
-# TODO make the below some sort of better type
-DeckConfiguration = List[Tuple[str, str]]
-
-
 class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
     """Addressable area state container."""
 
@@ -44,7 +41,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     def __init__(
         self,
-        deck_configuration: DeckConfiguration,
+        deck_configuration: DeckConfigurationType,
         config: Config,
         deck_definition: DeckDefinitionV4,
     ) -> None:
@@ -73,7 +70,8 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
-        # TODO have an action to reload the deck configuration.
+        if isinstance(action, UpdateDeckConfigurationAction):
+            self._load_addressable_areas_from_deck_configuration(action.deck_configuration)
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -95,7 +93,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             self._check_location_is_addressable_area(addressable_area_name)
 
     def _load_addressable_areas_from_deck_configuration(
-        self, deck_config: DeckConfiguration
+        self, deck_config: DeckConfigurationType
     ) -> List[AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
         # TODO uncomment once execute is hooked up with this properly

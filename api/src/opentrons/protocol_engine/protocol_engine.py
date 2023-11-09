@@ -24,6 +24,7 @@ from .types import (
     Liquid,
     HexColor,
     PostRunHardwareState,
+    DeckConfigurationType,
 )
 from .execution import (
     QueueWorker,
@@ -50,6 +51,7 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
     FailCommandAction,
+    UpdateDeckConfigurationAction,
 )
 
 
@@ -425,6 +427,16 @@ class ProtocolEngine:
             HardwareStoppedAction(
                 completed_at=self._model_utils.get_timestamp(),
                 finish_error_details=finish_error_details,
+            )
+        )
+
+    def update_deck_configuration(self, request: DeckConfigurationType) -> None:
+        """Update the existing robot deck configuration."""
+        created_at = self._model_utils.get_timestamp()
+        self._action_dispatcher.dispatch(
+            UpdateDeckConfigurationAction(
+                deck_configuration=request,
+                created_at=created_at,
             )
         )
 
