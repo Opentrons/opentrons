@@ -173,6 +173,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ])
     : []
 
+  console.log('AA',
+  deckDef.locations.addressableAreas
+  .filter(
+    addressableArea =>
+      isAddressableAreaStandardSlot(addressableArea.id, deckDef)
+  ))
   return (
     <>
       {/* all modules */}
@@ -335,7 +341,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         // only render standard slot fixture components
         .filter(
           addressableArea =>
-            isAddressableAreaStandardSlot(addressableArea.id) &&
+            isAddressableAreaStandardSlot(addressableArea.id, deckDef) &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
             getSlotIsEmpty(activeDeckSetup, addressableArea.id) &&
             addressableArea.id !== trashSlot
@@ -526,7 +532,7 @@ export const DeckSetup = (): JSX.Element => {
   ).filter(aE => aE.name === STAGING_AREA_LOAD_NAME)
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
-    aa => isAddressableAreaStandardSlot(aa.id)
+    aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
 
   return (

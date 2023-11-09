@@ -77,7 +77,7 @@ export function DeckLocationSelect({
       {deckDef.locations.addressableAreas
         // only render standard slot fixture components
         .filter(addressableArea =>
-          isAddressableAreaStandardSlot(addressableArea.id)
+          isAddressableAreaStandardSlot(addressableArea.id, deckDef)
         )
         .map(slot => {
           const slotLocation = { slotName: slot.id }
