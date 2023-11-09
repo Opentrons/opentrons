@@ -195,3 +195,16 @@ export const STAGING_AREA_LOAD_NAME = 'stagingArea'
 export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
 export const TRASH_BIN_LOAD_NAME = 'trashBin'
 export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'
+
+export const ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1and8ChannelWasteChute' =
+  '1and8ChannelWasteChute'
+export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChute' =
+  '96ChannelWasteChute'
+export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
+  'gripperWasteChute'
+
+export const WASTE_CHUTE_ADDRESSABLE_AREAS = [
+  ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+]

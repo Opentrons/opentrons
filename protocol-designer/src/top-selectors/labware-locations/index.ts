@@ -5,6 +5,7 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   FLEX_ROBOT_TYPE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
@@ -196,7 +197,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
             .map(lw => lw.slot)
             .includes(slotId) &&
           slotId !== trashSlot &&
-          (hasWasteChute ? slotId !== WASTE_CHUTE_CUTOUT : true)
+          (hasWasteChute ? !(slotId in WASTE_CHUTE_ADDRESSABLE_AREAS) : true)
       )
       .map(slotId => ({ name: slotId, value: slotId }))
     const offDeck = { name: 'Off-deck', value: 'offDeck' }
