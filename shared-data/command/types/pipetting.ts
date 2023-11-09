@@ -1,35 +1,27 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
-  | PipettingAtLocationRunTimeCommand
-  | PipettingInPlaceRunTimeCommand
-
-export type PipettingAtLocationRunTimeCommand =
   | AspirateRunTimeCommand
-  | BlowoutRunTimeCommand
   | DispenseRunTimeCommand
-  | DropTipRunTimeCommand
-  | PickUpTipRunTimeCommand
-  | TouchTipRunTimeCommand
-
-export type PipettingInPlaceRunTimeCommand =
+  | BlowoutRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
-  | ConfigureForVolumeRunTimeCommand
-  | DispenseInPlaceRunTimeCommand
+  | TouchTipRunTimeCommand
+  | PickUpTipRunTimeCommand
+  | DropTipRunTimeCommand
   | DropTipInPlaceRunTimeCommand
+  | ConfigureForVolumeRunTimeCommand
   | PrepareToAspirateRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
+  | DispenseCreateCommand
   | BlowoutCreateCommand
   | BlowoutInPlaceCreateCommand
-  | ConfigureForVolumeCreateCommand
-  | DispenseCreateCommand
-  | DispenseInPlaceCreateCommand
+  | TouchTipCreateCommand
+  | PickUpTipCreateCommand
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
-  | PickUpTipCreateCommand
+  | ConfigureForVolumeCreateCommand
   | PrepareToAspirateCreateCommand
-  | TouchTipCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -66,17 +58,6 @@ export interface DispenseRunTimeCommand
     DispenseCreateCommand {
   result?: BasicLiquidHandlingResult
 }
-
-export interface DispenseInPlaceCreateCommand extends CommonCommandCreateInfo {
-  commandType: 'dispenseInPlace'
-  params: DispenseInPlaceParams
-}
-export interface DispenseInPlaceRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    DispenseInPlaceCreateCommand {
-  result?: BasicLiquidHandlingResult
-}
-
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'blowout'
   params: BlowoutParams
@@ -171,13 +152,6 @@ export interface DropTipInPlaceParams {
 export interface BlowoutInPlaceParams {
   pipetteId: string
   flowRate: number // µL/s
-}
-
-export interface DispenseInPlaceParams {
-  pipetteId: string
-  volume: number
-  flowRate: number // µL/s
-  pushOut?: number
 }
 
 interface FlowRateParams {
