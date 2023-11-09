@@ -16,6 +16,7 @@ import {
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
+  getWellRange,
 } from './utils'
 
 type PipettingRunTimeCommmand =
@@ -122,8 +123,18 @@ export const PipettingCommandText = ({
           })
     }
     case 'pickUpTip': {
+      const pipetteId = command.params.pipetteId
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
       return t('pickup_tip', {
-        well_name: wellName,
+        well_range: getWellRange(
+          pipetteId,
+          pipetteName,
+          allPreviousCommands,
+          wellName
+        ),
         labware: getLabwareName(robotSideAnalysis, labwareId),
         labware_location: displayLocation,
       })
