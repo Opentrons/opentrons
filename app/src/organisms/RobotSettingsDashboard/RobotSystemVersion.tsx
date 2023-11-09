@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -17,8 +16,8 @@ import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
-import { getShellUpdateState } from '../../redux/shell'
 
+import type { RobotUpdateInfo } from '../../redux/robot-update/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
@@ -26,12 +25,14 @@ const GITHUB_URL = 'https://github.com/Opentrons/opentrons/releases'
 interface RobotSystemVersionProps {
   currentVersion: string
   isUpdateAvailable: boolean
+  robotUpdateInfo: RobotUpdateInfo | null
   setCurrentOption: SetSettingOption
 }
 
 export function RobotSystemVersion({
   currentVersion,
   isUpdateAvailable,
+  robotUpdateInfo,
   setCurrentOption,
 }: RobotSystemVersionProps): JSX.Element {
   const { t, i18n } = useTranslation([
@@ -41,16 +42,13 @@ export function RobotSystemVersion({
     'app_settings',
   ])
   const [showModal, setShowModal] = React.useState<boolean>(isUpdateAvailable)
-  const updateState = useSelector(getShellUpdateState)
-  const version = updateState?.info?.version ?? ''
-  const releaseNotes = updateState?.info?.releaseNotes ?? ''
 
   return (
     <>
       {showModal && (
         <RobotSystemVersionModal
-          version={version}
-          releaseNotes={releaseNotes}
+          version={robotUpdateInfo?.version ?? ''}
+          releaseNotes={robotUpdateInfo?.releaseNotes ?? ''}
           setShowModal={setShowModal}
         />
       )}

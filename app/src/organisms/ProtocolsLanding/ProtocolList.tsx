@@ -29,7 +29,7 @@ import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
-import { UploadInput } from './UploadInput'
+import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { ProtocolCard } from './ProtocolCard'
 import { EmptyStateLinks } from './EmptyStateLinks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -254,7 +254,9 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         onCloseClick={() => setShowImportProtocolSlideout(false)}
       >
         <Box marginTop={SPACING.spacing16}>
-          <UploadInput onUpload={() => setShowImportProtocolSlideout(false)} />
+          <ProtocolUploadInput
+            onUpload={() => setShowImportProtocolSlideout(false)}
+          />
         </Box>
       </Slideout>
     </Box>

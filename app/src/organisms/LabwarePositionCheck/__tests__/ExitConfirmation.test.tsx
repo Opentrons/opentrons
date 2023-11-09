@@ -17,6 +17,7 @@ describe('ExitConfirmation', () => {
     props = {
       onGoBack: jest.fn(),
       onConfirmExit: jest.fn(),
+      shouldUseMetalProbe: false,
     }
   })
   afterEach(() => {
@@ -29,14 +30,26 @@ describe('ExitConfirmation', () => {
     getByText(
       'If you exit now, all labware offsets will be discarded. This cannot be undone.'
     )
-    getByRole('button', { name: 'exit' })
+    getByRole('button', { name: 'Exit' })
     getByRole('button', { name: 'Go back' })
   })
   it('should invoke callback props when ctas are clicked', () => {
     const { getByRole } = render(props)
     getByRole('button', { name: 'Go back' }).click()
     expect(props.onGoBack).toHaveBeenCalled()
-    getByRole('button', { name: 'exit' }).click()
+    getByRole('button', { name: 'Exit' }).click()
     expect(props.onConfirmExit).toHaveBeenCalled()
+  })
+  it('should render correct copy for golden tip LPC', () => {
+    const { getByText, getByRole } = render({
+      ...props,
+      shouldUseMetalProbe: true,
+    })
+    getByText('Remove the calibration probe before exiting')
+    getByText(
+      'If you exit now, all labware offsets will be discarded. This cannot be undone.'
+    )
+    getByRole('button', { name: 'Remove calibration probe' })
+    getByRole('button', { name: 'Go back' })
   })
 })

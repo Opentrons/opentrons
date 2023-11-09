@@ -1,25 +1,29 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
   | AspirateRunTimeCommand
-  | DispenseRunTimeCommand
-  | BlowoutRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
-  | TouchTipRunTimeCommand
-  | PickUpTipRunTimeCommand
-  | DropTipRunTimeCommand
-  | DropTipInPlaceRunTimeCommand
+  | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
+  | DispenseInPlaceRunTimeCommand
+  | DispenseRunTimeCommand
+  | DropTipInPlaceRunTimeCommand
+  | DropTipRunTimeCommand
+  | PickUpTipRunTimeCommand
+  | PrepareToAspirateRunTimeCommand
+  | TouchTipRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
-  | DispenseCreateCommand
   | BlowoutCreateCommand
   | BlowoutInPlaceCreateCommand
-  | TouchTipCreateCommand
-  | PickUpTipCreateCommand
+  | ConfigureForVolumeCreateCommand
+  | DispenseCreateCommand
+  | DispenseInPlaceCreateCommand
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
-  | ConfigureForVolumeCreateCommand
+  | PickUpTipCreateCommand
+  | PrepareToAspirateCreateCommand
+  | TouchTipCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -56,6 +60,17 @@ export interface DispenseRunTimeCommand
     DispenseCreateCommand {
   result?: BasicLiquidHandlingResult
 }
+
+export interface DispenseInPlaceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'dispenseInPlace'
+  params: DispenseInPlaceParams
+}
+export interface DispenseInPlaceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    DispenseInPlaceCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
+
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'blowout'
   params: BlowoutParams
@@ -112,6 +127,18 @@ export interface DropTipInPlaceRunTimeCommand
   result?: any
 }
 
+export interface PrepareToAspirateCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'prepareToAspirate'
+  params: PipetteIdentityParams
+}
+
+export interface PrepareToAspirateRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    PrepareToAspirateCreateCommand {
+  result?: any
+}
+
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -140,12 +167,22 @@ export interface BlowoutInPlaceParams {
   flowRate: number // µL/s
 }
 
+export interface DispenseInPlaceParams {
+  pipetteId: string
+  volume: number
+  flowRate: number // µL/s
+  pushOut?: number
+}
+
 interface FlowRateParams {
   flowRate: number // µL/s
 }
 
-interface PipetteAccessParams {
+interface PipetteIdentityParams {
   pipetteId: string
+}
+
+interface PipetteAccessParams extends PipetteIdentityParams {
   labwareId: string
   wellName: string
 }

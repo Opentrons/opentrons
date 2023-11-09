@@ -12,6 +12,7 @@ from .shared_models import (
     OffsetVector,
     Metadata,
     DesignerApplication,
+    Robot,
 )
 
 
@@ -78,12 +79,6 @@ class CommandAnnotation(BaseModel):
         extra = Extra.allow
 
 
-class RobotV8(BaseModel):
-    model: Literal["OT-2 Standard", "OT-3 Standard"]
-    deckId: str
-    deckSchemaId: str
-
-
 class ProtocolSchemaV8(BaseModel):
     otSharedSchema: Literal["#/protocol/schemas/8"] = Field(
         ...,
@@ -93,7 +88,7 @@ class ProtocolSchemaV8(BaseModel):
     )
     schemaVersion: Literal[8]
     metadata: Metadata
-    robot: RobotV8
+    robot: Robot
     liquidSchemaId: Literal["opentronsLiquidSchemaV1"]
     liquids: Dict[str, Liquid]
     labwareDefinitionSchemaId: Literal["opentronsLabwareSchemaV2"]

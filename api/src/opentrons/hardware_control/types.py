@@ -38,6 +38,10 @@ class OT3Mount(enum.Enum):
             return top_types.Mount.EXTENSION
         return top_types.Mount[self.name]
 
+    @classmethod
+    def pipette_mounts(cls) -> List["Literal[OT3Mount.LEFT, OT3Mount.RIGHT]"]:
+        return [cls.LEFT, cls.RIGHT]
+
 
 class OT3AxisKind(enum.Enum):
     """An enum of the different kinds of axis we have.

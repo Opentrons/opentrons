@@ -39,7 +39,6 @@ import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
-import { useFeatureFlag } from '../../redux/config'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -90,7 +89,6 @@ function RenderModuleStatus({
   conflictedFixture,
 }: RenderModuleStatusProps): JSX.Element {
   const { makeSnackbar } = useToaster()
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
 
   const handleCalibrate = (): void => {
@@ -122,7 +120,7 @@ function RenderModuleStatus({
       {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
     </>
   )
-  if (conflictedFixture != null && enableDeckConfig) {
+  if (conflictedFixture != null) {
     moduleStatus = (
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
         <Chip
@@ -268,11 +266,7 @@ function RowModule({
           />
         </Flex>
         {isNonConnectingModule ? (
-          <Flex
-            flex="3 0 0"
-            alignItems={ALIGN_CENTER}
-            padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-          >
+          <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('n_a')}
             </StyledText>
@@ -372,8 +366,6 @@ export function ProtocolSetupModulesAndDeck({
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
 
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
-
   return (
     <>
       <Portal level="top">
@@ -392,13 +384,12 @@ export function ProtocolSetupModulesAndDeck({
             setShowDeckMapModal={setShowDeckMapModal}
             attachedProtocolModuleMatches={attachedProtocolModuleMatches}
             runId={runId}
-            deckDef={deckDef}
-            mostRecentAnalysis={mostRecentAnalysis}
+            protocolAnalysis={mostRecentAnalysis}
           />
         ) : null}
       </Portal>
       <ChildNavigation
-        header={enableDeckConfig ? t('modules_and_deck') : t('modules')}
+        header={t('modules_and_deck')}
         onClickBack={() => setSetupScreen('prepare to run')}
         buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
         buttonType="tertiaryLowLight"
@@ -466,14 +457,12 @@ export function ProtocolSetupModulesAndDeck({
               )
             })}
           </Flex>
-          {enableDeckConfig ? (
-            <FixtureTable
-              mostRecentAnalysis={mostRecentAnalysis}
-              setSetupScreen={setSetupScreen}
-              setFixtureLocation={setFixtureLocation}
-              setProvidedFixtureOptions={setProvidedFixtureOptions}
-            />
-          ) : null}
+          <FixtureTable
+            mostRecentAnalysis={mostRecentAnalysis}
+            setSetupScreen={setSetupScreen}
+            setFixtureLocation={setFixtureLocation}
+            setProvidedFixtureOptions={setProvidedFixtureOptions}
+          />
         </Flex>
       </Flex>
       <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />

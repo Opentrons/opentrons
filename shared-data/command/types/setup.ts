@@ -60,6 +60,7 @@ export interface LoadLiquidRunTimeCommand
     LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
+//  TODO(jr, 10/31/23): update `loadFixture` to `loadAddressableArea`
 export interface LoadFixtureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'loadFixture'
   params: LoadFixtureParams
@@ -91,11 +92,13 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
+  | { addressableAreaName: string }
 
 export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
+  | { addressableAreaName: string }
 
 export interface ModuleLocation {
   slotName: string
@@ -135,6 +138,7 @@ export interface MoveLabwareParams {
 interface MoveLabwareResult {
   offsetId: string
 }
+
 interface LoadModuleParams {
   moduleId?: string
   location: ModuleLocation

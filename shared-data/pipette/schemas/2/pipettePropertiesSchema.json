@@ -61,9 +61,8 @@
     "tipConfigurations": {
       "type": "object",
       "description": "Object containing configurations specific to tip handling",
-      "required": ["current", "speed"],
+      "required": ["speed"],
       "properties": {
-        "current": { "$ref": "#/definitions/currentRange" },
         "presses": {},
         "speed": { "$ref": "#/definitions/editConfigurations" },
         "increment": {},

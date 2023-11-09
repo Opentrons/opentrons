@@ -27,7 +27,7 @@ index 174a8f76e4..01b81cd6a0 100644
      def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
          return push_out_dist_mm <= (
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
-index 0cddcabd9f..4111cf1cf2 100644
+index b0ca38d294..f213febabd 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py
 +++ b/api/src/opentrons/protocol_api/core/legacy/deck.py
 @@ -47,11 +47,11 @@ class DeckItem(Protocol):
@@ -36,11 +36,11 @@ index 0cddcabd9f..4111cf1cf2 100644
  
 -    def __init__(self, deck_type: str) -> None:
 +    def __init__(
-+        self, deck_type: str, version: int = DEFAULT_DECK_DEFINITION_VERSION
++        self, deck_type: str, version: int = DEFAULT_LEGACY_DECK_DEFINITION_VERSION
 +    ) -> None:
          super().__init__()
 -        self._definition = load_deck(
--            name=deck_type, version=DEFAULT_DECK_DEFINITION_VERSION
+-            name=deck_type, version=DEFAULT_LEGACY_DECK_DEFINITION_VERSION
 -        )
 +        self._definition = load_deck(name=deck_type, version=version)
          self._positions = {}

@@ -173,7 +173,9 @@ export const migrateFile = (
     .map(command => {
       const labwareId = command.params.labwareId
       const definitionId = labware[labwareId].definitionId
-      const { namespace, version } = labwareDefinitions[definitionId]
+      const { namespace, version, parameters } = labwareDefinitions[
+        definitionId
+      ]
       const labwareLocation = command.params.location
       let location: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -188,7 +190,7 @@ export const migrateFile = (
         ...command,
         params: {
           ...command.params,
-          loadName: definitionId,
+          loadName: parameters.loadName,
           namespace,
           version,
           location,

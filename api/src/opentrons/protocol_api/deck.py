@@ -65,13 +65,47 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         self._core_map = core_map
         self._api_version = api_version
 
-        self._protocol_core.robot_type
+        # TODO(jbl 10-30-2023) this hardcoding should be removed once slots are refactored to work with deck config
+        if self._protocol_core.robot_type == "OT-2 Standard":
+            ordered_slot_ids = [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+            ]
+        else:
+            ordered_slot_ids = [
+                "D1",
+                "D2",
+                "D3",
+                "C1",
+                "C2",
+                "C3",
+                "B1",
+                "B2",
+                "B3",
+                "A1",
+                "A2",
+                "A3",
+            ]
+
+        self._slot_definitions_by_name = {
+            slot_id: self._protocol_core.get_slot_definition(
+                DeckSlotName.from_primitive(slot_id)
+            )
+            for slot_id in ordered_slot_ids
+        }
 
         deck_locations = protocol_core.get_deck_definition()["locations"]
 
-        self._slot_definitions_by_name = {
-            slot["id"]: slot for slot in deck_locations["orderedSlots"]
-        }
         self._calibration_positions = [
             CalibrationPosition(
                 id=point["id"],

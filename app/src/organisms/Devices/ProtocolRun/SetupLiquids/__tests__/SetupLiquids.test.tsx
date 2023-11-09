@@ -23,7 +23,12 @@ const mockBackToTopButton = BackToTopButton as jest.MockedFunction<
 
 const render = (props: React.ComponentProps<typeof SetupLiquids>) => {
   return renderWithProviders(
-    <SetupLiquids robotName="otie" runId="123" protocolRunHeaderRef={null} />,
+    <SetupLiquids
+      robotName="otie"
+      runId="123"
+      protocolRunHeaderRef={null}
+      protocolAnalysis={null}
+    />,
     {
       i18nInstance: i18n,
     }

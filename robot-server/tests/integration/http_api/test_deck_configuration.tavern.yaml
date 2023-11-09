@@ -1,0 +1,110 @@
+test_name: Test setting and getting a Flex deck configuration
+
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: Set a valid deck configuration
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+      method: PUT
+      json:
+        data:
+          cutoutFixtures: &expectedCutoutFixtures
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutA1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutB1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutC1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutD1
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutA2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutC2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutD2
+            # Throw in a weird right-side deck layout
+            # so we know this won't happen to match the default.
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutA3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutB3
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutC3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutD3
+
+  - name: Get the deck configuration
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+    response:
+      json:
+        data:
+          lastUpdatedAt: !anystr
+          cutoutFixtures: *expectedCutoutFixtures
+      save:
+        json:
+          last_updated_at: data.lastUpdatedAt
+
+  - name: Set an invalid deck configuration
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+      method: PUT
+      json:
+        data:
+          cutoutFixtures:
+            # Invalid deck configuration: cutoutA1 is left unoccupied.
+            # - cutoutFixtureId: singleLeftSlot
+            #   cutoutId: cutoutA1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutB1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutC1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutD1
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutA2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutC2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutD2
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutA3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutB3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutC3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutD3
+    response:
+      status_code: 422
+      json:
+        errors:
+          - id: InvalidDeckConfiguration
+            title: Invalid Deck Configuration
+            errorCode: '4000'
+            detail: Invalid deck configuration.
+            meta:
+              deckConfigurationProblem: UnoccupiedCutoutError
+              cutout_id: cutoutA1
+
+  - name: Get the deck configuration and make sure it's not the invalid one
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+    response:
+      json:
+        data:
+          lastUpdatedAt: '{last_updated_at}'
+          cutoutFixtures: *expectedCutoutFixtures
+# TODO(mm, 2023-11-02):
+#
+# - Test that the server has a default deck configuration.
+#   The default configuration will be different between OT-2 and Flex.

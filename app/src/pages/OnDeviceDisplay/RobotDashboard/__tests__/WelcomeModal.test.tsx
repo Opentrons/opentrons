@@ -6,11 +6,10 @@ import { i18n } from '../../../../i18n'
 import { WelcomeModal } from '../WelcomeModal'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
 jest.mock('../../../../redux/config')
 jest.mock('@opentrons/react-api-client')
-jest.mock('@opentrons/shared-data/protocol/types/schemaV7/command/incidental')
 
 const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation

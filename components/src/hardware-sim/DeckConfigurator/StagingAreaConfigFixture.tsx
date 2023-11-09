@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 
 import {
   getDeckDefFromRobotType,
@@ -64,15 +65,7 @@ export function StagingAreaConfigFixture(
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={COLORS.grey2}
-        borderRadius={BORDERS.radiusSoftCorners}
-        color={COLORS.white}
-        gridGap={SPACING.spacing8}
-        justifyContent={JUSTIFY_CENTER}
-        width="100%"
-      >
+      <Flex css={STAGING_AREA_CONFIG_STYLE}>
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
           {stagingAreaDef.metadata.displayName}
         </Text>
@@ -89,3 +82,25 @@ export function StagingAreaConfigFixture(
     </RobotCoordsForeignObject>
   )
 }
+
+const STAGING_AREA_CONFIG_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  background-color: ${COLORS.grey2};
+  border-radius: ${BORDERS.borderRadiusSize1};
+  color: ${COLORS.white};
+  grid-gap: ${SPACING.spacing8};
+  justify-content: ${JUSTIFY_CENTER};
+  width: 100%;
+
+  &:active {
+    background-color: ${COLORS.darkBlack90};
+  }
+
+  &:hover {
+    background-color: ${COLORS.grey1};
+  }
+
+  &:focus-visible {
+    border: 3px solid ${COLORS.fundamentalsFocus};
+  }
+`

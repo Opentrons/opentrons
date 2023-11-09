@@ -16,7 +16,7 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -104,7 +104,7 @@ class LabwareState:
     labware_offsets_by_id: Dict[str, LabwareOffset]
 
     definitions_by_uri: Dict[str, LabwareDefinition]
-    deck_definition: DeckDefinitionV3
+    deck_definition: DeckDefinitionV4
 
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
@@ -114,7 +114,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV3,
+        deck_definition: DeckDefinitionV4,
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
@@ -304,7 +304,7 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
         return self._state.deck_definition
 
@@ -312,8 +312,54 @@ class LabwareView(HasState[LabwareState]):
         """Get the definition of a slot in the deck."""
         deck_def = self.get_deck_definition()
 
-        for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == slot.id:
+        # TODO(jbl 2023-10-19 this is all incredibly hacky and ultimately we should get rid of SlotDefV3, and maybe
+        #   move all this to another store/provider. However for now, this can be more or less equivalent and not break
+        #   things TM TM TM
+
+        for cutout in deck_def["locations"]["cutouts"]:
+            if cutout["id"].endswith(slot.id):
+                base_position = cutout["position"]
+                break
+        else:
+            raise errors.SlotDoesNotExistError(
+                f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
+            )
+
+        slot_def: SlotDefV3
+        # Slot 12/fixed trash for ot2 is a little weird so if its that just return some hardcoded stuff
+        if slot.id == "12":
+            slot_def = {
+                "id": "12",
+                "position": base_position,
+                "boundingBox": {
+                    "xDimension": 128.0,
+                    "yDimension": 86.0,
+                    "zDimension": 0,
+                },
+                "displayName": "Slot 12",
+                "compatibleModuleTypes": [],
+            }
+            return slot_def
+
+        for area in deck_def["locations"]["addressableAreas"]:
+            if area["id"] == slot.id:
+                offset = area["offsetFromCutoutFixture"]
+                position = [
+                    offset[0] + base_position[0],
+                    offset[1] + base_position[1],
+                    offset[2] + base_position[2],
+                ]
+                slot_def = {
+                    "id": area["id"],
+                    "position": position,
+                    "boundingBox": area["boundingBox"],
+                    "displayName": area["displayName"],
+                    "compatibleModuleTypes": area["compatibleModuleTypes"],
+                }
+                if area.get("matingSurfaceUnitVector"):
+                    slot_def["matingSurfaceUnitVector"] = area[
+                        "matingSurfaceUnitVector"
+                    ]
                 return slot_def
 
         raise errors.SlotDoesNotExistError(
@@ -661,7 +707,7 @@ class LabwareView(HasState[LabwareState]):
 
         return None
 
-    def get_fixed_trash_id(self) -> str:
+    def get_fixed_trash_id(self) -> Optional[str]:
         """Get the identifier of labware loaded into the fixed trash location.
 
         Raises:
@@ -677,9 +723,7 @@ class LabwareView(HasState[LabwareState]):
             }:
                 return labware.id
 
-        raise errors.LabwareNotLoadedError(
-            "No labware loaded into fixed trash location by this deck type."
-        )
+        return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""

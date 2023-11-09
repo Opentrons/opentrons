@@ -166,7 +166,7 @@ def test_critical_points_pipette_offset(
 ) -> None:
     hw_pipette = pipette_builder(model, calibration)
     # pipette offset + nozzle offset to determine critical point
-    offsets = calibration.offset + Point(*hw_pipette.nozzle_offset)
+    offsets = calibration.offset + hw_pipette.nozzle_offset
     assert hw_pipette.critical_point() == offsets
     assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == offsets
     assert hw_pipette.critical_point(types.CriticalPoint.TIP) == offsets

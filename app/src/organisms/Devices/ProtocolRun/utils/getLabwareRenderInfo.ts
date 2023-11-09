@@ -1,12 +1,11 @@
-import {
+import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
-  getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
-  ProtocolAnalysisFile,
+  LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -46,10 +45,7 @@ export interface LabwareRenderInfoById {
 }
 
 export const getLabwareRenderInfo = (
-  protocolData:
-    | ProtocolAnalysisFile<{}>
-    | CompletedProtocolAnalysis
-    | ProtocolAnalysisOutput,
+  protocolData: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands
@@ -79,7 +75,10 @@ export const getLabwareRenderInfo = (
         )
       }
       // TODO(bh, 2023-10-19): convert this to deck definition v4 addressableAreas
-      const slotName = location.slotName.toString()
+      const slotName =
+        'addressableAreaName' in location
+          ? location.addressableAreaName
+          : location.slotName
       // TODO(bh, 2023-10-19): remove slotPosition when render info no longer relies on directly
       const slotPosition = getSlotPosition(deckDef, slotName)
 

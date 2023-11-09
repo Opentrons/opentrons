@@ -3,6 +3,7 @@ test_name: Upload and analyze a JSONv8 protocol
 marks:
   - usefixtures:
       - ot3_server_base_url
+  - ot3_only
 
 stages:
   - name: Upload simple v8 protocol for flex
@@ -89,12 +90,6 @@ stages:
                 pipetteName: p1000_96
                 mount: left
             labware:
-              - id: fixedTrash
-                loadName: opentrons_1_trash_1100ml_fixed
-                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-                displayName: Trash
-                location:
-                  slotName: 'A3'
               - id: sourcePlateId
                 loadName: armadillo_96_wellplate_200ul_pcr_full_skirt
                 definitionUri: opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
@@ -113,6 +108,12 @@ stages:
                 displayName: Opentrons 96 Tip Rack 1000 µL
                 location:
                   slotName: 'B2'
+              - id: fixedTrash
+                loadName: opentrons_1_trash_1100ml_fixed
+                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                displayName: Trash
+                location:
+                  slotName: 'A3'
             modules:
               - id: magneticModuleId
                 serialNumber: !anystr
@@ -593,6 +594,7 @@ test_name: Upload and analyze a JSONv8 protocol, with liquids
 marks:
   - usefixtures:
       - ot3_server_base_url
+  - ot3_only
 
 stages:
   - name: Upload simple v8 protocol

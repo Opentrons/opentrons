@@ -22,6 +22,7 @@ from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import (
     EngineStore,
     EngineConflictError,
+    NoRunnerEnginePairError,
     get_estop_listener,
 )
 
@@ -147,10 +148,10 @@ async def test_clear_engine(subject: EngineStore) -> None:
     assert subject.current_run_id is None
     assert isinstance(result, RunResult)
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.engine
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.runner
 
 
@@ -174,9 +175,9 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
     await subject.clear()
 
     # TODO: test engine finish is called
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.engine
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoRunnerEnginePairError):
         subject.runner
 
 

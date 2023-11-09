@@ -1,6 +1,13 @@
 import type { CreateCommand } from '../../../command/types'
+import type {
+  LoadedPipette,
+  LoadedLabware,
+  LoadedModule,
+  Liquid,
+} from '../../../js'
 import type { CommandAnnotation } from '../../../commandAnnotation/types'
-import type { LabwareDefinition2 } from '../../../js/types'
+import type { LabwareDefinition2, RobotType } from '../../../js/types'
+import type { RunTimeCommand } from '../schemaV8'
 
 export * from '../../../command/types'
 
@@ -56,37 +63,23 @@ export interface LiquidV1Mixin {
   }
 }
 
-export interface DeckStructure {
+export interface RobotStructure {
   model: string
   deckId: string
 }
 
-export interface OT2DeckSpec {
-  model: 'OT-2 Standard'
-  deckId: 'ot2_standard' | 'ot2_short_trash'
-}
-
-export interface OT3DeckSpec {
-  model: 'OT-3 Standard'
-  deckId: 'ot3_standard'
-}
-
-export interface RobotStructure {
+export interface OT2RobotMixin {
   robot: {
-    deckSchemaId: string
-  } & DeckStructure
+    model: 'OT-2 Standard'
+    deckId: 'ot2_standard' | 'ot2_short_trash'
+  }
 }
 
-export interface RobotDeckV3Mixin {
+export interface OT3RobotMixin {
   robot: {
-    deckSchemaId: 'opentronsDeckSchemaV3'
-  } & (OT2DeckSpec | OT3DeckSpec)
-}
-
-export interface RobotDeckV4Mixin {
-  robot: {
-    deckSchemaId: 'opentronsDeckSchemaV3'
-  } & (OT2DeckSpec | OT3DeckSpec)
+    model: 'OT-3 Standard'
+    deckId: 'ot3_standard'
+  }
 }
 
 export interface ProtocolBase<DesignerApplicationData> {
@@ -113,7 +106,7 @@ export interface ProtocolBase<DesignerApplicationData> {
 export type ProtocolFile<
   DesignerApplicationData = {}
 > = ProtocolBase<DesignerApplicationData> &
-  (RobotDeckV3Mixin | RobotDeckV4Mixin) &
+  (OT2RobotMixin | OT3RobotMixin) &
   LabwareV2Mixin &
   LiquidV1Mixin &
   CommandV8Mixin &
@@ -125,3 +118,43 @@ export type ProtocolStructure = ProtocolBase<{}> &
   LiquidStructure &
   CommandsStructure &
   CommandAnnotationsStructure
+
+/**
+ * This type interface is represents the output of the opentrons analyze cli tool
+ * which contains the protocol analysis engine
+ * TODO: reconcile this type with that of the analysis returned from
+ * the protocols record endpoints on the robot-server
+ */
+export interface ProtocolAnalysisOutput {
+  createdAt: string
+  files: AnalysisSourceFile[]
+  config: JsonConfig | PythonConfig
+  metadata: { [key: string]: any }
+  commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  pipettes: LoadedPipette[]
+  modules: LoadedModule[]
+  liquids: Liquid[]
+  errors: AnalysisError[]
+  robotType?: RobotType
+}
+
+interface AnalysisSourceFile {
+  name: string
+  role: 'main' | 'labware'
+}
+export interface JsonConfig {
+  protocolType: 'json'
+  schemaVersion: number
+}
+export interface PythonConfig {
+  protocolType: 'python'
+  apiVersion: [major: number, minor: number]
+}
+
+interface AnalysisError {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
+}

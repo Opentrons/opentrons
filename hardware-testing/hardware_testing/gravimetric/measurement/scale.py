@@ -112,9 +112,17 @@ class Scale:
         """Tare."""
         self._scale.set_tare(grams)
 
+    def read_max_capacity(self) -> float:
+        """Read max capacity."""
+        return self._scale.read_max_capacity()
+
     def read_serial_number(self) -> str:
         """Read serial number."""
         return self._scale.read_serial_number()
+
+    def zero(self) -> None:
+        """Zero."""
+        self._scale.zero()
 
     def calibrate(self) -> None:
         """Calibrate."""

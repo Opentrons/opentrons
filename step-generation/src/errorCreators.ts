@@ -202,3 +202,12 @@ export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
     message: 'The destination for dropping tip does not exist',
   }
 }
+
+export const additionalEquipmentDoesNotExist = (args: {
+  additionalEquipment: string
+}): CommandCreatorError => {
+  return {
+    type: 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST',
+    message: `The ${args.additionalEquipment} does not exist`,
+  }
+}

@@ -1,19 +1,19 @@
-import { migrateFile } from '../7_1_0'
+import { migrateFile } from '../8_0_0'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import _oldDoItAllProtocol from '../../../../fixtures/protocol/7/doItAllV7.json'
 import { getOnlyLatestDefs, LabwareDefByDefURI } from '../../../labware-defs'
-import type { ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolFileV7 } from '@opentrons/shared-data'
 
 jest.mock('../../../labware-defs')
 
-const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFile<any>
+const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV7<any>
 
 const mockGetOnlyLatestDefs = getOnlyLatestDefs as jest.MockedFunction<
   typeof getOnlyLatestDefs
 >
 const trashUri = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
 
-describe('v7.1 migration', () => {
+describe('v8.0 migration', () => {
   beforeEach(() => {
     mockGetOnlyLatestDefs.mockReturnValue({
       [trashUri]: fixture_trash,
@@ -33,21 +33,6 @@ describe('v7.1 migration', () => {
           location: {
             moduleId:
               'c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType',
-          },
-          namespace: 'opentrons',
-          version: 1,
-        },
-      },
-      {
-        commandType: 'loadLabware',
-        key: expect.any(String),
-        params: {
-          displayName: 'Opentrons Fixed Trash',
-          labwareId:
-            '89d0e1b6-4d51-447b-b01b-3726a1f54137:opentrons/opentrons_1_trash_3200ml_fixed/1',
-          loadName: 'opentrons_1_trash_3200ml_fixed',
-          location: {
-            slotName: 'A3',
           },
           namespace: 'opentrons',
           version: 1,
