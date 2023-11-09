@@ -57,6 +57,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'dispense':
     case 'blowout':
     case 'dropTip':
+    case 'dropTipInPlace':
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
