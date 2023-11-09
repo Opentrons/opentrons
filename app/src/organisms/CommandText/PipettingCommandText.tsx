@@ -55,7 +55,7 @@ export const PipettingCommandText = ({
       const { volume, flowRate } = command.params
       return t('aspirate', {
         well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware: getLabwareName(robotSideAnalysis, labwareId ?? ''),
         labware_location: displayLocation,
         volume: volume,
         flow_rate: flowRate,
