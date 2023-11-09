@@ -122,7 +122,7 @@ async def create_run_action(
         await maintenance_engine_store.clear()
     try:
         if action_type == RunActionType.PLAY:
-            deck_configuration = get_deck_configuration_store().get_cutoutFixtures()
+            deck_configuration = deck_configuration_store.get_cutoutFixtures()
         action = run_controller.create_action(
             action_id=action_id,
             action_type=action_type,

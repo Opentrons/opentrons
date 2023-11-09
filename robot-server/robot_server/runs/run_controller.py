@@ -11,6 +11,7 @@ from .engine_store import EngineStore
 from .run_store import RunStore
 from .action_models import RunAction, RunActionType
 
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 log = logging.getLogger(__name__)
 
