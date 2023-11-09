@@ -171,6 +171,7 @@ export function CommandText(props: Props): JSX.Element | null {
         pip => pip.id === pipetteId
       )?.pipetteName
 
+      // TODO (sb, 11/9/23): Add support for other configurations when needed
       return (
         <StyledText as="p" {...styleProps}>
           {t('configure_nozzle_layout', {

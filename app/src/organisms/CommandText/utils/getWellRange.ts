@@ -24,7 +24,7 @@ export function getWellRange(
         c.commandType === 'configureNozzleLayout' &&
         c.params?.pipetteId === pipetteId
       ) {
-        // TODO(sb(11/9/23): add support for quadrant and row configurations as needed)
+        // TODO(sb, 11/9/23): add support for quadrant and row configurations when needed
         if (c.params.configuration_params.style === 'SINGLE') {
           usedChannels = 1
         } else if (c.params.configuration_params.style === 'COLUMN') {
