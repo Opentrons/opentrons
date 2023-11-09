@@ -1,9 +1,10 @@
 # noqa: D100
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from . import models
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 
 class DeckConfigurationStore:
@@ -26,3 +27,12 @@ class DeckConfigurationStore:
         return models.DeckConfigurationResponse.construct(
             cutoutFixtures=self._cutoutFixtures, lastUpdatedAt=self._last_updated_at
         )
+    def get_cutoutFixtures(self) -> DeckConfigurationType:
+        """Get the robot's current deck configuration in an expected typing."""
+        deck_configuration: DeckConfigurationType = []
+        for item in self._cutoutFixtures:
+            deck_configuration.append(Tuple[item.cutoutFixtureId, item.cutoutId])
+        return deck_configuration
+
+
+

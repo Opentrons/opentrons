@@ -33,6 +33,8 @@ from opentrons.protocol_engine import (
 
 from robot_server.protocols import ProtocolResource
 
+#tbd cleanup this import
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
@@ -150,6 +152,7 @@ class EngineStore:
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
@@ -171,6 +174,7 @@ class EngineStore:
         else:
             load_fixed_trash = False
 
+        #convert the robot server deck config type to a list of tupled strings and pass to create protocol engine
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -181,6 +185,7 @@ class EngineStore:
                 ),
             ),
             load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
         )
         runner = create_protocol_runner(
             protocol_engine=engine,
