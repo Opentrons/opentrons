@@ -6,9 +6,12 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
+import {
+  getRobotUpdateDisplayInfo,
+  getRobotUpdateVersion,
+} from '../../../../../redux/robot-update'
 import { getDiscoverableRobotByName } from '../../../../../redux/discovery'
-import { UpdateRobotModal } from '../UpdateRobotModal'
+import { UpdateRobotModal, RELEASE_NOTES_URL_BASE } from '../UpdateRobotModal'
 import type { Store } from 'redux'
 
 import type { State } from '../../../../../redux/types'
@@ -24,6 +27,9 @@ const mockGetRobotUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFu
 >
 const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
   typeof getDiscoverableRobotByName
+>
+const mockGetRobotUpdateVersion = getRobotUpdateVersion as jest.MockedFunction<
+  typeof getRobotUpdateVersion
 >
 
 const render = (props: React.ComponentProps<typeof UpdateRobotModal>) => {
@@ -51,6 +57,7 @@ describe('UpdateRobotModal', () => {
       updateFromFileDisabledReason: 'test',
     })
     when(mockGetDiscoverableRobotByName).mockReturnValue(null)
+    when(mockGetRobotUpdateVersion).mockReturnValue('7.0.0')
   })
 
   afterEach(() => {
@@ -91,6 +98,13 @@ describe('UpdateRobotModal', () => {
     expect(updateNow).toBeDisabled()
     fireEvent.click(remindMeLater)
     expect(props.closeModal).toHaveBeenCalled()
+  })
+
+  it('renders a release notes link pointing to the Github releases page', () => {
+    const [{ getByText }] = render(props)
+
+    const link = getByText('Release notes')
+    expect(link).toHaveAttribute('href', RELEASE_NOTES_URL_BASE + '7.0.0')
   })
 
   it('renders proper text when reinstalling', () => {
