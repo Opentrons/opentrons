@@ -39,7 +39,10 @@ export function getRunLabwareRenderInfo(
       }
 
       if (location !== 'offDeck') {
-        const slotName = location.slotName
+        const slotName =
+          'addressableAreaName' in location
+            ? location.addressableAreaName
+            : location.slotName
         const slotPosition = getPositionFromSlotId(slotName, deckDef)
         const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
           deckDef,

@@ -52,7 +52,10 @@ export const getLabwareRenderInfo = (
         )
       }
 
-      const slotName = location.slotName
+      const slotName =
+        'addressableAreaName' in location
+          ? location.addressableAreaName
+          : location.slotName
       const slotPosition = getPositionFromSlotId(slotName, deckDef)
 
       if (slotPosition == null) {

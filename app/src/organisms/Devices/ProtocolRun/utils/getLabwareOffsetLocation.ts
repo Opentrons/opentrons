@@ -39,6 +39,11 @@ export const getLabwareOffsetLocation = (
         slotName: adapter.location.slotName,
         definitionUri: adapter.definitionUri,
       }
+    } else if ('addressableAreaName' in adapter.location) {
+      return {
+        slotName: adapter.location.addressableAreaName,
+        definitionUri: adapter.definitionUri,
+      }
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId
       const moduleModel = modules.find(
@@ -52,7 +57,12 @@ export const getLabwareOffsetLocation = (
       return { slotName, moduleModel, definitionUri: adapter.definitionUri }
     }
   } else {
-    return { slotName: labwareLocation.slotName }
+    return {
+      slotName:
+        'addressableAreaName' in labwareLocation
+          ? labwareLocation.addressableAreaName
+          : labwareLocation.slotName,
+    }
   }
   return null
 }

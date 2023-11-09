@@ -86,7 +86,9 @@ function getLabwareCoordinates({
 
     //  adapter on deck
     const loadedAdapterSlotPosition = getPositionFromSlotId(
-      loadedAdapterLocation.slotName,
+      'slotName' in loadedAdapterLocation
+        ? loadedAdapterLocation.slotName
+        : loadedAdapterLocation.addressableAreaName,
       deckDef
     )
     return loadedAdapterSlotPosition != null
@@ -94,6 +96,18 @@ function getLabwareCoordinates({
           x: loadedAdapterSlotPosition[0],
           y: loadedAdapterSlotPosition[1],
           z: loadedAdapterSlotPosition[2],
+        }
+      : null
+  } else if ('addressableAreaName' in location) {
+    const slotCoordinateTuple = getPositionFromSlotId(
+      location.addressableAreaName,
+      deckDef
+    )
+    return slotCoordinateTuple != null
+      ? {
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
         }
       : null
   } else if ('slotName' in location) {
