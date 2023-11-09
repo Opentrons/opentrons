@@ -232,6 +232,8 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
             slot = location.moduleId
           } else if ('labwareId' in location) {
             slot = location.labwareId
+          } else if ('addressableAreaName' in location) {
+            slot = location.addressableAreaName
           } else {
             slot = location.slotName
           }

@@ -85,13 +85,28 @@ function getLabwareCoordinates({
 
     //  adapter on deck
     const loadedAdapterSlot = orderedSlots.find(
-      s => s.id === loadedAdapterLocation.slotName
+      s =>
+        s.id ===
+        ('slotName' in loadedAdapterLocation
+          ? loadedAdapterLocation.slotName
+          : loadedAdapterLocation.addressableAreaName)
     )
     return loadedAdapterSlot != null
       ? {
           x: loadedAdapterSlot.position[0],
           y: loadedAdapterSlot.position[1],
           z: loadedAdapterSlot.position[2],
+        }
+      : null
+  } else if ('addressableAreaName' in location) {
+    const slotCoordinateTuple =
+      orderedSlots.find(s => s.id === location.addressableAreaName)?.position ??
+      null
+    return slotCoordinateTuple != null
+      ? {
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
         }
       : null
   } else if ('slotName' in location) {

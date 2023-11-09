@@ -30,9 +30,9 @@ import {
   WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
-import type { RunTimeCommand } from '../command/types'
+import type { RunTimeCommand, LabwareLocation } from '../command/types'
 import type { PipetteName } from './pipettes'
-import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -284,10 +284,28 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export interface CutoutFixture {
+  id: CutoutFixtureId
+  mayMountTo: CutoutId[]
+  displayName: string
+  providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+}
+
+export interface AddressableArea {
+  id: AddressableAreaName
+  areaType: 'slot' | 'movableTrash' | 'fixedTrash' | 'wasteChute'
+  matingSurfaceUnitVector: UnitVectorTuple
+  offsetFromCutoutFixture: UnitVectorTuple
+  boundingBox: Dimensions
+  displayName: string
+  compatibleModuleTypes: ModuleType[]
+}
+
 export interface DeckLocations {
   orderedSlots: DeckSlot[]
   calibrationPoints: DeckCalibrationPoint[]
   fixtures: DeckFixture[]
+  addressableAreas: AddressableArea[]
 }
 
 export interface DeckMetadata {
@@ -300,6 +318,7 @@ export interface DeckDefinition {
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple
   robot: DeckRobot
+  cutoutFixtures: CutoutFixture[]
   locations: DeckLocations
   metadata: DeckMetadata
   layers: INode[]
