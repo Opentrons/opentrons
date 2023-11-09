@@ -184,7 +184,8 @@ push-no-restart-ot3: sdist
 	echo $(sdist_file)
 	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
 	ssh $(ssh_helper) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
-	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/{ot3repl,ot3gripper} root@$(host):/usr/local/bin/
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/
+	scp $(ssh_helper) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/
 	ssh $(ssh_helper) root@$(host) "mount -o remount,ro /"
 
 .PHONY: push-ot3

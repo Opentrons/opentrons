@@ -5,7 +5,7 @@ import functools
 """ Classes and functions for pipette state tracking
 """
 import logging
-from typing import Any, Dict, Optional, Set, Tuple, Union, cast, List
+from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
@@ -46,6 +46,7 @@ from opentrons.hardware_control.types import (
     BoardRevision,
 )
 from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.hardware_control import nozzle_manager
 
 
 from opentrons_shared_data.pipette.dev_types import (
@@ -54,15 +55,12 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
 )
 from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
-from typing_extensions import Final
 
 
 RECONFIG_KEYS = {"quirks"}
 
 
 mod_log = logging.getLogger(__name__)
-
-INTERNOZZLE_SPACING_MM: Final[float] = 9
 
 # TODO (lc 11-1-2022) Once we unify calibration loading
 # for the hardware controller, we will be able to
@@ -92,6 +90,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pipette_version = self._config.version
         self._max_channels = self._config.channels
         self._backlash_distance = config.backlash_distance
+        self._pick_up_configurations = config.pick_up_tip_configurations
 
         self._liquid_class_name = pip_types.LiquidClasses.default
         self._liquid_class = self._config.liquid_properties[self._liquid_class_name]
@@ -109,6 +108,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             pipette_version=config.version,
         )
         self._nozzle_offset = self._config.nozzle_offset
+        self._nozzle_manager = (
+            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
+                self._config.nozzle_map,
+                self._config.partial_tip_configurations.per_tip_pickup_current,
+            )
+        )
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
         self._current_tip_length = 0.0
@@ -197,8 +202,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._liquid_class_name
 
     @property
-    def nozzle_offset(self) -> List[float]:
-        return self._nozzle_offset
+    def nozzle_offset(self) -> Point:
+        return self._nozzle_manager.starting_nozzle_offset
+
+    @property
+    def nozzle_manager(self) -> nozzle_manager.NozzleConfigurationManager:
+        return self._nozzle_manager
 
     @property
     def pipette_offset(self) -> PipetteOffsetByPipetteMount:
@@ -282,6 +291,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._nozzle_manager = (
+            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
+                self._config.nozzle_map,
+                self._config.partial_tip_configurations.per_tip_pickup_current,
+            )
+        )
 
     def reset_pipette_offset(self, mount: Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -323,8 +338,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
         critical point will be used.
         """
-        instr = Point(*self._pipette_offset.offset)
-        offsets = self.nozzle_offset
 
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,
@@ -333,42 +346,22 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ]:
             raise InvalidCriticalPoint(cp_override.name, "pipette")
 
-        if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
-            cp_type = CriticalPoint.NOZZLE
-            tip_length = 0.0
-        else:
-            cp_type = CriticalPoint.TIP
-            tip_length = self.current_tip_length
-        if cp_override == CriticalPoint.XY_CENTER:
-            mod_offset_xy = [
-                offsets[0],
-                offsets[1] - (INTERNOZZLE_SPACING_MM * (self._config.channels - 1) / 2),
-                offsets[2],
-            ]
-            cp_type = CriticalPoint.XY_CENTER
-        elif cp_override == CriticalPoint.FRONT_NOZZLE:
-            mod_offset_xy = [
-                0,
-                (offsets[1] - INTERNOZZLE_SPACING_MM * (self._config.channels - 1)),
-                offsets[2],
-            ]
-            cp_type = CriticalPoint.FRONT_NOZZLE
-        else:
-            mod_offset_xy = list(offsets)
-        mod_and_tip = Point(
-            mod_offset_xy[0], mod_offset_xy[1], mod_offset_xy[2] - tip_length
+        instr = Point(*self._pipette_offset.offset)
+        cp_with_tip_length = self._nozzle_manager.critical_point_with_tip_length(
+            cp_override,
+            self.current_tip_length if cp_override != CriticalPoint.NOZZLE else 0.0,
         )
 
-        cp = mod_and_tip + instr
+        cp = cp_with_tip_length + instr
 
         if self._log.isEnabledFor(logging.DEBUG):
             info_str = "cp: {}{}: {} (from: ".format(
-                cp_type, " (from override)" if cp_override else "", cp
+                cp_override, " (from override)" if cp_override else "", cp
             )
             info_str += "model offset: {} + instrument offset: {}".format(
-                mod_offset_xy, instr
+                cp_with_tip_length, instr
             )
-            info_str += " - tip_length: {}".format(tip_length)
+            info_str += " - tip_length: {}".format(self.current_tip_length)
             info_str += ")"
             self._log.debug(info_str)
 
@@ -484,6 +477,25 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return push_out_dist_mm <= (
             self.plunger_positions.bottom - self.plunger_positions.blow_out
         )
+
+    def update_nozzle_configuration(
+        self,
+        back_left_nozzle: str,
+        front_right_nozzle: str,
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        Update nozzle configuration manager.
+        """
+        self._nozzle_manager.update_nozzle_configuration(
+            back_left_nozzle, front_right_nozzle, starting_nozzle
+        )
+
+    def reset_nozzle_configuration(self) -> None:
+        """
+        Reset nozzle configuration manager.
+        """
+        self._nozzle_manager.reset_to_default_configuration()
 
     def add_tip(self, tip_length: float) -> None:
         """

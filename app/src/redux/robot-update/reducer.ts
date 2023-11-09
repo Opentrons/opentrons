@@ -23,7 +23,7 @@ export const INITIAL_STATE: RobotUpdateState = {
 }
 
 export const initialSession = (
-  robotName: string,
+  robotName: string | null,
   session: RobotUpdateSession | null
 ): RobotUpdateSession => ({
   robotName,
@@ -67,6 +67,21 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
       }
     }
 
+    case Constants.ROBOTUPDATE_CHECKING_FOR_UPDATE: {
+      const session = state.session as RobotUpdateSession
+      const target = action.payload
+
+      return {
+        ...state,
+        session: {
+          ...session,
+          step: Constants.DOWNLOAD_FILE,
+          stage: Constants.WRITING,
+          target,
+        },
+      }
+    }
+
     case Constants.ROBOTUPDATE_DOWNLOAD_PROGRESS: {
       return {
         ...state,
@@ -77,6 +92,24 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
           },
         },
       }
+    }
+
+    case Constants.ROBOTUPDATE_DOWNLOAD_DONE: {
+      if (!state.session) return state
+
+      const { target, ...session } = state.session
+      const isThisRobotDownloadDone =
+        session?.step === Constants.DOWNLOAD_FILE && target === action.payload
+
+      return isThisRobotDownloadDone
+        ? {
+            ...state,
+            session: {
+              ...session,
+              stage: Constants.DONE,
+            },
+          }
+        : state
     }
 
     case Constants.ROBOTUPDATE_DOWNLOAD_ERROR: {
@@ -104,7 +137,12 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
 
       return {
         ...state,
-        session: { ...session, step: Constants.GET_TOKEN },
+        session: {
+          ...session,
+          robotName: host.name,
+          step: Constants.GET_TOKEN,
+          stage: null,
+        },
       }
     }
 

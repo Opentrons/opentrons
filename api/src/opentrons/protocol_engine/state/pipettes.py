@@ -6,6 +6,10 @@ from typing import Dict, List, Mapping, Optional, Tuple
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import (
+    NozzleConfigurationType,
+    NozzleMap,
+)
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
@@ -39,7 +43,10 @@ from ..commands import (
     CommandPrivateResult,
     PrepareToAspirateResult,
 )
-from ..commands.configuring_common import PipetteConfigUpdateResultMixin
+from ..commands.configuring_common import (
+    PipetteConfigUpdateResultMixin,
+    PipetteNozzleLayoutResultMixin,
+)
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
@@ -94,6 +101,7 @@ class PipetteState:
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
+    nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -112,6 +120,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             movement_speed_by_id={},
             static_config_by_id={},
             flow_rates_by_id={},
+            nozzle_configuration_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -144,6 +153,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 nozzle_offset_z=config.nozzle_offset_z,
             )
             self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
+        elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
+            self._state.nozzle_configuration_by_id[
+                private_result.pipette_id
+            ] = private_result.nozzle_map
 
         if isinstance(command.result, LoadPipetteResult):
             pipette_id = command.result.pipetteId
@@ -156,6 +169,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
+            self._state.nozzle_configuration_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId
@@ -535,6 +549,10 @@ class PipetteView(HasState[PipetteState]):
         """Get the serial number of the pipette."""
         return self.get_config(pipette_id).serial_number
 
+    def get_channels(self, pipette_id: str) -> int:
+        """Return the max channels of the pipette."""
+        return self.get_config(pipette_id).channels
+
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""
         return self.get_config(pipette_id).min_volume
@@ -597,3 +615,11 @@ class PipetteView(HasState[PipetteState]):
             if mount == MountType.LEFT
             else MotorAxis.RIGHT_PLUNGER
         )
+
+    def get_nozzle_layout_type(self, pipette_id: str) -> NozzleConfigurationType:
+        """Get the current set nozzle layout configuration."""
+        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
+        if nozzle_map_for_pipette:
+            return nozzle_map_for_pipette.configuration
+        else:
+            return NozzleConfigurationType.FULL
