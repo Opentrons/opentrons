@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next'
+
 import {
   CompletedProtocolAnalysis,
   getLabwareDefURI,
   RobotType,
 } from '@opentrons/shared-data'
-import type { PipettingRunTimeCommand } from '@opentrons/shared-data'
+
 import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { getLoadedLabware } from './utils/accessors'
 import {
@@ -12,6 +13,8 @@ import {
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
 } from './utils'
+
+import type { PipettingRunTimeCommand } from '@opentrons/shared-data'
 
 interface PipettingCommandTextProps {
   command: PipettingRunTimeCommand
@@ -26,14 +29,9 @@ export const PipettingCommandText = ({
 }: PipettingCommandTextProps): JSX.Element | null => {
   const { t } = useTranslation('protocol_command_text')
 
-  let labwareId = ''
-  let wellName = ''
-  if ('labwareId' in command.params) {
-    labwareId = command.params.labwareId
-  }
-  if ('wellName' in command.params) {
-    wellName = command.params.wellName
-  }
+  const labwareId =
+    'labwareId' in command.params ? command.params.labwareId : ''
+  const wellName = 'wellName' in command.params ? command.params.wellName : ''
 
   const allPreviousCommands = robotSideAnalysis.commands.slice(
     0,
@@ -57,7 +55,7 @@ export const PipettingCommandText = ({
       const { volume, flowRate } = command.params
       return t('aspirate', {
         well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId ?? ''),
+        labware: getLabwareName(robotSideAnalysis, labwareId),
         labware_location: displayLocation,
         volume: volume,
         flow_rate: flowRate,
