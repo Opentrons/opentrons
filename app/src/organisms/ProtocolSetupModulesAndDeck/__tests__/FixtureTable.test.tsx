@@ -122,7 +122,7 @@ describe('FixtureTable', () => {
     }
     const [{ getByText }] = render(props)
     getByText('Not configured').click()
-    expect(mockSetFixtureLocation).toHaveBeenCalledWith('D3')
+    expect(mockSetFixtureLocation).toHaveBeenCalledWith('cutoutD3')
     expect(mockSetSetupScreen).toHaveBeenCalledWith('deck configuration')
     expect(mockSetProvidedFixtureOptions).toHaveBeenCalledWith(['wasteChute'])
   })

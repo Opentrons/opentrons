@@ -43,19 +43,17 @@ export function getRunModuleRenderInfo(
       }
       const slotPosition = getPositionFromSlotId(slotName, deckDef)
 
-      return slotPosition != null
-        ? [
-            ...acc,
-            {
-              moduleId: module.id,
-              x: slotPosition[0] ?? 0,
-              y: slotPosition[1] ?? 0,
-              moduleDef,
-              nestedLabwareDef,
-              nestedLabwareId: nestedLabware?.id ?? null,
-            },
-          ]
-        : acc
+      return [
+        ...acc,
+        {
+          moduleId: module.id,
+          x: slotPosition?.[0] ?? 0,
+          y: slotPosition?.[1] ?? 0,
+          moduleDef,
+          nestedLabwareDef,
+          nestedLabwareId: nestedLabware?.id ?? null,
+        },
+      ]
     }, [])
   }
   return []

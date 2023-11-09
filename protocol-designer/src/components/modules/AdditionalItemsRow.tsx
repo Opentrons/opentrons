@@ -104,7 +104,7 @@ export function AdditionalItemsRow(
                   label="Position"
                   value={`${getCutoutDisplayName(
                     (name === 'trashBin'
-                      ? trashBinSlot
+                      ? trashBinSlot ?? ''
                       : WASTE_CHUTE_CUTOUT) as Cutout
                   )}`}
                 />
