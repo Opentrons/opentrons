@@ -2,6 +2,7 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import {
+  CoordinateTuple,
   DeckSlot,
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
@@ -18,27 +19,23 @@ describe('SlotControlsComponent', () => {
     typeof labwareModuleCompatibility.getLabwareIsCompatible
   >
   beforeEach(() => {
-    const slot: DeckSlot = {
-      id: 'deckSlot1',
-      position: [1, 2, 3],
-      boundingBox: {
-        xDimension: 10,
-        yDimension: 20,
-        zDimension: 40,
-      },
-      displayName: 'slot 1',
-      compatibleModules: [MAGNETIC_MODULE_TYPE],
+    const slotId = 'D1'
+    const slotPosition: CoordinateTuple = [1, 2, 3]
+    const slotBoundingBox = {
+      xDimension: 10,
+      yDimension: 20,
+      zDimension: 40,
     }
 
     const labwareOnDeck = {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'plate123',
-      slot: '3',
-      def: fixture_96_plate as LabwareDefinition2,
     }
 
     props = {
-      slot,
+      slotId,
+      slotPosition,
+      slotBoundingBox,
       addLabware: jest.fn(),
       moveDeckItem: jest.fn(),
       selectedTerminalItemId: START_TERMINAL_ITEM_ID,

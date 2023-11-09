@@ -39,6 +39,8 @@ import {
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_LOAD_NAME,
   AddressableAreaName,
+  CutoutFixture,
+  CutoutId,
 } from '@opentrons/shared-data'
 import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
@@ -156,21 +158,21 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
     ? compact([
-        allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '1' &&
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        )
-          ? deckDef.locations.addressableAreas.find(s => s.id === '4')?.id
-          : null,
-        allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '3' &&
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        )
-          ? deckDef.locations.addressableAreas.find(s => s.id === '6')?.id
-          : null,
-      ])
+      allModules.some(
+        moduleOnDeck =>
+          moduleOnDeck.slot === '1' &&
+          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+      )
+        ? deckDef.locations.addressableAreas.find(s => s.id === '4')?.id
+        : null,
+      allModules.some(
+        moduleOnDeck =>
+          moduleOnDeck.slot === '3' &&
+          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+      )
+        ? deckDef.locations.addressableAreas.find(s => s.id === '6')?.id
+        : null,
+    ])
     : []
 
   return (
@@ -283,8 +285,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             ) : null}
 
             {labwareLoadedOnModule == null &&
-            !shouldHideChildren &&
-            !isAdapter ? (
+              !shouldHideChildren &&
+              !isAdapter ? (
               <SlotControls
                 key={moduleOnDeck.slot}
                 slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
@@ -505,7 +507,7 @@ export const DeckSetup = (): JSX.Element => {
   const trashBinFixtures = [
     {
       fixtureId: trash?.id,
-      fixtureLocation: trash?.slot as Cutout,
+      fixtureLocation: trash?.slot != null ? getCutoutIdForAddressableArea(trash?.slot as AddressableAreaName, deckDef.cutoutFixtures) : null,
       loadName: TRASH_BIN_LOAD_NAME,
     },
   ]
@@ -515,13 +517,9 @@ export const DeckSetup = (): JSX.Element => {
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
   ).filter(aE => aE.name === STAGING_AREA_LOAD_NAME)
-  const locations = Object.values(
-    activeDeckSetup.additionalEquipmentOnDeck
-  ).map(aE => aE.location)
 
-  const filteredSlots = DEFAULT_SLOTS.filter(
-    slot => !locations.includes(slot.fixtureLocation)
-  )
+  const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(aa => isAddressableAreaStandardSlot(aa.id))
+
 
   return (
     <div className={styles.deck_row}>
@@ -538,16 +536,18 @@ export const DeckSetup = (): JSX.Element => {
                 <DeckFromLayers robotType={robotType} layerBlocklist={[]} />
               ) : (
                 <>
-                  {filteredSlots.map(fixture => (
-                    <SingleSlotFixture
-                      key={fixture.fixtureId}
-                      cutoutId={fixture.fixtureLocation as Cutout}
+                  {filteredAddressableAreas.map(addressableArea => {
+                    const cutoutId = getCutoutIdForAddressableArea(addressableArea.id, deckDef.cutoutFixtures)
+                    return cutoutId != null ? (<SingleSlotFixture
+                      key={addressableArea.id}
+                      cutoutId={cutoutId}
                       deckDefinition={deckDef}
                       slotClipColor={darkFill}
-                      showExpansion={fixture.fixtureLocation === 'A1'}
+                      showExpansion={cutoutId === 'cutoutA1'}
                       fixtureBaseColor={lightFill}
                     />
-                  ))}
+                    ) : null
+                  })}
                   {stagingAreaFixtures.map(fixture => (
                     <StagingAreaFixture
                       key={fixture.id}
@@ -559,6 +559,7 @@ export const DeckSetup = (): JSX.Element => {
                   ))}
                   {trash != null
                     ? trashBinFixtures.map(fixture => (
+                      fixture.fixtureLocation != null ? (
                         <React.Fragment key={fixture.fixtureId}>
                           <SingleSlotFixture
                             cutoutId={fixture.fixtureLocation}
@@ -575,7 +576,8 @@ export const DeckSetup = (): JSX.Element => {
                             backgroundColor={darkFill}
                           />
                         </React.Fragment>
-                      ))
+                      ) : null
+                    ))
                     : null}
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture
@@ -609,4 +611,19 @@ export const DeckSetup = (): JSX.Element => {
       </div>
     </div>
   )
+}
+
+function getCutoutIdForAddressableArea(
+  addressableArea: AddressableAreaName,
+  cutoutFixtures: CutoutFixture[]
+): CutoutId | null {
+  return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
+    const [cutoutId] =
+      Object.entries(
+        cutoutFixture.providesAddressableAreas
+      ).find(([_cutoutId, providedAAs]) =>
+        providedAAs.includes(addressableArea)
+      ) ?? []
+    return (cutoutId as CutoutId) ?? acc
+  }, null)
 }

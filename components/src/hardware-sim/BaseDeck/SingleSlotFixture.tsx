@@ -3,10 +3,10 @@ import * as React from 'react'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 
-import type { Cutout, DeckDefinition, ModuleType } from '@opentrons/shared-data'
+import type { CutoutId, DeckDefinition, ModuleType } from '@opentrons/shared-data'
 
 interface SingleSlotFixtureProps extends React.SVGProps<SVGGElement> {
-  cutoutId: Cutout
+  cutoutId: CutoutId
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
@@ -37,7 +37,7 @@ export function SingleSlotFixture(
   }
 
   const contentsByCutoutLocation: {
-    [cutoutId in Cutout]: JSX.Element
+    [cutoutId in CutoutId]: JSX.Element
   } = {
     cutoutA1: (
       <>
