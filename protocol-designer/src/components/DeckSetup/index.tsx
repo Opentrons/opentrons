@@ -33,7 +33,6 @@ import {
   DeckDefinition,
   RobotType,
   FLEX_ROBOT_TYPE,
-  Cutout,
   TRASH_BIN_LOAD_NAME,
   STAGING_AREA_LOAD_NAME,
   WASTE_CHUTE_CUTOUT,
@@ -71,7 +70,6 @@ import {
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
 import { SlotLabels } from './SlotLabels'
-import { DEFAULT_SLOTS } from './constants'
 import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
 
 import styles from './DeckSetup.css'
@@ -158,21 +156,21 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
     ? compact([
-      allModules.some(
-        moduleOnDeck =>
-          moduleOnDeck.slot === '1' &&
-          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-      )
-        ? deckDef.locations.addressableAreas.find(s => s.id === '4')?.id
-        : null,
-      allModules.some(
-        moduleOnDeck =>
-          moduleOnDeck.slot === '3' &&
-          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-      )
-        ? deckDef.locations.addressableAreas.find(s => s.id === '6')?.id
-        : null,
-    ])
+        allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '1' &&
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        )
+          ? deckDef.locations.addressableAreas.find(s => s.id === '4')?.id
+          : null,
+        allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '3' &&
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        )
+          ? deckDef.locations.addressableAreas.find(s => s.id === '6')?.id
+          : null,
+      ])
     : []
 
   return (
@@ -257,6 +255,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   labwareOnDeck={labwareLoadedOnModule}
                 />
                 {isAdapter ? (
+                  // @ts-expect-error
                   <AdapterControls
                     allLabware={allLabware}
                     onDeck={false}
@@ -285,8 +284,9 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             ) : null}
 
             {labwareLoadedOnModule == null &&
-              !shouldHideChildren &&
-              !isAdapter ? (
+            !shouldHideChildren &&
+            !isAdapter ? (
+              // @ts-expect-error
               <SlotControls
                 key={moduleOnDeck.slot}
                 slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
@@ -342,6 +342,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         )
         .map(addressableArea => {
           return (
+            // @ts-expect-error
             <SlotControls
               key={addressableArea.id}
               slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
@@ -367,7 +368,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           return null
 
         const slotPosition = getPositionFromSlotId(labware.slot, deckDef)
-        console.log('labawre', labware.slot)
         const slotBoundingBox = getAddressableAreaFromSlotId(
           labware.slot,
           deckDef
@@ -387,6 +387,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             />
             <g>
               {labwareIsAdapter ? (
+                //  @ts-expect-error
                 <AdapterControls
                   allLabware={allLabware}
                   onDeck={true}
@@ -507,7 +508,13 @@ export const DeckSetup = (): JSX.Element => {
   const trashBinFixtures = [
     {
       fixtureId: trash?.id,
-      fixtureLocation: trash?.slot != null ? getCutoutIdForAddressableArea(trash?.slot as AddressableAreaName, deckDef.cutoutFixtures) : null,
+      fixtureLocation:
+        trash?.slot != null
+          ? getCutoutIdForAddressableArea(
+              trash?.slot as AddressableAreaName,
+              deckDef.cutoutFixtures
+            )
+          : null,
       loadName: TRASH_BIN_LOAD_NAME,
     },
   ]
@@ -518,8 +525,9 @@ export const DeckSetup = (): JSX.Element => {
     activeDeckSetup.additionalEquipmentOnDeck
   ).filter(aE => aE.name === STAGING_AREA_LOAD_NAME)
 
-  const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(aa => isAddressableAreaStandardSlot(aa.id))
-
+  const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
+    aa => isAddressableAreaStandardSlot(aa.id)
+  )
 
   return (
     <div className={styles.deck_row}>
@@ -537,15 +545,19 @@ export const DeckSetup = (): JSX.Element => {
               ) : (
                 <>
                   {filteredAddressableAreas.map(addressableArea => {
-                    const cutoutId = getCutoutIdForAddressableArea(addressableArea.id, deckDef.cutoutFixtures)
-                    return cutoutId != null ? (<SingleSlotFixture
-                      key={addressableArea.id}
-                      cutoutId={cutoutId}
-                      deckDefinition={deckDef}
-                      slotClipColor={darkFill}
-                      showExpansion={cutoutId === 'cutoutA1'}
-                      fixtureBaseColor={lightFill}
-                    />
+                    const cutoutId = getCutoutIdForAddressableArea(
+                      addressableArea.id,
+                      deckDef.cutoutFixtures
+                    )
+                    return cutoutId != null ? (
+                      <SingleSlotFixture
+                        key={addressableArea.id}
+                        cutoutId={cutoutId}
+                        deckDefinition={deckDef}
+                        slotClipColor={darkFill}
+                        showExpansion={cutoutId === 'cutoutA1'}
+                        fixtureBaseColor={lightFill}
+                      />
                     ) : null
                   })}
                   {stagingAreaFixtures.map(fixture => (
@@ -558,26 +570,26 @@ export const DeckSetup = (): JSX.Element => {
                     />
                   ))}
                   {trash != null
-                    ? trashBinFixtures.map(fixture => (
-                      fixture.fixtureLocation != null ? (
-                        <React.Fragment key={fixture.fixtureId}>
-                          <SingleSlotFixture
-                            cutoutId={fixture.fixtureLocation}
-                            deckDefinition={deckDef}
-                            slotClipColor={COLORS.transparent}
-                            fixtureBaseColor={lightFill}
-                          />
-                          <FlexTrash
-                            robotType={robotType}
-                            trashIconColor={lightFill}
-                            trashLocation={
-                              fixture.fixtureLocation as TrashLocation
-                            }
-                            backgroundColor={darkFill}
-                          />
-                        </React.Fragment>
-                      ) : null
-                    ))
+                    ? trashBinFixtures.map(fixture =>
+                        fixture.fixtureLocation != null ? (
+                          <React.Fragment key={fixture.fixtureId}>
+                            <SingleSlotFixture
+                              cutoutId={fixture.fixtureLocation}
+                              deckDefinition={deckDef}
+                              slotClipColor={COLORS.transparent}
+                              fixtureBaseColor={lightFill}
+                            />
+                            <FlexTrash
+                              robotType={robotType}
+                              trashIconColor={lightFill}
+                              trashLocation={
+                                fixture.fixtureLocation as TrashLocation
+                              }
+                              backgroundColor={darkFill}
+                            />
+                          </React.Fragment>
+                        ) : null
+                      )
                     : null}
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture

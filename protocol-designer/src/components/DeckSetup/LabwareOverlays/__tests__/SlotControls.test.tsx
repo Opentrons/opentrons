@@ -3,7 +3,6 @@ import { shallow } from 'enzyme'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import {
   CoordinateTuple,
-  DeckSlot,
   LabwareDefinition2,
   MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
