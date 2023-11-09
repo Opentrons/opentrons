@@ -420,6 +420,10 @@ class OT3Controller:
         self._current_settings = self.get_current_settings(gantry_load)
         await self.set_default_currents()
 
+    def update_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        """Update the hardware feature flags used by the hardware controller."""
+        self._feature_flags = feature_flags
+
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
         motor_nodes = self._motor_nodes()

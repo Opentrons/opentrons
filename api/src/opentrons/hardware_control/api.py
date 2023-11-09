@@ -977,6 +977,14 @@ class API(
         """
         self._config = replace(self._config, **kwargs)
 
+    @property
+    def hardware_feature_flags(self) -> HardwareFeatureFlags:
+        return self._feature_flags
+
+    @hardware_feature_flags.setter
+    def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        self._feature_flags = feature_flags
+
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
 

@@ -1612,6 +1612,16 @@ class OT3API(
         """Update values of the robot's configuration."""
         self._config = replace(self._config, **kwargs)
 
+    @property
+    def hardware_feature_flags(self) -> HardwareFeatureFlags:
+        return self._feature_flags
+
+    @hardware_feature_flags.setter
+    def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        self._feature_flags = feature_flags
+        if isinstance(self._backend, OT3Controller):
+            self._backend.update_feature_flags(self._feature_flags)
+
     @ExecutionManagerProvider.wait_for_running
     async def _grip(self, duty_cycle: float, stay_engaged: bool = True) -> None:
         """Move the gripper jaw inward to close."""
