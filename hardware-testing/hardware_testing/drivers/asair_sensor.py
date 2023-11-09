@@ -16,6 +16,8 @@ import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
 from hardware_testing.data import ui
 
+from serial.tools.list_ports import comports  # type: ignore[import]
+
 log = logging.getLogger(__name__)
 
 USB_VID = 0x0403
@@ -72,17 +74,31 @@ class AsairSensorBase(ABC):
         ...
 
 
-def BuildAsairSensor(simulate: bool) -> AsairSensorBase:
+def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase:
     """Try to find and return an Asair sensor, if not found return a simulator."""
     ui.print_title("Connecting to Environmental sensor")
     if not simulate:
-        port = list_ports_and_select(device_name="Asair environmental sensor")
-        try:
-            sensor = AsairSensor.connect(port)
-            ui.print_info(f"Found sensor on port {port}")
-            return sensor
-        except SerialException:
-            pass
+        if not autosearch:
+            port = list_ports_and_select(device_name="Asair environmental sensor")
+            try:
+                sensor = AsairSensor.connect(port)
+                ui.print_info(f"Found sensor on port {port}")
+                return sensor
+            except SerialException:
+                pass
+        else:
+            ports = comports()
+            assert ports
+            for port in ports:
+                try:
+                    ui.print_info(f"Trying to connect to env sensor on port {port}")
+                    sensor = AsairSensor.connect(port)
+                    ser_id = sensor.get_serial()
+                    ui.print_info(f"Found env sensor {ser_id} on port {port}")
+                    return sensor
+                except:  # noqa: E722
+                    pass
+    ui.print_info("no sensor found returing simulator")
     return SimAsairSensor()
 
 
