@@ -372,7 +372,7 @@ class Labware:
         """The parent of this labware---where this labware is loaded.
 
         Returns:
-            If the labware is directly on the robot's deck, the `str` name of the deck slot,
+            If the labware is directly on the robot's deck, the ``str`` name of the deck slot,
             like ``"D1"`` (Flex) or ``"1"`` (OT-2). See :ref:`deck-slots`.
 
             If the labware is on a module, a :py:class:`ModuleContext`.
@@ -428,13 +428,13 @@ class Labware:
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def load_name(self) -> str:
-        """The API load name of the labware definition"""
+        """The API load name of the labware definition."""
         return self._core.load_name
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def parameters(self) -> "LabwareParameters":
-        """Internal properties of a labware including type and quirks"""
+        """Internal properties of a labware including type and quirks."""
         return self._core.get_parameters()
 
     @property  # type: ignore
@@ -558,7 +558,7 @@ class Labware:
         (see :ref:`protocol-api-deck-coords`) that the motion system
         will add to any movement targeting this labware instance.
 
-        The offset will *not* apply to any other labware instances,
+        The offset *will not* apply to any other labware instances,
         even if those labware are of the same type.
 
         .. caution::
@@ -596,7 +596,7 @@ class Labware:
 
     @requires_version(2, 0)
     def well(self, idx: Union[int, str]) -> Well:
-        """Deprecated---use result of `wells` or `wells_by_name`"""
+        """Deprecated---use result of ``wells`` or ``wells_by_name``."""
         if isinstance(idx, int):
             return self.wells()[idx]
         elif isinstance(idx, str):
@@ -609,20 +609,16 @@ class Labware:
     @requires_version(2, 0)
     def wells(self, *args: Union[str, int]) -> List[Well]:
         """
-        Accessor function used to generate a list of wells in top -> down,
+        Accessor function that generates a list of wells in a top  down,
         left -> right order. This is representative of moving down `rows` and
         across `columns` (e.g. 'A1', 'B1', 'C1'...'A2', 'B2', 'C2')
 
         With indexing one can treat it as a typical python
-        list. To access well A1, for example, write: labware.wells()[0]
+        list. To access well A1 for example, write ``labware.wells()[0]``.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.wells(1, 4, 8)` or `self.wells('A1', 'B2')`, but
-        `self.wells('A1', 4)` is invalid.
+        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
 
-        :return: Ordered list of all wells in a labware
+        :return: Ordered list of all wells in a labware.
         """
         if not args:
             return list(self._wells_by_name.values())
@@ -647,10 +643,10 @@ class Labware:
         Accessor function used to create a look-up table of Wells by name.
 
         With indexing one can treat it as a typical python
-        dictionary whose keys are well names. To access well A1, for example,
-        write: labware.wells_by_name()['A1']
+        dictionary whose keys are well names. To access well A1 for example,
+        write ``labware.wells_by_name()['A1']``.
 
-        :return: Dictionary of well objects keyed by well name
+        :return: Dictionary of well objects keyed by well name.
         """
         return dict(self._wells_by_name)
 
@@ -671,14 +667,10 @@ class Labware:
         Accessor function used to navigate through a labware by row.
 
         With indexing one can treat it as a typical python nested list.
-        To access row A for example, write: labware.rows()[0]. This
-        will output ['A1', 'A2', 'A3', 'A4'...]
+        To access row A for example, write ``labware.rows()[0]``. This
+        will output ``['A1', 'A2', 'A3', 'A4'...]``.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.rows(1, 4, 8)` or `self.rows('A', 'B')`, but  `self.rows('A', 4)`
-        is invalid.
+        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
 
         :return: A list of row lists
         """
@@ -708,10 +700,10 @@ class Labware:
         Accessor function used to navigate through a labware by row name.
 
         With indexing one can treat it as a typical python dictionary.
-        To access row A for example, write: labware.rows_by_name()['A']
-        This will output ['A1', 'A2', 'A3', 'A4'...].
+        To access row A for example, write ``labware.rows_by_name()['A']``.
+        This will output ``['A1', 'A2', 'A3', 'A4'...]``.
 
-        :return: Dictionary of Well lists keyed by row name
+        :return: Dictionary of Well lists keyed by row name.
         """
         return {
             row_name: [self._wells_by_name[well_name] for well_name in row]
@@ -733,17 +725,15 @@ class Labware:
         Accessor function used to navigate through a labware by column.
 
         With indexing one can treat it as a typical python nested list.
-        To access row A for example,
-        write: labware.columns()[0]
-        This will output ['A1', 'B1', 'C1', 'D1'...].
+        To access row A for example, write ``labware.columns()[0]``.
+        This will output ``['A1', 'B1', 'C1', 'D1'...]``.
 
-        Note that this method takes args for backward-compatibility, but use
-        of args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type (e.g.:
-        `self.columns(1, 4, 8)` or `self.columns('1', '2')`, but
-        `self.columns('1', 4)` is invalid.
+        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args
+        can be either strings or integers, but must all be the same type. For example, 
+        ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but
+        ``self.columns('1', 4)`` is not.
 
-        :return: A list of column lists
+        :return: A list of column lists.
         """
         if not args:
             return [
@@ -772,10 +762,10 @@ class Labware:
 
         With indexing one can treat it as a typical python dictionary.
         To access row A for example,
-        write: labware.columns_by_name()['1']
-        This will output ['A1', 'B1', 'C1', 'D1'...].
+        write ``labware.columns_by_name()['1']``.
+        This will output ``['A1', 'B1', 'C1', 'D1'...]``.
 
-        :return: Dictionary of Well lists keyed by column name
+        :return: Dictionary of Well lists keyed by column name.
         """
         return {
             column_name: [self._wells_by_name[well_name] for well_name in column]
@@ -795,7 +785,7 @@ class Labware:
     @requires_version(2, 0)
     def highest_z(self) -> float:
         """
-        The z-coordinate of the tallest single point anywhere on the labware.
+        The z-coordinate of the highest single point anywhere on the labware.
 
         This is drawn from the 'dimensions'/'zDimension' elements of the
         labware definition and takes into account the calibration offset.
