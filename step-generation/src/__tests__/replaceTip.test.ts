@@ -17,8 +17,11 @@ import type { InvariantContext, RobotState } from '../types'
 
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
+const tiprack4Id = 'tiprack4Id'
+const tiprack5Id = 'tiprack5Id'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
+const p100096Id = 'p100096Id'
 const wasteChuteId = 'wasteChuteId'
 describe('replaceTip', () => {
   let invariantContext: InvariantContext

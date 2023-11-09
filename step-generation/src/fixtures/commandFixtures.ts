@@ -90,6 +90,7 @@ export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => (
 // =================
 export const DEFAULT_PIPETTE = 'p300SingleId'
 export const MULTI_PIPETTE = 'p300MultiId'
+export const PIPETTE_96 = 'p100096Id'
 export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'
 export const TROUGH_LABWARE = 'troughId'
