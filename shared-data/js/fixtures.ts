@@ -105,7 +105,6 @@ export function getFixtureDisplayName(loadName: FixtureLoadName): string {
   }
 }
 
-
 const STANDARD_OT2_SLOTS = [
   '1',
   '2',
@@ -138,4 +137,8 @@ const STANDARD_FLEX_SLOTS = [
 export const isAddressableAreaStandardSlot = (
   addressableAreaId: string,
   deckDef: DeckDefinition
-): boolean => (deckDef.robot.model === FLEX_ROBOT_TYPE ? STANDARD_FLEX_SLOTS : STANDARD_OT2_SLOTS).includes(addressableAreaId)
+): boolean =>
+  (deckDef.robot.model === FLEX_ROBOT_TYPE
+    ? STANDARD_FLEX_SLOTS
+    : STANDARD_OT2_SLOTS
+  ).includes(addressableAreaId)
