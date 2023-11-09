@@ -16,13 +16,13 @@ interface StepMeterProps {
 
 export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const { totalSteps, currentStep } = props
+  const prevPercentComplete = React.useRef(0)
   const progress = currentStep != null ? currentStep : 0
-  const percentComplete = `${
+  const percentComplete =
     //    this logic puts a cap at 100% percentComplete which we should never run into
     currentStep != null && currentStep > totalSteps
       ? 100
       : (progress / totalSteps) * 100
-  }%`
 
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
@@ -45,10 +45,14 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     top: 0;
     height: 100%;
     background-color: ${COLORS.blueEnabled};
-    width: ${percentComplete};
+    width: ${percentComplete}%;
     transform: translateX(0);
-    transition: width 0.5s ease-in-out;
+    transition: ${prevPercentComplete.current <= percentComplete
+      ? 'width 0.5s ease-in-out'
+      : ''};
   `
+
+  prevPercentComplete.current = percentComplete
 
   return (
     <Box data-testid="StepMeter_StepMeterContainer" css={StepMeterContainer}>
