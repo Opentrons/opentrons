@@ -2,6 +2,7 @@ import * as React from 'react'
 import map from 'lodash/map'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
   BORDERS,
   Box,
@@ -26,17 +27,17 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
+
 import { Banner } from '../../../../atoms/Banner'
-import { StyledText } from '../../../../atoms/text'
-import { useChainLiveCommands } from '../../../../resources/runs/hooks'
-import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { StatusLabel } from '../../../../atoms/StatusLabel'
+import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useFeatureFlag } from '../../../../redux/config'
+import { useChainLiveCommands } from '../../../../resources/runs/hooks'
+import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
 import { getModuleTooHot } from '../../getModuleTooHot'
-import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
-import { MultipleModulesModal } from './MultipleModulesModal'
 import {
   ModuleRenderInfoForProtocol,
   useIsFlex,
@@ -44,9 +45,9 @@ import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../hooks'
-import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { LocationConflictModal } from './LocationConflictModal'
+import { MultipleModulesModal } from './MultipleModulesModal'
+import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'
 
 import type { Cutout, ModuleModel, Fixture } from '@opentrons/shared-data'
@@ -230,7 +231,6 @@ export function ModulesListItem({
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = React.useState<boolean>(false)
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
@@ -412,7 +412,7 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing10}
           >
-            {conflictedFixture != null && enableDeckConfig ? (
+            {conflictedFixture != null && isFlex ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing10}

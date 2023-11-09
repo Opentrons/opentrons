@@ -52,9 +52,10 @@ describe('Introduction', () => {
     getByRole('link', { name: 'Need help?' })
     expect(queryByRole('button', { name: 'Change tip rack' })).toBe(null)
   })
-  it('renders change tip rack button if deck calibration', () => {
+  it('renders change tip rack button if allowChangeTipRack', () => {
     const { getByRole, getByText, queryByRole } = render({
       sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
+      allowChangeTipRack: true,
     })[0]
     const button = getByRole('button', { name: 'Change tip rack' })
     button.click()

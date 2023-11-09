@@ -5,7 +5,7 @@
 	<title>Hardware-Testing: Plot</title>
 	<link rel="icon" href="/favicon.png" type="image/png">
 	<meta name="description" content="Hardware-Testing: Plot">
-	<script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+	<script src="plotly-2.12.1.min.js" charset="utf-8"></script>
 	<style>
 		html, body {
 			height: 100%;
@@ -15,7 +15,7 @@
 			border: solid 2px black;
 			position: absolute;
 			left: 5px;
-			top: 55px;
+			top: 105px;
 			display: inline-block;
 		}
 		#testnamecontainer {
@@ -24,13 +24,28 @@
 			top: 5px;
 			display: inline-block;
 		}
+		#buttoncontainer {
+			position: absolute;
+			border: 1px solid blue;
+			left: 8px;
+			top: 35px;
+			display: inline-block;
+			width: 500px;
+			height: 50px;
+			overflow-x: scroll;
+  			white-space: nowrap;
+		}
 	</style>
 </head>
 <body>
-	<div><p id="testnamecontainer">
-		Test Name:
-		<input type="text" id="testname" name="testname">
-	</p></div>
+	<div>
+		<p id="testnamecontainer">
+			Test Name:
+			<input type="text" id="testname" name="testname">
+		</p>
+		<p id="buttoncontainer">
+		</p>
+	</div>
 	<div id="plotly"></div>
 </body>
 <script src="./index.js" type="text/javascript"></script>

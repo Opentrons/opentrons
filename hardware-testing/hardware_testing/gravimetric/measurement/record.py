@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
 from statistics import stdev
+from subprocess import Popen
 from threading import Thread, Event
 from time import sleep, time
 from typing import List, Optional, Callable, Generator
@@ -10,6 +11,7 @@ from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
     create_file_name,
+    ui,
 )
 
 from .scale import Scale
@@ -17,8 +19,7 @@ from .scale import Scale
 SLEEP_TIME_IN_RECORD_LOOP = 0.05
 SLEEP_TIME_IN_RECORD_LOOP_SIMULATING = 0.01
 
-SERVER_PORT = 8080
-SERVER_CMD = "{0} -m hardware_testing.tools.plot --test-name gravimetric-ot3 --port {1}"
+SERVER_CMD = "python3 -m hardware_testing.tools.plot"
 
 
 @dataclass
@@ -216,6 +217,16 @@ class GravimetricRecording(List):
                 f"(start={start}, duration={duration})"
             )
 
+    def get_tagged_samples(self, tag: str) -> "GravimetricRecording":
+        """Get samples with given tag."""
+        return GravimetricRecording(
+            [sample for sample in self if sample.tag and sample.tag == tag]
+        )
+
+    def get_stable_samples(self) -> "GravimetricRecording":
+        """Get stable samples."""
+        return GravimetricRecording([sample for sample in self if sample.stable])
+
 
 class GravimetricRecorderConfig:
     """Recording config."""
@@ -281,8 +292,20 @@ class GravimetricRecorder:
         self._thread: Optional[Thread] = None
         self._sample_tag: str = ""
         self._scale_serial: str = ""
+        self._scale_max_capacity: float = 0.0
         super().__init__()
         self.activate()
+
+    def _start_graph_server_process(self) -> None:
+        if self.is_simulator:
+            return
+        assert self._cfg.test_name
+        # NOTE: it's ok if this fails b/c prior process is already using port
+        #       the server just needs to be running, doesn't matter when it started
+        Popen(f"nohup {SERVER_CMD} --test-name {self._cfg.test_name} &", shell=True)
+        if not self.is_simulator:
+            sleep(2)  # small delay so nohup output isn't confusing
+            ui.get_user_ready("open WEBPAGE to port 8080")
 
     @property
     def tag(self) -> str:
@@ -310,6 +333,11 @@ class GravimetricRecorder:
         return self._scale
 
     @property
+    def max_capacity(self) -> float:
+        """Max capacity."""
+        return self._scale_max_capacity
+
+    @property
     def serial_number(self) -> str:
         """Serial number."""
         return self._scale_serial
@@ -324,14 +352,15 @@ class GravimetricRecorder:
 
     def activate(self) -> None:
         """Activate."""
+        self._start_graph_server_process()
         # Some Radwag settings cannot be controlled remotely.
         # Listed below are the things the must be done using the touchscreen:
         #   1) Set profile to USER
         #   2) Set screensaver to NONE
         self._scale.connect()
         self._scale.initialize()
-        self._scale.tare(0.0)
         self._scale_serial = self._scale.read_serial_number()
+        self._scale_max_capacity = self._scale.read_max_capacity()
 
     def deactivate(self) -> None:
         """Deactivate."""
@@ -370,6 +399,10 @@ class GravimetricRecorder:
     def clear_sample_tag(self) -> None:
         """Clear the sample tag."""
         self._sample_tag = ""
+
+    def zero_scale(self) -> None:
+        """Zero scale."""
+        self._scale.zero()
 
     def calibrate_scale(self) -> None:
         """Calibrate scale."""

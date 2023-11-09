@@ -62,3 +62,25 @@ export function getAreInstrumentsReady(
 
   return allSpeccedPipettesReady && isExtensionMountReady
 }
+
+export function getIncompleteInstrumentCount(
+  analysis: CompletedProtocolAnalysis,
+  attachedInstruments: Instruments
+): number {
+  const speccedPipettes = analysis?.pipettes ?? []
+
+  const incompleteInstrumentCount = speccedPipettes.filter(loadedPipette => {
+    const attachedPipetteMatch = getPipetteMatch(
+      loadedPipette,
+      attachedInstruments
+    )
+    return attachedPipetteMatch?.data.calibratedOffset?.last_modified == null
+  }).length
+
+  const isExtensionMountReady = getProtocolUsesGripper(analysis)
+    ? getAttachedGripper(attachedInstruments)?.data.calibratedOffset
+        ?.last_modified != null
+    : true
+
+  return incompleteInstrumentCount + (isExtensionMountReady ? 0 : 1)
+}

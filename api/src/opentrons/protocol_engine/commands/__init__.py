@@ -266,6 +266,22 @@ from .configure_for_volume import (
     ConfigureForVolumeCommandType,
 )
 
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateCreate,
+    PrepareToAspirateParams,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
+)
+
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -463,4 +479,16 @@ __all__ = [
     "ConfigureForVolumeParams",
     "ConfigureForVolumeResult",
     "ConfigureForVolumeCommandType",
+    # prepare pipette for aspirate command bundle
+    "PrepareToAspirate",
+    "PrepareToAspirateCreate",
+    "PrepareToAspirateParams",
+    "PrepareToAspirateResult",
+    "PrepareToAspirateCommandType",
+    # configure nozzle layout command bundle
+    "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutCreate",
+    "ConfigureNozzleLayoutParams",
+    "ConfigureNozzleLayoutResult",
+    "ConfigureNozzleLayoutCommandType",
 ]

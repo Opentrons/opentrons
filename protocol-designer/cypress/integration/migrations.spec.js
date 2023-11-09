@@ -1,6 +1,7 @@
 import 'cypress-file-upload'
 import cloneDeep from 'lodash/cloneDeep'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../src/constants'
 const semver = require('semver')
 
 // TODO: (sa 2022-03-31: change these migration fixtures to v6 protocols once the liquids key is added to PD protocols
@@ -12,61 +13,54 @@ describe('Protocol fixtures migrate and match snapshots', () => {
   })
 
   const testCases = [
-    //  TODO(jr, 9/26/23): when 7.1 is more developed, lets go back and fix these
-    //  {
-    //   title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 7.0.x, schema 7',
-    //   importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
-    //   expectedExportFixture:
-    //     '../../fixtures/protocol/7/example_1_1_0MigratedFromV1_0_0.json',
-    //   unusedPipettes: true,
-    //   migrationModal: 'newLabwareDefs',
-    // },
-    // {
-    //   title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 7.0.x, schema 7',
-    //   importFixture: '../../fixtures/protocol/4/doItAllV3.json',
-    //   expectedExportFixture:
-    //     '../../fixtures/protocol/7/doItAllV3MigratedToV7.json',
-    //   unusedPipettes: false,
-    //   migrationModal: 'generic',
-    // },
-    // {
-    //   title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 7.0.x, schema 7',
-    //   importFixture: '../../fixtures/protocol/4/doItAllV4.json',
-    //   expectedExportFixture:
-    //     '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
-    //   unusedPipettes: false,
-    //   migrationModal: 'generic',
-    // },
-    // {
-    //   title: 'doItAllV6 (schema 6, PD version 6.1.0) -> PD 7.0.x, schema 7',
-    //   importFixture: '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
-    //   expectedExportFixture:
-    //     '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
-    //   unusedPipettes: false,
-    //   migrationModal: 'generic',
-    // },
+    {
+      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 8.0.x, schema 8',
+      importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/8/example_1_1_0MigratedToV8.json',
+      unusedPipettes: true,
+      migrationModal: 'newLabwareDefs',
+    },
+    {
+      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 8.0.x, schema 8',
+      importFixture: '../../fixtures/protocol/4/doItAllV3.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/8/doItAllV3MigratedToV8.json',
+      unusedPipettes: false,
+      migrationModal: 'generic',
+    },
+    {
+      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 8.0.x, schema 8',
+      importFixture: '../../fixtures/protocol/4/doItAllV4.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/8/doItAllV4MigratedToV8.json',
+      unusedPipettes: false,
+      migrationModal: 'generic',
+    },
+    //  TODO(jr, 11/1/23): add a test for v8 migrated to v8 with the deck config commands
     // {
     //   title:
-    //     'doItAllV7 (schema 7, PD version 7.0.0) -> import and re-export should preserve data',
+    //     'doItAllV8 (schema 7, PD version 8.0.0) -> import and re-export should preserve data',
     //   importFixture: '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
     //   expectedExportFixture:
     //     '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
     //   unusedPipettes: false,
     //   migrationModal: null,
     // },
-    // {
-    //   title:
-    //     'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 7.0.x, schema 7',
-    //   importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
-    //   expectedExportFixture: '../../fixtures/protocol/7/mix_7_0_0.json',
-    //   migrationModal: 'generic',
-    //   unusedPipettes: false,
-    // },
     {
-      title: 'doItAllV7 Flex robot (schema 7, PD version 7.1.0)',
+      title:
+        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 8.0.x, schema 8',
+      importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
+      expectedExportFixture: '../../fixtures/protocol/8/mix_8_0_0.json',
+      migrationModal: 'generic',
+      unusedPipettes: false,
+    },
+    {
+      title: 'doItAll7MigratedToV8 flex robot (schema 8, PD version 8.0.x)',
       importFixture: '../../fixtures/protocol/7/doItAllV7.json',
-      expectedExportFixture: '../../fixtures/protocol/7/doItAllV7.json',
-      migrationModal: null,
+      expectedExportFixture:
+        '../../fixtures/protocol/8/doItAllV7MigratedToV8.json',
+      migrationModal: 'generic',
       unusedPipettes: false,
     },
   ]
@@ -136,7 +130,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
           cy.get('div')
             .contains(
-              'This protocol can only run on app and robot server version 7.0 or higher'
+              'This protocol can only run on app and robot server version 7.1 or higher'
             )
             .should('exist')
           cy.get('button').contains('continue', { matchCase: false }).click()
@@ -160,9 +154,70 @@ describe('Protocol fixtures migrate and match snapshots', () => {
                 f.metadata.lastModified = 123
                 f.designerApplication.data._internalAppBuildDate = 'Foo Date'
                 f.designerApplication.version = 'x.x.x'
+
+                //  NOTE: labwareLocationUpdates, trash stubs can be removed for the release after 8.0.0
+                //  currently stubbed because of the newly created trash id for movable trash support
+                const labwareLocationUpdate =
+                  f.designerApplication.data.savedStepForms
+                    .__INITIAL_DECK_SETUP_STEP__.labwareLocationUpdate
+
+                Object.entries(labwareLocationUpdate).forEach(
+                  ([labwareId, slot]) => {
+                    if (
+                      labwareId.includes(OT_2_TRASH_DEF_URI) ||
+                      labwareId.includes(FLEX_TRASH_DEF_URI)
+                    ) {
+                      const trashId = 'trashId'
+                      labwareLocationUpdate[trashId] = slot
+                      delete labwareLocationUpdate[labwareId]
+                    }
+                  }
+                )
+
+                Object.values(
+                  f.designerApplication.data.savedStepForms
+                ).forEach(stepForm => {
+                  if (stepForm.stepType === 'moveLiquid') {
+                    stepForm.dropTip_location = 'trash drop tip location'
+                    if (
+                      stepForm.blowout_location.includes(OT_2_TRASH_DEF_URI) ||
+                      stepForm.blowout_location.includes(FLEX_TRASH_DEF_URI)
+                    ) {
+                      stepForm.blowout_location = 'trash blowout location'
+                    }
+                  }
+                  if (stepForm.stepType === 'mix') {
+                    if (
+                      stepForm.labware.includes(OT_2_TRASH_DEF_URI) ||
+                      stepForm.labware.includes(FLEX_TRASH_DEF_URI)
+                    ) {
+                      stepForm.labware = 'trash'
+                    }
+                    stepForm.dropTip_location = 'trash drop tip location'
+                    stepForm.blowout_location = 'trash blowout location'
+                  }
+                })
                 f.commands.forEach(command => {
                   if ('key' in command) {
                     command.key = '123'
+                  }
+                  if (
+                    command.commandType === 'loadLabware' &&
+                    command.params.displayName === 'Opentrons Fixed Trash'
+                  ) {
+                    command.params.labwareId = 'loadTrash'
+                  }
+                  if (command.commandType === 'dropTip') {
+                    command.params.labwareId = 'dropTipLabwareId'
+                  }
+                  if (
+                    (command.commandType === 'aspirate' ||
+                      command.commandType === 'dispense' ||
+                      command.commandType === 'blowout') &&
+                    (command.params.labwareId.includes(OT_2_TRASH_DEF_URI) ||
+                      command.params.labwareId.includes(FLEX_TRASH_DEF_URI))
+                  ) {
+                    command.params.labwareId = 'trash'
                   }
                 })
               })

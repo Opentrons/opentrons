@@ -33,8 +33,11 @@ import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import type { LabwareOffset, CommandData } from '@opentrons/api-client'
-import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
-import type { CreateCommand, RobotType } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  DropTipCreateCommand,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
 
@@ -258,6 +261,8 @@ export const LabwarePositionCheckComponent = (
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
 
+  const protocolHasModules = protocolData.modules.length > 0
+
   const handleJog = (
     axis: Axis,
     dir: Sign,
@@ -354,7 +359,14 @@ export const LabwarePositionCheckComponent = (
   } else if (currentStep.section === 'DETACH_PROBE') {
     modalContent = <DetachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
-    modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <PickUpTip
+        {...currentStep}
+        {...movementStepProps}
+        protocolHasModules={protocolHasModules}
+        currentStepIndex={currentStepIndex}
+      />
+    )
   } else if (currentStep.section === 'RETURN_TIP') {
     modalContent = (
       <ReturnTip

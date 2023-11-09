@@ -197,7 +197,6 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids' | 'stats'
   >('robot_config')
@@ -253,7 +252,7 @@ export function ProtocolDetails(
     status: 'succeeded',
   }
   const requiredFixtureDetails =
-    enableDeckConfig && mostRecentAnalysis?.commands != null
+    mostRecentAnalysis?.commands != null
       ? [
           ...map(
             parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands)
@@ -350,15 +349,7 @@ export function ProtocolDetails(
     ) : null,
   }
 
-  const deckThumbnail = (
-    <DeckThumbnail
-      commands={mostRecentAnalysis?.commands ?? []}
-      labware={mostRecentAnalysis?.labware ?? []}
-      liquids={
-        mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : []
-      }
-    />
-  )
+  const deckThumbnail = <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
     missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,

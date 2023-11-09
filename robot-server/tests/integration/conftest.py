@@ -4,6 +4,7 @@ import json
 import time
 from pathlib import Path
 from typing import Any, Dict, Generator
+from datetime import datetime
 
 import pytest
 import requests
@@ -18,6 +19,7 @@ _SESSION_SERVER_SCHEME = "http://"
 _SESSION_SERVER_HOST = "localhost"
 _OT2_SESSION_SERVER_PORT = "31950"
 _OT3_SESSION_SERVER_PORT = "31960"
+_INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
 
 def pytest_tavern_beta_before_every_test_run(
@@ -110,7 +112,11 @@ def _requests_session() -> Generator[requests.Session, None, None]:
 
 def _wait_until_ready(base_url: str) -> None:
     with _requests_session() as requests_session:
+        started = datetime.now()
         while True:
+            now = datetime.now()
+            if (now - started).total_seconds() > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
+                raise RuntimeError("Could not start dev server")
             try:
                 health_response = requests_session.get(f"{base_url}/health")
             except requests.ConnectionError:
@@ -127,6 +133,7 @@ def _wait_until_ready(base_url: str) -> None:
             time.sleep(0.1)
 
 
+# TODO(mm, 2023-11-02): This should also restore the server's original deck configuration.
 def _clean_server_state(base_url: str) -> None:
     async def _clean_server_state_async() -> None:
         async with RobotClient.make(base_url=base_url, version="*") as robot_client:

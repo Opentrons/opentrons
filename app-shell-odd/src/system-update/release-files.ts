@@ -55,8 +55,6 @@ export function downloadReleaseFiles(
   onProgress: (progress: DownloadProgress) => unknown
 ): Promise<ReleaseSetFilepaths> {
   const tempDir: string = tempy.directory()
-  // @ts-expect-error delete this when the OT-3 manifest has release notes
-  urls.releaseNotes = null
   const tempSystemPath = outPath(tempDir, urls.system)
   const tempNotesPath = outPath(tempDir, urls.releaseNotes ?? '')
 
@@ -67,12 +65,14 @@ export function downloadReleaseFiles(
   const systemReq = fetchToFile(urls.system, tempSystemPath, { onProgress })
   const notesReq = urls.releaseNotes
     ? fetchToFile(urls.releaseNotes, tempNotesPath)
-    : Promise.resolve('')
+    : Promise.resolve(null)
 
   return Promise.all([systemReq, notesReq]).then(results => {
     const [systemTemp, releaseNotesTemp] = results
     const systemPath = outPath(directory, systemTemp)
-    const notesPath = outPath(directory, releaseNotesTemp)
+    const notesPath = releaseNotesTemp
+      ? outPath(directory, releaseNotesTemp)
+      : null
 
     log.debug('renaming directory', { from: tempDir, to: directory })
 

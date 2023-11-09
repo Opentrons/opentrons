@@ -1,12 +1,11 @@
-import {
+import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
-  getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
-  ProtocolAnalysisFile,
+  LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -46,10 +45,7 @@ export interface LabwareRenderInfoById {
 }
 
 export const getLabwareRenderInfo = (
-  protocolData:
-    | ProtocolAnalysisFile<{}>
-    | CompletedProtocolAnalysis
-    | ProtocolAnalysisOutput,
+  protocolData: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands

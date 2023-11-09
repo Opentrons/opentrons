@@ -26,7 +26,7 @@ import {
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '../redux/types'
 
 const CURRENT_RUN_POLL = 5000

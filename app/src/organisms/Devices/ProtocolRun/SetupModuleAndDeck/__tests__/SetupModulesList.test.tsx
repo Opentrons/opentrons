@@ -12,7 +12,6 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { useFeatureFlag } from '../../../../../redux/config'
 import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
@@ -75,9 +74,7 @@ const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
 const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
   typeof LocationConflictModal
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
+
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -146,9 +143,6 @@ describe('SetupModulesList', () => {
       .mockReturnValue({
         complete: true,
       })
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
@@ -453,9 +447,7 @@ describe('SetupModulesList', () => {
     getByText('mockModuleSetupModal')
   })
   it('shoulde render a magnetic block with a conflicted fixture', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockMagneticBlock.id]: {
         moduleId: mockMagneticBlock.id,

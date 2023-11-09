@@ -1,7 +1,7 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, cast
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
@@ -14,13 +14,23 @@ from opentrons.protocol_engine import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    EmptyNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
+)
+from opentrons.protocol_engine.types import (
+    PRIMARY_NOZZLE_LITERAL,
+    NozzleLayoutConfigurationType,
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -409,13 +419,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             slot_origin_to_tip_a1 = _waste_chute_dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
 
         # TODO: All of this logic to compute the destination coordinate belongs in Protocol Engine.
-        slot_d3 = next(
-            s
-            for s in self._protocol_core.get_deck_definition()["locations"][
-                "orderedSlots"
-            ]
-            if s["id"] == "D3"
-        )
+        slot_d3 = self._protocol_core.get_slot_definition(DeckSlotName.SLOT_D3)
         slot_d3_origin = Point(*slot_d3["position"])
         destination_point = slot_d3_origin + slot_origin_to_tip_a1
 
@@ -589,4 +593,40 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def configure_for_volume(self, volume: float) -> None:
         self._engine_client.configure_for_volume(
             pipette_id=self._pipette_id, volume=volume
+        )
+
+    def prepare_to_aspirate(self) -> None:
+        self._engine_client.prepare_to_aspirate(pipette_id=self._pipette_id)
+
+    def configure_nozzle_layout(
+        self,
+        style: NozzleLayout,
+        primary_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+
+        if style == NozzleLayout.COLUMN:
+            configuration_model: NozzleLayoutConfigurationType = (
+                ColumnNozzleLayoutConfiguration(
+                    primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+                )
+            )
+        elif style == NozzleLayout.ROW:
+            configuration_model = RowNozzleLayoutConfiguration(
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+            )
+        elif style == NozzleLayout.QUADRANT:
+            assert front_right_nozzle is not None
+            configuration_model = QuadrantNozzleLayoutConfiguration(
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
+                front_right_nozzle=front_right_nozzle,
+            )
+        elif style == NozzleLayout.SINGLE:
+            configuration_model = SingleNozzleLayoutConfiguration(
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+            )
+        else:
+            configuration_model = EmptyNozzleLayoutConfiguration()
+        self._engine_client.configure_nozzle_layout(
+            pipette_id=self._pipette_id, configuration_params=configuration_model
         )
