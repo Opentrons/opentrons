@@ -2049,7 +2049,9 @@ class OT3API(
             and instrument.nozzle_manager.current_configuration.configuration
             == NozzleConfigurationType.FULL
         ):
-            spec = self._pipette_handler.plan_ht_pick_up_tip()
+            spec = self._pipette_handler.plan_ht_pick_up_tip(
+                instrument.nozzle_manager.current_configuration.tip_count
+            )
             if spec.z_distance_to_tiprack:
                 await self.move_rel(
                     realmount, top_types.Point(z=spec.z_distance_to_tiprack)
@@ -2057,7 +2059,10 @@ class OT3API(
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
             spec = self._pipette_handler.plan_lt_pick_up_tip(
-                realmount, presses, increment
+                realmount,
+                instrument.nozzle_manager.current_configuration.tip_count,
+                presses,
+                increment,
             )
             await self._force_pick_up_tip(realmount, spec)
 

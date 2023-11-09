@@ -60,8 +60,7 @@ class VirtualPipetteDataProvider:
                 pipette_model_string
             )
             new_nozzle_manager = NozzleConfigurationManager.build_from_nozzlemap(
-                config.nozzle_map,
-                config.partial_tip_configurations.per_tip_pickup_current,
+                config.nozzle_map
             )
             if back_left_nozzle and front_right_nozzle and starting_nozzle:
                 new_nozzle_manager.update_nozzle_configuration(

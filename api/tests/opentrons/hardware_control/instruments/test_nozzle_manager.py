@@ -11,9 +11,7 @@ from opentrons.hardware_control.types import CriticalPoint
 def build_nozzle_manger(
     nozzle_map: Dict[str, List[float]]
 ) -> nozzle_manager.NozzleConfigurationManager:
-    return nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-        nozzle_map, pick_up_current_map={1: 0.1}
-    )
+    return nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(nozzle_map)
 
 
 NINETY_SIX_CHANNEL_MAP = {

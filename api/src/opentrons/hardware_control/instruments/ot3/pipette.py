@@ -11,7 +11,10 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PlungerPositions,
     MotorConfigurations,
     SupportedTipsDefinition,
-    TipHandlingConfigurations,
+    PickUpTipConfigurations,
+    PressFitPickUpTipConfiguration,
+    CamActionPickUpTipConfiguration,
+    DropTipConfigurations,
     PlungerHomingConfigurations,
     PipetteNameType,
     PipetteModelVersionType,
@@ -96,8 +99,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map,
-                self._config.partial_tip_configurations.per_tip_pickup_current,
+                self._config.nozzle_map
             )
         )
         self._current_volume = 0.0
@@ -185,13 +187,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._plunger_motor_current
 
     @property
-    def pick_up_configurations(self) -> TipHandlingConfigurations:
+    def pick_up_configurations(self) -> PickUpTipConfigurations:
         return self._pick_up_configurations
 
     @pick_up_configurations.setter
-    def pick_up_configurations(
-        self, pick_up_configs: TipHandlingConfigurations
-    ) -> None:
+    def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
         self._pick_up_configurations = pick_up_configs
 
     @property
@@ -199,7 +199,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._plunger_homing_configurations
 
     @property
-    def drop_configurations(self) -> TipHandlingConfigurations:
+    def drop_configurations(self) -> DropTipConfigurations:
         return self._drop_configurations
 
     @property
@@ -259,8 +259,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._nozzle_manager = (
             nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map,
-                self._config.partial_tip_configurations.per_tip_pickup_current,
+                self._config.nozzle_map
             )
         )
 
@@ -671,6 +670,21 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._working_volume = min(tip_type.value, self.liquid_class.max_volume)
+
+    def get_pick_up_configuration_for_tip_count(
+        self, count: int
+    ) -> Union[CamActionPickUpTipConfiguration, PressFitPickUpTipConfiguration]:
+        for config in (
+            self._config.pick_up_tip_configurations.press_fit,
+            self._config.pick_up_tip_configurations.cam_action,
+        ):
+            if not config:
+                continue
+            if count in config.current_by_tip_count:
+                return config
+        raise CommandPreconditionViolated(
+            message=f"No pick up tip configuration for {count} tips",
+        )
 
 
 def _reload_and_check_skip(
