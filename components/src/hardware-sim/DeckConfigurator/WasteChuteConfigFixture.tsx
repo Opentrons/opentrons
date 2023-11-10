@@ -1,18 +1,13 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import {
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-
 import { Icon } from '../../icons'
 import { Btn, Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
 
 // TODO: replace stubs with JSON definitions when available
 const wasteChuteDef = {
@@ -33,6 +28,7 @@ const wasteChuteDef = {
 }
 
 interface WasteChuteConfigFixtureProps {
+  deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
 }
@@ -40,11 +36,9 @@ interface WasteChuteConfigFixtureProps {
 export function WasteChuteConfigFixture(
   props: WasteChuteConfigFixtureProps
 ): JSX.Element {
-  const { handleClickRemove, fixtureLocation } = props
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const { deckDefinition, handleClickRemove, fixtureLocation } = props
 
-  // TODO: migrate to fixture location for v4
-  const wasteChuteSlot = deckDef.locations.orderedSlots.find(
+  const wasteChuteSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === fixtureLocation
   )
   const [xSlotPosition = 0, ySlotPosition = 0] = wasteChuteSlot?.position ?? []

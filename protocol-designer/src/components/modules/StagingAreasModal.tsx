@@ -20,6 +20,7 @@ import {
   Cutout,
   DeckConfiguration,
   STAGING_AREA_LOAD_NAME,
+  STAGING_AREA_CUTOUTS,
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
@@ -32,8 +33,6 @@ import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { PDAlert } from '../alerts/PDAlert'
 import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import { getStagingAreaSlots } from '../../utils'
-
-const STAGING_AREA_SLOTS: Cutout[] = ['A3', 'B3', 'C3', 'D3']
 
 export interface StagingAreasValues {
   selectedSlots: string[]
@@ -59,7 +58,7 @@ const StagingAreasModalComponent = (
       },
     ] as DeckConfiguration
   })
-  const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_SLOTS.map(
+  const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_CUTOUTS.map(
     fixtureLocation => ({
       fixtureId: `id_${fixtureLocation}`,
       fixtureLocation: fixtureLocation as Cutout,

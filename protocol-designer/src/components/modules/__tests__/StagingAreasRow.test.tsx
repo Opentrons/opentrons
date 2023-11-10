@@ -42,7 +42,7 @@ describe('StagingAreasRow', () => {
     const { getByRole, getByText } = render(props)
     getByText('mock slot map')
     getByText('Position:')
-    getByText('Slots B3')
+    getByText('B3')
     getByRole('button', { name: 'remove' }).click()
     expect(props.handleAttachment).toHaveBeenCalled()
     getByRole('button', { name: 'edit' }).click()

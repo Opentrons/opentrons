@@ -1,51 +1,53 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { DeckFromData } from './DeckFromData'
+import { DeckFromLayers } from './DeckFromLayers'
 import { FlexTrash } from './FlexTrash'
 
-import type { DeckFromDataProps } from './DeckFromData'
+import type { RobotType } from '@opentrons/shared-data'
+import type { DeckFromLayersProps } from './DeckFromLayers'
 import type { TrashLocation } from './FlexTrash'
 
 interface StyledDeckProps {
   deckFill: string
+  robotType: RobotType
   trashColor?: string
   trashLocation?: TrashLocation
 }
 
 // apply fill to .SLOT_BASE class from ot3_standard deck definition
-const StyledG = styled.g<StyledDeckProps>`
+const StyledG = styled.g<Pick<StyledDeckProps, 'deckFill'>>`
   .SLOT_BASE {
     fill: ${props => props.deckFill};
   }
 `
 
 export function StyledDeck(
-  props: StyledDeckProps & DeckFromDataProps
+  props: StyledDeckProps & DeckFromLayersProps
 ): JSX.Element {
   const {
     deckFill,
+    robotType,
     trashLocation,
     trashColor = '#757070',
-    ...deckFromDataProps
+    ...DeckFromLayersProps
   } = props
-
-  const robotType = deckFromDataProps.def.robot.model ?? 'OT-2 Standard'
-
   const trashSlotClipId =
     trashLocation != null ? `SLOT_CLIPS_${trashLocation}` : null
 
   const trashLayerBlocklist =
     trashSlotClipId != null
-      ? deckFromDataProps.layerBlocklist.concat(trashSlotClipId)
-      : deckFromDataProps.layerBlocklist
+      ? DeckFromLayersProps.layerBlocklist.concat(trashSlotClipId)
+      : DeckFromLayersProps.layerBlocklist
 
   return (
     <StyledG deckFill={deckFill}>
-      <DeckFromData
-        {...deckFromDataProps}
+      <DeckFromLayers
+        {...DeckFromLayersProps}
         layerBlocklist={trashLayerBlocklist}
+        robotType={robotType}
       />
+      {/* TODO(bh, 2023-11-06): remove trash and trashLocation prop when StyledDeck removed from MoveLabwareOnDeck */}
       {trashLocation != null ? (
         <FlexTrash
           robotType={robotType}

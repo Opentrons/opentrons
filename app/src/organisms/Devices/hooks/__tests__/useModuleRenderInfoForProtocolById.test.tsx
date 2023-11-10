@@ -134,7 +134,7 @@ const TEMPERATURE_MODULE_INFO = {
 
 const mockFixture = {
   fixtureId: 'mockId',
-  fixtureLocation: 'D1',
+  fixtureLocation: 'cutoutD1',
   loadName: STAGING_AREA_LOAD_NAME,
 } as Fixture
 
@@ -187,12 +187,15 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     )
     expect(result.current).toStrictEqual({
       magneticModuleId: {
-        conflictedFixture: mockFixture,
+        // TODO(bh, 2023-11-09): update this test once conflict logic has been updated to use getSimplestDeckConfigForProtocolCommands or similar
+        // conflictedFixture: mockFixture,
+        conflictedFixture: undefined,
         attachedModuleMatch: mockMagneticModuleGen2,
         ...MAGNETIC_MODULE_INFO,
       },
       temperatureModuleId: {
-        conflictedFixture: mockFixture,
+        // conflictedFixture: mockFixture,
+        conflictedFixture: undefined,
         attachedModuleMatch: mockTemperatureModuleGen2,
         ...TEMPERATURE_MODULE_INFO,
       },

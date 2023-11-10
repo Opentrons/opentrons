@@ -30,7 +30,7 @@ jest.mock('react-router-dom', () => {
 const mockDeckConfig = [
   {
     fixtureId: 'mockFixtureIdC3',
-    fixtureLocation: 'C3',
+    fixtureLocation: 'cutoutC3',
     loadName: TRASH_BIN_LOAD_NAME,
   },
 ]

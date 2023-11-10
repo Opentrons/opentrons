@@ -2,8 +2,6 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardOt2DeckDefv3 from '../../deck/definitions/3/ot2_standard.json'
-import standardFlexDeckDefv3 from '../../deck/definitions/3/ot3_standard.json'
 import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
 import type {
@@ -206,7 +204,7 @@ export const getSlotHasMatingSurfaceUnitVector = (
   deckDef: DeckDefinition,
   slotNumber: string
 ): boolean => {
-  const matingSurfaceUnitVector = deckDef.locations.orderedSlots.find(
+  const matingSurfaceUnitVector = deckDef.locations.addressableAreas.find(
     orderedSlot => orderedSlot.id === slotNumber
   )?.matingSurfaceUnitVector
 
@@ -226,7 +224,8 @@ export const getAreSlotsHorizontallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardOt2DeckDefv3.locations.orderedSlots
+  // TODO(bh, 2023-11-03): is this OT-2 only?
+  const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -262,7 +261,8 @@ export const getAreSlotsVerticallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardOt2DeckDefv3.locations.orderedSlots
+  // TODO(bh, 2023-11-03): is this OT-2 only?
+  const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -352,10 +352,11 @@ export const getDeckDefFromRobotType = (
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
   return robotType === 'OT-3 Standard'
-    ? standardFlexDeckDefv3
-    : standardOt2DeckDefv3
+    ? standardFlexDeckDef
+    : standardOt2DeckDef
 }
 
+// TODO(bh, 2023-11-09): delete this function
 export const getDeckDefFromRobotTypeV4 = (
   robotType: RobotType
 ): DeckDefinition => {

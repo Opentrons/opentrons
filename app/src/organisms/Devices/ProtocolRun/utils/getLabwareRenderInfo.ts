@@ -1,4 +1,7 @@
-import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
+import {
+  getPositionFromSlotId,
+  getSlotHasMatingSurfaceUnitVector,
+} from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
@@ -6,32 +9,6 @@ import type {
   LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-
-const getSlotPosition = (
-  deckDef: DeckDefinition,
-  slotName: string
-): [number, number, number] => {
-  let x = 0
-  let y = 0
-  let z = 0
-  const slotPosition = deckDef.locations.orderedSlots.find(
-    orderedSlot => orderedSlot.id === slotName
-  )?.position
-
-  if (slotPosition == null) {
-    console.error(
-      `expected to find a slot position for slot ${slotName} in ${String(
-        deckDef.metadata.displayName
-      )}, but could not`
-    )
-  } else {
-    x = slotPosition[0]
-    y = slotPosition[1]
-    z = slotPosition[2]
-  }
-
-  return [x, y, z]
-}
 
 export interface LabwareRenderInfoById {
   [labwareId: string]: {
@@ -74,13 +51,19 @@ export const getLabwareRenderInfo = (
           )} but could not`
         )
       }
-      // TODO(bh, 2023-10-19): convert this to deck definition v4 addressableAreas
+
       const slotName =
         'addressableAreaName' in location
           ? location.addressableAreaName
           : location.slotName
-      // TODO(bh, 2023-10-19): remove slotPosition when render info no longer relies on directly
-      const slotPosition = getSlotPosition(deckDef, slotName)
+      const slotPosition = getPositionFromSlotId(slotName, deckDef)
+
+      if (slotPosition == null) {
+        console.warn(
+          `expected to find a position for slot ${slotName} in the standard deck definition, but could not`
+        )
+        return acc
+      }
 
       const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
         deckDef,
@@ -99,5 +82,5 @@ export const getLabwareRenderInfo = (
               slotName,
             },
           }
-        : { ...acc }
+        : acc
     }, {})

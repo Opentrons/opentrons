@@ -1,6 +1,9 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import {
+  getCutoutDisplayName,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import {
   OutlineButton,
   Flex,
@@ -23,6 +26,8 @@ import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.css'
+
+import type { Cutout } from '@opentrons/shared-data'
 
 interface AdditionalItemsRowProps {
   handleAttachment: () => void
@@ -97,9 +102,11 @@ export function AdditionalItemsRow(
               <div className={styles.module_col}>
                 <LabeledValue
                   label="Position"
-                  value={`Slot ${
-                    name === 'trashBin' ? trashBinSlot : WASTE_CHUTE_SLOT
-                  }`}
+                  value={`${getCutoutDisplayName(
+                    (name === 'trashBin'
+                      ? trashBinSlot ?? ''
+                      : WASTE_CHUTE_CUTOUT) as Cutout
+                  )}`}
                 />
               </div>
               <div className={styles.slot_map}>
@@ -107,7 +114,7 @@ export function AdditionalItemsRow(
                   selectedSlots={
                     name === 'trashBin'
                       ? [trashBinSlot ?? '']
-                      : [WASTE_CHUTE_SLOT]
+                      : [WASTE_CHUTE_CUTOUT]
                   }
                 />
               </div>

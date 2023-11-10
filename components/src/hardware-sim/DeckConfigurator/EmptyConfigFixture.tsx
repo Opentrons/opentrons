@@ -1,18 +1,13 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import {
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-
 import { Icon } from '../../icons'
 import { Btn, Flex } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
 
 // TODO: replace stubs with JSON definitions when available
 const standardSlotDef = {
@@ -33,6 +28,7 @@ const standardSlotDef = {
 }
 
 interface EmptyConfigFixtureProps {
+  deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickAdd: (fixtureLocation: Cutout) => void
 }
@@ -40,11 +36,10 @@ interface EmptyConfigFixtureProps {
 export function EmptyConfigFixture(
   props: EmptyConfigFixtureProps
 ): JSX.Element {
-  const { handleClickAdd, fixtureLocation } = props
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const { deckDefinition, handleClickAdd, fixtureLocation } = props
 
   // TODO: migrate to fixture location for v4
-  const standardSlot = deckDef.locations.orderedSlots.find(
+  const standardSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === fixtureLocation
   )
   const [xSlotPosition = 0, ySlotPosition = 0] = standardSlot?.position ?? []
@@ -52,10 +47,10 @@ export function EmptyConfigFixture(
   // TODO: remove adjustment when reading from fixture position
   // adjust x differently for right side/left side
   const isLeftSideofDeck =
-    fixtureLocation === 'A1' ||
-    fixtureLocation === 'B1' ||
-    fixtureLocation === 'C1' ||
-    fixtureLocation === 'D1'
+    fixtureLocation === 'cutoutA1' ||
+    fixtureLocation === 'cutoutB1' ||
+    fixtureLocation === 'cutoutC1' ||
+    fixtureLocation === 'cutoutD1'
   const xAdjustment = isLeftSideofDeck ? -101.5 : -17
   const x = xSlotPosition + xAdjustment
   const yAdjustment = -10

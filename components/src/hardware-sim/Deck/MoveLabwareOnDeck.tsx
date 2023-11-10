@@ -7,6 +7,7 @@ import {
   LoadedModule,
   getDeckDefFromRobotType,
   getModuleDef2,
+  getPositionFromSlotId,
   LoadedLabware,
 } from '@opentrons/shared-data'
 
@@ -19,28 +20,31 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
   RobotType,
-  DeckSlot,
   DeckDefinition,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 import type { TrashLocation } from './FlexTrash'
 
 const getModulePosition = (
-  orderedSlots: DeckSlot[],
+  deckDef: DeckDefinition,
   moduleId: string,
-  loadedModules: LoadedModule[],
-  deckId: DeckDefinition['otId']
+  loadedModules: LoadedModule[]
 ): Coordinates | null => {
   const loadedModule = loadedModules.find(m => m.id === moduleId)
   if (loadedModule == null) return null
-  const modSlot = orderedSlots.find(
+  const modSlot = deckDef.locations.addressableAreas.find(
     s => s.id === loadedModule.location.slotName
   )
   if (modSlot == null) return null
-  const [modX, modY] = modSlot.position
+
+  const modPosition = getPositionFromSlotId(loadedModule.id, deckDef)
+  if (modPosition == null) return null
+  const [modX, modY] = modPosition
+
   const deckSpecificAffineTransform =
-    getModuleDef2(loadedModule.model).slotTransforms?.[deckId]?.[modSlot.id]
-      ?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
+    getModuleDef2(loadedModule.model).slotTransforms?.[deckDef.otId]?.[
+      modSlot.id
+    ]?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
   const [[labwareX], [labwareY], [labwareZ]] = multiplyMatrices(
     [[modX], [modY], [1], [1]],
     deckSpecificAffineTransform
@@ -49,15 +53,13 @@ const getModulePosition = (
 }
 
 function getLabwareCoordinates({
-  orderedSlots,
+  deckDef,
   location,
-  deckId,
   loadedModules,
   loadedLabware,
 }: {
-  orderedSlots: DeckSlot[]
+  deckDef: DeckDefinition
   location: LabwareLocation
-  deckId: DeckDefinition['otId']
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
 }): Coordinates | null {
@@ -76,32 +78,31 @@ function getLabwareCoordinates({
     //  adapter on module
     if ('moduleId' in loadedAdapterLocation) {
       return getModulePosition(
-        orderedSlots,
+        deckDef,
         loadedAdapterLocation.moduleId,
-        loadedModules,
-        deckId
+        loadedModules
       )
     }
 
     //  adapter on deck
-    const loadedAdapterSlot = orderedSlots.find(
-      s =>
-        s.id ===
-        ('slotName' in loadedAdapterLocation
-          ? loadedAdapterLocation.slotName
-          : loadedAdapterLocation.addressableAreaName)
+    const loadedAdapterSlotPosition = getPositionFromSlotId(
+      'slotName' in loadedAdapterLocation
+        ? loadedAdapterLocation.slotName
+        : loadedAdapterLocation.addressableAreaName,
+      deckDef
     )
-    return loadedAdapterSlot != null
+    return loadedAdapterSlotPosition != null
       ? {
-          x: loadedAdapterSlot.position[0],
-          y: loadedAdapterSlot.position[1],
-          z: loadedAdapterSlot.position[2],
+          x: loadedAdapterSlotPosition[0],
+          y: loadedAdapterSlotPosition[1],
+          z: loadedAdapterSlotPosition[2],
         }
       : null
   } else if ('addressableAreaName' in location) {
-    const slotCoordinateTuple =
-      orderedSlots.find(s => s.id === location.addressableAreaName)?.position ??
-      null
+    const slotCoordinateTuple = getPositionFromSlotId(
+      location.addressableAreaName,
+      deckDef
+    )
     return slotCoordinateTuple != null
       ? {
           x: slotCoordinateTuple[0],
@@ -110,8 +111,10 @@ function getLabwareCoordinates({
         }
       : null
   } else if ('slotName' in location) {
-    const slotCoordinateTuple =
-      orderedSlots.find(s => s.id === location.slotName)?.position ?? null
+    const slotCoordinateTuple = getPositionFromSlotId(
+      location.slotName,
+      deckDef
+    )
     return slotCoordinateTuple != null
       ? {
           x: slotCoordinateTuple[0],
@@ -120,12 +123,7 @@ function getLabwareCoordinates({
         }
       : null
   } else {
-    return getModulePosition(
-      orderedSlots,
-      location.moduleId,
-      loadedModules,
-      deckId
-    )
+    return getModulePosition(deckDef, location.moduleId, loadedModules)
   }
 }
 
@@ -162,8 +160,20 @@ export function MoveLabwareOnDeck(
     robotType,
   ])
 
+  const initialSlotId =
+    initialLabwareLocation === 'offDeck' ||
+    !('slotName' in initialLabwareLocation)
+      ? deckDef.locations.addressableAreas[1].id
+      : initialLabwareLocation.slotName
+
+  const slotPosition = getPositionFromSlotId(initialSlotId, deckDef) ?? [
+    0,
+    0,
+    0,
+  ]
+
   const offDeckPosition = {
-    x: deckDef.locations.orderedSlots[1].position[0],
+    x: slotPosition[0],
     y:
       deckDef.cornerOffsetFromOrigin[1] -
       movedLabwareDef.dimensions.xDimension -
@@ -171,18 +181,16 @@ export function MoveLabwareOnDeck(
   }
   const initialPosition =
     getLabwareCoordinates({
-      orderedSlots: deckDef.locations.orderedSlots,
+      deckDef,
       location: initialLabwareLocation,
       loadedModules,
-      deckId: deckDef.otId,
       loadedLabware,
     }) ?? offDeckPosition
   const finalPosition =
     getLabwareCoordinates({
-      orderedSlots: deckDef.locations.orderedSlots,
+      deckDef,
       location: finalLabwareLocation,
       loadedModules,
-      deckId: deckDef.otId,
       loadedLabware,
     }) ?? offDeckPosition
 
@@ -220,10 +228,11 @@ export function MoveLabwareOnDeck(
       {...styleProps}
     >
       {deckDef != null && (
+        // TODO(bh, 2023-11-06): change reference to BaseDeck, pass in deck config as prop, render animation as children
         <StyledDeck
-          def={deckDef}
           deckFill={deckFill}
           layerBlocklist={[]}
+          robotType={robotType}
           trashLocation={trashLocation}
         />
       )}

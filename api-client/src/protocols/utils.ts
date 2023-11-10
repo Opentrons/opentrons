@@ -229,6 +229,7 @@ export function parseInitialLoadedModulesBySlot(
 export interface LoadedFixturesBySlot {
   [slotName: string]: LoadFixtureRunTimeCommand
 }
+// TODO(bh, 2023-11-09): remove this util, there will be no loadFixture command
 export function parseInitialLoadedFixturesByCutout(
   commands: RunTimeCommand[]
 ): LoadedFixturesBySlot {

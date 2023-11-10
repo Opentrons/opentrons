@@ -30,42 +30,42 @@ const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFu
 
 const MOCK_DECK_CONFIG: DeckConfiguration = [
   {
-    fixtureLocation: 'A1',
+    fixtureLocation: 'cutoutA1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B1',
+    fixtureLocation: 'cutoutB1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C1',
+    fixtureLocation: 'cutoutC1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D1',
+    fixtureLocation: 'cutoutD1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A3',
+    fixtureLocation: 'cutoutA3',
     loadName: TRASH_BIN_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B3',
+    fixtureLocation: 'cutoutB3',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C3',
+    fixtureLocation: 'cutoutC3',
     loadName: STAGING_AREA_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D3',
+    fixtureLocation: 'cutoutD3',
     loadName: WASTE_CHUTE_LOAD_NAME,
     fixtureId: uuidv4(),
   },
@@ -77,7 +77,7 @@ const WASTE_CHUTE_LOADED_FIXTURE: LoadFixtureRunTimeCommand = {
   params: {
     fixtureId: 'stubbedFixtureId',
     loadName: WASTE_CHUTE_LOAD_NAME,
-    location: { cutout: 'D3' },
+    location: { cutout: 'cutoutD3' },
   },
   createdAt: 'fakeTimestamp',
   startedAt: 'fakeTimestamp',
@@ -91,7 +91,7 @@ const STAGING_AREA_LOADED_FIXTURE: LoadFixtureRunTimeCommand = {
   params: {
     fixtureId: 'stubbedFixtureId',
     loadName: STAGING_AREA_LOAD_NAME,
-    location: { cutout: 'D3' },
+    location: { cutout: 'cutoutD3' },
   },
   createdAt: 'fakeTimestamp',
   startedAt: 'fakeTimestamp',
