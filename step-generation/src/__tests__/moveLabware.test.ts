@@ -1,6 +1,6 @@
 import {
   HEATERSHAKER_MODULE_TYPE,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
@@ -249,7 +249,7 @@ describe('moveLabware', () => {
         mockWasteChuteId: {
           name: 'wasteChute',
           id: mockWasteChuteId,
-          location: WASTE_CHUTE_SLOT,
+          location: WASTE_CHUTE_CUTOUT,
         },
       },
     } as InvariantContext
@@ -266,7 +266,7 @@ describe('moveLabware', () => {
       commandCreatorFnName: 'moveLabware',
       labware: TIPRACK_1,
       useGripper: true,
-      newLocation: { slotName: WASTE_CHUTE_SLOT },
+      newLocation: { slotName: WASTE_CHUTE_CUTOUT },
     } as MoveLabwareArgs
 
     const result = moveLabware(
@@ -288,7 +288,7 @@ describe('moveLabware', () => {
         mockWasteChuteId: {
           name: 'wasteChute',
           id: mockWasteChuteId,
-          location: WASTE_CHUTE_SLOT,
+          location: WASTE_CHUTE_CUTOUT,
         },
       },
     } as InvariantContext
@@ -304,7 +304,7 @@ describe('moveLabware', () => {
       commandCreatorFnName: 'moveLabware',
       labware: SOURCE_LABWARE,
       useGripper: true,
-      newLocation: { slotName: WASTE_CHUTE_SLOT },
+      newLocation: { slotName: WASTE_CHUTE_CUTOUT },
     } as MoveLabwareArgs
 
     const result = moveLabware(

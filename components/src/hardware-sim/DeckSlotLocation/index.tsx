@@ -25,7 +25,7 @@ export function DeckSlotLocation(
     ...restProps
   } = props
 
-  const slotDef = deckDefinition?.locations.orderedSlots.find(
+  const slotDef = deckDefinition?.locations.addressableAreas.find(
     s => s.id === slotName
   )
   if (slotDef == null) {

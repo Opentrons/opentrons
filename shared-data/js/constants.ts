@@ -1,4 +1,4 @@
-import type { ModuleType } from './types'
+import type { Cutout, ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -183,9 +183,126 @@ export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
-export const WASTE_CHUTE_SLOT: 'D3' = 'D3'
+export const STAGING_AREA_CUTOUTS: Cutout[] = [
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
 export const STAGING_AREA_LOAD_NAME = 'stagingArea'
 export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
 export const TRASH_BIN_LOAD_NAME = 'trashBin'
 export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'
+
+export const A1_ADDRESSABLE_AREA: 'A1' = 'A1'
+export const A2_ADDRESSABLE_AREA: 'A2' = 'A2'
+export const A3_ADDRESSABLE_AREA: 'A3' = 'A3'
+export const A4_ADDRESSABLE_AREA: 'A4' = 'A4'
+export const B1_ADDRESSABLE_AREA: 'B1' = 'B1'
+export const B2_ADDRESSABLE_AREA: 'B2' = 'B2'
+export const B3_ADDRESSABLE_AREA: 'B3' = 'B3'
+export const B4_ADDRESSABLE_AREA: 'B4' = 'B4'
+export const C1_ADDRESSABLE_AREA: 'C1' = 'C1'
+export const C2_ADDRESSABLE_AREA: 'C2' = 'C2'
+export const C3_ADDRESSABLE_AREA: 'C3' = 'C3'
+export const C4_ADDRESSABLE_AREA: 'C4' = 'C4'
+export const D1_ADDRESSABLE_AREA: 'D1' = 'D1'
+export const D2_ADDRESSABLE_AREA: 'D2' = 'D2'
+export const D3_ADDRESSABLE_AREA: 'D3' = 'D3'
+export const D4_ADDRESSABLE_AREA: 'D4' = 'D4'
+
+export const MOVABLE_TRASH_A1_ADDRESSABLE_AREA: 'movableTrashA1' =
+  'movableTrashA1'
+export const MOVABLE_TRASH_A3_ADDRESSABLE_AREA: 'movableTrashA3' =
+  'movableTrashA3'
+export const MOVABLE_TRASH_B1_ADDRESSABLE_AREA: 'movableTrashB1' =
+  'movableTrashB1'
+export const MOVABLE_TRASH_B3_ADDRESSABLE_AREA: 'movableTrashB3' =
+  'movableTrashB3'
+export const MOVABLE_TRASH_C1_ADDRESSABLE_AREA: 'movableTrashC1' =
+  'movableTrashC1'
+export const MOVABLE_TRASH_C3_ADDRESSABLE_AREA: 'movableTrashC3' =
+  'movableTrashC3'
+export const MOVABLE_TRASH_D1_ADDRESSABLE_AREA: 'movableTrashD1' =
+  'movableTrashD1'
+export const MOVABLE_TRASH_D3_ADDRESSABLE_AREA: 'movableTrashD3' =
+  'movableTrashD3'
+
+export const ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '1and8ChannelWasteChute' =
+  '1and8ChannelWasteChute'
+export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChute' =
+  '96ChannelWasteChute'
+export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
+  'gripperWasteChute'
+
+export const FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS = [
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
+]
+
+export const FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS = [
+  A4_ADDRESSABLE_AREA,
+  B4_ADDRESSABLE_AREA,
+  C4_ADDRESSABLE_AREA,
+  D4_ADDRESSABLE_AREA,
+]
+
+export const MOVABLE_TRASH_ADDRESSABLE_AREAS = [
+  MOVABLE_TRASH_A1_ADDRESSABLE_AREA,
+  MOVABLE_TRASH_A3_ADDRESSABLE_AREA,
+  MOVABLE_TRASH_B1_ADDRESSABLE_AREA,
+  MOVABLE_TRASH_B3_ADDRESSABLE_AREA,
+  MOVABLE_TRASH_C1_ADDRESSABLE_AREA,
+  MOVABLE_TRASH_C3_ADDRESSABLE_AREA,
+  MOVABLE_TRASH_D1_ADDRESSABLE_AREA,
+  MOVABLE_TRASH_D3_ADDRESSABLE_AREA,
+]
+
+export const WASTE_CHUTE_ADDRESSABLE_AREAS = [
+  ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+]
+
+export const SINGLE_LEFT_SLOT_FIXTURE: 'singleLeftSlot' = 'singleLeftSlot'
+export const SINGLE_CENTER_SLOT_FIXTURE: 'singleCenterSlot' = 'singleCenterSlot'
+export const SINGLE_RIGHT_SLOT_FIXTURE: 'singleRightSlot' = 'singleRightSlot'
+
+export const STAGING_AREA_RIGHT_SLOT_FIXTURE: 'stagingAreaRightSlot' =
+  'stagingAreaRightSlot'
+
+export const TRASH_BIN_ADAPTER_FIXTURE: 'trashBinAdapter' = 'trashBinAdapter'
+
+export const WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: 'wasteChuteRightAdapterCovered' =
+  'wasteChuteRightAdapterCovered'
+export const WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 'wasteChuteRightAdapterNoCover' =
+  'wasteChuteRightAdapterNoCover'
+export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: 'stagingAreaSlotWithWasteChuteRightAdapterCovered' =
+  'stagingAreaSlotWithWasteChuteRightAdapterCovered'
+export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' =
+  'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+
+export const SINGLE_SLOT_FIXTURES = [
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+]
+
+export const WASTE_CHUTE_FIXTURES = [
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+]

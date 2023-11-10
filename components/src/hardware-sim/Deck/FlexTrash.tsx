@@ -1,26 +1,30 @@
 import * as React from 'react'
 
+import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
+
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import trashDef from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 
 import type { RobotType } from '@opentrons/shared-data'
 
 // only allow edge cutout locations (columns 1 and 3)
 export type TrashLocation =
-  | 'A1'
-  | 'B1'
-  | 'C1'
-  | 'D1'
-  | 'A3'
-  | 'B3'
-  | 'C3'
-  | 'D3'
+  | 'cutoutA1'
+  | 'cutoutB1'
+  | 'cutoutC1'
+  | 'cutoutD1'
+  | 'cutoutA3'
+  | 'cutoutB3'
+  | 'cutoutC3'
+  | 'cutoutD3'
 
 interface FlexTrashProps {
   robotType: RobotType
@@ -40,19 +44,18 @@ export const FlexTrash = ({
   trashLocation,
 }: FlexTrashProps): JSX.Element | null => {
   // be sure we don't try to render for an OT-2
-  if (robotType !== 'OT-3 Standard') return null
+  if (robotType !== FLEX_ROBOT_TYPE) return null
 
-  const deckDef = getDeckDefFromRobotType(robotType)
-  // TODO(bh, 2023-10-09): migrate from "orderedSlots" to v4 "cutouts" key
-  const trashSlot = deckDef.locations.orderedSlots.find(
+  const deckDefinition = getDeckDefFromRobotType(robotType)
+
+  const trashSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === trashLocation
   )
 
   // retrieve slot x,y positions and dimensions from deck definition for the given trash slot
   // TODO(bh, 2023-10-09): refactor position, offsets, and rotation after v4 migration
   const [x = 0, y = 0] = trashSlot?.position ?? []
-  const { xDimension: slotXDimension = 0, yDimension: slotYDimension = 0 } =
-    trashSlot?.boundingBox ?? {}
+  const [slotXDimension = 0, slotYDimension = 0] = trashSlot?.position ?? []
 
   // adjust for dimensions from trash definition
   const { x: xAdjustment, y: yAdjustment } = trashDef.cornerOffsetFromSlot
@@ -60,10 +63,10 @@ export const FlexTrash = ({
 
   // rotate trash 180 degrees in column 1
   const rotateDegrees =
-    trashLocation === 'A1' ||
-    trashLocation === 'B1' ||
-    trashLocation === 'C1' ||
-    trashLocation === 'D1'
+    trashLocation === 'cutoutA1' ||
+    trashLocation === 'cutoutB1' ||
+    trashLocation === 'cutoutC1' ||
+    trashLocation === 'cutoutD1'
       ? '180'
       : '0'
 

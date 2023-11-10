@@ -3,7 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import {
   STAGING_AREA_LOAD_NAME,
   WASTE_CHUTE_LOAD_NAME,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
@@ -63,13 +63,13 @@ describe('Hardware', () => {
           {
             hardwareType: 'fixture',
             fixtureName: WASTE_CHUTE_LOAD_NAME,
-            location: { cutout: WASTE_CHUTE_SLOT },
+            location: { cutout: WASTE_CHUTE_CUTOUT },
             hasSlotConflict: false,
           },
           {
             hardwareType: 'fixture',
             fixtureName: STAGING_AREA_LOAD_NAME,
-            location: { cutout: 'B3' },
+            location: { cutout: 'cutoutB3' },
             hasSlotConflict: false,
           },
         ],

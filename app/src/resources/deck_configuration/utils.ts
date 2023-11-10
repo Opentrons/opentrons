@@ -175,7 +175,7 @@ export function getDeckConfigFromProtocolCommands(
   )
 }
 
-function getCutoutFixturesForAddressableAreas(
+export function getCutoutFixturesForAddressableAreas(
   addressableAreas: AddressableAreaName[],
   cutoutFixtures: CutoutFixture[]
 ): CutoutFixture[] {
@@ -186,7 +186,7 @@ function getCutoutFixturesForAddressableAreas(
   )
 }
 
-function getCutoutFixturesForCutoutId(
+export function getCutoutFixturesForCutoutId(
   cutoutId: CutoutId,
   cutoutFixtures: CutoutFixture[]
 ): CutoutFixture[] {
@@ -195,7 +195,7 @@ function getCutoutFixturesForCutoutId(
   )
 }
 
-function getCutoutIdForAddressableArea(
+export function getCutoutIdForAddressableArea(
   addressableArea: AddressableAreaName,
   cutoutFixtures: CutoutFixture[]
 ): CutoutId | null {
@@ -210,7 +210,7 @@ function getCutoutIdForAddressableArea(
   }, null)
 }
 
-function getSimplestFixtureForAddressableAreas(
+export function getSimplestFixtureForAddressableAreas(
   cutoutId: CutoutId,
   requiredAddressableAreas: AddressableAreaName[],
   allCutoutFixtures: CutoutFixture[]

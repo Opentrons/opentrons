@@ -52,13 +52,20 @@ export type CutoutId =
   | 'cutoutA2'
   | 'cutoutA3'
 
-export type CutoutFixtureId =
+export type SingleSlotCutoutFixtureId =
   | 'singleLeftSlot'
   | 'singleCenterSlot'
   | 'singleRightSlot'
-  | 'stagingAreaRightSlot'
-  | 'trashBinAdapter'
+
+export type TrashBinAdapterCutoutFixtureId = 'trashBinAdapter'
+
+export type WasteChuteCutoutFixtureId =
   | 'wasteChuteRightAdapterCovered'
   | 'wasteChuteRightAdapterNoCover'
   | 'stagingAreaSlotWithWasteChuteRightAdapterCovered'
   | 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+
+export type CutoutFixtureId =
+  | SingleSlotCutoutFixtureId
+  | TrashBinAdapterCutoutFixtureId
+  | WasteChuteCutoutFixtureId

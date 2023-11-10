@@ -7,7 +7,7 @@ import { createDeckConfiguration } from '@opentrons/api-client'
 // import {
 //   TRASH_BIN_LOAD_NAME,
 //   WASTE_CHUTE_LOAD_NAME,
-//   WASTE_CHUTE_SLOT,
+//   WASTE_CHUTE_CUTOUT,
 // } from '@opentrons/shared-data'
 
 import { useHost } from '../../api'
@@ -27,7 +27,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 // const mockDeckConfiguration = [
 //   {
 //     fixtureId: 'mockFixtureWasteChuteId',
-//     fixtureLocation: 'D3',
+//     fixtureLocation: 'cutoutD3',
 //     loadName: WASTE_CHUTE_LOAD_NAME,
 //   },
 // ] as DeckConfiguration

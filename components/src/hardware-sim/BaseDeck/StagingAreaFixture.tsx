@@ -8,7 +8,7 @@ import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 export type StagingAreaLocation = 'A3' | 'B3' | 'C3' | 'D3'
 
 interface StagingAreaFixtureProps extends React.SVGProps<SVGGElement> {
-  cutoutLocation: StagingAreaLocation
+  cutoutId: StagingAreaLocation
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
@@ -20,16 +20,15 @@ export function StagingAreaFixture(
   props: StagingAreaFixtureProps
 ): JSX.Element | null {
   const {
-    cutoutLocation,
+    cutoutId,
     deckDefinition,
     fixtureBaseColor,
     slotClipColor,
     ...restProps
   } = props
 
-  // TODO(bh, 2023-10-09): migrate from "orderedSlots" to v4 "cutouts" key
-  const cutoutDef = deckDefinition?.locations.orderedSlots.find(
-    s => s.id === cutoutLocation
+  const cutoutDef = deckDefinition?.locations.cutouts.find(
+    s => s.id === cutoutId
   )
   if (cutoutDef == null) {
     console.warn(
@@ -38,9 +37,8 @@ export function StagingAreaFixture(
     return null
   }
 
-  // TODO(bh, 2023-10-10): adjust base and clip d values if needed to fit v4 deck definition
   const contentsByCutoutLocation: {
-    [cutoutLocation in StagingAreaLocation]: JSX.Element
+    [cutoutId in StagingAreaLocation]: JSX.Element
   } = {
     A3: (
       <>
@@ -108,5 +106,5 @@ export function StagingAreaFixture(
     ),
   }
 
-  return <g {...restProps}>{contentsByCutoutLocation[cutoutLocation]}</g>
+  return <g {...restProps}>{contentsByCutoutLocation[cutoutId]}</g>
 }

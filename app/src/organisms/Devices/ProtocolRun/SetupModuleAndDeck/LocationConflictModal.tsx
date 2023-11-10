@@ -21,6 +21,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
   STANDARD_SLOT_LOAD_NAME,
@@ -101,7 +102,7 @@ export const LocationConflictModal = (
               i18nKey="deck_conflict_info"
               values={{
                 currentFixture: currentFixtureDisplayName,
-                cutout,
+                cutout: getCutoutDisplayName(cutout),
               }}
               components={{
                 block: <StyledText as="p" />,
@@ -114,7 +115,7 @@ export const LocationConflictModal = (
                 fontWeight={TYPOGRAPHY.fontWeightBold}
                 paddingBottom={SPACING.spacing8}
               >
-                {t('slot_location', { slotName: cutout })}
+                {t('slot_location', { slotName: getCutoutDisplayName(cutout) })}
               </StyledText>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -198,7 +199,7 @@ export const LocationConflictModal = (
               i18nKey="deck_conflict_info"
               values={{
                 currentFixture: currentFixtureDisplayName,
-                cutout,
+                cutout: getCutoutDisplayName(cutout),
               }}
               components={{
                 block: <StyledText fontSize={TYPOGRAPHY.fontSizeH4} />,
@@ -210,7 +211,7 @@ export const LocationConflictModal = (
                 fontSize={TYPOGRAPHY.fontSizeH4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
-                {t('slot_location', { slotName: cutout })}
+                {t('slot_location', { slotName: getCutoutDisplayName(cutout) })}
               </StyledText>
               <Flex
                 flexDirection={DIRECTION_COLUMN}

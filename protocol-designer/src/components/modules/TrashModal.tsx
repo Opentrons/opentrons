@@ -21,7 +21,7 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { OUTER_SLOTS_FLEX } from '../../modules'
@@ -144,7 +144,7 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
         })
       )
     } else if (trashName === 'wasteChute') {
-      dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+      dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
     }
 
     onCloseClick()
@@ -154,7 +154,7 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
     <Formik
       onSubmit={onSaveClick}
       initialValues={{
-        selectedSlot: trashName === 'trashBin' ? 'A3' : WASTE_CHUTE_SLOT,
+        selectedSlot: trashName === 'trashBin' ? 'A3' : WASTE_CHUTE_CUTOUT,
       }}
     >
       <ModalShell width="48rem">

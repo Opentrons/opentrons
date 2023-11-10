@@ -3,7 +3,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   LabwareMovementStrategy,
   THERMOCYCLER_MODULE_TYPE,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import * as warningCreators from '../../warningCreators'
@@ -44,7 +44,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   const newLocationInWasteChute =
     newLocation !== 'offDeck' &&
     'slotName' in newLocation &&
-    newLocation.slotName === WASTE_CHUTE_SLOT
+    newLocation.slotName === WASTE_CHUTE_CUTOUT
 
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(

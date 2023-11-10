@@ -88,7 +88,7 @@ export function ProtocolRunSetup({
       params: {
         fixtureId: 'stubbedFixtureId',
         loadName: WASTE_CHUTE_LOAD_NAME,
-        location: { cutout: 'D3' },
+        location: { cutout: 'cutoutD3' },
       },
       createdAt: 'fakeTimestamp',
       startedAt: 'fakeTimestamp',
@@ -101,7 +101,7 @@ export function ProtocolRunSetup({
       params: {
         fixtureId: 'stubbedFixtureId_2',
         loadName: STAGING_AREA_LOAD_NAME,
-        location: { cutout: 'B3' },
+        location: { cutout: 'cutoutB3' },
       },
       createdAt: 'fakeTimestamp',
       startedAt: 'fakeTimestamp',
@@ -114,7 +114,7 @@ export function ProtocolRunSetup({
       params: {
         fixtureId: 'stubbedFixtureId_3',
         loadName: TRASH_BIN_LOAD_NAME,
-        location: { cutout: 'C3' },
+        location: { cutout: 'cutoutC3' },
       },
       createdAt: 'fakeTimestamp',
       startedAt: 'fakeTimestamp',
