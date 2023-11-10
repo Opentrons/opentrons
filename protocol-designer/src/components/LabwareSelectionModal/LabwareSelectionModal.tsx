@@ -204,7 +204,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     },
     [moduleType]
   )
-
+  console.log('slot', slot)
   const getIsLabwareFiltered = React.useCallback(
     (labwareDef: LabwareDefinition2) => {
       const smallXDimension = labwareDef.dimensions.xDimension < 127.75

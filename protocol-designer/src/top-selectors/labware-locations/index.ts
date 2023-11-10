@@ -8,6 +8,7 @@ import {
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
@@ -108,9 +109,13 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
     additionalEquipmentEntities
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
-    const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
+    const trashSlot =
+      robotType === FLEX_ROBOT_TYPE ? 'movableTrash' : 'fixedTrash'
     const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const stagingAddressableAreas = Object.values(additionalEquipmentEntities)
+      .filter(aE => aE.name === 'stagingArea')
+      .map(aE => aE.location as string)
 
     if (robotState == null) return null
 
@@ -189,6 +194,10 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       []
     )
 
+    const stagingAreaSlots = COLUMN_4_SLOTS.filter(slot =>
+      stagingAddressableAreas.every(areas => areas.charAt(6) + '4' !== slot)
+    )
+
     const unoccupiedSlotOptions = allSlotIds
       .filter(
         slotId =>
@@ -197,7 +206,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
             .map(lw => lw.slot)
             .includes(slotId) &&
           slotId !== trashSlot &&
-          (hasWasteChute ? !(slotId in WASTE_CHUTE_ADDRESSABLE_AREAS) : true)
+          !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
+          !stagingAreaSlots.includes(slotId)
       )
       .map(slotId => ({ name: slotId, value: slotId }))
     const offDeck = { name: 'Off-deck', value: 'offDeck' }

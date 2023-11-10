@@ -85,8 +85,8 @@ export const getTrashSlot = (values: FormState): string => {
     .filter(equipment => equipment.includes('stagingArea'))
     .map(stagingArea => stagingArea.split('_')[1])
 
-  //   return default trash slot A3 if staging area is not on slot
-  if (!stagingAreaLocations.includes(FLEX_TRASH_DEFAULT_SLOT)) {
+  //   return default trash slot A3 if staging area is not in cutoutA3
+  if (!stagingAreaLocations.includes('cutoutA3')) {
     return FLEX_TRASH_DEFAULT_SLOT
   }
 

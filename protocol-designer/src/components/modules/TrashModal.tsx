@@ -154,7 +154,7 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
     <Formik
       onSubmit={onSaveClick}
       initialValues={{
-        selectedSlot: trashName === 'trashBin' ? 'A3' : WASTE_CHUTE_CUTOUT,
+        selectedSlot: trashName === 'trashBin' ? 'A3' : 'D3',
       }}
     >
       <ModalShell width="48rem">

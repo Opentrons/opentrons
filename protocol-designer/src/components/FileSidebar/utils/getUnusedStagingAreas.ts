@@ -17,9 +17,11 @@ export const getUnusedStagingAreas = (
     })
 
   const corresponding4thColumnSlots = stagingAreaSlots.map(slot => {
-    const letter = slot.charAt(0)
+    //  staging area locations should always start with "cutout", that's
+    //  why we are getting the character at index 6, right after the cutout
+    const letter = slot.charAt(6)
     const correspondingLocation = stagingAreaSlots.find(slot =>
-      slot.startsWith(letter)
+      slot.startsWith('cutout' + letter)
     )
     if (correspondingLocation) {
       return letter + '4'

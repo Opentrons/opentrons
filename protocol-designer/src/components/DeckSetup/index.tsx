@@ -173,12 +173,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ])
     : []
 
-  console.log(
-    'AA',
-    deckDef.locations.addressableAreas.filter(addressableArea =>
-      isAddressableAreaStandardSlot(addressableArea.id, deckDef)
-    )
-  )
   return (
     <>
       {/* all modules */}
@@ -300,6 +294,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 selectedTerminalItemId={props.selectedTerminalItemId}
                 moduleType={moduleOnDeck.type}
                 handleDragHover={handleHoverEmptySlot}
+                slotId={moduleOnDeck.slot as AddressableAreaName}
               />
             ) : null}
             {robotType === FLEX_ROBOT_TYPE ? (
@@ -534,7 +529,7 @@ export const DeckSetup = (): JSX.Element => {
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
-
+  console.log('stagingAreaFixtures', stagingAreaFixtures)
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}

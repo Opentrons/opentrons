@@ -107,6 +107,7 @@ export const getSlotIsEmpty = (
      since labware/wasteChute can still go on top of staging areas  **/
   includeStagingAreas?: boolean
 ): boolean => {
+
   if (
     slot === SPAN7_8_10_11_SLOT &&
     TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
@@ -123,23 +124,24 @@ export const getSlotIsEmpty = (
   }
 
   const filteredAdditionalEquipmentOnDeck = includeStagingAreas
-    ? values(initialDeckSetup.additionalEquipmentOnDeck).filter(
-        (additionalEquipment: AdditionalEquipmentOnDeck) =>
-          additionalEquipment.location === slot
+    ? values(
+        initialDeckSetup.additionalEquipmentOnDeck
+      ).filter((additionalEquipment: AdditionalEquipmentOnDeck) =>
+        additionalEquipment.location?.includes(slot)
       )
     : values(initialDeckSetup.additionalEquipmentOnDeck).filter(
         (additionalEquipment: AdditionalEquipmentOnDeck) =>
-          additionalEquipment.location === slot &&
+          additionalEquipment.location?.includes(slot) &&
           additionalEquipment.name !== 'stagingArea'
       )
 
   return (
     [
-      ...values(initialDeckSetup.modules).filter(
-        (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.slot === slot
+      ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>
+        slot.includes(moduleOnDeck.slot)
       ),
-      ...values(initialDeckSetup.labware).filter(
-        (labware: LabwareOnDeckType) => labware.slot === slot
+      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
+        slot.includes(labware.slot)
       ),
       ...filteredAdditionalEquipmentOnDeck,
     ].length === 0
