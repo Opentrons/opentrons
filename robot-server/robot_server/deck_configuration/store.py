@@ -32,5 +32,5 @@ class DeckConfigurationStore:
         """Get the robot's current deck configuration in an expected typing."""
         deck_configuration: DeckConfigurationType = []
         for item in self._cutoutFixtures:
-            deck_configuration.append((item.cutoutFixtureId, item.cutoutId))
+            deck_configuration.append((item.cutoutId, item.cutoutFixtureId))
         return deck_configuration
