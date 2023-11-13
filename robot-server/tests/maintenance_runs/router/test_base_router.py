@@ -72,6 +72,7 @@ async def test_create_run(
             run_id=run_id,
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
+            deck_configuration=[],
         )
     ).then_return(expected_response)
 

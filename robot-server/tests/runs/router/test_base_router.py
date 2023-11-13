@@ -80,6 +80,7 @@ async def test_create_run(
             run_id=run_id,
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
+            deck_configuration=[],
             protocol=None,
         )
     ).then_return(expected_response)
@@ -150,6 +151,7 @@ async def test_create_protocol_run(
             run_id=run_id,
             created_at=run_created_at,
             labware_offsets=[],
+            deck_configuration=[],
             protocol=protocol_resource,
         )
     ).then_return(expected_response)
@@ -201,6 +203,7 @@ async def test_create_run_conflict(
             run_id="run-id",
             created_at=created_at,
             labware_offsets=[],
+            deck_configuration=[],
             protocol=None,
         )
     ).then_raise(EngineConflictError("oh no"))

@@ -100,6 +100,7 @@ async def test_create(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=[],
+        deck_configuration=[],
     )
 
     assert result == MaintenanceRun(
@@ -148,6 +149,7 @@ async def test_create_with_options(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=[labware_offset],
+        deck_configuration=[],
     )
 
     assert result == MaintenanceRun(
@@ -190,6 +192,7 @@ async def test_create_engine_error(
             run_id=run_id,
             created_at=created_at,
             labware_offsets=[],
+            deck_configuration=[],
         )
 
 

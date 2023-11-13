@@ -102,6 +102,7 @@ async def test_create_play_action_to_resume(
         action_id="some-action-id",
         action_type=RunActionType.PLAY,
         created_at=datetime(year=2021, month=1, day=1),
+        action_payload=[],
     )
 
     assert result == RunAction(
@@ -111,8 +112,8 @@ async def test_create_play_action_to_resume(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_json_runner.play(), times=1)
-    decoy.verify(await mock_json_runner.run(), times=0)
+    decoy.verify(mock_json_runner.play(deck_configuration=[]), times=1)
+    decoy.verify(await mock_json_runner.run(deck_configuration=[]), times=0)
 
 
 async def test_create_play_action_to_start(
@@ -134,6 +135,7 @@ async def test_create_play_action_to_start(
         action_id="some-action-id",
         action_type=RunActionType.PLAY,
         created_at=datetime(year=2021, month=1, day=1),
+        action_payload=[],
     )
 
     assert result == RunAction(
@@ -147,7 +149,7 @@ async def test_create_play_action_to_start(
     background_task_captor = matchers.Captor()
     decoy.verify(mock_task_runner.run(background_task_captor))
 
-    decoy.when(await mock_python_runner.run()).then_return(
+    decoy.when(await mock_python_runner.run(deck_configuration=[])).then_return(
         RunResult(
             commands=protocol_commands,
             state_summary=engine_state_summary,
@@ -178,6 +180,7 @@ async def test_create_pause_action(
         action_id="some-action-id",
         action_type=RunActionType.PAUSE,
         created_at=datetime(year=2021, month=1, day=1),
+        action_payload=[],
     )
 
     assert result == RunAction(
@@ -203,6 +206,7 @@ async def test_create_stop_action(
         action_id="some-action-id",
         action_type=RunActionType.STOP,
         created_at=datetime(year=2021, month=1, day=1),
+        action_payload=[],
     )
 
     assert result == RunAction(
@@ -235,7 +239,9 @@ async def test_action_not_allowed(
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
     decoy.when(mock_engine_store.runner.was_started()).then_return(True)
-    decoy.when(mock_engine_store.runner.play()).then_raise(exception)
+    decoy.when(mock_engine_store.runner.play(deck_configuration=[])).then_raise(
+        exception
+    )
     decoy.when(mock_engine_store.runner.pause()).then_raise(exception)
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
@@ -243,4 +249,5 @@ async def test_action_not_allowed(
             action_id="whatever",
             action_type=action_type,
             created_at=datetime(year=2021, month=1, day=1),
+            action_payload=[],
         )

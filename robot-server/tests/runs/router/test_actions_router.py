@@ -45,6 +45,7 @@ async def test_create_run_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
+            action_payload=[],
         )
     ).then_return(expected_result)
 
@@ -83,6 +84,7 @@ async def test_play_action_clears_maintenance_run(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
+            action_payload=[],
         )
     ).then_return(expected_result)
 
@@ -128,6 +130,7 @@ async def test_create_play_action_not_allowed(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
+            action_payload=[],
         )
     ).then_raise(exception)
 
