@@ -10,6 +10,7 @@ import type { RobotType } from '@opentrons/shared-data'
 interface SlotLabelsProps {
   robotType: RobotType
   color?: string
+  show4thColumn?: boolean
 }
 
 /**
@@ -19,6 +20,7 @@ interface SlotLabelsProps {
 export const SlotLabels = ({
   robotType,
   color,
+  show4thColumn = false,
 }: SlotLabelsProps): JSX.Element | null => {
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
@@ -102,6 +104,15 @@ export const SlotLabels = ({
           >
             <LocationIcon color={color} slotName="3" height="100%" />
           </Flex>
+          {show4thColumn ? (
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_CENTER}
+              flex="1"
+            >
+              <LocationIcon color={color} slotName="4" height="100%" />
+            </Flex>
+          ) : null}
         </Flex>
       </RobotCoordsForeignObject>
     </>

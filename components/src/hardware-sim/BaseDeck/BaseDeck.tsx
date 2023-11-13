@@ -245,7 +245,11 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           }
         )}
         {showSlotLabels ? (
-          <SlotLabels robotType={robotType} color={darkFill} />
+          <SlotLabels
+            robotType={robotType}
+            color={darkFill}
+            show4thColumn={stagingAreaFixtures.length > 0}
+          />
         ) : null}
       </>
       {children}
