@@ -15,6 +15,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 from ..engine_store import EngineStore
 from ..run_store import RunStore
@@ -121,6 +122,7 @@ async def create_run_action(
     ):
         await maintenance_engine_store.clear()
     try:
+        deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
             deck_configuration = deck_configuration_store.get_cutoutFixtures()
         action = run_controller.create_action(
