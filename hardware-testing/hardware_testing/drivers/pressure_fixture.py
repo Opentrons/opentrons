@@ -122,7 +122,8 @@ def connect_to_fixture(
         else:
             ports = comports()
             assert ports
-            for port in ports:
+            for _port in ports:
+                port = _port.device  # type: ignore[attr-defined]
                 try:
                     ui.print_info(
                         f"Trying to connect to Pressure fixture on port {port}"
