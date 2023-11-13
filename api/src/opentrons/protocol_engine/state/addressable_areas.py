@@ -201,11 +201,15 @@ class AddressableAreaView(HasState[AddressableAreaState]):
     def get_addressable_area(self, addressable_area_name: str) -> AddressableArea:
         """Get addressable area."""
         if not self._state.use_simulated_deck_config:
-            return self.get_loaded_addressable_area(addressable_area_name)
+            return self._get_loaded_addressable_area(addressable_area_name)
         else:
-            return self.get_addressable_area_for_simulation(addressable_area_name)
+            return self._get_addressable_area_for_simulation(addressable_area_name)
 
-    def get_loaded_addressable_area(
+    def get_all(self) -> List[str]:
+        """Get a list of all loaded addressable area names."""
+        return list(self._state.loaded_addressable_areas_by_name)
+
+    def _get_loaded_addressable_area(
         self, addressable_area_name: str
     ) -> AddressableArea:
         """Get an addressable area that has been loaded into state. Will raise error if it does not exist."""
@@ -214,7 +218,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         except KeyError:
             raise RuntimeError("Addressable area is not configured for this robot")
 
-    def get_addressable_area_for_simulation(
+    def _get_addressable_area_for_simulation(
         self, addressable_area_name: str
     ) -> AddressableArea:
         """Get an addressable area that may not have been already loaded for a simulated run.
@@ -256,3 +260,8 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             y=position.y + bounding_box.y / 2,
             z=position.z,
         )
+
+    def get_addressable_area_height(self, addressable_area_name: str) -> float:
+        """Get the z height of an addressable area."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        return addressable_area.bounding_box.z

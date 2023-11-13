@@ -58,7 +58,12 @@ class AddressableAreaLocation(BaseModel):
     """The location of something place in an addressable area. This is a superset of deck slots."""
 
     addressableAreaName: str = Field(
-        ..., description="lorem ipsum i don't know the rest it aint real latin"
+        ...,
+        description=(
+            "The name of the addressable area that you want to use."
+            " Valid values are the `id`s of `addressableArea`s in the"
+            " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
+        ),
     )
 
 

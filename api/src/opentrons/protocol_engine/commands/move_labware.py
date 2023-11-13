@@ -101,13 +101,12 @@ class MoveLabwareImplementation(
             )
 
         if isinstance(params.newLocation, AddressableAreaLocation):
+            area_name = params.newLocation.addressableAreaName
             if not fixture_validation.is_gripper_waste_chute(
-                params.newLocation.addressableAreaName
-            ) and not fixture_validation.is_deck_slot(
-                params.newLocation.addressableAreaName
-            ):
-                raise ValueError(
-                    f"Cannot move to labware to addressable area {params.newLocation.addressableAreaName}"
+                area_name
+            ) and not fixture_validation.is_deck_slot(area_name):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move {current_labware.loadName} to addressable area {area_name}"
                 )
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
