@@ -9,6 +9,8 @@ import {
   WASTE_CHUTE_CUTOUT,
   AddressableAreaName,
   CutoutId,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  isAddressableAreaStandardSlot,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
@@ -116,23 +118,10 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       robotType === FLEX_ROBOT_TYPE ? 'movableTrash' : 'fixedTrash'
     const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
-    const stagingAddressableAreas = Object.values(additionalEquipmentEntities)
+    const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
       .filter(aE => aE.name === 'stagingArea')
-      .map(aE => aE.location as AddressableAreaName)
-
-    const providesAddressableAreasForAddressableArea = cutoutFixtures
-      .filter(cutoutFixture => {
-        const providesAddressableAreas = Object.values(
-          cutoutFixture.providesAddressableAreas
-        )
-        return stagingAddressableAreas.map(aa =>
-          providesAddressableAreas.map(addressableArea =>
-            addressableArea.includes(aa)
-          )
-        )
-      })
-      .find(cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot'))
-      ?.providesAddressableAreas
+      //  TODO(jr, 11/13/23): fix AdditionalEquipment['location'] from type string to CutoutId
+      .map(aE => aE.location as CutoutId)
 
     if (robotState == null) return null
 
@@ -211,22 +200,14 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       []
     )
 
-    if (providesAddressableAreasForAddressableArea == null) {
-      console.error(
-        `expected to find addressable area for StagingAreaRightSlot but could not`
-      )
-      return []
-    }
-
-    const cutoutAddressableArea = stagingAddressableAreas.map(aa => {
-      const providedAddressableArea =
-        providesAddressableAreasForAddressableArea[aa as CutoutId]
-      return providedAddressableArea?.[1]
-    })
-
-    const stagingAreaSlots = COLUMN_4_SLOTS.filter(slot =>
-      cutoutAddressableArea.every(addressableArea => addressableArea !== slot)
-    )
+    const stagingAreaAddressableAreaNames = stagingAreaCutoutIds
+      .flatMap(cutoutId => {
+        const addressableAreasOnCutout = cutoutFixtures.find(
+          cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
+        )?.providesAddressableAreas[cutoutId]
+        return addressableAreasOnCutout ?? []
+      })
+      .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
 
     const unoccupiedSlotOptions = allSlotIds
       .filter(
@@ -237,7 +218,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
             .includes(slotId) &&
           slotId !== trashSlot &&
           !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
-          !stagingAreaSlots.includes(slotId)
+          !stagingAreaAddressableAreaNames.includes(slotId)
       )
       .map(slotId => ({ name: slotId, value: slotId }))
     const offDeck = { name: 'Off-deck', value: 'offDeck' }

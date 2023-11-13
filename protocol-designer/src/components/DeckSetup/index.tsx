@@ -43,7 +43,7 @@ import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { getStagingAreaSlotsCutouts } from '../../utils'
+import { getStagingAreaAddressableAreas } from '../../utils'
 import {
   getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
@@ -108,7 +108,7 @@ interface ContentsProps {
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
   robotType: RobotType
-  stagingAddressableAreas: AddressableAreaName[]
+  stagingAreaCutoutIds: CutoutId[]
   trashSlot: string | null
 }
 
@@ -123,7 +123,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     deckDef,
     robotType,
     trashSlot,
-    stagingAddressableAreas,
+    stagingAreaCutoutIds,
   } = props
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
@@ -348,12 +348,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const stagingAreaSlotsCutouts = getStagingAreaSlotsCutouts(
-            stagingAddressableAreas
+          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
+            stagingAreaCutoutIds
           )
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
-            stagingAreaSlotsCutouts.includes(addressableArea.id)
+            stagingAreaAddressableAreas.includes(addressableArea.id)
           return (
             addressableAreas &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
@@ -630,8 +630,10 @@ export const DeckSetup = (): JSX.Element => {
                 robotType={robotType}
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}
-                stagingAddressableAreas={stagingAreaFixtures.map(
-                  areas => areas.location as AddressableAreaName
+                stagingAreaCutoutIds={stagingAreaFixtures.map(
+                  //  TODO(jr, 11/13/23): fix this type since AdditionalEquipment['location'] is type string
+                  //  instead of CutoutId
+                  areas => areas.location as CutoutId
                 )}
                 {...{
                   deckDef,

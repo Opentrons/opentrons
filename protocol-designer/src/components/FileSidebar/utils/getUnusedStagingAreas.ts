@@ -1,12 +1,12 @@
-import { getStagingAreaSlotsCutouts } from '../../../utils'
-import type { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
+import { getStagingAreaAddressableAreas } from '../../../utils'
+import type { CreateCommand, CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipment } from '../FileSidebar'
 
 export const getUnusedStagingAreas = (
   additionalEquipment: AdditionalEquipment,
   commands?: CreateCommand[]
 ): string[] => {
-  const stagingAreaSlots = Object.values(additionalEquipment)
+  const stagingAreaCutoutIds = Object.values(additionalEquipment)
     .filter(equipment => equipment?.name === 'stagingArea')
     .map(equipment => {
       if (equipment.location == null) {
@@ -17,11 +17,12 @@ export const getUnusedStagingAreas = (
       return equipment.location ?? ''
     })
 
-  const stagingAreaSlotsCutouts = getStagingAreaSlotsCutouts(
-    stagingAreaSlots as AddressableAreaName[]
+  const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
+    //  TODO(jr, 11/13/23): fix AdditionalEquipment['location'] from type string to CutoutId
+    stagingAreaCutoutIds as CutoutId[]
   )
 
-  const stagingAreaCommandSlots: string[] = stagingAreaSlotsCutouts.filter(
+  const stagingAreaCommandSlots: string[] = stagingAreaAddressableAreaNames.filter(
     location =>
       commands?.filter(
         command =>

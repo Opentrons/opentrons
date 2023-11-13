@@ -6,6 +6,8 @@ import {
   getDeckDefFromRobotTypeV4,
   FLEX_ROBOT_TYPE,
   CutoutId,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  isAddressableAreaStandardSlot,
 } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
@@ -140,37 +142,18 @@ export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
   return Object.values(pipettes).some(pip => pip.spec.channels === 96)
 }
 
-export const getStagingAreaSlotsCutouts = (
-  stagingAddressableAreas: AddressableAreaName[]
+export const getStagingAreaAddressableAreas = (
+  cutoutIds: CutoutId[]
 ): AddressableAreaName[] => {
   const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
   const cutoutFixtures = deckDef.cutoutFixtures
-  const providesAddressableAreasForAddressableArea = cutoutFixtures
-    .filter(cutoutFixture => {
-      const providesAddressableAreas = Object.values(
-        cutoutFixture.providesAddressableAreas
-      )
-      return stagingAddressableAreas.map(aa =>
-        providesAddressableAreas.map(addressableArea =>
-          addressableArea.includes(aa)
-        )
-      )
+
+  return cutoutIds
+    .flatMap(cutoutId => {
+      const addressableAreasOnCutout = cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
+      )?.providesAddressableAreas[cutoutId]
+      return addressableAreasOnCutout ?? []
     })
-    .find(cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot'))
-    ?.providesAddressableAreas
-
-  if (providesAddressableAreasForAddressableArea == null) {
-    console.error(
-      `expected to find addressable area for StagingAreaRightSlot but could not`
-    )
-    return []
-  }
-
-  const cutoutAddressableArea = stagingAddressableAreas.map(aa => {
-    const providedAddressableArea =
-      providesAddressableAreasForAddressableArea[aa as CutoutId]
-    return providedAddressableArea?.[1]
-  })
-
-  return cutoutAddressableArea
+    .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
 }
