@@ -1,16 +1,17 @@
 import * as React from 'react'
 
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+
 import { COLORS } from '../../ui-style-constants'
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 import { WasteChute } from './WasteChuteFixture'
 
 import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
-import type { WasteChuteLocation } from './WasteChuteFixture'
 
 interface WasteChuteStagingAreaFixtureProps
   extends React.SVGProps<SVGGElement> {
-  cutoutLocation: WasteChuteLocation
+  cutoutId: typeof WASTE_CHUTE_CUTOUT
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
@@ -22,23 +23,22 @@ export function WasteChuteStagingAreaFixture(
   props: WasteChuteStagingAreaFixtureProps
 ): JSX.Element | null {
   const {
-    cutoutLocation,
+    cutoutId,
     deckDefinition,
     fixtureBaseColor = COLORS.light1,
     slotClipColor = COLORS.darkGreyEnabled,
     ...restProps
   } = props
 
-  if (cutoutLocation !== 'D3') {
+  if (cutoutId !== WASTE_CHUTE_CUTOUT) {
     console.warn(
-      `cannot render WasteChuteStagingAreaFixture in given cutout location ${cutoutLocation}`
+      `cannot render WasteChuteStagingAreaFixture in given cutout location ${cutoutId}`
     )
     return null
   }
 
-  // TODO(bh, 2023-10-09): migrate from "orderedSlots" to v4 "cutouts" key
-  const cutoutDef = deckDefinition?.locations.orderedSlots.find(
-    s => s.id === cutoutLocation
+  const cutoutDef = deckDefinition?.locations.cutouts.find(
+    s => s.id === cutoutId
   )
   if (cutoutDef == null) {
     console.warn(
@@ -47,7 +47,6 @@ export function WasteChuteStagingAreaFixture(
     return null
   }
 
-  // TODO(bh, 2023-10-10): adjust base and clip d values if needed to fit v4 deck definition
   return (
     // TODO: render a "Waste chute" foreign object similar to FlexTrash
     <g {...restProps}>

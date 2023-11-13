@@ -60,7 +60,9 @@ def dummy_instruments_ot3():
 
 
 @pytest.fixture
-def mock_api_verify_tip_presence() -> Iterator[mock.AsyncMock]:
+def mock_api_verify_tip_presence_ot3(request) -> Iterator[mock.AsyncMock]:
+    if request.config.getoption("--ot2-only"):
+        pytest.skip("testing ot2 only")
     from opentrons.hardware_control.ot3api import OT3API
 
     with mock.patch.object(OT3API, "verify_tip_presence") as mock_tip_presence:
@@ -70,11 +72,14 @@ def mock_api_verify_tip_presence() -> Iterator[mock.AsyncMock]:
 def wrap_build_ot3_sim():
     from opentrons.hardware_control.ot3api import OT3API
 
-    return OT3API.build_hardware_simulator
+    with mock.patch.object(
+        OT3API, "verify_tip_presence"
+    ) as mock_tip_presence:  # noqa: F841
+        return OT3API.build_hardware_simulator
 
 
 @pytest.fixture
-def ot3_api_obj(request, mock_api_verify_tip_presence):
+def ot3_api_obj(request, mock_api_verify_tip_presence_ot3):
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing ot2 only")
     from opentrons.hardware_control.ot3api import OT3API
@@ -89,7 +94,7 @@ def ot3_api_obj(request, mock_api_verify_tip_presence):
     ],
     ids=["ot2", "ot3"],
 )
-def sim_and_instr(request, mock_api_verify_tip_presence):
+def sim_and_instr(request):
     if (
         request.node.get_closest_marker("ot2_only")
         and request.param[0] == wrap_build_ot3_sim

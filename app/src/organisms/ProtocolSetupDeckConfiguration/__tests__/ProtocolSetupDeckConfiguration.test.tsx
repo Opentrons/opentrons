@@ -51,7 +51,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'D3',
+      fixtureLocation: 'cutoutD3',
       runId: 'mockRunId',
       setSetupScreen: mockSetSetupScreen,
       providedFixtureOptions: [],

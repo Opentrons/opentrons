@@ -244,7 +244,7 @@ export function ProtocolDetails(
     params: {
       fixtureId: 'stubbedFixtureId',
       loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
+      location: { cutout: 'cutoutD3' },
     },
     createdAt: 'fakeTimestamp',
     startedAt: 'fakeTimestamp',
@@ -349,15 +349,7 @@ export function ProtocolDetails(
     ) : null,
   }
 
-  const deckThumbnail = (
-    <DeckThumbnail
-      commands={mostRecentAnalysis?.commands ?? []}
-      labware={mostRecentAnalysis?.labware ?? []}
-      liquids={
-        mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : []
-      }
-    />
-  )
+  const deckThumbnail = <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
     missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,

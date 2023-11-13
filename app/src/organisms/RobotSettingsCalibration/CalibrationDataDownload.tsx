@@ -94,7 +94,7 @@ export function CalibrationDataDownload({
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      paddingTop={SPACING.spacing24}
+      gridGap={SPACING.spacing40}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

@@ -286,23 +286,78 @@ describe('robot update epics', () => {
       })
     })
 
-    it('issues error if begin request fails without 409', () => {
+    it('sends request to cancel URL if a non 409 occurs and reissues CREATE_SESSION', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
-        mockFetchRobotApi.mockReturnValueOnce(
-          cold('r', { r: Fixtures.mockUpdateBeginFailure })
-        )
+        mockFetchRobotApi
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginFailure })
+          )
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateCancelSuccess })
+          )
 
         const action$ = hot<Action>('-a', { a: action })
         const state$ = hot<State>('a-', { a: state } as any)
         const output$ = epics.createSessionEpic(action$, state$)
 
-        expectObservable(output$).toBe('-e', {
-          e: actions.unexpectedRobotUpdateError(
+        expectObservable(output$).toBe('-a', { a: action })
+        flush()
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(robot, {
+          method: 'POST',
+          path: '/server/update/cancel',
+        })
+      })
+    })
+
+    it('Issues an error if cancelling a session fails after a 409 error occurs', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
+
+        mockFetchRobotApi
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginConflict })
+          )
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateCancelFailure })
+          )
+
+        const action$ = hot<Action>('-a', { a: action })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.createSessionEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.unexpectedRobotUpdateError(
+            'Unable to cancel in-progress update session'
+          ),
+        })
+        flush()
+      })
+    })
+
+    it('Issues an error if cancelling a session fails after a non 409 error occurs', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
+
+        mockFetchRobotApi
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateBeginFailure })
+          )
+          .mockReturnValueOnce(
+            cold<RobotApiResponse>('r', { r: Fixtures.mockUpdateCancelFailure })
+          )
+
+        const action$ = hot<Action>('-a', { a: action })
+        const state$ = hot<State>('a-', { a: state } as any)
+        const output$ = epics.createSessionEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.unexpectedRobotUpdateError(
             'Unable to start update session'
           ),
         })
+        flush()
       })
     })
 
@@ -326,6 +381,46 @@ describe('robot update epics', () => {
           e: actions.unexpectedRobotUpdateError(
             'Unable to cancel in-progress update session'
           ),
+        })
+      })
+    })
+  })
+
+  describe('startUpdateAfterFileDownload', () => {
+    it('should start the update after file download if the robot is a flex', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        const session: ReturnType<typeof getRobotUpdateSession> = {
+          stage: 'done',
+          step: 'downloadFile',
+        } as any
+
+        getRobotUpdateRobot.mockReturnValue(brRobotFlex)
+        getRobotUpdateSession.mockReturnValue(session)
+
+        const state$ = hot<State>('-a', { a: state })
+        const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readSystemRobotUpdateFile('flex'),
+        })
+      })
+    })
+
+    it('should start the update after file download if the robot is a ot-2', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        const session: ReturnType<typeof getRobotUpdateSession> = {
+          stage: 'done',
+          step: 'downloadFile',
+        } as any
+
+        getRobotUpdateRobot.mockReturnValue(brRobotOt2)
+        getRobotUpdateSession.mockReturnValue(session)
+
+        const state$ = hot<State>('-a', { a: state })
+        const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readSystemRobotUpdateFile('ot2'),
         })
       })
     })

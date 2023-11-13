@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { SpinnerModalPage, AlertModal } from '@opentrons/components'
+import { SpinnerModalPage, AlertModal, SPACING } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
@@ -315,7 +315,7 @@ export function RobotSettingsCalibration({
           <CalibrationDataDownload
             {...{ robotName, setShowHowCalibrationWorksModal }}
           />
-          <Line />
+          <Line marginTop={SPACING.spacing24} />
           <RobotSettingsPipetteOffsetCalibration
             formattedPipetteOffsetCalibrations={
               formattedPipetteOffsetCalibrations
@@ -363,7 +363,7 @@ export function RobotSettingsCalibration({
             isPending={isPending}
             robotName={robotName}
           />
-          <Line />
+          <Line marginBottom={SPACING.spacing24} />
           <CalibrationDataDownload
             robotName={robotName}
             setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}

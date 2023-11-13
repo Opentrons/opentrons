@@ -56,12 +56,6 @@ describe('analytics selectors', () => {
   })
 
   describe('analytics calibration selectors', () => {
-    describe('getAnalyticsHealthCheckData', () => {
-      it('should return null if no robot connected', () => {
-        const mockState: State = {} as any
-        expect(Selectors.getAnalyticsHealthCheckData(mockState)).toBeNull()
-      })
-    })
     describe('getAnalyticsSessionExitDetails', () => {
       const mockGetRobotSessionById = SessionsSelectors.getRobotSessionById as jest.MockedFunction<
         typeof SessionsSelectors.getRobotSessionById

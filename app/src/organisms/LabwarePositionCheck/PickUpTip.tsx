@@ -49,6 +49,8 @@ interface PickUpTipProps extends PickUpTipStep {
   handleJog: Jog
   isRobotMoving: boolean
   robotType: RobotType
+  protocolHasModules: boolean
+  currentStepIndex: number
 }
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -67,6 +69,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     setFatalError,
     adapterId,
     robotType,
+    protocolHasModules,
+    currentStepIndex,
   } = props
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
   const isOnDevice = useSelector(getIsOnDevice)
@@ -87,7 +91,10 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   )
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
   const instructions = [
-    t('clear_all_slots'),
+    ...(protocolHasModules && currentStepIndex === 1
+      ? [t('place_modules')]
+      : []),
+    isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
     <Trans
       key="place_a_full_tip_rack_in_location"
       t={t}
@@ -400,10 +407,14 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
               t={t}
               i18nKey={
                 isOnDevice
-                  ? 'ensure_nozzle_is_above_tip_odd'
-                  : 'ensure_nozzle_is_above_tip_desktop'
+                  ? 'ensure_nozzle_position_odd'
+                  : 'ensure_nozzle_position_desktop'
               }
               components={{ block: <StyledText as="p" />, bold: <strong /> }}
+              values={{
+                tip_type: t('pipette_nozzle'),
+                item_location: t('check_tip_location'),
+              }}
             />
           }
           labwareDef={labwareDef}
@@ -413,6 +424,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           handleJog={handleJog}
           initialPosition={initialPosition}
           existingOffset={existingOffset}
+          shouldUseMetalProbe={false}
         />
       ) : (
         <PrepareSpace

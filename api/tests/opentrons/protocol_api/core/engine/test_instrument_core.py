@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based instrument API core."""
-from typing import cast
+from typing import cast, Optional
 
 import pytest
 from decoy import Decoy
@@ -20,7 +20,15 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import FlowRates, TipGeometry
+from opentrons.protocol_engine.types import (
+    FlowRates,
+    TipGeometry,
+    NozzleLayoutConfigurationType,
+    RowNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+)
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api.core.engine import InstrumentCore, WellCore, ProtocolCore
 from opentrons.types import Location, Mount, MountType, Point
 
@@ -874,3 +882,43 @@ def test_has_tip(
     ).then_return(TipGeometry(length=1, diameter=2, volume=3))
 
     assert subject.has_tip() is True
+
+
+@pytest.mark.parametrize(
+    argnames=["style", "primary_nozzle", "front_right_nozzle", "expected_model"],
+    argvalues=[
+        [
+            NozzleLayout.COLUMN,
+            "A1",
+            "H1",
+            ColumnNozzleLayoutConfiguration(primary_nozzle="A1"),
+        ],
+        [
+            NozzleLayout.SINGLE,
+            "H12",
+            None,
+            SingleNozzleLayoutConfiguration(primary_nozzle="H12"),
+        ],
+        [
+            NozzleLayout.ROW,
+            "A12",
+            None,
+            RowNozzleLayoutConfiguration(primary_nozzle="A12"),
+        ],
+    ],
+)
+def test_configure_nozzle_layout(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+    style: NozzleLayout,
+    primary_nozzle: Optional[str],
+    front_right_nozzle: Optional[str],
+    expected_model: NozzleLayoutConfigurationType,
+) -> None:
+    """The correct model is passed to the engine client."""
+    subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+
+    decoy.verify(
+        mock_engine_client.configure_nozzle_layout(subject._pipette_id, expected_model)
+    )

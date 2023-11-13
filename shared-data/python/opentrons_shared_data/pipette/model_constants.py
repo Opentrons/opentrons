@@ -76,8 +76,8 @@ _MAP_KEY_TO_V2: Dict[str, Dict[str, str]] = {
         "liquid_class": "default",
     },
     "pickUpCurrent": {
-        "top_level_name": "pickUpTipConfigurations",
-        "nested_name": "current",
+        "top_level_name": "partialTipConfigurations",
+        "nested_name": "perTipPickupCurrent",
     },
     "pickUpDistance": {
         "top_level_name": "pickUpTipConfigurations",

@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useRobot } from './'
 import { getAttachedPipettes } from '../../../redux/pipettes'
 import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
-import { FF_PREFIX } from '../../../redux/analytics'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
@@ -12,6 +11,8 @@ import {
 
 import type { State, Dispatch } from '../../../redux/types'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
+
+const FF_PREFIX = 'robotFF_'
 
 /**
  *
@@ -45,10 +46,10 @@ export function useRobotAnalyticsData(
         }),
         // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
         {
-          robotApiServerVersion: getRobotApiVersion(robot) || '',
-          robotSmoothieVersion: getRobotFirmwareVersion(robot) || '',
-          robotLeftPipette: pipettes.left?.model || '',
-          robotRightPipette: pipettes.right?.model || '',
+          robotApiServerVersion: getRobotApiVersion(robot) ?? '',
+          robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
+          robotLeftPipette: pipettes.left?.model ?? '',
+          robotRightPipette: pipettes.right?.model ?? '',
         }
       )
     }

@@ -25,7 +25,7 @@ const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutatio
 
 const mockFixture = {
   fixtureId: 'mockId',
-  fixtureLocation: 'B3',
+  fixtureLocation: 'cutoutB3',
   loadName: STAGING_AREA_LOAD_NAME,
 } as Fixture
 
@@ -41,7 +41,7 @@ describe('LocationConflictModal', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
-      cutout: 'B3',
+      cutout: 'cutoutB3',
       requiredFixture: TRASH_BIN_LOAD_NAME,
     }
     mockUseDeckConfigurationQuery.mockReturnValue({
@@ -67,7 +67,7 @@ describe('LocationConflictModal', () => {
   it('should render the modal information for a module fixture conflict', () => {
     props = {
       onCloseClick: jest.fn(),
-      cutout: 'B3',
+      cutout: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
     }
     const { getByText, getByRole } = render(props)

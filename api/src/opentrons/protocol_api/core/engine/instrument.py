@@ -1,7 +1,7 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, cast
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
@@ -14,6 +14,15 @@ from opentrons.protocol_engine import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    EmptyNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
+)
+from opentrons.protocol_engine.types import (
+    PRIMARY_NOZZLE_LITERAL,
+    NozzleLayoutConfigurationType,
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -21,6 +30,7 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.types import Point, DeckSlotName
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -587,3 +597,36 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def prepare_to_aspirate(self) -> None:
         self._engine_client.prepare_to_aspirate(pipette_id=self._pipette_id)
+
+    def configure_nozzle_layout(
+        self,
+        style: NozzleLayout,
+        primary_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+
+        if style == NozzleLayout.COLUMN:
+            configuration_model: NozzleLayoutConfigurationType = (
+                ColumnNozzleLayoutConfiguration(
+                    primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+                )
+            )
+        elif style == NozzleLayout.ROW:
+            configuration_model = RowNozzleLayoutConfiguration(
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+            )
+        elif style == NozzleLayout.QUADRANT:
+            assert front_right_nozzle is not None
+            configuration_model = QuadrantNozzleLayoutConfiguration(
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
+                front_right_nozzle=front_right_nozzle,
+            )
+        elif style == NozzleLayout.SINGLE:
+            configuration_model = SingleNozzleLayoutConfiguration(
+                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+            )
+        else:
+            configuration_model = EmptyNozzleLayoutConfiguration()
+        self._engine_client.configure_nozzle_layout(
+            pipette_id=self._pipette_id, configuration_params=configuration_model
+        )

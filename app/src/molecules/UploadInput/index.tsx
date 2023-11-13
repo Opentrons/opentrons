@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   Icon,
@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
-const DROP_ZONE_STYLES = css`
+const StyledLabel = styled.label`
   display: flex;
   cursor: pointer;
   flex-direction: ${DIRECTION_COLUMN};
@@ -39,7 +39,7 @@ const DRAG_OVER_STYLES = css`
   border: 2px dashed ${COLORS.blueEnabled};
 `
 
-const INPUT_STYLES = css`
+const StyledInput = styled.input`
   position: fixed;
   clip: rect(1px 1px 1px 1px);
 `
@@ -61,8 +61,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    const { files = [] } = 'dataTransfer' in e ? e.dataTransfer : {}
-    props.onUpload(files[0])
+    Array.from(e.dataTransfer.files).forEach(f => props.onUpload(f))
     setIsFileOverDropZone(false)
   }
   const handleDragEnter: React.DragEventHandler<HTMLLabelElement> = e => {
@@ -85,16 +84,9 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   }
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    const { files = [] } = event.target ?? {}
-    files?.[0] != null && props.onUpload(files?.[0])
+    ;[...(event.target.files ?? [])].forEach(f => props.onUpload(f))
     if ('value' in event.currentTarget) event.currentTarget.value = ''
   }
-
-  const dropZoneStyles = isFileOverDropZone
-    ? css`
-        ${DROP_ZONE_STYLES} ${DRAG_OVER_STYLES}
-      `
-    : DROP_ZONE_STYLES
 
   return (
     <Flex
@@ -115,16 +107,16 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         onClick={handleClick}
         id="UploadInput_protocolUploadButton"
       >
-        {t('choose_protocol_file')}
+        {t('upload')}
       </PrimaryButton>
 
-      <label
+      <StyledLabel
         data-testid="file_drop_zone"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
-        css={dropZoneStyles}
+        css={isFileOverDropZone ? DRAG_OVER_STYLES : undefined}
       >
         <Icon
           width={SIZE_3}
@@ -133,15 +125,15 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           marginBottom={SPACING.spacing24}
         />
         {props.dragAndDropText}
-        <input
+        <StyledInput
           id="file_input"
           data-testid="file_input"
           ref={fileInput}
-          css={INPUT_STYLES}
           type="file"
           onChange={onChange}
+          multiple
         />
-      </label>
+      </StyledLabel>
     </Flex>
   )
 }

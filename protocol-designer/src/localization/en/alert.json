@@ -49,10 +49,10 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v7_protocol_7_0": {
+    "export_v8_protocol_7_1": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "7.0 or higher",
+      "body2": "7.1 or higher",
       "body3": ". Please ensure your robot is updated to the correct version."
     },
     "change_magnet_module_model": {
@@ -159,6 +159,10 @@
       "MISSING_96_CHANNEL_TIPRACK_ADAPTER": {
         "title": "Missing 96-channel tip rack adapter",
         "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
+      },
+      "ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST": {
+        "title": "{{additionalEquipment}} does not exist",
+        "body": "Attempting to interact with an unknown entity."
       }
     },
     "warning": {
@@ -241,6 +245,18 @@
       "heading": "Unused gripper",
       "body1": "The Flex Gripper specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
       "body2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
+    },
+    "unused_trash": {
+      "heading": "Unused trash",
+      "body": "The {{name}} specified in your protocol is not currently used in any step. It will not appear as a needed item on the deck when uploaded to the app.",
+      "body_both": "The {{trashName}} and {{wasteName}} specified in your protocol are not currently used in any step. They will not appear as a needed item on the deck when uploaded to the app."
+    },
+    "unused_staging_area": {
+      "heading": "One or more staging area slots are unused",
+      "body1_plural": "The {{count}} staging area slots in [{{slot}}] in your protocol are not currently in use. They will not appear as a needed item on the deck when uploaded to the app.",
+      "body1": "The staging area slot in {{slot}} in your protocol is not currently in use. It will not appear as a needed item on the deck when uploaded to the app.",
+      "body2_plural": "If you don't intend to use these staging area slots, please consider removing it from your protocol.",
+      "body2": "If you don't intend to use this staging area slot, please consider removing it from your protocol."
     }
   },
   "crash": {

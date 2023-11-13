@@ -6,8 +6,8 @@ export interface DesignerApplicationData {
   ingredients: Record<
     string,
     {
-      name: string | null | undefined
-      description: string | null | undefined
+      name?: string | null
+      description?: string | null
       serialize: boolean
     }
   >

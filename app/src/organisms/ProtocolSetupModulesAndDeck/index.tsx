@@ -266,11 +266,7 @@ function RowModule({
           />
         </Flex>
         {isNonConnectingModule ? (
-          <Flex
-            flex="3 0 0"
-            alignItems={ALIGN_CENTER}
-            padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-          >
+          <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('n_a')}
             </StyledText>

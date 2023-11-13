@@ -14,6 +14,7 @@ import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '../useIsFlex'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ProtocolUpload/hooks')
@@ -49,7 +50,7 @@ describe('useIsRobotBusy', () => {
           current: {},
         },
       },
-    } as UseQueryResult<Runs, Error>)
+    } as UseQueryResult<Runs, AxiosError>)
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
     mockUseIsFlex.mockReturnValue(false)
   })

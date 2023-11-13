@@ -17,10 +17,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
@@ -32,6 +34,8 @@ import { AddFixtureModal } from './AddFixtureModal'
 import { useRunStatuses } from '../Devices/hooks'
 
 import type { Cutout } from '@opentrons/shared-data'
+
+const RUN_REFETCH_INTERVAL = 5000
 
 interface DeviceDetailsDeckConfigurationProps {
   robotName: string
@@ -56,6 +60,10 @@ export function DeviceDetailsDeckConfiguration({
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+  })
+  const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
 
   const handleClickAdd = (fixtureLocation: Cutout): void => {
     setTargetFixtureLocation(fixtureLocation)
@@ -63,6 +71,7 @@ export function DeviceDetailsDeckConfiguration({
   }
 
   const handleClickRemove = (fixtureLocation: Cutout): void => {
+    console.log('remove fixtureLocation', fixtureLocation)
     updateDeckConfiguration({
       fixtureLocation,
       loadName: STANDARD_SLOT_LOAD_NAME,
@@ -124,13 +133,22 @@ export function DeviceDetailsDeckConfiguration({
           gridGap={SPACING.spacing16}
           paddingX={SPACING.spacing16}
           paddingBottom={SPACING.spacing32}
-          paddingTop={isRunRunning ? undefined : SPACING.spacing32}
+          paddingTop={
+            isRunRunning || isMaintenanceRunExisting
+              ? undefined
+              : SPACING.spacing32
+          }
           width="100%"
           flexDirection={DIRECTION_COLUMN}
         >
           {isRunRunning ? (
             <Banner type="warning">
-              {t('deck_configuration_is_not_available')}
+              {t('deck_configuration_is_not_available_when_run_is_in_progress')}
+            </Banner>
+          ) : null}
+          {isMaintenanceRunExisting ? (
+            <Banner type="warning">
+              {t('deck_configuration_is_not_available_when_robot_is_busy')}
             </Banner>
           ) : null}
           <Flex gridGap={SPACING.spacing40}>
@@ -142,7 +160,7 @@ export function DeviceDetailsDeckConfiguration({
               flexDirection={DIRECTION_COLUMN}
             >
               <DeckConfigurator
-                readOnly={isRunRunning}
+                readOnly={isRunRunning || isMaintenanceRunExisting}
                 deckConfig={deckConfig}
                 handleClickAdd={handleClickAdd}
                 handleClickRemove={handleClickRemove}
@@ -171,7 +189,9 @@ export function DeviceDetailsDeckConfiguration({
                     width={SIZE_5}
                     css={TYPOGRAPHY.labelRegular}
                   >
-                    <StyledText>{fixture.fixtureLocation}</StyledText>
+                    <StyledText>
+                      {getCutoutDisplayName(fixture.fixtureLocation)}
+                    </StyledText>
                     <StyledText>
                       {getFixtureDisplayName(fixture.loadName)}
                     </StyledText>

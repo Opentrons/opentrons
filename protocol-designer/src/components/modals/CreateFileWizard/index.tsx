@@ -26,7 +26,7 @@ import {
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
   TEMPERATURE_MODULE_V2,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   actions as stepFormActions,
@@ -238,7 +238,7 @@ export function CreateFileWizard(): JSX.Element | null {
         enableDeckModification &&
         values.additionalEquipment.includes('wasteChute')
       ) {
-        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_SLOT))
+        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
       }
       //  add staging areas
       const stagingAreas = values.additionalEquipment.filter(equipment =>
