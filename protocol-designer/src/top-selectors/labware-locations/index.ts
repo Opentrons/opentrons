@@ -7,7 +7,6 @@ import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
-  AddressableAreaName,
   CutoutId,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   isAddressableAreaStandardSlot,
@@ -209,6 +208,14 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       })
       .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
 
+    //  TODO(jr, 11/13/23): update COLUMN_4_SLOTS usage to FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS
+    const notSelectedStagingAreaAddressableAreaNames = COLUMN_4_SLOTS.filter(
+      slot =>
+        stagingAreaAddressableAreaNames.every(
+          addressableArea => addressableArea !== slot
+        )
+    )
+
     const unoccupiedSlotOptions = allSlotIds
       .filter(
         slotId =>
@@ -218,7 +225,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
             .includes(slotId) &&
           slotId !== trashSlot &&
           !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
-          !stagingAreaAddressableAreaNames.includes(slotId)
+          !notSelectedStagingAreaAddressableAreaNames.includes(slotId)
       )
       .map(slotId => ({ name: slotId, value: slotId }))
     const offDeck = { name: 'Off-deck', value: 'offDeck' }
