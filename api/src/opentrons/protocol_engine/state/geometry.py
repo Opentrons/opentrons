@@ -463,6 +463,15 @@ class GeometryView:
         elif isinstance(labware.location, OnLabwareLocation):
             below_labware_id = labware.location.labwareId
             slot_name = self.get_ancestor_slot_name(below_labware_id)
+        elif isinstance(labware.location, AddressableAreaLocation):
+            area_name = labware.location.addressableAreaName
+            # TODO we might want to eventually return some sort of staging slot name when we're ready to work through
+            #   the linting nightmare it will create
+            if fixture_validation.is_staging_slot(area_name):
+                raise ValueError(
+                    "Cannot get ancestor slot name for labware on staging slot."
+                )
+            slot_name = DeckSlotName.from_primitive(area_name)
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a slot associated with it"

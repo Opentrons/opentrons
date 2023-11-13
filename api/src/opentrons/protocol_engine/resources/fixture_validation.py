@@ -27,9 +27,14 @@ def is_trash(addressable_area_name: str) -> bool:
     return addressable_area_name in {"movableTrash", "fixedTrash", "shortFixedTrash"}
 
 
+def is_staging_slot(addressable_area_name: str) -> bool:
+    """Check if an addressable area is a staging area slot."""
+    return addressable_area_name in {"A4", "B4", "C4", "D4"}
+
+
 def is_deck_slot(addressable_area_name: str) -> bool:
-    """Check if an addressable area is a deck slot."""
-    if addressable_area_name in {"A4", "B4", "C4", "D4"}:
+    """Check if an addressable area is a deck slot (including staging area slots)."""
+    if is_staging_slot(addressable_area_name):
         return True
     try:
         DeckSlotName.from_primitive(addressable_area_name)
