@@ -165,7 +165,11 @@ describe('FileSidebar', () => {
     // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
     props.additionalEquipment = {
-      [stagingArea]: { name: 'stagingArea', id: stagingArea, location: 'A3' },
+      [stagingArea]: {
+        name: 'stagingArea',
+        id: stagingArea,
+        location: 'cutoutA3',
+      },
     }
 
     const wrapper = shallow(<FileSidebar {...props} />)
