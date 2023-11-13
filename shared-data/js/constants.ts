@@ -191,11 +191,6 @@ export const STAGING_AREA_CUTOUTS: Cutout[] = [
 ]
 export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
-export const STAGING_AREA_LOAD_NAME = 'stagingArea'
-export const STANDARD_SLOT_LOAD_NAME = 'standardSlot'
-export const TRASH_BIN_LOAD_NAME = 'trashBin'
-export const WASTE_CHUTE_LOAD_NAME = 'wasteChute'
-
 export const A1_ADDRESSABLE_AREA: 'A1' = 'A1'
 export const A2_ADDRESSABLE_AREA: 'A2' = 'A2'
 export const A3_ADDRESSABLE_AREA: 'A3' = 'A3'

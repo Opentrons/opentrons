@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
-
 // import { PATCH, request } from '../request'
 import { DECK_CONFIG_STUB } from './__stubs__'
 
@@ -23,10 +21,9 @@ import type { HostConfig } from '../types'
 
 export function updateDeckConfiguration(
   config: HostConfig,
-  data: Omit<Fixture, 'fixtureId'>
+  data: Fixture
 ): Promise<{ data: Fixture }> {
-  const { fixtureLocation } = data
-  const fixtureId = uuidv4()
-  DECK_CONFIG_STUB[fixtureLocation] = { ...data, fixtureId }
-  return Promise.resolve({ data: DECK_CONFIG_STUB[fixtureLocation] })
+  const { cutoutId } = data
+  DECK_CONFIG_STUB[cutoutId] = data
+  return Promise.resolve({ data: DECK_CONFIG_STUB[cutoutId] })
 }

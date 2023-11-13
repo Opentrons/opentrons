@@ -13,7 +13,7 @@ import {
 } from '@opentrons/api-client'
 
 import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
-import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { getLabwareRenderInfo } from '../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
@@ -43,7 +43,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
     protocolAnalysis.commands
   )
 
-  const deckConfig = getDeckConfigFromProtocolCommands(
+  const deckConfig = getSimplestDeckConfigForProtocolCommands(
     protocolAnalysis.commands
   )
   const liquids = protocolAnalysis.liquids

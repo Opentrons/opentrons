@@ -1,15 +1,15 @@
 import {
   FLEX_ROBOT_TYPE,
-  STAGING_AREA_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
 } from './constants'
+import type { CutoutFixtureId, WasteChuteCutoutFixtureId } from '../deck'
 import type {
   AddressableArea,
   CoordinateTuple,
   Cutout,
   DeckDefinition,
-  FixtureLoadName,
   OT2Cutout,
 } from './types'
 
@@ -93,12 +93,14 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-export function getFixtureDisplayName(loadName: FixtureLoadName): string {
-  if (loadName === STAGING_AREA_LOAD_NAME) {
+export function getFixtureDisplayName(fixtureId: CutoutFixtureId): string {
+  if (fixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return 'Staging Area Slot'
-  } else if (loadName === TRASH_BIN_LOAD_NAME) {
+  } else if (fixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
     return 'Trash Bin'
-  } else if (loadName === WASTE_CHUTE_LOAD_NAME) {
+  } else if (
+    WASTE_CHUTE_FIXTURES.includes(fixtureId as WasteChuteCutoutFixtureId)
+  ) {
     return 'Waste Chute'
   } else {
     return 'Slot'

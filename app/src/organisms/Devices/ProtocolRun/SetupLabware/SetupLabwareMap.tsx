@@ -17,7 +17,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
-import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { useAttachedModules } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
@@ -107,7 +107,7 @@ export function SetupLabwareMap({
 
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
 
-  const deckConfig = getDeckConfigFromProtocolCommands(
+  const deckConfig = getSimplestDeckConfigForProtocolCommands(
     protocolAnalysis.commands
   )
 

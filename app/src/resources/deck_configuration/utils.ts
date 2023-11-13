@@ -6,20 +6,11 @@ import {
 
 import type {
   CutoutId,
-  DeckConfiguration,
   RunTimeCommand,
-  Cutout,
-  CutoutFixtureId,
   CutoutFixture,
   AddressableAreaName,
-  FixtureLoadName,
 } from '@opentrons/shared-data'
-
-interface CutoutConfig {
-  cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId
-  requiredAddressableAreas: AddressableAreaName[]
-}
+import type { CutoutConfig } from './types'
 
 export const FLEX_SIMPLEST_DECK_CONFIG: CutoutConfig[] = [
   {
@@ -160,19 +151,6 @@ export function getSimplestDeckConfigForProtocolCommands(
   )
 
   return simplestDeckConfig
-}
-
-// TODO(BC, 11/7/23): remove this function in favor of getSimplestDeckConfigForProtocolCommands
-export function getDeckConfigFromProtocolCommands(
-  commands: RunTimeCommand[]
-): DeckConfiguration {
-  return getSimplestDeckConfigForProtocolCommands(commands).map(
-    ({ cutoutId, cutoutFixtureId }) => ({
-      fixtureId: cutoutFixtureId,
-      fixtureLocation: cutoutId as Cutout,
-      loadName: cutoutFixtureId as FixtureLoadName,
-    })
-  )
 }
 
 export function getCutoutFixturesForAddressableAreas(

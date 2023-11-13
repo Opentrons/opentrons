@@ -24,7 +24,7 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
-  STANDARD_SLOT_LOAD_NAME,
+  SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -33,16 +33,16 @@ import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 
 import type {
-  Cutout,
+  CutoutId,
+  CutoutFixtureId,
   Fixture,
-  FixtureLoadName,
   ModuleModel,
 } from '@opentrons/shared-data'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
-  cutout: Cutout
-  requiredFixture?: FixtureLoadName
+  cutoutId: CutoutId
+  requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
   isOnDevice?: boolean
 }
@@ -52,32 +52,33 @@ export const LocationConflictModal = (
 ): JSX.Element => {
   const {
     onCloseClick,
-    cutout,
-    requiredFixture,
+    cutoutId,
+    requiredFixtureId,
     requiredModule,
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const deckConfigurationAtLocationLoadName = deckConfig.find(
-    (deckFixture: Fixture) => deckFixture.fixtureLocation === cutout
-  )?.loadName
+  const deckConfigurationAtLocationFixtureId = deckConfig.find(
+    (deckFixture: Fixture) => deckFixture.cutoutId === cutoutId
+  )?.cutoutFixtureId
   const currentFixtureDisplayName =
-    deckConfigurationAtLocationLoadName != null
-      ? getFixtureDisplayName(deckConfigurationAtLocationLoadName)
+    deckConfigurationAtLocationFixtureId != null
+      ? getFixtureDisplayName(deckConfigurationAtLocationFixtureId)
       : ''
 
   const handleUpdateDeck = (): void => {
-    if (requiredFixture != null) {
+    if (requiredFixtureId != null) {
+      // TODO(bh, 2023-11-13): update the update
       updateDeckConfiguration({
-        fixtureLocation: cutout,
-        loadName: requiredFixture,
+        cutoutId,
+        cutoutFixtureId: requiredFixtureId,
       })
     } else {
       updateDeckConfiguration({
-        fixtureLocation: cutout,
-        loadName: STANDARD_SLOT_LOAD_NAME,
+        cutoutId,
+        cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
       })
     }
     onCloseClick()
@@ -102,7 +103,7 @@ export const LocationConflictModal = (
               i18nKey="deck_conflict_info"
               values={{
                 currentFixture: currentFixtureDisplayName,
-                cutout: getCutoutDisplayName(cutout),
+                cutout: getCutoutDisplayName(cutoutId),
               }}
               components={{
                 block: <StyledText as="p" />,
@@ -115,7 +116,9 @@ export const LocationConflictModal = (
                 fontWeight={TYPOGRAPHY.fontWeightBold}
                 paddingBottom={SPACING.spacing8}
               >
-                {t('slot_location', { slotName: getCutoutDisplayName(cutout) })}
+                {t('slot_location', {
+                  slotName: getCutoutDisplayName(cutoutId),
+                })}
               </StyledText>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -135,8 +138,8 @@ export const LocationConflictModal = (
                   </StyledText>
 
                   <StyledText as="p">
-                    {requiredFixture != null &&
-                      getFixtureDisplayName(requiredFixture)}
+                    {requiredFixtureId != null &&
+                      getFixtureDisplayName(requiredFixtureId)}
                     {requiredModule != null &&
                       getModuleDisplayName(requiredModule)}
                   </StyledText>
@@ -199,7 +202,7 @@ export const LocationConflictModal = (
               i18nKey="deck_conflict_info"
               values={{
                 currentFixture: currentFixtureDisplayName,
-                cutout: getCutoutDisplayName(cutout),
+                cutout: getCutoutDisplayName(cutoutId),
               }}
               components={{
                 block: <StyledText fontSize={TYPOGRAPHY.fontSizeH4} />,
@@ -211,7 +214,9 @@ export const LocationConflictModal = (
                 fontSize={TYPOGRAPHY.fontSizeH4}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
-                {t('slot_location', { slotName: getCutoutDisplayName(cutout) })}
+                {t('slot_location', {
+                  slotName: getCutoutDisplayName(cutoutId),
+                })}
               </StyledText>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -231,8 +236,8 @@ export const LocationConflictModal = (
                     </StyledText>
                   </Box>
                   <StyledText as="label">
-                    {requiredFixture != null &&
-                      getFixtureDisplayName(requiredFixture)}
+                    {requiredFixtureId != null &&
+                      getFixtureDisplayName(requiredFixtureId)}
                     {requiredModule != null &&
                       getModuleDisplayName(requiredModule)}
                   </StyledText>

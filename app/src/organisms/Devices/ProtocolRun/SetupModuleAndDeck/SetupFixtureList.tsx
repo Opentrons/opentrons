@@ -1,5 +1,4 @@
 import * as React from 'react'
-import map from 'lodash/map'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -16,12 +15,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FixtureLoadName,
+  getCutoutDisplayName,
   getFixtureDisplayName,
-  LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
 import {
-  useLoadedFixturesConfigStatus,
+  // useLoadedFixturesConfigStatus,
   CONFIGURED,
   CONFLICTING,
   NOT_CONFIGURED,
@@ -33,15 +31,15 @@ import { LocationConflictModal } from './LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 
-import type { LoadedFixturesBySlot } from '@opentrons/api-client'
-import type { Cutout } from '@opentrons/shared-data'
+import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
+import type { CutoutConfig } from '../../../../resources/deck_configuration/types'
 
 interface SetupFixtureListProps {
-  loadedFixturesBySlot: LoadedFixturesBySlot
+  fixtureList: CutoutConfig[]
 }
 
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
-  const { loadedFixturesBySlot } = props
+  const { fixtureList } = props
   const { t, i18n } = useTranslation('protocol_setup')
   return (
     <>
@@ -81,15 +79,12 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
-        {map(loadedFixturesBySlot, ({ params, id }) => {
-          const { loadName, location } = params
+        {fixtureList.map(({ cutoutId, cutoutFixtureId }) => {
           return (
             <FixtureListItem
-              key={`SetupFixturesList_${loadName}_slot_${location.cutout}`}
-              loadName={loadName}
-              cutout={location.cutout}
-              loadedFixtures={Object.values(loadedFixturesBySlot)}
-              commandId={id}
+              key={`SetupFixturesList_${cutoutFixtureId}_cutout_${cutoutId}`}
+              cutoutId={cutoutId}
+              cutoutFixtureId={cutoutFixtureId}
             />
           )
         })}
@@ -99,23 +94,17 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 }
 
 interface FixtureListItemProps {
-  loadedFixtures: LoadFixtureRunTimeCommand[]
-  loadName: FixtureLoadName
-  cutout: Cutout
-  commandId: string
+  cutoutFixtureId: CutoutFixtureId
+  cutoutId: CutoutId
 }
 
 export function FixtureListItem({
-  loadedFixtures,
-  loadName,
-  cutout,
-  commandId,
+  cutoutFixtureId,
+  cutoutId,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const configuration = useLoadedFixturesConfigStatus(loadedFixtures)
-  const configurationStatus = configuration.find(
-    config => config.id === commandId
-  )?.configurationStatus
+  // TODO(bh, 2023-11-13): ignore configuration status pending refactor of conflicts
+  const configurationStatus = '' as any
 
   let statusLabel
   if (
@@ -162,15 +151,15 @@ export function FixtureListItem({
       {showNotConfiguredModal ? (
         <NotConfiguredModal
           onCloseClick={() => setShowNotConfiguredModal(false)}
-          cutout={cutout}
-          requiredFixture={loadName}
+          cutoutId={cutoutId}
+          requiredFixtureId={cutoutFixtureId}
         />
       ) : null}
       {showLocationConflictModal ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          cutout={cutout}
-          requiredFixture={loadName}
+          cutoutId={cutoutId}
+          requiredFixtureId={cutoutFixtureId}
         />
       ) : null}
       <Box
@@ -187,13 +176,17 @@ export function FixtureListItem({
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex alignItems={JUSTIFY_CENTER} width="45%">
-            <img width="60px" height="54px" src={getFixtureImage(loadName)} />
+            <img
+              width="60px"
+              height="54px"
+              src={getFixtureImage(cutoutFixtureId)}
+            />
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {getFixtureDisplayName(loadName)}
+                {getFixtureDisplayName(cutoutFixtureId)}
               </StyledText>
               <Btn
                 marginLeft={SPACING.spacing16}
@@ -215,7 +208,7 @@ export function FixtureListItem({
             </Flex>
           </Flex>
           <StyledText as="p" width="15%">
-            {cutout}
+            {getCutoutDisplayName(cutoutId)}
           </StyledText>
           <Flex
             width="15%"

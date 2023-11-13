@@ -8,6 +8,8 @@ import {
   useHoverTooltip,
   PrimaryButton,
 } from '@opentrons/components'
+import { SINGLE_SLOT_FIXTURES } from '@opentrons/shared-data'
+
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
@@ -19,13 +21,15 @@ import {
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
-import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+
+import type { SingleSlotCutoutFixtureId } from '@opentrons/shared-data'
+import type { CutoutConfig } from '../../../../resources/deck_configuration/types'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
-  loadedFixturesBySlot: LoadedFixturesBySlot
+  protocolDeckConfig: CutoutConfig[]
   hasModules: boolean
 }
 
@@ -33,7 +37,7 @@ export const SetupModuleAndDeck = ({
   expandLabwarePositionCheckStep,
   robotName,
   runId,
-  loadedFixturesBySlot,
+  protocolDeckConfig,
   hasModules,
 }: SetupModuleAndDeckProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
@@ -49,6 +53,13 @@ export const SetupModuleAndDeck = ({
 
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
+  const nonSingleSlotFixtureList = protocolDeckConfig.filter(
+    fixture =>
+      !SINGLE_SLOT_FIXTURES.includes(
+        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
+      )
+  )
+
   return (
     <>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing32}>
@@ -58,8 +69,8 @@ export const SetupModuleAndDeck = ({
             {hasModules ? (
               <SetupModulesList robotName={robotName} runId={runId} />
             ) : null}
-            {Object.keys(loadedFixturesBySlot).length > 0 && isFlex ? (
-              <SetupFixtureList loadedFixturesBySlot={loadedFixturesBySlot} />
+            {protocolDeckConfig.length > 0 && isFlex ? (
+              <SetupFixtureList fixtureList={nonSingleSlotFixtureList} />
             ) : null}
           </>
         ) : (

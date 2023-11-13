@@ -57,6 +57,8 @@ export type SingleSlotCutoutFixtureId =
   | 'singleCenterSlot'
   | 'singleRightSlot'
 
+export type StagingAreaRightSlotFixtureId = 'stagingAreaRightSlot'
+
 export type TrashBinAdapterCutoutFixtureId = 'trashBinAdapter'
 
 export type WasteChuteCutoutFixtureId =
@@ -67,5 +69,6 @@ export type WasteChuteCutoutFixtureId =
 
 export type CutoutFixtureId =
   | SingleSlotCutoutFixtureId
+  | StagingAreaRightSlotFixtureId
   | TrashBinAdapterCutoutFixtureId
   | WasteChuteCutoutFixtureId

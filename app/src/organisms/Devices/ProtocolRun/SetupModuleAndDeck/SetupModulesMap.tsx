@@ -12,7 +12,7 @@ import {
   getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 
-import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
@@ -64,7 +64,7 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getDeckConfigFromProtocolCommands(
+  const deckConfig = getSimplestDeckConfigForProtocolCommands(
     protocolAnalysis.commands
   )
 

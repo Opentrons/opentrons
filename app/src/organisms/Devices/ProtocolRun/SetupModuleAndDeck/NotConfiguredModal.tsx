@@ -17,25 +17,25 @@ import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
-import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 interface NotConfiguredModalProps {
   onCloseClick: () => void
-  requiredFixture: FixtureLoadName
-  cutout: Cutout
+  requiredFixtureId: CutoutFixtureId
+  cutoutId: CutoutId
 }
 
 export const NotConfiguredModal = (
   props: NotConfiguredModalProps
 ): JSX.Element => {
-  const { onCloseClick, cutout, requiredFixture } = props
+  const { onCloseClick, cutoutId, requiredFixtureId } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const handleUpdateDeck = (): void => {
     updateDeckConfiguration({
-      fixtureLocation: cutout,
-      loadName: requiredFixture,
+      cutoutId,
+      cutoutFixtureId: requiredFixtureId,
     })
     onCloseClick()
   }
@@ -46,7 +46,7 @@ export const NotConfiguredModal = (
         title={
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('add_fixture', {
-              fixtureName: getFixtureDisplayName(requiredFixture),
+              fixtureName: getFixtureDisplayName(requiredFixtureId),
             })}
           </StyledText>
         }
@@ -64,7 +64,7 @@ export const NotConfiguredModal = (
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {getFixtureDisplayName(requiredFixture)}
+                {getFixtureDisplayName(requiredFixtureId)}
               </StyledText>
               <TertiaryButton onClick={handleUpdateDeck}>
                 {i18n.format(t('add'), 'capitalize')}
