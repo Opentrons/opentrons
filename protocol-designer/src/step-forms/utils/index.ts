@@ -107,7 +107,6 @@ export const getSlotIsEmpty = (
      since labware/wasteChute can still go on top of staging areas  **/
   includeStagingAreas?: boolean
 ): boolean => {
-
   if (
     slot === SPAN7_8_10_11_SLOT &&
     TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))

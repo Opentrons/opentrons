@@ -55,10 +55,10 @@ describe('getLastCheckedEquipment', () => {
       ...MOCK_FORM_STATE,
       additionalEquipment: [
         'trashBin',
-        'stagingArea_A3',
-        'stagingArea_B3',
-        'stagingArea_C3',
-        'stagingArea_D3',
+        'stagingArea_cutoutA3',
+        'stagingArea_cutoutB3',
+        'stagingArea_cutoutC3',
+        'stagingArea_cutoutD3',
       ],
       modulesByType: {
         ...MOCK_FORM_STATE.modulesByType,
@@ -83,7 +83,7 @@ describe('getTrashSlot', () => {
   it('should return B3 when there is a staging area in slot A3', () => {
     MOCK_FORM_STATE = {
       ...MOCK_FORM_STATE,
-      additionalEquipment: ['stagingArea_A3'],
+      additionalEquipment: ['stagingArea_cutoutA3'],
     }
     const result = getTrashSlot(MOCK_FORM_STATE)
     expect(result).toBe('B3')

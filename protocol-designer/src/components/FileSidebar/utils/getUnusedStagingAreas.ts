@@ -1,4 +1,5 @@
-import type { CreateCommand } from '@opentrons/shared-data'
+import { getStagingAreaSlots4thColumnSlot } from '../../../utils'
+import type { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
 import type { AdditionalEquipment } from '../FileSidebar'
 
 export const getUnusedStagingAreas = (
@@ -16,19 +17,9 @@ export const getUnusedStagingAreas = (
       return equipment.location ?? ''
     })
 
-  const corresponding4thColumnSlots = stagingAreaSlots.map(slot => {
-    //  staging area locations should always start with "cutout", that's
-    //  why we are getting the character at index 6, right after the cutout
-    const letter = slot.charAt(6)
-    const correspondingLocation = stagingAreaSlots.find(slot =>
-      slot.startsWith('cutout' + letter)
-    )
-    if (correspondingLocation) {
-      return letter + '4'
-    }
-
-    return slot
-  })
+  const corresponding4thColumnSlots = getStagingAreaSlots4thColumnSlot(
+    stagingAreaSlots as AddressableAreaName[]
+  )
 
   const stagingAreaCommandSlots: string[] = corresponding4thColumnSlots.filter(
     location =>

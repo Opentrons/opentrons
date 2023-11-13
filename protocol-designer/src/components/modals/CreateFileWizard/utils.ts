@@ -83,10 +83,9 @@ export const getTrashBinOptionDisabled = (values: FormState): boolean => {
 export const getTrashSlot = (values: FormState): string => {
   const stagingAreaLocations = values.additionalEquipment
     .filter(equipment => equipment.includes('stagingArea'))
-    .map(stagingArea => stagingArea.split('_')[1])
-
+    .map(stagingArea => stagingArea.split('_cutout')[1])
   //   return default trash slot A3 if staging area is not in cutoutA3
-  if (!stagingAreaLocations.includes('cutoutA3')) {
+  if (!stagingAreaLocations.includes(FLEX_TRASH_DEFAULT_SLOT)) {
     return FLEX_TRASH_DEFAULT_SLOT
   }
 
@@ -103,7 +102,6 @@ export const getTrashSlot = (values: FormState): string => {
     },
     []
   )
-
   const unoccupiedSlot = OUTER_SLOTS_FLEX.find(
     slot =>
       !stagingAreaLocations.includes(slot.value) &&

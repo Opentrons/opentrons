@@ -6,6 +6,7 @@ import {
   getLabwareDisplayName,
   getLabwareHasQuirk,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
@@ -82,9 +83,28 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           savedStepForms ?? {},
           labwareId
         )
+        const isStartingInColumn4 = COLUMN_4_SLOTS.includes(
+          initialDeckSetup.labware[labwareId]?.slot
+        )
+
+        const isInColumn4 =
+          savedStepForms != null
+            ? Object.values(savedStepForms)
+                ?.reverse()
+                .some(
+                  form =>
+                    form.stepType === 'moveLabware' &&
+                    form.labware === labwareId &&
+                    (COLUMN_4_SLOTS.includes(form.newLocation) ||
+                      (isStartingInColumn4 &&
+                        !COLUMN_4_SLOTS.includes(form.newLocation)))
+                )
+            : false
+
         const isAdapterOrAluminumBlock =
           isAdapter ||
           labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
+
         const moduleOnDeck = getModuleUnderLabware(
           initialDeckSetup,
           savedStepForms ?? {},
@@ -104,6 +124,8 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           nickName = `Off-deck - ${nicknamesById[labwareId]}`
         } else if (nickName === 'Opentrons Fixed Trash') {
           nickName = TRASH
+        } else if (isInColumn4) {
+          nickName = `${nicknamesById[labwareId]} in staging area slot`
         }
 
         if (!moveLabwarePresavedStep) {

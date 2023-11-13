@@ -35,7 +35,6 @@ interface SP {
 
 function mapStateToProps(state: BaseState): SP {
   const slot = labwareIngredSelectors.selectedAddLabwareSlot(state) || null
-  console.log('slot in modal', slot)
   const pipettes = getPipetteEntities(state)
   const has96Channel = getHas96Channel(pipettes)
 
@@ -47,7 +46,7 @@ function mapStateToProps(state: BaseState): SP {
   const labwareById = stepFormSelectors.getInitialDeckSetup(state).labware
   const parentModule =
     (slot != null &&
-      initialModules.find(moduleOnDeck => moduleOnDeck.slot === slot)) ||
+      initialModules.find(moduleOnDeck => moduleOnDeck.id === slot)) ||
     null
   const parentSlot = parentModule != null ? parentModule.slot : null
   const moduleModel = parentModule != null ? parentModule.model : null
@@ -56,11 +55,9 @@ function mapStateToProps(state: BaseState): SP {
       hardwareModule.type === HEATERSHAKER_MODULE_TYPE &&
       getAreSlotsHorizontallyAdjacent(hardwareModule.slot, parentSlot ?? slot)
   )
-  console.log('labwareById', labwareById)
   const adapterLoadNameOnDeck = Object.values(labwareById)
     .filter(labwareOnDeck => slot === labwareOnDeck.id)
     .map(labwareOnDeck => labwareOnDeck.def.parameters.loadName)[0]
-  console.log('adapter loadname on deck', adapterLoadNameOnDeck)
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     slot,

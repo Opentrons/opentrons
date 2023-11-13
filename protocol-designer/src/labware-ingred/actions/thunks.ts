@@ -60,9 +60,6 @@ export const createContainer: (
     args.labwareDefURI
   ]
   const isTiprack = getIsTiprack(labwareDef)
-  // const moduleId = Object.values(initialDeckSetup.modules).find(
-  //   mod => mod.slot === slot
-  // )?.id
   if (slot) {
     const id = `${uuid()}:${args.labwareDefURI}`
     const adapterId =
@@ -88,16 +85,7 @@ export const createContainer: (
           slot: adapterId,
         },
       })
-    }
-    
-    // else if (moduleId != null) {
-    //   dispatch({
-    //     type: 'CREATE_CONTAINER',
-    //     payload: { ...args, id, slot: moduleId },
-    //   })
-    // } 
-    
-    else {
+    } else {
       dispatch({
         type: 'CREATE_CONTAINER',
         payload: { ...args, id, slot },

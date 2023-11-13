@@ -1,5 +1,9 @@
 import uuidv1 from 'uuid/v4'
-import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
+import {
+  WellSetHelpers,
+  makeWellSetHelpers,
+  AddressableAreaName,
+} from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
@@ -131,4 +135,23 @@ export const getStagingAreaSlots = (
 
 export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
   return Object.values(pipettes).some(pip => pip.spec.channels === 96)
+}
+
+export const getStagingAreaSlots4thColumnSlot = (
+  stagingAddressableAreas: AddressableAreaName[]
+): AddressableAreaName[] => {
+  const corresponding4thColumnSlots = stagingAddressableAreas.map(slot => {
+    //  staging area slot addressable areas should always start with "cutout", that's
+    //  why we are getting the character at index 6, right after the cutout
+    const letter = slot.charAt(6)
+    const correspondingLocation = stagingAddressableAreas.find(slot =>
+      slot.startsWith('cutout' + letter)
+    )
+    if (correspondingLocation) {
+      return (letter + '4') as AddressableAreaName
+    }
+
+    return slot
+  })
+  return corresponding4thColumnSlots
 }
