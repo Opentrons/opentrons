@@ -58,6 +58,7 @@ function mapStateToProps(state: BaseState): SP {
   const adapterLoadNameOnDeck = Object.values(labwareById)
     .filter(labwareOnDeck => slot === labwareOnDeck.id)
     .map(labwareOnDeck => labwareOnDeck.def.parameters.loadName)[0]
+
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     slot,

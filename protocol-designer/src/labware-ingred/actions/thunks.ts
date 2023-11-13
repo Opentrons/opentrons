@@ -60,6 +60,7 @@ export const createContainer: (
     args.labwareDefURI
   ]
   const isTiprack = getIsTiprack(labwareDef)
+
   if (slot) {
     const id = `${uuid()}:${args.labwareDefURI}`
     const adapterId =
