@@ -87,6 +87,6 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           {i18n.t('tooltip.disabled_no_space_additional_items')}
         </Tooltip>
       ) : null}
-    </React.Fragment>
+    </>
   )
 }
