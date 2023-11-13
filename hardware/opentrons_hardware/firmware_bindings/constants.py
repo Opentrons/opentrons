@@ -211,6 +211,7 @@ class MessageId(int, Enum):
 class ErrorSeverity(int, Enum):
     """Error Severity levels."""
 
+    none = 0x0
     warning = 0x1
     recoverable = 0x2
     unrecoverable = 0x3
