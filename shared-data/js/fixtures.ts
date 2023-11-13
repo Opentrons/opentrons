@@ -2,7 +2,10 @@ import {
   FLEX_ROBOT_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
 import type { CutoutFixtureId } from '../deck'
 import type {
@@ -94,14 +97,26 @@ export function getAddressableAreaFromSlotId(
 }
 
 export function getFixtureDisplayName(
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureId | null
 ): string {
   if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
-    return 'Staging Area Slot'
+    return 'Staging area slot'
   } else if (cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
-    return 'Trash Bin'
-  } else if (WASTE_CHUTE_FIXTURES.includes(cutoutFixtureId)) {
-    return 'Waste Chute'
+    return 'Trash bin'
+  } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE) {
+    return 'Waste chute only'
+  } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE) {
+    return 'Waste chute only covered'
+  } else if (
+    cutoutFixtureId ===
+    STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+  ) {
+    return 'Waste chute with staging area slot'
+  } else if (
+    cutoutFixtureId ===
+    STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
+  ) {
+    return 'Waste chute with staging area slot covered'
   } else {
     return 'Slot'
   }

@@ -93,33 +93,33 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           showExpansion={showExpansion}
         />
       ))}
-      {stagingAreaFixtures.map(({ cutoutFixtureId, cutoutId }) => (
+      {stagingAreaFixtures.map(({ cutoutId }) => (
         <StagingAreaConfigFixture
-          key={cutoutFixtureId}
+          key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={cutoutId}
         />
       ))}
-      {emptyFixtures.map(({ cutoutFixtureId, cutoutId }) => (
+      {emptyFixtures.map(({ cutoutId }) => (
         <EmptyConfigFixture
-          key={cutoutFixtureId}
+          key={cutoutId}
           deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={cutoutId}
         />
       ))}
-      {wasteChuteFixtures.map(({ cutoutFixtureId, cutoutId }) => (
+      {wasteChuteFixtures.map(({ cutoutId }) => (
         <WasteChuteConfigFixture
-          key={cutoutFixtureId}
+          key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={cutoutId}
         />
       ))}
-      {trashBinFixtures.map(({ cutoutFixtureId, cutoutId }) => (
+      {trashBinFixtures.map(({ cutoutId }) => (
         <TrashBinConfigFixture
-          key={cutoutFixtureId}
+          key={cutoutId}
           deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={cutoutId}

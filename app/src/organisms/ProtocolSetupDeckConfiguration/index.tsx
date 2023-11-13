@@ -19,21 +19,21 @@ import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_c
 import { Portal } from '../../App/portal'
 
 import type {
-  Cutout,
+  CutoutFixtureId,
+  CutoutId,
   DeckConfiguration,
-  FixtureLoadName,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
-  fixtureLocation: Cutout
+  cutoutId: CutoutId
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
-  providedFixtureOptions: FixtureLoadName[]
+  providedFixtureOptions: CutoutFixtureId[]
 }
 
 export function ProtocolSetupDeckConfiguration({
-  fixtureLocation,
+  cutoutId,
   runId,
   setSetupScreen,
   providedFixtureOptions,
@@ -74,9 +74,9 @@ export function ProtocolSetupDeckConfiguration({
             setShowConfirmationModal={setShowDiscardChangeModal}
           />
         ) : null}
-        {showConfigurationModal && fixtureLocation != null ? (
+        {showConfigurationModal && cutoutId != null ? (
           <AddFixtureModal
-            fixtureLocation={fixtureLocation}
+            cutoutId={cutoutId}
             setShowAddFixtureModal={setShowConfigurationModal}
             providedFixtureOptions={providedFixtureOptions}
             setCurrentDeckConfig={setCurrentDeckConfig}

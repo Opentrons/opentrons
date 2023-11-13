@@ -1,5 +1,5 @@
-import { CutoutFixtureId } from '../deck'
-import type { Cutout, ModuleType } from './types'
+import { CutoutFixtureId, CutoutId } from '../deck'
+import type { ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -184,12 +184,34 @@ export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
-export const STAGING_AREA_CUTOUTS: Cutout[] = [
+export const SINGLE_LEFT_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
+]
+
+export const SINGLE_CENTER_CUTOUTS: CutoutId[] = [
+  'cutoutA2',
+  'cutoutB2',
+  'cutoutC2',
+  'cutoutD2',
+]
+
+export const SINGLE_RIGHT_CUTOUTS: CutoutId[] = [
   'cutoutA3',
   'cutoutB3',
   'cutoutC3',
   'cutoutD3',
 ]
+
+export const STAGING_AREA_CUTOUTS: CutoutId[] = [
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+
 export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
 export const A1_ADDRESSABLE_AREA: 'A1' = 'A1'
