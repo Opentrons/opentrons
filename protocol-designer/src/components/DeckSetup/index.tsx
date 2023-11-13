@@ -43,7 +43,7 @@ import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
-import { getStagingAreaSlots4thColumnSlot } from '../../utils'
+import { getStagingAreaSlotsCutouts } from '../../utils'
 import {
   getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
@@ -348,12 +348,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
         .filter(addressableArea => {
-          const corresponding4thColumnSlots = getStagingAreaSlots4thColumnSlot(
+          const stagingAreaSlotsCutouts = getStagingAreaSlotsCutouts(
             stagingAddressableAreas
           )
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
-            corresponding4thColumnSlots.includes(addressableArea.id)
+            stagingAreaSlotsCutouts.includes(addressableArea.id)
           return (
             addressableAreas &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
@@ -631,7 +631,7 @@ export const DeckSetup = (): JSX.Element => {
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}
                 stagingAddressableAreas={stagingAreaFixtures.map(
-                  areas => areas.location as AddressableAreaName
+                  areas => areas.location
                 )}
                 {...{
                   deckDef,

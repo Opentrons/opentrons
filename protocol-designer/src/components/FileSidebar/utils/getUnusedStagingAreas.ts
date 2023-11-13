@@ -1,4 +1,4 @@
-import { getStagingAreaSlots4thColumnSlot } from '../../../utils'
+import { getStagingAreaSlotsCutouts } from '../../../utils'
 import type { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
 import type { AdditionalEquipment } from '../FileSidebar'
 
@@ -17,11 +17,11 @@ export const getUnusedStagingAreas = (
       return equipment.location ?? ''
     })
 
-  const corresponding4thColumnSlots = getStagingAreaSlots4thColumnSlot(
+  const stagingAreaSlotsCutouts = getStagingAreaSlotsCutouts(
     stagingAreaSlots as AddressableAreaName[]
   )
 
-  const stagingAreaCommandSlots: string[] = corresponding4thColumnSlots.filter(
+  const stagingAreaCommandSlots: string[] = stagingAreaSlotsCutouts.filter(
     location =>
       commands?.filter(
         command =>

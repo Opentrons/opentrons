@@ -41,6 +41,7 @@ interface DNDP {
 interface OP {
   slotPosition: CoordinateTuple | null
   slotBoundingBox: Dimensions
+  //  NOTE: slotId can be either AddressableAreaName or moduleId
   slotId: string
   moduleType: ModuleType | null
   selectedTerminalItemId?: TerminalItemId | null

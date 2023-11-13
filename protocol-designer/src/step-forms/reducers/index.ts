@@ -1336,12 +1336,15 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       const hasWasteChuteCommands = Object.values(file.commands).some(
         command =>
           (command.commandType === 'moveToAddressableArea' &&
-            command.params.addressableAreaName.includes(
-              WASTE_CHUTE_ADDRESSABLE_AREAS
+            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName
             )) ||
           (command.commandType === 'moveLabware' &&
             command.params.newLocation !== 'offDeck' &&
-            'addressableAreaName' in command.params.newLocation)
+            'addressableAreaName' in command.params.newLocation &&
+            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName
+            ))
       )
       const wasteChuteId = `${uuid()}:wasteChute`
       const wasteChute = hasWasteChuteCommands
@@ -1360,19 +1363,13 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       ): string[] => {
         return Object.values(file.commands)
           .filter(
-            (
-              command
-            ): command is MoveLabwareCreateCommand | LoadLabwareCreateCommand =>
+            command =>
               command.commandType === commandType &&
               command.params[locationKey] !== 'offDeck' &&
               'slotName' in command.params[locationKey] &&
               COLUMN_4_SLOTS.includes(command.params[locationKey].slotName)
           )
-          .map(
-            command =>
-              //  @ts-expect-error: ts can't determine the type for location and newLocation
-              command.params[locationKey].slotName
-          )
+          .map(command => command.params[locationKey].slotName)
       }
 
       const stagingAreaSlotNames = [

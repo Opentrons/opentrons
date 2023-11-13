@@ -3,6 +3,9 @@ import {
   WellSetHelpers,
   makeWellSetHelpers,
   AddressableAreaName,
+  getDeckDefFromRobotTypeV4,
+  FLEX_ROBOT_TYPE,
+  CutoutId,
 } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
@@ -137,21 +140,35 @@ export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
   return Object.values(pipettes).some(pip => pip.spec.channels === 96)
 }
 
-export const getStagingAreaSlots4thColumnSlot = (
+export const getStagingAreaSlotsCutouts = (
   stagingAddressableAreas: AddressableAreaName[]
 ): AddressableAreaName[] => {
-  const corresponding4thColumnSlots = stagingAddressableAreas.map(slot => {
-    //  staging area slot addressable areas should always start with "cutout", that's
-    //  why we are getting the character at index 6, right after the cutout
-    const letter = slot.charAt(6)
-    const correspondingLocation = stagingAddressableAreas.find(slot =>
-      slot.startsWith('cutout' + letter)
-    )
-    if (correspondingLocation) {
-      return (letter + '4') as AddressableAreaName
-    }
+  const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+  const cutoutFixtures = deckDef.cutoutFixtures
+  const providesAddressableAreasForAddressableArea = cutoutFixtures
+    .filter(cutoutFixture => {
+      const providesAddressableAreas = Object.values(
+        cutoutFixture.providesAddressableAreas
+      )
+      return stagingAddressableAreas.map(aa =>
+        providesAddressableAreas.map(areaArray => areaArray.includes(aa))
+      )
+    })
+    .find(cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot'))
+    ?.providesAddressableAreas
 
-    return slot
+  if (providesAddressableAreasForAddressableArea == null) {
+    console.error(
+      `expected to find addressable area for StagingAreaRightSlot but could not`
+    )
+    return []
+  }
+
+  const cutoutAddressableArea = stagingAddressableAreas.map(aa => {
+    const providedAddressableArea =
+      providesAddressableAreasForAddressableArea[aa as CutoutId]
+    return providedAddressableArea?.[1]
   })
-  return corresponding4thColumnSlots
+
+  return cutoutAddressableArea
 }
