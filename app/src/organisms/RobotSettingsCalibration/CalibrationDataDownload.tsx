@@ -91,7 +91,11 @@ export function CalibrationDataDownload({
   }
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
+    <Flex
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      gridGap={SPACING.spacing40}
+    >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isFlex
