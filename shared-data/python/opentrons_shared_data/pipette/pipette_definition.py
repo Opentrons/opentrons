@@ -9,7 +9,7 @@ from . import types as pip_types, dev_types
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
-NOZZLE_MAP_NAMES = re.compile(r"[A-Z]{1}[0-9]{1,2}")
+NOZZLE_MAP_NAMES = re.compile(r"(?P<row>[A-Z]+)(?P<column>[0-9]+)")
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -359,6 +359,16 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         }
 
 
+class PipetteRowDefinition(BaseModel):
+    key: str
+    ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
+
+
+class PipetteColumnDefinition(BaseModel):
+    key: str
+    ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
+
+
 class PipetteGeometryDefinition(BaseModel):
     """The geometry properties definition of a pipette."""
 
@@ -369,6 +379,8 @@ class PipetteGeometryDefinition(BaseModel):
         alias="pathTo3D",
     )
     nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+    ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
+    ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
 
     @validator("nozzle_map", pre=True)
     def check_nonempty_strings(

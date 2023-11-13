@@ -98,9 +98,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
@@ -258,9 +256,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
