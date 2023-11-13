@@ -37,7 +37,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
-    <React.Fragment>
+    <>
       <Flex
         aria-label={`EquipmentOption_flex_${text}`}
         alignItems={ALIGN_CENTER}
