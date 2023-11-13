@@ -163,7 +163,6 @@ export function ChooseProtocolSlideoutComponent(
           }}
           robotName={robot.name}
           {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
-          protocolAnalysis={selectedProtocol?.mostRecentAnalysis}
         />
       ) : null}
     </Slideout>
@@ -192,7 +191,6 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
     runCreationError,
     runCreationErrorCode,
     robotName,
-    protocolAnalysis,
   } = props
   const { t } = useTranslation(['device_details', 'shared'])
   const storedProtocols = useSelector((state: State) =>
@@ -227,8 +225,10 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     height="4.25rem"
                     width="4.75rem"
                   >
-                    {protocolAnalysis != null ? (
-                      <DeckThumbnail protocolAnalysis={protocolAnalysis} />
+                    {storedProtocol.mostRecentAnalysis != null ? (
+                      <DeckThumbnail
+                        protocolAnalysis={storedProtocol.mostRecentAnalysis}
+                      />
                     ) : null}
                   </Box>
                   <StyledText
