@@ -204,6 +204,10 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         else:
             return self._get_addressable_area_for_simulation(addressable_area_name)
 
+    def get_all(self) -> List[str]:
+        """Get a list of all loaded addressable area names."""
+        return list(self._state.loaded_addressable_areas_by_name)
+
     def _get_loaded_addressable_area(
         self, addressable_area_name: str
     ) -> AddressableArea:
@@ -256,12 +260,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             z=position.z,
         )
 
-    def get_highest_addressable_area_z(self) -> float:
-        """Get the highest z height of all loaded and referenced addressable areas."""
-        return max(
-            (
-                addressable_area.bounding_box.z
-                for addressable_area in self._state.loaded_addressable_areas_by_name.values()
-            ),
-            default=0.0,
-        )
+    def get_addressable_area_height(self, addressable_area_name: str) -> float:
+        """Get the z height of an addressable area."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        return addressable_area.bounding_box.z

@@ -105,8 +105,12 @@ class GeometryView:
             default=0.0,
         )
 
-        highest_addressable_area_z = (
-            self._addressable_areas.get_highest_addressable_area_z()
+        highest_addressable_area_z = max(
+            (
+                self._addressable_areas.get_addressable_area_height(area_name)
+                for area_name in self._addressable_areas.get_all()
+            ),
+            default=0.0,
         )
 
         return max(highest_labware_z, highest_module_z, highest_addressable_area_z)

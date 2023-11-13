@@ -432,11 +432,13 @@ def test_get_all_labware_highest_z_no_equipment(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should return 0 if no loaded equipment."""
     decoy.when(module_view.get_all()).then_return([])
     decoy.when(labware_view.get_all()).then_return([])
+    decoy.when(addressable_area_view.get_all()).then_return([])
 
     result = subject.get_all_labware_highest_z()
 
@@ -450,6 +452,7 @@ def test_get_all_labware_highest_z(
     falcon_tuberack_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z amongst all labware."""
@@ -480,6 +483,7 @@ def test_get_all_labware_highest_z(
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(module_view.get_all()).then_return([])
+    decoy.when(addressable_area_view.get_all()).then_return([])
 
     decoy.when(labware_view.get_all()).then_return([plate, off_deck_lw, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
@@ -521,6 +525,7 @@ def test_get_all_labware_highest_z_with_modules(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z including modules."""
@@ -528,9 +533,35 @@ def test_get_all_labware_highest_z_with_modules(
     module_2 = LoadedModule.construct(id="module-id-2")  # type: ignore[call-arg]
 
     decoy.when(labware_view.get_all()).then_return([])
+    decoy.when(addressable_area_view.get_all()).then_return([])
+
     decoy.when(module_view.get_all()).then_return([module_1, module_2])
     decoy.when(module_view.get_overall_height("module-id-1")).then_return(42.0)
     decoy.when(module_view.get_overall_height("module-id-2")).then_return(1337.0)
+
+    result = subject.get_all_labware_highest_z()
+
+    assert result == 1337.0
+
+
+def test_get_all_labware_highest_z_with_addressable_area(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should get the highest Z including addressable areas."""
+    decoy.when(labware_view.get_all()).then_return([])
+    decoy.when(module_view.get_all()).then_return([])
+
+    decoy.when(addressable_area_view.get_all()).then_return(["abc", "xyz"])
+    decoy.when(addressable_area_view.get_addressable_area_height("abc")).then_return(
+        42.0
+    )
+    decoy.when(addressable_area_view.get_addressable_area_height("xyz")).then_return(
+        1337.0
+    )
 
     result = subject.get_all_labware_highest_z()
 
@@ -554,6 +585,7 @@ def test_get_min_travel_z(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     location: Optional[CurrentWell],
     min_z_height: Optional[float],
     expected_min_z: float,
@@ -579,6 +611,7 @@ def test_get_min_travel_z(
 
     decoy.when(module_view.get_all()).then_return([])
     decoy.when(labware_view.get_all()).then_return([])
+    decoy.when(addressable_area_view.get_all()).then_return([])
 
     min_travel_z = subject.get_min_travel_z(
         "pipette-id", "labware-id", location, min_z_height
