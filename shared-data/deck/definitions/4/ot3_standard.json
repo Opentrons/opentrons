@@ -252,7 +252,7 @@
       {
         "id": "movableTrashD1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
         "boundingBox": {
           "xDimension": 246.5,
           "yDimension": 91.5,
@@ -265,7 +265,7 @@
       {
         "id": "movableTrashC1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
         "boundingBox": {
           "xDimension": 246.5,
           "yDimension": 91.5,
@@ -278,7 +278,7 @@
       {
         "id": "movableTrashB1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
         "boundingBox": {
           "xDimension": 246.5,
           "yDimension": 91.5,
@@ -291,7 +291,7 @@
       {
         "id": "movableTrashA1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
         "boundingBox": {
           "xDimension": 246.5,
           "yDimension": 91.5,
