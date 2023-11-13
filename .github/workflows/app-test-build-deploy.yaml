@@ -230,7 +230,7 @@ jobs:
              echo "Configuring project, bucket, and folder for ot3"
              echo "project=ot3" >> $GITHUB_OUTPUT
              echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
-             echo "folder=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
+             echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
           fi
       - uses: 'actions/checkout@v3'
         with:
@@ -290,7 +290,7 @@ jobs:
           HOST_PYTHON: python
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
-          OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
+          OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}/${{OT_BUILD}}
 
         run: |
           make -C app-shell dist-${{ matrix.os }}
@@ -343,11 +343,13 @@ jobs:
           aws configure set source_profile identity --profile deploy
         shell: bash
       - name: 'deploy release builds to s3'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         run: |
-          aws --profile=deploy s3 sync --acl=public-read to_upload_release/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
+          aws --profile=deploy s3 sync --acl=public-read to_upload_release/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
       - name: 'deploy internal-release release builds to s3'
+        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |
-          aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+          aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
 
       - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
@@ -404,7 +406,7 @@ jobs:
           payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}"}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
-          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
+          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env.OT_APP_DEPLOY_FOLDER}}
       - name: 'slack notify release'
         uses: slackapi/slack-github-action@v1.14.0
         if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
@@ -412,7 +414,7 @@ jobs:
           payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}"}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
-          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}
+          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env.OT_APP_DEPLOY_FOLDER}}
 
       - name: 'pull repo for scripts'
         uses: 'actions/checkout@v3'
@@ -453,13 +455,13 @@ jobs:
       - name: 'update internal-releases releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
         run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json ./to_upload_internal-release/releases.json
+          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env.OT_APP_DEPLOY_FOLDER }}/releases.json ./to_upload_internal-release/releases.json
           node ./monorepo/scripts/update-releases-json ./to_upload_internal-release/releases.json ot3 ./to_upload_internal-release https://ot3-development.builds.opentrons.com/app/
-          aws --profile=deploy s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}/releases.json
+          aws --profile=deploy s3 cp ./to_upload_internal-release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env.OT_APP_DEPLOY_FOLDER }}/releases.json
 
       - name: 'update release releases.json'
         if: needs.determine-build-type.outputs.type == 'release' && contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
         run: |
-          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json ./to_upload_release/releases.json
+          aws --profile=deploy s3 cp s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env.OT_APP_DEPLOY_FOLDER }}/releases.json ./to_upload_release/releases.json
           node ./monorepo/scripts/update-releases-json ./to_upload_release/releases.json robot-stack ./to_upload_release https://builds.opentrons.com/app/
-          aws --profile=deploy s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}/releases.json
+          aws --profile=deploy s3 cp ./to_upload_release/releases.json s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env.OT_APP_DEPLOY_FOLDER }}/releases.json
