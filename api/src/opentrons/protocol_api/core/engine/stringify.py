@@ -44,8 +44,8 @@ def _labware_location_string(
         return f"{labware_name} on {labware_on_string}"
 
     elif isinstance(location, AddressableAreaLocation):
-        # TODO get the real name of this guy
-        return "my cool addressable area"
+        # In practice this will always be a deck slot or staging slot
+        return f"slot {location.addressableAreaName}"
 
     elif location == "offDeck":
         return "[off-deck]"

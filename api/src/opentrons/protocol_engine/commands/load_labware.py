@@ -112,8 +112,8 @@ class LoadLabwareImplementation(
 
         if isinstance(params.location, AddressableAreaLocation):
             if not fixture_validation.is_deck_slot(params.location.addressableAreaName):
-                raise ValueError(
-                    f"Cannot load labware onto addressable area {params.location.addressableAreaName}"
+                raise LabwareIsNotAllowedInLocationError(
+                    f"Cannot load {params.loadName} onto addressable area {params.location.addressableAreaName}"
                 )
 
         loaded_labware = await self._equipment.load_labware(
