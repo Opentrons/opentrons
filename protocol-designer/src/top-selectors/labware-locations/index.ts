@@ -7,6 +7,8 @@ import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
+  AddressableAreaName,
+  CutoutId,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
@@ -109,13 +111,28 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
     additionalEquipmentEntities
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
+    const cutoutFixtures = deckDef.cutoutFixtures
     const trashSlot =
       robotType === FLEX_ROBOT_TYPE ? 'movableTrash' : 'fixedTrash'
     const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
     const stagingAddressableAreas = Object.values(additionalEquipmentEntities)
       .filter(aE => aE.name === 'stagingArea')
-      .map(aE => aE.location as string)
+      .map(aE => aE.location as AddressableAreaName)
+
+    const providesAddressableAreasForAddressableArea = cutoutFixtures
+      .filter(cutoutFixture => {
+        const providesAddressableAreas = Object.values(
+          cutoutFixture.providesAddressableAreas
+        )
+        return stagingAddressableAreas.map(aa =>
+          providesAddressableAreas.map(addressableArea =>
+            addressableArea.includes(aa)
+          )
+        )
+      })
+      .find(cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot'))
+      ?.providesAddressableAreas
 
     if (robotState == null) return null
 
@@ -194,8 +211,21 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       []
     )
 
+    if (providesAddressableAreasForAddressableArea == null) {
+      console.error(
+        `expected to find addressable area for StagingAreaRightSlot but could not`
+      )
+      return []
+    }
+
+    const cutoutAddressableArea = stagingAddressableAreas.map(aa => {
+      const providedAddressableArea =
+        providesAddressableAreasForAddressableArea[aa as CutoutId]
+      return providedAddressableArea?.[1]
+    })
+
     const stagingAreaSlots = COLUMN_4_SLOTS.filter(slot =>
-      stagingAddressableAreas.every(areas => areas.charAt(6) + '4' !== slot)
+      cutoutAddressableArea.every(addressableArea => addressableArea !== slot)
     )
 
     const unoccupiedSlotOptions = allSlotIds
