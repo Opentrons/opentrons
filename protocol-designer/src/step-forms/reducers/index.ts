@@ -21,6 +21,9 @@ import {
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
+  getDeckDefFromRobotTypeV4,
+  AddressableAreaName,
+  CutoutId,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
@@ -1328,6 +1331,12 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
       const isFlex = file.robot.model === FLEX_ROBOT_TYPE
+      const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+      const cutoutFixtures = deckDef.cutoutFixtures
+      const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot')
+      )?.providesAddressableAreas
+
       const hasGripperCommands = Object.values(file.commands).some(
         (command): command is MoveLabwareCreateCommand =>
           command.commandType === 'moveLabware' &&
@@ -1360,7 +1369,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       const getStagingAreaSlotNames = (
         commandType: 'moveLabware' | 'loadLabware',
         locationKey: 'newLocation' | 'location'
-      ): string[] => {
+      ): AddressableAreaName[] => {
         return Object.values(file.commands)
           .filter(
             command =>
@@ -1379,15 +1388,32 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ]),
       ]
 
+      const findCutoutIdByAddressableArea = (
+        addressableAreaName: AddressableAreaName
+      ): CutoutId | null => {
+        if (providesAddressableAreasForAddressableArea != null) {
+          for (const cutoutId in providesAddressableAreasForAddressableArea) {
+            if (
+              providesAddressableAreasForAddressableArea[
+                cutoutId as keyof typeof providesAddressableAreasForAddressableArea
+              ].includes(addressableAreaName)
+            ) {
+              return cutoutId as CutoutId
+            }
+          }
+        }
+        return null
+      }
+
       const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
         const stagingAreaId = `${uuid()}:stagingArea`
-        const letter = slot.charAt(0)
+        const cutoutId = findCutoutIdByAddressableArea(slot)
         return {
           ...acc,
           [stagingAreaId]: {
             name: 'stagingArea' as const,
             id: stagingAreaId,
-            location: `cutout${letter}3`,
+            location: cutoutId,
           },
         }
       }, {})

@@ -631,7 +631,7 @@ export const DeckSetup = (): JSX.Element => {
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}
                 stagingAddressableAreas={stagingAreaFixtures.map(
-                  areas => areas.location
+                  areas => areas.location as AddressableAreaName
                 )}
                 {...{
                   deckDef,

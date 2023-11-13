@@ -151,7 +151,9 @@ export const getStagingAreaSlotsCutouts = (
         cutoutFixture.providesAddressableAreas
       )
       return stagingAddressableAreas.map(aa =>
-        providesAddressableAreas.map(areaArray => areaArray.includes(aa))
+        providesAddressableAreas.map(addressableArea =>
+          addressableArea.includes(aa)
+        )
       )
     })
     .find(cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot'))
