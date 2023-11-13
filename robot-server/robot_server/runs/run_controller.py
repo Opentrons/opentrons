@@ -71,11 +71,12 @@ class RunController:
                     # TODO(mc, 2022-05-13): engine_store.runner.run could raise
                     # the same errors as runner.play, but we are unable to catch them.
                     # This unlikely to occur in production, but should be addressed.
-                    assert isinstance(
-                        action_payload, DeckConfigurationType
-                    ), "Received invalid deck configuration"
+                    # assert isinstance(
+                    #     action_payload, DeckConfigurationType
+                    # ), "Received invalid deck configuration"
                     self._task_runner.run(
-                        self._run_protocol_and_insert_result, action_payload
+                        func=self._run_protocol_and_insert_result,
+                        deck_configuration=action_payload,
                     )
 
             elif action_type == RunActionType.PAUSE:
