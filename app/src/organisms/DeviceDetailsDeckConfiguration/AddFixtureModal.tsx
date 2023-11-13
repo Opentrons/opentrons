@@ -37,11 +37,12 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
+import { CutoutConfig } from '../../resources/deck_configuration/utils'
 
 interface AddFixtureModalProps {
   fixtureLocation: Cutout
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
-  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<DeckConfiguration>>
+  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<CutoutConfig[]>>
   providedFixtureOptions?: FixtureLoadName[]
   isOnDevice?: boolean
 }

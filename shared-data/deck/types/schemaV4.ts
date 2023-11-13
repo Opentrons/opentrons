@@ -72,3 +72,4 @@ export type CutoutFixtureId =
   | StagingAreaRightSlotFixtureId
   | TrashBinAdapterCutoutFixtureId
   | WasteChuteCutoutFixtureId
+  | 'stagingAreaRightSlot'

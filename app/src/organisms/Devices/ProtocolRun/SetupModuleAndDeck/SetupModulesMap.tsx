@@ -77,7 +77,10 @@ export const SetupModulesMap = ({
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <BaseDeck
-          deckConfig={deckConfig}
+          deckConfig={deckConfig.map(({ cutoutId, cutoutFixtureId }) => ({
+            cutoutId,
+            cutoutFixtureId,
+          }))}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           robotType={robotType}
           labwareLocations={[]}

@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
@@ -57,7 +58,12 @@ import { FixtureTable } from './FixtureTable'
 import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
 
 import type { CommandData } from '@opentrons/api-client'
-import type { Cutout, Fixture, FixtureLoadName } from '@opentrons/shared-data'
+import type {
+  Cutout,
+  CutoutFixtureId,
+  Fixture,
+  FixtureLoadName,
+} from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
@@ -303,7 +309,7 @@ interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   setFixtureLocation: (fixtureLocation: Cutout) => void
-  setProvidedFixtureOptions: (providedFixtureOptions: FixtureLoadName[]) => void
+  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
 /**
@@ -337,7 +343,7 @@ export function ProtocolSetupModulesAndDeck({
   const { data: deckConfig } = useDeckConfigurationQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const attachedModules =
     useAttachedModules({
@@ -458,6 +464,7 @@ export function ProtocolSetupModulesAndDeck({
             })}
           </Flex>
           <FixtureTable
+            robotType={FLEX_ROBOT_TYPE}
             mostRecentAnalysis={mostRecentAnalysis}
             setSetupScreen={setSetupScreen}
             setFixtureLocation={setFixtureLocation}

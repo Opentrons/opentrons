@@ -166,6 +166,7 @@ export function ProtocolRunSetup({
           runId={runId}
           protocolDeckConfig={protocolDeckConfig}
           hasModules={hasModules}
+          commands={protocolData?.commands ?? []}
         />
       ),
       description: moduleDescription,

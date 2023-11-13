@@ -623,9 +623,9 @@ export type FlexSlot =
   | 'C4'
   | 'D4'
 
-export interface Fixture {
+export interface CutoutConfig {
   cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureId | null
 }
 
-export type DeckConfiguration = Fixture[]
+export type DeckConfiguration = CutoutConfig[]

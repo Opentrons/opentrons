@@ -4,7 +4,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from './constants'
-import type { CutoutFixtureId, WasteChuteCutoutFixtureId } from '../deck'
+import type { CutoutFixtureId } from '../deck'
 import type {
   AddressableArea,
   CoordinateTuple,
@@ -93,14 +93,14 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-export function getFixtureDisplayName(fixtureId: CutoutFixtureId): string {
-  if (fixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
+export function getFixtureDisplayName(
+  cutoutFixtureId: CutoutFixtureId
+): string {
+  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
     return 'Staging Area Slot'
-  } else if (fixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
+  } else if (cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
     return 'Trash Bin'
-  } else if (
-    WASTE_CHUTE_FIXTURES.includes(fixtureId as WasteChuteCutoutFixtureId)
-  ) {
+  } else if (WASTE_CHUTE_FIXTURES.includes(cutoutFixtureId)) {
     return 'Waste Chute'
   } else {
     return 'Slot'

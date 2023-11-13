@@ -15,15 +15,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import {
-  // useLoadedFixturesConfigStatus,
-  CONFIGURED,
-  CONFLICTING,
-  NOT_CONFIGURED,
-} from '../../../../resources/deck_configuration/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
@@ -31,15 +26,14 @@ import { LocationConflictModal } from './LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 
-import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
-import type { CutoutConfig } from '../../../../resources/deck_configuration/types'
+import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
 
 interface SetupFixtureListProps {
-  fixtureList: CutoutConfig[]
+  deckConfigCompatibility: CutoutConfigAndCompatibility[]
 }
 
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
-  const { fixtureList } = props
+  const { deckConfigCompatibility } = props
   const { t, i18n } = useTranslation('protocol_setup')
   return (
     <>
@@ -79,12 +73,11 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
-        {fixtureList.map(({ cutoutId, cutoutFixtureId }) => {
+        {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
           return (
             <FixtureListItem
-              key={`SetupFixturesList_${cutoutFixtureId}_cutout_${cutoutId}`}
-              cutoutId={cutoutId}
-              cutoutFixtureId={cutoutFixtureId}
+              key={cutoutConfigAndCompatibility.cutoutId}
+              {...cutoutConfigAndCompatibility}
             />
           )
         })}
@@ -93,48 +86,43 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   )
 }
 
-interface FixtureListItemProps {
-  cutoutFixtureId: CutoutFixtureId
-  cutoutId: CutoutId
-}
+interface FixtureListItemProps extends CutoutConfigAndCompatibility {}
 
 export function FixtureListItem({
-  cutoutFixtureId,
   cutoutId,
+  cutoutFixtureId,
+  compatibleCutoutFixtureIds,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  // TODO(bh, 2023-11-13): ignore configuration status pending refactor of conflicts
-  const configurationStatus = '' as any
 
+  const isCurrentFixtureCompatible =
+    cutoutFixtureId != null &&
+    compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+  const isConflictingFixtureConfigured =
+    cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
   let statusLabel
-  if (
-    configurationStatus === CONFLICTING ||
-    configurationStatus === NOT_CONFIGURED
-  ) {
+  if (!isCurrentFixtureCompatible) {
     statusLabel = (
       <StatusLabel
         status={
-          configurationStatus === CONFLICTING
+          isConflictingFixtureConfigured
             ? t('location_conflict')
-            : configurationStatus
+            : t('not_configured')
         }
         backgroundColor={COLORS.warningBackgroundLight}
         iconColor={COLORS.warningEnabled}
         textColor={COLORS.warningText}
       />
     )
-  } else if (configurationStatus === CONFIGURED) {
+  } else {
     statusLabel = (
       <StatusLabel
-        status={configurationStatus}
+        status={t('configured')}
         backgroundColor={COLORS.successBackgroundLight}
         iconColor={COLORS.successEnabled}
         textColor={COLORS.successText}
       />
     )
-    //  shouldn't run into this case
-  } else {
-    statusLabel = 'status label unknown'
   }
 
   const [
@@ -216,11 +204,11 @@ export function FixtureListItem({
             gridGap={SPACING.spacing10}
           >
             {statusLabel}
-            {configurationStatus !== CONFIGURED ? (
+            {!isCurrentFixtureCompatible ? (
               <TertiaryButton
                 width="max-content"
                 onClick={() =>
-                  configurationStatus === CONFLICTING
+                  isConflictingFixtureConfigured
                     ? setShowLocationConflictModal(true)
                     : setShowNotConfiguredModal(true)
                 }

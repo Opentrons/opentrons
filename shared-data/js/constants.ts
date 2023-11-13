@@ -1,3 +1,4 @@
+import { CutoutFixtureId } from '../deck'
 import type { Cutout, ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
@@ -289,13 +290,13 @@ export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: '
 export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' =
   'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
 
-export const SINGLE_SLOT_FIXTURES = [
+export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
 ]
 
-export const WASTE_CHUTE_FIXTURES = [
+export const WASTE_CHUTE_FIXTURES: CutoutFixtureId[] = [
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,

@@ -46,7 +46,7 @@ import type { WellFill } from '../Labware'
 
 interface BaseDeckProps {
   robotType: RobotType
-  labwareLocations: Array<{
+  labwareLocations?: Array<{
     labwareLocation: LabwareLocation
     definition: LabwareDefinition2
     wellFill?: WellFill
@@ -54,7 +54,7 @@ interface BaseDeckProps {
     labwareChildren?: React.ReactNode
     onLabwareClick?: () => void
   }>
-  moduleLocations: Array<{
+  moduleLocations?: Array<{
     moduleModel: ModuleModel
     moduleLocation: ModuleLocation
     nestedLabwareDef?: LabwareDefinition2 | null
@@ -76,8 +76,8 @@ interface BaseDeckProps {
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
   const {
     robotType,
-    moduleLocations,
-    labwareLocations,
+    moduleLocations = [],
+    labwareLocations = [],
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
     deckLayerBlocklist = [],
