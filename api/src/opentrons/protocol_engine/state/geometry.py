@@ -105,7 +105,11 @@ class GeometryView:
             default=0.0,
         )
 
-        return max(highest_labware_z, highest_module_z)
+        highest_addressable_area_z = (
+            self._addressable_areas.get_highest_addressable_area_z()
+        )
+
+        return max(highest_labware_z, highest_module_z, highest_addressable_area_z)
 
     def get_min_travel_z(
         self,
