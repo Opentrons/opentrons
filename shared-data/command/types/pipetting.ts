@@ -1,16 +1,16 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
   | AspirateRunTimeCommand
-  | BlowoutRunTimeCommand
-  | DispenseRunTimeCommand
-  | DropTipRunTimeCommand
-  | PickUpTipRunTimeCommand
-  | TouchTipRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
+  | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
   | DispenseInPlaceRunTimeCommand
+  | DispenseRunTimeCommand
   | DropTipInPlaceRunTimeCommand
+  | DropTipRunTimeCommand
+  | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
+  | TouchTipRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
