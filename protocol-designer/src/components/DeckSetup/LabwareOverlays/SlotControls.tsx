@@ -23,7 +23,6 @@ import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 
 import type {
-  AddressableArea,
   CoordinateTuple,
   Dimensions,
   ModuleType,
