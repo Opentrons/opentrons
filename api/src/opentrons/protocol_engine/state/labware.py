@@ -375,13 +375,6 @@ class LabwareView(HasState[LabwareState]):
             f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
         )
 
-    def get_slot_position(self, slot: DeckSlotName) -> Point:
-        """Get the position of a deck slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(x=position[0], y=position[1], z=position[2])
-
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
         try:

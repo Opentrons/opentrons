@@ -825,16 +825,6 @@ def test_get_slot_definition_raises_with_bad_slot_name(
         subject.get_slot_definition(DeckSlotName.SLOT_A1)
 
 
-def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should get the absolute location of a deck slot's origin."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    expected_position = Point(x=132.5, y=90.5, z=0.0)
-    result = subject.get_slot_position(DeckSlotName.SLOT_5)
-
-    assert result == expected_position
-
-
 def test_get_labware_offset_vector() -> None:
     """It should get a labware's offset vector."""
     labware_without_offset = LoadedLabware(
