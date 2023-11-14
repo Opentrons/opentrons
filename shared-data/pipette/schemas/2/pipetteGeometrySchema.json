@@ -44,11 +44,11 @@
         "description": "A row of nozzle keys",
         "required": ["key", "orderedNozzles"],
         "properties": {
-          "key": {"$ref": "#/definitions/rowName"},
+          "key": { "$ref": "#/definitions/rowName" },
           "orderedNozzles": {
             "type": "array",
             "description": "The list of nozzle names in this row",
-            "items": {"$ref": "#/definitions/nozzleName"}
+            "items": { "$ref": "#/definitions/nozzleName" }
           }
         }
       }
@@ -60,11 +60,11 @@
         "description": "A column of nozzle keys",
         "required": ["key", "orderedNozzles"],
         "properties": {
-          "key": {"$ref": "#/definitions/columnName"},
+          "key": { "$ref": "#/definitions/columnName" },
           "orderedNozzles": {
             "type": "array",
             "description": "The list of nozzle names in this column",
-            "items": {"$ref": "#/definitions/nozzleName"}
+            "items": { "$ref": "#/definitions/nozzleName" }
           }
         }
       }
