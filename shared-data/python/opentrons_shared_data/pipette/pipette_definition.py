@@ -156,7 +156,7 @@ class PressFitPickUpTipConfiguration(BaseModel):
         description="The number of times to press (incrementally more each time by increment)",
     )
     increment: float = Field(
-        ..., description="The incremental amount to press more by each press"
+        ..., description="The increment to move the pipette down on each force tip pickup press"
     )
     distance: float = Field(
         ..., description="The starting distance to begin a pick up tip from"
