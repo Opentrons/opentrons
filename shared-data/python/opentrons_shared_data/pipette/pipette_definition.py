@@ -161,7 +161,7 @@ class PressFitPickUpTipConfiguration(BaseModel):
     distance: float = Field(
         ..., description="The starting distance to begin a pick up tip from"
     )
-    speed: float = Field(..., description="How fast to press each stroke")
+    speed: float = Field(..., description="The speed to move the Z axis for each force pickup")
     current_by_tip_count: Dict[int, float] = Field(
         ...,
         description="A current dictionary look-up by partial tip configuration.",
