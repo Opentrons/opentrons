@@ -228,12 +228,6 @@ export type ModuleModelWithLegacy =
   | typeof MAGDECK
   | typeof TEMPDECK
 
-export interface DeckOffset {
-  x: number
-  y: number
-  z: number
-}
-
 export interface Dimensions {
   xDimension: number
   yDimension: number
@@ -242,13 +236,6 @@ export interface Dimensions {
 
 export interface DeckRobot {
   model: RobotType
-}
-
-export interface DeckFixture {
-  id: string
-  slot: string
-  labware: string
-  displayName: string
 }
 
 export type CoordinateTuple = [number, number, number]
@@ -297,27 +284,9 @@ export interface AddressableArea {
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 
-export interface DeckLocations {
-  orderedSlots: DeckSlot[]
-  calibrationPoints: DeckCalibrationPoint[]
-  fixtures: DeckFixture[]
-  addressableAreas: AddressableArea[]
-}
-
 export interface DeckMetadata {
   displayName: string
   tags: string[]
-}
-
-export interface DeckDefinitionV3 {
-  otId: string
-  cornerOffsetFromOrigin: CoordinateTuple
-  dimensions: CoordinateTuple
-  robot: DeckRobot
-  cutoutFixtures: CutoutFixture[]
-  locations: DeckLocations
-  metadata: DeckMetadata
-  layers: INode[]
 }
 
 export interface DeckCutout {
@@ -328,13 +297,12 @@ export interface DeckCutout {
 
 export interface LegacyFixture {
   id: string
-  // TODO: is this cutout location?
   slot: string
   labware: string
   displayName: string
 }
 
-export interface DeckLocationsV4 {
+export interface DeckLocations {
   addressableAreas: AddressableArea[]
   calibrationPoints: DeckCalibrationPoint[]
   cutouts: DeckCutout[]
@@ -346,7 +314,7 @@ export interface DeckDefinition {
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple
   robot: DeckRobot
-  locations: DeckLocationsV4
+  locations: DeckLocations
   metadata: DeckMetadata
   cutoutFixtures: CutoutFixture[]
 }
