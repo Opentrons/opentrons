@@ -1,7 +1,6 @@
 import { i18n } from './localization'
 import { selectors as loadFileSelectors } from './load-file'
-import { selectors as analyticsSelectors } from './analytics'
-import { initializeFullstory } from './analytics/fullstory'
+
 export const initialize = (store: Record<string, any>): void => {
   if (process.env.NODE_ENV === 'production') {
     window.onbeforeunload = (_e: unknown) => {
@@ -9,11 +8,6 @@ export const initialize = (store: Record<string, any>): void => {
       return loadFileSelectors.getHasUnsavedChanges(store.getState())
         ? i18n.t('alert.window.confirm_leave')
         : undefined
-    }
-
-    // Initialize analytics if user has already opted in
-    if (analyticsSelectors.getHasOptedIn(store.getState())) {
-      initializeFullstory()
     }
   }
 }

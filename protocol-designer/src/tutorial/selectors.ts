@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import {
   THERMOCYCLER_MODULE_TYPE,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 import {
@@ -85,7 +85,7 @@ export const shouldShowWasteChuteHint: Selector<boolean> = createSelector(
       return false
     }
     const { newLocation } = unsavedForm
-    if (newLocation === WASTE_CHUTE_SLOT) {
+    if (newLocation === WASTE_CHUTE_CUTOUT) {
       return true
     }
 

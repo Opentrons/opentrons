@@ -9,6 +9,7 @@
   "include": [
     "js",
     "protocol",
+    "deck",
     "command/types",
     "liquid/types",
     "commandAnnotation/types"

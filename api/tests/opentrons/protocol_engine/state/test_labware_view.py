@@ -20,7 +20,7 @@ from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.types import DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -803,45 +803,6 @@ def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     assert subject.get_deck_definition() == ot2_standard_deck_def
-
-
-def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should return a deck slot's definition."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    result = subject.get_slot_definition(DeckSlotName.SLOT_6)
-
-    assert result["id"] == "6"
-    assert result["displayName"] == "Slot 6"
-
-
-def test_get_slot_definition_raises_with_bad_slot_name(
-    ot2_standard_deck_def: DeckDefinitionV4,
-) -> None:
-    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    with pytest.raises(errors.SlotDoesNotExistError):
-        subject.get_slot_definition(DeckSlotName.SLOT_A1)
-
-
-def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should get the absolute location of a deck slot's origin."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    expected_position = Point(x=132.5, y=90.5, z=0.0)
-    result = subject.get_slot_position(DeckSlotName.SLOT_5)
-
-    assert result == expected_position
-
-
-def test_get_slot_center_position(ot2_standard_deck_def: DeckDefinitionV4) -> None:
-    """It should get the absolute location of a deck slot's center."""
-    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
-
-    expected_center = Point(x=196.5, y=43.0, z=0.0)
-    result = subject.get_slot_center_position(DeckSlotName.SLOT_2)
-    assert result == expected_center
 
 
 def test_get_labware_offset_vector() -> None:

@@ -53,10 +53,6 @@ Used for analytics segmentation. Also saved in protocol file at `designer-applic
 
 Used for analytics segmentation. In Travis CI, this is fed by `$TRAVIS_COMMIT`.
 
-### `OT_PD_FULLSTORY_ORG`
-
-Used for FullStory. Should be provided in the Travis build.
-
 ### `OT_PD_MIXPANEL_ID`
 
 Used for Mixpanel in prod. Should be provided in the CI build.

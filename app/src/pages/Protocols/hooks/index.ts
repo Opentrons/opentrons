@@ -146,19 +146,19 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     {
       hardwareType: 'fixture',
       fixtureName: 'wasteChute',
-      location: { cutout: 'D3' },
+      location: { cutout: 'cutoutD3' },
       hasSlotConflict: false,
     },
     {
       hardwareType: 'fixture',
       fixtureName: 'standardSlot',
-      location: { cutout: 'C3' },
+      location: { cutout: 'cutoutC3' },
       hasSlotConflict: false,
     },
     {
       hardwareType: 'fixture',
       fixtureName: 'stagingArea',
-      location: { cutout: 'B3' },
+      location: { cutout: 'cutoutB3' },
       hasSlotConflict: false,
     },
   ]

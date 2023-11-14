@@ -1397,9 +1397,9 @@ class OT3API(
         self, axis: Axis
     ) -> Tuple[OT3AxisMap[float], OT3AxisMap[float]]:
         origin = await self._backend.update_position()
-        target_pos = {ax: pos for ax, pos in origin.items()}
-        target_pos.update({axis: self._backend.home_position()[axis]})
-        return origin, target_pos
+        origin_pos = {axis: origin[axis]}
+        target_pos = {axis: self._backend.home_position()[axis]}
+        return origin_pos, target_pos
 
     @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:

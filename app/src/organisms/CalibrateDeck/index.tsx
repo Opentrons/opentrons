@@ -175,6 +175,7 @@ export function CalibrateDeck(
             supportedCommands={supportedCommands}
             defaultTipracks={instrument?.defaultTipracks}
             calInvalidationHandler={offsetInvalidationHandler}
+            allowChangeTipRack
           />
         )}
       </LegacyModalShell>

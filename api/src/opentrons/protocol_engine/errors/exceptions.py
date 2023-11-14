@@ -425,6 +425,32 @@ class FixtureDoesNotProvideAreasError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class AreaNotInDeckConfigurationError(ProtocolEngineError):
+    """Raised when an addressable area is referenced that is not provided by a deck configuration."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a AreaNotInDeckConfigurationError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class IncompatibleAddressableAreaError(ProtocolEngineError):
+    """Raised when two non-compatible addressable areas are referenced during analysis."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a IncompatibleAddressableAreaError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 # TODO(mc, 2020-11-06): flesh out with structured data to replicate
 # existing LabwareHeightError
 class FailedToPlanMoveError(ProtocolEngineError):

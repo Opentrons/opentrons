@@ -18,6 +18,7 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
+from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 
 
 class EngineStatus(str, Enum):
@@ -678,7 +679,7 @@ class AddressableArea:
     display_name: str
     bounding_box: Dimensions
     position: AddressableOffsetVector
-    compatible_module_types: List[ModuleType]
+    compatible_module_types: List[SharedDataModuleType]
     # TODO do we need "ableToDropLabware" in the definition?
     drop_tip_location: Optional[Point]
     drop_labware_location: Optional[Point]

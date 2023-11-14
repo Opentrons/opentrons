@@ -26,7 +26,7 @@ const mockLoadedFixture = {
   params: {
     fixtureId: 'stubbedFixtureId',
     loadName: WASTE_CHUTE_LOAD_NAME,
-    location: { cutout: 'D3' },
+    location: { cutout: 'cutoutD3' },
   },
   createdAt: 'fakeTimestamp',
   startedAt: 'fakeTimestamp',
@@ -40,7 +40,7 @@ const mockLoadedStagingAreaFixture = {
   params: {
     fixtureId: 'stubbedFixtureId',
     loadName: STAGING_AREA_LOAD_NAME,
-    location: { cutout: 'D3' },
+    location: { cutout: 'cutoutD3' },
   },
   createdAt: 'fakeTimestamp',
   startedAt: 'fakeTimestamp',
@@ -122,7 +122,7 @@ describe('FixtureTable', () => {
     }
     const [{ getByText }] = render(props)
     getByText('Not configured').click()
-    expect(mockSetFixtureLocation).toHaveBeenCalledWith('D3')
+    expect(mockSetFixtureLocation).toHaveBeenCalledWith('cutoutD3')
     expect(mockSetSetupScreen).toHaveBeenCalledWith('deck configuration')
     expect(mockSetProvidedFixtureOptions).toHaveBeenCalledWith(['wasteChute'])
   })

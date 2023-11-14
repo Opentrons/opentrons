@@ -23,11 +23,11 @@ import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
 import { ModuleDiagram } from './ModuleDiagram'
+import { FlexSlotMap } from './FlexSlotMap'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
 import type { ModuleType, RobotType } from '@opentrons/shared-data'
-import { FlexSlotMap } from './FlexSlotMap'
 
 interface Props {
   robotType?: RobotType
@@ -68,17 +68,17 @@ export function ModuleRow(props: Props): JSX.Element {
   // If this module is in a deck slot + is not TC spanning Slot
   // add to occupiedSlots
   if (slot && slot !== SPAN7_8_10_11_SLOT) {
-    slotDisplayName = `Slot ${slot}`
+    slotDisplayName = slot
     occupiedSlotsForMap = [slot]
   }
   // If this Module is a TC deck slot and spanning
   // populate all 4 slots individually
   if (slot === SPAN7_8_10_11_SLOT) {
-    slotDisplayName = 'Slot 7,8,10,11'
+    slotDisplayName = '7,8,10,11'
     occupiedSlotsForMap = ['7', '8', '10', '11']
     //  TC on Flex
   } else if (isFlex && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
-    slotDisplayName = 'Slot A1+B1'
+    slotDisplayName = 'A1+B1'
     occupiedSlotsForMap = ['A1', 'B1']
   }
   // If collisionSlots are populated, check which slot is occupied

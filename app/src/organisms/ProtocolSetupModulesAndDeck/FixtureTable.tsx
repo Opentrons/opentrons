@@ -14,6 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
@@ -56,7 +57,7 @@ export function FixtureTable({
     params: {
       fixtureId: 'stubbedFixtureId',
       loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
+      location: { cutout: 'cutoutD3' },
     },
     createdAt: 'fakeTimestamp',
     startedAt: 'fakeTimestamp',
@@ -176,7 +177,11 @@ export function FixtureTable({
                 </StyledText>
               </Flex>
               <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-                <LocationIcon slotName={fixture.params.location.cutout} />
+                <LocationIcon
+                  slotName={getCutoutDisplayName(
+                    fixture.params.location.cutout
+                  )}
+                />
               </Flex>
               <Flex
                 flex="3 0 0"

@@ -34,6 +34,7 @@ import { css } from 'styled-components'
 import { Portal } from '../../../App/portal'
 import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
+import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
 import { getLabwareDefinitionsFromCommands } from '../utils/labware'
 
@@ -52,6 +53,7 @@ export const IntroScreen = (props: {
   isRobotMoving: boolean
   existingOffsets: LabwareOffset[]
   protocolName: string
+  shouldUseMetalProbe: boolean
 }): JSX.Element | null => {
   const {
     proceed,
@@ -61,6 +63,7 @@ export const IntroScreen = (props: {
     setFatalError,
     existingOffsets,
     protocolName,
+    shouldUseMetalProbe,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -73,6 +76,19 @@ export const IntroScreen = (props: {
           `IntroScreen failed to issue prep commands with message: ${e.message}`
         )
       })
+  }
+  const requiredEquipmentList = [
+    {
+      loadName: t('all_modules_and_labware_from_protocol', {
+        protocol_name: protocolName,
+      }),
+      displayName: t('all_modules_and_labware_from_protocol', {
+        protocol_name: protocolName,
+      }),
+    },
+  ]
+  if (shouldUseMetalProbe) {
+    requiredEquipmentList.push(CALIBRATION_PROBE)
   }
 
   if (isRobotMoving) {
@@ -91,18 +107,7 @@ export const IntroScreen = (props: {
         />
       }
       rightElement={
-        <WizardRequiredEquipmentList
-          equipmentList={[
-            {
-              loadName: t('all_modules_and_labware_from_protocol', {
-                protocol_name: protocolName,
-              }),
-              displayName: t('all_modules_and_labware_from_protocol', {
-                protocol_name: protocolName,
-              }),
-            },
-          ]}
-        />
+        <WizardRequiredEquipmentList equipmentList={requiredEquipmentList} />
       }
       footer={
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

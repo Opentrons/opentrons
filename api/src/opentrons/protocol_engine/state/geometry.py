@@ -138,7 +138,7 @@ class GeometryView:
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
         """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
         slot_name = self.get_ancestor_slot_name(labware_id)
-        slot_pos = self._labware.get_slot_position(slot_name)
+        slot_pos = self._addressable_areas.get_addressable_area_position(slot_name.id)
         labware_data = self._labware.get(labware_id)
         offset = self._get_labware_position_offset(labware_id, labware_data.location)
 
@@ -567,8 +567,8 @@ class GeometryView:
             middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
                 self._config.robot_type
             )
-            middle_slot_center = self._labware.get_slot_center_position(
-                slot=middle_slot,
+            middle_slot_center = self._addressable_areas.get_addressable_area_center(
+                addressable_area_name=middle_slot.id,
             )
             return [(middle_slot_center.x, middle_slot_center.y)]
         return []

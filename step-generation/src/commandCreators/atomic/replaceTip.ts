@@ -1,5 +1,6 @@
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
+import { COLUMN_4_SLOTS } from '../../constants'
 import { dropTip } from './dropTip'
 import {
   curryCommandCreator,
@@ -36,6 +37,11 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
       : null
   if (adapterId == null && pipetteName === 'p1000_96') {
     errors.push(errorCreators.missingAdapter())
+  }
+  if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
+    errors.push(
+      errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
+    )
   }
 
   if (errors.length > 0) {

@@ -11,6 +11,7 @@ import {
 import { DeckConfigurator } from '.'
 
 import type { Story, Meta } from '@storybook/react'
+import type { Fixture } from '@opentrons/shared-data'
 
 export default {
   title: 'Library/Molecules/Simulation/DeckConfigurator',
@@ -19,44 +20,44 @@ export default {
 const Template: Story<React.ComponentProps<typeof DeckConfigurator>> = args => (
   <DeckConfigurator {...args} />
 )
-const deckConfig = [
+const deckConfig: Fixture[] = [
   {
-    fixtureLocation: 'A1',
+    fixtureLocation: 'cutoutA1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B1',
+    fixtureLocation: 'cutoutB1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C1',
+    fixtureLocation: 'cutoutC1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D1',
+    fixtureLocation: 'cutoutD1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A3',
+    fixtureLocation: 'cutoutA3',
     loadName: TRASH_BIN_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B3',
+    fixtureLocation: 'cutoutB3',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C3',
+    fixtureLocation: 'cutoutC3',
     loadName: STAGING_AREA_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D3',
+    fixtureLocation: 'cutoutD3',
     loadName: WASTE_CHUTE_LOAD_NAME,
     fixtureId: uuidv4(),
   },

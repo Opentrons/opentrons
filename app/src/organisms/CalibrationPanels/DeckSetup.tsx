@@ -98,6 +98,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
               'fixedTrash',
             ]}
             deckDef={deckDef}
+            showDeckLayers
             viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
           >
             {({ deckSlotsById }) =>

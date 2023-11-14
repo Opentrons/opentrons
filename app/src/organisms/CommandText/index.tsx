@@ -3,6 +3,11 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { getPipetteNameSpecs, RunTimeCommand } from '@opentrons/shared-data'
+import {
+  getLabwareName,
+  getLabwareDisplayLocation,
+  getFinalLabwareLocation,
+} from './utils'
 import { StyledText } from '../../atoms/text'
 import { LoadCommandText } from './LoadCommandText'
 import { PipettingCommandText } from './PipettingCommandText'
@@ -50,9 +55,11 @@ export function CommandText(props: Props): JSX.Element | null {
   switch (command.commandType) {
     case 'aspirate':
     case 'dispense':
+    case 'dispenseInPlace':
     case 'blowout':
-    case 'moveToWell':
+    case 'blowOutInPlace':
     case 'dropTip':
+    case 'dropTipInPlace':
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
@@ -138,6 +145,31 @@ export function CommandText(props: Props): JSX.Element | null {
         </StyledText>
       )
     }
+    case 'moveToWell': {
+      const { wellName, labwareId } = command.params
+      const allPreviousCommands = robotSideAnalysis.commands.slice(
+        0,
+        robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+      )
+      const labwareLocation = getFinalLabwareLocation(
+        labwareId,
+        allPreviousCommands
+      )
+      const displayLocation =
+        labwareLocation != null
+          ? getLabwareDisplayLocation(
+              robotSideAnalysis,
+              labwareLocation,
+              t,
+              robotType
+            )
+          : ''
+      return t('move_to_well', {
+        well_name: wellName,
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: displayLocation,
+      })
+    }
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
@@ -178,6 +210,18 @@ export function CommandText(props: Props): JSX.Element | null {
               pipetteName != null
                 ? getPipetteNameSpecs(pipetteName)?.displayName
                 : '',
+          })}
+        </StyledText>
+      )
+    }
+    case 'moveToAddressableArea': {
+      const { addressableAreaName, speed, minimumZHeight } = command.params
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('move_to_addressable_area', {
+            addressable_area: addressableAreaName,
+            speed: speed,
+            height: minimumZHeight,
           })}
         </StyledText>
       )

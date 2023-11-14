@@ -10,7 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { UploadInput as FileImporter } from '../../molecules/UploadInput'
+import { UploadInput } from '../../molecules/UploadInput'
 import { addProtocol } from '../../redux/protocol-storage'
 import {
   useTrackEvent,
@@ -24,8 +24,9 @@ export interface UploadInputProps {
   onUpload?: () => void
 }
 
-// TODO(bc, 2022-3-21): consider making this generic for any file upload and adding it to molecules/organisms with onUpload taking the files from the event
-export function UploadInput(props: UploadInputProps): JSX.Element | null {
+export function ProtocolUploadInput(
+  props: UploadInputProps
+): JSX.Element | null {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(__filename)
@@ -49,7 +50,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       alignItems={ALIGN_CENTER}
       marginY={SPACING.spacing20}
     >
-      <FileImporter
+      <UploadInput
         onUpload={(file: File) => handleUpload(file)}
         uploadText={t('valid_file_types')}
         dragAndDropText={

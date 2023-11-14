@@ -186,7 +186,7 @@ async def capacitive_probe(
             detail={
                 "tool": tool.name,
                 "sensor": sensor_id.name,
-                "threshold": relative_threshold_pf,
+                "threshold": str(relative_threshold_pf),
             },
         )
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")

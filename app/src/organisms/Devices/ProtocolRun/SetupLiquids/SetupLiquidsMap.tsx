@@ -96,6 +96,12 @@ export function SetupLiquidsMap(
     const topLabwareDisplayName =
       labwareInAdapterInMod?.params.displayName ??
       module.nestedLabwareDisplayName
+    const nestedLabwareWellFill = getWellFillFromLabwareId(
+      module.nestedLabwareId ?? '',
+      liquids,
+      labwareByLiquidId
+    )
+    const labwareHasLiquid = !isEmpty(nestedLabwareWellFill)
 
     return {
       moduleModel: module.moduleDef.model,
@@ -106,18 +112,28 @@ export function SetupLiquidsMap(
           : {},
 
       nestedLabwareDef: topLabwareDefinition,
-      moduleChildren: (
-        <>
-          {topLabwareDefinition != null && topLabwareId != null ? (
+      nestedLabwareWellFill,
+      moduleChildren:
+        topLabwareDefinition != null && topLabwareId != null ? (
+          <g
+            onMouseEnter={() => setHoverLabwareId(topLabwareId)}
+            onMouseLeave={() => setHoverLabwareId('')}
+            onClick={() =>
+              labwareHasLiquid ? setLiquidDetailsLabwareId(topLabwareId) : null
+            }
+            cursor={labwareHasLiquid ? 'pointer' : ''}
+          >
             <LabwareInfoOverlay
               definition={topLabwareDefinition}
+              // TODO(bh, 2023-11-09): pass hover to labware render in BaseDeck
+              hover={topLabwareId === hoverLabwareId && labwareHasLiquid}
+              labwareHasLiquid={labwareHasLiquid}
               labwareId={topLabwareId}
               displayName={topLabwareDisplayName}
               runId={runId}
             />
-          ) : null}
-        </>
-      ),
+          </g>
+        ) : null,
     }
   })
 

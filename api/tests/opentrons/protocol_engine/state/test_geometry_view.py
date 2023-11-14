@@ -98,6 +98,7 @@ def subject(
 def test_get_labware_parent_position(
     decoy: Decoy,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should return a deck slot position for labware in a deck slot."""
@@ -109,9 +110,9 @@ def test_get_labware_parent_position(
         offsetId=None,
     )
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
 
     result = subject.get_labware_parent_position("labware-id")
 
@@ -140,6 +141,7 @@ def test_get_labware_parent_position_on_module(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     ot2_standard_deck_def: DeckDefinitionV4,
     subject: GeometryView,
 ) -> None:
@@ -156,9 +158,9 @@ def test_get_labware_parent_position_on_module(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
@@ -189,6 +191,7 @@ def test_get_labware_parent_position_on_labware(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     ot2_standard_deck_def: DeckDefinitionV4,
     subject: GeometryView,
 ) -> None:
@@ -211,9 +214,9 @@ def test_get_labware_parent_position_on_labware(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
     decoy.when(labware_view.get("adapter-id")).then_return(adapter_data)
     decoy.when(labware_view.get_dimensions("adapter-id")).then_return(
         Dimensions(x=123, y=456, z=5)
@@ -310,6 +313,7 @@ def test_get_labware_origin_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should return a deck slot position with the labware's offset as its origin."""
@@ -323,9 +327,9 @@ def test_get_labware_origin_position(
 
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
 
     expected_parent = Point(1, 2, 3)
     expected_offset = Point(
@@ -344,6 +348,7 @@ def test_get_labware_highest_z(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should get the absolute location of a labware's highest Z point."""
@@ -362,9 +367,9 @@ def test_get_labware_highest_z(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(slot_pos)
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
@@ -376,6 +381,7 @@ def test_get_module_labware_highest_z(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     ot2_standard_deck_def: DeckDefinitionV4,
     subject: GeometryView,
 ) -> None:
@@ -395,9 +401,9 @@ def test_get_module_labware_highest_z(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(slot_pos)
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
@@ -506,12 +512,12 @@ def test_get_all_labware_highest_z(
         reservoir_offset
     )
 
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(1, 2, 3)
-    )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        Point(4, 5, 6)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(Point(4, 5, 6))
 
     plate_z = subject.get_labware_highest_z("plate-id")
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
@@ -605,9 +611,9 @@ def test_get_min_travel_z(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         LabwareOffsetVector(x=0, y=0, z=3)
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
-        Point(0, 0, 3)
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(0, 0, 3))
 
     decoy.when(module_view.get_all()).then_return([])
     decoy.when(labware_view.get_all()).then_return([])
@@ -624,6 +630,7 @@ def test_get_labware_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should return the slot position plus calibrated offset."""
@@ -642,9 +649,9 @@ def test_get_labware_position(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
 
     position = subject.get_labware_position(labware_id="labware-id")
 
@@ -659,6 +666,7 @@ def test_get_well_position(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware."""
@@ -678,9 +686,9 @@ def test_get_well_position(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
     decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
@@ -713,6 +721,7 @@ def test_get_module_labware_well_position(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     ot2_standard_deck_def: DeckDefinitionV4,
     subject: GeometryView,
 ) -> None:
@@ -733,9 +742,9 @@ def test_get_module_labware_well_position(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
     decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
@@ -775,6 +784,7 @@ def test_get_well_position_with_top_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware."""
@@ -794,9 +804,9 @@ def test_get_well_position_with_top_offset(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
     decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
@@ -821,6 +831,7 @@ def test_get_well_position_with_bottom_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well bottom in a labware."""
@@ -840,9 +851,9 @@ def test_get_well_position_with_bottom_offset(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
     decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
@@ -867,6 +878,7 @@ def test_get_well_position_with_center_offset(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well center in a labware."""
@@ -886,9 +898,9 @@ def test_get_well_position_with_center_offset(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
     decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
@@ -913,6 +925,7 @@ def test_get_relative_well_location(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
     """It should get the relative location of a well given an absolute position."""
@@ -932,9 +945,9 @@ def test_get_relative_well_location(
     decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
     )
-    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
-        slot_pos
-    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_4.id)
+    ).then_return(slot_pos)
     decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
         well_def
     )
@@ -1314,6 +1327,7 @@ def test_get_extra_waypoints(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     location: Optional[CurrentWell],
     should_dodge: bool,
     expected_waypoints: List[Tuple[float, float]],
@@ -1344,7 +1358,9 @@ def test_get_extra_waypoints(
     ).then_return(should_dodge)
     decoy.when(
         # Assume the subject's Config is for an OT-3, so use an OT-3 slot name.
-        labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_C2)
+        addressable_area_view.get_addressable_area_center(
+            addressable_area_name=DeckSlotName.SLOT_C2.id
+        )
     ).then_return(Point(x=11, y=22, z=33))
 
     extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
