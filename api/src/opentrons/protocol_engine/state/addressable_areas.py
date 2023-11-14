@@ -78,14 +78,12 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         if config.use_simulated_deck_config:
             loaded_addressable_areas_by_name = {}
         else:
-            addressable_areas = self._get_addressable_areas_from_deck_configuration(
-                deck_configuration,
-                deck_definition,
+            loaded_addressable_areas_by_name = (
+                self._get_addressable_areas_from_deck_configuration(
+                    deck_configuration,
+                    deck_definition,
+                )
             )
-            loaded_addressable_areas_by_name = {
-                area.area_name: area for area in addressable_areas
-            }
-
         self._state = AddressableAreaState(
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
@@ -100,9 +98,11 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         if isinstance(action, PlayAction):
             current_state = self._state
             if action.deck_configuration is not None:
-                self._get_addressable_areas_from_deck_configuration(
-                    deck_config=action.deck_configuration,
-                    deck_definition=current_state.deck_definition,
+                self._state.loaded_addressable_areas_by_name = (
+                    self._get_addressable_areas_from_deck_configuration(
+                        deck_config=action.deck_configuration,
+                        deck_definition=current_state.deck_definition,
+                    )
                 )
 
     def _handle_command(self, command: Command) -> None:
@@ -124,9 +124,10 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             addressable_area_name = command.params.addressableAreaName
             self._check_location_is_addressable_area(addressable_area_name)
 
+    @staticmethod
     def _get_addressable_areas_from_deck_configuration(
-        self, deck_config: DeckConfiguration, deck_definition: DeckDefinitionV4
-    ) -> List[AddressableArea]:
+        deck_config: DeckConfiguration, deck_definition: DeckDefinitionV4
+    ) -> Dict[str, AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
         # TODO uncomment once execute is hooked up with this properly
         # assert (
@@ -150,7 +151,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                         deck_definition,
                     )
                 )
-        return addressable_areas
+        return {area.area_name: area for area in addressable_areas}
 
     def _check_location_is_addressable_area(
         self, location: Union[DeckSlotLocation, AddressableAreaLocation, str]
