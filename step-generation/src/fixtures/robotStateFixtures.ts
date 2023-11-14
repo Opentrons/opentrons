@@ -17,7 +17,8 @@ import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_9
 import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
+import _fixtureTiprackAdapter from '@opentrons/shared-data/labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
@@ -35,9 +36,9 @@ import {
 } from './commandFixtures'
 import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
-imPIPETTE_96 type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '../types'
-import typePIPETTE_96 {
+import type {
   Config,
   InvariantContext,
   ModuleEntities,
@@ -58,6 +59,7 @@ const fixture12Trough = _fixture12Trough as LabwareDefinition2
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack300ul = _fixtureTiprack300ul as LabwareDefinition2
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
+const fixtureTiprackAdapter = _fixtureTiprackAdapter as LabwareDefinition2
 
 export const DEFAULT_CONFIG: Config = {
   OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
@@ -125,6 +127,18 @@ export function makeContext(): InvariantContext {
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
+    tiprack4AdapterId: {
+      id: 'tiprack4AdapterId',
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
+      def: fixtureTiprackAdapter,
+    },
+    tiprack5AdapterId: {
+      id: 'tiprack5AdapterId',
+
+      labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
+      def: fixtureTiprackAdapter,
+    },
     tiprack4Id: {
       id: 'tiprack4Id',
 
@@ -177,9 +191,9 @@ export function makeContext(): InvariantContext {
       name: 'p1000_96',
       id: PIPETTE_96,
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
-      tiprackLabwareDef: fixtureTiprack300ul,
-      spec: fixtureP300Multi,
+      tiprackDefURI: getLabwareDefURI(fixtureTiprack1000ul),
+      tiprackLabwareDef: fixtureTiprack1000ul,
+      spec: fixtureP100096,
     },
   }
   return {
@@ -237,6 +251,18 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
     },
     tiprack2Id: {
       slot: '5',
+    },
+    tiprack4AdapterId: {
+      slot: '7',
+    },
+    tiprack5AdapterId: {
+      slot: '8',
+    },
+    tiprack4Id: {
+      slot: 'tiprack4AdapterId',
+    },
+    tiprack5Id: {
+      slot: 'tiprack5AdapterId',
     },
     sourcePlateId: {
       slot: '2',

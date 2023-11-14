@@ -249,4 +249,49 @@ describe('replaceTip', () => {
       ])
     })
   })
+  describe('replaceTip: 96-channel', () => {
+    it('96-channel, dropping tips in waste chute', () => {
+      invariantContext = {
+        ...invariantContext,
+        additionalEquipmentEntities: {
+          wasteChuteId: {
+            name: 'wasteChute',
+            id: wasteChuteId,
+            location: 'D3',
+          },
+        },
+      }
+      const initialTestRobotState = merge({}, initialRobotState, {
+        tipState: {
+          tipracks: {
+            [tiprack4Id]: getTiprackTipstate(false),
+            [tiprack5Id]: getTiprackTipstate(true),
+          },
+          pipettes: {
+            p100096Id: true,
+          },
+        },
+      })
+      const result = replaceTip(
+        {
+          pipette: p100096Id,
+          dropTipLocation: 'wasteChuteId',
+        },
+        invariantContext,
+        initialTestRobotState
+      )
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        moveToAddressableAreaHelper({
+          pipetteId: p100096Id,
+          addressableAreaName: '96ChannelWasteChute',
+        }),
+        dropTipInPlaceHelper({ pipetteId: p100096Id }),
+        pickUpTipHelper('A1', {
+          pipetteId: p100096Id,
+          labwareId: tiprack5Id,
+        }),
+      ])
+    })
+  })
 })
