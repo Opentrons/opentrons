@@ -188,8 +188,6 @@ test('single transfer: 1 source & 1 dest', () => {
   ])
 })
 
-//  TODO(Jr, 10/26/23): update this when we have dispensing into waste chute
-//  params!
 test('single transfer: 1 source & 1 dest with waste chute', () => {
   const mockWasteChuteId = 'mockWasteChuteId'
 
@@ -197,7 +195,7 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
     ...mixinArgs,
     destLabware: mockWasteChuteId,
     sourceWells: ['A1'],
-    destWells: ['A1'],
+    destWells: null,
     changeTip: 'never',
     volume: 30,
   }

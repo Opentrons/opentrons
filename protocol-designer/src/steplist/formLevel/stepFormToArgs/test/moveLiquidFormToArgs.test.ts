@@ -18,7 +18,6 @@ jest.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
 const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
-const WASTE_CHUTE_WELL = 'A1'
 
 const mockGetOrderedWells = getOrderedWells as jest.MockedFunction<
   typeof getOrderedWells
