@@ -443,7 +443,7 @@ describe('SetupModulesList', () => {
     fireEvent.click(moduleSetup)
     getByText('mockModuleSetupModal')
   })
-  it('shoulde render a magnetic block with a conflicted fixture', () => {
+  it('should render a magnetic block with a conflicted fixture', () => {
     when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockMagneticBlock.id]: {
@@ -460,7 +460,7 @@ describe('SetupModulesList', () => {
         nestedLabwareDef: null,
         nestedLabwareId: null,
         protocolLoadOrder: 0,
-        slotName: '1',
+        slotName: 'B3',
         attachedModuleMatch: null,
         conflictedFixture: {
           cutoutId: 'cutoutB3',
