@@ -290,7 +290,7 @@ jobs:
           HOST_PYTHON: python
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
-          OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}/${{OT_BUILD}}
+          OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
 
         run: |
           make -C app-shell dist-${{ matrix.os }}
@@ -343,13 +343,13 @@ jobs:
           aws configure set source_profile identity --profile deploy
         shell: bash
       - name: 'deploy release builds to s3'
-        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release')
+        if: needs.determine-build-type.outputs.type == 'release'
         run: |
-          aws --profile=deploy s3 sync --acl=public-read to_upload_release/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
+          aws --profile=deploy s3 sync --acl=public-read to_upload_release/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}/${{OT_BUILD}}
       - name: 'deploy internal-release release builds to s3'
-        if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')
+        if: needs.determine-build-type.outputs.type == 'internal-release'
         run: |
-          aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
+          aws s3 --profile=deploy sync --acl=public-read to_upload_internal-release/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}/${{OT_BUILD}}
 
       - name: 'upload windows artifacts to GH release'
         uses: 'ncipollo/release-action@v1.12.0'
