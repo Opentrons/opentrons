@@ -218,3 +218,12 @@ export const gripperRequired = (): CommandCreatorError => {
     message: 'The gripper is required to fulfill this action',
   }
 }
+
+export const pipettingIntoColumn4 = (args: {
+  typeOfStep: string
+}): CommandCreatorError => {
+  return {
+    type: 'PIPETTING_INTO_COLUMN_4',
+    message: `Cannot ${args.typeOfStep} into a column 4 slot.`,
+  }
+}

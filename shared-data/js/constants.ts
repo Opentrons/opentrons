@@ -1,3 +1,4 @@
+import { AddressableAreaName } from '.'
 import type { Cutout, ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
@@ -259,7 +260,7 @@ export const FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS = [
   D4_ADDRESSABLE_AREA,
 ]
 
-export const MOVABLE_TRASH_ADDRESSABLE_AREAS = [
+export const MOVABLE_TRASH_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MOVABLE_TRASH_A1_ADDRESSABLE_AREA,
   MOVABLE_TRASH_A3_ADDRESSABLE_AREA,
   MOVABLE_TRASH_B1_ADDRESSABLE_AREA,
@@ -270,7 +271,7 @@ export const MOVABLE_TRASH_ADDRESSABLE_AREAS = [
   MOVABLE_TRASH_D3_ADDRESSABLE_AREA,
 ]
 
-export const WASTE_CHUTE_ADDRESSABLE_AREAS = [
+export const WASTE_CHUTE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ONE_AND_EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,

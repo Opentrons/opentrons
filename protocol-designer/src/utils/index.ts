@@ -1,5 +1,14 @@
 import uuidv1 from 'uuid/v4'
-import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
+import {
+  WellSetHelpers,
+  makeWellSetHelpers,
+  AddressableAreaName,
+  getDeckDefFromRobotTypeV4,
+  FLEX_ROBOT_TYPE,
+  CutoutId,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  isAddressableAreaStandardSlot,
+} from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
@@ -131,4 +140,20 @@ export const getStagingAreaSlots = (
 
 export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
   return Object.values(pipettes).some(pip => pip.spec.channels === 96)
+}
+
+export const getStagingAreaAddressableAreas = (
+  cutoutIds: CutoutId[]
+): AddressableAreaName[] => {
+  const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+  const cutoutFixtures = deckDef.cutoutFixtures
+
+  return cutoutIds
+    .flatMap(cutoutId => {
+      const addressableAreasOnCutout = cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
+      )?.providesAddressableAreas[cutoutId]
+      return addressableAreasOnCutout ?? []
+    })
+    .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
 }
