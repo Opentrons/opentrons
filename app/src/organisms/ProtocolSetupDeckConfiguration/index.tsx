@@ -57,7 +57,7 @@ export function ProtocolSetupDeckConfiguration({
     params: {
       fixtureId: 'stubbedFixtureId',
       loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
+      location: { cutout: 'cutoutD3' },
     },
     createdAt: 'fakeTimestamp',
     startedAt: 'fakeTimestamp',

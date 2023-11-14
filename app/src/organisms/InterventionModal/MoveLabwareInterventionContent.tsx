@@ -196,8 +196,10 @@ export function MoveLabwareInterventionContent({
               movedLabwareDef={movedLabwareDef}
               loadedModules={run.modules}
               loadedLabware={run.labware}
-              // TODO(bh, 2023-07-19): read trash slot name from protocol
-              trashLocation={robotType === 'OT-3 Standard' ? 'A3' : undefined}
+              // TODO(bh, 2023-07-19): remove when StyledDeck removed from MoveLabwareOnDeck
+              trashLocation={
+                robotType === 'OT-3 Standard' ? 'cutoutA3' : undefined
+              }
               backgroundItems={
                 <>
                   {moduleRenderInfo.map(

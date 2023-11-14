@@ -407,10 +407,14 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
               t={t}
               i18nKey={
                 isOnDevice
-                  ? 'ensure_nozzle_is_above_tip_odd'
-                  : 'ensure_nozzle_is_above_tip_desktop'
+                  ? 'ensure_nozzle_position_odd'
+                  : 'ensure_nozzle_position_desktop'
               }
               components={{ block: <StyledText as="p" />, bold: <strong /> }}
+              values={{
+                tip_type: t('pipette_nozzle'),
+                item_location: t('check_tip_location'),
+              }}
             />
           }
           labwareDef={labwareDef}
@@ -420,6 +424,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           handleJog={handleJog}
           initialPosition={initialPosition}
           existingOffset={existingOffset}
+          shouldUseMetalProbe={false}
         />
       ) : (
         <PrepareSpace

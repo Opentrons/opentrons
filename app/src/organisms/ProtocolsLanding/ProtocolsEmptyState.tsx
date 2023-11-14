@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
-import { UploadInput } from './UploadInput'
+import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { EmptyStateLinks } from './EmptyStateLinks'
 export function ProtocolsEmptyState(): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
@@ -25,7 +25,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       <StyledText role="complementary" as="h1">
         {t('import_a_file')}
       </StyledText>
-      <UploadInput />
+      <ProtocolUploadInput />
       <EmptyStateLinks title={t('no_protocol_yet')} />
     </Flex>
   )

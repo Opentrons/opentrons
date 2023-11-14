@@ -26,11 +26,12 @@ import { SmallButton } from '../../atoms/buttons'
 interface ExitConfirmationProps {
   onGoBack: () => void
   onConfirmExit: () => void
+  shouldUseMetalProbe: boolean
 }
 
 export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
-  const { onGoBack, onConfirmExit } = props
+  const { onGoBack, onConfirmExit, shouldUseMetalProbe } = props
   const isOnDevice = useSelector(getIsOnDevice)
   return (
     <Flex
@@ -49,7 +50,9 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         {isOnDevice ? (
           <>
             <ConfirmationHeaderODD>
-              {t('exit_screen_title')}
+              {shouldUseMetalProbe
+                ? t('remove_probe_before_exit')
+                : t('exit_screen_title')}
             </ConfirmationHeaderODD>
             <Flex textAlign={TEXT_ALIGN_CENTER}>
               <ConfirmationBodyODD>
@@ -59,7 +62,11 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
           </>
         ) : (
           <>
-            <ConfirmationHeader>{t('exit_screen_title')}</ConfirmationHeader>
+            <ConfirmationHeader>
+              {shouldUseMetalProbe
+                ? t('remove_probe_before_exit')
+                : t('exit_screen_title')}
+            </ConfirmationHeader>
             <StyledText as="p" marginTop={SPACING.spacing8}>
               {t('exit_screen_subtitle')}
             </StyledText>
@@ -80,7 +87,11 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
           />
           <SmallButton
             onClick={onConfirmExit}
-            buttonText={i18n.format(t('shared:exit'), 'capitalize')}
+            buttonText={
+              shouldUseMetalProbe
+                ? t('remove_calibration_probe')
+                : i18n.format(t('shared:exit'), 'capitalize')
+            }
             buttonType="alert"
           />
         </Flex>
@@ -99,7 +110,9 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
               onClick={onConfirmExit}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
-              {t('shared:exit')}
+              {shouldUseMetalProbe
+                ? t('remove_calibration_probe')
+                : i18n.format(t('shared:exit'), 'capitalize')}
             </AlertPrimaryButton>
           </Flex>
         </Flex>

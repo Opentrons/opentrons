@@ -11,62 +11,62 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export const STANDARD_SLOT_DECK_CONFIG_FIXTURE: DeckConfiguration = [
   {
-    fixtureLocation: 'A1',
+    fixtureLocation: 'cutoutA1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B1',
+    fixtureLocation: 'cutoutB1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C1',
+    fixtureLocation: 'cutoutC1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D1',
+    fixtureLocation: 'cutoutD1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A2',
+    fixtureLocation: 'cutoutA2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B2',
+    fixtureLocation: 'cutoutB2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C2',
+    fixtureLocation: 'cutoutC2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D2',
+    fixtureLocation: 'cutoutD2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A3',
+    fixtureLocation: 'cutoutA3',
     loadName: TRASH_BIN_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B3',
+    fixtureLocation: 'cutoutB3',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C3',
+    fixtureLocation: 'cutoutC3',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D3',
+    fixtureLocation: 'cutoutD3',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
@@ -75,62 +75,62 @@ export const STANDARD_SLOT_DECK_CONFIG_FIXTURE: DeckConfiguration = [
 // contains staging area fixtures
 export const EXTENDED_DECK_CONFIG_FIXTURE: DeckConfiguration = [
   {
-    fixtureLocation: 'A1',
+    fixtureLocation: 'cutoutA1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B1',
+    fixtureLocation: 'cutoutB1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C1',
+    fixtureLocation: 'cutoutC1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D1',
+    fixtureLocation: 'cutoutD1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A2',
+    fixtureLocation: 'cutoutA2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B2',
+    fixtureLocation: 'cutoutB2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C2',
+    fixtureLocation: 'cutoutC2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D2',
+    fixtureLocation: 'cutoutD2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A3',
+    fixtureLocation: 'cutoutA3',
     loadName: TRASH_BIN_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B3',
+    fixtureLocation: 'cutoutB3',
     loadName: STAGING_AREA_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C3',
+    fixtureLocation: 'cutoutC3',
     loadName: STAGING_AREA_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D3',
+    fixtureLocation: 'cutoutD3',
     loadName: STAGING_AREA_LOAD_NAME,
     fixtureId: uuidv4(),
   },
@@ -139,62 +139,62 @@ export const EXTENDED_DECK_CONFIG_FIXTURE: DeckConfiguration = [
 // contains waste chute fixture
 export const WASTE_CHUTE_DECK_CONFIG_FIXTURE: DeckConfiguration = [
   {
-    fixtureLocation: 'A1',
+    fixtureLocation: 'cutoutA1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B1',
+    fixtureLocation: 'cutoutB1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C1',
+    fixtureLocation: 'cutoutC1',
     loadName: TRASH_BIN_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D1',
+    fixtureLocation: 'cutoutD1',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A2',
+    fixtureLocation: 'cutoutA2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B2',
+    fixtureLocation: 'cutoutB2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C2',
+    fixtureLocation: 'cutoutC2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D2',
+    fixtureLocation: 'cutoutD2',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'A3',
+    fixtureLocation: 'cutoutA3',
     loadName: STANDARD_SLOT_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'B3',
+    fixtureLocation: 'cutoutB3',
     loadName: STAGING_AREA_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'C3',
+    fixtureLocation: 'cutoutC3',
     loadName: STAGING_AREA_LOAD_NAME,
     fixtureId: uuidv4(),
   },
   {
-    fixtureLocation: 'D3',
+    fixtureLocation: 'cutoutD3',
     loadName: WASTE_CHUTE_LOAD_NAME,
     fixtureId: uuidv4(),
   },

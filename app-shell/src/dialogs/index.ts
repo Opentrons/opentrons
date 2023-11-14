@@ -11,6 +11,17 @@ interface BaseDialogOptions {
 
 interface FileDialogOptions extends BaseDialogOptions {
   filters: Array<{ name: string; extensions: string[] }>
+  properties: Array<
+    | 'openDirectory'
+    | 'createDirectory'
+    | 'openFile'
+    | 'multiSelections'
+    | 'showHiddenFiles'
+    | 'promptToCreate'
+    | 'noResolveAliases'
+    | 'treatPackageAsDirectory'
+    | 'dontAddToRecent'
+  >
 }
 
 const BASE_DIRECTORY_OPTS = {
@@ -53,6 +64,13 @@ export function showOpenFileDialog(
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (options.filters) {
     openDialogOpts = { ...openDialogOpts, filters: options.filters }
+  }
+
+  if (options.properties != null) {
+    openDialogOpts = {
+      ...openDialogOpts,
+      properties: [...(openDialogOpts.properties ?? []), ...options.properties],
+    }
   }
 
   return dialog

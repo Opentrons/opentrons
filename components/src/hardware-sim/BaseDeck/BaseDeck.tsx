@@ -71,7 +71,7 @@ interface BaseDeckProps {
   darkFill?: string
   children?: React.ReactNode
   showSlotLabels?: boolean
-  isOnDevice? boolean
+  isOnDevice?: boolean
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {

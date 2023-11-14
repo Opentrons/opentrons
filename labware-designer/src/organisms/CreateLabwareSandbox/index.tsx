@@ -21,13 +21,16 @@ import {
 import {
   createIrregularLabware,
   createRegularLabware,
+  getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
 import { IRREGULAR_OPTIONS, REGULAR_OPTIONS } from './fixtures'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { DeckDefinition, LabwareDefinition2 } from '@opentrons/shared-data'
 
-const SLOT_OPTIONS = standardDeckDef.locations.orderedSlots.map(slot => slot.id)
+const SLOT_OPTIONS = standardDeckDef.locations.addressableAreas.map(
+  slot => slot.id
+)
 const DEFAULT_LABWARE_SLOT = SLOT_OPTIONS[0]
 
 const SlotSelect = styled.select`
@@ -177,12 +180,20 @@ export function CreateLabwareSandbox(): JSX.Element {
           </Flex>
           <Flex maxHeight="84vh">
             {viewOnDeck ? (
-              <RobotWorkSpace deckDef={standardDeckDef as any}>
-                {({ deckSlotsById }) => {
-                  const lwSlot = deckSlotsById[labwareSlot]
+              <RobotWorkSpace
+                deckDef={(standardDeckDef as unknown) as DeckDefinition}
+                showDeckLayers
+              >
+                {() => {
+                  const lwPosition = getPositionFromSlotId(
+                    labwareSlot,
+                    (standardDeckDef as unknown) as DeckDefinition
+                  )
                   return (
                     <g
-                      transform={`translate(${lwSlot.position[0]}, ${lwSlot.position[1]})`}
+                      transform={`translate(${lwPosition?.[0] ?? 0}, ${
+                        lwPosition?.[1] ?? 0
+                      })`}
                       data-testid="lw_on_deck"
                     >
                       <LabwareRender

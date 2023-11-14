@@ -70,6 +70,7 @@
   "problem_during_update": "This update is taking longer than usual.",
   "prompt": "Always show the prompt to choose calibration block or trash bin",
   "receive_alert": "Receive an alert when an Opentrons software update is available.",
+  "release_notes": "Release notes",
   "remind_later": "Remind me later",
   "reset_to_default": "Reset to default",
   "restart_touchscreen": "Restart touchscreen",

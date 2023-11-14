@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   LoadFixtureRunTimeCommand,
   WASTE_CHUTE_LOAD_NAME,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import { useLoadedFixturesConfigStatus } from '../../../../../resources/deck_configuration/hooks'
@@ -31,7 +31,7 @@ const mockLoadedFixture = {
   params: {
     fixtureId: 'stubbedFixtureId',
     loadName: WASTE_CHUTE_LOAD_NAME,
-    location: { cutout: 'D3' },
+    location: { cutout: 'cutoutD3' },
   },
   createdAt: 'fakeTimestamp',
   startedAt: 'fakeTimestamp',
@@ -74,7 +74,7 @@ describe('SetupFixtureList', () => {
     getByText('Status')
     getByText('Waste Chute')
     getByRole('button', { name: 'View setup instructions' })
-    getByText(WASTE_CHUTE_SLOT)
+    getByText(WASTE_CHUTE_CUTOUT)
     getByText('Configured')
   })
   it('should render the headers and a fixture with conflicted status', () => {

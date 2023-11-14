@@ -35,7 +35,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
   const { protocolAnalysis, showSlotLabels = false, ...styleProps } = props
   const attachedModules = useAttachedModules()
 
-  if (protocolAnalysis == null) return null
+  if (protocolAnalysis == null || protocolAnalysis.errors.length) return null
 
   const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -87,7 +87,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
 
   const labwareLocations = map(
     labwareRenderInfo,
-    ({ labwareDef, displayName, slotName }, labwareId) => {
+    ({ labwareDef, slotName }, labwareId) => {
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
       //  only rendering the labware on top most layer so
       //  either the adapter or the labware are rendered but not both

@@ -25,7 +25,7 @@ const Template: Story<React.ComponentProps<typeof AddFixtureModal>> = args => (
 
 export const Default = Template.bind({})
 Default.args = {
-  fixtureLocation: 'D3',
+  fixtureLocation: 'cutoutD3',
   setShowAddFixtureModal: () => {},
   isOnDevice: true,
 }

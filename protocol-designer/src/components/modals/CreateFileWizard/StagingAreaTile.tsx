@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   OT2_ROBOT_TYPE,
+  STAGING_AREA_CUTOUTS,
   STAGING_AREA_LOAD_NAME,
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
@@ -21,10 +22,8 @@ import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
 
-import type { Cutout, DeckConfiguration } from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { WizardTileProps } from './types'
-
-const STAGING_AREA_SLOTS: Cutout[] = ['A3', 'B3', 'C3', 'D3']
 
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   const { values, goBack, proceed, setFieldValue } = props
@@ -49,7 +48,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   //  NOTE: fixtureId doesn't matter since we don't create
   //  the entity until you complete the create file wizard via createDeckFixture action
   //  fixtureId here is only needed to visually add to the deck configurator
-  const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_SLOTS.map(
+  const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_CUTOUTS.map(
     fixtureLocation => ({
       fixtureId: `id_${fixtureLocation}`,
       fixtureLocation,

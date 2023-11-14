@@ -40,14 +40,12 @@ def _build_tip_handling_configurations(
     increment = 0
     distance = 0.0
     if tip_handling_type == "pickup" and model_configurations:
-        current = model_configurations["pickUpCurrent"]["value"]
         speed = model_configurations["pickUpSpeed"]["value"]
         presses = model_configurations["pickUpPresses"]["value"]
         increment = int(model_configurations["pickUpIncrement"]["value"])
         distance = model_configurations["pickUpDistance"]["value"]
     elif tip_handling_type == "pickup":
         print("Handling pick up tip configurations\n")
-        current = float(input("please provide the current\n"))
         speed = float(input("please provide the speed\n"))
         presses = int(input("please provide the number of presses for force pick up\n"))
         increment = int(
@@ -59,14 +57,11 @@ def _build_tip_handling_configurations(
             input("please provide the starting distance for pick up tip\n")
         )
     elif tip_handling_type == "drop" and model_configurations:
-        current = model_configurations["dropTipCurrent"]["value"]
         speed = model_configurations["dropTipSpeed"]["value"]
     elif tip_handling_type == "drop":
         print("Handling drop tip configurations\n")
-        current = float(input("please provide the current\n"))
         speed = float(input("please provide the speed\n"))
     return TipHandlingConfigurations(
-        current=current,
         speed=speed,
         presses=presses,
         increment=increment,

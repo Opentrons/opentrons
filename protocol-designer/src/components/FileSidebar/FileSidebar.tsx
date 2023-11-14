@@ -223,12 +223,12 @@ function getWarningContent({
   return null
 }
 
-export const v7WarningContent: JSX.Element = (
+export const v8WarningContent: JSX.Element = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v7_protocol_7_0.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v7_protocol_7_0.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v7_protocol_7_0.body3`)}
+      {i18n.t(`alert.hint.export_v8_protocol_7_1.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v8_protocol_7_1.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v8_protocol_7_1.body3`)}
     </p>
   </div>
 )
@@ -256,13 +256,12 @@ export function FileSidebar(props: Props): JSX.Element {
   )
   const { trashBinUnused, wasteChuteUnused } = getUnusedTrash(
     labwareOnDeck,
-    // additionalEquipment,
+    additionalEquipment,
     fileData?.commands
   )
 
   const fixtureWithoutStep: Fixture = {
     trashBin: trashBinUnused,
-    //  TODO(jr, 10/30/23): wire this up later when we know waste chute commands
     wasteChute: wasteChuteUnused,
     stagingAreaSlots: getUnusedStagingAreas(
       additionalEquipment,
@@ -325,8 +324,8 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v7_protocol_7_0',
-      content: v7WarningContent,
+      hintKey: 'export_v8_protocol_7_1',
+      content: v8WarningContent,
     }
   }
 

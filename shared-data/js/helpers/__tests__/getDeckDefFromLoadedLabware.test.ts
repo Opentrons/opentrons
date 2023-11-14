@@ -1,5 +1,5 @@
-import ot2DeckDef from '../../../deck/definitions/3/ot2_standard.json'
-import ot3DeckDef from '../../../deck/definitions/3/ot3_standard.json'
+import ot2DeckDef from '../../../deck/definitions/4/ot2_standard.json'
+import ot3DeckDef from '../../../deck/definitions/4/ot3_standard.json'
 import { getDeckDefFromRobotType } from '..'
 
 describe('getDeckDefFromRobotType', () => {
