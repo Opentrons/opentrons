@@ -78,14 +78,11 @@ export function DeckConfigurationEditor(): JSX.Element {
           : fixture
       )
     )
-    // TODO(bh, 2023-11-13): update the update
-    // updateDeckConfiguration(currentDeckConfig)
   }
 
   const handleClickConfirm = (): void => {
     if (!isEqual(deckConfig, currentDeckConfig)) {
-      // TODO(bh, 2023-11-13): update the update
-      // updateDeckConfiguration(currentDeckConfig)
+      updateDeckConfiguration(currentDeckConfig)
     }
     history.goBack()
   }

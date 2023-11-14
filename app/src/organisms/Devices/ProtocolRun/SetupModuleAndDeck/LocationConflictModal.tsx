@@ -24,6 +24,8 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
+  SINGLE_RIGHT_CUTOUTS,
+  SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { Portal } from '../../../../App/portal'
@@ -70,16 +72,26 @@ export const LocationConflictModal = (
 
   const handleUpdateDeck = (): void => {
     if (requiredFixtureId != null) {
-      // TODO(bh, 2023-11-13): update the update
-      updateDeckConfiguration({
-        cutoutId,
-        cutoutFixtureId: requiredFixtureId,
-      })
+      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
+        fixture.cutoutId === cutoutId
+          ? { ...fixture, cutoutFixtureId: requiredFixtureId }
+          : fixture
+      )
+
+      updateDeckConfiguration(newRequiredFixtureDeckConfig)
     } else {
-      updateDeckConfiguration({
-        cutoutId,
-        cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
-      })
+      const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
+      const singleSlotFixture = isRightCutout
+        ? SINGLE_RIGHT_SLOT_FIXTURE
+        : SINGLE_LEFT_SLOT_FIXTURE
+
+      const newSingleSlotDeckConfig = deckConfig.map(fixture =>
+        fixture.cutoutId === cutoutId
+          ? { ...fixture, cutoutFixtureId: singleSlotFixture }
+          : fixture
+      )
+
+      updateDeckConfiguration(newSingleSlotDeckConfig)
     }
     onCloseClick()
   }

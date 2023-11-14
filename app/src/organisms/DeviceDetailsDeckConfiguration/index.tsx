@@ -73,12 +73,18 @@ export function DeviceDetailsDeckConfiguration({
   }
 
   const handleClickRemove = (cutoutId: CutoutId): void => {
-    updateDeckConfiguration({
-      cutoutId,
-      cutoutFixtureId: SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-        ? SINGLE_RIGHT_SLOT_FIXTURE
-        : SINGLE_LEFT_SLOT_FIXTURE,
-    })
+    const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
+    const singleSlotFixture = isRightCutout
+      ? SINGLE_RIGHT_SLOT_FIXTURE
+      : SINGLE_LEFT_SLOT_FIXTURE
+
+    const newDeckConfig = deckConfig.map(fixture =>
+      fixture.cutoutId === cutoutId
+        ? { ...fixture, cutoutFixtureId: singleSlotFixture }
+        : fixture
+    )
+
+    updateDeckConfiguration(newDeckConfig)
   }
 
   // do not show standard slot in fixture display list

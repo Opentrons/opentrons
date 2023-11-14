@@ -14,7 +14,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
@@ -57,6 +60,7 @@ export function AddFixtureModal({
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const deckConfig = useDeckConfigurationQuery().data ?? []
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', {
@@ -103,10 +107,13 @@ export function AddFixtureModal({
   const fixtureOptions = providedFixtureOptions ?? availableFixtures
 
   const handleClickAdd = (requiredFixtureId: CutoutFixtureId): void => {
-    updateDeckConfiguration({
-      cutoutId,
-      cutoutFixtureId: requiredFixtureId,
-    })
+    const newDeckConfig = deckConfig.map(fixture =>
+      fixture.cutoutId === cutoutId
+        ? { ...fixture, cutoutFixtureId: requiredFixtureId }
+        : fixture
+    )
+
+    updateDeckConfiguration(newDeckConfig)
     setShowAddFixtureModal(false)
   }
 

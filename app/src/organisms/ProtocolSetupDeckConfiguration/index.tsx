@@ -62,8 +62,7 @@ export function ProtocolSetupDeckConfiguration({
 
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const handleClickConfirm = (): void => {
-    // TODO(bh, 2023-11-13): update the update
-    // updateDeckConfiguration(currentDeckConfig)
+    updateDeckConfiguration(currentDeckConfig)
     setSetupScreen('modules')
   }
 

@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client/src/deck_configuration'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client/src/deck_configuration'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -31,12 +34,16 @@ export const NotConfiguredModal = (
   const { onCloseClick, cutoutId, requiredFixtureId } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const deckConfig = useDeckConfigurationQuery().data ?? []
 
   const handleUpdateDeck = (): void => {
-    updateDeckConfiguration({
-      cutoutId,
-      cutoutFixtureId: requiredFixtureId,
-    })
+    const newDeckConfig = deckConfig.map(fixture =>
+      fixture.cutoutId === cutoutId
+        ? { ...fixture, cutoutFixtureId: requiredFixtureId }
+        : fixture
+    )
+
+    updateDeckConfiguration(newDeckConfig)
     onCloseClick()
   }
 
