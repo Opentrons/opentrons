@@ -201,7 +201,6 @@ def test_addressable_area_referencing_commands_load_on_simulated_deck(
 )
 def test_handles_command_simulated_raises(
     command: Command,
-    well_plate_def: LabwareDefinition,
     simulated_subject: AddressableAreaStore,
 ) -> None:
     """It should raise when two incompatible areas are referenced."""

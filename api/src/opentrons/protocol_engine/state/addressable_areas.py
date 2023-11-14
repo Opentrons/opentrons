@@ -13,7 +13,11 @@ from ..commands import (
     MoveLabwareResult,
     MoveToAddressableAreaResult,
 )
-from ..errors import IncompatibleAddressableAreaError  # AreaNotInDeckConfigurationError
+from ..errors import (
+    IncompatibleAddressableAreaError,
+    AreaNotInDeckConfigurationError,
+    SlotDoesNotExistError,
+)
 from ..resources import deck_configuration_provider
 from ..types import (
     DeckSlotLocation,
@@ -34,6 +38,24 @@ class AddressableAreaState:
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
     deck_definition: DeckDefinitionV4
     use_simulated_deck_config: bool
+
+
+def _get_conflicting_addressable_areas(
+    potential_cutout_fixtures: Set[PotentialCutoutFixture],
+    loaded_addressable_areas: Set[str],
+    deck_definition: DeckDefinitionV4,
+) -> Set[str]:
+    loaded_areas_on_cutout = set()
+    for fixture in potential_cutout_fixtures:
+        loaded_areas_on_cutout.update(
+            deck_configuration_provider.get_provided_addressable_area_names(
+                fixture.cutout_fixture_id,
+                fixture.cutout_id,
+                deck_definition,
+            )
+        )
+    loaded_areas_on_cutout.intersection_update(loaded_addressable_areas)
+    return loaded_areas_on_cutout
 
 
 # TODO make the below some sort of better type
@@ -175,20 +197,14 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                 set(potential_fixtures)
             )
             if not remaining_fixtures:
-                loaded_areas_on_cutout = set()
-                for fixture in existing_potential_fixtures:
-                    loaded_areas_on_cutout.update(
-                        deck_configuration_provider.get_provided_addressable_area_names(
-                            fixture.cutout_fixture_id,
-                            fixture.cutout_id,
-                            self._state.deck_definition,
-                        )
-                    )
-                loaded_areas_on_cutout.intersection_update(
-                    set(self.state.loaded_addressable_areas_by_name)
+                loaded_areas_on_cutout = _get_conflicting_addressable_areas(
+                    existing_potential_fixtures,
+                    set(self.state.loaded_addressable_areas_by_name),
+                    self._deck_definition,
                 )
                 raise IncompatibleAddressableAreaError(
-                    f"Cannot load {addressable_area_name}, not compatible with one or more of the following areas: {loaded_areas_on_cutout}"
+                    f"Cannot load {addressable_area_name}, not compatible with one or more of"
+                    f" the following areas: {loaded_areas_on_cutout}"
                 )
             self._state.potential_cutout_fixtures_by_cutout_id[
                 cutout_id
@@ -231,7 +247,9 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         try:
             return self._state.loaded_addressable_areas_by_name[addressable_area_name]
         except KeyError:
-            raise RuntimeError("Addressable area is not configured for this robot")
+            raise AreaNotInDeckConfigurationError(
+                f"{addressable_area_name} not provided by deck configuration."
+            )
 
     def _get_addressable_area_for_simulation(
         self, addressable_area_name: str
@@ -256,7 +274,15 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             if not self._state.potential_cutout_fixtures_by_cutout_id[
                 cutout_id
             ].intersection(potential_fixtures):
-                raise RuntimeError("Fixture not allowed")
+                loaded_areas_on_cutout = _get_conflicting_addressable_areas(
+                    self._state.potential_cutout_fixtures_by_cutout_id[cutout_id],
+                    set(self._state.loaded_addressable_areas_by_name),
+                    self.state.deck_definition,
+                )
+                raise IncompatibleAddressableAreaError(
+                    f"Cannot load {addressable_area_name}, not compatible with one or more of"
+                    f" the following areas: {loaded_areas_on_cutout}"
+                )
 
         cutout_position = deck_configuration_provider.get_cutout_position(
             cutout_id, self._state.deck_definition
@@ -267,7 +293,8 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:
         """Get the position of an addressable area."""
-        addressable_area = self.get_addressable_area(addressable_area_name)
+        # TODO This should be the regular `get_addressable_area` once Robot Server deck config and tests is hooked up
+        addressable_area = self._get_addressable_area_for_simulation(addressable_area_name)
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
 
@@ -286,3 +313,26 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         """Get the z height of an addressable area."""
         addressable_area = self.get_addressable_area(addressable_area_name)
         return addressable_area.bounding_box.z
+
+    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+        """Get the definition of a slot in the deck."""
+        try:
+            # TODO This should be the regular `get_addressable_area` once Robot Server deck config and tests is hooked up
+            addressable_area = self._get_addressable_area_for_simulation(slot.id)
+        except (AreaNotInDeckConfigurationError, IncompatibleAddressableAreaError):
+            raise SlotDoesNotExistError(
+                f"Slot ID {slot.id} does not exist in deck {self._state.deck_definition['otId']}"
+            )
+        position = addressable_area.position
+        bounding_box = addressable_area.bounding_box
+        return {
+            "id": addressable_area.area_name,
+            "position": [position.x, position.y, position.z],
+            "boundingBox": {
+                "xDimension": bounding_box.x,
+                "yDimension": bounding_box.y,
+                "zDimension": bounding_box.z,
+            },
+            "displayName": addressable_area.display_name,
+            "compatibleModuleTypes": addressable_area.compatible_module_types,
+        }
