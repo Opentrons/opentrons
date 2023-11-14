@@ -299,7 +299,7 @@ async def test_run_json_runner(
     )
 
     assert json_runner_subject.was_started() is False
-    await json_runner_subject.run()
+    await json_runner_subject.run(deck_configuration=[])
     assert json_runner_subject.was_started() is True
 
     decoy.verify(
@@ -616,7 +616,7 @@ async def test_run_python_runner(
     )
 
     assert legacy_python_runner_subject.was_started() is False
-    await legacy_python_runner_subject.run()
+    await legacy_python_runner_subject.run(deck_configuration=[])
     assert legacy_python_runner_subject.was_started() is True
 
     decoy.verify(
@@ -639,7 +639,7 @@ async def test_run_live_runner(
     )
 
     assert live_runner_subject.was_started() is False
-    await live_runner_subject.run()
+    await live_runner_subject.run(deck_configuration=[])
     assert live_runner_subject.was_started() is True
 
     decoy.verify(
