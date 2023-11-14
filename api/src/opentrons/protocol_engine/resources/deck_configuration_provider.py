@@ -128,7 +128,9 @@ def get_addressable_area_from_name(
                 display_name=addressable_area["displayName"],
                 bounding_box=bounding_box,
                 position=position,
-                compatible_module_types=[],  # TODO figure out getting this correct later
+                compatible_module_types=addressable_area.get(
+                    "compatibleModuleTypes", []
+                ),
                 drop_tip_location=drop_tip_location,
                 drop_labware_location=drop_labware_location,
             )

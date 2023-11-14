@@ -9,7 +9,7 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.errors import (
-    AreaNotInDeckConfigurationError,
+    # AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
 )
 from opentrons.protocol_engine.state import Config

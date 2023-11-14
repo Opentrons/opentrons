@@ -13,7 +13,7 @@ from ..commands import (
     MoveLabwareResult,
     MoveToAddressableAreaResult,
 )
-from ..errors import AreaNotInDeckConfigurationError, IncompatibleAddressableAreaError
+from ..errors import IncompatibleAddressableAreaError  # AreaNotInDeckConfigurationError
 from ..resources import deck_configuration_provider
 from ..types import (
     DeckSlotLocation,
