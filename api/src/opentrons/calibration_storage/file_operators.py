@@ -63,7 +63,7 @@ def read_cal_file(
     # This can be done when the labware endpoints
     # are refactored to grab tip length calibration
     # from the correct locations.
-    with open(filepath, "r") as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         calibration_data = typing.cast(
             typing.Dict[str, typing.Any],
             json.load(f, cls=decoder),
