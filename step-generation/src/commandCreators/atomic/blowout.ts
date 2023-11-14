@@ -3,7 +3,6 @@ import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandCreatorError, CommandCreator } from '../../types'
 
 export const blowout: CommandCreator<BlowoutParams> = (
