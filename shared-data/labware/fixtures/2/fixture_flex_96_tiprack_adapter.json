@@ -32,9 +32,7 @@
   "namespace": "fixture",
   "version": 1,
   "schemaVersion": 2,
-  "allowedRoles": [
-    "adapter"
-  ],
+  "allowedRoles": ["adapter"],
   "cornerOffsetFromSlot": {
     "x": -14.25,
     "y": -3.5,
