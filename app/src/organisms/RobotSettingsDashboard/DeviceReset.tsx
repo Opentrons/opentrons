@@ -29,6 +29,7 @@ import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import e from 'express'
 
 interface LabelProps {
   isSelected?: boolean
@@ -141,6 +142,18 @@ export function DeviceReset({
       subText,
     }
   }
+
+  const totalOptionsSelected = Object.values(resetOptions).filter(
+    selected => selected === true
+  ).length
+
+  const allOptionsWithoutODD =
+    options != null ? options.filter(o => o.id !== 'onDeviceDisplay') : []
+
+  const isEveryOptionSelected =
+    totalOptionsSelected > 0 &&
+    totalOptionsSelected === allOptionsWithoutODD.length
+
   React.useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
   }, [dispatch, robotName])
@@ -234,7 +247,7 @@ export function DeviceReset({
           />
           <OptionLabel
             htmlFor="clearAllStoredData"
-            isSelected={resetOptions.clearAllStoredData}
+            isSelected={isEveryOptionSelected}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -243,9 +256,7 @@ export function DeviceReset({
               <StyledText
                 as="p"
                 color={
-                  resetOptions.clearAllStoredData === true
-                    ? COLORS.white
-                    : COLORS.darkBlack70
+                  isEveryOptionSelected ? COLORS.white : COLORS.darkBlack70
                 }
               >
                 {t('clear_all_stored_data_description')}
