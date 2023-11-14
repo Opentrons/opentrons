@@ -50,17 +50,13 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             </filter>
           </defs>
           <rect
-            x={OUTLINE_THICKNESS_MM}
-            y={OUTLINE_THICKNESS_MM}
+            x={0.5 * OUTLINE_THICKNESS_MM}
+            y={0.5 * OUTLINE_THICKNESS_MM}
             strokeWidth={OUTLINE_THICKNESS_MM}
-            width={dimensions.xDimension + 2 * OUTLINE_THICKNESS_MM}
-            height={dimensions.yDimension + 2 * OUTLINE_THICKNESS_MM}
+            width={dimensions.xDimension + 2.5 * OUTLINE_THICKNESS_MM}
+            height={dimensions.yDimension + 2.5 * OUTLINE_THICKNESS_MM}
             rx="8"
             ry="8"
-            className={cx(styles.labware_outline, {
-              [styles.tiprack_outline]: parameters && parameters.isTiprack,
-              [styles.labware_outline_highlight]: highlight,
-            })}
             filter="url(#feOffset)"
             style={{
               stroke: '#74B0FF',
@@ -71,17 +67,14 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             x={1.5 * OUTLINE_THICKNESS_MM}
             y={1.5 * OUTLINE_THICKNESS_MM}
             strokeWidth={OUTLINE_THICKNESS_MM}
-            width={dimensions.xDimension - 2 * OUTLINE_THICKNESS_MM}
-            height={dimensions.yDimension - 2 * OUTLINE_THICKNESS_MM}
-            className={cx(styles.labware_outline, {
-              [styles.tiprack_outline]: parameters && parameters.isTiprack,
-              [styles.labware_outline_highlight]: highlight,
-            })}
+            width={dimensions.xDimension - OUTLINE_THICKNESS_MM}
+            height={dimensions.yDimension - OUTLINE_THICKNESS_MM}
             rx="4"
             ry="4"
             style={{
               stroke: `${COLORS.blueEnabled}`,
               strokeWidth: '3px',
+              fillOpacity: 0.1,
             }}
           />
         </svg>
