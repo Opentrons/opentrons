@@ -64,7 +64,7 @@ interface BaseDeckProps {
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode
-  showSlotLabels?: boolean
+  isOnDevice?: boolean
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
@@ -80,7 +80,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     deckConfig = STANDARD_SLOT_DECK_CONFIG_FIXTURE,
     showExpansion = true,
     children,
-    showSlotLabels = false,
+    isOnDevice,
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -184,6 +184,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   definition={nestedLabwareDef}
                   onLabwareClick={onLabwareClick}
                   wellFill={nestedLabwareWellFill}
+                  isOnDevice={isOnDevice}
                 />
               ) : null}
               {moduleChildren}
@@ -215,13 +216,14 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 definition={definition}
                 onLabwareClick={onLabwareClick}
                 wellFill={wellFill ?? undefined}
+                isOnDevice={isOnDevice}
               />
               {labwareChildren}
             </g>
           ) : null
         }
       )}
-      {showSlotLabels ? (
+      {isOnDevice ? (
         <SlotLabels robotType={robotType} color={darkFill} />
       ) : null}
       {children}

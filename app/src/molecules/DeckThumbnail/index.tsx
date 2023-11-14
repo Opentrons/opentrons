@@ -107,7 +107,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
       }
     }
   )
-
+  console.log('showSlotLabels', showSlotLabels)
   return (
     <BaseDeck
       deckConfig={deckConfig}
@@ -115,7 +115,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
       robotType={robotType}
       labwareLocations={labwareLocations}
       moduleLocations={moduleLocations}
-      showSlotLabels={showSlotLabels}
+      isOnDevice={showSlotLabels}
       {...styleProps}
     ></BaseDeck>
   )

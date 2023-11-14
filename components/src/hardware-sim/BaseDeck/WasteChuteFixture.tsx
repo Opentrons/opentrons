@@ -96,7 +96,7 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         width="100%"
       >
-        <Icon name="trash" color={wasteIconColor} height="3.5rem" />
+        <Icon name="trash" color={wasteIconColor} height="2rem" />
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>Waste chute</Text>
       </Flex>
     </RobotCoordsForeignObject>
