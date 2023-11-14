@@ -115,4 +115,6 @@ describe('DeviceReset', () => {
       mockResetConfig('mockRobot', clearMockResetOptions)
     )
   })
+
+  it('when removing an option after tapping clear all stored data, clearAllStoredData and authorizedKeys are false', () => {})
 })

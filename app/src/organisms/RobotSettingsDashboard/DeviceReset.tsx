@@ -158,6 +158,8 @@ export function DeviceReset({
     dispatch(fetchResetConfigOptions(robotName))
   }, [dispatch, robotName])
 
+  console.log('resetOptions', resetOptions)
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       {showConfirmationModal && (
@@ -193,6 +195,7 @@ export function DeviceReset({
                     setResetOptions({
                       ...resetOptions,
                       [option.id]: !(resetOptions[option.id] ?? false),
+                      clearAllStoredData: isEveryOptionSelected,
                     })
                   }
                 />
@@ -231,7 +234,7 @@ export function DeviceReset({
             value="clearAllStoredData"
             onChange={() => {
               setResetOptions(
-                Boolean(resetOptions.clearAllStoredData)
+                isEveryOptionSelected
                   ? {}
                   : availableOptions.reduce(
                       (acc, val) => {
