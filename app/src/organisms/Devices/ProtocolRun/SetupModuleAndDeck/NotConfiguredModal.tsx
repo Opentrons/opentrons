@@ -34,7 +34,7 @@ export const NotConfiguredModal = (
   const { onCloseClick, cutoutId, requiredFixtureId } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useDeckConfigurationQuery()?.data ?? []
 
   const handleUpdateDeck = (): void => {
     const newDeckConfig = deckConfig.map(fixture =>
