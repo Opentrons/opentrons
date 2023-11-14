@@ -145,7 +145,7 @@ describe('replaceTip', () => {
           wasteChuteId: {
             name: 'wasteChute',
             id: wasteChuteId,
-            location: 'D3',
+            location: 'cutoutD3',
           },
         },
       }
@@ -257,7 +257,7 @@ describe('replaceTip', () => {
           wasteChuteId: {
             name: 'wasteChute',
             id: wasteChuteId,
-            location: 'D3',
+            location: 'cutoutD3',
           },
         },
       }
