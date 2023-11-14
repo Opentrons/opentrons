@@ -1,11 +1,9 @@
 import pytest
-from typing import Dict, List, ContextManager, Tuple, Union, Iterator
+from typing import Dict, List, Tuple, Union, Iterator
 
-from contextlib import nullcontext as does_not_raise
 from opentrons.hardware_control import nozzle_manager
 
 from opentrons.types import Point
-from opentrons.hardware_control.types import CriticalPoint
 
 from opentrons_shared_data.pipette.load_data import load_definition
 from opentrons_shared_data.pipette.types import (
@@ -208,7 +206,7 @@ def test_multi_config_map_entries(
         assert list(nozzlemap.rows.keys()) == [nozzle[0] for nozzle in nozzles]
         assert list(nozzlemap.columns.keys()) == ["1"]
         for rowname, row_elements in nozzlemap.rows.items():
-            row_elements = [f"{rowname}1"]
+            assert row_elements == [f"{rowname}1"]
 
         assert nozzlemap.columns["1"] == nozzles
         assert nozzlemap.tip_count == len(nozzles)

@@ -145,7 +145,7 @@ class NozzleMap:
     def tip_count(self) -> int:
         return len(self.map_store)
 
-    @classmethod
+    @classmethod  # noqa: C901
     def build(
         cls,
         physical_nozzles: "OrderedDict[str, Point]",
@@ -155,7 +155,6 @@ class NozzleMap:
         back_left_nozzle: str,
         front_right_nozzle: str,
     ) -> "NozzleMap":
-
         try:
             back_left_row, back_left_column = _row_col_for_nozzle(
                 physical_rows, physical_columns, back_left_nozzle
@@ -296,7 +295,6 @@ class NozzleConfigurationManager:
     def build_from_config(
         cls, pipette_geometry: PipetteGeometryDefinition
     ) -> "NozzleConfigurationManager":
-
         sorted_nozzle_map = OrderedDict(
             (
                 (k, Point(*pipette_geometry.nozzle_map[k]))
