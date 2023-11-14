@@ -14,6 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getFixtureDisplayName,
   SINGLE_SLOT_FIXTURES,
@@ -46,7 +47,7 @@ export function FixtureTable({
   setSetupScreen,
   setCutoutId,
   setProvidedFixtureOptions,
-}: FixtureTableProps): JSX.Element {
+}: FixtureTableProps): JSX.Element | null {
   const { t, i18n } = useTranslation('protocol_setup')
 
   const [
@@ -62,7 +63,19 @@ export function FixtureTable({
     mostRecentAnalysis?.commands ?? []
   )
 
-  return (
+  const nonSingleSlotDeckConfigCompatibility = deckConfigCompatibility.filter(
+    ({ requiredAddressableAreas }) =>
+      // required AA list includes a non-single-slot AA
+      !requiredAddressableAreas.every(aa =>
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+      )
+  )
+  // fixture includes at least 1 required AA
+  const requiredDeckConfigCompatibility = nonSingleSlotDeckConfigCompatibility.filter(
+    fixture => fixture.requiredAddressableAreas.length > 0
+  )
+
+  return requiredDeckConfigCompatibility.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
         color={COLORS.darkBlack70}
@@ -76,7 +89,7 @@ export function FixtureTable({
         <StyledText flex="2 0 0">{t('location')}</StyledText>
         <StyledText flex="3 0 0"> {t('status')}</StyledText>
       </Flex>
-      {deckConfigCompatibility.map(
+      {requiredDeckConfigCompatibility.map(
         ({ cutoutId, cutoutFixtureId, compatibleCutoutFixtureIds }, index) => {
           const isCurrentFixtureCompatible =
             cutoutFixtureId != null &&
@@ -169,5 +182,5 @@ export function FixtureTable({
         }
       )}
     </Flex>
-  )
+  ) : null
 }

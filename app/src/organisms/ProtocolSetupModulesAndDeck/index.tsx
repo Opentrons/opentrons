@@ -406,6 +406,7 @@ export function ProtocolSetupModulesAndDeck({
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
         marginTop="7.75rem"
+        marginBottom={SPACING.spacing80}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
           <InlineNotification
