@@ -6,7 +6,6 @@ import {
   renderWithProviders,
   partialComponentPropsMatcher,
   LabwareRender,
-  EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
 
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
@@ -168,7 +167,6 @@ describe('SetupLiquidsMap', () => {
       .calledWith(simpleAnalysisFileFixture.commands as RunTimeCommand[])
       // TODO(bh, 2023-11-13): mock the cutout config protocol spec
       .mockReturnValue([])
-    // .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
     when(mockGetRobotTypeFromLoadedLabware)
       .calledWith(simpleAnalysisFileFixture.labware as any)
       .mockReturnValue(FLEX_ROBOT_TYPE)
@@ -337,7 +335,6 @@ describe('SetupLiquidsMap', () => {
     when(mockBaseDeck)
       .calledWith(
         partialComponentPropsMatcher({
-          deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(
             FLEX_ROBOT_TYPE
           ),

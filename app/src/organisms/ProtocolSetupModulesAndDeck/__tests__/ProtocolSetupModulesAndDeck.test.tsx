@@ -8,9 +8,9 @@ import { renderWithProviders } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs/hooks'
@@ -120,7 +120,7 @@ const calibratedMockApiHeaterShaker = {
 }
 const mockFixture: CutoutConfig = {
   cutoutId: 'cutoutD3',
-  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 }
 
 const render = () => {
@@ -362,6 +362,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: calibratedMockApiHeaterShaker,
+        slotName: 'D3',
       },
     ])
     const [{ getByText }] = render()

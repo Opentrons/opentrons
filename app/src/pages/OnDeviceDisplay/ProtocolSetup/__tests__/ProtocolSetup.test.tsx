@@ -46,6 +46,7 @@ import {
   useRunStatus,
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ProtocolSetup } from '..'
 
@@ -87,6 +88,7 @@ jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../../organisms/ToasterOven')
+jest.mock('../../../../resources/deck_configuration/hooks')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -161,6 +163,9 @@ const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.Mocked
 >
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
+>
+const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
+  typeof useDeckConfigurationCompatibility
 >
 
 const render = (path = '/') => {
@@ -330,6 +335,7 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(({
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
+    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
   })
 
   afterEach(() => {
