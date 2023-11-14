@@ -141,6 +141,19 @@ describe('dispense', () => {
         type: 'LABWARE_DOES_NOT_EXIST',
       })
     })
+    it('should return an error when dispensing from the 4th column', () => {
+      robotStateWithTip = {
+        ...robotStateWithTip,
+        labware: {
+          [SOURCE_LABWARE]: { slot: 'A4' },
+        },
+      }
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      expect(getErrorResult(result).errors).toHaveLength(1)
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'PIPETTING_INTO_COLUMN_4',
+      })
+    })
     it('should return an error when dispensing into thermocycler with pipette collision', () => {
       mockThermocyclerPipetteCollision.mockImplementationOnce(
         (

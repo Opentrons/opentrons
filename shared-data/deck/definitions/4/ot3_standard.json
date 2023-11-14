@@ -250,7 +250,98 @@
         "compatibleModuleTypes": []
       },
       {
-        "id": "movableTrash",
+        "id": "movableTrashD1",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "movableTrashC1",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "movableTrashB1",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "movableTrashA1",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "movableTrashD3",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "movableTrashC3",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "movableTrashB3",
+        "areaType": "movableTrash",
+        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "boundingBox": {
+          "xDimension": 246.5,
+          "yDimension": 91.5,
+          "zDimension": 40
+        },
+        "displayName": "Trash Bin",
+        "ableToDropTips": true,
+        "dropTipsOffset": [123.25, 45.75, 40.0]
+      },
+      {
+        "id": "movableTrashA3",
         "areaType": "movableTrash",
         "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
         "boundingBox": {
@@ -433,14 +524,14 @@
       ],
       "displayName": "Slot With Movable Trash",
       "providesAddressableAreas": {
-        "cutoutD1": ["movableTrash"],
-        "cutoutC1": ["movableTrash"],
-        "cutoutB1": ["movableTrash"],
-        "cutoutA1": ["movableTrash"],
-        "cutoutD3": ["movableTrash"],
-        "cutoutC3": ["movableTrash"],
-        "cutoutB3": ["movableTrash"],
-        "cutoutA3": ["movableTrash"]
+        "cutoutD1": ["movableTrashD1"],
+        "cutoutC1": ["movableTrashC1"],
+        "cutoutB1": ["movableTrashB1"],
+        "cutoutA1": ["movableTrashA1"],
+        "cutoutD3": ["movableTrashD3"],
+        "cutoutC3": ["movableTrashC3"],
+        "cutoutB3": ["movableTrashB3"],
+        "cutoutA3": ["movableTrashA3"]
       }
     },
     {

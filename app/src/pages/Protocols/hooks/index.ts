@@ -81,13 +81,13 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(analysis)
     ? [
-      {
-        hardwareType: 'gripper',
-        connected:
-          attachedInstruments.some(i => i.instrumentType === 'gripper') ??
-          false,
-      },
-    ]
+        {
+          hardwareType: 'gripper',
+          connected:
+            attachedInstruments.some(i => i.instrumentType === 'gripper') ??
+            false,
+        },
+      ]
     : []
 
   const handleModuleConnectionCheckFor = (
@@ -135,14 +135,18 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     })
   )
 
-  const requiredFixtures = deckConfigCompatibility.map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
-    hardwareType: 'fixture' as const,
-    cutoutFixtureId,
-    location: { cutout: cutoutId },
-    hasSlotConflict: cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-      ? compatibleCutoutFixtureIds.includes(cutoutFixtureId)
-      : false
-  }))
+  const requiredFixtures = deckConfigCompatibility.map(
+    ({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
+      hardwareType: 'fixture' as const,
+      cutoutFixtureId,
+      location: { cutout: cutoutId },
+      hasSlotConflict:
+        cutoutFixtureId != null &&
+        !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+          ? compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+          : false,
+    })
+  )
 
   return {
     requiredProtocolHardware: [
@@ -226,9 +230,9 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
       } else {
         // fixtures
         return !deckConfig?.some(
-          ({cutoutId, cutoutFixtureId})=>
+          ({ cutoutId, cutoutFixtureId }) =>
             hardware.location.cutout === cutoutId &&
-            hardware.cutoutFixtureId === cutoutFixtureId 
+            hardware.cutoutFixtureId === cutoutFixtureId
         )
       }
     }),
