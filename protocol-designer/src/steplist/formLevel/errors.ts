@@ -218,14 +218,15 @@ export const wellRatioMoveLiquid = (
     return null
   let dispenseWells = dispense_wells
   if (isDispensingIntoWasteChute) {
-    //  stubbing in A1 well for waste chute
-    dispenseWells = ['A1']
+    dispenseWells = null
   }
-  return getWellRatio(aspirate_wells, dispenseWells)
-    ? null
-    : isDispensingIntoWasteChute
+  const wellRatioFormError = isDispensingIntoWasteChute
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
+
+  return getWellRatio(aspirate_wells, dispenseWells, isDispensingIntoWasteChute)
+    ? null
+    : wellRatioFormError
 }
 export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette } = fields

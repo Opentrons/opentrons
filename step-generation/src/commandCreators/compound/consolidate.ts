@@ -102,15 +102,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     args.destLabware
   )
 
-  const destinationWell =
-    wasteChuteOrLabware === 'labware' ? args.destWell : null
+  const destinationWell = args.destWell
 
   const destLabwareDef =
     wasteChuteOrLabware === 'labware'
       ? invariantContext.labwareEntities[args.destLabware].def
       : null
   const wellDepth =
-    destLabwareDef != null ? getWellDepth(destLabwareDef, args.destWell) : 0
+    destLabwareDef != null && destinationWell != null
+      ? getWellDepth(destLabwareDef, destinationWell)
+      : 0
   const airGapOffsetDestWell = wellDepth + AIR_GAP_OFFSET_FROM_TOP
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)

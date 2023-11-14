@@ -209,7 +209,7 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'consolidate'
 
   sourceWells: string[]
-  destWell: string
+  destWell: string | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -226,7 +226,7 @@ export type TransferArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'transfer'
 
   sourceWells: string[]
-  destWells: string[]
+  destWells: string[] | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -488,9 +488,7 @@ export interface RobotState {
     }
     additionalEquipment: {
       /** for now, the only entity in here will be the waste chute */
-      [additionalEquipmentId: string]: {
-        [well: string]: LocationLiquidState
-      }
+      [additionalEquipmentId: string]: LocationLiquidState
     }
   }
 }

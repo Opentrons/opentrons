@@ -56,8 +56,6 @@ const _createNextTimelineFrame = (args: {
   return newTimelineFrame
 }
 
-const wasteChuteWell = 'A1'
-
 interface SubstepTimelineAcc {
   timeline: SubstepTimelineFrame[]
   errors: CommandCreatorError[] | null | undefined
@@ -94,9 +92,7 @@ export const substepTimelineSingleChannel = (
           acc.prevRobotState.liquidState.additionalEquipment[labwareId] != null
         ) {
           preIngreds =
-            acc.prevRobotState.liquidState.additionalEquipment[labwareId][
-              wasteChuteWell
-            ]
+            acc.prevRobotState.liquidState.additionalEquipment[labwareId]
         }
 
         let postIngreds = {}
@@ -106,14 +102,12 @@ export const substepTimelineSingleChannel = (
           nextRobotState.liquidState.additionalEquipment[labwareId] != null
         ) {
           postIngreds =
-            nextRobotState.liquidState.additionalEquipment[labwareId][
-              wasteChuteWell
-            ]
+            nextRobotState.liquidState.additionalEquipment[labwareId]
         }
 
         const wellInfo = {
           labwareId,
-          wells: [wellName] ?? [wasteChuteWell],
+          wells: [wellName] ?? [],
           preIngreds: preIngreds,
           postIngreds: postIngreds,
         }
@@ -189,10 +183,7 @@ export const substepTimelineMultiChannel = (
           acc.prevRobotState.liquidState.additionalEquipment[labwareId] != null
         ) {
           preIngreds =
-            acc.prevRobotState.liquidState.additionalEquipment[labwareId][
-              wasteChuteWell
-            ]
-          wells = [wasteChuteWell]
+            acc.prevRobotState.liquidState.additionalEquipment[labwareId]
         }
 
         let postIngreds = {}
@@ -202,9 +193,7 @@ export const substepTimelineMultiChannel = (
           nextRobotState.liquidState.additionalEquipment[labwareId] != null
         ) {
           postIngreds =
-            nextRobotState.liquidState.additionalEquipment[labwareId][
-              wasteChuteWell
-            ]
+            nextRobotState.liquidState.additionalEquipment[labwareId]
         }
 
         const wellInfo = {

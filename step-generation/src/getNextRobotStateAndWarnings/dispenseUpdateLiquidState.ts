@@ -53,8 +53,7 @@ export function dispenseUpdateLiquidState(
     )
   }
 
-  //  stubbing in A1 for waste chute well to track liquid state
-  const well = wellName ?? 'A1'
+  const well = wellName ?? null
 
   const labwareDef =
     labwareId != null ? invariantContext.labwareEntities[labwareId].def : null
@@ -70,12 +69,16 @@ export function dispenseUpdateLiquidState(
   const { wellsForTips, allWellsShared } =
     labwareDef != null && wellName != null
       ? getWellsForTips(pipetteSpec.channels, labwareDef, wellName)
-      : //  special-casing waste chute info
-        { wellsForTips: ['A1'], allWellsShared: true }
+      : { wellsForTips: null, allWellsShared: true }
 
   const liquidLabware =
-    prevLiquidState.labware[sourceId] ??
-    prevLiquidState.additionalEquipment[sourceId]
+    prevLiquidState.labware[sourceId] != null
+      ? prevLiquidState.labware[sourceId]
+      : null
+  const liquidWasteChute =
+    prevLiquidState.additionalEquipment[sourceId] != null
+      ? prevLiquidState.additionalEquipment[sourceId]
+      : null
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
@@ -97,39 +100,69 @@ export function dispenseUpdateLiquidState(
     }
   )
 
-  const mergeLiquidtoSingleWell = {
-    [well]: reduce(
+  let mergeLiquidtoSingleWell = null
+  if (well != null && liquidLabware != null) {
+    mergeLiquidtoSingleWell = {
+      [well]: reduce(
+        splitLiquidStates,
+        (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
+          const res = mergeLiquid(
+            wellLiquidStateAcc,
+            splitLiquidStateForTip.dest
+          )
+          return res
+        },
+        liquidLabware[well]
+      ),
+    }
+  }
+
+  if (well == null && liquidWasteChute != null) {
+    mergeLiquidtoSingleWell = reduce(
       splitLiquidStates,
       (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
         const res = mergeLiquid(wellLiquidStateAcc, splitLiquidStateForTip.dest)
         return res
       },
-      liquidLabware[well]
-    ),
+      liquidWasteChute
+    )
   }
-  const mergeTipLiquidToOwnWell = wellsForTips.reduce(
-    (acc, wellForTip, tipIdx) => {
-      return {
-        ...acc,
-        [wellForTip]: mergeLiquid(
-          splitLiquidStates[`${tipIdx}`].dest,
-          liquidLabware[wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
-        ),
-      }
-    },
-    {}
-  )
+
+  if (mergeLiquidtoSingleWell == null) {
+    console.assert(
+      `expected to merge liquid to a single well with sourceId ${sourceId}`
+    )
+  }
+
+  const mergeTipLiquidToOwnWell =
+    well != null && liquidLabware != null && wellsForTips != null
+      ? wellsForTips.reduce((acc, wellForTip, tipIdx) => {
+          return {
+            ...acc,
+            [wellForTip]: mergeLiquid(
+              splitLiquidStates[`${tipIdx}`].dest,
+              liquidLabware[wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
+            ),
+          }
+        }, {})
+      : {}
+
   // add liquid to well(s)
   const labwareLiquidState = allWellsShared
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
-  if (prevLiquidState.additionalEquipment[sourceId] != null) {
+  if (
+    prevLiquidState.additionalEquipment[sourceId] != null &&
+    labwareLiquidState != null
+  ) {
     prevLiquidState.additionalEquipment[sourceId] = Object.assign(
-      liquidLabware,
       labwareLiquidState
     )
-  } else if (prevLiquidState.labware[sourceId] != null) {
+  } else if (
+    prevLiquidState.labware[sourceId] != null &&
+    labwareLiquidState != null
+  ) {
     prevLiquidState.labware[sourceId] = Object.assign(
       liquidLabware,
       labwareLiquidState

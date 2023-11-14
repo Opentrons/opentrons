@@ -130,23 +130,17 @@ describe('move liquid step form -> command creator args', () => {
         dispense_labware: {
           id: 'destLabwareId',
           name: 'wasteChute',
-          location: 'D3',
+          location: 'cutoutD3',
         },
       },
     })
 
-    expect(mockGetOrderedWells).toHaveBeenCalledTimes(2)
+    expect(mockGetOrderedWells).toHaveBeenCalledTimes(1)
     expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
       sourceLabwareDef.ordering,
       'l2r',
       't2b'
-    )
-    expect(mockGetOrderedWells).toHaveBeenCalledWith(
-      [WASTE_CHUTE_WELL],
-      [['A1']],
-      'r2l',
-      'b2t'
     )
   })
 

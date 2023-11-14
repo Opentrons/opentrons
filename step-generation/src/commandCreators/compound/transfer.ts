@@ -54,10 +54,29 @@ export const transfer: CommandCreator<TransferArgs> = (
     * 'perDest': change tip each time you encounter a new destination well (including the first one)
     NOTE: In some situations, different changeTip options have equivalent outcomes. That's OK.
   */
-  assert(
-    args.sourceWells.length === args.destWells.length,
-    `Transfer command creator expected N:N source-to-dest wells ratio. Got ${args.sourceWells.length}:${args.destWells.length}`
+
+  const wasteChuteOrLabware = getWasteChuteOrLabware(
+    invariantContext.labwareEntities,
+    invariantContext.additionalEquipmentEntities,
+    args.destLabware
   )
+
+  if (
+    (wasteChuteOrLabware === 'labware' &&
+      args.destWells != null &&
+      args.sourceWells.length === args.destWells.length) ||
+    (wasteChuteOrLabware === 'wasteChute' &&
+      args.destWells == null &&
+      args.sourceWells.length === 1)
+  ) {
+    // No assertion failure, continue with the logic
+  } else {
+    assert(
+      false,
+      `Transfer command creator expected N:N source-to-dest wells ratio. Got ${args.sourceWells.length}:${args.destWells?.length} in labware`
+    )
+  }
+
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
@@ -156,14 +175,9 @@ export const transfer: CommandCreator<TransferArgs> = (
       .concat(splitLastVol)
       .concat(splitLastVol)
   }
-  const wasteChuteOrLabware = getWasteChuteOrLabware(
-    invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
-    args.destLabware
-  )
 
   // @ts-expect-error(SA, 2021-05-05): zip can return undefined so this really should be Array<[string | undefined, string | undefined]>
-  const sourceDestPairs: Array<[string, string]> = zip(
+  const sourceDestPairs: Array<[string, string | null]> = zip(
     args.sourceWells,
     args.destWells
   )
@@ -172,12 +186,10 @@ export const transfer: CommandCreator<TransferArgs> = (
   const commandCreators = sourceDestPairs.reduce(
     (
       outerAcc: CurriedCommandCreator[],
-      wellPair: [string, string],
+      wellPair: [string, string | null],
       pairIdx: number
     ): CurriedCommandCreator[] => {
-      const [sourceWell, destWell] = wellPair
-      const destinationWell =
-        wasteChuteOrLabware === 'labware' ? destWell : null
+      const [sourceWell, destinationWell] = wellPair
       const sourceLabwareDef =
         invariantContext.labwareEntities[args.sourceLabware].def
       const destLabwareDef =
@@ -185,7 +197,9 @@ export const transfer: CommandCreator<TransferArgs> = (
           ? invariantContext.labwareEntities[args.destLabware].def
           : null
       const wellDepth =
-        destLabwareDef != null ? getWellDepth(destLabwareDef, destWell) : 0
+        destinationWell != null && destLabwareDef != null
+          ? getWellDepth(destLabwareDef, destinationWell)
+          : 0
       const airGapOffsetSourceWell =
         getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
       const airGapOffsetDestWell = wellDepth + AIR_GAP_OFFSET_FROM_TOP

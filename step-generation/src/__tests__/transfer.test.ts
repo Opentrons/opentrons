@@ -1,4 +1,3 @@
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
@@ -30,6 +29,7 @@ import {
 } from '../utils/misc'
 import { transfer } from '../commandCreators/compound/transfer'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
@@ -208,12 +208,12 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
       mockWasteChuteId: {
         name: 'wasteChute',
         id: mockWasteChuteId,
-        location: WASTE_CHUTE_SLOT,
+        location: WASTE_CHUTE_CUTOUT,
       },
     },
   }
   robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId = {
-    A1: { '0': { volume: 200 } },
+    '0': { volume: 200 },
   }
   robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
     '0': { volume: 200 },

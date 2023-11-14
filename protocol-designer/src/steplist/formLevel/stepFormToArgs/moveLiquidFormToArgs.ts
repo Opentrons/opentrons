@@ -85,33 +85,41 @@ export const moveLiquidFormToArgs = (
     fields.aspirate_wellOrder_second
   )
 
+  const dispenseInWasteChute =
+    'name' in destLabware && destLabware.name === 'wasteChute'
+
   let ordering: string[][] = []
   let dispWells: string[] = []
-  if ('name' in destLabware && destLabware.name === 'wasteChute') {
-    ordering = [['A1']]
-    dispWells = ['A1']
-  } else if ('def' in destLabware) {
+
+  if ('def' in destLabware) {
     ordering = destLabware.def.ordering
     dispWells = destWellsUnordered
   }
 
-  let destWells = getOrderedWells(
-    dispWells,
-    ordering,
-    fields.dispense_wellOrder_first,
-    fields.dispense_wellOrder_second
-  )
+  let destWells = dispenseInWasteChute
+    ? null
+    : getOrderedWells(
+        dispWells,
+        ordering,
+        fields.dispense_wellOrder_first,
+        fields.dispense_wellOrder_second
+      )
 
   // 1:many with single path: spread well array of length 1 to match other well array
-  if (path === 'single' && sourceWells.length !== destWells.length) {
-    if (sourceWells.length === 1) {
-      sourceWells = Array(destWells.length).fill(sourceWells[0])
-    } else if (destWells.length === 1) {
-      destWells = Array(sourceWells.length).fill(destWells[0])
+  // distribute 1:many can not happen into the waste chute
+  if (destWells != null && !dispenseInWasteChute) {
+    if (path === 'single' && sourceWells.length !== destWells.length) {
+      if (sourceWells.length === 1) {
+        sourceWells = Array(destWells.length).fill(sourceWells[0])
+      } else if (destWells.length === 1) {
+        destWells = Array(sourceWells.length).fill(destWells[0])
+      }
     }
   }
   const wellDepth =
-    'def' in destLabware ? getWellsDepth(destLabware.def, destWells) : 0
+    'def' in destLabware && destWells != null
+      ? getWellsDepth(destLabware.def, destWells)
+      : 0
 
   const disposalVolume = fields.disposalVolume_checkbox
     ? fields.disposalVolume_volume
@@ -196,7 +204,6 @@ export const moveLiquidFormToArgs = (
     sourceWellsUnordered.length > 0,
     'expected sourceWells to have length > 0'
   )
-  assert(dispWells.length > 0, 'expected destWells to have length > 0')
   assert(
     sourceWellsUnordered.length === 1 ||
       dispWells.length === 1 ||
@@ -209,6 +216,15 @@ export const moveLiquidFormToArgs = (
       blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION
     ),
     'blowout location for multiDispense cannot be destination well'
+  )
+
+  if (!dispenseInWasteChute && dispWells.length === 0) {
+    console.error('expected to have destWells.length > 0 but got none')
+  }
+
+  assert(
+    !(path === 'multiDispense' && destWells == null),
+    'cannot distribute when destWells is null'
   )
 
   switch (path) {
@@ -233,7 +249,7 @@ export const moveLiquidFormToArgs = (
         mixFirstAspirate: mixBeforeAspirate,
         mixInDestination,
         sourceWells,
-        destWell: destWells[0],
+        destWell: destWells != null ? destWells[0] : null,
       }
       return consolidateStepArguments
     }
@@ -247,7 +263,9 @@ export const moveLiquidFormToArgs = (
         blowoutLocation: fields.blowout_location,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
-        destWells,
+        // cannot distribute into a waste chute so if destWells is null
+        // there is an error
+        destWells: destWells ?? [],
       }
       return distributeStepArguments
     }

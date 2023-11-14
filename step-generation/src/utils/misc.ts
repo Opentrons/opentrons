@@ -324,7 +324,7 @@ export function createEmptyLiquidState(
       additionalEquipmentEntities,
       (acc, additionalEquipment: AdditionalEquipmentEntity, id: string) => {
         if (additionalEquipment.name === 'wasteChute') {
-          return { ...acc, [id]: { A1: {} } }
+          return { ...acc, [id]: {} }
         } else {
           return acc
         }

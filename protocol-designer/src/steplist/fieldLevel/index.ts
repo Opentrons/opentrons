@@ -55,7 +55,7 @@ import type {
 
 export type { StepFieldName }
 
-const getLabwareOrFixtureEntity = (
+const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
   id: string
 ): LabwareEntity | AdditionalEquipmentEntity | null => {
@@ -160,7 +160,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   aspirate_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareOrFixtureEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -191,7 +191,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareOrFixtureEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   dispense_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -209,6 +209,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   dispense_wells: {
+    getErrors: composeErrors(requiredField, minimumWellCount(1)),
     maskValue: defaultTo([]),
   },
   disposalVolume_volume: {
@@ -221,7 +222,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareOrFixtureEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),

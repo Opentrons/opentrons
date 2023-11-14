@@ -137,6 +137,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
         : null
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
+    // wellDepth is 0 if labwareId is a waste chute
     wellDepthMm = labwareDef != null ? getWellsDepth(labwareDef, ['A1']) : 0
   }
 
