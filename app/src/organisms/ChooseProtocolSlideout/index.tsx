@@ -36,7 +36,6 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -181,7 +180,6 @@ interface StoredProtocolListProps {
   runCreationError: string | null
   runCreationErrorCode: number | null
   robotName: string
-  protocolAnalysis?: ProtocolAnalysisOutput | null
 }
 
 function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
