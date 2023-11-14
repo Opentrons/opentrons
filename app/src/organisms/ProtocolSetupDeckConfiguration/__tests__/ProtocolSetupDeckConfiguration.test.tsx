@@ -2,10 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders, DeckConfigurator } from '@opentrons/components'
-import {
-  useUpdateDeckConfigurationMutation,
-  useCreateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -34,9 +31,6 @@ const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jes
 const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
   typeof useUpdateDeckConfigurationMutation
 >
-const mockUseCreateDeckConfigurationMutation = useCreateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useCreateDeckConfigurationMutation
->
 
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupDeckConfiguration>
@@ -51,7 +45,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'cutoutD3',
+      cutoutId: 'cutoutD3',
       runId: 'mockRunId',
       setSetupScreen: mockSetSetupScreen,
       providedFixtureOptions: [],
@@ -62,9 +56,6 @@ describe('ProtocolSetupDeckConfiguration', () => {
       .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
-    } as any)
-    mockUseCreateDeckConfigurationMutation.mockReturnValue({
-      createDeckConfiguration: mockCreateDeckConfiguration,
     } as any)
   })
 

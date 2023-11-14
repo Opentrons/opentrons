@@ -24,7 +24,7 @@ import {
 import { i18n } from '../../../i18n'
 import { useAttachedModules } from '../../../organisms/Devices/hooks'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { getAttachedProtocolModuleMatches } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getLabwareRenderInfo } from '../../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
@@ -66,8 +66,8 @@ const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.Mocked
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
-const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
-  typeof getDeckConfigFromProtocolCommands
+const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocolCommands
 >
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
   typeof getLabwareRenderInfo
@@ -127,9 +127,11 @@ describe('DeckThumbnail', () => {
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    when(mockGetDeckConfigFromProtocolCommands)
+    when(mockGetSimplestDeckConfigForProtocolCommands)
       .calledWith(commands)
-      .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
+      .mockReturnValue([])
+    // TODO(bh, 2023-11-13): mock the cutout config protocol spec
+    // .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
     when(mockGetLabwareRenderInfo).mockReturnValue({})
     when(mockGetProtocolModulesInfo)
       .calledWith(protocolAnalysis, ot2StandardDeckDef as any)
@@ -224,9 +226,11 @@ describe('DeckThumbnail', () => {
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    when(mockGetDeckConfigFromProtocolCommands)
+    when(mockGetSimplestDeckConfigForProtocolCommands)
       .calledWith(commands)
-      .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
+      .mockReturnValue([])
+    // TODO(bh, 2023-11-13): mock the cutout config protocol spec
+    // .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
     when(mockGetLabwareRenderInfo).mockReturnValue({
       [MOCK_300_UL_TIPRACK_ID]: {
         labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,

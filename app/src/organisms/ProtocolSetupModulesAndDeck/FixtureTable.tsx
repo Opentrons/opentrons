@@ -17,18 +17,17 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   SINGLE_SLOT_FIXTURES,
-  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
+import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 
 import type {
   CompletedProtocolAnalysis,
   CutoutFixtureId,
   CutoutId,
-  LoadFixtureRunTimeCommand,
   RobotType,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -37,7 +36,7 @@ interface FixtureTableProps {
   robotType: RobotType
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
-  setFixtureLocation: (fixtureLocation: CutoutId) => void
+  setCutoutId: (cutoutId: CutoutId) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -45,36 +44,19 @@ export function FixtureTable({
   robotType,
   mostRecentAnalysis,
   setSetupScreen,
-  setFixtureLocation,
+  setCutoutId,
   setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'cutoutD3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  }
 
   const [
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = React.useState<boolean>(false)
 
-  const requiredFixtureDetails =
-    mostRecentAnalysis?.commands != null
-      ? [
-          // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
-          STUBBED_LOAD_FIXTURE,
-        ]
-      : []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocolCommands(
+    mostRecentAnalysis?.commands ?? []
+  )
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
     mostRecentAnalysis?.commands ?? []
@@ -124,7 +106,7 @@ export function FixtureTable({
             handleClick = isConflictingFixtureConfigured
               ? () => setShowLocationConflictModal(true)
               : () => {
-                  setFixtureLocation(cutoutId)
+                  setCutoutId(cutoutId)
                   setProvidedFixtureOptions(compatibleCutoutFixtureIds)
                   setSetupScreen('deck configuration')
                 }
@@ -144,7 +126,7 @@ export function FixtureTable({
                 <LocationConflictModal
                   onCloseClick={() => setShowLocationConflictModal(false)}
                   cutoutId={cutoutId}
-                  requiredFixture={compatibleCutoutFixtureIds[0]}
+                  requiredFixtureId={compatibleCutoutFixtureIds[0]}
                   isOnDevice={true}
                 />
               ) : null}

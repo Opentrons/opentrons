@@ -1,24 +1,16 @@
 import { when, resetAllWhenMocks } from 'jest-when'
-import { v4 as uuidv4 } from 'uuid'
 
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
-  STAGING_AREA_LOAD_NAME,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  STANDARD_SLOT_LOAD_NAME,
   TRASH_BIN_ADAPTER_FIXTURE,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
 
 import type { UseQueryResult } from 'react-query'
-import type {
-  DeckConfiguration,
-  LoadFixtureRunTimeCommand,
-} from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 
@@ -61,7 +53,7 @@ const MOCK_DECK_CONFIG: DeckConfiguration = [
   },
 ]
 
-describe('useLoadedFixturesConfigStatus', () => {
+describe('useDeckConfigurationCompatibility', () => {
   beforeEach(() => {
     when(mockUseDeckConfigurationQuery)
       .calledWith()

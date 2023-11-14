@@ -136,14 +136,14 @@ export function FixtureListItem({
 
   return (
     <>
-      {showNotConfiguredModal ? (
+      {showNotConfiguredModal && cutoutFixtureId != null ? (
         <NotConfiguredModal
           onCloseClick={() => setShowNotConfiguredModal(false)}
           cutoutId={cutoutId}
           requiredFixtureId={cutoutFixtureId}
         />
       ) : null}
-      {showLocationConflictModal ? (
+      {showLocationConflictModal && cutoutFixtureId != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutId}
@@ -164,11 +164,13 @@ export function FixtureListItem({
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex alignItems={JUSTIFY_CENTER} width="45%">
-            <img
-              width="60px"
-              height="54px"
-              src={getFixtureImage(cutoutFixtureId)}
-            />
+            {cutoutFixtureId != null ? (
+              <img
+                width="60px"
+                height="54px"
+                src={getFixtureImage(cutoutFixtureId)}
+              />
+            ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}

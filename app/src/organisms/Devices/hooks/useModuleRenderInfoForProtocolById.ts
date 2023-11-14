@@ -1,9 +1,8 @@
 import {
   checkModuleCompatibility,
-  Fixture,
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
-  STANDARD_SLOT_LOAD_NAME,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
@@ -12,12 +11,13 @@ import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMo
 import { useAttachedModules } from './useAttachedModules'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
 
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null
-  conflictedFixture?: Fixture
+  conflictedFixture?: CutoutConfig
 }
 
 export interface ModuleRenderInfoById {
@@ -61,8 +61,9 @@ export function useModuleRenderInfoForProtocolById(
           attachedModuleMatch: compatibleAttachedModule,
           conflictedFixture: deckConfig?.find(
             fixture =>
-              fixture.fixtureLocation === protocolMod.slotName &&
-              fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+              fixture.cutoutId === protocolMod.slotName &&
+              fixture.cutoutFixtureId != null &&
+              !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
           ),
         }
       }
@@ -71,8 +72,9 @@ export function useModuleRenderInfoForProtocolById(
         attachedModuleMatch: null,
         conflictedFixture: deckConfig?.find(
           fixture =>
-            fixture.fixtureLocation === protocolMod.slotName &&
-            fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+            fixture.cutoutId === protocolMod.slotName &&
+            fixture.cutoutFixtureId != null &&
+            !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
         ),
       }
     }

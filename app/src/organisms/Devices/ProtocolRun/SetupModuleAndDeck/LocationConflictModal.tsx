@@ -33,9 +33,9 @@ import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 
 import type {
+  CutoutConfig,
   CutoutId,
   CutoutFixtureId,
-  Fixture,
   ModuleModel,
 } from '@opentrons/shared-data'
 
@@ -61,7 +61,7 @@ export const LocationConflictModal = (
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
-    (deckFixture: Fixture) => deckFixture.cutoutId === cutoutId
+    (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
   )?.cutoutFixtureId
   const currentFixtureDisplayName =
     deckConfigurationAtLocationFixtureId != null

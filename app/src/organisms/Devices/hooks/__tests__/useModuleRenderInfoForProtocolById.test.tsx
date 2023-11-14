@@ -6,7 +6,7 @@ import {
   getDeckDefFromRobotType,
   getRobotTypeFromLoadedLabware,
   FLEX_ROBOT_TYPE,
-  STAGING_AREA_LOAD_NAME,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
@@ -27,9 +27,9 @@ import {
 } from '..'
 
 import type {
+  CutoutConfig,
   DeckConfiguration,
   DeckDefinition,
-  Fixture,
   ModuleModel,
   ModuleType,
   ProtocolAnalysisOutput,
@@ -132,11 +132,10 @@ const TEMPERATURE_MODULE_INFO = {
   slotName: 'D1',
 }
 
-const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: 'cutoutD1',
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+const mockFixture: CutoutConfig = {
+  cutoutId: 'cutoutD1',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
 
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {

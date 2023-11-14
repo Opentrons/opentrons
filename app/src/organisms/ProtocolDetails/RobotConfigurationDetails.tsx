@@ -34,14 +34,14 @@ import type {
   RobotType,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { CutoutConfig } from '../../resources/deck_configuration/types'
+import type { CutoutConfigProtocolSpec } from '../../resources/deck_configuration/utils'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
   extensionInstrumentName: string | null
   requiredModuleDetails: LoadModuleRunTimeCommand[]
-  requiredFixtureDetails: CutoutConfig[]
+  requiredFixtureDetails: CutoutConfigProtocolSpec[]
   isLoading: boolean
   robotType: RobotType | null
 }

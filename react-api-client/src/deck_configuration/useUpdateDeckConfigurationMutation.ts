@@ -12,24 +12,24 @@ import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { ErrorResponse, HostConfig } from '@opentrons/api-client'
-import type { Fixture } from '@opentrons/shared-data'
+import type { CutoutConfig } from '@opentrons/shared-data'
 
 export type UseUpdateDeckConfigurationMutationResult = UseMutationResult<
-  Fixture,
+  CutoutConfig,
   AxiosError<ErrorResponse>,
-  Fixture
+  CutoutConfig
 > & {
   updateDeckConfiguration: UseMutateFunction<
-    Fixture,
+    CutoutConfig,
     AxiosError<ErrorResponse>,
-    Fixture
+    CutoutConfig
   >
 }
 
 export type UseUpdateDeckConfigurationMutationOptions = UseMutationOptions<
-  Fixture,
+  CutoutConfig,
   AxiosError<ErrorResponse>,
-  Fixture
+  CutoutConfig
 >
 
 export function useUpdateDeckConfigurationMutation(
@@ -38,9 +38,13 @@ export function useUpdateDeckConfigurationMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<Fixture, AxiosError<ErrorResponse>, Fixture>(
+  const mutation = useMutation<
+    CutoutConfig,
+    AxiosError<ErrorResponse>,
+    CutoutConfig
+  >(
     [host, 'deck_configuration'],
-    (fixture: Fixture) =>
+    (fixture: CutoutConfig) =>
       updateDeckConfiguration(host as HostConfig, fixture).then(response => {
         queryClient
           .invalidateQueries([host, 'deck_configuration'])

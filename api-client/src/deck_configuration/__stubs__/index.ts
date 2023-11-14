@@ -7,9 +7,9 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import type { Fixture } from '@opentrons/shared-data'
+import type { CutoutConfig } from '@opentrons/shared-data'
 
-export const DECK_CONFIG_STUB: { [cutoutId: string]: Fixture } = {
+export const DECK_CONFIG_STUB: { [cutoutId: string]: CutoutConfig } = {
   cutoutA1: {
     cutoutId: 'cutoutA1',
     cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,

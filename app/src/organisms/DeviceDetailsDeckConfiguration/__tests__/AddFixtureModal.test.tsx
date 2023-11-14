@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
@@ -27,7 +27,7 @@ describe('Touchscreen AddFixtureModal', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'cutoutD3',
+      cutoutId: 'cutoutD3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
       setCurrentDeckConfig: mockSetCurrentDeckConfig,
       isOnDevice: true,
@@ -61,7 +61,7 @@ describe('Desktop AddFixtureModal', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'cutoutD3',
+      cutoutId: 'cutoutD3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
     }
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
@@ -86,7 +86,7 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot A1', () => {
-    props = { ...props, fixtureLocation: 'cutoutA1' }
+    props = { ...props, cutoutId: 'cutoutA1' }
     const [{ getByText, getByRole }] = render(props)
     getByText('Add to slot A1')
     getByText(
@@ -97,7 +97,7 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot B3', () => {
-    props = { ...props, fixtureLocation: 'cutoutB3' }
+    props = { ...props, cutoutId: 'cutoutB3' }
     const [{ getByText, getAllByRole }] = render(props)
     getByText('Add to slot B3')
     getByText(
@@ -109,12 +109,12 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should call a mock function when clicking add button', () => {
-    props = { ...props, fixtureLocation: 'cutoutA1' }
+    props = { ...props, cutoutId: 'cutoutA1' }
     const [{ getByRole }] = render(props)
     getByRole('button', { name: 'Add' }).click()
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith({
-      fixtureLocation: 'cutoutA1',
-      loadName: TRASH_BIN_LOAD_NAME,
+      cutoutId: 'cutoutA1',
+      cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     })
   })
 })

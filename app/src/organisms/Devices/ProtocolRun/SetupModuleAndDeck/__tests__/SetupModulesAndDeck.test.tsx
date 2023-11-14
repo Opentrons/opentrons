@@ -2,7 +2,7 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
-import { WASTE_CHUTE_LOAD_NAME } from '@opentrons/shared-data'
+// import { WASTE_CHUTE_LOAD_NAME } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   useIsFlex,
@@ -15,23 +15,6 @@ import { SetupModulesList } from '../SetupModulesList'
 import { SetupModulesMap } from '../SetupModulesMap'
 import { SetupFixtureList } from '../SetupFixtureList'
 import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
-import { LoadedFixturesBySlot } from '@opentrons/api-client'
-
-const mockLoadedFixturesBySlot: LoadedFixturesBySlot = {
-  D3: {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'cutoutD3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  },
-}
 
 jest.mock('../../../hooks')
 jest.mock('../SetupModulesList')
@@ -75,7 +58,8 @@ describe('SetupModuleAndDeck', () => {
       runId: MOCK_RUN_ID,
       expandLabwarePositionCheckStep: () => jest.fn(),
       hasModules: true,
-      loadedFixturesBySlot: {},
+      protocolDeckConfig: [],
+      commands: [],
     }
     mockSetupFixtureList.mockReturnValue(<div>Mock setup fixture list</div>)
     mockSetupModulesList.mockReturnValue(<div>Mock setup modules list</div>)
@@ -141,7 +125,6 @@ describe('SetupModuleAndDeck', () => {
 
   it('should render the SetupModulesList and SetupFixtureList component when clicking List View for Flex', () => {
     when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(true)
-    props.loadedFixturesBySlot = mockLoadedFixturesBySlot
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'List View' })
     fireEvent.click(button)

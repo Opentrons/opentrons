@@ -21,7 +21,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   NON_CONNECTING_MODULE_TYPES,
-  STANDARD_SLOT_LOAD_NAME,
+  SINGLE_SLOT_FIXTURES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -39,7 +39,7 @@ import {
 import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/MultipleModulesModal'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
+import { getLocalRobot } from '../../redux/discovery'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -59,10 +59,9 @@ import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
 
 import type { CommandData } from '@opentrons/api-client'
 import type {
-  Cutout,
+  CutoutConfig,
+  CutoutId,
   CutoutFixtureId,
-  Fixture,
-  FixtureLoadName,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
@@ -81,7 +80,7 @@ interface RenderModuleStatusProps {
     commands: ModulePrepCommandsType[],
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
-  conflictedFixture?: Fixture
+  conflictedFixture?: CutoutConfig
 }
 
 function RenderModuleStatus({
@@ -192,7 +191,7 @@ interface RowModuleProps {
   ) => Promise<CommandData[]>
   prepCommandErrorMessage: string
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
-  conflictedFixture?: Fixture
+  conflictedFixture?: CutoutConfig
 }
 
 function RowModule({
@@ -235,7 +234,7 @@ function RowModule({
       {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          cutout={conflictedFixture.fixtureLocation}
+          cutoutId={conflictedFixture.cutoutId}
           requiredModule={module.moduleDef.model}
           isOnDevice={true}
         />
@@ -308,7 +307,7 @@ function RowModule({
 interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
-  setFixtureLocation: (fixtureLocation: Cutout) => void
+  setCutoutId: (cutoutId: CutoutId) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
@@ -318,7 +317,7 @@ interface ProtocolSetupModulesAndDeckProps {
 export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
-  setFixtureLocation,
+  setCutoutId,
   setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
@@ -456,8 +455,9 @@ export function ProtocolSetupModulesAndDeck({
                   setPrepCommandErrorMessage={setPrepCommandErrorMessage}
                   conflictedFixture={deckConfig?.find(
                     fixture =>
-                      fixture.fixtureLocation === module.slotName &&
-                      fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+                      fixture.cutoutId === module.slotName &&
+                      fixture.cutoutFixtureId != null &&
+                      !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
                   )}
                 />
               )
@@ -467,7 +467,7 @@ export function ProtocolSetupModulesAndDeck({
             robotType={FLEX_ROBOT_TYPE}
             mostRecentAnalysis={mostRecentAnalysis}
             setSetupScreen={setSetupScreen}
-            setFixtureLocation={setFixtureLocation}
+            setCutoutId={setCutoutId}
             setProvidedFixtureOptions={setProvidedFixtureOptions}
           />
         </Flex>

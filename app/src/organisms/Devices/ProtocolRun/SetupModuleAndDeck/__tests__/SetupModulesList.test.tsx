@@ -2,6 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -27,11 +28,7 @@ import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
 
-import {
-  ModuleModel,
-  ModuleType,
-  STAGING_AREA_LOAD_NAME,
-} from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../hooks')
@@ -466,9 +463,8 @@ describe('SetupModulesList', () => {
         slotName: '1',
         attachedModuleMatch: null,
         conflictedFixture: {
-          fixtureId: 'mockId',
-          fixtureLocation: '1',
-          loadName: STAGING_AREA_LOAD_NAME,
+          cutoutId: 'cutoutB3',
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
         },
       },
     } as any)

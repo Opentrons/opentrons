@@ -31,7 +31,7 @@ import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckViewLayerBlockList'
 import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
-import { getDeckConfigFromProtocolCommands } from '../../../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../../../resources/deck_configuration/utils'
 import { mockProtocolModuleInfo } from '../../../../ProtocolSetupLabware/__fixtures__'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redux/modules/__fixtures__'
 
@@ -97,8 +97,8 @@ const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
 >
-const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
-  typeof getDeckConfigFromProtocolCommands
+const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocolCommands
 >
 
 const RUN_ID = '1'
@@ -164,9 +164,11 @@ describe('SetupLiquidsMap', () => {
     when(mockGetLabwareRenderInfo)
       .calledWith(simpleAnalysisFileFixture as any, ot2StandardDeckDef as any)
       .mockReturnValue({})
-    when(mockGetDeckConfigFromProtocolCommands)
+    when(mockGetSimplestDeckConfigForProtocolCommands)
       .calledWith(simpleAnalysisFileFixture.commands as RunTimeCommand[])
-      .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
+      // TODO(bh, 2023-11-13): mock the cutout config protocol spec
+      .mockReturnValue([])
+    // .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
     when(mockGetRobotTypeFromLoadedLabware)
       .calledWith(simpleAnalysisFileFixture.labware as any)
       .mockReturnValue(FLEX_ROBOT_TYPE)

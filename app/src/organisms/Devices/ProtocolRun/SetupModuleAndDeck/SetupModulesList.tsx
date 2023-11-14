@@ -50,7 +50,11 @@ import { MultipleModulesModal } from './MultipleModulesModal'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'
 
-import type { Cutout, ModuleModel, Fixture } from '@opentrons/shared-data'
+import type {
+  CutoutConfig,
+  CutoutId,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import type { ProtocolCalibrationStatus } from '../../hooks'
 
@@ -205,7 +209,7 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
-  conflictedFixture?: Fixture
+  conflictedFixture?: CutoutConfig
 }
 
 export function ModulesListItem({
@@ -352,7 +356,7 @@ export function ModulesListItem({
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
-          cutout={slotName as Cutout}
+          cutoutId={slotName as CutoutId}
           requiredModule={moduleModel}
         />
       ) : null}

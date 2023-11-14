@@ -24,13 +24,13 @@ import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { CutoutConfig } from '../../../../resources/deck_configuration/types'
+import type { CutoutConfigProtocolSpec } from '../../../../resources/deck_configuration/utils'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
-  protocolDeckConfig: CutoutConfig[]
+  protocolDeckConfig: CutoutConfigProtocolSpec[]
   hasModules: boolean
   commands: RunTimeCommand[]
 }
@@ -61,8 +61,8 @@ export const SetupModuleAndDeck = ({
   )
 
   const nonSingleSlotFixtureList = deckConfigCompatibility.filter(
-    fixture =>
-      !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
+    ({ cutoutFixtureId }) =>
+      cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
   )
 
   return (
@@ -74,7 +74,9 @@ export const SetupModuleAndDeck = ({
             {hasModules ? (
               <SetupModulesList robotName={robotName} runId={runId} />
             ) : null}
-            <SetupFixtureList deckConfigCompatibility={nonSingleSlotFixtureList} />
+            <SetupFixtureList
+              deckConfigCompatibility={nonSingleSlotFixtureList}
+            />
           </>
         ) : (
           <SetupModulesMap runId={runId} />
@@ -96,14 +98,14 @@ export const SetupModuleAndDeck = ({
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 ||
-        runHasStarted ||
-        !moduleCalibrationStatus.complete ? (
+      runHasStarted ||
+      !moduleCalibrationStatus.complete ? (
         <Tooltip tooltipProps={tooltipProps}>
           {runHasStarted
             ? t('protocol_run_started')
             : missingModuleIds.length > 0
-              ? t('plug_in_required_module', { count: missingModuleIds.length })
-              : t('calibrate_module_failure_reason')}
+            ? t('plug_in_required_module', { count: missingModuleIds.length })
+            : t('calibrate_module_failure_reason')}
         </Tooltip>
       ) : null}
     </>

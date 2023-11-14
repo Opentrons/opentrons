@@ -18,7 +18,7 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  STAGING_AREA_LOAD_NAME,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
@@ -53,7 +53,6 @@ import type { UseQueryResult } from 'react-query'
 import type {
   DeckConfiguration,
   CompletedProtocolAnalysis,
-  Fixture,
 } from '@opentrons/shared-data'
 
 // Mock IntersectionObserver
@@ -230,10 +229,9 @@ const mockDoorStatus = {
   },
 }
 const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: 'cutoutD1',
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+  cutoutId: 'cutoutD1',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
 
 const MOCK_MAKE_SNACKBAR = jest.fn()
 

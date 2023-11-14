@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client/src/deck_configuration'
 import { i18n } from '../../../../../i18n'
 import { NotConfiguredModal } from '../NotConfiguredModal'
@@ -23,8 +23,8 @@ describe('NotConfiguredModal', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
-      cutout: 'cutoutB3',
-      requiredFixture: TRASH_BIN_LOAD_NAME,
+      cutoutId: 'cutoutB3',
+      requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     }
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
       updateDeckConfiguration: mockUpdate,

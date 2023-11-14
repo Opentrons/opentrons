@@ -9,7 +9,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { useCreateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
@@ -26,7 +26,7 @@ import type {
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
-  cutoutId: CutoutId
+  cutoutId: CutoutId | null
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   providedFixtureOptions: CutoutFixtureId[]
@@ -60,9 +60,10 @@ export function ProtocolSetupDeckConfiguration({
     setCurrentDeckConfig,
   ] = React.useState<DeckConfiguration>(simplestDeckConfig)
 
-  const { createDeckConfiguration } = useCreateDeckConfigurationMutation()
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const handleClickConfirm = (): void => {
-    createDeckConfiguration(currentDeckConfig)
+    // TODO(bh, 2023-11-13): update the update
+    // updateDeckConfiguration(currentDeckConfig)
     setSetupScreen('modules')
   }
 

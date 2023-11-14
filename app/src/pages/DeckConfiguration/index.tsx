@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
-  useCreateDeckConfigurationMutation,
+  useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
   SINGLE_RIGHT_CUTOUTS,
@@ -53,7 +53,7 @@ export function DeckConfigurationEditor(): JSX.Element {
   ] = React.useState<boolean>(false)
 
   const deckConfig = useDeckConfigurationQuery().data ?? []
-  const { createDeckConfiguration } = useCreateDeckConfigurationMutation()
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const [
     currentDeckConfig,
@@ -78,12 +78,14 @@ export function DeckConfigurationEditor(): JSX.Element {
           : fixture
       )
     )
-    createDeckConfiguration(currentDeckConfig)
+    // TODO(bh, 2023-11-13): update the update
+    // updateDeckConfiguration(currentDeckConfig)
   }
 
   const handleClickConfirm = (): void => {
     if (!isEqual(deckConfig, currentDeckConfig)) {
-      createDeckConfiguration(currentDeckConfig)
+      // TODO(bh, 2023-11-13): update the update
+      // updateDeckConfiguration(currentDeckConfig)
     }
     history.goBack()
   }
