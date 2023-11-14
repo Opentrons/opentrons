@@ -56,10 +56,12 @@ const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: {
     ...heaterShakerCommandsWithResultsKey,
-    labware: [{
-      "displayName": "Trash",
-      "definitionId": "opentrons/opentrons_1_trash_3200ml_fixed/1"
-    }]
+    labware: [
+      {
+        displayName: 'Trash',
+        definitionId: 'opentrons/opentrons_1_trash_3200ml_fixed/1',
+      },
+    ],
   },
   protocolKey: 'fakeProtocolKey',
 }
@@ -147,7 +149,10 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
-    mockGetProtocolModulesInfo.mockReturnValue([TEMPERATURE_MODULE_INFO, MAGNETIC_MODULE_INFO])
+    mockGetProtocolModulesInfo.mockReturnValue([
+      TEMPERATURE_MODULE_INFO,
+      MAGNETIC_MODULE_INFO,
+    ])
   })
 
   afterEach(() => {
