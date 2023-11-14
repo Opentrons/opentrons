@@ -31,8 +31,8 @@ import {
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
-import type { PipetteName } from './pipettes'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
+import type { PipetteName } from './pipettes'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 

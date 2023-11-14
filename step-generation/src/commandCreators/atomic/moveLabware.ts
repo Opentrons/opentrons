@@ -3,7 +3,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   LabwareMovementStrategy,
   THERMOCYCLER_MODULE_TYPE,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import * as warningCreators from '../../warningCreators'
@@ -28,6 +27,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
 ) => {
   const { labware, useGripper, newLocation } = args
   const { additionalEquipmentEntities } = invariantContext
+  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
   const tiprackHasTip =
     prevRobotState.tipState != null
       ? getTiprackHasTips(prevRobotState.tipState, labware)
@@ -43,8 +43,12 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
 
   const newLocationInWasteChute =
     newLocation !== 'offDeck' &&
-    'slotName' in newLocation &&
-    newLocation.slotName === WASTE_CHUTE_CUTOUT
+    'addressableAreaName' in newLocation &&
+    newLocation.addressableAreaName === 'gripperWasteChute'
+
+  const hasGripper = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'gripper'
+  )
 
   if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
@@ -55,6 +59,13 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
+  }
+
+  if (
+    (newLocationInWasteChute && hasGripper && !useGripper) ||
+    (!hasGripper && useGripper)
+  ) {
+    errors.push(errorCreators.gripperRequired())
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
@@ -98,6 +109,13 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   if (newLocation === 'offDeck' && useGripper) {
     errors.push(errorCreators.labwareOffDeck())
   }
+
+  if (tiprackHasTip && newLocationInWasteChute && hasWasteChute) {
+    warnings.push(warningCreators.tiprackInWasteChuteHasTips())
+  } else if (labwareHasLiquid && newLocationInWasteChute && hasWasteChute) {
+    warnings.push(warningCreators.labwareInWasteChuteHasLiquid())
+  }
+
   if (
     destinationModuleIdOrSlot != null &&
     prevRobotState.modules[destinationModuleIdOrSlot] != null
@@ -139,6 +157,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       params,
     },
   ]
+
   return {
     commands,
     warnings: warnings.length > 0 ? warnings : undefined,
