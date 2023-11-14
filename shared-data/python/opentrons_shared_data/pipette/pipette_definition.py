@@ -153,7 +153,7 @@ class PlungerHomingConfigurations(BaseModel):
 class PressFitPickUpTipConfiguration(BaseModel):
     presses: int = Field(
         ...,
-        description="The number of times to press (incrementally more each time by increment)",
+        description="The number of times to force pickup (incrementally more each time by increment)",
     )
     increment: float = Field(
         ..., description="The increment to move the pipette down on each force tip pickup press"
