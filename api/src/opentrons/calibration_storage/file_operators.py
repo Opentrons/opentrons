@@ -27,8 +27,9 @@ def delete_file(path: Path) -> None:
         pass
 
 
+# TODO: This is private but used by other files.
 def _remove_json_files_in_directories(p: Path) -> None:
-    """Delete json file by the path"""
+    """Delete .json files in the given directory and its subdirectories."""
     for item in p.iterdir():
         if item.is_dir():
             _remove_json_files_in_directories(item)
