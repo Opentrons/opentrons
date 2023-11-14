@@ -1,25 +1,28 @@
 import * as React from 'react'
 
 import { AlertModal, SpinnerModal } from '@opentrons/components'
+
+import * as Copy from './i18n'
 import { ErrorModal } from '../../../../molecules/modals'
 import { DISCONNECT } from './constants'
-import * as Copy from './i18n'
+import { PENDING, SUCCESS, FAILURE } from '../../../../redux/robot-api'
 
 import type { NetworkChangeType } from './types'
+import type { RequestStatus } from '../../../../redux/robot-api/types'
 
 export interface ResultModalProps {
   type: NetworkChangeType
   ssid: string | null
-  isPending: boolean
+  requestStatus: RequestStatus
   error: { message?: string; [key: string]: unknown } | null
   onClose: () => unknown
 }
 
 export const ResultModal = (props: ResultModalProps): JSX.Element => {
-  const { type, ssid, isPending, error, onClose } = props
+  const { type, ssid, requestStatus, error, onClose } = props
   const isDisconnect = type === DISCONNECT
 
-  if (isPending) {
+  if (requestStatus === PENDING) {
     const message = isDisconnect
       ? Copy.DISCONNECTING_FROM_NETWORK(ssid)
       : Copy.CONNECTING_TO_NETWORK(ssid)
@@ -27,7 +30,7 @@ export const ResultModal = (props: ResultModalProps): JSX.Element => {
     return <SpinnerModal alertOverlay message={message} />
   }
 
-  if (error) {
+  if (error || requestStatus === FAILURE) {
     const heading = isDisconnect
       ? Copy.UNABLE_TO_DISCONNECT
       : Copy.UNABLE_TO_CONNECT
