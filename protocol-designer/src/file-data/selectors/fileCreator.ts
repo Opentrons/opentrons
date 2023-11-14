@@ -41,16 +41,13 @@ import type {
   LabwareEntities,
   PipetteEntities,
   RobotState,
-  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
-  Cutout,
   LabwareV2Mixin,
   LiquidV1Mixin,
-  LoadFixtureCreateCommand,
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
@@ -300,30 +297,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       []
     )
 
-    //  TODO(jr, 10/31/23): update to loadAddressableArea
-    const loadFixtureCommands = reduce<
-      AdditionalEquipmentEntity,
-      LoadFixtureCreateCommand[]
-    >(
-      Object.values(additionalEquipmentEntities),
-      (acc, additionalEquipment): LoadFixtureCreateCommand[] => {
-        if (additionalEquipment.name === 'gripper') return acc
-
-        const loadFixtureCommands = {
-          key: uuid(),
-          commandType: 'loadFixture' as const,
-          params: {
-            fixtureId: additionalEquipment.id,
-            location: { cutout: additionalEquipment.location as Cutout },
-            loadName: additionalEquipment.name,
-          },
-        }
-
-        return [...acc, loadFixtureCommands]
-      },
-      []
-    )
-
     const loadLiquidCommands = getLoadLiquidCommands(
       ingredients,
       ingredLocations
@@ -356,7 +329,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareDefsByURI
     )
     const loadCommands: CreateCommand[] = [
-      ...loadFixtureCommands,
       ...loadPipetteCommands,
       ...loadModuleCommands,
       ...loadAdapterCommands,

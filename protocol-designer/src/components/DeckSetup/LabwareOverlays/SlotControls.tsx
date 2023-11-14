@@ -23,7 +23,6 @@ import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 
 import type {
-  AddressableArea,
   CoordinateTuple,
   Dimensions,
   ModuleType,
@@ -42,7 +41,8 @@ interface DNDP {
 interface OP {
   slotPosition: CoordinateTuple | null
   slotBoundingBox: Dimensions
-  slotId: AddressableArea['id']
+  //  NOTE: slotId can be either AddressableAreaName or moduleId
+  slotId: string
   moduleType: ModuleType | null
   selectedTerminalItemId?: TerminalItemId | null
   handleDragHover?: () => unknown
