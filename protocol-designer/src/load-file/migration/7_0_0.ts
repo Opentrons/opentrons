@@ -50,16 +50,24 @@ export const migrateFile = (
     const loadName =
       labwareDefinitions[labwareEntity.definitionId].parameters.loadName
 
-    return (
-      loadName === 'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep' ||
-      loadName ===
-        'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat' ||
-      loadName ===
-        'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt' ||
-      loadName ===
-        'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat' ||
-      loadName === 'opentrons_96_aluminumblock_biorad_wellplate_200ul' ||
-      loadName === 'opentrons_96_aluminumblock_nest_wellplate_100ul'
+    const adapterLoadNames = [
+      'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep',
+      'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
+      'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
+      'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+      'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+      'opentrons_96_aluminumblock_nest_wellplate_100ul',
+    ]
+    console.log(
+      loadName === 'opentrons_96_aluminumblock_biorad_wellplate_200ul'
+        ? 'loadname in adapter loadname'
+        : null,
+      loadName,
+      adapterLoadNames.includes(loadName)
+    )
+
+    return labwareId.includes(
+      'opentrons_96_aluminumblock_biorad_wellplate_200ul'
     )
   }
 
@@ -152,6 +160,7 @@ export const migrateFile = (
   const newLabwareDefinitions: LabwareDefinitionsByUri = Object.keys(
     labwareDefinitions
   ).reduce((acc: LabwareDefinitionsByUri, defId: string) => {
+    //  !defId.includes('opentrons_96_aluminumblock_biorad_wellplate_200ul')
     if (!getIsAdapter(defId)) {
       acc[defId] = labwareDefinitions[defId]
     } else {
