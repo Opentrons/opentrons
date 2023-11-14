@@ -10,6 +10,7 @@ import {
   CutoutId,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   isAddressableAreaStandardSlot,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
@@ -113,8 +114,6 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const trashSlot =
-      robotType === FLEX_ROBOT_TYPE ? 'movableTrash' : 'fixedTrash'
     const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
     const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
@@ -209,24 +208,29 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
 
     //  TODO(jr, 11/13/23): update COLUMN_4_SLOTS usage to FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS
-    const notSelectedStagingAreaAddressableAreaNames = COLUMN_4_SLOTS.filter(
-      slot =>
-        stagingAreaAddressableAreaNames.every(
-          addressableArea => addressableArea !== slot
-        )
+    const notSelectedStagingAreaAddressableAreas = COLUMN_4_SLOTS.filter(slot =>
+      stagingAreaAddressableAreaNames.every(
+        addressableArea => addressableArea !== slot
+      )
     )
 
     const unoccupiedSlotOptions = allSlotIds
-      .filter(
-        slotId =>
+      .filter(slotId => {
+        const isTrashSlot =
+          robotType === FLEX_ROBOT_TYPE
+            ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
+            : slotId === 'fixedTrash'
+
+        return (
           !slotIdsOccupiedByModules.includes(slotId) &&
           !Object.values(labware)
             .map(lw => lw.slot)
             .includes(slotId) &&
-          slotId !== trashSlot &&
+          !isTrashSlot &&
           !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
-          !notSelectedStagingAreaAddressableAreaNames.includes(slotId)
-      )
+          !notSelectedStagingAreaAddressableAreas.includes(slotId)
+        )
+      })
       .map(slotId => ({ name: slotId, value: slotId }))
     const offDeck = { name: 'Off-deck', value: 'offDeck' }
     const wasteChuteSlot = {
