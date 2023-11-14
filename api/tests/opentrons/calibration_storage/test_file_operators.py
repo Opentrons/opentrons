@@ -80,6 +80,23 @@ def test_malformed_calibration(
         io.read_cal_file(malformed_calibration_path)
 
 
+def test_save_pydantic_model_to_file(tmp_path: Path) -> None:
+    directory_path = tmp_path / "nonexistent 1" / "nonexistent 2" / "nonexistent 3"
+    file_name = "test.json"
+    assert not directory_path.exists()
+
+    io.save_pydantic_model_to_file(
+        directory_path,
+        file_name,
+        DummyModel.construct(integer_field=123, aliased_field="abc"),
+    )
+
+    assert json.loads((directory_path / file_name).read_text(encoding="utf-8")) == {
+        "integer_field": 123,
+        "! aliased field !": "abc",
+    }
+
+
 def test_read_pydantic_model_from_file_valid(tmp_path: Path) -> None:
     valid_path = tmp_path / "valid.json"
     valid_path.write_text(

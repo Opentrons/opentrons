@@ -108,6 +108,15 @@ def save_to_file(
     file_path.write_text(json_data, encoding="utf-8")
 
 
+def save_pydantic_model_to_file(
+    directory_path: Path, file_name: str, data: pydantic.BaseModel
+) -> None:
+    """Safely serialize data from a Pydantic model into a JSON file."""
+    directory_path.mkdir(parents=True, exist_ok=True)
+    file_path = directory_path / file_name
+    file_path.write_text(data.json(by_alias=True), encoding="utf-8")
+
+
 _ModelT = typing.TypeVar("_ModelT", bound=pydantic.BaseModel)
 
 
