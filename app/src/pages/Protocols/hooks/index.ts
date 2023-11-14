@@ -9,7 +9,6 @@ import {
 import { FLEX_ROBOT_TYPE, SINGLE_SLOT_FIXTURES } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 
 import type {
@@ -44,7 +43,7 @@ interface ProtocolGripper {
 
 export interface ProtocolFixture {
   hardwareType: 'fixture'
-  cutoutFixtureId: CutoutFixtureId
+  cutoutFixtureId: CutoutFixtureId | null
   location: { cutout: CutoutId }
   hasSlotConflict: boolean
 }
@@ -71,6 +70,10 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   const { data: deckConfig } = useDeckConfigurationQuery()
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    FLEX_ROBOT_TYPE,
+    analysis?.commands ?? []
+  )
 
   if (analysis == null || analysis?.status !== 'completed') {
     return { requiredProtocolHardware: [], isLoading: true }
@@ -78,13 +81,13 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(analysis)
     ? [
-        {
-          hardwareType: 'gripper',
-          connected:
-            attachedInstruments.some(i => i.instrumentType === 'gripper') ??
-            false,
-        },
-      ]
+      {
+        hardwareType: 'gripper',
+        connected:
+          attachedInstruments.some(i => i.instrumentType === 'gripper') ??
+          false,
+      },
+    ]
     : []
 
   const handleModuleConnectionCheckFor = (
@@ -132,14 +135,14 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     })
   )
 
-  const requiredFixtures = getSimplestDeckConfigForProtocolCommands(
-    analysis.commands
-  )
-
-  const deckConfigCompatibility = useDeckConfigurationCompatibility(
-    FLEX_ROBOT_TYPE,
-    analysis?.commands ?? []
-  )
+  const requiredFixtures = deckConfigCompatibility.map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
+    hardwareType: 'fixture' as const,
+    cutoutFixtureId,
+    location: { cutout: cutoutId },
+    hasSlotConflict: cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+      ? compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+      : false
+  }))
 
   return {
     requiredProtocolHardware: [
@@ -222,10 +225,10 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
         return !hardware.connected
       } else {
         // fixtures
-        return !deckConfig?.find(
-          fixture =>
-            hardware.location.cutout === fixture.fixtureLocation &&
-            hardware.fixtureName === fixture.loadName
+        return !deckConfig?.some(
+          ({cutoutId, cutoutFixtureId})=>
+            hardware.location.cutout === cutoutId &&
+            hardware.cutoutFixtureId === cutoutFixtureId 
         )
       }
     }),

@@ -173,12 +173,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ])
     : []
 
-  console.log(
-    'AA',
-    deckDef.locations.addressableAreas.filter(addressableArea =>
-      isAddressableAreaStandardSlot(addressableArea.id, deckDef)
-    )
-  )
   return (
     <>
       {/* all modules */}
