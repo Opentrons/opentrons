@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { StyleProps, Svg } from '../../primitives'
 import { StyledDeck } from './StyledDeck'
 
@@ -19,6 +20,8 @@ export interface RobotWorkSpaceProps extends StyleProps {
   children?: (props: RobotWorkSpaceRenderProps) => React.ReactNode
   deckFill?: string
   deckLayerBlocklist?: string[]
+  // optional boolean to show the OT-2 deck from deck defintion layers
+  showDeckLayers?: boolean
   // TODO(bh, 2023-10-09): remove
   trashSlotName?: TrashLocation
   trashColor?: string
@@ -33,6 +36,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     deckDef,
     deckFill = '#CCCCCC',
     deckLayerBlocklist = [],
+    showDeckLayers = false,
     trashSlotName,
     viewBox,
     trashColor,
@@ -65,7 +69,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
     const [deckXDimension, deckYDimension] = deckDef.dimensions
 
-    deckSlotsById = deckDef.locations.orderedSlots.reduce(
+    deckSlotsById = deckDef.locations.addressableAreas.reduce(
       (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
       {}
     )
@@ -80,15 +84,15 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       transform="scale(1, -1)"
       {...styleProps}
     >
-      {deckDef != null && (
+      {showDeckLayers ? (
         <StyledDeck
           deckFill={deckFill}
-          def={deckDef}
           layerBlocklist={deckLayerBlocklist}
+          robotType={OT2_ROBOT_TYPE}
           trashLocation={trashSlotName}
           trashColor={trashColor}
         />
-      )}
+      ) : null}
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
     </Svg>
   )

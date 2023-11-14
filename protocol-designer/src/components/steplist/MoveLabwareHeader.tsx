@@ -6,7 +6,7 @@ import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
-  WASTE_CHUTE_SLOT,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
@@ -59,7 +59,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     destSlot = getLabwareDisplayName(labwareEntities[destinationSlot].def)
   } else if (
     getHasWasteChute(additionalEquipmentEntities) &&
-    destinationSlot === WASTE_CHUTE_SLOT
+    destinationSlot === WASTE_CHUTE_CUTOUT
   ) {
     destSlot = i18n.t('application.waste_chute_slot')
   } else {

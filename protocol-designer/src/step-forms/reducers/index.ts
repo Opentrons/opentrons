@@ -20,9 +20,10 @@ import {
   MAGNETIC_MODULE_V1,
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
-  LoadFixtureCreateCommand,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+  getDeckDefFromRobotTypeV4,
+  AddressableAreaName,
+  CutoutId,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
@@ -43,6 +44,7 @@ import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import {
+  COLUMN_4_SLOTS,
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
@@ -1328,58 +1330,111 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       action: LoadFileAction
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
-      const gripperCommands = Object.values(file.commands).filter(
+      const isFlex = file.robot.model === FLEX_ROBOT_TYPE
+      const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+      const cutoutFixtures = deckDef.cutoutFixtures
+      const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot')
+      )?.providesAddressableAreas
+
+      const hasGripperCommands = Object.values(file.commands).some(
         (command): command is MoveLabwareCreateCommand =>
           command.commandType === 'moveLabware' &&
           command.params.strategy === 'usingGripper'
       )
-      const fixtureCommands = Object.values(file.commands).filter(
-        (command): command is LoadFixtureCreateCommand =>
-          command.commandType === 'loadFixture'
+      const hasWasteChuteCommands = Object.values(file.commands).some(
+        command =>
+          (command.commandType === 'moveToAddressableArea' &&
+            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName
+            )) ||
+          (command.commandType === 'moveLabware' &&
+            command.params.newLocation !== 'offDeck' &&
+            'addressableAreaName' in command.params.newLocation &&
+            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName
+            ))
       )
-      const fixtures = fixtureCommands.reduce(
-        (
-          acc: NormalizedAdditionalEquipmentById,
-          command: LoadFixtureCreateCommand
-        ) => {
-          const { fixtureId, loadName, location } = command.params
-          const id = fixtureId ?? ''
-          if (
-            loadName === STANDARD_SLOT_LOAD_NAME ||
-            loadName === TRASH_BIN_LOAD_NAME
-          ) {
-            return acc
-          }
-          return {
-            ...acc,
-            [id]: {
-              id: id,
-              name: loadName,
-              location: location.cutout,
+      const wasteChuteId = `${uuid()}:wasteChute`
+      const wasteChute = hasWasteChuteCommands
+        ? {
+            [wasteChuteId]: {
+              name: 'wasteChute' as const,
+              id: wasteChuteId,
+              location: 'cutoutD3',
             },
           }
-        },
-        {}
-      )
-      const hasGripper = gripperCommands.length > 0
-      const isFlex = file.robot.model === FLEX_ROBOT_TYPE
-      const gripperId = `${uuid()}:gripper`
-      const gripper = {
-        [gripperId]: {
-          name: 'gripper' as const,
-          id: gripperId,
-        },
+        : {}
+
+      const getStagingAreaSlotNames = (
+        commandType: 'moveLabware' | 'loadLabware',
+        locationKey: 'newLocation' | 'location'
+      ): AddressableAreaName[] => {
+        return Object.values(file.commands)
+          .filter(
+            command =>
+              command.commandType === commandType &&
+              command.params[locationKey] !== 'offDeck' &&
+              'slotName' in command.params[locationKey] &&
+              COLUMN_4_SLOTS.includes(command.params[locationKey].slotName)
+          )
+          .map(command => command.params[locationKey].slotName)
       }
-      if (isFlex) {
-        if (hasGripper) {
-          return { ...state, ...gripper, ...fixtures }
-        } else {
-          return { ...state, ...fixtures }
+
+      const stagingAreaSlotNames = [
+        ...new Set([
+          ...getStagingAreaSlotNames('moveLabware', 'newLocation'),
+          ...getStagingAreaSlotNames('loadLabware', 'location'),
+        ]),
+      ]
+
+      const findCutoutIdByAddressableArea = (
+        addressableAreaName: AddressableAreaName
+      ): CutoutId | null => {
+        if (providesAddressableAreasForAddressableArea != null) {
+          for (const cutoutId in providesAddressableAreasForAddressableArea) {
+            if (
+              providesAddressableAreasForAddressableArea[
+                cutoutId as keyof typeof providesAddressableAreasForAddressableArea
+              ].includes(addressableAreaName)
+            ) {
+              return cutoutId as CutoutId
+            }
+          }
         }
+        return null
+      }
+
+      const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
+        const stagingAreaId = `${uuid()}:stagingArea`
+        const cutoutId = findCutoutIdByAddressableArea(slot)
+        return {
+          ...acc,
+          [stagingAreaId]: {
+            name: 'stagingArea' as const,
+            id: stagingAreaId,
+            location: cutoutId,
+          },
+        }
+      }, {})
+
+      const gripperId = `${uuid()}:gripper`
+      const gripper = hasGripperCommands
+        ? {
+            [gripperId]: {
+              name: 'gripper' as const,
+              id: gripperId,
+            },
+          }
+        : {}
+
+      if (isFlex) {
+        return { ...state, ...gripper, ...wasteChute, ...stagingAreas }
       } else {
         return { ...state }
       }
     },
+
     TOGGLE_IS_GRIPPER_REQUIRED: (
       state: NormalizedAdditionalEquipmentById
     ): NormalizedAdditionalEquipmentById => {

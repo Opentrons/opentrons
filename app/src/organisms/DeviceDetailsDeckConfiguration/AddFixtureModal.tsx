@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   STAGING_AREA_LOAD_NAME,
   TRASH_BIN_LOAD_NAME,
@@ -56,13 +57,17 @@ export function AddFixtureModal({
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
   const modalHeader: ModalHeaderBaseProps = {
-    title: t('add_to_slot', { slotName: fixtureLocation }),
+    title: t('add_to_slot', {
+      slotName: getCutoutDisplayName(fixtureLocation),
+    }),
     hasExitIcon: true,
     onClick: () => setShowAddFixtureModal(false),
   }
 
   const modalProps: LegacyModalProps = {
-    title: t('add_to_slot', { slotName: fixtureLocation }),
+    title: t('add_to_slot', {
+      slotName: getCutoutDisplayName(fixtureLocation),
+    }),
     onClose: () => setShowAddFixtureModal(false),
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
@@ -71,13 +76,13 @@ export function AddFixtureModal({
 
   const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
   if (
-    fixtureLocation === 'A3' ||
-    fixtureLocation === 'B3' ||
-    fixtureLocation === 'C3'
+    fixtureLocation === 'cutoutA3' ||
+    fixtureLocation === 'cutoutB3' ||
+    fixtureLocation === 'cutoutC3'
   ) {
     availableFixtures.push(STAGING_AREA_LOAD_NAME)
   }
-  if (fixtureLocation === 'D3') {
+  if (fixtureLocation === 'cutoutD3') {
     availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
   }
 

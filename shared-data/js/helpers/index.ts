@@ -2,8 +2,8 @@ import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardDeckDefOt2 from '../../deck/definitions/3/ot2_standard.json'
-import standardDeckDefOt3 from '../../deck/definitions/3/ot3_standard.json'
+import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
+import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -204,7 +204,7 @@ export const getSlotHasMatingSurfaceUnitVector = (
   deckDef: DeckDefinition,
   slotNumber: string
 ): boolean => {
-  const matingSurfaceUnitVector = deckDef.locations.orderedSlots.find(
+  const matingSurfaceUnitVector = deckDef.locations.addressableAreas.find(
     orderedSlot => orderedSlot.id === slotNumber
   )?.matingSurfaceUnitVector
 
@@ -220,14 +220,12 @@ export const getAreSlotsHorizontallyAdjacent = (
   }
   const slotANumber = parseInt(slotNameA)
   const slotBNumber = parseInt(slotNameB)
-
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardDeckDefOt2.locations.orderedSlots
+  const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
-
   if (slotBNumber > numSlots || slotANumber > numSlots) {
     return false
   }
@@ -260,7 +258,7 @@ export const getAreSlotsVerticallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  const orderedSlots = standardDeckDefOt2.locations.orderedSlots
+  const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
 
@@ -284,6 +282,9 @@ export const getAreSlotsVerticallyAdjacent = (
 
   return areSlotsVerticallyAdjacent
 }
+//  TODO(jr, 11/12/23): rename this utility to mention that it
+//  is only used in the OT-2, same with getAreSlotsHorizontallyAdjacent
+//  and getAreSlotsVerticallyAdjacent
 export const getAreSlotsAdjacent = (
   slotNameA?: string | null,
   slotNameB?: string | null
@@ -349,5 +350,17 @@ export const getDeckDefFromRobotType = (
   robotType: RobotType
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard' ? standardDeckDefOt3 : standardDeckDefOt2
+  return robotType === 'OT-3 Standard'
+    ? standardFlexDeckDef
+    : standardOt2DeckDef
+}
+
+// TODO(bh, 2023-11-09): delete this function
+export const getDeckDefFromRobotTypeV4 = (
+  robotType: RobotType
+): DeckDefinition => {
+  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
+  return robotType === 'OT-3 Standard'
+    ? standardFlexDeckDef
+    : standardOt2DeckDef
 }

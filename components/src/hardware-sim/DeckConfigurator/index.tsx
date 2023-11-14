@@ -45,15 +45,15 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   // restrict configuration to certain locations
-  const configurableFixtureLocations = [
-    'A1',
-    'B1',
-    'C1',
-    'D1',
-    'A3',
-    'B3',
-    'C3',
-    'D3',
+  const configurableFixtureLocations: Cutout[] = [
+    'cutoutA1',
+    'cutoutB1',
+    'cutoutC1',
+    'cutoutD1',
+    'cutoutA3',
+    'cutoutB3',
+    'cutoutC3',
+    'cutoutD3',
   ]
   const configurableDeckConfig = deckConfig.filter(fixture =>
     configurableFixtureLocations.includes(fixture.fixtureLocation)
@@ -81,10 +81,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {/* TODO(bh, 2023-10-18): migrate to v4 deck def cutouts */}
-      {deckDef.locations.orderedSlots.map(slotDef => (
+      {deckDef.locations.cutouts.map(slotDef => (
         <SingleSlotFixture
           key={slotDef.id}
-          cutoutLocation={slotDef.id as Cutout}
+          cutoutId={slotDef.id as Cutout}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
           fixtureBaseColor={lightFill}
@@ -94,6 +94,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {stagingAreaFixtures.map(fixture => (
         <StagingAreaConfigFixture
           key={fixture.fixtureId}
+          deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />
@@ -101,6 +102,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {emptyFixtures.map(fixture => (
         <EmptyConfigFixture
           key={fixture.fixtureId}
+          deckDefinition={deckDef}
           handleClickAdd={handleClickAdd}
           fixtureLocation={fixture.fixtureLocation}
         />
@@ -108,6 +110,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {wasteChuteFixtures.map(fixture => (
         <WasteChuteConfigFixture
           key={fixture.fixtureId}
+          deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />
@@ -115,6 +118,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       {trashBinFixtures.map(fixture => (
         <TrashBinConfigFixture
           key={fixture.fixtureId}
+          deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={fixture.fixtureLocation}
         />

@@ -30,9 +30,9 @@ import {
   WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
-import type { RunTimeCommand } from '../command/types'
+import type { RunTimeCommand, LabwareLocation } from '../command/types'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
-import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -284,10 +284,34 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export interface CutoutFixture {
+  id: CutoutFixtureId
+  mayMountTo: CutoutId[]
+  displayName: string
+  providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+}
+
+type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'
+
+export interface AddressableArea {
+  id: AddressableAreaName
+  areaType: AreaType
+  offsetFromCutoutFixture: CoordinateTuple
+  boundingBox: Dimensions
+  displayName: string
+  compatibleModuleTypes: ModuleType[]
+  ableToDropLabware?: boolean
+  ableToDropTips?: boolean
+  dropLabwareOffset?: CoordinateTuple
+  dropTipsOffset?: CoordinateTuple
+  matingSurfaceUnitVector?: UnitVectorTuple
+}
+
 export interface DeckLocations {
   orderedSlots: DeckSlot[]
   calibrationPoints: DeckCalibrationPoint[]
   fixtures: DeckFixture[]
+  addressableAreas: AddressableArea[]
 }
 
 export interface DeckMetadata {
@@ -295,14 +319,46 @@ export interface DeckMetadata {
   tags: string[]
 }
 
+export interface DeckDefinitionV3 {
+  otId: string
+  cornerOffsetFromOrigin: CoordinateTuple
+  dimensions: CoordinateTuple
+  robot: DeckRobot
+  cutoutFixtures: CutoutFixture[]
+  locations: DeckLocations
+  metadata: DeckMetadata
+  layers: INode[]
+}
+
+export interface DeckCutout {
+  id: string
+  position: CoordinateTuple
+  displayName: string
+}
+
+export interface LegacyFixture {
+  id: string
+  // TODO: is this cutout location?
+  slot: string
+  labware: string
+  displayName: string
+}
+
+export interface DeckLocationsV4 {
+  addressableAreas: AddressableArea[]
+  calibrationPoints: DeckCalibrationPoint[]
+  cutouts: DeckCutout[]
+  legacyFixtures: LegacyFixture[]
+}
+
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple
   robot: DeckRobot
-  locations: DeckLocations
+  locations: DeckLocationsV4
   metadata: DeckMetadata
-  layers: INode[]
+  cutoutFixtures: CutoutFixture[]
 }
 
 export interface ModuleDimensions {
@@ -531,8 +587,35 @@ export type StatusBarAnimation =
 
 export type StatusBarAnimations = StatusBarAnimation[]
 
-// TODO(bh, 2023-09-28): refine types when settled
 export type Cutout =
+  | 'cutoutA1'
+  | 'cutoutB1'
+  | 'cutoutC1'
+  | 'cutoutD1'
+  | 'cutoutA2'
+  | 'cutoutB2'
+  | 'cutoutC2'
+  | 'cutoutD2'
+  | 'cutoutA3'
+  | 'cutoutB3'
+  | 'cutoutC3'
+  | 'cutoutD3'
+
+export type OT2Cutout =
+  | 'cutout1'
+  | 'cutout2'
+  | 'cutout3'
+  | 'cutout4'
+  | 'cutout5'
+  | 'cutout6'
+  | 'cutout7'
+  | 'cutout8'
+  | 'cutout9'
+  | 'cutout10'
+  | 'cutout11'
+  | 'cutout12'
+
+export type FlexSlot =
   | 'A1'
   | 'B1'
   | 'C1'
@@ -545,6 +628,10 @@ export type Cutout =
   | 'B3'
   | 'C3'
   | 'D3'
+  | 'A4'
+  | 'B4'
+  | 'C4'
+  | 'D4'
 
 export interface Fixture {
   fixtureId: string

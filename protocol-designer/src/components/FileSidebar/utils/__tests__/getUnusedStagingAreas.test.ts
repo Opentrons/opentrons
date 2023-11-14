@@ -6,7 +6,11 @@ describe('getUnusedStagingAreas', () => {
   it('returns true for unused staging area', () => {
     const stagingArea = 'stagingAreaId'
     const mockAdditionalEquipment = {
-      [stagingArea]: { name: 'stagingArea', id: stagingArea, location: 'A3' },
+      [stagingArea]: {
+        name: 'stagingArea',
+        id: stagingArea,
+        location: 'cutoutA3',
+      },
     } as AdditionalEquipment
 
     expect(getUnusedStagingAreas(mockAdditionalEquipment, [])).toEqual(['A4'])
@@ -15,8 +19,16 @@ describe('getUnusedStagingAreas', () => {
     const stagingArea = 'stagingAreaId'
     const stagingArea2 = 'stagingAreaId2'
     const mockAdditionalEquipment = {
-      [stagingArea]: { name: 'stagingArea', id: stagingArea, location: 'A3' },
-      [stagingArea2]: { name: 'stagingArea', id: stagingArea2, location: 'B3' },
+      [stagingArea]: {
+        name: 'stagingArea',
+        id: stagingArea,
+        location: 'cutoutA3',
+      },
+      [stagingArea2]: {
+        name: 'stagingArea',
+        id: stagingArea2,
+        location: 'cutoutB3',
+      },
     } as AdditionalEquipment
 
     expect(getUnusedStagingAreas(mockAdditionalEquipment, [])).toEqual([
@@ -27,7 +39,11 @@ describe('getUnusedStagingAreas', () => {
   it('returns false for unused staging area', () => {
     const stagingArea = 'stagingAreaId'
     const mockAdditionalEquipment = {
-      [stagingArea]: { name: 'stagingArea', id: stagingArea, location: 'A3' },
+      [stagingArea]: {
+        name: 'stagingArea',
+        id: stagingArea,
+        location: 'cutoutA3',
+      },
     } as AdditionalEquipment
     const mockCommand = ([
       {

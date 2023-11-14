@@ -83,6 +83,7 @@
   "device_reset_description": "Reset labware calibration, boot scripts, and/or robot calibration to factory settings.",
   "device_reset_slideout_description": "Select individual settings to only clear specific data types.",
   "device_resets_cannot_be_undone": "Resets cannot be undone",
+  "release_notes": "Release notes",
   "directly_connected_to_this_computer": "Directly connected to this computer.",
   "disconnect": "Disconnect",
   "disconnect_from_ssid": "Disconnect from {{ssid}}",

@@ -116,6 +116,7 @@ jobs:
   build-ll:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
+    timeout-minutes: 30
     runs-on: 'ubuntu-20.04'
     if: github.event_name != 'pull_request'
     steps:

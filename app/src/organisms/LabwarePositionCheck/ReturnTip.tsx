@@ -20,6 +20,8 @@ import {
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
+import { useSelector } from 'react-redux'
+import { getIsOnDevice } from '../../redux/config'
 
 import type { VectorOffset } from '@opentrons/api-client'
 import type { ReturnTipStep } from './types'
@@ -48,6 +50,8 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     adapterId,
   } = props
 
+  const isOnDevice = useSelector(getIsOnDevice)
+
   const labwareDef = getLabwareDef(labwareId, protocolData)
   if (labwareDef == null) return null
 
@@ -60,7 +64,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [
-    t('clear_all_slots'),
+    isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
     <Trans
       key="place_previous_tip_rack_in_location"
       t={t}

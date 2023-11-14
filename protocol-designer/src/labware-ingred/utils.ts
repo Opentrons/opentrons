@@ -8,7 +8,7 @@ export function getNextAvailableDeckSlot(
   robotType: RobotType
 ): DeckSlot | null | undefined {
   const deckDef = getDeckDefFromRobotType(robotType)
-  return deckDef.locations.orderedSlots.find(slot =>
+  return deckDef.locations.addressableAreas.find(slot =>
     getSlotIsEmpty(initialDeckSetup, slot.id)
   )?.id
 }

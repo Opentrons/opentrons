@@ -19,6 +19,7 @@
     "labware-designer/typings",
     "labware-library/src",
     "labware-library/typings",
+    "shared-data/deck",
     "shared-data/js",
     "shared-data/protocol",
     "shared-data/pipette",

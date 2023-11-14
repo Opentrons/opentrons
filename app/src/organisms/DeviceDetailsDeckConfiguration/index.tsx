@@ -22,6 +22,7 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   STANDARD_SLOT_LOAD_NAME,
 } from '@opentrons/shared-data'
@@ -70,6 +71,7 @@ export function DeviceDetailsDeckConfiguration({
   }
 
   const handleClickRemove = (fixtureLocation: Cutout): void => {
+    console.log('remove fixtureLocation', fixtureLocation)
     updateDeckConfiguration({
       fixtureLocation,
       loadName: STANDARD_SLOT_LOAD_NAME,
@@ -187,7 +189,9 @@ export function DeviceDetailsDeckConfiguration({
                     width={SIZE_5}
                     css={TYPOGRAPHY.labelRegular}
                   >
-                    <StyledText>{fixture.fixtureLocation}</StyledText>
+                    <StyledText>
+                      {getCutoutDisplayName(fixture.fixtureLocation)}
+                    </StyledText>
                     <StyledText>
                       {getFixtureDisplayName(fixture.loadName)}
                     </StyledText>

@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 

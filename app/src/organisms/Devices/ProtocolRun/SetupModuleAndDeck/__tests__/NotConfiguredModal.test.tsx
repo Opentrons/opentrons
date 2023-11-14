@@ -23,7 +23,7 @@ describe('NotConfiguredModal', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
-      cutout: 'B3',
+      cutout: 'cutoutB3',
       requiredFixture: TRASH_BIN_LOAD_NAME,
     }
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({

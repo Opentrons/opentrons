@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  BlowoutInPlaceRunTimeCommand,
+  DispenseInPlaceRunTimeCommand,
+  DropTipInPlaceRunTimeCommand,
   FLEX_ROBOT_TYPE,
+  MoveToAddressableAreaRunTimeCommand,
   PrepareToAspirateRunTimeCommand,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -85,6 +89,26 @@ describe('CommandText', () => {
       )
     }
   })
+  it('renders correct text for dispenseInPlace', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          {
+            commandType: 'dispenseInPlace',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              flowRate: 300,
+              volume: 50,
+            },
+          } as DispenseInPlaceRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Dispensing 50 µL in place at 300 µL/sec')
+  })
   it('renders correct text for blowout', () => {
     const dispenseCommand = mockRobotSideAnalysis.commands.find(
       c => c.commandType === 'dispense'
@@ -108,6 +132,25 @@ describe('CommandText', () => {
       )
     }
   })
+  it('renders correct text for blowOutInPlace', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          {
+            commandType: 'blowOutInPlace',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              flowRate: 300,
+            },
+          } as BlowoutInPlaceRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Blowing out in place at 300 µL/sec')
+  })
   it('renders correct text for moveToWell', () => {
     const dispenseCommand = mockRobotSideAnalysis.commands.find(
       c => c.commandType === 'aspirate'
@@ -128,6 +171,27 @@ describe('CommandText', () => {
       )[0]
       getByText('Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5')
     }
+  })
+  it('renders correct text for moveToAddressableArea', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          {
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'D3',
+              speed: 200,
+              minimumZHeight: 100,
+            },
+          } as MoveToAddressableAreaRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Moving to D3 at 200 mm/s at 100 mm high')
   })
   it('renders correct text for configureForVolume', () => {
     const command = {
@@ -203,6 +267,24 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )[0]
     getByText('Returning tip to A1 of Opentrons 96 Tip Rack 300 µL in Slot 9')
+  })
+  it('renders correct text for dropTipInPlace', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          {
+            commandType: 'dropTipInPlace',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+            },
+          } as DropTipInPlaceRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Dropping tip in place')
   })
   it('renders correct text for pickUpTip', () => {
     const command = mockRobotSideAnalysis.commands.find(

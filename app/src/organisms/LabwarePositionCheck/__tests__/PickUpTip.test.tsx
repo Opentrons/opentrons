@@ -62,6 +62,8 @@ describe('PickUpTip', () => {
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
       robotType: FLEX_ROBOT_TYPE,
+      protocolHasModules: false,
+      currentStepIndex: 1,
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })
@@ -69,15 +71,45 @@ describe('PickUpTip', () => {
     jest.resetAllMocks()
     resetAllWhenMocks()
   })
-  it('renders correct copy when preparing space', () => {
+  it('renders correct copy when preparing space on desktop if protocol has modules', () => {
+    props.protocolHasModules = true
+    const { getByText, getByRole } = render(props)
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    getByText('Place modules on deck')
+    getByText('Clear all deck slots of labware, leaving modules in place')
+    getByText(
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
+    )
+    getByRole('button', { name: 'Confirm placement' })
+  })
+  it('renders correct copy when preparing space on touchscreen if protocol has modules', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    props.protocolHasModules = true
+    const { getByText, getByRole } = render(props)
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    getByText('Place modules on deck')
+    getByText('Clear all deck slots of labware')
+    getByText(
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
+    )
+  })
+  it('renders correct copy when preparing space on desktop if protocol has no modules', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
       matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
     )
-    getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
+  })
+  it('renders correct copy when preparing space on touchscreen if protocol has no modules', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText, getByRole } = render(props)
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    getByText('Clear all deck slots of labware')
+    getByText(
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
+    )
   })
   it('renders correct copy when confirming position on desktop', () => {
     const { getByText, getByRole } = render({

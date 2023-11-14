@@ -8,13 +8,13 @@ import {
   useTrackEvent,
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
 } from '../../../redux/analytics'
-import { UploadInput } from '../UploadInput'
+import { ProtocolUploadInput } from '../ProtocolUploadInput'
 
 jest.mock('../../../redux/analytics')
 
 const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
 
-describe('UploadInput', () => {
+describe('ProtocolUploadInput', () => {
   let onUpload: jest.MockedFunction<() => {}>
   let trackEvent: jest.MockedFunction<any>
   let render: () => ReturnType<typeof renderWithProviders>[0]
@@ -26,7 +26,7 @@ describe('UploadInput', () => {
     render = () => {
       return renderWithProviders(
         <BrowserRouter>
-          <UploadInput onUpload={onUpload} />
+          <ProtocolUploadInput onUpload={onUpload} />
         </BrowserRouter>,
         {
           i18nInstance: i18n,
@@ -41,7 +41,7 @@ describe('UploadInput', () => {
   it('renders correct contents for empty state', () => {
     const { findByText, getByRole } = render()
 
-    getByRole('button', { name: 'Choose File' })
+    getByRole('button', { name: 'Upload' })
     findByText('Drag and drop or')
     findByText('your files')
     findByText(
@@ -52,7 +52,7 @@ describe('UploadInput', () => {
 
   it('opens file select on button click', () => {
     const { getByRole, getByTestId } = render()
-    const button = getByRole('button', { name: 'Choose File' })
+    const button = getByRole('button', { name: 'Upload' })
     const input = getByTestId('file_input')
     input.click = jest.fn()
     fireEvent.click(button)
