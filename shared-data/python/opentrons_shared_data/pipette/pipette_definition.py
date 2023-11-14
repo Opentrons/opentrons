@@ -159,7 +159,7 @@ class PressFitPickUpTipConfiguration(BaseModel):
         ..., description="The incremental amount to press more by each press"
     )
     distance: float = Field(
-        ..., description="The distance to press on the first stroke"
+        ..., description="The starting distance to begin a pick up tip from"
     )
     speed: float = Field(..., description="How fast to press each stroke")
     current_by_tip_count: Dict[int, float] = Field(
