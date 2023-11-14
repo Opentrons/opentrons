@@ -107,7 +107,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
       }
     }
   )
-  
+
   return (
     <BaseDeck
       deckConfig={deckConfig}
