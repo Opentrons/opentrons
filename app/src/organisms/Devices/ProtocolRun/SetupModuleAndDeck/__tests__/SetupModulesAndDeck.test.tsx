@@ -2,7 +2,6 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
-// import { WASTE_CHUTE_LOAD_NAME } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   useIsFlex,
@@ -58,7 +57,6 @@ describe('SetupModuleAndDeck', () => {
       runId: MOCK_RUN_ID,
       expandLabwarePositionCheckStep: () => jest.fn(),
       hasModules: true,
-      protocolDeckConfig: [],
       commands: [],
     }
     mockSetupFixtureList.mockReturnValue(<div>Mock setup fixture list</div>)

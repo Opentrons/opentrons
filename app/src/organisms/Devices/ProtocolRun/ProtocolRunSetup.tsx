@@ -164,7 +164,6 @@ export function ProtocolRunSetup({
           expandLabwarePositionCheckStep={() => setExpandedStepKey(LPC_KEY)}
           robotName={robotName}
           runId={runId}
-          protocolDeckConfig={protocolDeckConfig}
           hasModules={hasModules}
           commands={protocolData?.commands ?? []}
         />

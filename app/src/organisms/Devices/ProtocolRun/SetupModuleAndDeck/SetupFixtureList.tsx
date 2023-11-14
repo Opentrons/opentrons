@@ -140,14 +140,14 @@ export function FixtureListItem({
         <NotConfiguredModal
           onCloseClick={() => setShowNotConfiguredModal(false)}
           cutoutId={cutoutId}
-          requiredFixtureId={cutoutFixtureId}
+          requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
       {showLocationConflictModal && cutoutFixtureId != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutId}
-          requiredFixtureId={cutoutFixtureId}
+          requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
       <Box

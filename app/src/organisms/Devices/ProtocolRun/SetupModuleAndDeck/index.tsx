@@ -8,7 +8,7 @@ import {
   useHoverTooltip,
   PrimaryButton,
 } from '@opentrons/components'
-import { SINGLE_SLOT_FIXTURES } from '@opentrons/shared-data'
+import { FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
@@ -24,13 +24,11 @@ import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { CutoutConfigProtocolSpec } from '../../../../resources/deck_configuration/utils'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
-  protocolDeckConfig: CutoutConfigProtocolSpec[]
   hasModules: boolean
   commands: RunTimeCommand[]
 }
@@ -39,7 +37,6 @@ export const SetupModuleAndDeck = ({
   expandLabwarePositionCheckStep,
   robotName,
   runId,
-  protocolDeckConfig,
   hasModules,
   commands,
 }: SetupModuleAndDeckProps): JSX.Element => {
@@ -60,9 +57,16 @@ export const SetupModuleAndDeck = ({
     commands
   )
 
-  const nonSingleSlotFixtureList = deckConfigCompatibility.filter(
-    ({ cutoutFixtureId }) =>
-      cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+  const nonSingleSlotDeckConfigCompatibility = deckConfigCompatibility.filter(
+    ({ requiredAddressableAreas }) =>
+      // required AA list includes a non-single-slot AA
+      !requiredAddressableAreas.every(aa =>
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+      )
+  )
+  // fixture includes at least 1 required AA
+  const requiredDeckConfigCompatibility = nonSingleSlotDeckConfigCompatibility.filter(
+    fixture => fixture.requiredAddressableAreas.length > 0
   )
 
   return (
@@ -75,7 +79,7 @@ export const SetupModuleAndDeck = ({
               <SetupModulesList robotName={robotName} runId={runId} />
             ) : null}
             <SetupFixtureList
-              deckConfigCompatibility={nonSingleSlotFixtureList}
+              deckConfigCompatibility={requiredDeckConfigCompatibility}
             />
           </>
         ) : (
