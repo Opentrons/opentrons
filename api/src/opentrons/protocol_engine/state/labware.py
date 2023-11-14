@@ -382,17 +382,6 @@ class LabwareView(HasState[LabwareState]):
 
         return Point(x=position[0], y=position[1], z=position[2])
 
-    def get_slot_center_position(self, slot: DeckSlotName) -> Point:
-        """Get the (x, y, z) position of the center of the slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(
-            x=position[0] + slot_def["boundingBox"]["xDimension"] / 2,
-            y=position[1] + slot_def["boundingBox"]["yDimension"] / 2,
-            z=position[2] + slot_def["boundingBox"]["zDimension"] / 2,
-        )
-
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
         try:

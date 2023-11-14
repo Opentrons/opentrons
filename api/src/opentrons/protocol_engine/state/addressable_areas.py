@@ -2,9 +2,9 @@
 from dataclasses import dataclass
 from typing import Dict, Set, Union, List, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 
 from ..commands import (
     Command,
@@ -264,6 +264,12 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         return deck_configuration_provider.get_addressable_area_from_name(
             addressable_area_name, cutout_position, self._state.deck_definition
         )
+
+    def get_addressable_area_position(self, addressable_area_name: str) -> Point:
+        """Get the position of an addressable area."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        position = addressable_area.position
+        return Point(x=position.x, y=position.y, z=position.z)
 
     def get_addressable_area_center(self, addressable_area_name: str) -> Point:
         """Get the (x, y, z) position of the center of the area."""

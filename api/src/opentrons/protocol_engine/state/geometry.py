@@ -567,8 +567,8 @@ class GeometryView:
             middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
                 self._config.robot_type
             )
-            middle_slot_center = self._labware.get_slot_center_position(
-                slot=middle_slot,
+            middle_slot_center = self._addressable_areas.get_addressable_area_center(
+                addressable_area_name=middle_slot.id,
             )
             return [(middle_slot_center.x, middle_slot_center.y)]
         return []

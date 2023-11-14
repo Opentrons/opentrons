@@ -1314,6 +1314,7 @@ def test_get_extra_waypoints(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
     location: Optional[CurrentWell],
     should_dodge: bool,
     expected_waypoints: List[Tuple[float, float]],
@@ -1344,7 +1345,9 @@ def test_get_extra_waypoints(
     ).then_return(should_dodge)
     decoy.when(
         # Assume the subject's Config is for an OT-3, so use an OT-3 slot name.
-        labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_C2)
+        addressable_area_view.get_addressable_area_center(
+            addressable_area_name=DeckSlotName.SLOT_C2.id
+        )
     ).then_return(Point(x=11, y=22, z=33))
 
     extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
