@@ -11,7 +11,6 @@ import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_st
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   BaseDeck,
-  EXTENDED_DECK_CONFIG_FIXTURE,
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
@@ -299,7 +298,6 @@ describe('DeckThumbnail', () => {
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(
             FLEX_ROBOT_TYPE
           ),
-          deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
           labwareLocations: expect.anything(),
           moduleLocations: expect.anything(),
         })

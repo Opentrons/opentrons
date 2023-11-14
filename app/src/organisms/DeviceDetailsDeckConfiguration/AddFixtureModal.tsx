@@ -60,7 +60,7 @@ export function AddFixtureModal({
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useDeckConfigurationQuery()?.data ?? []
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', {
