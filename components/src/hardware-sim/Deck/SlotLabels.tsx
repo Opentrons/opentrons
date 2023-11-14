@@ -22,7 +22,7 @@ export const SlotLabels = ({
   color,
   show4thColumn = false,
 }: SlotLabelsProps): JSX.Element | null => {
-  const widthColumnLabelsRem = 30.375
+  const widthPerColumnLabelRem = 10.125
 
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
@@ -76,7 +76,9 @@ export const SlotLabels = ({
       <RobotCoordsForeignObject
         height="2.5rem"
         width={`${
-          show4thColumn ? (widthColumnLabelsRem * 4) / 3 : widthColumnLabelsRem
+          show4thColumn
+            ? widthPerColumnLabelRem * 4
+            : widthPerColumnLabelRem * 3
         }rem`}
         x="-15"
         y="-55"
@@ -86,8 +88,8 @@ export const SlotLabels = ({
           flex="1"
           width={`${
             show4thColumn
-              ? (widthColumnLabelsRem * 4) / 3
-              : widthColumnLabelsRem
+              ? widthPerColumnLabelRem * 4
+              : widthPerColumnLabelRem * 3
           }rem`}
           height="2.5rem"
         >
