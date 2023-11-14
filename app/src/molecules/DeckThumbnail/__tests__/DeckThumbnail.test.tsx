@@ -190,6 +190,21 @@ describe('DeckThumbnail', () => {
     getByText('mock BaseDeck')
   })
 
+  it('returns null when there is no protocolAnalysis or the protocolAnalysis contains an error', () => {
+    const { queryByText } = render({
+      protocolAnalysis: null,
+    })
+    expect(queryByText('mock BaseDeck')).not.toBeInTheDocument()
+
+    render({
+      protocolAnalysis: {
+        ...protocolAnalysis,
+        errors: 'test error',
+      },
+    })
+    expect(queryByText('mock BaseDeck')).not.toBeInTheDocument()
+  })
+
   it('renders an OT-3 deck view when the protocol is an OT-3 protocol', () => {
     // ToDo (kk:11/06/2023) update this test later
     // const mockLabwareLocations = [

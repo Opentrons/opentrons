@@ -35,7 +35,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
   const { protocolAnalysis, showSlotLabels = false, ...styleProps } = props
   const attachedModules = useAttachedModules()
 
-  if (protocolAnalysis == null) return null
+  if (protocolAnalysis == null || protocolAnalysis.errors.length) return null
 
   const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
