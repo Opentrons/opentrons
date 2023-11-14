@@ -46,7 +46,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
           definition={props.definition}
           hover={props.hover}
           highlight={props.highlightLabware === true}
-          isOnDevice={props.isOnDevice ?? false}
+          isOnDevice={props.isOnDevice}
         />
       </g>
       <g>

@@ -79,7 +79,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         hover={props.hover}
         onLabwareClick={props.onLabwareClick}
         highlightLabware={props.highlightLabware}
-        isOnDevice={props.isOnDevice ?? false}
+        isOnDevice={props.isOnDevice}
       />
       {props.wellStroke && (
         <StrokedWells
