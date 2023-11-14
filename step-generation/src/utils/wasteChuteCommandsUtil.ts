@@ -62,15 +62,18 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
   let commands: CurriedCommandCreator[] = []
   switch (type) {
     case 'dropTip': {
-      commands = [
-        curryCommandCreator(moveToAddressableArea, {
-          pipetteId,
-          addressableAreaName,
-        }),
-        curryCommandCreator(dropTipInPlace, {
-          pipetteId,
-        }),
-      ]
+      commands = !prevRobotState.tipState.pipettes[pipetteId]
+        ? []
+        : [
+            curryCommandCreator(moveToAddressableArea, {
+              pipetteId,
+              addressableAreaName,
+            }),
+            curryCommandCreator(dropTipInPlace, {
+              pipetteId,
+            }),
+          ]
+
       break
     }
     case 'dispense': {
