@@ -48,14 +48,20 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getPresavedStepForm,
   stepFormSelectors.getSavedStepForms,
+  stepFormSelectors.getAdditionalEquipmentEntities,
   (
     labwareEntities,
     nicknamesById,
     initialDeckSetup,
     presavedStepForm,
-    savedStepForms
+    savedStepForms,
+    additionalEquipmentEntities
   ) => {
     const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
+    const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
+      aE => aE.name === 'wasteChute'
+    )?.location
+
     const options = reduce(
       labwareEntities,
       (
@@ -63,6 +69,13 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
+        const isLabwareInWasteChute = Object.values(savedStepForms).find(
+          form =>
+            form.stepType === 'moveLabware' &&
+            form.labware === labwareId &&
+            form.newLocation === wasteChuteLocation
+        )
+
         const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
         const isOffDeck = getLabwareOffDeck(
           initialDeckSetup,
@@ -94,7 +107,11 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         }
 
         if (!moveLabwarePresavedStep) {
-          return getIsTiprack(labwareEntity.def) || isAdapter
+          //  filter out tip racks, adapters, and labware in waste chute
+          //  for aspirating/dispensing/mixing into
+          return getIsTiprack(labwareEntity.def) ||
+            isAdapter ||
+            isLabwareInWasteChute
             ? acc
             : [
                 ...acc,
@@ -104,8 +121,11 @@ export const getLabwareOptions: Selector<Options> = createSelector(
                 },
               ]
         } else {
-          //  filter out moving trash for now in MoveLabware step type
-          return nickName === TRASH || isAdapterOrAluminumBlock
+          //  filter out moving trash, aluminum blocks, adapters and labware in
+          //  waste chute for moveLabware
+          return nickName === TRASH ||
+            isAdapterOrAluminumBlock ||
+            isLabwareInWasteChute
             ? acc
             : [
                 ...acc,

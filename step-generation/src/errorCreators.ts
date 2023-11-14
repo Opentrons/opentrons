@@ -211,3 +211,10 @@ export const additionalEquipmentDoesNotExist = (args: {
     message: `The ${args.additionalEquipment} does not exist`,
   }
 }
+
+export const gripperRequired = (): CommandCreatorError => {
+  return {
+    type: 'GRIPPER_REQUIRED',
+    message: 'The gripper is required to fulfill this action',
+  }
+}
