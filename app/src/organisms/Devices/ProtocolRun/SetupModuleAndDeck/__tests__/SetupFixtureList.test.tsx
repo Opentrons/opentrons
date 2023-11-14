@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import { SetupFixtureList } from '../SetupFixtureList'
 import { NotConfiguredModal } from '../NotConfiguredModal'
@@ -20,7 +20,14 @@ const mockNotConfiguredModal = NotConfiguredModal as jest.MockedFunction<
 >
 
 const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
-  // TODO(bh, 2023-11-13): mock out compatibility
+  {
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    requiredAddressableAreas: ['D4'],
+    compatibleCutoutFixtureIds: [
+      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    ],
+  },
 ]
 
 const render = (props: React.ComponentProps<typeof SetupFixtureList>) => {
@@ -46,21 +53,22 @@ describe('SetupFixtureList', () => {
     getByText('Fixture')
     getByText('Location')
     getByText('Status')
-    getByText('Waste Chute')
+    getByText('Waste chute with staging area slot')
     getByRole('button', { name: 'View setup instructions' })
-    getByText(WASTE_CHUTE_CUTOUT)
+    getByText('D3')
     getByText('Configured')
   })
-  it('should render the headers and a fixture with conflicted status', () => {
-    const { getByText, getByRole } = render(props)[0]
-    getByText('Location conflict')
-    getByRole('button', { name: 'Update deck' }).click()
-    getByText('mock location conflict modal')
-  })
-  it('should render the headers and a fixture with not configured status and button', () => {
-    const { getByText, getByRole } = render(props)[0]
-    getByText('Not configured')
-    getByRole('button', { name: 'Update deck' }).click()
-    getByText('mock not configured modal')
-  })
+  // TODO(bh, 2023-11-14): implement test cases when example JSON protocol fixtures exist
+  // it('should render the headers and a fixture with conflicted status', () => {
+  //   const { getByText, getByRole } = render(props)[0]
+  //   getByText('Location conflict')
+  //   getByRole('button', { name: 'Update deck' }).click()
+  //   getByText('mock location conflict modal')
+  // })
+  // it('should render the headers and a fixture with not configured status and button', () => {
+  //   const { getByText, getByRole } = render(props)[0]
+  //   getByText('Not configured')
+  //   getByRole('button', { name: 'Update deck' }).click()
+  //   getByText('mock not configured modal')
+  // })
 })
