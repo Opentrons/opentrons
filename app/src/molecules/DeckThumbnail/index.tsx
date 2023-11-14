@@ -107,7 +107,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
       }
     }
   )
-  console.log('showSlotLabels', showSlotLabels)
+  
   return (
     <BaseDeck
       deckConfig={deckConfig}
