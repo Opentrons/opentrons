@@ -112,7 +112,7 @@ class API(
         backend: Union[Controller, Simulator],
         loop: asyncio.AbstractEventLoop,
         config: RobotConfig,
-        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> None:
         """Initialize an API instance.
 
@@ -124,7 +124,7 @@ class API(
         self._config = config
         self._backend = backend
         self._loop = loop
-        self._feature_flags = feature_flags
+        self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -173,7 +173,7 @@ class API(
         port: Optional[str] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         firmware: Optional[Tuple[pathlib.Path, str]] = None,
-        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "API":
         """Build a hardware controller that will actually talk to hardware.
 
@@ -258,7 +258,7 @@ class API(
         config: Optional[Union[RobotConfig, OT3Config]] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
-        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "API":
         """Build a simulating hardware controller.
 

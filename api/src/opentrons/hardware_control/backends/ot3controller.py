@@ -246,7 +246,7 @@ class OT3Controller:
         config: OT3Config,
         use_usb_bus: bool = False,
         check_updates: bool = True,
-        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> OT3Controller:
         """Create the OT3Controller instance.
 
@@ -283,7 +283,7 @@ class OT3Controller:
         usb_driver: Optional[SerialUsbDriver] = None,
         eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
-        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> None:
         """Construct.
 
@@ -298,7 +298,7 @@ class OT3Controller:
         self._drivers = self._build_system_hardware(
             self._messenger, usb_driver, eeprom_driver
         )
-        self._feature_flags = feature_flags
+        self._feature_flags = feature_flags or HardwareFeatureFlags()
         self._usb_messenger = self._drivers.usb_messenger
         self._gpio_dev = self._drivers.gpio_dev
         self._subsystem_manager = SubsystemManager(

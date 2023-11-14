@@ -381,10 +381,12 @@ class OT3API(
         use_usb_bus: bool = False,
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
-        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
+        if feature_flags is None:
+            feature_flags = HardwareFeatureFlags()
         if not isinstance(config, OT3Config):
             checked_config = robot_configs.load_ot3()
         else:
@@ -429,13 +431,15 @@ class OT3API(
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
-        feature_flags: HardwareFeatureFlags = HardwareFeatureFlags(),
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "OT3API":
         """Build a simulating hardware controller.
 
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
+        if feature_flags is None:
+            feature_flags = HardwareFeatureFlags()
 
         checked_modules = attached_modules or []
 
@@ -452,6 +456,7 @@ class OT3API(
             checked_config,
             checked_loop,
             strict_attached_instruments,
+            feature_flags,
         )
         api_instance = cls(
             backend,
@@ -1640,8 +1645,7 @@ class OT3API(
     @hardware_feature_flags.setter
     def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
         self._feature_flags = feature_flags
-        if isinstance(self._backend, OT3Controller):
-            self._backend.update_feature_flags(self._feature_flags)
+        self._backend.update_feature_flags(self._feature_flags)
 
     @ExecutionManagerProvider.wait_for_running
     async def _grip(self, duty_cycle: float, stay_engaged: bool = True) -> None:
