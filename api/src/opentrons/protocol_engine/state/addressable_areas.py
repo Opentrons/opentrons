@@ -13,6 +13,7 @@ from ..commands import (
     MoveLabwareResult,
     MoveToAddressableAreaResult,
 )
+from ..errors import AreaNotInDeckConfigurationError, IncompatibleAddressableAreaError
 from ..resources import deck_configuration_provider
 from ..types import (
     DeckSlotLocation,
@@ -135,10 +136,11 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             addressable_area_name = location
 
         if addressable_area_name not in self._state.loaded_addressable_areas_by_name:
-            # TODO we might not need this check since referencing it earlier will raise an error, but just in case
-            #   I'm putting this here (commented out) for now
-            # if not self._config.use_virtual_pipettes:
-            #     raise RuntimeError("Non-existent addressable area")
+            # TODO Uncomment this out once robot server side stuff is hooked up
+            # if not self._config.use_simulated_deck_config:
+            #     raise AreaNotInDeckConfigurationError(
+            #         f"{addressable_area_name} not provided by deck configuration."
+            #     )
             cutout_id = self._validate_addressable_area_for_simulation(
                 addressable_area_name
             )
@@ -173,7 +175,21 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                 set(potential_fixtures)
             )
             if not remaining_fixtures:
-                raise RuntimeError("Invalid fixtures")
+                loaded_areas_on_cutout = set()
+                for fixture in existing_potential_fixtures:
+                    loaded_areas_on_cutout.update(
+                        deck_configuration_provider.get_provided_addressable_area_names(
+                            fixture.cutout_fixture_id,
+                            fixture.cutout_id,
+                            self._state.deck_definition,
+                        )
+                    )
+                loaded_areas_on_cutout.intersection_update(
+                    set(self.state.loaded_addressable_areas_by_name)
+                )
+                raise IncompatibleAddressableAreaError(
+                    f"Cannot load {addressable_area_name}, not compatible with one or more of the following areas: {loaded_areas_on_cutout}"
+                )
             self._state.potential_cutout_fixtures_by_cutout_id[
                 cutout_id
             ] = remaining_fixtures
