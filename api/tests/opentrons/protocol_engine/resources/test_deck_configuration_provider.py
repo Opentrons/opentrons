@@ -290,9 +290,9 @@ def test_get_potential_cutout_fixtures_raises(
             lazy_fixture("ot3_standard_deck_def"),
         ),
         (
-            "movableTrash",
+            "movableTrashB3",
             AddressableArea(
-                area_name="movableTrash",
+                area_name="movableTrashB3",
                 display_name="Trash Bin",
                 bounding_box=Dimensions(x=246.5, y=91.5, z=40),
                 position=AddressableOffsetVector(x=-16, y=-0.75, z=3),
