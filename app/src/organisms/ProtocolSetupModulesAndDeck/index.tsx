@@ -40,6 +40,7 @@ import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocalRobot } from '../../redux/discovery'
+import { getCutoutIdForSlotName } from '../../resources/deck_configuration/utils'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -443,6 +444,12 @@ export function ProtocolSetupModulesAndDeck({
                   otherModule =>
                     otherModule.moduleDef.model === module.moduleDef.model
                 )
+
+              const cutoutIdForSlotName = getCutoutIdForSlotName(
+                module.slotName,
+                deckDef
+              )
+
               return (
                 <RowModule
                   key={module.moduleId}
@@ -456,7 +463,7 @@ export function ProtocolSetupModulesAndDeck({
                   setPrepCommandErrorMessage={setPrepCommandErrorMessage}
                   conflictedFixture={deckConfig?.find(
                     fixture =>
-                      fixture.cutoutId === module.slotName &&
+                      fixture.cutoutId === cutoutIdForSlotName &&
                       fixture.cutoutFixtureId != null &&
                       !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
                   )}

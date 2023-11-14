@@ -6,6 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
+import { getCutoutIdForSlotName } from '../../../resources/deck_configuration/utils'
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from './useAttachedModules'
@@ -54,28 +55,31 @@ export function useModuleRenderInfoForProtocolById(
               protocolMod.moduleDef.model
             ) && !matchedAmod.find(m => m === attachedMod)
         ) ?? null
+
+      const cutoutIdForSlotName = getCutoutIdForSlotName(
+        protocolMod.slotName,
+        deckDef
+      )
+
+      const conflictedFixture = deckConfig?.find(
+        fixture =>
+          fixture.cutoutId === cutoutIdForSlotName &&
+          fixture.cutoutFixtureId != null &&
+          !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
+      )
+
       if (compatibleAttachedModule !== null) {
         matchedAmod = [...matchedAmod, compatibleAttachedModule]
         return {
           ...protocolMod,
           attachedModuleMatch: compatibleAttachedModule,
-          conflictedFixture: deckConfig?.find(
-            fixture =>
-              fixture.cutoutId === protocolMod.slotName &&
-              fixture.cutoutFixtureId != null &&
-              !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
-          ),
+          conflictedFixture,
         }
       }
       return {
         ...protocolMod,
         attachedModuleMatch: null,
-        conflictedFixture: deckConfig?.find(
-          fixture =>
-            fixture.cutoutId === protocolMod.slotName &&
-            fixture.cutoutFixtureId != null &&
-            !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
-        ),
+        conflictedFixture,
       }
     }
   )

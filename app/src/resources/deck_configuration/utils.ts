@@ -1,6 +1,7 @@
 import { parseAllAddressableAreas } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
+  getAddressableAreaFromSlotId,
   getDeckDefFromRobotTypeV4,
 } from '@opentrons/shared-data'
 
@@ -10,6 +11,7 @@ import type {
   CutoutFixtureId,
   CutoutFixture,
   AddressableAreaName,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 
 export interface CutoutConfigProtocolSpec {
@@ -176,6 +178,22 @@ export function getCutoutFixturesForCutoutId(
   return cutoutFixtures.filter(cutoutFixture =>
     cutoutFixture.mayMountTo.some(mayMountTo => mayMountTo.includes(cutoutId))
   )
+}
+
+export function getCutoutIdForSlotName(
+  slotName: string,
+  deckDef: DeckDefinition
+): CutoutId | null {
+  const addressableArea = getAddressableAreaFromSlotId(slotName, deckDef)
+  const cutoutIdForSlotName =
+    addressableArea != null
+      ? getCutoutIdForAddressableArea(
+          addressableArea.id,
+          deckDef.cutoutFixtures
+        )
+      : null
+
+  return cutoutIdForSlotName
 }
 
 export function getCutoutIdForAddressableArea(
