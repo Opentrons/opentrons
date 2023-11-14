@@ -66,9 +66,7 @@ export const migrateFile = (
       adapterLoadNames.includes(loadName)
     )
 
-    return labwareId.includes(
-      'opentrons_96_aluminumblock_biorad_wellplate_200ul'
-    )
+    return adapterLoadNames.includes(loadName)
   }
 
   const loadPipetteCommands: LoadPipetteCreateCommand[] = commands
