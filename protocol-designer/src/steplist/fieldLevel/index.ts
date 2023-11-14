@@ -65,12 +65,12 @@ const getIsAdapterLocation = (
     labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
   )
 }
-const getIsAddressableAreaLocation = (
+const getIsWasteChuteLocation = (
   newLocation: string,
   additionalEquipmentEntities: AdditionalEquipmentEntities
 ): boolean =>
   Object.values(additionalEquipmentEntities).find(
-    aE => aE.location === newLocation
+    aE => aE.location === newLocation && aE.name === 'wasteChute'
   ) != null
 
 const getLabwareLocation = (
@@ -87,7 +87,7 @@ const getLabwareLocation = (
   ) {
     return { labwareId: newLocationString }
   } else if (
-    getIsAddressableAreaLocation(
+    getIsWasteChuteLocation(
       newLocationString,
       state.additionalEquipmentEntities
     )
