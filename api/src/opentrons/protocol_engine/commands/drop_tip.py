@@ -83,7 +83,7 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
             well_location = params.wellLocation
 
         is_partially_configured = self._state_view.pipettes.get_is_partially_configured(
-            pipette_id
+            pipette_id=pipette_id
         )
         tip_drop_location = self._state_view.geometry.get_checked_tip_drop_location(
             pipette_id=pipette_id,
