@@ -11,7 +11,7 @@ from opentrons.types import Point, DeckSlotName
 from opentrons.protocol_engine.errors import (
     AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
-    SlotDoesNotExistError,
+    # SlotDoesNotExistError,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.protocol_engine.state.addressable_areas import (
@@ -239,6 +239,7 @@ def test_get_slot_definition() -> None:
         "displayName": "fancy name",
         "compatibleModuleTypes": ["magneticModuleType"],
     }
+
 
 # TODO Uncomment once Robot Server deck config and tests is hooked up
 # def test_get_slot_definition_raises_with_bad_slot_name() -> None:
