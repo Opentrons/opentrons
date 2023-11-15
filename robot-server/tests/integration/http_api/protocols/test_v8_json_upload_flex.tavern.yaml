@@ -69,7 +69,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-        links:
+        links: 
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
@@ -133,8 +133,8 @@ stages:
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params: {}
-                result: {}
+                params: { }
+                result: { }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -430,7 +430,8 @@ stages:
                   forceDirect: false
                   speed: 12.3
                 result:
-                  position: { 'x': 350.205, 'y': 65.115, 'z': 98.25 }
+                  position:
+                    { 'x': 350.205, 'y': 65.115, 'z': 98.25 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -451,7 +452,8 @@ stages:
                   minimumZHeight: 35.0
                   forceDirect: true
                 result:
-                  position: { 'x': 352.205, 'y': 68.115, 'z': 93.3 }
+                  position:
+                    { 'x': 352.205, 'y': 68.115, 'z': 93.3 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr

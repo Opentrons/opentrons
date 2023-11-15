@@ -68,7 +68,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-        links:
+        links: 
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
@@ -132,8 +132,8 @@ stages:
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params: {}
-                result: {}
+                params: { }
+                result: { }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -318,12 +318,7 @@ stages:
                   volume: 5.0
                   flowRate: 3.0
                 result:
-                  position:
-                    {
-                      'x': 12.930000000000001,
-                      'y': 74.08999999999999,
-                      'z': 83.14,
-                    }
+                  position: { 'x': 12.930000000000001, 'y': 74.08999999999999, 'z': 83.14 }
                   volume: 5.0
                 startedAt: !anystr
                 completedAt: !anystr
@@ -412,7 +407,7 @@ stages:
                     z: 100.0
                   forceDirect: false
                 result:
-                  position: { 'x': 100.0, 'y': 100.0, 'z': 100.0 }
+                  position: {'x': 100.0, 'y': 100.0, 'z': 100.0}
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -432,7 +427,8 @@ stages:
                       z: 0
                   forceDirect: false
                 result:
-                  position: { 'x': 289.805, 'y': 65.115, 'z': 98.25 }
+                  position:
+                    { 'x': 289.805, 'y': 65.115, 'z': 98.25 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -453,7 +449,8 @@ stages:
                   minimumZHeight: 35.0
                   forceDirect: true
                 result:
-                  position: { 'x': 291.805, 'y': 68.115, 'z': 93.3 }
+                  position:
+                    { 'x': 291.805, 'y': 68.115, 'z': 93.3 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
