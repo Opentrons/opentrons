@@ -289,7 +289,6 @@ export function ProtocolDetails(
       ? format(new Date(mostRecentAnalysis.createdAt), 'M/d/yy HH:mm')
       : t('shared:no_data')
   const robotType = mostRecentAnalysis?.robotType ?? null
-  console.log('robotType', robotType)
 
   const contentsByTabName = {
     labware: (
