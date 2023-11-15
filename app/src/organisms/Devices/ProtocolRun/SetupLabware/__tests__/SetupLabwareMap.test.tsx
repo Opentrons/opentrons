@@ -3,7 +3,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import {
   renderWithProviders,
-  componentPropsMatcher,
   partialComponentPropsMatcher,
   LabwareRender,
   Module,
@@ -111,7 +110,7 @@ describe('SetupLabwareMap', () => {
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
       .calledWith(
-        componentPropsMatcher({
+        partialComponentPropsMatcher({
           definition: fixture_tiprack_300_ul,
         })
       )
