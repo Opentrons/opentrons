@@ -4,6 +4,7 @@ from decoy import Decoy
 from datetime import datetime
 from pathlib import Path
 
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import MountType, DeckSlotName
@@ -53,7 +54,7 @@ async def test_analyze(
     subject: ProtocolAnalyzer,
 ) -> None:
     """It should be able to analyze a protocol."""
-    robot_type = "OT-3 Standard"
+    robot_type: RobotType = "OT-3 Standard"
 
     protocol_resource = ProtocolResource(
         protocol_id="protocol-id",
