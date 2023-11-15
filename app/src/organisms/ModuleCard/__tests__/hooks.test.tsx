@@ -603,24 +603,6 @@ describe('useModuleOverflowMenu', () => {
   })
 })
 
-const mockHeaterShakerDefinition = {
-  moduleId: 'someHeaterShakerModule',
-  model: 'heaterShakerModuleV1' as ModuleModel,
-  type: 'heaterShakerModuleType' as ModuleType,
-  displayName: 'Heater Shaker Module',
-  labwareOffset: { x: 5, y: 5, z: 5 },
-  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
-  dimensions: {
-    xDimension: 100,
-    yDimension: 100,
-    footprintXDimension: 50,
-    footprintYDimension: 50,
-    labwareInterfaceXDimension: 80,
-    labwareInterfaceYDimension: 120,
-  },
-  twoDimensionalRendering: { children: [] },
-}
-
 describe('useIsHeaterShakerInProtocol', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 

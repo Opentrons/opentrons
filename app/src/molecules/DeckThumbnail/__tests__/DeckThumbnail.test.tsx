@@ -32,7 +32,6 @@ import { DeckThumbnail } from '../'
 
 import type {
   LabwareDefinition2,
-  LoadedLabware,
   ModuleModel,
   ModuleType,
   RunTimeCommand,
