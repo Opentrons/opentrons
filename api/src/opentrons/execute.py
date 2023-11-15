@@ -60,7 +60,7 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
-from opentrons.protocol_engine.types import PostRunHardwareState, DeckConfigurationType
+from opentrons.protocol_engine.types import PostRunHardwareState
 
 from opentrons.protocol_reader import ProtocolSource
 
