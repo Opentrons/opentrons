@@ -10,6 +10,8 @@ PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
 NOZZLE_MAP_NAMES = re.compile(r"(?P<row>[A-Z]+)(?P<column>[0-9]+)")
+COLUMN_NAMES = re.compile(r"[0-9]+")
+ROW_NAMES = re.compile(r"[A-Z]+")
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -366,10 +368,22 @@ class PipetteRowDefinition(BaseModel):
     key: str
     ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
 
+    @validator("key")
+    def check_key_is_row(cls, v: str) -> str:
+        if not ROW_NAMES.search(v):
+            raise ValueError(f"{v} is not a valid row name")
+        return v
+
 
 class PipetteColumnDefinition(BaseModel):
     key: str
     ordered_nozzles: List[str] = Field(..., alias="orderedNozzles")
+
+    @validator("key")
+    def check_key_is_column(cls, v: str) -> str:
+        if not COLUMN_NAMES.search(v):
+            raise ValueError(f"{v} is not a valid column name")
+        return v
 
 
 class PipetteGeometryDefinition(BaseModel):
