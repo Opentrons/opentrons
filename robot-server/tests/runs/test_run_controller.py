@@ -147,7 +147,7 @@ async def test_create_play_action_to_start(
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
 
     background_task_captor = matchers.Captor()
-    decoy.verify(mock_task_runner.run(background_task_captor))
+    decoy.verify(mock_task_runner.run(background_task_captor, deck_configuration=[]))
 
     decoy.when(await mock_python_runner.run(deck_configuration=[])).then_return(
         RunResult(
