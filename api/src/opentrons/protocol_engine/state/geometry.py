@@ -164,10 +164,7 @@ class GeometryView:
           on modules as well as stacking overlaps.
           Does not include module calibration offset or LPC offset.
         """
-        if isinstance(labware_location, AddressableAreaLocation):
-            # TODO here we definitely need to check for standard vs staging and adjust the Z height... maybe?
-            return LabwareOffsetVector(x=0, y=0, z=0)
-        elif isinstance(labware_location, DeckSlotLocation):
+        if isinstance(labware_location, (AddressableAreaLocation, DeckSlotLocation)):
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId

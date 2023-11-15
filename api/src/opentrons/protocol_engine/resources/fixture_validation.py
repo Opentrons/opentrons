@@ -13,12 +13,12 @@ def is_waste_chute(addressable_area_name: str) -> bool:
 
 
 def is_gripper_waste_chute(addressable_area_name: str) -> bool:
-    """Check if an addressable area is a Waste Chute."""
+    """Check if an addressable area is a gripper-movement-compatible Waste Chute."""
     return addressable_area_name == "gripperWasteChute"
 
 
 def is_drop_tip_waste_chute(addressable_area_name: str) -> bool:
-    """Check if an addressable area is a Waste Chute."""
+    """Check if an addressable area is a Waste Chute compatible for dropping tips."""
     return addressable_area_name in {"1and8ChannelWasteChute", "96ChannelWasteChute"}
 
 

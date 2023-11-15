@@ -158,7 +158,7 @@ class StateStore(StateView, ActionHandler):
             is_door_open: Whether the robot's door is currently open.
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
-            deck_configuration: The deck configuration the addressable area store will be instantiated with.
+            deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()

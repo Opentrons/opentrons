@@ -39,7 +39,7 @@ class MoveToAddressableAreaResult(DestinationPositionResult):
 class MoveToAddressableAreaImplementation(
     AbstractCommandImpl[MoveToAddressableAreaParams, MoveToAddressableAreaResult]
 ):
-    """Move to well command implementation."""
+    """Move to addressable area command implementation."""
 
     def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
         self._movement = movement
@@ -47,14 +47,14 @@ class MoveToAddressableAreaImplementation(
     async def execute(
         self, params: MoveToAddressableAreaParams
     ) -> MoveToAddressableAreaResult:
-        """Move the requested pipette to the requested well."""
+        """Move the requested pipette to the requested addressable area."""
         raise NotImplementedError()
 
 
 class MoveToAddressableArea(
     BaseCommand[MoveToAddressableAreaParams, MoveToAddressableAreaResult]
 ):
-    """Move to well command model."""
+    """Move to addressable area command model."""
 
     commandType: MoveToAddressableAreaCommandType = "moveToAddressableArea"
     params: MoveToAddressableAreaParams
@@ -66,7 +66,7 @@ class MoveToAddressableArea(
 
 
 class MoveToAddressableAreaCreate(BaseCommandCreate[MoveToAddressableAreaParams]):
-    """Move to well command creation request model."""
+    """Move to addressable area command creation request model."""
 
     commandType: MoveToAddressableAreaCommandType = "moveToAddressableArea"
     params: MoveToAddressableAreaParams
