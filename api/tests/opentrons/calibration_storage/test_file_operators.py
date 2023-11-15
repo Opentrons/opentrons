@@ -1,8 +1,16 @@
-import pytest
 import json
 import typing
 from pathlib import Path
+
+import pydantic
+import pytest
+
 from opentrons.calibration_storage import file_operators as io
+
+
+class DummyModel(pydantic.BaseModel):
+    integer_field: int
+    aliased_field: str = pydantic.Field(alias="! aliased field !")
 
 
 @pytest.fixture
@@ -70,3 +78,40 @@ def test_malformed_calibration(
     )
     with pytest.raises(AssertionError):
         io.read_cal_file(malformed_calibration_path)
+
+
+def test_read_pydantic_model_from_file_valid(tmp_path: Path) -> None:
+    valid_path = tmp_path / "valid.json"
+    valid_path.write_text(
+        '{"integer_field": 123, "! aliased field !": "abc"}', encoding="utf-8"
+    )
+    assert io.read_pydantic_model_from_file(
+        valid_path, DummyModel
+    ) == DummyModel.construct(integer_field=123, aliased_field="abc")
+
+
+def test_read_pydantic_model_from_file_nonexistent_path(tmp_path: Path) -> None:
+    nonexistent_path = tmp_path / "nonexistent.json"
+    assert io.read_pydantic_model_from_file(nonexistent_path, DummyModel) is None
+
+
+def test_read_pydantic_model_from_file_invalid_json(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    not_json_path = tmp_path / "not_json.json"
+    not_json_path.write_text("😾", encoding="utf-8")
+
+    assert io.read_pydantic_model_from_file(not_json_path, DummyModel) is None
+
+    assert "not valid JSON" in caplog.text
+
+
+def test_read_pydantic_model_from_file_invalid_model(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    not_model_path = tmp_path / "not_model.json"
+    not_model_path.write_text('{"integer_field": "not an integer"}', encoding="utf-8")
+
+    assert io.read_pydantic_model_from_file(not_model_path, DummyModel) is None
+
+    assert "malformed" in caplog.text

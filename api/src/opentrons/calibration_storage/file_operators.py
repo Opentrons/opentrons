@@ -5,13 +5,18 @@ These methods should only be imported inside the calibration_storage
 module, except in the special case of v2 labware support in
 the v1 API.
 """
-import json
 import datetime
+import json
+import logging
 import typing
-from pydantic import BaseModel
 from pathlib import Path
 
+import pydantic
+
 from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
+
+
+_log = logging.getLogger(__name__)
 
 
 DecoderType = typing.Type[json.JSONDecoder]
@@ -81,7 +86,7 @@ def save_to_file(
     # todo(mm, 2023-11-15): This file_name argument does not include the file
     # extension, which is inconsistent with read_cal_file(). The two should match.
     file_name: str,
-    data: typing.Union[BaseModel, typing.Dict[str, typing.Any], typing.Any],
+    data: typing.Union[pydantic.BaseModel, typing.Dict[str, typing.Any], typing.Any],
     encoder: EncoderType = DateTimeEncoder,
 ) -> None:
     """
@@ -96,6 +101,38 @@ def save_to_file(
     directory_path.mkdir(parents=True, exist_ok=True)
     file_path = directory_path / f"{file_name}.json"
     json_data = (
-        data.json() if isinstance(data, BaseModel) else json.dumps(data, cls=encoder)
+        data.json()
+        if isinstance(data, pydantic.BaseModel)
+        else json.dumps(data, cls=encoder)
     )
     file_path.write_text(json_data, encoding="utf-8")
+
+
+_ModelT = typing.TypeVar("_ModelT", bound=pydantic.BaseModel)
+
+
+# TODO(mm, 2023-11-20): We probably want to distinguish "missing file" from "corrupt file."
+# The caller needs to deal with those cases separately because the appropriate action depends on
+# context. For example, when running protocols through robot-server, if the file is corrupt, it's
+# safe-ish to fall back to a default because the Opentrons App will let the user confirm everything
+# before starting the run. But when running protocols through the non-interactive
+# `opentrons_execute`, we don't want it to silently use default data if the file is corrupt.
+def read_pydantic_model_from_file(
+    file_path: Path,
+    model: typing.Type[_ModelT],
+) -> typing.Optional[_ModelT]:
+    """Safely read a JSON file into a Pydantic model.
+
+    Returns `None` if the file is missing or corrupt.
+    """
+    try:
+        return model.parse_file(file_path)
+    except FileNotFoundError:
+        _log.info(f"File {file_path} not found.")
+        return None
+    except json.JSONDecodeError:
+        _log.warning(f"File {file_path} is not valid JSON.", exc_info=True)
+        return None
+    except pydantic.ValidationError:
+        _log.warning(f"File {file_path} is malformed as a {model}.", exc_info=True)
+        return None
