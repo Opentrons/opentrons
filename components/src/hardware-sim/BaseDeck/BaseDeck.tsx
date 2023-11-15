@@ -260,9 +260,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             ) : null
           }
         )}
-        {/* {showSlotLabels ? (
-          <SlotLabels robotType={robotType} color={darkFill} />
-        ) : null} */}
       </>
       {children}
     </RobotCoordinateSpace>
