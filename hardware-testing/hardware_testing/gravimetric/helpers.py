@@ -352,6 +352,7 @@ def _load_pipette(
     pipette_volume: int,
     pipette_mount: str,
     increment: bool,
+    photometric: bool,
     gantry_speed: Optional[int] = None,
 ) -> InstrumentContext:
     pip_name = f"flex_{pipette_channels}channel_{pipette_volume}"
@@ -372,7 +373,7 @@ def _load_pipette(
 
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
-    if pipette.channels == 8 and not increment:
+    if pipette.channels == 8 and not increment and not photometric:
         hwapi = get_sync_hw_api(ctx)
         mnt = OT3Mount.LEFT if pipette_mount == "left" else OT3Mount.RIGHT
         hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]

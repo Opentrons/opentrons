@@ -195,6 +195,7 @@ class RunArgs:
             args.pipette,
             "left",
             args.increment,
+            args.photometric,
             args.gantry_speed if not args.photometric else None,
         )
         pipette_tag = helpers._get_tag_from_pipette(
