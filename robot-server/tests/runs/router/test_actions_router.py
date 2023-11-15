@@ -41,6 +41,7 @@ async def test_create_run_action(
         createdAt=created_at,
         actionType=RunActionType.PLAY,
     )
+    decoy.when(mock_deck_configuration_store.get_cutoutFixtures()).then_return([])
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return(None)
     decoy.when(
         mock_run_controller.create_action(
@@ -82,6 +83,7 @@ async def test_play_action_clears_maintenance_run(
         createdAt=created_at,
         actionType=RunActionType.PLAY,
     )
+    decoy.when(mock_deck_configuration_store.get_cutoutFixtures()).then_return([])
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return("some-id")
     decoy.when(
         mock_run_controller.create_action(
@@ -130,6 +132,7 @@ async def test_create_play_action_not_allowed(
     action_type = RunActionType.PLAY
     request_body = RequestModel(data=RunActionCreate(actionType=action_type))
 
+    decoy.when(mock_deck_configuration_store.get_cutoutFixtures()).then_return([])
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return(None)
     decoy.when(
         mock_run_controller.create_action(
