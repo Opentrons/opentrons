@@ -70,7 +70,7 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
-    "availableConfigurations": [1, 8, 12, 96]
+    "availableConfigurations": [1, 8, 12, 16, 24, 48, 96]
   },
   "backCompatNames": [],
   "channels": 96,
