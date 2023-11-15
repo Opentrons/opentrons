@@ -48,14 +48,18 @@ export const FlexTrash = ({
 
   const deckDefinition = getDeckDefFromRobotType(robotType)
 
-  const trashSlot = deckDefinition.locations.cutouts.find(
+  const trashCutout = deckDefinition.locations.cutouts.find(
     slot => slot.id === trashLocation
   )
 
-  // retrieve slot x,y positions and dimensions from deck definition for the given trash slot
-  // TODO(bh, 2023-10-09): refactor position, offsets, and rotation after v4 migration
-  const [x = 0, y = 0] = trashSlot?.position ?? []
-  const [slotXDimension = 0, slotYDimension = 0] = trashSlot?.position ?? []
+  // retrieve slot x,y positions and dimensions from deck definition for the given trash cutout location
+  const [x = 0, y = 0] = trashCutout?.position ?? []
+
+  // a standard addressable area slot bounding box dimension
+  const {
+    xDimension: slotXDimension = 0,
+    yDimension: slotYDimension = 0,
+  } = deckDefinition.locations.addressableAreas[0].boundingBox
 
   // adjust for dimensions from trash definition
   const { x: xAdjustment, y: yAdjustment } = trashDef.cornerOffsetFromSlot
