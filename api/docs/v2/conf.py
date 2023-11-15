@@ -96,13 +96,10 @@ release = _vers
 # setup the code block substitution extension to auto-update apiLevel
 extensions += ['sphinx-prompt', 'sphinx_substitution_extensions']
 
-# get the max API level
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION  # noqa
-max_apiLevel = str(MAX_SUPPORTED_VERSION)
-
 # use rst_prolog to hold the subsitution
+# update the apiLevel value whenever a new minor version is released
 rst_prolog = f"""
-.. |apiLevel| replace:: {max_apiLevel}
+.. |apiLevel| replace:: 2.15
 .. |release| replace:: {release}
 """
 
