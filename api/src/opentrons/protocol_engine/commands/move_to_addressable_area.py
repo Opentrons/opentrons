@@ -48,8 +48,7 @@ class MoveToAddressableAreaImplementation(
         self, params: MoveToAddressableAreaParams
     ) -> MoveToAddressableAreaResult:
         """Move the requested pipette to the requested addressable area."""
-        pass
-        # raise NotImplementedError()
+        raise NotImplementedError()
 
 
 class MoveToAddressableArea(
