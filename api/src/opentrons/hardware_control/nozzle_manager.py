@@ -98,37 +98,63 @@ class NozzleConfigurationType(Enum):
 @dataclass
 class NozzleMap:
     """
-    Nozzle Map.
+    A NozzleMap instance represents a specific configuration of active nozzles on a pipette.
 
-    A data store class that can build and store nozzle configurations based on the physical default
-    nozzle map of the pipette and the requested starting/ending tips.
+    It exposes properties of the configuration like the configuration's front-right, front-left,
+    back-left and starting nozzles as well as a map of all the nozzles active in the configuration.
+
+    Because NozzleMaps represent configurations directly, the properties of the NozzleMap may not
+    match the properties of the physical pipette. For instance, a NozzleMap for a single channel
+    configuration of an 8-channel pipette - say, A1 only - will have its front left, front right,
+    and active channels all be A1, while the physical configuration would have the front right
+    channel be H1.
     """
 
     starting_nozzle: str
+    #: The nozzle that automated operations that count nozzles should start at
     # these are really ordered dicts but you can't say that even in quotes because pydantic needs to
     # evaluate them to generate serdes code so please only use ordered dicts here
     map_store: Dict[str, Point]
+    #: A map of all of the nozzles active in this configuration
     rows: Dict[str, List[str]]
+    #: A map of all the rows active in this configuration
     columns: Dict[str, List[str]]
+    #: A map of all the columns active in this configuration
     configuration: NozzleConfigurationType
+    #: The kind of configuration this is
 
     def __str__(self) -> str:
         return f"back_left_nozzle: {self.back_left} front_right_nozzle: {self.front_right} configuration: {self.configuration}"
 
     @property
     def back_left(self) -> str:
+        """The backest, leftest (i.e. back if it's a column, left if it's a row) nozzle of the configuration.
+
+        Note: This is the value relevant for this particular configuration, and it may not represent the back left nozzle
+        of the underlying physical pipette. For instance, the back-left nozzle of a configuration representing nozzles
+        D7 to H12 of a 96-channel pipette is D7, which is not the back-left nozzle of the physical pipette (A1).
+        """
         return next(iter(self.rows.values()))[0]
 
     @property
     def front_right(self) -> str:
+        """The frontest, rightest (i.e. front if it's a column, right if it's a row) nozzle of the configuration.
+
+        Note: This is the value relevant for this configuration, not the physical pipette. See the note on back_left.
+        """
         return next(reversed(list(self.rows.values())))[-1]
 
     @property
     def starting_nozzle_offset(self) -> Point:
+        """The position of the starting nozzle."""
         return self.map_store[self.starting_nozzle]
 
     @property
     def xy_center_offset(self) -> Point:
+        """The position of the geometrical center of all nozzles in the configuration.
+
+        Note: This is the value relevant fro this configuration, not the physical pipette. See the note on back_left.
+        """
         difference = self.map_store[self.front_right] - self.map_store[self.back_left]
         return self.map_store[self.back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
@@ -136,6 +162,7 @@ class NozzleMap:
 
     @property
     def front_nozzle_offset(self) -> Point:
+        """The offset for the front_left nozzle."""
         # front left-most nozzle of the 96 channel in a given configuration
         # and front nozzle of the 8 channel
         front_left = next(iter(self.columns.values()))[-1]
@@ -143,6 +170,7 @@ class NozzleMap:
 
     @property
     def tip_count(self) -> int:
+        """The total number of active nozzles in the configuration, and thus the number of tips that will be picked up."""
         return len(self.map_store)
 
     @classmethod  # noqa: C901
