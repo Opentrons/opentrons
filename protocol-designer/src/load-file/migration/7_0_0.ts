@@ -3,8 +3,7 @@ import { uuid } from '../../utils'
 import { getOnlyLatestDefs } from '../../labware-defs'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
-import {
-  getLabwareDefURI,
+import type {
   LabwareDefinition2,
   LabwareDefinitionsByUri,
   ProtocolFileV6,
@@ -197,8 +196,6 @@ export const migrateFile = (
       const labwareDef = allLatestDefs[labwareUri]
       acc[adapterUri] = adapterLabwareDef
       acc[labwareUri] = labwareDef
-    } else {
-      acc[defId] = labwareDefinitions[defId]
     }
     return acc
   }, {})
