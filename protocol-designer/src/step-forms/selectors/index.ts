@@ -517,7 +517,7 @@ const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
 }
 
 // TODO: Ian 2019-01-25 type with hydrated form type, see #3161
-function _getHydratedForm(
+export function _getHydratedForm(
   rawForm: FormData,
   invariantContext: InvariantContext
 ): FormData {

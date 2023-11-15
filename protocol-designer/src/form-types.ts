@@ -327,3 +327,7 @@ export function getIsDelayPositionField(fieldName: string): boolean {
   return delayPositionFields.includes(fieldName)
 }
 export type CountPerStepType = Partial<Record<StepType, number>>
+
+
+//  TODO: get real HydratedFormData type
+export type HydratedFormdata = any

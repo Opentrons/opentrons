@@ -16,13 +16,11 @@ import { MixFields } from '../../fields/MixFields'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
-  getTouchTipNotSupportedLabware,
 } from '../../utils'
 import styles from '../../StepEditForm.css'
 
 import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { LabwareDefByDefURI } from '../../../../labware-defs'
 import type { FieldPropsByName } from '../../types'
 
 interface SourceDestFieldsProps {
@@ -30,7 +28,6 @@ interface SourceDestFieldsProps {
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   formData: FormData
-  allLabware: LabwareDefByDefURI
 }
 
 const makeAddFieldNamePrefix = (prefix: string) => (
@@ -38,11 +35,11 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
-  const { className, formData, prefix, propsForFields, allLabware } = props
+  const { className, formData, prefix, propsForFields } = props
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const hasWasteChuteSelected =
+  const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
       ? additionalEquipmentEntities[
           String(propsForFields.dispense_labware.value)
@@ -74,24 +71,6 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
       propsForFields={propsForFields}
     />
   )
-  const dispenseLabwareId =
-    formData[
-      getLabwareFieldForPositioningField(
-        addFieldNamePrefix('touchTip_mmFromBottom')
-      )
-    ]
-  //  special-casing touchTip disabled boolean here instead of using getDisabledFieldsMoveLiquidForm
-  //  since we need access to labware's quirks
-  const isTouchTipDisabledLabware = getTouchTipNotSupportedLabware(
-    allLabware,
-    dispenseLabwareId
-  )
-
-  let disabledTouchTip =
-    propsForFields[addFieldNamePrefix('touchTip_checkbox')].disabled
-  if (isTouchTipDisabledLabware) {
-    disabledTouchTip = true
-  }
 
   return (
     // @ts-expect-error(sa, 2021-7-2): className might be null
@@ -112,7 +91,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             ]
           }
         />
-        {prefix === 'dispense' && hasWasteChuteSelected ? null : (
+        {prefix === 'dispense' && isWasteChuteSelected ? null : (
           <WellOrderField
             prefix={prefix}
             label={i18n.t('form.step_edit_form.field.well_order.label')}
@@ -153,7 +132,6 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
-          disabled={disabledTouchTip}
         >
           <TipPositionField
             {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}

@@ -55,14 +55,37 @@ import type {
 
 export type { StepFieldName }
 
+interface LabwareEntityWithTouchTip extends LabwareEntity {
+  isTouchTipAllowed: boolean
+}
+
+interface AdditionalEquipmentEntityWithTouchTip
+  extends AdditionalEquipmentEntity {
+  isTouchTipAllowed: boolean
+}
+
+type LabwareOrAdditionalEquipmentEntity =
+  | LabwareEntityWithTouchTip
+  | AdditionalEquipmentEntityWithTouchTip
+
 const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
   id: string
-): LabwareEntity | AdditionalEquipmentEntity | null => {
+): LabwareOrAdditionalEquipmentEntity | null => {
   if (state.labwareEntities[id] != null) {
-    return state.labwareEntities[id]
+    const labwareDisallowsTouchTip =
+      state.labwareEntities[id]?.def.parameters.quirks?.includes(
+        'touchTipDisabled'
+      ) ?? false
+    return {
+      ...state.labwareEntities[id],
+      isTouchTipAllowed: !labwareDisallowsTouchTip,
+    }
   } else if (state.additionalEquipmentEntities[id] != null) {
-    return state.additionalEquipmentEntities[id]
+    return {
+      ...state.additionalEquipmentEntities[id],
+      isTouchTipAllowed: false,
+    }
   } else return null
 }
 

@@ -101,7 +101,8 @@ describe('makeSingleEditFieldProps', () => {
     const result = makeSingleEditFieldProps(
       focusHandlers,
       formData,
-      handleChangeFormInput
+      handleChangeFormInput,
+      formData
     )
     expect(result).toEqual({
       some_field: {

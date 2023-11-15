@@ -72,7 +72,7 @@ export type WarningChecker = (val: unknown) => FormWarning | null
  ** Warning Checkers **
  ********************/
 // TODO: real HydratedFormData type
-type HydratedFormData = any
+export type HydratedFormData = any
 
 export const belowPipetteMinimumVolume = (
   fields: HydratedFormData

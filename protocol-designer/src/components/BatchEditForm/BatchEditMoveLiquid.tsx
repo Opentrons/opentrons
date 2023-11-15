@@ -23,7 +23,6 @@ import { MixFields } from '../StepEditForm/fields/MixFields'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
-  getTouchTipNotSupportedLabware,
 } from '../StepEditForm/utils'
 import { FormColumn } from './FormColumn'
 import { FieldPropsByName } from '../StepEditForm/types'
@@ -61,20 +60,6 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
     } else {
       return null
     }
-  }
-
-  const isTouchTipNotSupportedLabware = getTouchTipNotSupportedLabware(
-    allLabware,
-    getLabwareIdForPositioningField(
-      addFieldNamePrefix('touchTip_mmFromBottom')
-    ) ?? undefined
-  )
-
-  let disabledTouchTip: boolean = false
-  if (isTouchTipNotSupportedLabware) {
-    disabledTouchTip = true
-  } else if (propsForFields[addFieldNamePrefix('touchTip_checkbox')].disabled) {
-    disabledTouchTip = true
   }
 
   return (
@@ -139,7 +124,6 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
         {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
         label={i18n.t('form.step_edit_form.field.touchTip.label')}
         className={styles.small_field}
-        disabled={disabledTouchTip}
       >
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}

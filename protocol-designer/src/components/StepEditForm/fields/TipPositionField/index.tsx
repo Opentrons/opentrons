@@ -141,7 +141,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
     if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
   }
 
-  if (wellDepthMm === 0 && labwareId != null && labwareDef == null) {
+  if (wellDepthMm === 0 && labwareId != null && labwareDef != null) {
     console.error(
       `expected to find the well depth mm with labwareId ${labwareId} but could not`
     )

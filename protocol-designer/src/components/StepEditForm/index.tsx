@@ -19,6 +19,8 @@ import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
 import { BaseState, ThunkDispatch } from '../../types'
 import { FormData, StepFieldName, StepIdType } from '../../form-types'
+import { getInvariantContext, _getHydratedForm } from '../../step-forms/selectors'
+import { InvariantContext } from '@opentrons/step-generation'
 
 interface SP {
   canSave: boolean
@@ -27,6 +29,7 @@ interface SP {
   isNewStep: boolean
   isPristineSetTempForm: boolean
   isPristineSetHeaterShakerTempForm: boolean
+  invariantContext: InvariantContext
 }
 interface DP {
   deleteStep: (stepId: string) => unknown
@@ -54,6 +57,7 @@ const StepEditFormManager = (
     saveSetTempFormWithAddedPauseUntilTemp,
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
+    invariantContext
   } = props
 
   const [
@@ -125,6 +129,8 @@ const StepEditFormManager = (
     return null
   }
 
+  const hydratedForm = _getHydratedForm(formData, invariantContext)
+
   const focusHandlers = {
     focusedField,
     dirtyFields,
@@ -135,7 +141,8 @@ const StepEditFormManager = (
   const propsForFields = makeSingleEditFieldProps(
     focusHandlers,
     formData,
-    handleChangeFormInput
+    handleChangeFormInput,
+    hydratedForm
   )
   let handleSave = saveStepForm
   if (isPristineSetTempForm) {
@@ -210,6 +217,7 @@ const mapStateToProps = (state: BaseState): SP => {
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
       state
     ),
+    invariantContext: getInvariantContext(state)
   }
 }
 
