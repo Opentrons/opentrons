@@ -33,6 +33,8 @@ from robot_server.maintenance_runs.router.base_router import (
     AllRunsLinks,
 )
 
+from robot_server.deck_configuration.store import DeckConfigurationStore
+
 
 @pytest.fixture
 def labware_offset_create() -> LabwareOffsetCreate:
@@ -48,6 +50,7 @@ async def test_create_run(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
     labware_offset_create: pe_types.LabwareOffsetCreate,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -84,6 +87,7 @@ async def test_create_run(
         run_id=run_id,
         created_at=run_created_at,
         is_ok_to_create_maintenance_run=True,
+        deck_configuration_store=mock_deck_configuration_store,
     )
 
     assert result.content.data == expected_response
@@ -93,6 +97,7 @@ async def test_create_run(
 async def test_create_maintenance_run_with_protocol_run_conflict(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should respond with a conflict error if protocol run is active during maintenance run creation."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -104,6 +109,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
             request_body=None,
             run_data_manager=mock_maintenance_run_data_manager,
             is_ok_to_create_maintenance_run=False,
+            deck_configuration_store=mock_deck_configuration_store,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"

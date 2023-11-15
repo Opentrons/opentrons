@@ -112,7 +112,7 @@ async def test_create_play_action_to_resume(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_json_runner.play(deck_configuration=[]), times=1)
+    decoy.verify(mock_json_runner.play(), times=1)
     decoy.verify(await mock_json_runner.run(deck_configuration=[]), times=0)
 
 
