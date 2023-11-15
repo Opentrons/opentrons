@@ -339,25 +339,15 @@ def test_96_config_identification(
         == nozzle_manager.NozzleConfigurationType.ROW
     )
 
-    subject.update_nozzle_configuration("A1", "D6")
-    assert (
-        subject.current_configuration.configuration
-        == nozzle_manager.NozzleConfigurationType.QUADRANT
-    )
-    subject.update_nozzle_configuration("A7", "D12")
-    assert (
-        subject.current_configuration.configuration
-        == nozzle_manager.NozzleConfigurationType.QUADRANT
-    )
     subject.update_nozzle_configuration("E1", "H6")
     assert (
         subject.current_configuration.configuration
-        == nozzle_manager.NozzleConfigurationType.QUADRANT
+        == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
     subject.update_nozzle_configuration("E7", "H12")
     assert (
         subject.current_configuration.configuration
-        == nozzle_manager.NozzleConfigurationType.QUADRANT
+        == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
 
     subject.update_nozzle_configuration("C4", "F9")

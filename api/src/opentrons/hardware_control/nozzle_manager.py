@@ -45,7 +45,6 @@ class NozzleConfigurationType(Enum):
 
     COLUMN = "COLUMN"
     ROW = "ROW"
-    QUADRANT = "QUADRANT"
     SINGLE = "SINGLE"
     FULL = "FULL"
     SUBRECT = "SUBRECT"
@@ -70,28 +69,6 @@ class NozzleConfigurationType(Enum):
             return NozzleConfigurationType.ROW
         if len(current_cols) == 1:
             return NozzleConfigurationType.COLUMN
-        physical_corner_nozzles = set(
-            (
-                next(iter(physical_cols.values()))[0],
-                next(reversed(list(physical_cols.values())))[0],
-                next(reversed(list(physical_cols.values())))[-1],
-                next(iter(physical_cols.values()))[-1],
-            )
-        )
-        current_corner_nozzles = set(
-            (
-                next(iter(current_cols.values()))[0],
-                next(reversed(list(current_cols.values())))[0],
-                next(reversed(list(current_cols.values())))[-1],
-                next(iter(current_cols.values()))[-1],
-            )
-        )
-        common_corners = physical_corner_nozzles.intersection(current_corner_nozzles)
-        if len(common_corners) == 1:
-            if len(current_rows) == len(physical_rows) // 2:
-                if len(current_cols) == len(physical_cols) // 2:
-                    return NozzleConfigurationType.QUADRANT
-
         return NozzleConfigurationType.SUBRECT
 
 
