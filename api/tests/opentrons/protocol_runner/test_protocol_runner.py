@@ -210,9 +210,9 @@ async def test_play_starts_run(
     subject: AnyRunner,
 ) -> None:
     """It should start a protocol run with play."""
-    subject.play()
+    subject.play(deck_configuration=[])
 
-    decoy.verify(protocol_engine.play(), times=1)
+    decoy.verify(protocol_engine.play(deck_configuration=[]), times=1)
 
 
 @pytest.mark.parametrize(
@@ -303,7 +303,7 @@ async def test_run_json_runner(
     assert json_runner_subject.was_started() is True
 
     decoy.verify(
-        protocol_engine.play(),
+        protocol_engine.play(deck_configuration=[]),
         task_queue.start(),
         await task_queue.join(),
     )
@@ -620,7 +620,7 @@ async def test_run_python_runner(
     assert legacy_python_runner_subject.was_started() is True
 
     decoy.verify(
-        protocol_engine.play(),
+        protocol_engine.play(deck_configuration=[]),
         task_queue.start(),
         await task_queue.join(),
     )
@@ -644,7 +644,7 @@ async def test_run_live_runner(
 
     decoy.verify(
         await hardware_api.home(),
-        protocol_engine.play(),
+        protocol_engine.play(deck_configuration=[]),
         task_queue.start(),
         await task_queue.join(),
     )

@@ -390,7 +390,7 @@ def test_play_blocked_by_door(
     )
     decoy.when(state_store.commands.get_is_door_blocking()).then_return(True)
 
-    subject.play()
+    subject.play(deck_configuration=[])
 
     decoy.verify(hardware_api.resume(HardwarePauseType.PAUSE), times=0)
     decoy.verify(
