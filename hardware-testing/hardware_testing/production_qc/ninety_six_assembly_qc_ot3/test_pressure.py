@@ -38,10 +38,11 @@ THRESHOLDS = {
         -400,
     ),
     "dispense-pa": (
-            2500,
-            3500,
-        )
+        2500,
+        3500,
+    ),
 }
+
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
     assert reading in PRESSURE_READINGS, f"{reading} not in PRESSURE_READINGS"
@@ -83,7 +84,7 @@ async def _read_from_sensor(
 
 
 def check_value(test_value: float, test_name: str) -> CSVResult:
-    """Determine if value is within pass limits"""
+    """Determine if value is within pass limits."""
     low_limit = THRESHOLDS[test_name][0]
     high_limit = THRESHOLDS[test_name][1]
 
@@ -91,6 +92,7 @@ def check_value(test_value: float, test_name: str) -> CSVResult:
         return CSVResult.PASS
     else:
         return CSVResult.FAIL
+
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
