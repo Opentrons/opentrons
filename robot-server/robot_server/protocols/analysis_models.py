@@ -1,8 +1,9 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
+from opentrons_shared_data.robot.dev_types import RobotType
 from pydantic import BaseModel, Field
-from typing import List, Union
+from typing import List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -90,6 +91,17 @@ class CompletedAnalysis(BaseModel):
     )
 
     # Fields that should match local analysis:
+    robotType: Optional[RobotType] = Field(
+        # robotType is deliberately typed as a Literal instead of an Enum.
+        # It's a bad idea at the moment to store enums in robot-server's database.
+        # https://opentrons.atlassian.net/browse/RSS-98
+        default=None,  # default=None to fit objects that were stored before this field existed.
+        description=(
+            "The type of robot that this protocol can run on."
+            " This field was added in v7.1.0. It will be `null` or omitted"
+            " in analyses that were originally created on older versions."
+        ),
+    )
     commands: List[Command] = Field(
         ...,
         description="The protocol commands the run is expected to produce",
