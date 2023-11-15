@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import {
   Box,
   DeprecatedPrimaryButton,
@@ -10,7 +9,6 @@ import {
   TOOLTIP_FIXED,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -38,7 +36,6 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
 }): JSX.Element => {
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = (name: string): string => `${prefix}_${name}`
-  const allLabware = useSelector(getLabwareDefsByURI)
 
   const getLabwareIdForPositioningField = (name: string): string | null => {
     const labwareField = getLabwareFieldForPositioningField(name)
