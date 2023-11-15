@@ -8,12 +8,13 @@ from typing_extensions import Literal
 from ..types import (
     LabwareLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
     LabwareMovementOffsetData,
 )
 from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
-from ..resources import labware_validation
+from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -83,7 +84,9 @@ class MoveLabwareImplementation(
         self._labware_movement = labware_movement
         self._run_control = run_control
 
-    async def execute(self, params: MoveLabwareParams) -> MoveLabwareResult:
+    async def execute(  # noqa: C901
+        self, params: MoveLabwareParams
+    ) -> MoveLabwareResult:
         """Move a loaded labware to a new location."""
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
@@ -96,6 +99,15 @@ class MoveLabwareImplementation(
             raise LabwareMovementNotAllowedError(
                 f"Cannot move fixed trash labware '{current_labware_definition.parameters.loadName}'."
             )
+
+        if isinstance(params.newLocation, AddressableAreaLocation):
+            area_name = params.newLocation.addressableAreaName
+            if not fixture_validation.is_gripper_waste_chute(
+                area_name
+            ) and not fixture_validation.is_deck_slot(area_name):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move {current_labware.loadName} to addressable area {area_name}"
+                )
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation

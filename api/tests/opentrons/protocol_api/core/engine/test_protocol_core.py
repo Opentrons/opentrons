@@ -1367,7 +1367,9 @@ def test_get_slot_center(
 ) -> None:
     """It should return a slot center from engine state."""
     decoy.when(
-        mock_engine_client.state.labware.get_slot_center_position(DeckSlotName.SLOT_2)
+        mock_engine_client.state.addressable_areas.get_addressable_area_center(
+            DeckSlotName.SLOT_2.id
+        )
     ).then_return(Point(1, 2, 3))
 
     result = subject.get_slot_center(DeckSlotName.SLOT_2)

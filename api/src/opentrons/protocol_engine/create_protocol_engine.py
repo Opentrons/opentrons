@@ -12,18 +12,25 @@ from .resources import DeckDataProvider, ModuleDataProvider
 from .state import Config, StateStore
 from .types import PostRunHardwareState
 
+# TODO move this type to a better location
+from .state.addressable_areas import DeckConfiguration
+
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
 # clean it up properly, especially in tests. See e.g. https://opentrons.atlassian.net/browse/RSS-222
 async def create_protocol_engine(
-    hardware_api: HardwareControlAPI, config: Config, load_fixed_trash: bool = False
+    hardware_api: HardwareControlAPI,
+    config: Config,
+    load_fixed_trash: bool = False,
+    deck_configuration: typing.Optional[DeckConfiguration] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
         config: ProtocolEngine configuration.
-        load_fixed_trash: Automatically load fixed trash labware in engine
+        load_fixed_trash: Automatically load fixed trash labware in engine.
+        deck_configuration: The initial deck configuration the engine will be instantiated with.
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
@@ -40,6 +47,7 @@ async def create_protocol_engine(
         deck_fixed_labware=deck_fixed_labware,
         is_door_open=hardware_api.door_state is DoorState.OPEN,
         module_calibration_offsets=module_calibration_offsets,
+        deck_configuration=deck_configuration,
     )
 
     return ProtocolEngine(state_store=state_store, hardware_api=hardware_api)

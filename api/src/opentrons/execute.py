@@ -653,6 +653,8 @@ def _get_protocol_engine_config() -> Config:
         # We deliberately omit ignore_pause=True because, in the current implementation of
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
+        use_simulated_deck_config=True,
+        # TODO the above is not correct for this and it should use the robot's actual config
     )
 
 
