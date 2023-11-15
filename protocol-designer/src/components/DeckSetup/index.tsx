@@ -23,6 +23,7 @@ import {
 } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getLabwareHasQuirk,
@@ -33,11 +34,10 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
-  STAGING_AREA_LOAD_NAME,
   THERMOCYCLER_MODULE_TYPE,
-  TRASH_BIN_LOAD_NAME,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_LOAD_NAME,
 } from '@opentrons/shared-data'
 import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
@@ -528,23 +528,28 @@ export const DeckSetup = (): JSX.Element => {
 
   const trashBinFixtures = [
     {
-      fixtureId: trash?.id,
-      fixtureLocation:
+      cutoutId:
         trash?.slot != null
           ? getCutoutIdForAddressableArea(
               trash?.slot as AddressableAreaName,
               deckDef.cutoutFixtures
             )
           : null,
-      loadName: TRASH_BIN_LOAD_NAME,
+      cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => aE.name === WASTE_CHUTE_LOAD_NAME)
+  ).filter(aE =>
+    WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aE.name as AddressableAreaName)
+  )
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => aE.name === STAGING_AREA_LOAD_NAME)
+  ).filter(aE =>
+    FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
+      aE.name as AddressableAreaName
+    )
+  )
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
@@ -593,11 +598,11 @@ export const DeckSetup = (): JSX.Element => {
                     />
                   ))}
                   {trash != null
-                    ? trashBinFixtures.map(fixture =>
-                        fixture.fixtureLocation != null ? (
-                          <React.Fragment key={fixture.fixtureId}>
+                    ? trashBinFixtures.map(({ cutoutId }) =>
+                        cutoutId != null ? (
+                          <React.Fragment key={cutoutId}>
                             <SingleSlotFixture
-                              cutoutId={fixture.fixtureLocation}
+                              cutoutId={cutoutId}
                               deckDefinition={deckDef}
                               slotClipColor={COLORS.transparent}
                               fixtureBaseColor={lightFill}
@@ -605,9 +610,7 @@ export const DeckSetup = (): JSX.Element => {
                             <FlexTrash
                               robotType={robotType}
                               trashIconColor={lightFill}
-                              trashLocation={
-                                fixture.fixtureLocation as TrashLocation
-                              }
+                              trashLocation={cutoutId as TrashLocation}
                               backgroundColor={darkFill}
                             />
                           </React.Fragment>

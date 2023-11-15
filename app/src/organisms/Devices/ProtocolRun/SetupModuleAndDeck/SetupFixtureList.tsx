@@ -1,5 +1,4 @@
 import * as React from 'react'
-import map from 'lodash/map'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
@@ -16,16 +15,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FixtureLoadName,
+  SINGLE_SLOT_FIXTURES,
+  getCutoutDisplayName,
   getFixtureDisplayName,
-  LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
-import {
-  useLoadedFixturesConfigStatus,
-  CONFIGURED,
-  CONFLICTING,
-  NOT_CONFIGURED,
-} from '../../../../resources/deck_configuration/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
@@ -33,15 +26,14 @@ import { LocationConflictModal } from './LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 
-import type { LoadedFixturesBySlot } from '@opentrons/api-client'
-import type { Cutout } from '@opentrons/shared-data'
+import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
 
 interface SetupFixtureListProps {
-  loadedFixturesBySlot: LoadedFixturesBySlot
+  deckConfigCompatibility: CutoutConfigAndCompatibility[]
 }
 
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
-  const { loadedFixturesBySlot } = props
+  const { deckConfigCompatibility } = props
   const { t, i18n } = useTranslation('protocol_setup')
   return (
     <>
@@ -81,15 +73,11 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
         gridGap={SPACING.spacing4}
         marginBottom={SPACING.spacing24}
       >
-        {map(loadedFixturesBySlot, ({ params, id }) => {
-          const { loadName, location } = params
+        {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
           return (
             <FixtureListItem
-              key={`SetupFixturesList_${loadName}_slot_${location.cutout}`}
-              loadName={loadName}
-              cutout={location.cutout}
-              loadedFixtures={Object.values(loadedFixturesBySlot)}
-              commandId={id}
+              key={cutoutConfigAndCompatibility.cutoutId}
+              {...cutoutConfigAndCompatibility}
             />
           )
         })}
@@ -98,54 +86,43 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   )
 }
 
-interface FixtureListItemProps {
-  loadedFixtures: LoadFixtureRunTimeCommand[]
-  loadName: FixtureLoadName
-  cutout: Cutout
-  commandId: string
-}
+interface FixtureListItemProps extends CutoutConfigAndCompatibility {}
 
 export function FixtureListItem({
-  loadedFixtures,
-  loadName,
-  cutout,
-  commandId,
+  cutoutId,
+  cutoutFixtureId,
+  compatibleCutoutFixtureIds,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const configuration = useLoadedFixturesConfigStatus(loadedFixtures)
-  const configurationStatus = configuration.find(
-    config => config.id === commandId
-  )?.configurationStatus
 
+  const isCurrentFixtureCompatible =
+    cutoutFixtureId != null &&
+    compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+  const isConflictingFixtureConfigured =
+    cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
   let statusLabel
-  if (
-    configurationStatus === CONFLICTING ||
-    configurationStatus === NOT_CONFIGURED
-  ) {
+  if (!isCurrentFixtureCompatible) {
     statusLabel = (
       <StatusLabel
         status={
-          configurationStatus === CONFLICTING
+          isConflictingFixtureConfigured
             ? t('location_conflict')
-            : configurationStatus
+            : t('not_configured')
         }
         backgroundColor={COLORS.warningBackgroundLight}
         iconColor={COLORS.warningEnabled}
         textColor={COLORS.warningText}
       />
     )
-  } else if (configurationStatus === CONFIGURED) {
+  } else {
     statusLabel = (
       <StatusLabel
-        status={configurationStatus}
+        status={t('configured')}
         backgroundColor={COLORS.successBackgroundLight}
         iconColor={COLORS.successEnabled}
         textColor={COLORS.successText}
       />
     )
-    //  shouldn't run into this case
-  } else {
-    statusLabel = 'status label unknown'
   }
 
   const [
@@ -159,18 +136,18 @@ export function FixtureListItem({
 
   return (
     <>
-      {showNotConfiguredModal ? (
+      {showNotConfiguredModal && cutoutFixtureId != null ? (
         <NotConfiguredModal
           onCloseClick={() => setShowNotConfiguredModal(false)}
-          cutout={cutout}
-          requiredFixture={loadName}
+          cutoutId={cutoutId}
+          requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
-      {showLocationConflictModal ? (
+      {showLocationConflictModal && cutoutFixtureId != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          cutout={cutout}
-          requiredFixture={loadName}
+          cutoutId={cutoutId}
+          requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
       <Box
@@ -187,13 +164,19 @@ export function FixtureListItem({
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Flex alignItems={JUSTIFY_CENTER} width="45%">
-            <img width="60px" height="54px" src={getFixtureImage(loadName)} />
+            {cutoutFixtureId != null ? (
+              <img
+                width="60px"
+                height="54px"
+                src={getFixtureImage(cutoutFixtureId)}
+              />
+            ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {getFixtureDisplayName(loadName)}
+                {getFixtureDisplayName(cutoutFixtureId)}
               </StyledText>
               <Btn
                 marginLeft={SPACING.spacing16}
@@ -215,7 +198,7 @@ export function FixtureListItem({
             </Flex>
           </Flex>
           <StyledText as="p" width="15%">
-            {cutout}
+            {getCutoutDisplayName(cutoutId)}
           </StyledText>
           <Flex
             width="15%"
@@ -223,11 +206,11 @@ export function FixtureListItem({
             gridGap={SPACING.spacing10}
           >
             {statusLabel}
-            {configurationStatus !== CONFIGURED ? (
+            {!isCurrentFixtureCompatible ? (
               <TertiaryButton
                 width="max-content"
                 onClick={() =>
-                  configurationStatus === CONFLICTING
+                  isConflictingFixtureConfigured
                     ? setShowLocationConflictModal(true)
                     : setShowNotConfiguredModal(true)
                 }

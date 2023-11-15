@@ -25,7 +25,7 @@ import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import { getWellFillFromLabwareId } from './utils'
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
-import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
@@ -70,7 +70,7 @@ export function SetupLiquidsMap(
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
     protocolAnalysis.commands ?? []
   )
-  const deckConfig = getDeckConfigFromProtocolCommands(
+  const deckConfig = getSimplestDeckConfigForProtocolCommands(
     protocolAnalysis.commands
   )
   const deckLayerBlocklist = getStandardDeckViewLayerBlockList(robotType)

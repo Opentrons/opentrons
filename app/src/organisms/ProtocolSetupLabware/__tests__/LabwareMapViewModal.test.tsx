@@ -10,7 +10,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { i18n } from '../../../i18n'
-import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { mockProtocolModuleInfo } from '../__fixtures__'
@@ -32,8 +32,8 @@ jest.mock('../../../redux/config')
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
   typeof getLabwareRenderInfo
 >
-const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
-  typeof getDeckConfigFromProtocolCommands
+const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocolCommands
 >
 
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
@@ -53,7 +53,7 @@ const render = (props: React.ComponentProps<typeof LabwareMapViewModal>) => {
 describe('LabwareMapViewModal', () => {
   beforeEach(() => {
     mockGetLabwareRenderInfo.mockReturnValue({})
-    mockGetDeckConfigFromProtocolCommands.mockReturnValue([])
+    mockGetSimplestDeckConfigForProtocolCommands.mockReturnValue([])
   })
 
   afterEach(() => {

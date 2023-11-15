@@ -24,10 +24,6 @@ import {
   GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
@@ -232,18 +228,6 @@ export type ModuleModelWithLegacy =
   | typeof MAGDECK
   | typeof TEMPDECK
 
-export type FixtureLoadName =
-  | typeof STAGING_AREA_LOAD_NAME
-  | typeof STANDARD_SLOT_LOAD_NAME
-  | typeof TRASH_BIN_LOAD_NAME
-  | typeof WASTE_CHUTE_LOAD_NAME
-
-export interface DeckOffset {
-  x: number
-  y: number
-  z: number
-}
-
 export interface Dimensions {
   xDimension: number
   yDimension: number
@@ -252,13 +236,6 @@ export interface Dimensions {
 
 export interface DeckRobot {
   model: RobotType
-}
-
-export interface DeckFixture {
-  id: string
-  slot: string
-  labware: string
-  displayName: string
 }
 
 export type CoordinateTuple = [number, number, number]
@@ -307,27 +284,9 @@ export interface AddressableArea {
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 
-export interface DeckLocations {
-  orderedSlots: DeckSlot[]
-  calibrationPoints: DeckCalibrationPoint[]
-  fixtures: DeckFixture[]
-  addressableAreas: AddressableArea[]
-}
-
 export interface DeckMetadata {
   displayName: string
   tags: string[]
-}
-
-export interface DeckDefinitionV3 {
-  otId: string
-  cornerOffsetFromOrigin: CoordinateTuple
-  dimensions: CoordinateTuple
-  robot: DeckRobot
-  cutoutFixtures: CutoutFixture[]
-  locations: DeckLocations
-  metadata: DeckMetadata
-  layers: INode[]
 }
 
 export interface DeckCutout {
@@ -338,13 +297,12 @@ export interface DeckCutout {
 
 export interface LegacyFixture {
   id: string
-  // TODO: is this cutout location?
   slot: string
   labware: string
   displayName: string
 }
 
-export interface DeckLocationsV4 {
+export interface DeckLocations {
   addressableAreas: AddressableArea[]
   calibrationPoints: DeckCalibrationPoint[]
   cutouts: DeckCutout[]
@@ -356,7 +314,7 @@ export interface DeckDefinition {
   cornerOffsetFromOrigin: CoordinateTuple
   dimensions: CoordinateTuple
   robot: DeckRobot
-  locations: DeckLocationsV4
+  locations: DeckLocations
   metadata: DeckMetadata
   cutoutFixtures: CutoutFixture[]
 }
@@ -633,10 +591,9 @@ export type FlexSlot =
   | 'C4'
   | 'D4'
 
-export interface Fixture {
-  fixtureId: string
-  fixtureLocation: Cutout
-  loadName: FixtureLoadName
+export interface CutoutConfig {
+  cutoutId: CutoutId
+  cutoutFixtureId: CutoutFixtureId | null
 }
 
-export type DeckConfiguration = Fixture[]
+export type DeckConfiguration = CutoutConfig[]

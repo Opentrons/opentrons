@@ -24,7 +24,10 @@ import {
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
-  STANDARD_SLOT_LOAD_NAME,
+  SINGLE_RIGHT_CUTOUTS,
+  SINGLE_SLOT_FIXTURES,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
@@ -33,7 +36,7 @@ import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstruction
 import { AddFixtureModal } from './AddFixtureModal'
 import { useRunStatuses } from '../Devices/hooks'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -52,10 +55,9 @@ export function DeviceDetailsDeckConfiguration({
   const [showAddFixtureModal, setShowAddFixtureModal] = React.useState<boolean>(
     false
   )
-  const [
-    targetFixtureLocation,
-    setTargetFixtureLocation,
-  ] = React.useState<Cutout | null>(null)
+  const [targetCutoutId, setTargetCutoutId] = React.useState<CutoutId | null>(
+    null
+  )
 
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
@@ -65,29 +67,38 @@ export function DeviceDetailsDeckConfiguration({
   })
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
 
-  const handleClickAdd = (fixtureLocation: Cutout): void => {
-    setTargetFixtureLocation(fixtureLocation)
+  const handleClickAdd = (cutoutId: CutoutId): void => {
+    setTargetCutoutId(cutoutId)
     setShowAddFixtureModal(true)
   }
 
-  const handleClickRemove = (fixtureLocation: Cutout): void => {
-    console.log('remove fixtureLocation', fixtureLocation)
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    })
+  const handleClickRemove = (cutoutId: CutoutId): void => {
+    const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
+    const singleSlotFixture = isRightCutout
+      ? SINGLE_RIGHT_SLOT_FIXTURE
+      : SINGLE_LEFT_SLOT_FIXTURE
+
+    const newDeckConfig = deckConfig.map(fixture =>
+      fixture.cutoutId === cutoutId
+        ? { ...fixture, cutoutFixtureId: singleSlotFixture }
+        : fixture
+    )
+
+    updateDeckConfiguration(newDeckConfig)
   }
 
   // do not show standard slot in fixture display list
   const fixtureDisplayList = deckConfig.filter(
-    fixture => fixture.loadName !== STANDARD_SLOT_LOAD_NAME
+    fixture =>
+      fixture.cutoutFixtureId != null &&
+      !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
   )
 
   return (
     <>
-      {showAddFixtureModal && targetFixtureLocation != null ? (
+      {showAddFixtureModal && targetCutoutId != null ? (
         <AddFixtureModal
-          fixtureLocation={targetFixtureLocation}
+          cutoutId={targetCutoutId}
           setShowAddFixtureModal={setShowAddFixtureModal}
         />
       ) : null}
@@ -182,7 +193,7 @@ export function DeviceDetailsDeckConfiguration({
               {fixtureDisplayList.map(fixture => {
                 return (
                   <Flex
-                    key={fixture.fixtureId}
+                    key={fixture.cutoutId}
                     backgroundColor={COLORS.fundamentalsBackground}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
@@ -190,10 +201,10 @@ export function DeviceDetailsDeckConfiguration({
                     css={TYPOGRAPHY.labelRegular}
                   >
                     <StyledText>
-                      {getCutoutDisplayName(fixture.fixtureLocation)}
+                      {getCutoutDisplayName(fixture.cutoutId)}
                     </StyledText>
                     <StyledText>
-                      {getFixtureDisplayName(fixture.loadName)}
+                      {getFixtureDisplayName(fixture.cutoutFixtureId)}
                     </StyledText>
                   </Flex>
                 )
