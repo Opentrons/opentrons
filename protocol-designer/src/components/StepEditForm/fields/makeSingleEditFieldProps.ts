@@ -7,7 +7,7 @@ import {
   getFieldDefaultTooltip,
   getSingleSelectDisabledTooltip,
 } from '../utils'
-import { StepFieldName, FormData, HydratedFormData } from '../../../form-types'
+import { StepFieldName, FormData } from '../../../form-types'
 import { FieldProps, FieldPropsByName, FocusHandlers } from '../types'
 interface ShowFieldErrorParams {
   name: StepFieldName
@@ -24,7 +24,7 @@ export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
   formData: FormData,
   handleChangeFormInput: (name: string, value: unknown) => void,
-  hydratedForm: HydratedFormData
+  hydratedForm: any //  TODO: create real HydratedFormData type
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
   const fieldNames: string[] = Object.keys(

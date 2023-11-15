@@ -1,13 +1,10 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { CheckboxRowField, DelayFields, WellOrderField } from '../../fields'
 import { SourceDestFields } from '../MoveLiquidForm/SourceDestFields'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormData } from '../../../../form-types'
 
 jest.mock('../../../../step-forms')
@@ -39,18 +36,7 @@ jest.mock('../../fields/', () => {
     WellSelectionField: () => <div></div>,
   }
 })
-const fixtureTipRack10ul = {
-  ...fixture_tiprack_10_ul,
-  version: 2,
-} as LabwareDefinition2
 
-const fixtureTipRack300uL = {
-  ...fixture_tiprack_300_ul,
-  version: 2,
-} as LabwareDefinition2
-const ten = '10uL'
-const threeHundred = '300uL'
-const sourceLab = 'sourceLabware'
 describe('SourceDestFields', () => {
   let store: any
   let props: React.ComponentProps<typeof SourceDestFields>
@@ -191,11 +177,6 @@ describe('SourceDestFields', () => {
         },
       },
       prefix: 'aspirate',
-      allLabware: {
-        [ten]: fixtureTipRack10ul,
-        [threeHundred]: fixtureTipRack300uL,
-        [sourceLab]: { parameters: { quirks: ['touchTipDisabled'] } } as any,
-      },
     }
     store = {
       dispatch: jest.fn(),
