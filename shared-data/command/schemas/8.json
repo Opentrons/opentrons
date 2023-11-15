@@ -1928,7 +1928,7 @@
     },
     "MoveToAddressableAreaCreate": {
       "title": "MoveToAddressableAreaCreate",
-      "description": "Move to well command creation request model.",
+      "description": "Move to addressable area command creation request model.",
       "type": "object",
       "properties": {
         "commandType": {

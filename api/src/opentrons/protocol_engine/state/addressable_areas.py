@@ -117,8 +117,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             addressable_area_name = command.params.addressableAreaName
             self._check_location_is_addressable_area(addressable_area_name)
 
+    @staticmethod
     def _get_addressable_areas_from_deck_configuration(
-        self, deck_config: DeckConfiguration, deck_definition: DeckDefinitionV4
+        deck_config: DeckConfiguration, deck_definition: DeckDefinitionV4
     ) -> List[AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
         # TODO uncomment once execute is hooked up with this properly
