@@ -75,6 +75,10 @@ class CompletedAnalysis(BaseModel):
         JSON protocols are currently deterministic by design.
     """
 
+    # We want to unify this HTTP-facing analysis model with the one that local analysis returns.
+    # Until that happens, we need to keep these fields in sync manually.
+
+    # Fields that are currently unique to robot-server, missing from local analysis:
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: Literal[AnalysisStatus.COMPLETED] = Field(
         AnalysisStatus.COMPLETED,
@@ -84,9 +88,11 @@ class CompletedAnalysis(BaseModel):
         ...,
         description="Whether the protocol is expected to run successfully",
     )
-    pipettes: List[LoadedPipette] = Field(
+
+    # Fields that should match local analysis:
+    commands: List[Command] = Field(
         ...,
-        description="Pipettes used by the protocol",
+        description="The protocol commands the run is expected to produce",
     )
     labware: List[LoadedLabware] = Field(
         ...,
@@ -98,13 +104,17 @@ class CompletedAnalysis(BaseModel):
             " not its *initial* location."
         ),
     )
+    pipettes: List[LoadedPipette] = Field(
+        ...,
+        description="Pipettes used by the protocol",
+    )
     modules: List[LoadedModule] = Field(
         default_factory=list,
         description="Modules that have been loaded into the run.",
     )
-    commands: List[Command] = Field(
-        ...,
-        description="The protocol commands the run is expected to produce",
+    liquids: List[Liquid] = Field(
+        default_factory=list,
+        description="Liquids used by the protocol",
     )
     errors: List[ErrorOccurrence] = Field(
         ...,
@@ -113,10 +123,6 @@ class CompletedAnalysis(BaseModel):
             " For historical reasons, this is an array,"
             " but it won't have more than one element."
         ),
-    )
-    liquids: List[Liquid] = Field(
-        default_factory=list,
-        description="Liquids used by the protocol",
     )
 
 
