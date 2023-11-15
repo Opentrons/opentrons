@@ -4,7 +4,7 @@ import { StyleProps, Svg } from '../../primitives'
 import { StyledDeck } from './StyledDeck'
 
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
-import type { TrashLocation } from './FlexTrash'
+import type { TrashCutoutId } from './FlexTrash'
 
 export interface RobotWorkSpaceRenderProps {
   deckSlotsById: { [slotId: string]: DeckSlot }
@@ -23,7 +23,7 @@ export interface RobotWorkSpaceProps extends StyleProps {
   // optional boolean to show the OT-2 deck from deck defintion layers
   showDeckLayers?: boolean
   // TODO(bh, 2023-10-09): remove
-  trashSlotName?: TrashLocation
+  trashCutoutId?: TrashCutoutId
   trashColor?: string
   id?: string
 }
@@ -37,7 +37,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     deckFill = '#CCCCCC',
     deckLayerBlocklist = [],
     showDeckLayers = false,
-    trashSlotName,
+    trashCutoutId,
     viewBox,
     trashColor,
     id,
@@ -89,7 +89,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
           deckFill={deckFill}
           layerBlocklist={deckLayerBlocklist}
           robotType={OT2_ROBOT_TYPE}
-          trashLocation={trashSlotName}
+          trashCutoutId={trashCutoutId}
           trashColor={trashColor}
         />
       ) : null}

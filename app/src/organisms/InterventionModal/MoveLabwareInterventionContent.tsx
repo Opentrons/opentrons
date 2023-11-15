@@ -197,7 +197,7 @@ export function MoveLabwareInterventionContent({
               loadedModules={run.modules}
               loadedLabware={run.labware}
               // TODO(bh, 2023-07-19): remove when StyledDeck removed from MoveLabwareOnDeck
-              trashLocation={
+              trashCutoutId={
                 robotType === 'OT-3 Standard' ? 'cutoutA3' : undefined
               }
               backgroundItems={

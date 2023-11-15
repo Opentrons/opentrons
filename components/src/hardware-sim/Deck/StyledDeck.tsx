@@ -6,13 +6,13 @@ import { FlexTrash } from './FlexTrash'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { DeckFromLayersProps } from './DeckFromLayers'
-import type { TrashLocation } from './FlexTrash'
+import type { TrashCutoutId } from './FlexTrash'
 
 interface StyledDeckProps {
   deckFill: string
   robotType: RobotType
   trashColor?: string
-  trashLocation?: TrashLocation
+  trashCutoutId?: TrashCutoutId
 }
 
 // apply fill to .SLOT_BASE class from ot3_standard deck definition
@@ -28,12 +28,12 @@ export function StyledDeck(
   const {
     deckFill,
     robotType,
-    trashLocation,
+    trashCutoutId,
     trashColor = '#757070',
     ...DeckFromLayersProps
   } = props
   const trashSlotClipId =
-    trashLocation != null ? `SLOT_CLIPS_${trashLocation}` : null
+    trashCutoutId != null ? `SLOT_CLIPS_${trashCutoutId}` : null
 
   const trashLayerBlocklist =
     trashSlotClipId != null
@@ -47,13 +47,13 @@ export function StyledDeck(
         layerBlocklist={trashLayerBlocklist}
         robotType={robotType}
       />
-      {/* TODO(bh, 2023-11-06): remove trash and trashLocation prop when StyledDeck removed from MoveLabwareOnDeck */}
-      {trashLocation != null ? (
+      {/* TODO(bh, 2023-11-06): remove trash and trashCutoutId prop when StyledDeck removed from MoveLabwareOnDeck */}
+      {trashCutoutId != null ? (
         <FlexTrash
           robotType={robotType}
           trashIconColor={deckFill}
           backgroundColor={trashColor}
-          trashLocation={trashLocation}
+          trashCutoutId={trashCutoutId}
         />
       ) : null}
     </StyledG>

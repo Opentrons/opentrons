@@ -35,7 +35,7 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type { TrashLocation } from '../Deck/FlexTrash'
+import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 import type { WellFill } from '../Labware'
 
@@ -155,7 +155,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 robotType={robotType}
                 trashIconColor={lightFill}
                 // TODO(bh, 2023-10-09): typeguard fixture location
-                trashLocation={fixture.cutoutId as TrashLocation}
+                trashCutoutId={fixture.cutoutId as TrashCutoutId}
                 backgroundColor={darkFill}
               />
             </React.Fragment>
