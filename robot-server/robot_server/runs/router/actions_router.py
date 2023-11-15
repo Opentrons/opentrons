@@ -108,12 +108,14 @@ async def create_run_action(
     Arguments:
         runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
+        engine_store: Dependency to fetch the engine store.
         run_controller: Run controller bound to the given run ID.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
         maintenance_engine_store: The maintenance run's EngineStore
         deck_configuration_store: The deck configuration store
         check_estop: Dependency to verify the estop is in a valid state.
+        deck_configuration_store: Dependency to fetch the deck configuration.
     """
     action_type = request_body.data.actionType
     if (

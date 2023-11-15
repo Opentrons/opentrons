@@ -155,6 +155,7 @@ async def create_run(
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
         check_estop: Dependency to verify the estop is in a valid state.
+        deck_configuration_store: Dependency to fetch the deck configuration.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []

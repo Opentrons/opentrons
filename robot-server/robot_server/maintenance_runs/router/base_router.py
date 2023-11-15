@@ -164,6 +164,7 @@ async def create_run(
         created_at: Timestamp to attach to created run.
         is_ok_to_create_maintenance_run: Verify if a maintenance run may be created if a protocol run exists.
         check_estop: Dependency to verify the estop is in a valid state.
+        deck_configuration_store: Dependency to fetch the deck configuration.
     """
     if not is_ok_to_create_maintenance_run:
         raise ProtocolRunIsActive(

@@ -1,7 +1,7 @@
 # noqa: D100
 
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from . import models
 from opentrons.protocol_engine.types import DeckConfigurationType
