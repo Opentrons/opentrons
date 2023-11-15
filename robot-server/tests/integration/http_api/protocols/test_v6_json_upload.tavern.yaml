@@ -68,7 +68,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-        links: 
+        links:
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
@@ -84,6 +84,7 @@ stages:
           - id: '{analysis_id}'
             status: completed
             result: ok
+            robotType: OT-2 Standard
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single
@@ -131,8 +132,8 @@ stages:
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params: { }
-                result: { }
+                params: {}
+                result: {}
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
