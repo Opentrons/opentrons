@@ -44,15 +44,15 @@ describe('getModuleImage', () => {
 
 describe('getFixtureImage', () => {
   it('should render the staging area image', () => {
-    const result = getFixtureImage('stagingArea')
+    const result = getFixtureImage('stagingAreaRightSlot')
     expect(result).toEqual('staging_area_slot.png')
   })
   it('should render the waste chute image', () => {
-    const result = getFixtureImage('wasteChute')
+    const result = getFixtureImage('wasteChuteRightAdapterNoCover')
     expect(result).toEqual('waste_chute.png')
   })
   it('should render the trash binimage', () => {
-    const result = getFixtureImage('trashBin')
+    const result = getFixtureImage('trashBinAdapter')
     expect(result).toEqual('flex_trash_bin.png')
   })
   //  TODO(jr, 10/17/23): add rest of the test cases when we add the assets

@@ -1,48 +1,60 @@
+import { parseAllAddressableAreas } from '@opentrons/api-client'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotTypeV4,
+} from '@opentrons/shared-data'
 
-import type { Fixture, LoadFixtureRunTimeCommand } from '@opentrons/shared-data'
+import {
+  getCutoutFixturesForCutoutId,
+  getCutoutIdForAddressableArea,
+} from './utils'
 
-export const CONFIGURED = 'configured'
-export const CONFLICTING = 'conflicting'
-export const NOT_CONFIGURED = 'not configured'
+import type {
+  CutoutFixtureId,
+  RobotType,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type { CutoutConfigProtocolSpec } from './utils'
 
-type LoadedFixtureConfigurationStatus =
-  | typeof CONFIGURED
-  | typeof CONFLICTING
-  | typeof NOT_CONFIGURED
-
-type LoadedFixtureConfiguration = LoadFixtureRunTimeCommand & {
-  configurationStatus: LoadedFixtureConfigurationStatus
+export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
 }
-
-export function useLoadedFixturesConfigStatus(
-  loadedFixtures: LoadFixtureRunTimeCommand[]
-): LoadedFixtureConfiguration[] {
+export function useDeckConfigurationCompatibility(
+  robotType: RobotType,
+  protocolCommands: RunTimeCommand[]
+): CutoutConfigAndCompatibility[] {
   const deckConfig = useDeckConfigurationQuery().data ?? []
-
-  return loadedFixtures.map(loadedFixture => {
-    const deckConfigurationAtLocation = deckConfig.find(
-      (deckFixture: Fixture) =>
-        deckFixture.fixtureLocation === loadedFixture.params.location.cutout
-    )
-
-    let configurationStatus: LoadedFixtureConfigurationStatus = NOT_CONFIGURED
-    if (
-      deckConfigurationAtLocation != null &&
-      deckConfigurationAtLocation.loadName === loadedFixture.params.loadName
-    ) {
-      configurationStatus = CONFIGURED
-      //  special casing this for now until we know what the backend will give us. It is only
-      //  conflicting if the current deck configuration fixture is not the desired or standard slot
-    } else if (
-      deckConfigurationAtLocation != null &&
-      deckConfigurationAtLocation.loadName !== loadedFixture.params.loadName &&
-      deckConfigurationAtLocation.loadName !== STANDARD_SLOT_LOAD_NAME
-    ) {
-      configurationStatus = CONFLICTING
-    }
-
-    return { ...loadedFixture, configurationStatus }
-  })
+  if (robotType !== FLEX_ROBOT_TYPE) return []
+  const deckDef = getDeckDefFromRobotTypeV4(robotType)
+  const allAddressableAreas = parseAllAddressableAreas(protocolCommands)
+  return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
+    (acc, { cutoutId, cutoutFixtureId }) => {
+      const fixturesThatMountToCutoutId = getCutoutFixturesForCutoutId(
+        cutoutId,
+        deckDef.cutoutFixtures
+      )
+      const requiredAddressableAreasForCutoutId = allAddressableAreas.filter(
+        aa =>
+          getCutoutIdForAddressableArea(aa, fixturesThatMountToCutoutId) ===
+          cutoutId
+      )
+      return [
+        ...acc,
+        {
+          cutoutId,
+          cutoutFixtureId: cutoutFixtureId,
+          requiredAddressableAreas: requiredAddressableAreasForCutoutId,
+          compatibleCutoutFixtureIds: fixturesThatMountToCutoutId
+            .filter(cf =>
+              requiredAddressableAreasForCutoutId.every(aa =>
+                cf.providesAddressableAreas[cutoutId].includes(aa)
+              )
+            )
+            .map(cf => cf.id),
+        },
+      ]
+    },
+    []
+  )
 }

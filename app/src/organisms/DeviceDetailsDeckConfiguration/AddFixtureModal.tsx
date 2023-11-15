@@ -14,13 +14,18 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
-  STAGING_AREA_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
+  STAGING_AREA_CUTOUTS,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_CUTOUT,
+  WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
@@ -30,24 +35,24 @@ import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type {
-  Cutout,
+  CutoutConfig,
+  CutoutId,
+  CutoutFixtureId,
   DeckConfiguration,
-  Fixture,
-  FixtureLoadName,
 } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 interface AddFixtureModalProps {
-  fixtureLocation: Cutout
+  cutoutId: CutoutId
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void
-  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<DeckConfiguration>>
-  providedFixtureOptions?: FixtureLoadName[]
+  setCurrentDeckConfig?: React.Dispatch<React.SetStateAction<CutoutConfig[]>>
+  providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
 
 export function AddFixtureModal({
-  fixtureLocation,
+  cutoutId,
   setShowAddFixtureModal,
   setCurrentDeckConfig,
   providedFixtureOptions,
@@ -55,10 +60,11 @@ export function AddFixtureModal({
 }: AddFixtureModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
+  const deckConfig = useDeckConfigurationQuery()?.data ?? []
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(fixtureLocation),
+      slotName: getCutoutDisplayName(cutoutId),
     }),
     hasExitIcon: true,
     onClick: () => setShowAddFixtureModal(false),
@@ -66,7 +72,7 @@ export function AddFixtureModal({
 
   const modalProps: LegacyModalProps = {
     title: t('add_to_slot', {
-      slotName: getCutoutDisplayName(fixtureLocation),
+      slotName: getCutoutDisplayName(cutoutId),
     }),
     onClose: () => setShowAddFixtureModal(false),
     closeOnOutsideClick: true,
@@ -74,26 +80,22 @@ export function AddFixtureModal({
     width: '23.125rem',
   }
 
-  const availableFixtures: FixtureLoadName[] = [TRASH_BIN_LOAD_NAME]
-  if (
-    fixtureLocation === 'cutoutA3' ||
-    fixtureLocation === 'cutoutB3' ||
-    fixtureLocation === 'cutoutC3'
-  ) {
-    availableFixtures.push(STAGING_AREA_LOAD_NAME)
+  const availableFixtures: CutoutFixtureId[] = [TRASH_BIN_ADAPTER_FIXTURE]
+  if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
+    availableFixtures.push(STAGING_AREA_RIGHT_SLOT_FIXTURE)
   }
-  if (fixtureLocation === 'cutoutD3') {
-    availableFixtures.push(STAGING_AREA_LOAD_NAME, WASTE_CHUTE_LOAD_NAME)
+  if (cutoutId === WASTE_CHUTE_CUTOUT) {
+    availableFixtures.push(...WASTE_CHUTE_FIXTURES)
   }
 
   // For Touchscreen app
-  const handleTapAdd = (fixtureLoadName: FixtureLoadName): void => {
+  const handleTapAdd = (requiredFixtureId: CutoutFixtureId): void => {
     if (setCurrentDeckConfig != null)
       setCurrentDeckConfig(
         (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
-          prevDeckConfig.map((fixture: Fixture) =>
-            fixture.fixtureLocation === fixtureLocation
-              ? { ...fixture, loadName: fixtureLoadName }
+          prevDeckConfig.map((fixture: CutoutConfig) =>
+            fixture.cutoutId === cutoutId
+              ? { ...fixture, cutoutFixtureId: requiredFixtureId }
               : fixture
           )
       )
@@ -104,11 +106,14 @@ export function AddFixtureModal({
   // For Desktop app
   const fixtureOptions = providedFixtureOptions ?? availableFixtures
 
-  const handleClickAdd = (fixtureLoadName: FixtureLoadName): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: fixtureLoadName,
-    })
+  const handleClickAdd = (requiredFixtureId: CutoutFixtureId): void => {
+    const newDeckConfig = deckConfig.map(fixture =>
+      fixture.cutoutId === cutoutId
+        ? { ...fixture, cutoutFixtureId: requiredFixtureId }
+        : fixture
+    )
+
+    updateDeckConfiguration(newDeckConfig)
     setShowAddFixtureModal(false)
   }
 
@@ -122,10 +127,10 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {fixtureOptions.map(fixture => (
-                <React.Fragment key={fixture}>
+              {fixtureOptions.map(cutoutFixtureId => (
+                <React.Fragment key={cutoutFixtureId}>
                   <AddFixtureButton
-                    fixtureLoadName={fixture}
+                    cutoutFixtureId={cutoutFixtureId}
                     handleClickAdd={handleTapAdd}
                   />
                 </React.Fragment>
@@ -166,18 +171,18 @@ export function AddFixtureModal({
 }
 
 interface AddFixtureButtonProps {
-  fixtureLoadName: FixtureLoadName
-  handleClickAdd: (fixtureLoadName: FixtureLoadName) => void
+  cutoutFixtureId: CutoutFixtureId
+  handleClickAdd: (cutoutFixtureId: CutoutFixtureId) => void
 }
 function AddFixtureButton({
-  fixtureLoadName,
+  cutoutFixtureId,
   handleClickAdd,
 }: AddFixtureButtonProps): JSX.Element {
   const { t } = useTranslation('device_details')
 
   return (
     <Btn
-      onClick={() => handleClickAdd(fixtureLoadName)}
+      onClick={() => handleClickAdd(cutoutFixtureId)}
       display="flex"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       flexDirection={DIRECTION_ROW}
@@ -186,7 +191,7 @@ function AddFixtureButton({
       css={FIXTURE_BUTTON_STYLE}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {getFixtureDisplayName(fixtureLoadName)}
+        {getFixtureDisplayName(cutoutFixtureId)}
       </StyledText>
       <StyledText as="p">{t('add')}</StyledText>
     </Btn>
