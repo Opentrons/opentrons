@@ -70,7 +70,9 @@ interface SetupModulesListProps {
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId } = props
   const { t } = useTranslation('protocol_setup')
-  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(runId)
+  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
+    runId
+  )
   const {
     missingModuleIds,
     remainingAttachedModules,

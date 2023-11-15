@@ -12,7 +12,6 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
@@ -52,7 +51,7 @@ export function SetupLabwareMap({
 
   const commands = protocolAnalysis.commands
 
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)

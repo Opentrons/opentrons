@@ -61,9 +61,10 @@ export function useProtocolDetailsForRun(
     protocolData: mostRecentAnalysis ?? null,
     protocolKey: protocolRecord?.data.key ?? null,
     isProtocolAnalyzing: protocolRecord != null && mostRecentAnalysis == null,
-    robotType: protocolRecord?.data.robotType ?? 
+    robotType:
+      protocolRecord?.data.robotType ??
       (mostRecentAnalysis?.status === 'completed'
         ? mostRecentAnalysis?.robotType ?? FLEX_ROBOT_TYPE
-        : FLEX_ROBOT_TYPE)
+        : FLEX_ROBOT_TYPE),
   }
 }

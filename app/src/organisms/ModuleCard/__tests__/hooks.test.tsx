@@ -9,7 +9,6 @@ import { i18n } from '../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
-import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useIsRobotBusy, useRunStatuses } from '../../Devices/hooks'
 import {
@@ -31,16 +30,12 @@ import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../Devices/hooks')
 
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
->
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
 >
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
@@ -626,31 +621,27 @@ const mockHeaterShakerDefinition = {
   twoDimensionalRendering: { children: [] },
 }
 
-const HEATER_SHAKER_MODULE_INFO = {
-  moduleId: 'heaterShakerModuleId',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockHeaterShakerDefinition as any,
-  nestedLabwareDef: null,
-  nestedLabwareId: null,
-  nestedLabwareDisplayName: null,
-  protocolLoadOrder: 0,
-  slotName: '1',
-}
-
 describe('useIsHeaterShakerInProtocol', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
   beforeEach(() => {
     when(mockUseCurrentRunId).calledWith().mockReturnValue('1')
     store.dispatch = jest.fn()
-    mockGetProtocolModulesInfo.mockReturnValue([HEATER_SHAKER_MODULE_INFO])
 
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
       .mockReturnValue({
         ...heaterShakerCommandsWithResultsKey,
+        modules: [
+          {
+            id: 'fake_module_id',
+            model: 'heaterShakerModuleV1',
+            location: {
+              slotName: '1',
+            },
+            serialNumber: 'fake_serial',
+          },
+        ],
         labware: Object.keys(heaterShakerCommandsWithResultsKey.labware).map(
           id => ({
             location: 'offDeck',
@@ -677,8 +668,20 @@ describe('useIsHeaterShakerInProtocol', () => {
   })
 
   it('should return false when a heater shaker is NOT in the protocol', () => {
-    mockGetProtocolModulesInfo.mockReturnValue([])
-
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith('1')
+      .mockReturnValue({
+        ...heaterShakerCommandsWithResultsKey,
+        modules: [],
+        labware: Object.keys(heaterShakerCommandsWithResultsKey.labware).map(
+          id => ({
+            location: 'offDeck',
+            loadName: id,
+            definitionUrui: id,
+            id,
+          })
+        ),
+      } as any)
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )

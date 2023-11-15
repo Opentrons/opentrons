@@ -35,7 +35,9 @@ export function useModuleRenderInfoForProtocolById(
   const attachedModules = useAttachedModules()
   if (protocolAnalysis == null) return {}
 
-  const deckDef = getDeckDefFromRobotType(protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE)
+  const deckDef = getDeckDefFromRobotType(
+    protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
+  )
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 

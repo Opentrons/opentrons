@@ -153,7 +153,7 @@ describe('SetupModulesList', () => {
   it('should render the list view headers', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({})
     const { getByText } = render(props)
     getByText('Module')
@@ -349,7 +349,7 @@ describe('SetupModulesList', () => {
     const dupModPort = 10
     const dupModHub = 2
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
           moduleId: mockMagneticModule.moduleId,

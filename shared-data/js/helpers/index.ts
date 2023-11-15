@@ -7,7 +7,6 @@ import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
-  LoadedLabware,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
@@ -335,15 +334,6 @@ export const getCalibrationAdapterLoadName = (
       )
       return null
   }
-}
-
-export const getRobotTypeFromLoadedLabware = (
-  labware: LoadedLabware[]
-): RobotType => {
-  const isProtocolForOT3 = labware.some(
-    l => l.loadName === 'opentrons_1_trash_3200ml_fixed'
-  )
-  return isProtocolForOT3 ? 'OT-3 Standard' : 'OT-2 Standard'
 }
 
 export const getDeckDefFromRobotType = (

@@ -3,7 +3,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
@@ -49,10 +48,6 @@ jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo')
 
-const mockGetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<
-  typeof getRobotTypeFromLoadedLabware
->
-
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
 >
@@ -79,9 +74,11 @@ const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as
 >
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
 
-const protocolAnalysis = simpleAnalysisFileFixture as any
+const protocolAnalysis = {
+  ...simpleAnalysisFileFixture,
+  robotType: OT2_ROBOT_TYPE,
+} as any
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
-const labware: LoadedLabware[] = simpleAnalysisFileFixture.labware as any
 const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_SECOND_MAGNETIC_MODULE_COORDS = [100, 200, 0]
@@ -111,9 +108,6 @@ const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
 
 describe('DeckThumbnail', () => {
   beforeEach(() => {
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(labware)
-      .mockReturnValue(OT2_ROBOT_TYPE)
     when(mockGetDeckDefFromRobotType)
       .calledWith(OT2_ROBOT_TYPE)
       .mockReturnValue(ot2StandardDeckDef as any)
@@ -228,9 +222,6 @@ describe('DeckThumbnail', () => {
     //     nestedLabwareDef: null,
     //   },
     // ]
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(labware)
-      .mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockGetDeckDefFromRobotType)
       .calledWith(FLEX_ROBOT_TYPE)
       .mockReturnValue(ot3StandardDeckDef as any)

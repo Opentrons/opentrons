@@ -66,8 +66,8 @@ export function ProtocolRunSetup({
   const { t, i18n } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
-  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const modules = parseAllRequiredModuleModels(protocolData?.commands ?? [])
+  const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const modules = parseAllRequiredModuleModels(protocolAnalysis?.commands ?? [])
 
   const robot = useRobot(robotName)
   const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)
@@ -80,7 +80,7 @@ export function ProtocolRunSetup({
   )
 
   const stepsKeysInOrder =
-    protocolData != null
+    protocolAnalysis != null
       ? [
           ROBOT_CALIBRATION_STEP_KEY,
           MODULE_SETUP_KEY,
@@ -91,33 +91,34 @@ export function ProtocolRunSetup({
       : [ROBOT_CALIBRATION_STEP_KEY, LPC_KEY, LABWARE_SETUP_KEY]
 
   const targetStepKeyInOrder = stepsKeysInOrder.filter((stepKey: StepKey) => {
-    if (protocolData == null) {
+    if (protocolAnalysis == null) {
       return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
     }
 
     if (
-      protocolData.modules.length === 0 &&
-      protocolData.liquids.length === 0
+      protocolAnalysis.modules.length === 0 &&
+      protocolAnalysis.liquids.length === 0
     ) {
       return stepKey !== MODULE_SETUP_KEY && stepKey !== LIQUID_SETUP_KEY
     }
 
-    if (protocolData.modules.length === 0) {
+    if (protocolAnalysis.modules.length === 0) {
       return stepKey !== MODULE_SETUP_KEY
     }
 
-    if (protocolData.liquids.length === 0) {
+    if (protocolAnalysis.liquids.length === 0) {
       return stepKey !== LIQUID_SETUP_KEY
     }
     return true
   })
 
   if (robot == null) return null
-  const hasLiquids = protocolData != null && protocolData.liquids?.length > 0
-  const hasModules = protocolData != null && modules.length > 0
+  const hasLiquids =
+    protocolAnalysis != null && protocolAnalysis.liquids?.length > 0
+  const hasModules = protocolAnalysis != null && modules.length > 0
 
   const protocolDeckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolData?.commands ?? []
+    protocolAnalysis?.commands ?? []
   )
 
   const hasFixtures = protocolDeckConfig.length > 0
@@ -165,7 +166,7 @@ export function ProtocolRunSetup({
           robotName={robotName}
           runId={runId}
           hasModules={hasModules}
-          commands={protocolData?.commands ?? []}
+          commands={protocolAnalysis?.commands ?? []}
         />
       ),
       description: moduleDescription,
@@ -202,7 +203,7 @@ export function ProtocolRunSetup({
           protocolRunHeaderRef={protocolRunHeaderRef}
           robotName={robotName}
           runId={runId}
-          protocolAnalysis={protocolData}
+          protocolAnalysis={protocolAnalysis}
         />
       ),
       description: hasLiquids
@@ -217,7 +218,7 @@ export function ProtocolRunSetup({
       gridGap={SPACING.spacing16}
       margin={SPACING.spacing16}
     >
-      {protocolData != null ? (
+      {protocolAnalysis != null ? (
         <>
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />

@@ -33,7 +33,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 import {
   getRunLabwareRenderInfo,
@@ -103,6 +102,7 @@ export interface MoveLabwareInterventionProps {
   command: MoveLabwareRunTimeCommand
   analysis: CompletedProtocolAnalysis | null
   run: RunData
+  robotType: RobotType
   isOnDevice: boolean
 }
 
@@ -110,13 +110,13 @@ export function MoveLabwareInterventionContent({
   command,
   analysis,
   run,
+  robotType,
   isOnDevice,
 }: MoveLabwareInterventionProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
-  const robotType = getRobotTypeFromLoadedLabware(run.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const moduleRenderInfo = getRunModuleRenderInfo(

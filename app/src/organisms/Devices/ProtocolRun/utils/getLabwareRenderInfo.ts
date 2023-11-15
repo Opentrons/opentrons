@@ -1,7 +1,4 @@
-import {
-  getPositionFromSlotId,
-  getSlotHasMatingSurfaceUnitVector,
-} from '@opentrons/shared-data'
+import { getPositionFromSlotId } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
@@ -64,18 +61,21 @@ export const getLabwareRenderInfo = (
         )
         return acc
       }
-      const isSlot = deckDef.locations.addressableAreas.some(aa => aa.id === slotName && aa.areaType === 'slot')
+      const isSlot = deckDef.locations.addressableAreas.some(
+        aa => aa.id === slotName && aa.areaType === 'slot'
+      )
 
-      return isSlot ? {
-        ...acc,
-        [labwareId]: {
-          x: slotPosition[0],
-          y: slotPosition[1],
-          z: slotPosition[2],
-          labwareDef,
-          displayName,
-          slotName,
-        },
-      } : acc
-
+      return isSlot
+        ? {
+            ...acc,
+            [labwareId]: {
+              x: slotPosition[0],
+              y: slotPosition[1],
+              z: slotPosition[2],
+              labwareDef,
+              displayName,
+              slotName,
+            },
+          }
+        : acc
     }, {})
