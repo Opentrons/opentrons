@@ -196,6 +196,8 @@ export const migrateFile = (
       const labwareDef = allLatestDefs[labwareUri]
       acc[adapterUri] = adapterLabwareDef
       acc[labwareUri] = labwareDef
+    } else {
+      acc[defId] = labwareDefinitions[defId]
     }
     return acc
   }, {})
@@ -339,7 +341,7 @@ export const migrateFile = (
         }
         if (newDispenseLabwareDefinition == null) {
           console.error(
-            `expected to find aspirate labware definition with labwareId ${dispenseLabware} but could not`
+            `expected to find dispense labware definition with labwareId ${dispenseLabware} but could not`
           )
         }
         const dispenseTouchTipIncompatible = newDispenseLabwareDefinition?.parameters.quirks?.includes(
@@ -380,7 +382,7 @@ export const migrateFile = (
 
         if (newMixLabwareDefinition == null) {
           console.error(
-            `expected to find aspirate labware definition with labwareId ${mixLabware} but could not`
+            `expected to find mix labware definition with labwareId ${mixLabware} but could not`
           )
         }
 
