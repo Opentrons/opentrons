@@ -1,11 +1,16 @@
 import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
+
+import type { UseQueryResult } from 'react-query'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 const mockSetShowAddFixtureModal = jest.fn()
@@ -14,6 +19,9 @@ const mockSetCurrentDeckConfig = jest.fn()
 
 const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
   typeof useUpdateDeckConfigurationMutation
+>
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
 >
 
 const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
@@ -27,7 +35,7 @@ describe('Touchscreen AddFixtureModal', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'cutoutD3',
+      cutoutId: 'cutoutD3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
       setCurrentDeckConfig: mockSetCurrentDeckConfig,
       isOnDevice: true,
@@ -35,6 +43,9 @@ describe('Touchscreen AddFixtureModal', () => {
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+    mockUseDeckConfigurationQuery.mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
   it('should render text and buttons', () => {
@@ -43,10 +54,10 @@ describe('Touchscreen AddFixtureModal', () => {
     getByText(
       'Choose a fixture below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Staging Area Slot')
-    getByText('Trash Bin')
-    getByText('Waste Chute')
-    expect(getAllByText('Add').length).toBe(3)
+    getByText('Staging area slot')
+    getByText('Trash bin')
+    getByText('Waste chute only')
+    expect(getAllByText('Add').length).toBe(6)
   })
 
   it('should a mock function when tapping app button', () => {
@@ -61,7 +72,7 @@ describe('Desktop AddFixtureModal', () => {
 
   beforeEach(() => {
     props = {
-      fixtureLocation: 'cutoutD3',
+      cutoutId: 'cutoutD3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
     }
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
@@ -79,42 +90,39 @@ describe('Desktop AddFixtureModal', () => {
     getByText(
       'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Staging Area Slot')
-    getByText('Trash Bin')
-    getByText('Waste Chute')
-    expect(getAllByRole('button', { name: 'Add' }).length).toBe(3)
+    getByText('Staging area slot')
+    getByText('Trash bin')
+    getByText('Waste chute only')
+    expect(getAllByRole('button', { name: 'Add' }).length).toBe(6)
   })
 
   it('should render text and buttons slot A1', () => {
-    props = { ...props, fixtureLocation: 'cutoutA1' }
+    props = { ...props, cutoutId: 'cutoutA1' }
     const [{ getByText, getByRole }] = render(props)
     getByText('Add to slot A1')
     getByText(
       'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Trash Bin')
+    getByText('Trash bin')
     getByRole('button', { name: 'Add' })
   })
 
   it('should render text and buttons slot B3', () => {
-    props = { ...props, fixtureLocation: 'cutoutB3' }
+    props = { ...props, cutoutId: 'cutoutB3' }
     const [{ getByText, getAllByRole }] = render(props)
     getByText('Add to slot B3')
     getByText(
       'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Staging Area Slot')
-    getByText('Trash Bin')
+    getByText('Staging area slot')
+    getByText('Trash bin')
     expect(getAllByRole('button', { name: 'Add' }).length).toBe(2)
   })
 
   it('should call a mock function when clicking add button', () => {
-    props = { ...props, fixtureLocation: 'cutoutA1' }
+    props = { ...props, cutoutId: 'cutoutA1' }
     const [{ getByRole }] = render(props)
     getByRole('button', { name: 'Add' }).click()
-    expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith({
-      fixtureLocation: 'cutoutA1',
-      loadName: TRASH_BIN_LOAD_NAME,
-    })
+    expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 })

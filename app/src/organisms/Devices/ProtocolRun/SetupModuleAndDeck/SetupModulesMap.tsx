@@ -12,7 +12,7 @@ import {
   getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 
-import { getDeckConfigFromProtocolCommands } from '../../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
@@ -64,7 +64,7 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getDeckConfigFromProtocolCommands(
+  const deckConfig = getSimplestDeckConfigForProtocolCommands(
     protocolAnalysis.commands
   )
 
@@ -77,7 +77,10 @@ export const SetupModulesMap = ({
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <BaseDeck
-          deckConfig={deckConfig}
+          deckConfig={deckConfig.map(({ cutoutId, cutoutFixtureId }) => ({
+            cutoutId,
+            cutoutFixtureId,
+          }))}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           robotType={robotType}
           labwareLocations={[]}

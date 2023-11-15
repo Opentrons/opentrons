@@ -83,7 +83,7 @@ const getHardwareName = (protocolHardware: ProtocolHardware): string => {
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
-    return getFixtureDisplayName(protocolHardware.fixtureName)
+    return getFixtureDisplayName(protocolHardware.cutoutFixtureId)
   }
 }
 
