@@ -239,9 +239,7 @@ async def test_action_not_allowed(
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
     decoy.when(mock_engine_store.runner.was_started()).then_return(True)
-    decoy.when(mock_engine_store.runner.play(deck_configuration=[])).then_raise(
-        exception
-    )
+    decoy.when(mock_engine_store.runner.play()).then_raise(exception)
     decoy.when(mock_engine_store.runner.pause()).then_raise(exception)
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
