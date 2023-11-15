@@ -24,7 +24,6 @@ export function useUnmatchedModulesForProtocol(
 ): UnmatchedModuleResults {
   const robot = useRobot(robotName)
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const attachedModules = useAttachedModules()

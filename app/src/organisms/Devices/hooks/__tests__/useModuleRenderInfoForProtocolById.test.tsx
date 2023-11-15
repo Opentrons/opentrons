@@ -164,13 +164,13 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() =>
-      useModuleRenderInfoForProtocolById('otie', '1')
+      useModuleRenderInfoForProtocolById('1')
     )
     expect(result.current).toStrictEqual({})
   })
   it('should return module render info', () => {
     const { result } = renderHook(() =>
-      useModuleRenderInfoForProtocolById('otie', '1')
+      useModuleRenderInfoForProtocolById('1')
     )
     expect(result.current).toStrictEqual({
       magneticModuleId: {

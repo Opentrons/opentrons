@@ -8,6 +8,7 @@ from typing_extensions import Final
 
 import sqlalchemy
 
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -126,6 +127,7 @@ class AnalysisStore:
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
         liquids: List[Liquid],
+        robot_type: RobotType
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 
@@ -162,6 +164,7 @@ class AnalysisStore:
             pipettes=pipettes,
             errors=errors,
             liquids=liquids,
+            robot_type=robot_type
         )
         completed_analysis_resource = CompletedAnalysisResource(
             id=completed_analysis.id,
