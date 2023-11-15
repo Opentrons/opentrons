@@ -376,8 +376,7 @@ def _load_pipette(
     if pipette.channels == 8 and not increment and not photometric:
         hwapi = get_sync_hw_api(ctx)
         mnt = OT3Mount.LEFT if pipette_mount == "left" else OT3Mount.RIGHT
-        hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
-        hwpipette.pick_up_configurations.current = 0.2
+        hwapi.update_nozzle_configuration_for_mount(mnt, "H1", "H1", "H1")
     return pipette
 
 

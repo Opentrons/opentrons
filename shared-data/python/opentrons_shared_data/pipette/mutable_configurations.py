@@ -40,6 +40,34 @@ SERIAL_STUB_REGEX = re.compile(r"P[0-9]{1,3}[KSMHV]{1,2}V[0-9]{2}")
 LIQUID_CLASS = LiquidClasses.default
 
 
+def _edit_non_quirk(
+    mutable_config_key: str, new_mutable_value: MutableConfig, base_dict: Dict[str, Any]
+) -> None:
+    def _do_edit_non_quirk(
+        new_value: MutableConfig, existing: Dict[Any, Any], keypath: List[Any]
+    ) -> None:
+        thiskey: Any = keypath[0]
+        if thiskey in [lc.name for lc in LiquidClasses]:
+            thiskey = LiquidClasses[thiskey]
+        if len(keypath) > 1:
+            restkeys = keypath[1:]
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    _do_edit_non_quirk(new_value, existing[key], restkeys)
+            else:
+                _do_edit_non_quirk(new_value, existing[thiskey], restkeys)
+        else:
+            # This was the last key
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    existing[key] = new_value.value
+            else:
+                existing[thiskey] = new_value.value
+
+    new_names = _MAP_KEY_TO_V2[mutable_config_key]
+    _do_edit_non_quirk(new_mutable_value, base_dict, new_names)
+
+
 def _migrate_to_v2_configurations(
     base_configurations: PipetteConfigurations,
     v1_mutable_configs: OverrideType,
@@ -59,26 +87,9 @@ def _migrate_to_v2_configurations(
             continue
         if c == "quirks" and isinstance(v, dict):
             quirks_list.extend([b.name for b in v.values() if b.value])
-        else:
-            new_names = _MAP_KEY_TO_V2[c]
-            top_name = new_names["top_level_name"]
-            nested_name = new_names["nested_name"]
-            if c == "tipLength" and isinstance(v, MutableConfig):
-                # This is only a concern for OT-2 configs and I think we can
-                # be less smart about handling multiple tip types by updating
-                # all tips.
-                for k in dict_of_base_model["liquid_properties"][LIQUID_CLASS][
-                    new_names["top_level_name"]
-                ].keys():
-                    dict_of_base_model["liquid_properties"][LIQUID_CLASS][top_name][k][
-                        nested_name
-                    ] = v
-            elif new_names.get("liquid_class") and isinstance(v, MutableConfig):
-                _class = LiquidClasses[new_names["liquid_class"]]
-                dict_of_base_model[top_name][_class][nested_name] = v.value
-            elif isinstance(v, MutableConfig):
-                # isinstances are needed for type checking.
-                dict_of_base_model[top_name][nested_name] = v.value
+        elif isinstance(v, MutableConfig):
+            _edit_non_quirk(c, v, dict_of_base_model)
+
     dict_of_base_model["quirks"] = list(
         set(dict_of_base_model["quirks"]).union(set(quirks_list))
     )
@@ -143,10 +154,40 @@ def _list_all_mutable_configs(
     return default_configurations
 
 
+def _get_default_value_for(config: Dict[str, Any], keypath: List[str]) -> Any:
+    def _do_get_default_value_for(
+        remaining_config: Dict[Any, Any], keypath: List[str]
+    ) -> Any:
+        first: Any = keypath[0]
+        if first in [lc.name for lc in LiquidClasses]:
+            first = LiquidClasses[first]
+        if len(keypath) > 1:
+            rest = keypath[1:]
+            if first == "##EACHTIP##":
+                tip_list = list(remaining_config.keys())
+                tip_list.sort(key=lambda o: o.value)
+                return _do_get_default_value_for(remaining_config[tip_list[-1]], rest)
+            else:
+                return _do_get_default_value_for(remaining_config[first], rest)
+        else:
+            if first == "###EACHTIP##":
+                tip_list = list(remaining_config.keys())
+                tip_list.sort(key=lambda o: o.value)
+                return remaining_config[tip_list[-1]]
+            elif first == "currentByTipCount":
+                # return the value for the most tips at a time
+                cbt = remaining_config[first]
+                return cbt[next(reversed(sorted(cbt.keys())))]
+            else:
+                return remaining_config[first]
+
+    return _do_get_default_value_for(config, keypath)
+
+
 def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
     """Find the default value from the configs and return it as a mutable config."""
-    lookup_dict = _MAP_KEY_TO_V2[name]
-    nested_name = lookup_dict["nested_name"]
+    keypath = _MAP_KEY_TO_V2[name]
+    nested_name = keypath[-1]
 
     if name == "pickUpCurrent":
         min_max_dict = _MIN_MAX_LOOKUP["current"]
@@ -156,27 +197,7 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
         min_max_dict = _MIN_MAX_LOOKUP[nested_name]
         type_lookup = _TYPE_LOOKUP[nested_name]
         units_lookup = _UNITS_LOOKUP[nested_name]
-    if name == "tipLength":
-        # This is only a concern for OT-2 configs and I think we can
-        # be less smart about handling multiple tip types. Instead, just
-        # get the max tip type.
-        tip_list = list(
-            configs["liquid_properties"][LIQUID_CLASS][
-                lookup_dict["top_level_name"]
-            ].keys()
-        )
-        tip_list.sort(key=lambda o: o.value)
-        default_value = configs["liquid_properties"][LIQUID_CLASS][
-            lookup_dict["top_level_name"]
-        ][tip_list[-1]][nested_name]
-    elif name == "pickUpCurrent":
-        default_value_dict = configs[lookup_dict["top_level_name"]][nested_name]
-        default_value = default_value_dict[configs["channels"].value]
-    elif lookup_dict.get("liquid_class"):
-        _class = LiquidClasses[lookup_dict["liquid_class"]]
-        default_value = configs[lookup_dict["top_level_name"]][_class][nested_name]
-    else:
-        default_value = configs[lookup_dict["top_level_name"]][nested_name]
+    default_value = _get_default_value_for(configs, keypath)
     return MutableConfig(
         value=default_value,
         default=default_value,

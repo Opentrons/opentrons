@@ -30,6 +30,16 @@
         "type": { "type": "string" },
         "displayName": { "type": "string" }
       }
+    },
+    "partialTipCount": {
+      "type": "number",
+      "enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]
+    },
+    "currentByTipCount": {
+      "type": "object",
+      "patternProperties": {
+        "\\d+": { "$ref": "#/definitions/currentRange" }
+      }
     }
   },
   "description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
@@ -66,38 +76,24 @@
     "channels": { "$ref": "#/definitions/channels" },
     "partialTipConfigurations": {
       "description": "Object containing information on partial tip configurations",
-      "$oneof": [
+      "oneof": [
         {
           "type": "object",
           "required": ["partialTipSupported"],
           "properties": {
-            "partialTipSupported": { "type": "boolean", "value": true }
+            "partialTipSupported": { "const": false },
+            "availableConfigurations": null
           }
         },
         {
           "type": "object",
-          "required": [
-            "partialTipSupported",
-            "availableConfigurations",
-            "perTipPickupCurrent"
-          ],
+          "required": ["partialTipSupported", "availableConfigurations"],
           "properties": {
-            "partialTipSupported": { "type": "boolean", "value": false },
+            "partialTipSupported": { "const": true },
             "availableConfigurations": {
               "type": "array",
               "description": "Array of available configurations",
-              "items": {
-                "type": "number",
-                "enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]
-              },
-              "perTipPickupCurrent": {
-                "type": "object",
-                "patternProperties": {
-                  "\\d+": {
-                    "$ref": "#/definitions/positiveNumber"
-                  }
-                }
-              }
+              "items": { "$ref": "#/definitions/partialTipCount" }
             }
           }
         }
@@ -162,42 +158,124 @@
       }
     },
     "pickUpTipConfigurations": {
-      "type": "object",
       "description": "Object containing configurations for picking up tips common to all partial configurations",
-      "required": ["speed"],
-      "properties": {
-        "presses": { "$ref": "#/definitions/positiveNumber" },
-        "speed": { "$ref": "#/definitions/positiveNumber" },
-        "increment": { "$ref": "#/definitions/positiveNumber" },
-        "distance": { "$ref": "#/definitions/positiveNumber" }
-      }
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["pressFit"],
+          "properties": {
+            "pressFit": {
+              "type": "object",
+              "required": [
+                "presses",
+                "speed",
+                "increment",
+                "distance",
+                "currentByTipCount"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "presses": { "$ref": "#/definitions/positiveNumber" },
+                "speed": { "$ref": "#/definitions/positiveNumber" },
+                "increment": { "$ref": "#/definitions/positiveNumber" },
+                "distance": { "$ref": "#/definitions/positiveNumber" },
+                "currentByTipCount": {
+                  "$ref": "#/definitions/currentByTipCount"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["camAction"],
+          "properties": {
+            "camAction": {
+              "type": "object",
+              "required": [
+                "prep_move_distance",
+                "prep_move_speed",
+                "speed",
+                "distance",
+                "currentByTipCount"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "prep_move_distance": {
+                  "$ref": "#/definitions/positiveNumber"
+                },
+                "prep_move_speed": { "$ref": "#/definitions/positiveNumber" },
+                "speed": { "$ref": "#/definitions/positiveNumber" },
+                "distance": { "$ref": "#/definitions/positiveNumber" },
+                "currentByTipCount": {
+                  "$ref": "#/definitions/currentByTipCount"
+                },
+                "connectTiprackDistanceMM": {
+                  "$ref": "#/definitions/positiveNumber"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "dropTipConfigurations": {
       "type": "object",
       "description": "Object containing configurations specific to dropping tips",
-      "required": ["current", "speed"],
-      "properties": {
-        "current": { "$ref": "#/definitions/currentRange" },
-        "presses": {},
-        "speed": { "$ref": "#/definitions/positiveNumber" },
-        "increment": {},
-        "distance": {}
-      }
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["plungerEject"],
+          "properties": {
+            "plungerEject": {
+              "type": "object",
+              "required": ["current", "speed"],
+              "additionalProperties": false,
+              "properties": {
+                "current": { "$ref": "#/definitions/currentRange" },
+                "speed": { "$ref": "#/definitions/positiveNumber" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["camAction"],
+          "properties": {
+            "camAction": {
+              "type": "object",
+              "required": [
+                "current",
+                "prep_move_distance",
+                "prep_move_speed",
+                "distance",
+                "speed"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "current": { "$ref": "#/definitions/currentRange" },
+                "prep_move_distance": {
+                  "$ref": "#/definitions/positiveNumber"
+                },
+                "prep_move_speed": { "$ref": "#/definitions/positiveNumber" },
+                "distance": { "$ref": "#/definitions/positiveNumber" },
+                "speed": { "$ref": "#/definitions/positiveNumber" }
+              }
+            }
+          }
+        }
+      ]
     },
     "displayName": {
       "type": "string",
       "description": "Display name of the pipette include model and generation number in readable format."
     },
     "tipPresenceCheckDistanceMM": {
-      "type": "string",
+      "$ref": "#/definitions/positiveNumber",
       "description": "The distance to move the gear motors down to check tip presence status."
     },
-    "connectTiprackDistanceMM": {
-      "type": "string",
-      "description": "The distance to move the z stage down to connect with the tiprack before clamping."
-    },
     "endTipActionRetractDistanceMM": {
-      "type": "string",
+      "$ref": "#/definitions/positiveNumber",
       "description": "The distance to move the z stage up after a tip pickup or dropoff."
     },
     "model": {

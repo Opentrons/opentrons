@@ -90,9 +90,8 @@ describe('test schema against all general specs definitions', () => {
   expect(generalPaths.length).toBeGreaterThan(0)
 
   generalPaths.forEach(generalPath => {
-    const generalDef = require(generalPath)
-
     it(`${generalPath} validates against schema`, () => {
+      const generalDef = require(generalPath)
       const valid = validateGeneralSpecs(generalDef)
       const validationErrors = validateGeneralSpecs.errors
       expect(validationErrors).toBe(null)

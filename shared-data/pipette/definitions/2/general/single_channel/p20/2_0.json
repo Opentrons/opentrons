@@ -4,17 +4,21 @@
   "model": "p20",
   "displayCategory": "GEN2",
   "pickUpTipConfigurations": {
-    "speed": 10.0,
-    "presses": 1,
-    "increment": 0.0,
-    "distance": 14.0
+    "pressFit": {
+      "speed": 10.0,
+      "presses": 1,
+      "increment": 0.0,
+      "distance": 14.0,
+      "currentByTipCount": {
+        "1": 0.1
+      }
+    }
   },
   "dropTipConfigurations": {
-    "current": 1.0,
-    "speed": 15.0,
-    "presses": 0,
-    "increment": 0.0,
-    "distance": 0.0
+    "plungerEject": {
+      "current": 1.0,
+      "speed": 15.0
+    }
   },
   "plungerMotorConfigurations": {
     "idle": 0.05,
@@ -33,10 +37,7 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": false,
-    "availableConfigurations": null,
-    "perTipPickupCurrent": {
-      "1": 0.1
-    }
+    "availableConfigurations": null
   },
   "channels": 1,
   "shaftDiameter": 1.0,
@@ -47,6 +48,5 @@
   "plungerHomingConfigurations": {
     "current": 1.0,
     "speed": 30
-  },
-  "tipPresenceCheckDistanceMM": "0.0"
+  }
 }

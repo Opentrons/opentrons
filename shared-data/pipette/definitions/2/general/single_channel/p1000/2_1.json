@@ -4,17 +4,21 @@
   "model": "p1000",
   "displayCategory": "GEN2",
   "pickUpTipConfigurations": {
-    "speed": 10.0,
-    "presses": 1,
-    "increment": 0.0,
-    "distance": 17.0
+    "pressFit": {
+      "speed": 10.0,
+      "presses": 1,
+      "increment": 0.0,
+      "distance": 17.0,
+      "currentByTipCount": {
+        "1": 0.17
+      }
+    }
   },
   "dropTipConfigurations": {
-    "current": 1.25,
-    "speed": 7.0,
-    "presses": 0,
-    "increment": 0.0,
-    "distance": 0.0
+    "plungerEject": {
+      "current": 1.25,
+      "speed": 7.0
+    }
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,
@@ -33,10 +37,7 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": false,
-    "availableConfigurations": null,
-    "perTipPickupCurrent": {
-      "1": 0.17
-    }
+    "availableConfigurations": null
   },
   "channels": 1,
   "shaftDiameter": 6.0,
@@ -47,6 +48,5 @@
   "plungerHomingConfigurations": {
     "current": 1.0,
     "speed": 30
-  },
-  "tipPresenceCheckDistanceMM": "0.0"
+  }
 }
