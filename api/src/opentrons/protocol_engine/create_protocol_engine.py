@@ -30,7 +30,7 @@ async def create_protocol_engine(
         hardware_api: Hardware control API to pass down to dependencies.
         config: ProtocolEngine configuration.
         load_fixed_trash: Automatically load fixed trash labware in engine.
-        deck_configuration: The deck configuration the engine will be instantiated with.
+        deck_configuration: The initial deck configuration the engine will be instantiated with.
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
