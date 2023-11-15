@@ -5,7 +5,7 @@ import { AlertModal, SpinnerModal } from '@opentrons/components'
 import * as Copy from './i18n'
 import { ErrorModal } from '../../../../molecules/modals'
 import { DISCONNECT } from './constants'
-import { PENDING, SUCCESS, FAILURE } from '../../../../redux/robot-api'
+import { PENDING, FAILURE } from '../../../../redux/robot-api'
 
 import type { NetworkChangeType } from './types'
 import type { RequestStatus } from '../../../../redux/robot-api/types'
@@ -41,11 +41,15 @@ export const ResultModal = (props: ResultModalProps): JSX.Element => {
 
     const retryMessage = !isDisconnect ? ` ${Copy.CHECK_YOUR_CREDENTIALS}.` : ''
 
+    const placeholderError = {
+      message: `Likely incorrect network password. ${Copy.CHECK_YOUR_CREDENTIALS}.`,
+    }
+
     return (
       <ErrorModal
         heading={heading}
         description={`${message}.${retryMessage}`}
-        error={error}
+        error={error ?? placeholderError}
         close={onClose}
       />
     )
