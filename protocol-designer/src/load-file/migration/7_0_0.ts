@@ -344,7 +344,7 @@ export const migrateFile = (
           mixLabwareDefinition = newLabwareDefinitions[labwareUri]
           mixLabware = labwaresMapped[stepForm.labware][0]
         }
-        const mixTouchTipIncompatible = mixLabware?.parameters.quirks?.includes(
+        const mixTouchTipIncompatible = mixLabwareDefinition?.parameters.quirks?.includes(
           'touchTipDisabled'
         )
         return {
