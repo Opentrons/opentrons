@@ -29,7 +29,7 @@ interface WasteChuteCommandArgs {
   volume?: number
   flowRate?: number
 }
-/** Helper fn for waste chute dispense, drop tip and blow_out commands */
+/** Helper fn for waste chute dispense, drop tip, air_gap and blow_out commands */
 export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
   args,
   invariantContext,
