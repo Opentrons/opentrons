@@ -12,7 +12,7 @@ import {
   SingleSlotFixture,
   StagingAreaFixture,
   StagingAreaLocation,
-  TrashLocation,
+  TrashCutoutId,
   useOnClickOutside,
   WasteChuteFixture,
 } from '@opentrons/components'
@@ -610,7 +610,7 @@ export const DeckSetup = (): JSX.Element => {
                             <FlexTrash
                               robotType={robotType}
                               trashIconColor={lightFill}
-                              trashLocation={cutoutId as TrashLocation}
+                              trashCutoutId={cutoutId as TrashCutoutId}
                               backgroundColor={darkFill}
                             />
                           </React.Fragment>
