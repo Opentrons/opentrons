@@ -84,6 +84,7 @@ class Scale:
                 return port.device
             except:  # noqa: E722
                 pass
+        ui.print_info("Unable to find the scale: please connect")
         return list_ports_and_select(device_name="scale")
 
     @property

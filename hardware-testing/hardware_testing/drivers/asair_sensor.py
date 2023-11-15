@@ -80,12 +80,9 @@ def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase
     if not simulate:
         if not autosearch:
             port = list_ports_and_select(device_name="Asair environmental sensor")
-            try:
-                sensor = AsairSensor.connect(port)
-                ui.print_info(f"Found sensor on port {port}")
-                return sensor
-            except SerialException:
-                pass
+            sensor = AsairSensor.connect(port)
+            ui.print_info(f"Found sensor on port {port}")
+            return sensor
         else:
             ports = comports()
             assert ports
@@ -99,7 +96,10 @@ def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase
                     return sensor
                 except:  # noqa: E722
                     pass
-    ui.print_info("no sensor found returing simulator")
+            use_sim = ui.get_user_answer("No env sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no sensor found returning simulator")
     return SimAsairSensor()
 
 

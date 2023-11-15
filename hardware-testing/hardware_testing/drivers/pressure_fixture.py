@@ -111,14 +111,10 @@ def connect_to_fixture(
     if not simulate:
         if not autosearch:
             port = list_ports_and_select(device_name="Pressure fixture")
-            try:
-                fixture = PressureFixture.create(port=port, slot_side=side)
-                fixture.connect()
-                ui.print_info(f"Found fixture on port {port}")
-                return fixture
-            except SerialException:
-                ui.print_error(f"Fixture not responding on port {port}")
-                pass
+            fixture = PressureFixture.create(port=port, slot_side=side)
+            fixture.connect()
+            ui.print_info(f"Found fixture on port {port}")
+            return fixture
         else:
             ports = comports()
             assert ports
@@ -134,7 +130,10 @@ def connect_to_fixture(
                     return fixture
                 except:  # noqa: E722
                     pass
-    ui.print_info("no fixture found returing simulator")
+            use_sim = ui.get_user_answer("No pressure sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no fixture found returning simulator")
     return SimPressureFixture()
 
 
