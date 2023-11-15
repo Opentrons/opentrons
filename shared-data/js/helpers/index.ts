@@ -202,10 +202,10 @@ export const getWellsDepth = (
 
 export const getSlotHasMatingSurfaceUnitVector = (
   deckDef: DeckDefinition,
-  slotNumber: string
+  addressableAreaName: string
 ): boolean => {
   const matingSurfaceUnitVector = deckDef.locations.addressableAreas.find(
-    orderedSlot => orderedSlot.id === slotNumber
+    aa => aa.id === addressableAreaName
   )?.matingSurfaceUnitVector
 
   return Boolean(matingSurfaceUnitVector)

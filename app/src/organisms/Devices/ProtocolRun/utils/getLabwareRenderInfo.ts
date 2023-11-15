@@ -64,23 +64,18 @@ export const getLabwareRenderInfo = (
         )
         return acc
       }
+      const isSlot = deckDef.locations.addressableAreas.some(aa => aa.id === slotName && aa.areaType === 'slot')
 
-      const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
-        deckDef,
-        slotName
-      )
+      return isSlot ? {
+        ...acc,
+        [labwareId]: {
+          x: slotPosition[0],
+          y: slotPosition[1],
+          z: slotPosition[2],
+          labwareDef,
+          displayName,
+          slotName,
+        },
+      } : acc
 
-      return slotHasMatingSurfaceVector
-        ? {
-            ...acc,
-            [labwareId]: {
-              x: slotPosition[0],
-              y: slotPosition[1],
-              z: slotPosition[2],
-              labwareDef,
-              displayName,
-              slotName,
-            },
-          }
-        : acc
     }, {})
