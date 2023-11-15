@@ -156,7 +156,7 @@ async def test_create_play_action_to_start(
         )
     )
 
-    await background_task_captor.value()
+    await background_task_captor.value(deck_configuration=[])
 
     decoy.verify(
         mock_run_store.update_run_state(
