@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from math import pi
-from subprocess import run
+from subprocess import run, Popen
 from time import time
 from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
-
+import atexit
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -77,6 +77,15 @@ def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
     print('Stopping "opentrons-robot-server"...')
     run(["systemctl", "stop", "opentrons-robot-server"])
+    atexit.register(restart_server_ot3)
+
+
+def restart_server_ot3() -> None:
+    """Start opentrons-robot-server on the OT3."""
+    print('Starting "opentrons-robot-server"...')
+    Popen(
+        ["systemctl", "restart", "opentrons-robot-server", "&"],
+    )
 
 
 def start_server_ot3() -> None:
