@@ -3,8 +3,8 @@ import map from 'lodash/map'
 
 import { BaseDeck } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -25,7 +25,6 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import { Labware } from '../../pages/Labware'
 
 interface DeckThumbnailProps extends StyleProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
@@ -37,8 +36,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
   const attachedModules = useAttachedModules()
 
   if (protocolAnalysis == null || protocolAnalysis.errors.length) return null
-
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     protocolAnalysis.commands
@@ -50,6 +48,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
   const liquids = protocolAnalysis.liquids
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
+
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
     protocolModulesInfo
