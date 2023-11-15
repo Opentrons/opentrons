@@ -47,12 +47,12 @@ def _assert_last_modified_value(calibration_dict: typing.Dict[str, typing.Any]) 
 
 
 def read_cal_file(
-    filepath: Path, decoder: DecoderType = DateTimeDecoder
+    file_path: Path, decoder: DecoderType = DateTimeDecoder
 ) -> typing.Dict[str, typing.Any]:
     """
     Function used to read data from a file
 
-    :param filepath: path to look for data at
+    :param file_path: path to look for data at
     :param decoder: if there is any specialized decoder needed.
     The default decoder is the date time decoder.
     :return: Data from the file
@@ -63,7 +63,7 @@ def read_cal_file(
     # This can be done when the labware endpoints
     # are refactored to grab tip length calibration
     # from the correct locations.
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         calibration_data = typing.cast(
             typing.Dict[str, typing.Any],
             json.load(f, cls=decoder),
@@ -76,7 +76,9 @@ def read_cal_file(
 
 
 def save_to_file(
-    directorypath: Path,
+    directory_path: Path,
+    # todo(mm, 2023-11-15): This file_name argument does not include the file
+    # extension, which is inconsistent with read_cal_file(). The two should match.
     file_name: str,
     data: typing.Union[BaseModel, typing.Dict[str, typing.Any], typing.Any],
     encoder: EncoderType = DateTimeEncoder,
@@ -84,14 +86,15 @@ def save_to_file(
     """
     Function used to save data to a file
 
-    :param filepath: path to save data at
+    :param directory_path: path to the directory in which to save the data
+    :param file_name: name of the file within the directory, *without the extension*.
     :param data: data to save
     :param encoder: if there is any specialized encoder needed.
     The default encoder is the date time encoder.
     """
-    directorypath.mkdir(parents=True, exist_ok=True)
-    filepath = directorypath / f"{file_name}.json"
+    directory_path.mkdir(parents=True, exist_ok=True)
+    file_path = directory_path / f"{file_name}.json"
     json_data = (
         data.json() if isinstance(data, BaseModel) else json.dumps(data, cls=encoder)
     )
-    filepath.write_text(json_data, encoding="utf-8")
+    file_path.write_text(json_data, encoding="utf-8")
