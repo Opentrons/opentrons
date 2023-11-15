@@ -300,7 +300,6 @@ const ModuleControlsTab = (
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const { isRunStill } = useRunStatuses()

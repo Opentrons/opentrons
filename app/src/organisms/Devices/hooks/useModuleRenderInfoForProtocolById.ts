@@ -1,7 +1,7 @@
 import {
   checkModuleCompatibility,
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
@@ -26,20 +26,20 @@ export interface ModuleRenderInfoById {
 }
 
 export function useModuleRenderInfoForProtocolById(
-  robotName: string,
   runId: string
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const { data: deckConfig } = useDeckConfigurationQuery()
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
-  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const robotType = getRobotTypeFromLoadedLabware(protocolData?.labware ?? [])
+  const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()
-  if (protocolData == null) return {}
+  if (protocolAnalysis == null) return {}
 
-  const deckDef = getDeckDefFromRobotType(robotType)
+  const deckDef = getDeckDefFromRobotType(
+    protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
+  )
 
-  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
+  const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const protocolModulesInfoInLoadOrder = protocolModulesInfo.sort(
     (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder
