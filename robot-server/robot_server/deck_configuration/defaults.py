@@ -54,7 +54,46 @@ _for_flex = models.DeckConfigurationRequest.construct(
 )
 
 
-_for_ot2 = models.DeckConfigurationRequest.construct(cutoutFixtures=[])
+_for_ot2 = models.DeckConfigurationRequest.construct(
+    cutoutFixtures=[
+        models.CutoutFixture.construct(
+            cutoutId="cutout1", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout2", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout3", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout4", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout5", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout6", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout7", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout8", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout9", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout10", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout11", cutoutFixtureId="singleStandardSlot"
+        ),
+        models.CutoutFixture.construct(
+            cutoutId="cutout12", cutoutFixtureId="fixedTrashSlot"
+        ),
+    ]
+)
 
 
 def for_deck_definition(deck_definition_name: str) -> models.DeckConfigurationRequest:
