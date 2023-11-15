@@ -213,6 +213,8 @@ const fakeReleaseNotesForMassStorage = (version: string): string => `
 # Opentrons Robot Software Version ${version}
 
 This update is from a USB mass storage device connected to your flex, and release notes cannot be shown.
+
+Don't remove the USB mass storage device while the update is in progress.
 `
 
 export const getLatestMassStorageUpdateFiles = (
