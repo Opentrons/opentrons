@@ -2,6 +2,7 @@ from typing import Dict, List, Optional, Any, Sequence, Iterator, Tuple, cast
 from dataclasses import dataclass
 from collections import OrderedDict
 from enum import Enum
+from itertools import chain
 
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.types import Point
@@ -18,21 +19,23 @@ def _nozzle_names_by_row(rows: List[PipetteRowDefinition]) -> Iterator[str]:
             yield nozzle
 
 
-def _row_or_col_for_nozzle(
+def _row_or_col_index_for_nozzle(
     row_or_col: "OrderedDict[str, List[str]]", nozzle: str
-) -> str:
-    for row_or_col_name, row_or_col_contents in row_or_col.items():
+) -> int:
+    for index, row_or_col_contents in enumerate(row_or_col.values()):
         if nozzle in row_or_col_contents:
-            return row_or_col_name
+            return index
     raise KeyError(nozzle)
 
 
-def _row_col_for_nozzle(
+def _row_col_indices_for_nozzle(
     rows: "OrderedDict[str, List[str]]",
     cols: "OrderedDict[str, List[str]]",
     nozzle: str,
-) -> Tuple[str, str]:
-    return _row_or_col_for_nozzle(rows, nozzle), _row_or_col_for_nozzle(cols, nozzle)
+) -> Tuple[int, int]:
+    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(
+        cols, nozzle
+    )
 
 
 class NozzleConfigurationType(Enum):
@@ -150,7 +153,7 @@ class NozzleMap:
         """The total number of active nozzles in the configuration, and thus the number of tips that will be picked up."""
         return len(self.map_store)
 
-    @classmethod  # noqa: C901
+    @classmethod
     def build(
         cls,
         physical_nozzles: "OrderedDict[str, Point]",
@@ -161,7 +164,7 @@ class NozzleMap:
         front_right_nozzle: str,
     ) -> "NozzleMap":
         try:
-            back_left_row, back_left_column = _row_col_for_nozzle(
+            back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(
                 physical_rows, physical_columns, back_left_nozzle
             )
         except KeyError as e:
@@ -170,7 +173,10 @@ class NozzleMap:
                 wrapping=[PythonException(e)],
             ) from e
         try:
-            front_right_row, front_right_column = _row_col_for_nozzle(
+            (
+                front_right_row_index,
+                front_right_column_index,
+            ) = _row_col_indices_for_nozzle(
                 physical_rows, physical_columns, front_right_nozzle
             )
         except KeyError as e:
@@ -179,93 +185,37 @@ class NozzleMap:
                 wrapping=[PythonException(e)],
             ) from e
 
-        def _rows_in_map() -> Iterator[Tuple[str, List[str]]]:
-            rows_iter = iter(
-                physical_rows.items()
-            )  # Iterator(("A", ["A1", "A2"...]), ("B": ["B1", "B2"...]))
-            this_row = next(rows_iter)  # ("A", ["A1", "A2",...])
-            while this_row[0] != back_left_row:  # "A" to "A"
-                this_row = next(rows_iter)  # yielding ("A", ["A1", "A2",...])
-            yield this_row
-            while this_row[0] != front_right_row:
-                this_row = next(rows_iter)
-                yield this_row
-
-        def _cols_in_row_in_map(
-            row_name: str, row_contents: List[str]
-        ) -> Iterator[str]:
-            col_iter = iter(physical_columns.items())
-            row_contents_iter = iter(row_contents)
-            this_col = next(col_iter)
-            this_nozzle = next(row_contents_iter)
-            while this_col[0] != back_left_column:
-                this_col = next(col_iter)
-                this_nozzle = next(row_contents_iter)
-            yield this_nozzle
-            while this_col[0] != front_right_column:
-                this_col = next(col_iter)
-                this_nozzle = next(row_contents_iter)
-                yield this_nozzle
-
-        def _cols_in_map() -> Iterator[Tuple[str, List[str]]]:
-            cols_iter = iter(physical_columns.items())
-            this_col = next(cols_iter)
-            while this_col[0] != back_left_column:
-                this_col = next(cols_iter)
-            yield this_col
-            while this_col[0] != front_right_column:
-                this_col = next(cols_iter)
-                yield this_col
-
-        def _rows_in_col_in_map(
-            col_name: str, col_contents: List[str]
-        ) -> Iterator[str]:
-            row_iter = iter(physical_rows.items())
-            col_contents_iter = iter(col_contents)
-            this_row = next(row_iter)
-            this_nozzle = next(col_contents_iter)
-            while this_row[0] != back_left_row:
-                this_row = next(row_iter)
-                this_nozzle = next(col_contents_iter)
-            yield this_nozzle
-            while this_row[0] != front_right_row:
-                this_row = next(row_iter)
-                this_nozzle = next(col_contents_iter)
-                yield this_nozzle
-
-        def _nozzles() -> Iterator[str]:
-            for row in _rows_in_map():
-                for nozzle in _cols_in_row_in_map(row[0], row[1]):
-                    yield nozzle
-
-        nozzles = list(_nozzles())
-        if len(nozzles) == 0:
-            raise IncompatibleNozzleConfiguration(
-                message=f"Back left nozzle {back_left_nozzle} provided is not to the back or left of {front_right_nozzle}.",
-                detail={
-                    "requested_back_left_nozzle": back_left_nozzle,
-                    "requested_front_right_nozzle": front_right_nozzle,
-                },
+        correct_rows_with_all_columns = list(physical_rows.items())[
+            back_left_row_index : front_right_row_index + 1
+        ]
+        correct_rows = [
+            (
+                row_name,
+                row_entries[back_left_column_index : front_right_column_index + 1],
             )
+            for row_name, row_entries in correct_rows_with_all_columns
+        ]
+        rows = OrderedDict(correct_rows)
+        correct_columns_with_all_rows = list(physical_columns.items())[
+            back_left_column_index : front_right_column_index + 1
+        ]
+        correct_columns = [
+            (col_name, col_entries[back_left_row_index : front_right_row_index + 1])
+            for col_name, col_entries in correct_columns_with_all_rows
+        ]
+        columns = OrderedDict(correct_columns)
 
         map_store = OrderedDict(
-            (nozzle, physical_nozzles[nozzle]) for nozzle in nozzles
+            (nozzle, physical_nozzles[nozzle]) for nozzle in chain(*rows.values())
         )
-        rows = OrderedDict(
-            (row_name, list(_cols_in_row_in_map(row_name, row_contents)))
-            for row_name, row_contents in _rows_in_map()
-        )
-        cols = OrderedDict(
-            (col_name, list(_rows_in_col_in_map(col_name, col_contents)))
-            for col_name, col_contents in _cols_in_map()
-        )
+
         return cls(
             starting_nozzle=starting_nozzle,
             map_store=map_store,
             rows=rows,
-            columns=cols,
+            columns=columns,
             configuration=NozzleConfigurationType.determine_nozzle_configuration(
-                physical_rows, rows, physical_columns, cols
+                physical_rows, rows, physical_columns, columns
             ),
         )
 
