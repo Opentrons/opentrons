@@ -19,6 +19,8 @@ import {
   SOURCE_LABWARE,
   makeDispenseAirGapHelper,
   AIR_GAP_META,
+  dropTipInPlaceHelper,
+  moveToAddressableAreaHelper,
 } from '../fixtures'
 import { FIXED_TRASH_ID } from '..'
 import {
@@ -108,6 +110,40 @@ describe('pick up tip if no tip on pipette', () => {
 
       expect(res.commands[0]).toEqual(pickUpTipHelper('A1'))
     })
+  })
+  it('...once, drop tip in waste chute', () => {
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        wasteChuteId: {
+          name: 'wasteChute',
+          id: 'wasteChuteId',
+          location: 'cutoutD3',
+        },
+      },
+    }
+
+    noTipArgs = {
+      ...noTipArgs,
+      changeTip: 'always',
+      dropTipLocation: 'wasteChuteId',
+      dispenseAirGapVolume: 5,
+    } as TransferArgs
+
+    const result = transfer(noTipArgs, invariantContext, robotStateWithTip)
+
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+      aspirateHelper('A1', 30),
+      dispenseHelper('B2', 30),
+      airGapHelper('B2', 5, { labwareId: 'destPlateId' }),
+      moveToAddressableAreaHelper({
+        addressableAreaName: '1and8ChannelWasteChute',
+      }),
+      dropTipInPlaceHelper(),
+    ])
   })
 
   it('...never (should not pick up tip, and fail)', () => {
