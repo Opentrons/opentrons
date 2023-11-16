@@ -1123,7 +1123,6 @@ def test_get_tip_drop_explicit_location(
     tip_rack_def: LabwareDefinition,
 ) -> None:
     """It should pass the location through if origin is not WellOrigin.DROP_TIP."""
-
     decoy.when(labware_view.get_definition("tip-rack-id")).then_return(tip_rack_def)
 
     input_location = DropTipWellLocation(
