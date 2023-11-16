@@ -1666,28 +1666,31 @@ class InstrumentContext(publisher.CommandPublisher):
         start: Optional[str] = None,
         front_right: Optional[str] = None,
     ) -> None:
-        """Configure how many tips a a multi-channel pipette will pick up, in what layout.
+        """Configure how many tips the 96-channel pipette will pick up.
 
         Changing the nozzle layout will affect gantry movement for all subsequent
         pipetting actions that the pipette performs. It also alters the pipette's
         behavior for picking up tips. The pipette will continue to use the specified
         layout until this function is called again.
+        
+        .. note::
+            When picking up 8 tips with the 96-channel pipette, the tip rack *must not*
+            be placed in a tip rack adapter in the deck. If you try to perform partial
+            tip pickup on a tip rack that is in an adapter, the API will raise an error.
 
         :param style: The shape of the nozzle layout.
 
-            - For a 96-channel pipette, either ``SINGLE`` or ``COLUMN``.
-            - For 8-channel pipettes, only ``SINGLE``.
+            - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
+              with respect to the deck. This corresponds to a column of wells on labware.
+            - ``EMPTY`` or ``None`` resets the pipette to use all of its nozzles.
 
-            ``EMPTY`` or ``None`` resets any multi-channel pipette to use all of its
-            nozzles.
         :type style: ``NozzleLayout`` or ``None``
         :param start: The nozzle at the back left of the layout, which the robot uses
-            to determine how it will move to different locations on the deck. The
-            string should be of the same format used when identifying wells by name.
-            For example, ``"A1"`` is the back left nozzle of a 96-channel pipette and
-            the back nozzle of an 8-channel pipette. ``"H12"`` is the front right
-            nozzle of a 96-channel pipette (and is not a valid nozzle name on an
-            8-channel pipette).
+            to determine how it will move to different locations on the deck. The string
+            should be of the same format used when identifying wells by name. Use
+            ``"A1"`` to have the pipette use its leftmost nozzles to pick up tips
+            *left-to-right* from a tip rack. Use ``"H1"`` to have the pipette use its
+            rightmost nozzles to pick up tips *right-to-left* from a tip rack.
         :type start: str or ``None``
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
