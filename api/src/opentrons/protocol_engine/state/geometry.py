@@ -427,7 +427,7 @@ class GeometryView:
             self._labware.get_definition(labware_id).parameters.isTiprack
             and partially_configured
         ):
-            raise errors.LabwareMovementNotAllowedError(
+            raise errors.UnexpectedProtocolError(
                 "Cannot return tip to a tiprack while the pipette is configured for partial tip."
             )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
