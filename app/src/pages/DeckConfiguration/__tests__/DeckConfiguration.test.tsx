@@ -5,9 +5,9 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
-  useCreateDeckConfigurationMutation,
+  useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-import { TRASH_BIN_LOAD_NAME } from '@opentrons/shared-data'
+import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
@@ -17,7 +17,7 @@ import { DeckConfigurationEditor } from '..'
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
-const mockCreateDeckConfiguration = jest.fn()
+const mockUpdateDeckConfiguration = jest.fn()
 const mockGoBack = jest.fn()
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
@@ -29,9 +29,8 @@ jest.mock('react-router-dom', () => {
 
 const mockDeckConfig = [
   {
-    fixtureId: 'mockFixtureIdC3',
-    fixtureLocation: 'cutoutC3',
-    loadName: TRASH_BIN_LOAD_NAME,
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
   },
 ]
 
@@ -56,8 +55,8 @@ const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFu
 const mockDeckConfigurationDiscardChangesModal = DeckConfigurationDiscardChangesModal as jest.MockedFunction<
   typeof DeckConfigurationDiscardChangesModal
 >
-const mockUseCreateDeckConfigurationMutation = useCreateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useCreateDeckConfigurationMutation
+const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
+  typeof useUpdateDeckConfigurationMutation
 >
 
 const render = () => {
@@ -83,8 +82,8 @@ describe('DeckConfigurationEditor', () => {
     mockDeckConfigurationDiscardChangesModal.mockReturnValue(
       <div>mock DeckConfigurationDiscardChangesModal</div>
     )
-    when(mockUseCreateDeckConfigurationMutation).mockReturnValue({
-      createDeckConfiguration: mockCreateDeckConfiguration,
+    when(mockUseUpdateDeckConfigurationMutation).mockReturnValue({
+      updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
   })
 

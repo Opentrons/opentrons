@@ -7,7 +7,6 @@ import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
-  LoadedLabware,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
@@ -202,10 +201,10 @@ export const getWellsDepth = (
 
 export const getSlotHasMatingSurfaceUnitVector = (
   deckDef: DeckDefinition,
-  slotNumber: string
+  addressableAreaName: string
 ): boolean => {
   const matingSurfaceUnitVector = deckDef.locations.addressableAreas.find(
-    orderedSlot => orderedSlot.id === slotNumber
+    aa => aa.id === addressableAreaName
   )?.matingSurfaceUnitVector
 
   return Boolean(matingSurfaceUnitVector)
@@ -220,15 +219,12 @@ export const getAreSlotsHorizontallyAdjacent = (
   }
   const slotANumber = parseInt(slotNameA)
   const slotBNumber = parseInt(slotNameB)
-
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  // TODO(bh, 2023-11-03): is this OT-2 only?
   const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
-
   if (slotBNumber > numSlots || slotANumber > numSlots) {
     return false
   }
@@ -261,7 +257,6 @@ export const getAreSlotsVerticallyAdjacent = (
   if (isNaN(slotBNumber) || isNaN(slotANumber)) {
     return false
   }
-  // TODO(bh, 2023-11-03): is this OT-2 only?
   const orderedSlots = standardOt2DeckDef.locations.cutouts
   // intentionally not substracting by 1 because trash (slot 12) should not count
   const numSlots = orderedSlots.length
@@ -286,6 +281,9 @@ export const getAreSlotsVerticallyAdjacent = (
 
   return areSlotsVerticallyAdjacent
 }
+//  TODO(jr, 11/12/23): rename this utility to mention that it
+//  is only used in the OT-2, same with getAreSlotsHorizontallyAdjacent
+//  and getAreSlotsVerticallyAdjacent
 export const getAreSlotsAdjacent = (
   slotNameA?: string | null,
   slotNameB?: string | null
@@ -336,15 +334,6 @@ export const getCalibrationAdapterLoadName = (
       )
       return null
   }
-}
-
-export const getRobotTypeFromLoadedLabware = (
-  labware: LoadedLabware[]
-): RobotType => {
-  const isProtocolForOT3 = labware.some(
-    l => l.loadName === 'opentrons_1_trash_3200ml_fixed'
-  )
-  return isProtocolForOT3 ? 'OT-3 Standard' : 'OT-2 Standard'
 }
 
 export const getDeckDefFromRobotType = (

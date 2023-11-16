@@ -927,6 +927,7 @@ def _get_protocol_engine_config(robot_type: RobotType) -> Config:
         use_virtual_pipettes=True,
         use_virtual_modules=True,
         use_virtual_gripper=True,
+        use_simulated_deck_config=True,
     )
 
 

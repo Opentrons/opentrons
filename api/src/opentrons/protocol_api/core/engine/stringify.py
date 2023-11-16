@@ -4,6 +4,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
 )
 
 
@@ -41,6 +42,10 @@ def _labware_location_string(
         )
         labware_on_string = _labware_location_string(engine_client, labware_on)
         return f"{labware_name} on {labware_on_string}"
+
+    elif isinstance(location, AddressableAreaLocation):
+        # In practice this will always be a deck slot or staging slot
+        return f"slot {location.addressableAreaName}"
 
     elif location == "offDeck":
         return "[off-deck]"

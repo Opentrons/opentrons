@@ -541,7 +541,7 @@ class ProtocolCore(
 
     def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
-        return self._engine_client.state.labware.get_slot_definition(slot)
+        return self._engine_client.state.addressable_areas.get_slot_definition(slot)
 
     def _ensure_module_location(
         self, slot: DeckSlotName, module_type: ModuleType
@@ -595,7 +595,9 @@ class ProtocolCore(
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
-        return self._engine_client.state.labware.get_slot_center_position(slot_name)
+        return self._engine_client.state.addressable_areas.get_addressable_area_center(
+            slot_name.id
+        )
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""

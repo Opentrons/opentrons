@@ -37,12 +37,8 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
-  parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
-import {
-  WASTE_CHUTE_LOAD_NAME,
-  getGripperDisplayName,
-} from '@opentrons/shared-data'
+import { getGripperDisplayName } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -58,6 +54,7 @@ import {
   analyzeProtocol,
 } from '../../redux/protocol-storage'
 import { useFeatureFlag } from '../../redux/config'
+import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -72,11 +69,7 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
-import type {
-  JsonConfig,
-  LoadFixtureRunTimeCommand,
-  PythonConfig,
-} from '@opentrons/shared-data'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
 
@@ -237,29 +230,9 @@ export function ProtocolDetails(
       ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
       : []
 
-  // TODO: IMMEDIATELY remove stubbed fixture as soon as PE supports loadFixture
-  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'cutoutD3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  }
-  const requiredFixtureDetails =
-    mostRecentAnalysis?.commands != null
-      ? [
-          ...map(
-            parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands)
-          ),
-          STUBBED_LOAD_FIXTURE,
-        ]
-      : []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocolCommands(
+    mostRecentAnalysis?.commands ?? []
+  )
 
   const requiredLabwareDetails =
     mostRecentAnalysis != null

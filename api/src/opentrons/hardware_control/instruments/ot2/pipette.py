@@ -12,7 +12,8 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PlungerPositions,
     MotorConfigurations,
     SupportedTipsDefinition,
-    TipHandlingConfigurations,
+    PickUpTipConfigurations,
+    DropTipConfigurations,
     PipetteModelVersionType,
     PipetteNameType,
     PipetteLiquidPropertiesDefinition,
@@ -109,10 +110,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._nozzle_offset = self._config.nozzle_offset
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map,
-                self._config.partial_tip_configurations.per_tip_pickup_current,
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
         self._current_volume = 0.0
         self._working_volume = float(self._liquid_class.max_volume)
@@ -230,17 +228,15 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._config.plunger_motor_configurations
 
     @property
-    def pick_up_configurations(self) -> TipHandlingConfigurations:
+    def pick_up_configurations(self) -> PickUpTipConfigurations:
         return self._config.pick_up_tip_configurations
 
     @pick_up_configurations.setter
-    def pick_up_configurations(
-        self, pick_up_configs: TipHandlingConfigurations
-    ) -> None:
+    def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
         self._pick_up_configurations = pick_up_configs
 
     @property
-    def drop_configurations(self) -> TipHandlingConfigurations:
+    def drop_configurations(self) -> DropTipConfigurations:
         return self._config.drop_tip_configurations
 
     @property
@@ -292,10 +288,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
         self._nozzle_manager = (
-            nozzle_manager.NozzleConfigurationManager.build_from_nozzlemap(
-                self._config.nozzle_map,
-                self._config.partial_tip_configurations.per_tip_pickup_current,
-            )
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
         )
 
     def reset_pipette_offset(self, mount: Mount, to_default: bool) -> None:

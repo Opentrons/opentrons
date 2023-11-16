@@ -17,11 +17,11 @@ import {
   DeckConfigurator,
 } from '@opentrons/components'
 import {
-  Cutout,
+  CutoutId,
   DeckConfiguration,
-  STAGING_AREA_LOAD_NAME,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_CUTOUTS,
-  STANDARD_SLOT_LOAD_NAME,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import {
@@ -47,29 +47,36 @@ const StagingAreasModalComponent = (
   const areSlotsEmpty = values.selectedSlots.map(slot =>
     getSlotIsEmpty(initialDeckSetup, slot)
   )
-  const hasConflictedSlot = areSlotsEmpty.includes(false)
+  const hasWasteChute =
+    Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
+      aE => aE.name === 'wasteChute'
+    ) != null
+  const hasConflictedSlot =
+    hasWasteChute && values.selectedSlots.find(slot => slot === 'cutoutD3')
+      ? false
+      : areSlotsEmpty.includes(false)
 
-  const mappedStagingAreas = stagingAreas.flatMap(area => {
-    return [
-      {
-        fixtureId: area.id,
-        fixtureLocation: area.location ?? '',
-        loadName: STAGING_AREA_LOAD_NAME,
-      },
-    ] as DeckConfiguration
+  const mappedStagingAreas: DeckConfiguration = stagingAreas.flatMap(area => {
+    return area.location != null
+      ? [
+          {
+            cutoutId: area.location as CutoutId,
+            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+          },
+        ]
+      : []
   })
   const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_CUTOUTS.map(
-    fixtureLocation => ({
-      fixtureId: `id_${fixtureLocation}`,
-      fixtureLocation: fixtureLocation as Cutout,
-      loadName: STANDARD_SLOT_LOAD_NAME,
+    cutoutId => ({
+      cutoutId,
+      cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
     })
   )
 
   STANDARD_EMPTY_SLOTS.forEach(emptySlot => {
     if (
       !mappedStagingAreas.some(
-        slot => slot.fixtureLocation === emptySlot.fixtureLocation
+        ({ cutoutId }) => cutoutId === emptySlot.cutoutId
       )
     ) {
       mappedStagingAreas.push(emptySlot)
@@ -82,34 +89,31 @@ const StagingAreasModalComponent = (
     selectableSlots
   )
 
-  const handleClickAdd = (fixtureLocation: string): void => {
+  const handleClickAdd = (cutoutId: string): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
-      if (slot.fixtureLocation === fixtureLocation) {
+      if (slot.cutoutId === cutoutId) {
         return {
           ...slot,
-          loadName: STAGING_AREA_LOAD_NAME,
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
         }
       }
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    const updatedSelectedSlots = [...values.selectedSlots, fixtureLocation]
+    const updatedSelectedSlots = [...values.selectedSlots, cutoutId]
     setFieldValue('selectedSlots', updatedSelectedSlots)
   }
 
-  const handleClickRemove = (fixtureLocation: string): void => {
+  const handleClickRemove = (cutoutId: string): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
-      if (slot.fixtureLocation === fixtureLocation) {
-        return {
-          ...slot,
-          loadName: STANDARD_SLOT_LOAD_NAME,
-        }
+      if (slot.cutoutId === cutoutId) {
+        return { ...slot, loadName: SINGLE_RIGHT_SLOT_FIXTURE }
       }
       return slot
     })
     setUpdatedSlots(modifiedSlots)
     const updatedSelectedSlots = values.selectedSlots.filter(
-      item => item !== fixtureLocation
+      item => item !== cutoutId
     )
     setFieldValue('selectedSlots', updatedSelectedSlots)
   }

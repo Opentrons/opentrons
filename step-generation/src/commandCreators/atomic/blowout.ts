@@ -1,8 +1,9 @@
-import { uuid } from '../../utils'
+import { uuid, getLabwareSlot } from '../../utils'
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreatorError, CommandCreator } from '../../types'
-import { CreateCommand } from '@opentrons/shared-data'
 
 export const blowout: CommandCreator<BlowoutParams> = (
   args,
@@ -14,7 +15,11 @@ export const blowout: CommandCreator<BlowoutParams> = (
   const actionName = 'blowout'
   const errors: CommandCreatorError[] = []
   const pipetteData = prevRobotState.pipettes[pipette]
-
+  const slotName = getLabwareSlot(
+    labware,
+    prevRobotState.labware,
+    prevRobotState.modules
+  )
   // TODO Ian 2018-04-30 this logic using command creator args + robotstate to push errors
   // is duplicated across several command creators (eg aspirate & blowout overlap).
   // You can probably make higher-level error creator util fns to be more DRY
@@ -47,6 +52,10 @@ export const blowout: CommandCreator<BlowoutParams> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
+  }
+
+  if (COLUMN_4_SLOTS.includes(slotName)) {
+    errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   }
 
   if (errors.length > 0) {

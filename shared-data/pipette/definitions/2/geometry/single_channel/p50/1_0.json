@@ -2,6 +2,8 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
   "nozzleOffset": [0.0, 0.0, 25.0],
   "pathTo3D": "pipette/definitions/2/geometry/single_channel/p50/placeholder.gltf",
+  "orderedRows": [{ "key": "A", "orderedNozzles": ["A1"] }],
+  "orderedColumns": [{ "key": "1", "orderedNozzles": ["A1"] }],
   "nozzleMap": {
     "A1": [0.0, 0.0, 25.0]
   }

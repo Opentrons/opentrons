@@ -1,5 +1,6 @@
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
+import { COLUMN_4_SLOTS } from '../../constants'
 import { dropTip } from './dropTip'
 import {
   curryCommandCreator,
@@ -10,6 +11,7 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  wasteChuteCommandsUtil,
 } from '../../utils'
 import type {
   CommandCreatorError,
@@ -36,6 +38,11 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
       : null
   if (adapterId == null && pipetteName === 'p1000_96') {
     errors.push(errorCreators.missingAdapter())
+  }
+  if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
+    errors.push(
+      errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
+    )
   }
 
   if (errors.length > 0) {
@@ -98,6 +105,9 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
+  const isWasteChute =
+    invariantContext.additionalEquipmentEntities[dropTipLocation] != null
+
   if (!labwareDef) {
     return {
       errors: [
@@ -158,17 +168,35 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const commandCreators: CurriedCommandCreator[] = [
-    curryCommandCreator(dropTip, {
-      pipette,
-      dropTipLocation,
-    }),
-    curryCommandCreator(_pickUpTip, {
-      pipette,
-      tiprack: nextTiprack.tiprackId,
-      well: nextTiprack.well,
-    }),
-  ]
+  const addressableAreaName =
+    pipetteSpec.channels === 96
+      ? '96ChannelWasteChute'
+      : '1and8ChannelWasteChute'
+
+  const commandCreators: CurriedCommandCreator[] = isWasteChute
+    ? [
+        curryCommandCreator(wasteChuteCommandsUtil, {
+          type: 'dropTip',
+          pipetteId: pipette,
+          addressableAreaName,
+        }),
+        curryCommandCreator(_pickUpTip, {
+          pipette,
+          tiprack: nextTiprack.tiprackId,
+          well: nextTiprack.well,
+        }),
+      ]
+    : [
+        curryCommandCreator(dropTip, {
+          pipette,
+          dropTipLocation,
+        }),
+        curryCommandCreator(_pickUpTip, {
+          pipette,
+          tiprack: nextTiprack.tiprackId,
+          well: nextTiprack.well,
+        }),
+      ]
 
   return reduceCommandCreators(
     commandCreators,

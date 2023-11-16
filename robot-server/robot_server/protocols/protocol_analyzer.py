@@ -36,6 +36,7 @@ class ProtocolAnalyzer:
 
         await self._analysis_store.update(
             analysis_id=analysis_id,
+            robot_type=protocol_resource.source.robot_type,
             commands=result.commands,
             labware=result.state_summary.labware,
             modules=result.state_summary.modules,

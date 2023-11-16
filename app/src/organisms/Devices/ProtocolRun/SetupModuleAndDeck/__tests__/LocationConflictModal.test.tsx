@@ -2,10 +2,8 @@ import * as React from 'react'
 import { UseQueryResult } from 'react-query'
 import { renderWithProviders } from '@opentrons/components'
 import {
-  DeckConfiguration,
-  STAGING_AREA_LOAD_NAME,
-  Fixture,
-  TRASH_BIN_LOAD_NAME,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 import {
   useDeckConfigurationQuery,
@@ -13,6 +11,8 @@ import {
 } from '@opentrons/react-api-client/src/deck_configuration'
 import { i18n } from '../../../../../i18n'
 import { LocationConflictModal } from '../LocationConflictModal'
+
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client/src/deck_configuration')
 
@@ -24,10 +24,9 @@ const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutatio
 >
 
 const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: 'cutoutB3',
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+  cutoutId: 'cutoutB3',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
 
 const render = (props: React.ComponentProps<typeof LocationConflictModal>) => {
   return renderWithProviders(<LocationConflictModal {...props} />, {
@@ -41,8 +40,8 @@ describe('LocationConflictModal', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
-      cutout: 'cutoutB3',
-      requiredFixture: TRASH_BIN_LOAD_NAME,
+      cutoutId: 'cutoutB3',
+      requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     }
     mockUseDeckConfigurationQuery.mockReturnValue({
       data: [mockFixture],
@@ -57,8 +56,8 @@ describe('LocationConflictModal', () => {
     getByText('Slot B3')
     getByText('Protocol specifies')
     getByText('Currently configured')
-    getAllByText('Staging Area Slot')
-    getByText('Trash Bin')
+    getAllByText('Staging area slot')
+    getByText('Trash bin')
     getByRole('button', { name: 'Cancel' }).click()
     expect(props.onCloseClick).toHaveBeenCalled()
     getByRole('button', { name: 'Update deck' }).click()
@@ -67,7 +66,7 @@ describe('LocationConflictModal', () => {
   it('should render the modal information for a module fixture conflict', () => {
     props = {
       onCloseClick: jest.fn(),
-      cutout: 'cutoutB3',
+      cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
     }
     const { getByText, getByRole } = render(props)
@@ -89,8 +88,8 @@ describe('LocationConflictModal', () => {
     getByText('Slot B3')
     getByText('Protocol specifies')
     getByText('Currently configured')
-    getAllByText('Staging Area Slot')
-    getByText('Trash Bin')
+    getAllByText('Staging area slot')
+    getByText('Trash bin')
     getByText('Cancel').click()
     expect(props.onCloseClick).toHaveBeenCalled()
     getByText('Confirm removal').click()

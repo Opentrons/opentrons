@@ -145,10 +145,16 @@ class AnalyzeResults(BaseModel):
     See robot-server's analysis models for field documentation.
     """
 
+    # We want to unify this local analysis model with the one that robot-server returns.
+    # Until that happens, we need to keep these fields in sync manually.
+
+    # Fields that are currently unique to this local analysis module, missing from robot-server:
     createdAt: datetime
     files: List[ProtocolFile]
     config: Union[JsonConfig, PythonConfig]
     metadata: Dict[str, Any]
+
+    # Fields that should match robot-server:
     robotType: RobotType
     commands: List[Command]
     labware: List[LoadedLabware]

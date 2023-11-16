@@ -149,6 +149,7 @@ describe('labware selectors', () => {
           names,
           initialDeckSetup,
           {},
+          {},
           {}
         )
       ).toEqual([
@@ -179,6 +180,7 @@ describe('labware selectors', () => {
           names,
           initialDeckSetup,
           presavedStepForm,
+          {},
           {}
         )
       ).toEqual([
@@ -261,6 +263,7 @@ describe('labware selectors', () => {
           nicknames,
           initialDeckSetup,
           {},
+          {},
           {}
         )
       ).toEqual([
@@ -317,11 +320,13 @@ describe('labware selectors', () => {
           labwareEntities,
           nicknames,
           initialDeckSetup,
-          savedStep
+          {},
+          savedStep,
+          {}
         )
       ).toEqual([
         { name: 'Trash', value: mockTrash },
-        { name: 'Well Plate in Magnetic Module', value: 'wellPlateId' },
+        { name: 'Well Plate', value: 'wellPlateId' },
       ])
     })
   })

@@ -23,7 +23,7 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
-import type { TrashLocation } from './FlexTrash'
+import type { TrashCutoutId } from './FlexTrash'
 
 const getModulePosition = (
   deckDef: DeckDefinition,
@@ -139,7 +139,7 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   loadedLabware: LoadedLabware[]
   backgroundItems?: React.ReactNode
   deckFill?: string
-  trashLocation?: TrashLocation
+  trashCutoutId?: TrashCutoutId
 }
 export function MoveLabwareOnDeck(
   props: MoveLabwareOnDeckProps
@@ -153,7 +153,7 @@ export function MoveLabwareOnDeck(
     loadedModules,
     backgroundItems = null,
     deckFill = '#e6e6e6',
-    trashLocation,
+    trashCutoutId,
     ...styleProps
   } = props
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
@@ -233,7 +233,7 @@ export function MoveLabwareOnDeck(
           deckFill={deckFill}
           layerBlocklist={[]}
           robotType={robotType}
-          trashLocation={trashLocation}
+          trashCutoutId={trashCutoutId}
         />
       )}
       {backgroundItems}

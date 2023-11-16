@@ -3,8 +3,8 @@ import map from 'lodash/map'
 
 import { BaseDeck } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -13,7 +13,7 @@ import {
 } from '@opentrons/api-client'
 
 import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
-import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { getLabwareRenderInfo } from '../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
@@ -29,21 +29,26 @@ import type {
 interface DeckThumbnailProps extends StyleProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   showSlotLabels?: boolean
+  isOnDevice?: boolean
 }
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
-  const { protocolAnalysis, showSlotLabels = false, ...styleProps } = props
+  const {
+    protocolAnalysis,
+    showSlotLabels = false,
+    isOnDevice = false,
+    ...styleProps
+  } = props
   const attachedModules = useAttachedModules()
 
-  if (protocolAnalysis == null) return null
-
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  if (protocolAnalysis == null || protocolAnalysis.errors.length) return null
+  const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     protocolAnalysis.commands
   )
 
-  const deckConfig = getDeckConfigFromProtocolCommands(
+  const deckConfig = getSimplestDeckConfigForProtocolCommands(
     protocolAnalysis.commands
   )
   const liquids = protocolAnalysis.liquids
@@ -116,6 +121,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
       labwareLocations={labwareLocations}
       moduleLocations={moduleLocations}
       showSlotLabels={showSlotLabels}
+      isOnDevice={isOnDevice}
       {...styleProps}
     ></BaseDeck>
   )

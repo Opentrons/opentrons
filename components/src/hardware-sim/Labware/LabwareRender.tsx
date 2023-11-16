@@ -58,6 +58,8 @@ export interface LabwareRenderProps {
   hover?: boolean
   onLabwareClick?: () => void
   highlightLabware?: boolean
+  /** This will be used for displaying outline of labware */
+  isOnDevice?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -77,6 +79,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         hover={props.hover}
         onLabwareClick={props.onLabwareClick}
         highlightLabware={props.highlightLabware}
+        isOnDevice={props.isOnDevice}
       />
       {props.wellStroke && (
         <StrokedWells

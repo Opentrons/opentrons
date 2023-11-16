@@ -15,10 +15,15 @@ import {
   truncatedCommandMessage,
 } from '../__fixtures__'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { useIsFlex } from '../../Devices/hooks'
 
 const ROBOT_NAME = 'Otie'
 
 const mockOnResumeHandler = jest.fn()
+
+jest.mock('../../Devices/hooks')
+
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = (props: React.ComponentProps<typeof InterventionModal>) => {
   return renderWithProviders(<InterventionModal {...props} />, {
@@ -43,6 +48,7 @@ describe('InterventionModal', () => {
         ],
       } as CompletedProtocolAnalysis,
     }
+    mockUseIsFlex.mockReturnValue(true)
   })
 
   it('renders an InterventionModal with the robot name in the header and confirm button', () => {

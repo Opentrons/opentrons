@@ -52,6 +52,8 @@ from .measurement.scale import Scale
 from .tips import MULTI_CHANNEL_TEST_ORDER
 import glob
 
+from opentrons.hardware_control.types import StatusBarState
+
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
@@ -593,7 +595,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     recorder._recording = GravimetricRecording()
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
-
+    hw_api = resources.ctx._core.get_hardware()
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
@@ -621,6 +623,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
         else:
+            hw_api.set_status_bar_state(StatusBarState.SOFTWARE_ERROR)
             (
                 average_aspirate_evaporation_ul,
                 average_dispense_evaporation_ul,
@@ -632,7 +635,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 resources.test_report,
                 labware_on_scale,
             )
-
+        hw_api.set_status_bar_state(StatusBarState.IDLE)
         ui.print_info("dropping tip")
         if not cfg.same_tip:
             _drop_tip(

@@ -5,7 +5,6 @@ import type {
   LabwareOffset,
   PipetteName,
   ModuleModel,
-  FixtureLoadName,
   Cutout,
 } from '../../js'
 
@@ -158,6 +157,6 @@ interface LoadLiquidResult {
 
 interface LoadFixtureParams {
   location: { cutout: Cutout }
-  loadName: FixtureLoadName
+  loadName: string
   fixtureId?: string
 }

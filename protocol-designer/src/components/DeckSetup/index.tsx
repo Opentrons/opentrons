@@ -3,18 +3,18 @@ import { useDispatch, useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
-  useOnClickOutside,
-  RobotWorkSpaceRenderProps,
-  Module,
   COLORS,
-  TrashLocation,
+  DeckFromLayers,
   FlexTrash,
+  Module,
   RobotCoordinateSpaceWithDOMCoords,
-  WasteChuteFixture,
+  RobotWorkSpaceRenderProps,
+  SingleSlotFixture,
   StagingAreaFixture,
   StagingAreaLocation,
-  SingleSlotFixture,
-  DeckFromLayers,
+  TrashCutoutId,
+  useOnClickOutside,
+  WasteChuteFixture,
 } from '@opentrons/components'
 import {
   AdditionalEquipmentEntity,
@@ -22,29 +22,28 @@ import {
   ModuleTemporalProperties,
 } from '@opentrons/step-generation'
 import {
-  getLabwareHasQuirk,
-  inferModuleOrientationFromSlot,
-  getDeckDefFromRobotType,
-  OT2_ROBOT_TYPE,
-  getModuleDef2,
-  inferModuleOrientationFromXCoordinate,
-  THERMOCYCLER_MODULE_TYPE,
-  getModuleDisplayName,
-  DeckDefinition,
-  RobotType,
   FLEX_ROBOT_TYPE,
-  TRASH_BIN_LOAD_NAME,
-  STAGING_AREA_LOAD_NAME,
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getAddressableAreaFromSlotId,
+  getDeckDefFromRobotType,
+  getLabwareHasQuirk,
+  getModuleDef2,
+  getModuleDisplayName,
+  getPositionFromSlotId,
+  inferModuleOrientationFromSlot,
+  inferModuleOrientationFromXCoordinate,
+  isAddressableAreaStandardSlot,
+  OT2_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_LOAD_NAME,
-  AddressableAreaName,
-  CutoutFixture,
-  CutoutId,
 } from '@opentrons/shared-data'
 import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
+import { getStagingAreaAddressableAreas } from '../../utils'
 import {
   getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
@@ -72,14 +71,27 @@ import { Ot2ModuleTag } from './Ot2ModuleTag'
 import { SlotLabels } from './SlotLabels'
 import { getHasGen1MultiChannelPipette, getSwapBlocked } from './utils'
 
+import type {
+  AddressableAreaName,
+  CutoutFixture,
+  CutoutId,
+  DeckDefinition,
+  RobotType,
+} from '@opentrons/shared-data'
+
 import styles from './DeckSetup.css'
-import {
-  getAddressableAreaFromSlotId,
-  getPositionFromSlotId,
-  isAddressableAreaStandardSlot,
-} from '@opentrons/shared-data/js'
 
 export const DECK_LAYER_BLOCKLIST = [
+  'calibrationMarkings',
+  'fixedBase',
+  'doorStops',
+  'metalFrame',
+  'removalHandle',
+  'removableDeckOutline',
+  'screwHoles',
+]
+
+const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -96,6 +108,7 @@ interface ContentsProps {
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
   robotType: RobotType
+  stagingAreaCutoutIds: CutoutId[]
   trashSlot: string | null
 }
 
@@ -110,6 +123,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     deckDef,
     robotType,
     trashSlot,
+    stagingAreaCutoutIds,
   } = props
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
@@ -173,12 +187,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ])
     : []
 
-  console.log(
-    'AA',
-    deckDef.locations.addressableAreas.filter(addressableArea =>
-      isAddressableAreaStandardSlot(addressableArea.id, deckDef)
-    )
-  )
   return (
     <>
       {/* all modules */}
@@ -300,6 +308,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 selectedTerminalItemId={props.selectedTerminalItemId}
                 moduleType={moduleOnDeck.type}
                 handleDragHover={handleHoverEmptySlot}
+                slotId={moduleOnDeck.id}
               />
             ) : null}
             {robotType === FLEX_ROBOT_TYPE ? (
@@ -336,16 +345,22 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         ) : null
       })}
 
-      {/* SlotControls for all empty deck + module slots */}
+      {/* SlotControls for all empty deck */}
       {deckDef.locations.addressableAreas
-        // only render standard slot fixture components
-        .filter(
-          addressableArea =>
-            isAddressableAreaStandardSlot(addressableArea.id, deckDef) &&
+        .filter(addressableArea => {
+          const stagingAreaAddressableAreas = getStagingAreaAddressableAreas(
+            stagingAreaCutoutIds
+          )
+          const addressableAreas =
+            isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
+            stagingAreaAddressableAreas.includes(addressableArea.id)
+          return (
+            addressableAreas &&
             !slotIdsBlockedBySpanning.includes(addressableArea.id) &&
             getSlotIsEmpty(activeDeckSetup, addressableArea.id) &&
             addressableArea.id !== trashSlot
-        )
+          )
+        })
         .map(addressableArea => {
           return (
             // @ts-expect-error
@@ -513,28 +528,32 @@ export const DeckSetup = (): JSX.Element => {
 
   const trashBinFixtures = [
     {
-      fixtureId: trash?.id,
-      fixtureLocation:
+      cutoutId:
         trash?.slot != null
           ? getCutoutIdForAddressableArea(
               trash?.slot as AddressableAreaName,
               deckDef.cutoutFixtures
             )
           : null,
-      loadName: TRASH_BIN_LOAD_NAME,
+      cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => aE.name === WASTE_CHUTE_LOAD_NAME)
+  ).filter(aE =>
+    WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aE.name as AddressableAreaName)
+  )
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => aE.name === STAGING_AREA_LOAD_NAME)
+  ).filter(aE =>
+    FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
+      aE.name as AddressableAreaName
+    )
+  )
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
-
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}
@@ -547,7 +566,10 @@ export const DeckSetup = (): JSX.Element => {
           {({ getRobotCoordsFromDOMCoords }) => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
-                <DeckFromLayers robotType={robotType} layerBlocklist={[]} />
+                <DeckFromLayers
+                  robotType={robotType}
+                  layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+                />
               ) : (
                 <>
                   {filteredAddressableAreas.map(addressableArea => {
@@ -576,11 +598,11 @@ export const DeckSetup = (): JSX.Element => {
                     />
                   ))}
                   {trash != null
-                    ? trashBinFixtures.map(fixture =>
-                        fixture.fixtureLocation != null ? (
-                          <React.Fragment key={fixture.fixtureId}>
+                    ? trashBinFixtures.map(({ cutoutId }) =>
+                        cutoutId != null ? (
+                          <React.Fragment key={cutoutId}>
                             <SingleSlotFixture
-                              cutoutId={fixture.fixtureLocation}
+                              cutoutId={cutoutId}
                               deckDefinition={deckDef}
                               slotClipColor={COLORS.transparent}
                               fixtureBaseColor={lightFill}
@@ -588,9 +610,7 @@ export const DeckSetup = (): JSX.Element => {
                             <FlexTrash
                               robotType={robotType}
                               trashIconColor={lightFill}
-                              trashLocation={
-                                fixture.fixtureLocation as TrashLocation
-                              }
+                              trashCutoutId={cutoutId as TrashCutoutId}
                               backgroundColor={darkFill}
                             />
                           </React.Fragment>
@@ -613,6 +633,11 @@ export const DeckSetup = (): JSX.Element => {
                 robotType={robotType}
                 activeDeckSetup={activeDeckSetup}
                 selectedTerminalItemId={selectedTerminalItemId}
+                stagingAreaCutoutIds={stagingAreaFixtures.map(
+                  //  TODO(jr, 11/13/23): fix this type since AdditionalEquipment['location'] is type string
+                  //  instead of CutoutId
+                  areas => areas.location as CutoutId
+                )}
                 {...{
                   deckDef,
                   getRobotCoordsFromDOMCoords,
