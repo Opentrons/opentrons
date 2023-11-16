@@ -71,7 +71,7 @@ class RunController:
                     # TODO(mc, 2022-05-13): engine_store.runner.run could raise
                     # the same errors as runner.play, but we are unable to catch them.
                     # This unlikely to occur in production, but should be addressed.
-                    
+
                     self._task_runner.run(
                         func=self._run_protocol_and_insert_result,
                         deck_configuration=action_payload,
