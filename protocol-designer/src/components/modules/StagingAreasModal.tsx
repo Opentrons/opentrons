@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import without from 'lodash/without'
 import { Form, Formik, useFormikContext } from 'formik'
 import {
   BUTTON_TYPE_SUBMIT,
@@ -107,15 +108,15 @@ const StagingAreasModalComponent = (
   const handleClickRemove = (cutoutId: string): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
       if (slot.cutoutId === cutoutId) {
-        return { ...slot, loadName: SINGLE_RIGHT_SLOT_FIXTURE }
+        return { ...slot, cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE }
       }
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    const updatedSelectedSlots = values.selectedSlots.filter(
-      item => item !== cutoutId
+    setFieldValue(
+      'selectedSlots',
+      values.selectedSlots.filter(item => item !== cutoutId)
     )
-    setFieldValue('selectedSlots', updatedSelectedSlots)
   }
 
   return (
