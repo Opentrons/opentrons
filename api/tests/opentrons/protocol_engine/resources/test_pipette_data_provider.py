@@ -149,6 +149,7 @@ def test_load_virtual_pipette_nozzle_layout(
     )
     result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
     assert result.configuration.value == "ROW"
+
     subject_instance.configure_virtual_pipette_nozzle_layout(
         "my-96-pipette", "p1000_96_v3.5", "A1", "A1"
     )
