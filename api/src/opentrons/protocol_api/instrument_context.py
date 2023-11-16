@@ -165,7 +165,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`new-aspirate` for more details and examples.
 
-        :param volume: The volume to aspirate, measured in µL. If 0 or unspecified,
+        :param volume: The volume to aspirate, measured in µL. If unspecified,
                     defaults to the maximum volume for the pipette and its currently
                     attached tip.
         :type volume: int or float
@@ -277,7 +277,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`new-dispense` for more details and examples.
 
-        :param volume: The volume to dispense, measured in µL. If 0 or unspecified,
+        :param volume: The volume to dispense, measured in µL. If unspecified,
                        defaults to :py:attr:`current_volume`. If only a volume is
                        passed, the pipette will dispense from its current position.
         :type volume: int or float
@@ -411,7 +411,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See :ref:`mix` for examples.
 
         :param repetitions: Number of times to mix (default is 1).
-        :param volume: The volume to mix, measured in µL. If 0 or unspecified, defaults
+        :param volume: The volume to mix, measured in µL. If unspecified, defaults
                        to the maximum volume for the pipette and its attached tip.
         :param location: The :py:class:`.Well` or :py:class:`~.types.Location` where the
                         pipette will mix. If unspecified, the pipette will mix at its
