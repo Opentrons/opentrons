@@ -1,24 +1,29 @@
 import { uuid } from '../../utils'
-import type { CommandCreator, Nozzles } from '../../types'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 interface configureNozzleLayoutArgs {
-  nozzles: Nozzles
+  pipetteId: string
+  nozzles: NozzleConfigurationStyle
 }
 
-//  @ts-expect-error: wait until we add this command to the ts command types!
 export const configureNozzleLayout: CommandCreator<configureNozzleLayoutArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { nozzles } = args
+  const { pipetteId, nozzles } = args
 
   const commands = [
     {
       commandType: 'configureNozzleLayout' as const,
       key: uuid(),
       params: {
-        nozzles,
+        pipetteId,
+        configuration_params: {
+          primary_nozzle: 'A1', // TODO(jr, 11/16/23): wire this up when we support other nozzle configurations
+          style: nozzles,
+        },
       },
     },
   ]

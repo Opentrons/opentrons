@@ -1,3 +1,4 @@
+import { ALL, COLUMN, NozzleConfigurationStyle } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
 import { COLUMN_4_SLOTS } from '../../constants'
@@ -19,7 +20,6 @@ import type {
   CommandCreator,
   CommandCreatorError,
   CurriedCommandCreator,
-  Nozzles,
 } from '../../types'
 interface PickUpTipArgs {
   pipette: string
@@ -61,7 +61,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 interface ReplaceTipArgs {
   pipette: string
   dropTipLocation: string
-  nozzles?: Nozzles
+  nozzles?: NozzleConfigurationStyle
 }
 
 /**
@@ -89,7 +89,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   if (
     nextTiprack == null &&
     channels === 96 &&
-    nozzles === 'full' &&
+    nozzles === ALL &&
     hasMoreTipracksOnDeck
   ) {
     return {
@@ -98,7 +98,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   } else if (
     nextTiprack == null &&
     channels === 96 &&
-    nozzles === 'column' &&
+    nozzles === COLUMN &&
     hasMoreTipracksOnDeck
   ) {
     return {
@@ -154,7 +154,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
   if (
     channels === 96 &&
-    nozzles === 'column' &&
+    nozzles === COLUMN &&
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,

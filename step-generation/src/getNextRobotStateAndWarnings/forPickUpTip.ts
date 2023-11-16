@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { getIsTiprack } from '@opentrons/shared-data'
+import { ALL, COLUMN, getIsTiprack } from '@opentrons/shared-data'
 import type { PickUpTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 export function forPickUpTip(
@@ -22,7 +22,7 @@ export function forPickUpTip(
   // remove tips from tiprack
   if (pipetteSpec.channels === 1) {
     tipState.tipracks[labwareId][wellName] = false
-  } else if (pipetteSpec.channels === 8 || nozzles === 'column') {
+  } else if (pipetteSpec.channels === 8 || nozzles === COLUMN) {
     const allWells = tiprackDef.ordering.find(col => col[0] === wellName)
 
     if (!allWells) {
@@ -33,7 +33,7 @@ export function forPickUpTip(
     allWells.forEach(function (wellName) {
       tipState.tipracks[labwareId][wellName] = false
     })
-  } else if (pipetteSpec.channels === 96 && nozzles === 'full') {
+  } else if (pipetteSpec.channels === 96 && nozzles === ALL) {
     const allTips: string[] = tiprackDef.ordering.reduce(
       (acc, wells) => acc.concat(wells),
       []

@@ -1,4 +1,5 @@
 import merge from 'lodash/merge'
+import { COLUMN } from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -265,7 +266,7 @@ describe('replaceTip', () => {
       }
       initialRobotState = {
         ...initialRobotState,
-        pipettes: { p100096Id: { mount: 'left', nozzles: 'column' } },
+        pipettes: { p100096Id: { mount: 'left', nozzles: COLUMN } },
         tipState: {
           tipracks: {
             [tiprack4Id]: getTiprackTipstate(false),
@@ -281,7 +282,7 @@ describe('replaceTip', () => {
         {
           pipette: p100096Id,
           dropTipLocation: 'wasteChuteId',
-          nozzles: 'column',
+          nozzles: COLUMN,
         },
         invariantContext,
         initialRobotState

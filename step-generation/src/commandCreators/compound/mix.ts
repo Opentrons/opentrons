@@ -1,5 +1,5 @@
 import flatMap from 'lodash/flatMap'
-import { LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+import { LOW_VOLUME_PIPETTES, COLUMN } from '@opentrons/shared-data'
 import {
   repeatArray,
   blowoutUtil,
@@ -161,7 +161,7 @@ export const mix: CommandCreator<MixArgs> = (
 
   if (
     is96Channel &&
-    data.nozzles === 'column' &&
+    data.nozzles === COLUMN &&
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
@@ -186,6 +186,7 @@ export const mix: CommandCreator<MixArgs> = (
       ? [
           curryCommandCreator(configureNozzleLayout, {
             nozzles: data.nozzles,
+            pipetteId: pipette,
           }),
         ]
       : []
@@ -201,6 +202,7 @@ export const mix: CommandCreator<MixArgs> = (
       ]
     : []
   const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
+    pipette,
     prevNozzles
   )
   // Command generation

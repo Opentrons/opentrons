@@ -1,5 +1,5 @@
 import type { OutputSelector } from 'reselect'
-import type { Nozzles } from '@opentrons/step-generation'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FileData } from './file-data'
@@ -45,4 +45,4 @@ export type WellVolumes = Record<string, number>
 // or a module ID.
 export type DeckSlot = string
 
-export type NozzleType = Nozzles | '8-channel'
+export type NozzleType = NozzleConfigurationStyle | '8-channel'

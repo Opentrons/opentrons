@@ -1,6 +1,11 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  getWellNamePerMultiTip,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import { WellGroup } from '@opentrons/components'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
@@ -8,29 +13,28 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
 import { getWellSetForMultichannel } from '../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type {
-  PipetteEntity,
-  LabwareEntity,
-  Nozzles,
-} from '@opentrons/step-generation'
+import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
+import e from 'express'
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
   labwareEntity: LabwareEntity,
   wells: string[],
-  nozzles: Nozzles | null
+  nozzles: NozzleConfigurationStyle | null
 ): string[] {
   const pipChannels = pipetteEntity.spec.channels
 
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipChannels === 8 || pipChannels === 96) {
     let channels: 8 | 96 = pipChannels
-    if (nozzles === 'full') {
+    if (nozzles === ALL) {
       channels = 96
-    } else {
+    } else if (nozzles === COLUMN) {
       channels = 8
+    } else {
+      console.error(`we don't support other 96-channel configurations yet`)
     }
     return wells.reduce((acc: string[], well: string) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(
@@ -115,9 +119,9 @@ function _getSelectedWellsForStep(
         stepArgs.commandCreatorFnName === 'mix' ||
         stepArgs.commandCreatorFnName === 'transfer'
       ) {
-        if (stepArgs.nozzles === 'full') {
+        if (stepArgs.nozzles === ALL) {
           channels = 96
-        } else if (stepArgs.nozzles === 'column') {
+        } else if (stepArgs.nozzles === COLUMN) {
           channels = 8
         } else {
           channels = pipetteSpec.channels
@@ -218,10 +222,14 @@ function _getSelectedWellsForSubstep(
           invariantContext.pipetteEntities[stepArgs.pipette].spec.channels
         let channels = pipChannels
         if ('nozzles' in stepArgs) {
-          if (stepArgs.nozzles === 'full') {
+          if (stepArgs.nozzles === ALL) {
             channels = 96
-          } else {
+          } else if (stepArgs.nozzles === COLUMN) {
             channels = 8
+          } else {
+            console.error(
+              `we don't support other 96-channel configurations yet`
+            )
           }
         }
         // just use first multi row

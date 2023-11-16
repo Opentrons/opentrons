@@ -15,6 +15,7 @@ import styles from '../../StepEditForm.css'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, NozzleType } from '../../../../types'
 import type { FieldProps } from '../../types'
+import { COLUMN } from '@opentrons/shared-data'
 
 export interface SP {
   stepId?: StepIdType | null
@@ -65,8 +66,7 @@ export class WellSelectionInputComponent extends React.Component<Props> {
   render(): JSX.Element {
     const modalKey = this.getModalKey()
     const label =
-      this.props.nozzleType === '8-channel' ||
-      this.props.nozzleType === 'column'
+      this.props.nozzleType === '8-channel' || this.props.nozzleType === COLUMN
         ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
         : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
     return (

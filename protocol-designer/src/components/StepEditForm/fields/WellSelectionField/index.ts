@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import { ALL, COLUMN } from '@opentrons/shared-data'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import {
   WellSelectionInput,
@@ -33,10 +34,10 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   let nozzleType: NozzleType | null = null
   if (pipette !== null && pipette !== '' && pipette?.spec.channels === 8) {
     nozzleType = '8-channel'
-  } else if (nozzles === 'column') {
-    nozzleType = 'column'
-  } else if (nozzles === 'full') {
-    nozzleType = 'full'
+  } else if (nozzles === COLUMN) {
+    nozzleType = COLUMN
+  } else if (nozzles === ALL) {
+    nozzleType = ALL
   }
 
   return {

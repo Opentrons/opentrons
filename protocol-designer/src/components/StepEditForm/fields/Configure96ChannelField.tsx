@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { ALL, COLUMN } from '@opentrons/shared-data'
 import { DropdownField, DropdownOption, FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { StepFormDropdown } from './StepFormDropdownField'
@@ -16,8 +17,8 @@ export function Configure96ChannelField(
   } = props
 
   const options: DropdownOption[] = [
-    { name: 'Full', value: 'full' },
-    { name: 'Column', value: 'column' },
+    { name: 'All', value: ALL },
+    { name: 'Column', value: COLUMN },
   ]
 
   const [selectedValue, setSelectedValue] = React.useState(

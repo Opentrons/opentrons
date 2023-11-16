@@ -6,13 +6,15 @@ import {
   getTiprackVolume,
   THERMOCYCLER_MODULE_TYPE,
   orderWells,
+  NozzleConfigurationStyle,
+  COLUMN,
+  ALL,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
   ThermocyclerModuleState,
-  Nozzles,
 } from './'
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']
@@ -26,7 +28,7 @@ export function _getNextTip(args: {
   tiprackId: string
   invariantContext: InvariantContext
   robotState: RobotState
-  nozzles?: Nozzles
+  nozzles?: NozzleConfigurationStyle
 }): string | null {
   // return the well name of the next available tip for a pipette (or null)
   const { pipetteId, tiprackId, invariantContext, robotState, nozzles } = args
@@ -43,16 +45,13 @@ export function _getNextTip(args: {
     return well || null
   }
 
-  if (
-    pipetteChannels === 8 ||
-    (pipetteChannels === 96 && nozzles === 'column')
-  ) {
+  if (pipetteChannels === 8 || (pipetteChannels === 96 && nozzles === COLUMN)) {
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
     const fullColumn = tiprackColumns.find(col => col.every(hasTip))
     return fullColumn != null ? fullColumn[0] : null
   }
-  if (pipetteChannels === 96 && nozzles === 'full') {
+  if (pipetteChannels === 96 && nozzles === ALL) {
     const allWellsHaveTip = orderedWells.every(hasTip)
     return allWellsHaveTip ? orderedWells[0] : null
   }
@@ -71,7 +70,7 @@ export function getNextTiprack(
   pipetteId: string,
   invariantContext: InvariantContext,
   robotState: RobotState,
-  nozzles?: Nozzles
+  nozzles?: NozzleConfigurationStyle
 ): NextTiprackInfo {
   /** Returns the next tiprack that has tips.
     Tipracks are any labwareIds that exist in tipState.tipracks.
@@ -112,7 +111,7 @@ export function getNextTiprack(
           'opentrons_flex_96_tiprack_adapter' &&
         tiprackLocation?.def.namespace === 'opentrons'
 
-      return nozzles === 'full' ? has96TiprackAdapterId : !has96TiprackAdapterId
+      return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
     }
   )
 

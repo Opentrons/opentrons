@@ -3,8 +3,15 @@ import pick from 'lodash/pick'
 import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
-  Nozzles,
 } from '@opentrons/step-generation'
+import {
+  AddressableAreaName,
+  FLEX_ROBOT_TYPE,
+  ALL,
+  COLUMN,
+  CreateCommand,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import { Channels } from '@opentrons/components'
 import { getCutoutIdByAddressableArea } from '../utils'
 import type {
@@ -14,12 +21,15 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
+<<<<<<< HEAD
 import {
   AddressableAreaName,
   CreateCommand,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+=======
+>>>>>>> d32452f15c (begin to use correct command params)
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
@@ -209,7 +219,7 @@ export const substepTimelineMultiChannel = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels,
-  nozzles: Nozzles | null
+  nozzles: NozzleConfigurationStyle | null
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
@@ -234,10 +244,14 @@ export const substepTimelineMultiChannel = (
             : null
 
         let numChannels = channels
-        if (nozzles === 'full') {
+        if (nozzles === ALL) {
           numChannels = 96
-        } else {
+        } else if (nozzles === COLUMN) {
           numChannels = 8
+        } else {
+          console.error(
+            'we currently do not support other 96-channel configurations'
+          )
         }
         const wellsForTips =
           numChannels &&
@@ -366,7 +380,7 @@ export const substepTimeline = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels,
-  nozzles: Nozzles | null
+  nozzles: NozzleConfigurationStyle | null
 ): SubstepTimelineFrame[] => {
   if (channels === 1) {
     return substepTimelineSingleChannel(

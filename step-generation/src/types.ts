@@ -14,6 +14,7 @@ import type {
   ModuleModel,
   PipetteNameSpecs,
   PipetteName,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -30,9 +31,6 @@ import { ShakeSpeedParams } from '@opentrons/shared-data/protocol/types/schemaV6
 
 export type { Command }
 
-//  TODO(jr, 11/2/23): add other nozzle options when we support full partial tip
-export type Nozzles = 'full' | 'column'
-
 // Copied from PD
 export type DeckSlot = string
 type THERMOCYCLER_STATE = 'thermocyclerState'
@@ -43,8 +41,8 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
-  nozzles?: Nozzles
-  prevNozzles?: Nozzles
+  nozzles?: NozzleConfigurationStyle
+  prevNozzles?: NozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -170,7 +168,7 @@ interface CommonArgs {
 
 export type SharedTransferLikeArgs = CommonArgs & {
   pipette: string // PipetteId
-  nozzles: Nozzles | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -266,7 +264,7 @@ export type MixArgs = CommonArgs & {
   commandCreatorFnName: 'mix'
   labware: string
   pipette: string
-  nozzles: Nozzles | null // setting for 96-channel
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number

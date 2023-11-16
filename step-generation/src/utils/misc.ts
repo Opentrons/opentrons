@@ -686,12 +686,14 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
 }
 
 export const getConfigureNozzleLayoutCommandReset = (
+  pipetteId: string,
   prevNozzles?: Nozzles
 ): CurriedCommandCreator[] => {
   return prevNozzles === 'column'
     ? [
         curryCommandCreator(configureNozzleLayout, {
           nozzles: 'full',
+          pipetteId,
         }),
       ]
     : []

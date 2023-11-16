@@ -1,6 +1,10 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import { getWellDepth, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  getWellDepth,
+  LOW_VOLUME_PIPETTES,
+} from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
@@ -86,7 +90,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   if (
     is96Channel &&
-    args.nozzles === 'column' &&
+    args.nozzles === COLUMN &&
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
@@ -107,7 +111,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   if (
     is96Channel &&
-    args.nozzles === 'column' &&
+    args.nozzles === COLUMN &&
     getIsTallLabwareWestOf96Channel(
       prevRobotState,
       invariantContext,
@@ -468,10 +472,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? [
               curryCommandCreator(configureNozzleLayout, {
                 nozzles: args.nozzles,
+                pipetteId: args.pipette,
               }),
             ]
           : []
       const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
+        args.pipette,
         prevNozzles
       )
 
