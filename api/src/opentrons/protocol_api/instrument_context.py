@@ -168,6 +168,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param volume: The volume to aspirate, measured in µL. If unspecified,
                     defaults to the maximum volume for the pipette and its currently
                     attached tip.
+
+                    If ``aspirate`` is called with a volume of precisely 0, its behavior
+                    depends on the API level of the protocol. On API levels below 2.16,
+                    it will behave the same as a volume of ``None``/unspecified: aspirate
+                    until the pipette is full. On API levels at or above 2.16, no liquid
+                    will be aspirated.
         :type volume: int or float
         :param location: Tells the robot where to aspirate from. The location can be
                          a :py:class:`.Well` or a :py:class:`.Location`.
@@ -263,7 +269,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def dispense(
         self,
         volume: Optional[float] = None,
@@ -279,6 +285,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param volume: The volume to dispense, measured in µL. If unspecified,
                        defaults to :py:attr:`current_volume`. If only a volume is
                        passed, the pipette will dispense from its current position.
+
+                       If ``dispense`` is called with a volume of precisely 0, its behavior
+                       depends on the API level of the protocol. On API levels below 2.16,
+                       it will behave the same as a volume of ``None``/unspecified: dispense
+                       all liquid in the pipette. On API levels at or above 2.16, no liquid
+                       will be dispensed.
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
@@ -411,6 +423,12 @@ class InstrumentContext(publisher.CommandPublisher):
         :param repetitions: Number of times to mix (default is 1).
         :param volume: The volume to mix, measured in µL. If unspecified, defaults
                        to the maximum volume for the pipette and its attached tip.
+
+                       If ``mix`` is called with a volume of precisely 0, its behavior
+                       depends on the API level of the protocol. On API levels below 2.16,
+                       it will behave the same as a volume of ``None``/unspecified: mix
+                       the full working volume of the pipette. On API levels at or above 2.16,
+                       no liquid will be mixed.
         :param location: The :py:class:`.Well` or :py:class:`~.types.Location` where the
                         pipette will mix. If unspecified, the pipette will mix at its
                         current position.
