@@ -1349,7 +1349,7 @@ def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV4) -> No
 
     assert subject.get_deck_default_gripper_offsets() == LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.25),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.75),
     )
 
 
