@@ -435,7 +435,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         c_vol = self._core.get_available_volume() if not volume else volume
 
-        non_ending_dispense_push_out = None if self.api_version < APIVersion(2, 16) else 0
+        non_ending_dispense_push_out = (
+            None if self.api_version < APIVersion(2, 16) else 0
+        )
 
         with publisher.publish_context(
             broker=self.broker,
