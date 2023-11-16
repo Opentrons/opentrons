@@ -1666,31 +1666,38 @@ class InstrumentContext(publisher.CommandPublisher):
         start: Optional[str] = None,
         front_right: Optional[str] = None,
     ) -> None:
-        """Configure a pipette to pick up less than the maximum tip capacity. The pipette
-        will remain in its partial state until this function is called again without any inputs. All subsequent
-        pipetting calls will execute with the new nozzle layout meaning that the pipette will perform
-        robot moves in the set nozzle layout.
+        """Configure a pipette to pick up less than the maximum tip capacity. 
+        
+        The pipette will remain in its partial state until this function is called again
+        without any inputs. All subsequent pipetting calls will execute with the new
+        nozzle layout meaning that the pipette will perform robot moves in the set
+        nozzle layout.
 
         :param style: The requested nozzle layout should specify the shape that you
-        wish to configure your pipette to. Certain pipettes are restricted to a subset of `NozzleLayout`
-        types. See the note below on the different `NozzleLayout` types.
-        :type requested_nozzle_layout: `NozzleLayout.COLUMN`, `NozzleLayout.EMPTY` or None.
-        :param start: Signifies the nozzle that the robot will use to determine how to perform moves to different locations on the deck.
+            wish to configure your pipette to. Certain pipettes are restricted to a
+            subset of ``NozzleLayout`` types. See the note below on the different
+            ``NozzleLayout`` types.
+        :type requested_nozzle_layout: ``NozzleLayout.COLUMN``, ``NozzleLayout.EMPTY`` or ``None``.
+        :param start: Signifies the nozzle that the robot will use to determine how
+            to perform moves to different locations on the deck.
         :type start: string or None.
-        :param front_right: Signifies the ending nozzle in your partial configuration. It is not required for NozzleLayout.COLUMN, NozzleLayout.ROW, or NozzleLayout.SINGLE
-        configurations.
+        :param front_right: Signifies the ending nozzle in your partial
+            configuration. It is not required for NozzleLayout.COLUMN,
+            NozzleLayout.ROW, or NozzleLayout.SINGLE configurations.
         :type front_right: string or None.
 
         .. note::
-            Your `start` and `front_right` strings should be formatted similarly to a well, so in the format of <LETTER><NUMBER>.
-            The pipette nozzles are mapped in the same format as a 96 well standard plate starting from the back left-most nozzle
-            to the front right-most nozzle.
+            Your ``start`` and ``front_right`` strings should be formatted similarly to a
+            well, so in the format of <LETTER><NUMBER>. The pipette nozzles are mapped
+            in the same format as a 96 well standard plate starting from the back
+            left-most nozzle to the front right-most nozzle.
 
         .. code-block:: python
 
             from opentrons.protocol_api import COLUMN, EMPTY
 
-            # Sets a pipette to a full single column pickup using "A1" as the primary nozzle. Implicitly, "H1" is the ending nozzle.
+            # Sets a pipette to a full single column pickup using "A1" as
+            # the primary nozzle. Implicitly, "H1" is the ending nozzle.
             instr.configure_nozzle_layout(style=COLUMN, start="A1")
 
             # Resets the pipette configuration to default

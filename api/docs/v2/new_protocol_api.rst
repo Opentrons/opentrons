@@ -17,7 +17,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
-   :exclude-members: delay, configure_nozzle_layout, prepare_to_aspirate
+   :exclude-members: delay, prepare_to_aspirate
 
 .. autoclass:: opentrons.protocol_api.Liquid
 
