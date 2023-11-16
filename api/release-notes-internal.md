@@ -22,3 +22,9 @@ The biggest new features, however, are
 - Labware position check now uses the calibration probe (the same one used for pipette and module calibration) instead of a tip; this should increase the accuracy of LPC.
 - Support for P1000S v3.6
 - Updated liquid handling functions for all 96 channel pipettes
+
+## Known Issues 
+
+- The ``MoveToAddressableArea`` command will noop. This means that all commands that use the movable trash bin will not "move to the trash bin". The command will analyze successfully.
+- The deck configuration on the robot is not persistent, this means that between boots of a robot, you must PUT a deck configuration on the robot via HTTP.
+ 

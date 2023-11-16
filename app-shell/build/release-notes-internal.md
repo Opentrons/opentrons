@@ -17,3 +17,7 @@ This is still pretty early in the process, so some things are known not to work,
 - Labware position check now uses the calibration (the same one used for pipette and module calibration) instead of a tip; this should increase the accuracy of LPC.
 - Connecting a Flex to a wifi network while the app is connected to it with USB should work now
 - The app should generally be better about figuring out what kind of robot a protocol is for, and displaying the correct deck layout accordingly
+
+## Known Issues
+
+- Labware Renders are slightly askew towards the top right.
