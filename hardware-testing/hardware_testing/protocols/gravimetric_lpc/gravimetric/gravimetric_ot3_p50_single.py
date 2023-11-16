@@ -22,6 +22,7 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("flex_1channel_50", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
+        pipette.mix(3, 10, vial["A1"].top(-10))
         pipette.aspirate(10, vial["A1"].top())
         pipette.dispense(10, vial["A1"].top())
         pipette.drop_tip(home_after=False)
