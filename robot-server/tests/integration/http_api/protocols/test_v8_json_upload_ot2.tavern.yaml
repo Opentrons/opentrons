@@ -84,6 +84,7 @@ stages:
           - id: '{analysis_id}'
             status: completed
             result: ok
+            robotType: OT-2 Standard
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single

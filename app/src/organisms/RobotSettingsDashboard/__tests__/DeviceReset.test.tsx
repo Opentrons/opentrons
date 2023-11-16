@@ -87,6 +87,10 @@ describe('DeviceReset', () => {
     getByText('Clear module calibration')
     getByText('Clear protocol run history')
     getByText('Clears information about past runs of all protocols.')
+    getByText('Clear all stored data')
+    getByText(
+      'Resets all settings. You’ll have to redo initial setup before using the robot again.'
+    )
     expect(queryByText('Clear the ssh authorized keys')).not.toBeInTheDocument()
     expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })
@@ -107,6 +111,73 @@ describe('DeviceReset', () => {
     fireEvent.click(getByText('Clear pipette calibration'))
     fireEvent.click(getByText('Clear protocol run history'))
     fireEvent.click(getByText('Clear module calibration'))
+    const clearButton = getByText('Clear data and restart robot')
+    fireEvent.click(clearButton)
+    getByText('Are you sure you want to reset your device?')
+    fireEvent.click(getByText('Confirm'))
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig('mockRobot', clearMockResetOptions)
+    )
+  })
+
+  it('when tapping clear all stored data, all options are active', () => {
+    const clearMockResetOptions = {
+      pipetteOffsetCalibrations: true,
+      moduleCalibration: true,
+      runsHistory: true,
+      gripperOffsetCalibrations: true,
+      authorizedKeys: true,
+      onDeviceDisplay: true,
+    }
+
+    const [{ getByText }] = render(props)
+    getByText('Clear all stored data').click()
+    const clearButton = getByText('Clear data and restart robot')
+    fireEvent.click(clearButton)
+    getByText('Are you sure you want to reset your device?')
+    fireEvent.click(getByText('Confirm'))
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig('mockRobot', clearMockResetOptions)
+    )
+  })
+
+  it('when tapping all options except clear all stored data, all options are active', () => {
+    const clearMockResetOptions = {
+      pipetteOffsetCalibrations: true,
+      moduleCalibration: true,
+      runsHistory: true,
+      gripperOffsetCalibrations: true,
+      authorizedKeys: true,
+      onDeviceDisplay: true,
+    }
+
+    const [{ getByText }] = render(props)
+    getByText('Clear pipette calibration').click()
+    getByText('Clear gripper calibration').click()
+    getByText('Clear module calibration').click()
+    getByText('Clear protocol run history').click()
+    const clearButton = getByText('Clear data and restart robot')
+    fireEvent.click(clearButton)
+    getByText('Are you sure you want to reset your device?')
+    fireEvent.click(getByText('Confirm'))
+    expect(dispatchApiRequest).toBeCalledWith(
+      mockResetConfig('mockRobot', clearMockResetOptions)
+    )
+  })
+
+  it('when tapping clear all stored data and unselect one options, all options are not active', () => {
+    const clearMockResetOptions = {
+      pipetteOffsetCalibrations: false,
+      moduleCalibration: true,
+      runsHistory: true,
+      gripperOffsetCalibrations: true,
+      authorizedKeys: false,
+      onDeviceDisplay: false,
+    }
+
+    const [{ getByText }] = render(props)
+    getByText('Clear all stored data').click()
+    getByText('Clear pipette calibration').click()
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     getByText('Are you sure you want to reset your device?')

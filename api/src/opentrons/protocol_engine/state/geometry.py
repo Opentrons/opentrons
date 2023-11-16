@@ -416,12 +416,20 @@ class GeometryView:
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
+        partially_configured: bool = False,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette.
 
         This makes sure that the well location has an appropriate origin & offset
         if one is not already set previously.
         """
+        if (
+            self._labware.get_definition(labware_id).parameters.isTiprack
+            and partially_configured
+        ):
+            raise errors.UnexpectedProtocolError(
+                "Cannot return tip to a tiprack while the pipette is configured for partial tip."
+            )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
                 origin=WellOrigin(well_location.origin.value),
