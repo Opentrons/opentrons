@@ -1,5 +1,6 @@
 import { getSuccessResult } from '../fixtures'
 import { configureNozzleLayout } from '../commandCreators/atomic/configureNozzleLayout'
+import { ALL } from '@opentrons/shared-data'
 
 const getRobotInitialState = (): any => {
   return {}
@@ -10,9 +11,9 @@ const invariantContext: any = {}
 describe('configureNozzleLayout', () => {
   it('should call configureNozzleLayout with correct params', () => {
     const robotInitialState = getRobotInitialState()
-    const mockNozzles = 'full'
+    const mockPipette = 'mockPipette'
     const result = configureNozzleLayout(
-      { nozzles: 'full' },
+      { nozzles: ALL, pipetteId: mockPipette },
       invariantContext,
       robotInitialState
     )
@@ -22,7 +23,8 @@ describe('configureNozzleLayout', () => {
         commandType: 'configureNozzleLayout',
         key: expect.any(String),
         params: {
-          nozzles: mockNozzles,
+          pipettID: mockPipette,
+          configuration_params: { primary_nozzle: 'A1', style: ALL },
         },
       },
     ])

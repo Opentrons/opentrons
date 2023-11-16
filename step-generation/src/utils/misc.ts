@@ -8,6 +8,8 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
+  COLUMN,
+  ALL,
 } from '@opentrons/shared-data'
 import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
 import {
@@ -20,7 +22,10 @@ import { blowout } from '../commandCreators/atomic/blowout'
 import { configureNozzleLayout } from '../commandCreators/atomic'
 import { curryCommandCreator } from './curryCommandCreator'
 import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AdditionalEquipmentEntities,
@@ -31,7 +36,6 @@ import type {
   LabwareEntities,
   LabwareEntity,
   LocationLiquidState,
-  Nozzles,
   PipetteEntity,
   RobotState,
   SourceAndDest,
@@ -687,12 +691,12 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
 
 export const getConfigureNozzleLayoutCommandReset = (
   pipetteId: string,
-  prevNozzles?: Nozzles
+  prevNozzles?: NozzleConfigurationStyle
 ): CurriedCommandCreator[] => {
-  return prevNozzles === 'column'
+  return prevNozzles === COLUMN
     ? [
         curryCommandCreator(configureNozzleLayout, {
-          nozzles: 'full',
+          nozzles: ALL,
           pipetteId,
         }),
       ]

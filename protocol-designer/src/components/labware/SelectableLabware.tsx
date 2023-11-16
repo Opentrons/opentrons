@@ -6,6 +6,7 @@ import {
   WellMouseEvent,
   WellGroup,
 } from '@opentrons/components'
+import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -51,7 +52,7 @@ export class SelectableLabware extends React.Component<Props> {
       let channels: 8 | 96
       if (
         this.props.nozzleType === '8-channel' ||
-        this.props.nozzleType === 'column'
+        this.props.nozzleType === COLUMN
       ) {
         channels = 8
       } else {
@@ -89,7 +90,7 @@ export class SelectableLabware extends React.Component<Props> {
         let channels: 8 | 96
         if (
           this.props.nozzleType === '8-channel' ||
-          this.props.nozzleType === 'column'
+          this.props.nozzleType === COLUMN
         ) {
           channels = 8
         } else {
@@ -133,7 +134,7 @@ export class SelectableLabware extends React.Component<Props> {
       let channels: 8 | 96
       if (
         this.props.nozzleType === '8-channel' ||
-        this.props.nozzleType === 'column'
+        this.props.nozzleType === COLUMN
       ) {
         channels = 8
       } else {
@@ -166,7 +167,7 @@ export class SelectableLabware extends React.Component<Props> {
       selectedPrimaryWells,
     } = this.props
     let channels: 8 | 96
-    if (nozzleType === '8-channel' || nozzleType === 'column') {
+    if (nozzleType === '8-channel' || nozzleType === COLUMN) {
       channels = 8
     } else {
       channels = 96

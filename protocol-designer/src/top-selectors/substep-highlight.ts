@@ -16,7 +16,6 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { PipetteEntity, LabwareEntity } from '@opentrons/step-generation'
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
-import e from 'express'
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
