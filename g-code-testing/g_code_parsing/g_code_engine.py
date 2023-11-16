@@ -176,7 +176,9 @@ class GCodeEngine:
                     hardware_api=hardware,  # type: ignore
                 )
                 with GCodeWatcher(emulator_settings=self._config) as watcher:
-                    await protocol_runner.run(protocol_source=protocol_source)
+                    await protocol_runner.run(
+                        deck_configuration=[], protocol_source=protocol_source
+                    )
                     yield GCodeProgram.from_g_code_watcher(watcher)
             elif isinstance(version, APIVersion) and version < APIVersion(2, 14):
                 protocol = self._get_protocol(file_path)

@@ -900,7 +900,9 @@ def _run_file_pe(
 
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
-            result = await protocol_runner.run(protocol_source)
+            result = await protocol_runner.run(
+                deck_configuration=[], protocol_source=protocol_source
+            )
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
             raise entrypoint_util.ProtocolEngineExecuteError(

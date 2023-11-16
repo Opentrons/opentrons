@@ -15,6 +15,7 @@ from robot_server.runs.action_models import (
 from robot_server.runs.router.actions_router import create_run_action
 
 from robot_server.maintenance_runs import MaintenanceEngineStore
+from robot_server.deck_configuration.store import DeckConfigurationStore
 
 
 @pytest.fixture
@@ -27,6 +28,7 @@ async def test_create_run_action(
     decoy: Decoy,
     mock_run_controller: RunController,
     mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should create a run action."""
     run_id = "some-run-id"
@@ -39,12 +41,14 @@ async def test_create_run_action(
         createdAt=created_at,
         actionType=RunActionType.PLAY,
     )
+    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return(None)
     decoy.when(
         mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
+            action_payload=[],
         )
     ).then_return(expected_result)
 
@@ -55,6 +59,7 @@ async def test_create_run_action(
         action_id=action_id,
         created_at=created_at,
         maintenance_engine_store=mock_maintenance_engine_store,
+        deck_configuration_store=mock_deck_configuration_store,
     )
 
     assert result.content.data == expected_result
@@ -65,6 +70,7 @@ async def test_play_action_clears_maintenance_run(
     decoy: Decoy,
     mock_run_controller: RunController,
     mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should clear an existing maintenance run before issuing play action."""
     run_id = "some-run-id"
@@ -77,12 +83,14 @@ async def test_play_action_clears_maintenance_run(
         createdAt=created_at,
         actionType=RunActionType.PLAY,
     )
+    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return("some-id")
     decoy.when(
         mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
+            action_payload=[],
         )
     ).then_return(expected_result)
 
@@ -93,6 +101,7 @@ async def test_play_action_clears_maintenance_run(
         action_id=action_id,
         created_at=created_at,
         maintenance_engine_store=mock_maintenance_engine_store,
+        deck_configuration_store=mock_deck_configuration_store,
     )
 
     decoy.verify(await mock_maintenance_engine_store.clear(), times=1)
@@ -114,6 +123,7 @@ async def test_create_play_action_not_allowed(
     expected_error_id: str,
     expected_status_code: int,
     mock_maintenance_engine_store: MaintenanceEngineStore,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should 409 if the runner is not able to handle the action."""
     run_id = "some-run-id"
@@ -122,12 +132,14 @@ async def test_create_play_action_not_allowed(
     action_type = RunActionType.PLAY
     request_body = RequestModel(data=RunActionCreate(actionType=action_type))
 
+    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
     decoy.when(mock_maintenance_engine_store.current_run_id).then_return(None)
     decoy.when(
         mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
+            action_payload=[],
         )
     ).then_raise(exception)
 
@@ -139,6 +151,7 @@ async def test_create_play_action_not_allowed(
             action_id=action_id,
             created_at=created_at,
             maintenance_engine_store=mock_maintenance_engine_store,
+            deck_configuration_store=mock_deck_configuration_store,
         )
 
     assert exc_info.value.status_code == expected_status_code

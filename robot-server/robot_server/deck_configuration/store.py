@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from . import models
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 
 class DeckConfigurationStore:
@@ -26,3 +27,10 @@ class DeckConfigurationStore:
         return models.DeckConfigurationResponse.construct(
             cutoutFixtures=self._cutoutFixtures, lastUpdatedAt=self._last_updated_at
         )
+
+    def get_deck_configuration(self) -> DeckConfigurationType:
+        """Get the robot's current deck configuration in an expected typing."""
+        deck_configuration: DeckConfigurationType = []
+        for item in self._cutoutFixtures:
+            deck_configuration.append((item.cutoutId, item.cutoutFixtureId))
+        return deck_configuration

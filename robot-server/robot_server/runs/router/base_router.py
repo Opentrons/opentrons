@@ -41,6 +41,11 @@ from ..engine_store import EngineConflictError
 from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..dependencies import get_run_data_manager, get_run_auto_deleter
 
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
+
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -135,6 +140,9 @@ async def create_run(
     created_at: datetime = Depends(get_current_time),
     run_auto_deleter: RunAutoDeleter = Depends(get_run_auto_deleter),
     check_estop: bool = Depends(require_estop_in_good_state),
+    deck_configuration_store: DeckConfigurationStore = Depends(
+        get_deck_configuration_store
+    ),
 ) -> PydanticResponse[SimpleBody[Run]]:
     """Create a new run.
 
@@ -147,10 +155,13 @@ async def create_run(
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
         check_estop: Dependency to verify the estop is in a valid state.
+        deck_configuration_store: Dependency to fetch the deck configuration.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
     protocol_resource = None
+
+    deck_configuration = deck_configuration_store.get_deck_configuration()
 
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.
@@ -170,6 +181,7 @@ async def create_run(
             run_id=run_id,
             created_at=created_at,
             labware_offsets=offsets,
+            deck_configuration=deck_configuration,
             protocol=protocol_resource,
         )
     except EngineConflictError as e:

@@ -79,7 +79,7 @@ async def _analyze(
     runner = await create_simulating_runner(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-    analysis = await runner.run(protocol_source)
+    analysis = await runner.run(deck_configuration=[], protocol_source=protocol_source)
 
     if json_output:
         results = AnalyzeResults.construct(

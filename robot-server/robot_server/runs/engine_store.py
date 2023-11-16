@@ -32,6 +32,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.protocols import ProtocolResource
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 
 class EngineConflictError(RuntimeError):
@@ -150,6 +151,7 @@ class EngineStore:
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
@@ -181,6 +183,7 @@ class EngineStore:
                 ),
             ),
             load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
         )
         runner = create_protocol_runner(
             protocol_engine=engine,

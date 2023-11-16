@@ -39,6 +39,8 @@ from robot_server.runs.router.base_router import (
     update_run,
 )
 
+from robot_server.deck_configuration.store import DeckConfigurationStore
+
 
 @pytest.fixture
 def labware_offset_create() -> LabwareOffsetCreate:
@@ -55,6 +57,7 @@ async def test_create_run(
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LabwareOffsetCreate,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -74,12 +77,13 @@ async def test_create_run(
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
     )
-
+    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
     decoy.when(
         await mock_run_data_manager.create(
             run_id=run_id,
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
+            deck_configuration=[],
             protocol=None,
         )
     ).then_return(expected_response)
@@ -92,6 +96,7 @@ async def test_create_run(
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
+        deck_configuration_store=mock_deck_configuration_store,
     )
 
     assert result.content.data == expected_response
@@ -105,6 +110,7 @@ async def test_create_protocol_run(
     mock_protocol_store: ProtocolStore,
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -140,7 +146,7 @@ async def test_create_protocol_run(
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
     )
-
+    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
     decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
         protocol_resource
     )
@@ -150,6 +156,7 @@ async def test_create_protocol_run(
             run_id=run_id,
             created_at=run_created_at,
             labware_offsets=[],
+            deck_configuration=[],
             protocol=protocol_resource,
         )
     ).then_return(expected_response)
@@ -161,6 +168,7 @@ async def test_create_protocol_run(
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
+        deck_configuration_store=mock_deck_configuration_store,
     )
 
     assert result.content.data == expected_response
@@ -172,16 +180,18 @@ async def test_create_protocol_run(
 async def test_create_protocol_run_bad_protocol_id(
     decoy: Decoy,
     mock_protocol_store: ProtocolStore,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
-
+    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
     decoy.when(mock_protocol_store.get(protocol_id="protocol-id")).then_raise(error)
 
     with pytest.raises(ApiError) as exc_info:
         await create_run(
             request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
             protocol_store=mock_protocol_store,
+            deck_configuration_store=mock_deck_configuration_store,
         )
 
     assert exc_info.value.status_code == 404
@@ -192,15 +202,18 @@ async def test_create_run_conflict(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
+    mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
 
+    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
     decoy.when(
         await mock_run_data_manager.create(
             run_id="run-id",
             created_at=created_at,
             labware_offsets=[],
+            deck_configuration=[],
             protocol=None,
         )
     ).then_raise(EngineConflictError("oh no"))
@@ -212,6 +225,7 @@ async def test_create_run_conflict(
             request_body=None,
             run_data_manager=mock_run_data_manager,
             run_auto_deleter=mock_run_auto_deleter,
+            deck_configuration_store=mock_deck_configuration_store,
         )
 
     assert exc_info.value.status_code == 409

@@ -109,7 +109,11 @@ async def test_analyze(
         )
     ).then_return(json_runner)
 
-    decoy.when(await json_runner.run(protocol_resource.source)).then_return(
+    decoy.when(
+        await json_runner.run(
+            deck_configuration=[], protocol_source=protocol_resource.source
+        )
+    ).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(

@@ -35,6 +35,10 @@ from ..maintenance_engine_store import EngineConflictError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..dependencies import get_maintenance_run_data_manager
 
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -147,6 +151,9 @@ async def create_run(
         get_is_okay_to_create_maintenance_run
     ),
     check_estop: bool = Depends(require_estop_in_good_state),
+    deck_configuration_store: DeckConfigurationStore = Depends(
+        get_deck_configuration_store
+    ),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
 
@@ -157,6 +164,7 @@ async def create_run(
         created_at: Timestamp to attach to created run.
         is_ok_to_create_maintenance_run: Verify if a maintenance run may be created if a protocol run exists.
         check_estop: Dependency to verify the estop is in a valid state.
+        deck_configuration_store: Dependency to fetch the deck configuration.
     """
     if not is_ok_to_create_maintenance_run:
         raise ProtocolRunIsActive(
@@ -164,10 +172,13 @@ async def create_run(
         ).as_error(status.HTTP_409_CONFLICT)
 
     offsets = request_body.data.labwareOffsets if request_body is not None else []
+    deck_configuration = deck_configuration_store.get_deck_configuration()
+
     run_data = await run_data_manager.create(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=offsets,
+        deck_configuration=deck_configuration,
     )
 
     log.info(f'Created an empty run "{run_id}"".')

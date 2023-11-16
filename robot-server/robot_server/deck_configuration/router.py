@@ -25,7 +25,7 @@ router = fastapi.APIRouter()
 
 
 @router.put(
-    "/deck_configuration",
+    path="/deck_configuration",
     summary="Set the deck configuration",
     description=(
         "Inform the robot how its deck is physically set up."
