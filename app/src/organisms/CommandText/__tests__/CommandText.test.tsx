@@ -322,7 +322,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )[0]
       getByText(
-        'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
+        'Picking up tip(s) from A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
       )
     }
   })

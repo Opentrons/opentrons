@@ -81,7 +81,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setIsPending(true)
     refetch()
       .then(() => {
-        if (attachedPipette?.state?.tipDetected) {
+        if (is96Channel || attachedPipette?.state?.tipDetected) {
           chainRunCommands?.(
             [
               {

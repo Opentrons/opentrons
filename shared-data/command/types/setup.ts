@@ -70,7 +70,20 @@ export interface LoadFixtureRunTimeCommand
   result?: LoadLabwareResult
 }
 
+export interface ConfigureNozzleLayoutCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'configureNozzleLayout'
+  params: ConfigureNozzleLayoutParams
+}
+
+export interface ConfigureNozzleLayoutRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    ConfigureNozzleLayoutCreateCommand {
+  result?: {}
+}
+
 export type SetupRunTimeCommand =
+  | ConfigureNozzleLayoutRunTimeCommand
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
   | LoadFixtureRunTimeCommand
@@ -79,6 +92,7 @@ export type SetupRunTimeCommand =
   | MoveLabwareRunTimeCommand
 
 export type SetupCreateCommand =
+  | ConfigureNozzleLayoutCreateCommand
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
   | LoadFixtureCreateCommand
@@ -159,4 +173,27 @@ interface LoadFixtureParams {
   location: { cutout: Cutout }
   loadName: string
   fixtureId?: string
+}
+
+const COLUMN = 'COLUMN'
+const SINGLE = 'SINGLE'
+const ROW = 'ROW'
+const QUADRANT = 'QUADRANT'
+const EMPTY = 'EMPTY'
+
+export type NozzleConfigurationStyle =
+  | typeof COLUMN
+  | typeof SINGLE
+  | typeof ROW
+  | typeof QUADRANT
+  | typeof EMPTY
+
+interface NozzleConfigurationParams {
+  primary_nozzle: string
+  style: NozzleConfigurationStyle
+}
+
+interface ConfigureNozzleLayoutParams {
+  pipetteId: string
+  configuration_params: NozzleConfigurationParams
 }
