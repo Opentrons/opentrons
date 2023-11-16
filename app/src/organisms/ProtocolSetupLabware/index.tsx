@@ -145,6 +145,14 @@ export function ProtocolSetupLabware({
   } else if (
     selectedLabware != null &&
     typeof selectedLabware.location === 'object' &&
+    'addressableAreaName' in selectedLabware?.location
+  ) {
+    location = (
+      <LocationIcon slotName={selectedLabware?.location.addressableAreaName} />
+    )
+  } else if (
+    selectedLabware != null &&
+    typeof selectedLabware.location === 'object' &&
     'moduleId' in selectedLabware?.location
   ) {
     const matchedModule = attachedProtocolModuleMatches.find(
