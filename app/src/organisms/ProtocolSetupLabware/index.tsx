@@ -490,6 +490,9 @@ function RowLabware({
   } else if ('slotName' in initialLocation) {
     slotName = initialLocation.slotName
     location = <LocationIcon slotName={initialLocation.slotName} />
+  } else if ('addressableAreaName' in initialLocation) {
+    slotName = initialLocation.addressableAreaName
+    location = <LocationIcon slotName={initialLocation.addressableAreaName} />
   } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     slotName = matchedModule.slotName
     location = (
