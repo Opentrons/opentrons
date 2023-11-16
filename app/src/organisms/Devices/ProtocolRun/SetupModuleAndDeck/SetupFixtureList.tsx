@@ -168,7 +168,11 @@ export function FixtureListItem({
               <img
                 width="60px"
                 height="54px"
-                src={getFixtureImage(cutoutFixtureId)}
+                src={
+                  isCurrentFixtureCompatible
+                    ? getFixtureImage(cutoutFixtureId)
+                    : getFixtureImage(compatibleCutoutFixtureIds?.[0])
+                }
               />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
@@ -176,7 +180,9 @@ export function FixtureListItem({
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {getFixtureDisplayName(cutoutFixtureId)}
+                {isCurrentFixtureCompatible
+                  ? getFixtureDisplayName(cutoutFixtureId)
+                  : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
               </StyledText>
               <Btn
                 marginLeft={SPACING.spacing16}

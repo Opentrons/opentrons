@@ -161,9 +161,9 @@ export function FixtureTable({
               >
                 <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                    {cutoutFixtureId != null
+                    {cutoutFixtureId != null && isCurrentFixtureCompatible
                       ? getFixtureDisplayName(cutoutFixtureId)
-                      : null}
+                      : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
                   </StyledText>
                 </Flex>
                 <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
