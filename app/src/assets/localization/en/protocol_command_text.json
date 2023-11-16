@@ -2,6 +2,7 @@
   "adapter_in_mod_in_slot": "{{adapter}} on {{module}} in {{slot}}",
   "adapter_in_slot": "{{adapter}} in {{slot}}",
   "aspirate": "Aspirating {{volume}} µL from well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
+  "aspirate_in_place": "Aspirating {{volume}} µL in place at {{flow_rate}} µL/sec ",
   "blowout": "Blowing out at well {{well_name}} of {{labware}} in {{labware_location}} at {{flow_rate}} µL/sec",
   "blowout_in_place": "Blowing out in place at {{flow_rate}} µL/sec",
   "closing_tc_lid": "Closing Thermocycler lid",
