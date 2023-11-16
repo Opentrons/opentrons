@@ -22,7 +22,8 @@ export const SlotLabels = ({
   color,
   show4thColumn = false,
 }: SlotLabelsProps): JSX.Element | null => {
-  const widthPerColumnLabelRem = 10.125
+  const widthSmallRem = 10.5
+  const widthLargeRem = 15.25
 
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
@@ -77,10 +78,10 @@ export const SlotLabels = ({
         height="2.5rem"
         width={`${
           show4thColumn
-            ? widthPerColumnLabelRem * 4
-            : widthPerColumnLabelRem * 3
+            ? widthSmallRem * 2 + widthLargeRem * 2
+            : widthSmallRem + widthLargeRem * 2
         }rem`}
-        x="-15"
+        x="-100"
         y="-55"
       >
         <Flex
@@ -88,29 +89,31 @@ export const SlotLabels = ({
           flex="1"
           width={`${
             show4thColumn
-              ? widthPerColumnLabelRem * 4
-              : widthPerColumnLabelRem * 3
+              ? widthSmallRem * 2 + widthLargeRem * 2
+              : widthSmallRem + widthLargeRem * 2
           }rem`}
           height="2.5rem"
         >
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            flex="1"
+            width={`${widthLargeRem}rem`}
           >
             <LocationIcon color={color} slotName="1" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            flex="1"
+            width={`${widthSmallRem}rem`}
           >
             <LocationIcon color={color} slotName="2" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            flex="1"
+            width={
+              show4thColumn ? `${widthSmallRem}rem` : `${widthLargeRem}rem`
+            }
           >
             <LocationIcon color={color} slotName="3" height="100%" />
           </Flex>
@@ -118,7 +121,7 @@ export const SlotLabels = ({
             <Flex
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_CENTER}
-              flex="1"
+              width={`${widthSmallRem}rem`}
             >
               <LocationIcon color={color} slotName="4" height="100%" />
             </Flex>
