@@ -17,7 +17,6 @@ export interface StaticLabwareProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   hover?: boolean
   onLabwareClick?: () => void
-  highlightLabware?: boolean
   isOnDevice?: boolean
 }
 
@@ -42,12 +41,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   return (
     <g onClick={props.onLabwareClick}>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline
-          definition={props.definition}
-          hover={props.hover}
-          highlight={props.highlightLabware === true}
-          isOnDevice={props.isOnDevice}
-        />
+        <LabwareOutline definition={props.definition} highlight={props.hover} />
       </g>
       <g>
         {flatMap(

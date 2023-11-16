@@ -21,7 +21,7 @@ const render = (Component: any): void => {
   ReactDOM.render(
     <Provider store={store}>
       <AppContainer>
-        <I18nextProvider i18n={i18n as any}>
+        <I18nextProvider i18n={i18n}>
           <Component />
         </I18nextProvider>
       </AppContainer>
