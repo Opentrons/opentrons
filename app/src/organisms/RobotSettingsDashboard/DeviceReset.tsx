@@ -85,13 +85,7 @@ export function DeviceReset({
   )
 
   const isEveryOptionSelected = (obj: ResetConfigRequest): boolean => {
-    const requiredTrueKeys = [
-      'pipetteOffsetCalibrations',
-      'gripperOffsetCalibrations',
-      'moduleCalibration',
-      'runsHistory',
-    ]
-    for (const key of requiredTrueKeys) {
+    for (const key of targetOptionsOrder) {
       if (obj != null && !obj[key]) {
         return false
       }
