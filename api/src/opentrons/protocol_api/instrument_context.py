@@ -236,7 +236,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
-        c_vol = self._core.get_available_volume() if volume is None else volume
+        if self.api_version >= APIVersion(2, 16):
+            assume_volume = bool(volume is None)
+        else:
+            assume_volume = bool(not volume)
+        c_vol = self._core.get_available_volume() if assume_volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
         with publisher.publish_context(
@@ -363,7 +367,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
-        c_vol = self._core.get_current_volume() if volume is None else volume
+        if self.api_version >= APIVersion(2, 16):
+            assume_volume = bool(volume is None)
+        else:
+            assume_volume = bool(not volume)
+        c_vol = self._core.get_current_volume() if assume_volume else volume
 
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
@@ -433,7 +441,11 @@ class InstrumentContext(publisher.CommandPublisher):
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("mix", self.name, self.mount)
 
-        c_vol = self._core.get_available_volume() if volume is None else volume
+        if self.api_version >= APIVersion(2, 16):
+            assume_volume = bool(volume is None)
+        else:
+            assume_volume = bool(not volume)
+        c_vol = self._core.get_available_volume() if assume_volume else volume
 
         with publisher.publish_context(
             broker=self.broker,
