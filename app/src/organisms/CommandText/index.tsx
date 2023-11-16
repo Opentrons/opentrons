@@ -54,6 +54,7 @@ export function CommandText(props: Props): JSX.Element | null {
 
   switch (command.commandType) {
     case 'aspirate':
+    case 'aspirateInPlace':
     case 'dispense':
     case 'dispenseInPlace':
     case 'blowout':
@@ -189,6 +190,25 @@ export function CommandText(props: Props): JSX.Element | null {
         <StyledText as="p" {...styleProps}>
           {t('configure_for_volume', {
             volume,
+            pipette:
+              pipetteName != null
+                ? getPipetteNameSpecs(pipetteName)?.displayName
+                : '',
+          })}
+        </StyledText>
+      )
+    }
+    case 'configureNozzleLayout': {
+      const { configuration_params, pipetteId } = command.params
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
+      // TODO (sb, 11/9/23): Add support for other configurations when needed
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('configure_nozzle_layout', {
+            amount: configuration_params.style === 'COLUMN' ? '8' : 'all',
             pipette:
               pipetteName != null
                 ? getPipetteNameSpecs(pipetteName)?.displayName

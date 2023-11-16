@@ -78,6 +78,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     (instrument): instrument is PipetteData =>
       instrument.ok && instrument.mount === pipetteMount
   )
+  const is96Channel = attachedPipette?.data.channels === 96
 
   React.useEffect(() => {
     // move into correct position for probe attach on mount
@@ -103,7 +104,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setIsPending(true)
     refetch()
       .then(() => {
-        if (attachedPipette?.state?.tipDetected) {
+        if (is96Channel || attachedPipette?.state?.tipDetected) {
           chainRunCommands(
             [
               { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
