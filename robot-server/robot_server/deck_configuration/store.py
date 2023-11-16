@@ -28,7 +28,7 @@ class DeckConfigurationStore:
             cutoutFixtures=self._cutoutFixtures, lastUpdatedAt=self._last_updated_at
         )
 
-    def get_cutoutFixtures(self) -> DeckConfigurationType:
+    def get_deck_configuration(self) -> DeckConfigurationType:
         """Get the robot's current deck configuration in an expected typing."""
         deck_configuration: DeckConfigurationType = []
         for item in self._cutoutFixtures:
