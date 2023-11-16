@@ -6,6 +6,10 @@ import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { maskField } from '../../steplist/fieldLevel'
+import {
+  getInvariantContext,
+  _getHydratedForm,
+} from '../../step-forms/selectors'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
 import {
@@ -17,10 +21,10 @@ import {
 import { makeSingleEditFieldProps } from './fields/makeSingleEditFieldProps'
 import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
-import { BaseState, ThunkDispatch } from '../../types'
-import { FormData, StepFieldName, StepIdType } from '../../form-types'
-import { getInvariantContext, _getHydratedForm } from '../../step-forms/selectors'
-import { InvariantContext } from '@opentrons/step-generation'
+
+import type { InvariantContext } from '@opentrons/step-generation'
+import type { BaseState, ThunkDispatch } from '../../types'
+import type { FormData, StepFieldName, StepIdType } from '../../form-types'
 
 interface SP {
   canSave: boolean
@@ -57,7 +61,7 @@ const StepEditFormManager = (
     saveSetTempFormWithAddedPauseUntilTemp,
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
-    invariantContext
+    invariantContext,
   } = props
 
   const [
@@ -217,7 +221,7 @@ const mapStateToProps = (state: BaseState): SP => {
     isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
       state
     ),
-    invariantContext: getInvariantContext(state)
+    invariantContext: getInvariantContext(state),
   }
 }
 
