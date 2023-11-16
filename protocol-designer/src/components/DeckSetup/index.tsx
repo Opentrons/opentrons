@@ -524,16 +524,9 @@ export const DeckSetup = (): JSX.Element => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
     },
   })
-
   const trashBinFixtures = [
     {
-      cutoutId:
-        trash?.slot != null
-          ? getCutoutIdForAddressableArea(
-              trash?.slot as AddressableAreaName,
-              deckDef.cutoutFixtures
-            )
-          : null,
+      cutoutId: trash?.slot as CutoutId,
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]

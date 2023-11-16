@@ -228,7 +228,7 @@ export function CreateFileWizard(): JSX.Element | null {
             slot:
               values.fields.robotType === FLEX_ROBOT_TYPE
                 ? getTrashSlot(values)
-                : '12',
+                : 'cutout12',
           })
         )
       }
