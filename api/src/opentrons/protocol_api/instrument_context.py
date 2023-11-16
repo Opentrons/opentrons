@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import Any, List, Optional, Sequence, Union, cast
+from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -435,9 +435,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         c_vol = self._core.get_available_volume() if not volume else volume
 
-        non_ending_dispense_push_out = (
-            None if self.api_version < APIVersion(2, 16) else 0
-        )
+        dispense_kwargs: Dict[str, Any] = {}
+        if self.api_version >= APIVersion(2, 16):
+            dispense_kwargs["push_out"] = 0.0
 
         with publisher.publish_context(
             broker=self.broker,
@@ -450,7 +450,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             self.aspirate(volume, location, rate)
             while repetitions - 1 > 0:
-                self.dispense(volume, rate=rate, push_out=non_ending_dispense_push_out)
+                self.dispense(volume, rate=rate, **dispense_kwargs)
                 self.aspirate(volume, rate=rate)
                 repetitions -= 1
             self.dispense(volume, rate=rate)
