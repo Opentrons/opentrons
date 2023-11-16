@@ -66,7 +66,11 @@ export function TrashBinConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Flex css={TRASH_BIN_CONFIG_STYLE}>
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>
+        <Text
+          fontSize={TYPOGRAPHY.fontSize20}
+          lineHeight={TYPOGRAPHY.lineHeight24}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {trashBinDef.metadata.displayName}
         </Text>
         {handleClickRemove != null ? (
