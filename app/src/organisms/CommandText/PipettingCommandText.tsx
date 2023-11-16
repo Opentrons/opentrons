@@ -14,9 +14,10 @@ import {
   getFinalLabwareLocation,
   getWellRange,
 } from './utils'
-import type { PipetteName } from '@opentrons/shared-data'
-
-import type { PipettingRunTimeCommand } from '@opentrons/shared-data'
+import type {
+  PipetteName,
+  PipettingRunTimeCommand,
+} from '@opentrons/shared-data'
 
 interface PipettingCommandTextProps {
   command: PipettingRunTimeCommand
