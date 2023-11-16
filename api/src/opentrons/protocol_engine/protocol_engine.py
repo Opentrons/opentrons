@@ -429,15 +429,6 @@ class ProtocolEngine:
             )
         )
 
-    # def update_deck_configuration(self, request: DeckConfigurationType) -> None:
-    #     """Update the existing robot deck configuration."""
-    #     created_at = self._model_utils.get_timestamp()
-    #     self._action_dispatcher.dispatch(
-    #         UpdateDeckConfigurationAction(
-    #             deck_configuration=request,
-    #             created_at=created_at,
-    #         )
-    #     )
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.

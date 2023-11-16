@@ -139,12 +139,6 @@ class AddLabwareOffsetAction:
     request: LabwareOffsetCreate
 
 
-# class UpdateDeckConfigurationAction:
-#     """Update the existing deck configuration."""
-#     deck_configuration: DeckConfigurationType
-#     created_at: datetime
-
-
 @dataclass(frozen=True)
 class AddLabwareDefinitionAction:
     """Add a labware definition, to apply to subsequent `LoadLabwareCommand`s."""
