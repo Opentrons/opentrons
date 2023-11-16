@@ -1666,18 +1666,18 @@ class InstrumentContext(publisher.CommandPublisher):
         start: Optional[str] = None,
         front_right: Optional[str] = None,
     ) -> None:
-        """Configure how many tips a a multi-channel pipette will pick up, in what layout. 
-        
+        """Configure how many tips a a multi-channel pipette will pick up, in what layout.
+
         Changing the nozzle layout will affect gantry movement for all subsequent
         pipetting actions that the pipette performs. It also alters the pipette's
         behavior for picking up tips. The pipette will continue to use the specified
         layout until this function is called again.
 
         :param style: The shape of the nozzle layout.
-         
-            - For a 96-channel pipette, either ``SINGLE`` or ``COLUMN``. 
+
+            - For a 96-channel pipette, either ``SINGLE`` or ``COLUMN``.
             - For 8-channel pipettes, only ``SINGLE``.
-            
+
             ``EMPTY`` or ``None`` resets any multi-channel pipette to use all of its
             nozzles.
         :type style: ``NozzleLayout`` or ``None``
@@ -1690,11 +1690,11 @@ class InstrumentContext(publisher.CommandPublisher):
             8-channel pipette).
         :type start: str or ``None``
         """
-#       TODO: add the following back into the docstring when QUADRANT is supported
-#
-#       :param front_right: The nozzle at the front left of the layout. Only used for
-#           NozzleLayout.QUADRANT configurations.
-#       :type front_right: str or ``None``
+        #       TODO: add the following back into the docstring when QUADRANT is supported
+        #
+        #       :param front_right: The nozzle at the front left of the layout. Only used for
+        #           NozzleLayout.QUADRANT configurations.
+        #       :type front_right: str or ``None``
         if style != NozzleLayout.EMPTY:
             if start is None:
                 raise ValueError(
