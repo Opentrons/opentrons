@@ -57,5 +57,5 @@ def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
 
 @pytest.fixture
 def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
-    """Get a mock RunDataManager."""
+    """Get a mock DeckConfigurationStore."""
     return decoy.mock(cls=DeckConfigurationStore)
