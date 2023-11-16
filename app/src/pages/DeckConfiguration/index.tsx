@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import isEqual from 'lodash/isEqual'
 
 import {
   DeckConfigurator,
@@ -13,7 +14,11 @@ import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-import { STANDARD_SLOT_LOAD_NAME } from '@opentrons/shared-data'
+import {
+  SINGLE_RIGHT_CUTOUTS,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+} from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
@@ -22,9 +27,9 @@ import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetails
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { Portal } from '../../App/portal'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 
-export function DeckConfiguration(): JSX.Element {
+export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'devices_landing',
@@ -39,10 +44,9 @@ export function DeckConfiguration(): JSX.Element {
     showConfigurationModal,
     setShowConfigurationModal,
   ] = React.useState<boolean>(false)
-  const [
-    targetFixtureLocation,
-    setTargetFixtureLocation,
-  ] = React.useState<Cutout | null>(null)
+  const [targetCutoutId, setTargetCutoutId] = React.useState<CutoutId | null>(
+    null
+  )
   const [
     showDiscardChangeModal,
     setShowDiscardChangeModal,
@@ -51,26 +55,44 @@ export function DeckConfiguration(): JSX.Element {
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
-  const handleClickAdd = (fixtureLocation: Cutout): void => {
-    setTargetFixtureLocation(fixtureLocation)
+  const [
+    currentDeckConfig,
+    setCurrentDeckConfig,
+  ] = React.useState<DeckConfiguration>(deckConfig)
+
+  const handleClickAdd = (cutoutId: CutoutId): void => {
+    setTargetCutoutId(cutoutId)
     setShowConfigurationModal(true)
   }
 
-  const handleClickRemove = (fixtureLocation: Cutout): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    })
+  const handleClickRemove = (cutoutId: CutoutId): void => {
+    setCurrentDeckConfig(prevDeckConfig =>
+      prevDeckConfig.map(fixture =>
+        fixture.cutoutId === cutoutId
+          ? {
+              ...fixture,
+              cutoutFixtureId: SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
+                ? SINGLE_RIGHT_SLOT_FIXTURE
+                : SINGLE_LEFT_SLOT_FIXTURE,
+            }
+          : fixture
+      )
+    )
   }
 
   const handleClickConfirm = (): void => {
-    // ToDo (kk:10/13/2023) add a function for the confirmation
+    if (!isEqual(deckConfig, currentDeckConfig)) {
+      updateDeckConfiguration(currentDeckConfig)
+    }
+    history.goBack()
   }
 
   const handleClickBack = (): void => {
-    // ToDo If there is any unsaved change, display DeckConfigurationDiscardChangesModal
-    // setShowDiscardChangeModal(true)
-    history.goBack()
+    if (!isEqual(deckConfig, currentDeckConfig)) {
+      setShowDiscardChangeModal(true)
+    } else {
+      history.goBack()
+    }
   }
 
   const secondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
@@ -80,6 +102,10 @@ export function DeckConfiguration(): JSX.Element {
     iconName: 'information',
     iconPlacement: 'startIcon',
   }
+
+  React.useEffect(() => {
+    setCurrentDeckConfig(deckConfig)
+  }, [deckConfig])
 
   return (
     <>
@@ -95,10 +121,11 @@ export function DeckConfiguration(): JSX.Element {
             isOnDevice
           />
         ) : null}
-        {showConfigurationModal && targetFixtureLocation != null ? (
+        {showConfigurationModal && targetCutoutId != null ? (
           <AddFixtureModal
-            fixtureLocation={targetFixtureLocation}
+            cutoutId={targetCutoutId}
             setShowAddFixtureModal={setShowConfigurationModal}
+            setCurrentDeckConfig={setCurrentDeckConfig}
             isOnDevice
           />
         ) : null}
@@ -118,7 +145,7 @@ export function DeckConfiguration(): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
         >
           <DeckConfigurator
-            deckConfig={deckConfig}
+            deckConfig={currentDeckConfig}
             handleClickAdd={handleClickAdd}
             handleClickRemove={handleClickRemove}
           />

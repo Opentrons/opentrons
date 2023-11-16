@@ -319,13 +319,13 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
             raise InternalMessageFormatError(
                 f"FirmwareUpdateData: Data address needs to be doubleword aligned."
                 f" {address} mod 8 equals {address % 8} and should be 0",
-                detail={"address": address},
+                detail={"address": str(address)},
             )
         if data_length > FirmwareUpdateDataField.NUM_BYTES:
             raise InternalMessageFormatError(
                 f"FirmwareUpdateData: Data cannot be more than"
                 f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}.",
-                detail={"size": data_length},
+                detail={"size": str(data_length)},
             )
 
     @classmethod

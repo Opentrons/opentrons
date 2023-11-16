@@ -13,11 +13,11 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands
+   :exclude-members: location_cache, cleanup, clear_commands, load_waste_chute
 
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
-   :exclude-members: delay
+   :exclude-members: delay, configure_nozzle_layout, prepare_to_aspirate
 
 .. autoclass:: opentrons.protocol_api.Liquid
 

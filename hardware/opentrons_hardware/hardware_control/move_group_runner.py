@@ -617,7 +617,7 @@ class MoveScheduler:
                 detail={
                     "missing-nodes": missing_node_msg,
                     "full-timeout": str(full_timeout),
-                    "expected-time": expected_time,
+                    "expected-time": str(expected_time),
                     "elapsed": str(time.time() - start_time),
                 },
             )

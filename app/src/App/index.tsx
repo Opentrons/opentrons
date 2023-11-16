@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
-import NiceModal from '@ebay/nice-modal-react'
 
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
 
@@ -30,9 +29,7 @@ export const AppComponent = (): JSX.Element | null => {
         onDrop={stopEvent}
       >
         <TopPortalRoot />
-        <NiceModal.Provider>
-          {isOnDevice ? <OnDeviceDisplayApp /> : <DesktopApp />}
-        </NiceModal.Provider>
+        {isOnDevice ? <OnDeviceDisplayApp /> : <DesktopApp />}
       </Flex>
     </>
   ) : null

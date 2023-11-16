@@ -18,6 +18,7 @@ export interface StaticLabwareProps {
   hover?: boolean
   onLabwareClick?: () => void
   highlightLabware?: boolean
+  isOnDevice?: boolean
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -38,7 +39,6 @@ const TipDecoration = React.memo(function TipDecoration(props: {
 
 export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   const { isTiprack } = props.definition.parameters
-
   return (
     <g onClick={props.onLabwareClick}>
       <g className={styles.labware_detail_group}>
@@ -46,6 +46,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
           definition={props.definition}
           hover={props.hover}
           highlight={props.highlightLabware === true}
+          isOnDevice={props.isOnDevice}
         />
       </g>
       <g>

@@ -62,6 +62,7 @@ import {
   ROBOTUPDATE_FILE_INFO,
   ROBOTUPDATE_CREATE_SESSION,
   ROBOTUPDATE_CREATE_SESSION_SUCCESS,
+  DOWNLOAD_FILE,
 } from './constants'
 
 import type { Observable } from 'rxjs'
@@ -144,6 +145,19 @@ export const startUpdateEpic: Epic = (action$, state$) =>
     })
   )
 
+export const startUpdateAfterFileDownload: Epic = (_, state$) => {
+  return state$.pipe(
+    filter(passActiveSession({ step: DOWNLOAD_FILE, stage: DONE })),
+    switchMap(stateWithSession => {
+      const host: ViewableRobot = getRobotUpdateRobot(stateWithSession) as any
+      const robotModel =
+        host?.serverHealth?.robotModel === 'OT-3 Standard' ? 'flex' : 'ot2'
+
+      return of(readSystemRobotUpdateFile(robotModel))
+    })
+  )
+}
+
 // listen for a the active robot to come back with capabilities after premigration
 export const retryAfterPremigrationEpic: Epic = (_, state$) => {
   return state$.pipe(
@@ -219,7 +233,16 @@ export const createSessionEpic: Epic = action$ => {
         )
       }
 
-      return of(unexpectedRobotUpdateError(UNABLE_TO_START_UPDATE_SESSION))
+      return fetchRobotApi(host, {
+        method: POST,
+        path: `${pathPrefix}/cancel`,
+      }).pipe(
+        map(cancelResp => {
+          return cancelResp.ok
+            ? createSession(host, path)
+            : unexpectedRobotUpdateError(UNABLE_TO_START_UPDATE_SESSION)
+        })
+      )
     })
   )
 }
@@ -275,8 +298,6 @@ const passActiveSession = (props: Partial<RobotUpdateSession>) => (
   return (
     robot !== null &&
     !session?.error &&
-    typeof session?.pathPrefix === 'string' &&
-    typeof session?.token === 'string' &&
     every(
       props,
       (value, key) => session?.[key as keyof RobotUpdateSession] === value
@@ -440,6 +461,7 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
 
 export const robotUpdateEpic = combineEpics<Epic>(
   startUpdateEpic,
+  startUpdateAfterFileDownload,
   retryAfterPremigrationEpic,
   startSessionAfterFileInfoEpic,
   createSessionEpic,

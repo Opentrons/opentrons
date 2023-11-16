@@ -145,7 +145,7 @@ def update(
     Recursively update the given dictionary to ensure no data is lost when updating.
     """
     next_key = next(iter_of_configs, None)
-    if next_key and isinstance(dict_to_update[next_key], dict):
+    if next_key and isinstance(dict_to_update.get(next_key), dict):
         dict_to_update[next_key] = update(
             dict_to_update.get(next_key, {}), iter_of_configs, value_to_update
         )
@@ -157,8 +157,8 @@ def update(
 def build_nozzle_map(
     nozzle_offset: List[float], channels: PipetteChannelType
 ) -> Dict[str, List[float]]:
-    Y_OFFSET = 9
-    X_OFFSET = -9
+    Y_OFFSET = -9
+    X_OFFSET = 9
     if channels == PipetteChannelType.SINGLE_CHANNEL:
         return {"A1": nozzle_offset}
     elif channels == PipetteChannelType.EIGHT_CHANNEL:
@@ -350,7 +350,7 @@ def _update_single_model(configuration_to_update: List[str]) -> None:
 
 
 def _update_all_models(configuration_to_update: List[str]) -> None:
-    paths_to_validate = ROOT / "liquid"
+    paths_to_validate = ROOT / "general"
     _channel_model_str = {
         "single_channel": "single",
         "ninety_six_channel": "96",
@@ -378,7 +378,6 @@ def _update_all_models(configuration_to_update: List[str]) -> None:
                 )
 
                 model_version = convert_pipette_model(built_model)
-
                 load_and_update_file_from_config(
                     configuration_to_update, value_to_update, model_version
                 )

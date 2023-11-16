@@ -9,7 +9,7 @@ from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName
+from opentrons.types import MountType, DeckSlotName, Point
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -18,6 +18,7 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
+from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 
 
 class EngineStatus(str, Enum):
@@ -54,6 +55,19 @@ class DeckSlotLocation(BaseModel):
     )
 
 
+class AddressableAreaLocation(BaseModel):
+    """The location of something place in an addressable area. This is a superset of deck slots."""
+
+    addressableAreaName: str = Field(
+        ...,
+        description=(
+            "The name of the addressable area that you want to use."
+            " Valid values are the `id`s of `addressableArea`s in the"
+            " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
+        ),
+    )
+
+
 class ModuleLocation(BaseModel):
     """The location of something placed atop a hardware module."""
 
@@ -76,13 +90,21 @@ _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
 LabwareLocation = Union[
-    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    _OffDeckLocationType,
+    AddressableAreaLocation,
 ]
 """Union of all locations where it's legal to keep a labware."""
 
-OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
+OnDeckLabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+]
 
-NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+NonStackedLocation = Union[
+    DeckSlotLocation, AddressableAreaLocation, ModuleLocation, _OffDeckLocationType
+]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
@@ -390,6 +412,10 @@ class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
 
 
+class AddressableOffsetVector(Vec3f):
+    """Offset, in deck coordinates, from nominal to actual position of an addressable area."""
+
+
 class LabwareMovementOffsetData(BaseModel):
     """Offsets to be used during labware movement."""
 
@@ -637,6 +663,28 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
+@dataclass(frozen=True)
+class PotentialCutoutFixture:
+    """Cutout and cutout fixture id associated with a potential cutout fixture that can be on the deck."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+
+
+@dataclass(frozen=True)
+class AddressableArea:
+    """Addressable area that has been loaded."""
+
+    area_name: str
+    display_name: str
+    bounding_box: Dimensions
+    position: AddressableOffsetVector
+    compatible_module_types: List[SharedDataModuleType]
+    # TODO do we need "ableToDropLabware" in the definition?
+    drop_tip_location: Optional[Point]
+    drop_labware_location: Optional[Point]
+
+
 class PostRunHardwareState(Enum):
     """State of robot gantry & motors after a stop is performed and the hardware API is reset.
 
@@ -662,3 +710,67 @@ class PostRunHardwareState(Enum):
     HOME_THEN_DISENGAGE = "homeThenDisengage"
     STAY_ENGAGED_IN_PLACE = "stayEngagedInPlace"
     DISENGAGE_IN_PLACE = "disengageInPlace"
+
+
+NOZZLE_NAME_REGEX = "[A-Z][0-100]"
+PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
+
+
+class EmptyNozzleLayoutConfiguration(BaseModel):
+    """Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
+
+    style: Literal["EMPTY"] = "EMPTY"
+
+
+class SingleNozzleLayoutConfiguration(BaseModel):
+    """Minimum information required for a new nozzle configuration."""
+
+    style: Literal["SINGLE"] = "SINGLE"
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+        ...,
+        description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+    )
+
+
+class RowNozzleLayoutConfiguration(BaseModel):
+    """Minimum information required for a new nozzle configuration."""
+
+    style: Literal["ROW"] = "ROW"
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+        ...,
+        description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+    )
+
+
+class ColumnNozzleLayoutConfiguration(BaseModel):
+    """Information required for nozzle configurations of type ROW and COLUMN."""
+
+    style: Literal["COLUMN"] = "COLUMN"
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+        ...,
+        description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+    )
+
+
+class QuadrantNozzleLayoutConfiguration(BaseModel):
+    """Information required for nozzle configurations of type QUADRANT."""
+
+    style: Literal["QUADRANT"] = "QUADRANT"
+    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+        ...,
+        description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
+    )
+    front_right_nozzle: str = Field(
+        ...,
+        regex=NOZZLE_NAME_REGEX,
+        description="The front right nozzle in your configuration.",
+    )
+
+
+NozzleLayoutConfigurationType = Union[
+    EmptyNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
+]

@@ -8,7 +8,9 @@ from typing import Any, Generic, Optional, TypeVar
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
+from .._waste_chute import WasteChute
 from .well import WellCoreType
 
 
@@ -133,6 +135,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        ...
+
+    @abstractmethod
     def home(self) -> None:
         ...
 
@@ -233,6 +241,25 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
 
         Args:
             volume: The volume to preppare to handle.
+        """
+        ...
+
+    def prepare_to_aspirate(self) -> None:
+        """Prepare the pipette to aspirate."""
+        ...
+
+    def configure_nozzle_layout(
+        self,
+        style: NozzleLayout,
+        primary_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
+        """Configure the pipette to a specific nozzle layout.
+
+        Args:
+            style: The type of configuration you wish to build.
+            primary_nozzle: The nozzle that will determine a pipettes critical point.
+            front_right_nozzle: The front right most nozzle in the requested layout.
         """
         ...
 

@@ -13,16 +13,21 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  instrumentsResponseLeftPipetteFixture,
+  instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  useHost,
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
   useDismissCurrentRunMutation,
   useEstopQuery,
   useDoorQuery,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
 import { i18n } from '../../../../i18n'
@@ -79,6 +84,7 @@ import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import { RunFailedModal } from '../RunFailedModal'
 import { DISENGAGED, NOT_PRESENT } from '../../../EmergencyStop'
+import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWithTipAttached'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -101,6 +107,15 @@ jest.mock('@opentrons/components', () => {
   }
 })
 jest.mock('@opentrons/react-api-client')
+jest.mock('@opentrons/shared-data', () => ({
+  getAllPipetteNames: jest.fn(
+    jest.requireActual('@opentrons/shared-data').getAllPipetteNames
+  ),
+  getPipetteNameSpecs: jest.fn(
+    jest.requireActual('@opentrons/shared-data').getPipetteNameSpecs
+  ),
+  getPipetteModelSpecs: jest.fn(),
+}))
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
@@ -114,6 +129,7 @@ jest.mock('../../../../redux/config')
 jest.mock('../RunFailedModal')
 jest.mock('../../../../redux/robot-update/selectors')
 jest.mock('../../../../redux/robot-settings/selectors')
+jest.mock('../../../DropTipWizard/getPipettesWithTipAttached')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -200,6 +216,16 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
 >
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
+>
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
+const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+const mockGetPipettesWithTipAttached = getPipettesWithTipAttached as jest.MockedFunction<
+  typeof getPipettesWithTipAttached
+>
+const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
+  typeof getPipetteModelSpecs
 >
 
 const ROBOT_NAME = 'otie'
@@ -375,6 +401,15 @@ describe('ProtocolRunHeader', () => {
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
     mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
     mockGetRobotSettings.mockReturnValue([mockSettings])
+    mockUseInstrumentsQuery.mockReturnValue({ data: {} } as any)
+    mockUseHost.mockReturnValue({} as any)
+    mockGetPipettesWithTipAttached.mockReturnValue(
+      Promise.resolve([
+        instrumentsResponseLeftPipetteFixture,
+        instrumentsResponseRightPipetteFixture,
+      ]) as any
+    )
+    mockGetPipetteModelSpecs.mockReturnValue('p10_single_v1' as any)
   })
 
   afterEach(() => {
@@ -780,7 +815,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
-  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
+  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
@@ -789,7 +824,9 @@ describe('ProtocolRunHeader', () => {
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
-    getByText('Mock HeaterShakerIsRunningModal')
+    waitFor(() => {
+      getByText('Mock HeaterShakerIsRunningModal')
+    })
   })
 
   it('does not render the confirm attachment modal when there is a heater shaker in the protocol and run is idle', () => {
@@ -922,5 +959,69 @@ describe('ProtocolRunHeader', () => {
     expect(
       queryByText('Close the robot door before starting the run.')
     ).not.toBeInTheDocument()
+  })
+
+  it('renders the drop tip banner when the run is over and a pipette has a tip attached', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: {
+          data: {
+            ...mockIdleUnstartedRun,
+            current: true,
+            status: RUN_STATUS_SUCCEEDED,
+          },
+        },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+
+    const [{ getByText }] = render()
+    await waitFor(() => {
+      getByText('Tips may be attached.')
+    })
+  })
+
+  it('does not render the drop tip banner when the run is not over', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: {
+          data: {
+            ...mockIdleUnstartedRun,
+            current: true,
+            status: RUN_STATUS_IDLE,
+          },
+        },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
+
+    const [{ queryByText }] = render()
+    await waitFor(() => {
+      expect(queryByText('Tips may be attached.')).not.toBeInTheDocument()
+    })
+  })
+
+  it('does not show the drop tip banner when the run is not over', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: {
+          data: {
+            ...mockIdleUnstartedRun,
+            current: false,
+            status: RUN_STATUS_SUCCEEDED,
+          },
+        },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+
+    const [{ queryByText }] = render()
+    await waitFor(() => {
+      expect(queryByText('Tips may be attached.')).not.toBeInTheDocument()
+    })
   })
 })

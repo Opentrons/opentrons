@@ -546,9 +546,11 @@ async def update_pick_up_current(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
-    config_model.current = current
-    pipette.pick_up_configurations = config_model
+    config_model = pipette.pick_up_configurations.press_fit
+    config_model.current_by_tip_count = {
+        k: current for k in config_model.current_by_tip_count.keys()
+    }
+    pipette.pick_up_configurations.press_fit = config_model
 
 
 async def update_pick_up_distance(
@@ -556,9 +558,9 @@ async def update_pick_up_distance(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
+    config_model = pipette.pick_up_configurations.press_fit
     config_model.distance = distance
-    pipette.pick_up_configurations = config_model
+    pipette.pick_up_configurations.press_fit = config_model
 
 
 async def move_plunger_absolute_ot3(

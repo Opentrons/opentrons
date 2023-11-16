@@ -16,18 +16,18 @@ from typing import (
     cast,
 )
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, Point, MountType
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
-from ..resources import DeckFixedLabware, labware_validation
+from ..resources import DeckFixedLabware, labware_validation, fixture_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -36,6 +36,7 @@ from ..commands import (
 from ..types import (
     DeckSlotLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     NonStackedLocation,
     Dimensions,
     LabwareOffset,
@@ -47,6 +48,7 @@ from ..types import (
     ModuleModel,
     OverlapOffset,
     LabwareMovementOffsetData,
+    OFF_DECK_LOCATION,
 )
 from ..actions import (
     Action,
@@ -104,7 +106,7 @@ class LabwareState:
     labware_offsets_by_id: Dict[str, LabwareOffset]
 
     definitions_by_uri: Dict[str, LabwareDefinition]
-    deck_definition: DeckDefinitionV3
+    deck_definition: DeckDefinitionV4
 
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
@@ -114,7 +116,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV3,
+        deck_definition: DeckDefinitionV4,
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
@@ -203,6 +205,13 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             new_offset_id = command.result.offsetId
 
             self._state.labware_by_id[labware_id].offsetId = new_offset_id
+            if isinstance(
+                new_location, AddressableAreaLocation
+            ) and fixture_validation.is_gripper_waste_chute(
+                new_location.addressableAreaName
+            ):
+                # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+                new_location = OFF_DECK_LOCATION
             self._state.labware_by_id[labware_id].location = new_location
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
@@ -304,39 +313,9 @@ class LabwareView(HasState[LabwareState]):
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
 
-    def get_deck_definition(self) -> DeckDefinitionV3:
+    def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
         return self._state.deck_definition
-
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
-        """Get the definition of a slot in the deck."""
-        deck_def = self.get_deck_definition()
-
-        for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == slot.id:
-                return slot_def
-
-        raise errors.SlotDoesNotExistError(
-            f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
-        )
-
-    def get_slot_position(self, slot: DeckSlotName) -> Point:
-        """Get the position of a deck slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(x=position[0], y=position[1], z=position[2])
-
-    def get_slot_center_position(self, slot: DeckSlotName) -> Point:
-        """Get the (x, y, z) position of the center of the slot."""
-        slot_def = self.get_slot_definition(slot)
-        position = slot_def["position"]
-
-        return Point(
-            x=position[0] + slot_def["boundingBox"]["xDimension"] / 2,
-            y=position[1] + slot_def["boundingBox"]["yDimension"] / 2,
-            z=position[2] + slot_def["boundingBox"]["zDimension"] / 2,
-        )
 
     def get_definition_by_uri(self, uri: LabwareUri) -> LabwareDefinition:
         """Get the labware definition matching loadName namespace and version."""
@@ -661,7 +640,7 @@ class LabwareView(HasState[LabwareState]):
 
         return None
 
-    def get_fixed_trash_id(self) -> str:
+    def get_fixed_trash_id(self) -> Optional[str]:
         """Get the identifier of labware loaded into the fixed trash location.
 
         Raises:
@@ -677,16 +656,14 @@ class LabwareView(HasState[LabwareState]):
             }:
                 return labware.id
 
-        raise errors.LabwareNotLoadedError(
-            "No labware loaded into fixed trash location by this deck type."
-        )
+        return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""
         return self.get_fixed_trash_id() == labware_id
 
     def raise_if_labware_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
+        self, location: Union[DeckSlotLocation, ModuleLocation, AddressableAreaLocation]
     ) -> None:
         """Raise an error if the specified location has labware in it."""
         for labware in self.get_all():

@@ -28,7 +28,7 @@ describe('FlexModuleTag', () => {
       .calledWith(
         partialComponentPropsMatcher({
           width: 5,
-          height: 16,
+          height: 20,
         })
       )
       .mockImplementation(({ children }) => (
@@ -48,7 +48,7 @@ describe('FlexModuleTag', () => {
       .calledWith(
         partialComponentPropsMatcher({
           width: 5,
-          height: 16,
+          height: 20,
         })
       )
       .mockImplementation(({ children }) => (

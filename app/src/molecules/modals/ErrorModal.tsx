@@ -11,7 +11,7 @@ interface Props {
   description: string
   close?: () => unknown
   closeUrl?: string
-  error: { message?: string; [key: string]: unknown }
+  error: { message?: string; [key: string]: unknown } | null
 }
 
 const DEFAULT_HEADING = 'Unexpected Error'
@@ -37,7 +37,7 @@ export function ErrorModal(props: Props): JSX.Element {
     <Portal>
       <AlertModal heading={heading} buttons={[closeButtonProps]} alertOverlay>
         <p className={styles.error_modal_message}>
-          {error.message ?? AN_UNKNOWN_ERROR_OCCURRED}
+          {error?.message ?? AN_UNKNOWN_ERROR_OCCURRED}
         </p>
         <p>{description}</p>
         <p>

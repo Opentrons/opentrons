@@ -183,16 +183,16 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             raise CommandPreconditionViolated(
                 "Cannot calibrate gripper without attaching a calibration probe",
                 detail={
-                    "probe": self._attached_probe,
-                    "jaw_state": self.state,
+                    "probe": str(self._attached_probe),
+                    "jaw_state": str(self.state),
                 },
             )
         if self.state != GripperJawState.GRIPPING:
             raise CommandPreconditionViolated(
                 "Cannot calibrate gripper if jaw is not in gripping state",
                 detail={
-                    "probe": self._attached_probe,
-                    "jaw_state": self.state,
+                    "probe": str(self._attached_probe),
+                    "jaw_state": str(self.state),
                 },
             )
 

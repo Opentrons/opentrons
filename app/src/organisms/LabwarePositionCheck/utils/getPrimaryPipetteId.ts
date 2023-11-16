@@ -1,7 +1,9 @@
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { LoadedPipette } from '@opentrons/shared-data'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type {
+  LoadedPipette,
+  LoadPipetteRunTimeCommand,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export const getPrimaryPipetteId = (
   pipettesById: { [id: string]: LoadedPipette },

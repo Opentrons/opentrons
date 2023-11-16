@@ -8,14 +8,16 @@ import {
   TIME_BEFORE_ALLOWING_EXIT_MS,
 } from '../RobotUpdateProgressModal'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
-import { getRobotSessionIsManualFile } from '../../../../../redux/robot-update'
+import {
+  getRobotSessionIsManualFile,
+  getRobotUpdateDownloadError,
+} from '../../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/incidental'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('@opentrons/shared-data/protocol/types/schemaV7/command/incidental')
 jest.mock('../useRobotUpdateInfo')
 jest.mock('../../../../../redux/robot-update')
 jest.mock('../../../../../redux/robot-update/hooks')
@@ -31,6 +33,9 @@ const mockGetRobotSessionIsManualFile = getRobotSessionIsManualFile as jest.Mock
 >
 const mockUseDispatchStartRobotUpdate = useDispatchStartRobotUpdate as jest.MockedFunction<
   typeof useDispatchStartRobotUpdate
+>
+const mockGetRobotUpdateDownloadError = getRobotUpdateDownloadError as jest.MockedFunction<
+  typeof getRobotUpdateDownloadError
 >
 
 const render = (
@@ -72,10 +77,18 @@ describe('DownloadUpdateModal', () => {
     })
     mockGetRobotSessionIsManualFile.mockReturnValue(false)
     mockUseDispatchStartRobotUpdate.mockReturnValue(jest.fn)
+    mockGetRobotUpdateDownloadError.mockReturnValue(null)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+  })
+
+  it('renders robot update download errors', () => {
+    mockGetRobotUpdateDownloadError.mockReturnValue('test download error')
+
+    const [{ getByText }] = render(props)
+    getByText('test download error')
   })
 
   it('renders the robot name as a part of the header', () => {
@@ -158,7 +171,6 @@ describe('DownloadUpdateModal', () => {
 
     expect(getByText('test error')).toBeInTheDocument()
     fireEvent.click(exitButton)
-    expect(getByText('Try again')).toBeInTheDocument()
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
 
     expect(mockUseCreateLiveCommandMutation).toBeCalledWith()

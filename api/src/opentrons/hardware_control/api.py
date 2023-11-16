@@ -618,7 +618,7 @@ class API(
             if any(unsupported):
                 raise UnsupportedHardwareCommand(
                     message=f"At least one axis in {axes} is not supported on the OT2.",
-                    detail={"unsupported_axes": unsupported},
+                    detail={"unsupported_axes": str(unsupported)},
                 )
         self._reset_last_mount()
         # Initialize/update current_position
@@ -661,14 +661,14 @@ class API(
                 raise PositionUnknownError(
                     message=f"Current position of {str(mount)} pipette is unknown,"
                     " please home.",
-                    detail={"mount": str(mount), "missing_axes": position_axes},
+                    detail={"mount": str(mount), "missing_axes": str(position_axes)},
                 )
             axes_str = [ot2_axis_to_string(a) for a in position_axes]
             if not self._backend.is_homed(axes_str):
                 unhomed = self._backend._unhomed_axes(axes_str)
                 raise PositionUnknownError(
                     message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
-                    detail={"mount": str(mount), "unhomed_axes": unhomed},
+                    detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
                 )
         elif not self._current_position and not refresh:
             raise PositionUnknownError(
@@ -755,7 +755,7 @@ class API(
         """
         raise UnsupportedHardwareCommand(
             message="move_axes is not supported on the OT-2.",
-            detail={"axes_commanded": list(position.keys())},
+            detail={"axes_commanded": str(list(position.keys()))},
         )
 
     async def move_rel(
@@ -781,7 +781,7 @@ class API(
                     " is unknown.",
                     detail={
                         "mount": str(mount),
-                        "fail_on_not_homed": fail_on_not_homed,
+                        "fail_on_not_homed": str(fail_on_not_homed),
                     },
                 )
             else:
@@ -797,7 +797,7 @@ class API(
             unhomed = self._backend._unhomed_axes(axes_str)
             raise PositionUnknownError(
                 message=f"{str(mount)} pipette axes ({unhomed}) must be homed.",
-                detail={"mount": str(mount), "unhomed_axes": unhomed},
+                detail={"mount": str(mount), "unhomed_axes": str(unhomed)},
             )
 
         await self._cache_and_maybe_retract_mount(mount)
@@ -1083,6 +1083,38 @@ class API(
         finally:
             blowout_spec.instr.set_current_volume(0)
             blowout_spec.instr.ready_to_aspirate = False
+
+    async def update_nozzle_configuration_for_mount(
+        self,
+        mount: top_types.Mount,
+        back_left_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        Update a nozzle configuration for a given pipette.
+
+        The expectation of this function is that the back_left_nozzle/front_right_nozzle are the two corners
+        of a rectangle of nozzles. A call to this function that does not follow that schema will result
+        in an error.
+
+        :param mount: A robot mount that the instrument is on.
+        :param back_left_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param front_right_nozzle: A string representing a nozzle name of the form <LETTER><NUMBER> such as 'A1'.
+        :param starting_nozzle: A string representing the starting nozzle which will be used as the critical point
+        of the pipette nozzle configuration. By default, the back left nozzle will be the starting nozzle if
+        none is provided.
+        :return: None.
+
+        If none of the nozzle parameters are provided, the nozzle configuration will be reset to default.
+        """
+        if not back_left_nozzle and not front_right_nozzle and not starting_nozzle:
+            await self.reset_nozzle_configuration(mount)
+        else:
+            assert back_left_nozzle and front_right_nozzle
+            await self.update_nozzle_configuration(
+                mount, back_left_nozzle, front_right_nozzle, starting_nozzle
+            )
 
     async def pick_up_tip(
         self,

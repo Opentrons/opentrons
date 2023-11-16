@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
 
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
@@ -17,19 +17,16 @@ import {
 import {
   useAttachedModules,
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useStoredProtocolAnalysis,
 } from '..'
 
-import {
+import type {
+  CutoutConfig,
+  DeckConfiguration,
   ModuleModel,
   ModuleType,
   ProtocolAnalysisOutput,
-  DeckConfiguration,
-  STAGING_AREA_LOAD_NAME,
-  Fixture,
 } from '@opentrons/shared-data'
-import type { ProtocolDetails } from '..'
 
 jest.mock('@opentrons/react-api-client/src/deck_configuration')
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
@@ -44,9 +41,6 @@ const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
 >
@@ -60,9 +54,16 @@ const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey 
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
-  protocolData: heaterShakerCommandsWithResultsKey,
+  protocolData: {
+    ...heaterShakerCommandsWithResultsKey,
+    labware: [
+      {
+        displayName: 'Trash',
+        definitionId: 'opentrons/opentrons_1_trash_3200ml_fixed/1',
+      },
+    ],
+  },
   protocolKey: 'fakeProtocolKey',
-  robotType: 'OT-2 Standard' as const,
 }
 
 const mockMagneticModuleDefinition = {
@@ -125,16 +126,15 @@ const TEMPERATURE_MODULE_INFO = {
   slotName: 'D1',
 }
 
-const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: 'D1',
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+const mockCutoutConfig: CutoutConfig = {
+  cutoutId: 'cutoutD1',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
 
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {
     when(mockUseDeckConfigurationQuery).mockReturnValue({
-      data: [mockFixture],
+      data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
     when(mockUseAttachedModules)
       .calledWith()
@@ -143,48 +143,39 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
         mockTemperatureModuleGen2,
         mockThermocycler,
       ])
-    when(mockUseProtocolDetailsForRun)
-      .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS as any)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
       .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
-    when(mockGetProtocolModulesInfo)
-      .calledWith(heaterShakerCommandsWithResultsKey, standardDeckDef as any)
-      .mockReturnValue([TEMPERATURE_MODULE_INFO, MAGNETIC_MODULE_INFO])
+    mockGetProtocolModulesInfo.mockReturnValue([
+      TEMPERATURE_MODULE_INFO,
+      MAGNETIC_MODULE_INFO,
+    ])
   })
 
   afterEach(() => {
     resetAllWhenMocks()
   })
   it('should return no module render info when protocol details not found', () => {
-    when(mockUseProtocolDetailsForRun)
-      .calledWith('1')
-      .mockReturnValue({} as ProtocolDetails)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith('1')
       .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
-    const { result } = renderHook(() =>
-      useModuleRenderInfoForProtocolById('otie', '1')
-    )
+    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
     expect(result.current).toStrictEqual({})
   })
   it('should return module render info', () => {
-    const { result } = renderHook(() =>
-      useModuleRenderInfoForProtocolById('otie', '1')
-    )
+    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
     expect(result.current).toStrictEqual({
       magneticModuleId: {
-        conflictedFixture: mockFixture,
+        conflictedFixture: mockCutoutConfig,
         attachedModuleMatch: mockMagneticModuleGen2,
         ...MAGNETIC_MODULE_INFO,
       },
       temperatureModuleId: {
-        conflictedFixture: mockFixture,
+        conflictedFixture: mockCutoutConfig,
         attachedModuleMatch: mockTemperatureModuleGen2,
         ...TEMPERATURE_MODULE_INFO,
       },

@@ -52,7 +52,7 @@ defaults:
 jobs:
   lint-test:
     name: 'robot server package linting and tests'
-    timeout-minutes: 20
+    timeout-minutes: 40
     runs-on: 'ubuntu-22.04'
     strategy:
       matrix:

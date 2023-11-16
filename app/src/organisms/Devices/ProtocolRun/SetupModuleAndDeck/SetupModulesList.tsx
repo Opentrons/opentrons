@@ -2,6 +2,7 @@ import * as React from 'react'
 import map from 'lodash/map'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
   BORDERS,
   Box,
@@ -19,6 +20,8 @@ import {
   TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -26,30 +29,36 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
+
 import { Banner } from '../../../../atoms/Banner'
-import { StyledText } from '../../../../atoms/text'
-import { useChainLiveCommands } from '../../../../resources/runs/hooks'
-import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { StatusLabel } from '../../../../atoms/StatusLabel'
+import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useFeatureFlag } from '../../../../redux/config'
+import { getCutoutIdForSlotName } from '../../../../resources/deck_configuration/utils'
+import { useChainLiveCommands } from '../../../../resources/runs/hooks'
+import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
+import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
 import { getModuleTooHot } from '../../getModuleTooHot'
-import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
-import { MultipleModulesModal } from './MultipleModulesModal'
 import {
   ModuleRenderInfoForProtocol,
   useIsFlex,
   useModuleRenderInfoForProtocolById,
+  useRobot,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../hooks'
-import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
-import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { LocationConflictModal } from './LocationConflictModal'
+import { MultipleModulesModal } from './MultipleModulesModal'
+import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'
 
-import type { Cutout, ModuleModel, Fixture } from '@opentrons/shared-data'
+import type {
+  CutoutConfig,
+  DeckDefinition,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import type { ProtocolCalibrationStatus } from '../../hooks'
 
@@ -62,7 +71,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId } = props
   const { t } = useTranslation('protocol_setup')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const {
@@ -71,6 +79,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
   const isFlex = useIsFlex(robotName)
+  const { robotModel } = useRobot(robotName) ?? {}
+  const deckDef = getDeckDefFromRobotType(robotModel ?? FLEX_ROBOT_TYPE)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
@@ -187,6 +197,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 isFlex={isFlex}
                 calibrationStatus={calibrationStatus}
                 conflictedFixture={conflictedFixture}
+                deckDef={deckDef}
               />
             )
           }
@@ -204,7 +215,8 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
-  conflictedFixture?: Fixture
+  deckDef: DeckDefinition
+  conflictedFixture?: CutoutConfig
 }
 
 export function ModulesListItem({
@@ -216,6 +228,7 @@ export function ModulesListItem({
   isFlex,
   calibrationStatus,
   conflictedFixture,
+  deckDef,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
   const moduleConnectionStatus =
@@ -230,7 +243,6 @@ export function ModulesListItem({
     showLocationConflictModal,
     setShowLocationConflictModal,
   ] = React.useState<boolean>(false)
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   const [showModuleWizard, setShowModuleWizard] = React.useState<boolean>(false)
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
@@ -346,13 +358,16 @@ export function ModulesListItem({
     )
   }
 
+  // convert slot name to cutout id
+  const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
+
   return (
     <>
-      {showLocationConflictModal ? (
+      {showLocationConflictModal && cutoutIdForSlotName != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
-          cutout={slotName as Cutout}
+          cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
         />
       ) : null}
@@ -412,7 +427,7 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing10}
           >
-            {conflictedFixture != null && enableDeckConfig ? (
+            {conflictedFixture != null && isFlex ? (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing10}

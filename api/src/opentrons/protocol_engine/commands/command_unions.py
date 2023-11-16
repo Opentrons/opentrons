@@ -154,6 +154,14 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -235,6 +243,23 @@ from .configure_for_volume import (
     ConfigureForVolumePrivateResult,
 )
 
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateParams,
+    PrepareToAspirateCreate,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
+)
+
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutCommandType,
+    ConfigureNozzleLayoutPrivateResult,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -245,6 +270,7 @@ Command = Union[
     BlowOut,
     BlowOutInPlace,
     ConfigureForVolume,
+    ConfigureNozzleLayout,
     DropTip,
     DropTipInPlace,
     Home,
@@ -257,6 +283,8 @@ Command = Union[
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
+    MoveToAddressableArea,
+    PrepareToAspirate,
     WaitForResume,
     WaitForDuration,
     PickUpTip,
@@ -296,6 +324,7 @@ CommandParams = Union[
     AspirateInPlaceParams,
     CommentParams,
     ConfigureForVolumeParams,
+    ConfigureNozzleLayoutParams,
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
@@ -313,6 +342,8 @@ CommandParams = Union[
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
+    MoveToAddressableAreaParams,
+    PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
     PickUpTipParams,
@@ -353,6 +384,7 @@ CommandType = Union[
     AspirateInPlaceCommandType,
     CommentCommandType,
     ConfigureForVolumeCommandType,
+    ConfigureNozzleLayoutCommandType,
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
@@ -370,6 +402,8 @@ CommandType = Union[
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
+    MoveToAddressableAreaCommandType,
+    PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
     PickUpTipCommandType,
@@ -409,6 +443,7 @@ CommandCreate = Union[
     AspirateInPlaceCreate,
     CommentCreate,
     ConfigureForVolumeCreate,
+    ConfigureNozzleLayoutCreate,
     CustomCreate,
     DispenseCreate,
     DispenseInPlaceCreate,
@@ -426,6 +461,8 @@ CommandCreate = Union[
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
+    MoveToAddressableAreaCreate,
+    PrepareToAspirateCreate,
     WaitForResumeCreate,
     WaitForDurationCreate,
     PickUpTipCreate,
@@ -465,6 +502,7 @@ CommandResult = Union[
     AspirateInPlaceResult,
     CommentResult,
     ConfigureForVolumeResult,
+    ConfigureNozzleLayoutResult,
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,
@@ -482,6 +520,8 @@ CommandResult = Union[
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
+    MoveToAddressableAreaResult,
+    PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,
     PickUpTipResult,
@@ -517,5 +557,8 @@ CommandResult = Union[
 ]
 
 CommandPrivateResult = Union[
-    None, LoadPipettePrivateResult, ConfigureForVolumePrivateResult
+    None,
+    LoadPipettePrivateResult,
+    ConfigureForVolumePrivateResult,
+    ConfigureNozzleLayoutPrivateResult,
 ]

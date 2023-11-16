@@ -126,7 +126,7 @@ class AcknowledgeListener:
         """Add the ack to the queue if it matches the message_index of the sent message."""
         if message.payload.message_index == self._message.payload.message_index:
             self._remove_response_node(arbitration_id.parts.originating_node_id)
-        self._ack_queue.put_nowait((arbitration_id, message))
+            self._ack_queue.put_nowait((arbitration_id, message))
         # If we've recieved all responses exit the listener
         if len(self._expected_nodes) == 0:
             self._event.set()

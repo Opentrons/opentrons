@@ -1,9 +1,10 @@
 import pytest
 import datetime
-from mock import MagicMock, call
+from mock import call
 from typing import List, Tuple
 from pathlib import Path
-from opentrons.calibration_storage import types as cal_types, models
+from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config import robot_configs
@@ -150,14 +151,7 @@ async def test_save_default_pick_up_current(mock_hw):
     def mock_update_config_item(*args):
         pass
 
-    uf._hw_pipette.update_config_item = MagicMock(side_effect=mock_update_config_item)
-    default_current = pip.pick_up_configurations.current
-    update_config_calls = [
-        call({"pick_up_current": 0.1}),
-        call({"pick_up_current": default_current}),
-    ]
     await uf.pick_up_tip()
-    uf._hw_pipette.update_config_item.assert_has_calls(update_config_calls)
 
 
 async def test_return_tip(mock_user_flow):

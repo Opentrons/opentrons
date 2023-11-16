@@ -13,7 +13,10 @@ import { useProtocolDetailsForRun } from '..'
 import { RUN_ID_2 } from '../../../../organisms/RunTimeControl/__fixtures__'
 
 import type { Protocol, Run } from '@opentrons/api-client'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 
@@ -39,6 +42,7 @@ const PROTOCOL_RESPONSE = {
     metadata: { protocolName: 'fake protocol' },
     analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id, status: 'completed' }],
     key: 'fakeProtocolKey',
+    robotType: OT2_ROBOT_TYPE,
   },
 } as Protocol
 
@@ -68,7 +72,7 @@ describe('useProtocolDetailsForRun hook', () => {
       protocolData: null,
       protocolKey: null,
       isProtocolAnalyzing: false,
-      robotType: 'OT-2 Standard',
+      robotType: 'OT-3 Standard',
     })
   })
 

@@ -2,42 +2,38 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  DeckConfigurator,
+  BaseDeck,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
-import {
-  STANDARD_SLOT_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
-} from '@opentrons/shared-data'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckConfigurationDiscardChangesModal } from '../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { Portal } from '../../App/portal'
 
 import type {
-  Cutout,
+  CutoutFixtureId,
+  CutoutId,
   DeckConfiguration,
-  Fixture,
-  FixtureLoadName,
-  LoadFixtureRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
-  fixtureLocation: Cutout
+  cutoutId: CutoutId | null
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
-  providedFixtureOptions: FixtureLoadName[]
+  providedFixtureOptions: CutoutFixtureId[]
 }
 
 export function ProtocolSetupDeckConfiguration({
-  fixtureLocation,
+  cutoutId,
   runId,
   setSetupScreen,
   providedFixtureOptions,
@@ -49,63 +45,25 @@ export function ProtocolSetupDeckConfiguration({
     setShowConfigurationModal,
   ] = React.useState<boolean>(true)
   const [
-    targetFixtureLocation,
-    setTargetFixtureLocation,
-  ] = React.useState<Cutout>(fixtureLocation)
-  const [
     showDiscardChangeModal,
     setShowDiscardChangeModal,
   ] = React.useState<boolean>(false)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  }
 
-  const requiredFixtureDetails =
-    mostRecentAnalysis?.commands != null
-      ? [
-          // parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands),
-          STUBBED_LOAD_FIXTURE,
-        ]
-      : []
+  const simplestDeckConfig = getSimplestDeckConfigForProtocolCommands(
+    mostRecentAnalysis?.commands ?? []
+  ).map(({ cutoutId, cutoutFixtureId }) => ({ cutoutId, cutoutFixtureId }))
 
-  const deckConfig =
-    (requiredFixtureDetails.map(
-      (fixture): Fixture | false =>
-        fixture.params.fixtureId != null && {
-          fixtureId: fixture.params.fixtureId,
-          fixtureLocation: fixture.params.location.cutout,
-          loadName: fixture.params.loadName,
-        }
-    ) as DeckConfiguration) ?? []
+  const [
+    currentDeckConfig,
+    setCurrentDeckConfig,
+  ] = React.useState<DeckConfiguration>(simplestDeckConfig)
 
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-
-  const handleClickAdd = (fixtureLocation: Cutout): void => {
-    setTargetFixtureLocation(fixtureLocation)
-    setShowConfigurationModal(true)
-  }
-
-  const handleClickRemove = (fixtureLocation: Cutout): void => {
-    updateDeckConfiguration({
-      fixtureLocation,
-      loadName: STANDARD_SLOT_LOAD_NAME,
-    })
-  }
-
   const handleClickConfirm = (): void => {
-    // ToDo (kk:10/17/2023) add a function for the confirmation in a following PR for RAUT-804
+    updateDeckConfiguration(currentDeckConfig)
+    setSetupScreen('modules')
   }
 
   return (
@@ -116,12 +74,12 @@ export function ProtocolSetupDeckConfiguration({
             setShowConfirmationModal={setShowDiscardChangeModal}
           />
         ) : null}
-        {showConfigurationModal &&
-        (fixtureLocation != null || targetFixtureLocation != null) ? (
+        {showConfigurationModal && cutoutId != null ? (
           <AddFixtureModal
-            fixtureLocation={targetFixtureLocation}
+            cutoutId={cutoutId}
             setShowAddFixtureModal={setShowConfigurationModal}
             providedFixtureOptions={providedFixtureOptions}
+            setCurrentDeckConfig={setCurrentDeckConfig}
             isOnDevice
           />
         ) : null}
@@ -136,14 +94,11 @@ export function ProtocolSetupDeckConfiguration({
         <Flex
           marginTop="7.75rem"
           paddingX={SPACING.spacing40}
-          paddingBottom={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
         >
-          {/* DeckConfigurator will be replaced by BaseDeck when RAUT-793 is ready */}
-          <DeckConfigurator
-            deckConfig={deckConfig}
-            handleClickAdd={handleClickAdd}
-            handleClickRemove={handleClickRemove}
+          <BaseDeck
+            deckConfig={simplestDeckConfig}
+            robotType={FLEX_ROBOT_TYPE}
           />
         </Flex>
       </Flex>

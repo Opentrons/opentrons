@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -14,13 +15,19 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  getDeckDefFromRobotType,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
+
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
+
 import type { CommandData } from '@opentrons/api-client'
-import { SmallButton } from '../../atoms/buttons'
+import type { RobotType } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
@@ -56,13 +63,19 @@ export const ChooseLocation = (
   )
 
   const handleConfirmPosition: React.MouseEventHandler = () => {
-    const deckLocation = deckDef.locations.orderedSlots.find(
+    const deckSlot = deckDef.locations.addressableAreas.find(
       l => l.id === selectedLocation.slotName
     )
-    const slotX = deckLocation?.position[0]
-    const slotY = deckLocation?.position[1]
-    const xDimension = deckLocation?.boundingBox.xDimension
-    const yDimension = deckLocation?.boundingBox.yDimension
+
+    const slotPosition = getPositionFromSlotId(
+      selectedLocation.slotName,
+      deckDef
+    )
+
+    const slotX = slotPosition?.[0]
+    const slotY = slotPosition?.[1]
+    const xDimension = deckSlot?.boundingBox.xDimension
+    const yDimension = deckSlot?.boundingBox.yDimension
     if (
       slotX != null &&
       slotY != null &&

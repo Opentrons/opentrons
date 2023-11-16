@@ -177,6 +177,14 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -264,6 +272,22 @@ from .configure_for_volume import (
     ConfigureForVolumeParams,
     ConfigureForVolumeResult,
     ConfigureForVolumeCommandType,
+)
+
+from .prepare_to_aspirate import (
+    PrepareToAspirate,
+    PrepareToAspirateCreate,
+    PrepareToAspirateParams,
+    PrepareToAspirateResult,
+    PrepareToAspirateCommandType,
+)
+
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutCommandType,
 )
 
 __all__ = [
@@ -388,6 +412,12 @@ __all__ = [
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
+    # move to addressable area command models
+    "MoveToAddressableArea",
+    "MoveToAddressableAreaParams",
+    "MoveToAddressableAreaCreate",
+    "MoveToAddressableAreaResult",
+    "MoveToAddressableAreaCommandType",
     # wait for resume command models
     "WaitForResume",
     "WaitForResumeParams",
@@ -463,4 +493,16 @@ __all__ = [
     "ConfigureForVolumeParams",
     "ConfigureForVolumeResult",
     "ConfigureForVolumeCommandType",
+    # prepare pipette for aspirate command bundle
+    "PrepareToAspirate",
+    "PrepareToAspirateCreate",
+    "PrepareToAspirateParams",
+    "PrepareToAspirateResult",
+    "PrepareToAspirateCommandType",
+    # configure nozzle layout command bundle
+    "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutCreate",
+    "ConfigureNozzleLayoutParams",
+    "ConfigureNozzleLayoutResult",
+    "ConfigureNozzleLayoutCommandType",
 ]

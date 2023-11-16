@@ -2,6 +2,8 @@
 import path from 'path'
 import { ensureDir } from 'fs-extra'
 import { readFile } from 'fs/promises'
+import StreamZip from 'node-stream-zip'
+import Semver from 'semver'
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
 import {
@@ -23,15 +25,18 @@ import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
 
 const log = createLogger('systemUpdate/index')
+const REASONABLE_VERSION_FILE_SIZE_B = 4096
 
 let isGettingLatestSystemFiles = false
-let updateSet: ReleaseSetFilepaths | null = null
+const isGettingMassStorageUpdatesFrom: Set<string> = new Set()
+let massStorageUpdateSet: ReleaseSetFilepaths | null = null
+let systemUpdateSet: ReleaseSetFilepaths | null = null
 
 const readFileInfoAndDispatch = (
   dispatch: Dispatch,
   fileName: string,
   isManualFile: boolean = false
-): Promise<void> =>
+): Promise<unknown> =>
   readUserFileInfo(fileName)
     .then(fileInfo => ({
       type: 'robotUpdate:FILE_INFO' as const,
@@ -48,6 +53,7 @@ const readFileInfoAndDispatch = (
     .then(dispatch)
 
 export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
+  log.info(`Running robot system updates storing to ${getSystemUpdateDir()}`)
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
@@ -105,7 +111,8 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
         break
       }
       case 'robotUpdate:READ_SYSTEM_FILE': {
-        const systemFile = updateSet?.system
+        const systemFile =
+          massStorageUpdateSet?.system ?? systemUpdateSet?.system
         if (systemFile == null) {
           return dispatch({
             type: 'robotUpdate:UNEXPECTED_ERROR',
@@ -114,9 +121,152 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
         }
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         readFileInfoAndDispatch(dispatch, systemFile)
+        break
       }
+      case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
+        if (isGettingMassStorageUpdatesFrom.has(action.payload.rootPath)) {
+          return
+        }
+        isGettingMassStorageUpdatesFrom.add(action.payload.rootPath)
+        getLatestMassStorageUpdateFiles(action.payload.filePaths, dispatch)
+          .then(() => {
+            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
+          })
+          .catch(() => {
+            isGettingMassStorageUpdatesFrom.delete(action.payload.rootPath)
+          })
+        break
+      case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
+        if (
+          massStorageUpdateSet !== null &&
+          massStorageUpdateSet.system.startsWith(action.payload.rootPath)
+        ) {
+          console.log(
+            `Mass storage device ${action.payload.rootPath} removed, reverting to non-usb updates`
+          )
+          massStorageUpdateSet = null
+          getCachedSystemUpdateFiles(dispatch)
+        } else {
+          console.log(
+            `Mass storage device ${action.payload.rootPath} removed but this was not an update source`
+          )
+        }
+        break
     }
   }
+}
+
+const getVersionFromOpenedZipIfValid = (zip: StreamZip): Promise<string> =>
+  new Promise((resolve, reject) =>
+    Object.values(zip.entries()).forEach(entry => {
+      if (
+        entry.isFile &&
+        entry.name === 'VERSION.json' &&
+        entry.size < REASONABLE_VERSION_FILE_SIZE_B
+      ) {
+        const contents = zip.entryDataSync(entry.name).toString('ascii')
+        try {
+          const parsedContents = JSON.parse(contents)
+          if (parsedContents?.robot_type !== 'OT-3 Standard') {
+            reject(new Error('not a Flex release file'))
+          }
+          const fileVersion = parsedContents?.opentrons_api_version
+          const version = Semver.valid(fileVersion)
+          if (version === null) {
+            reject(new Error(`${fileVersion} is not a valid version`))
+          } else {
+            resolve(version)
+          }
+        } catch (error) {
+          reject(error)
+        }
+      }
+    })
+  )
+
+interface FileDetails {
+  path: string
+  version: string
+}
+
+const getVersionFromZipIfValid = (path: string): Promise<FileDetails> =>
+  new Promise((resolve, reject) => {
+    const zip = new StreamZip({ file: path, storeEntries: true })
+    zip.on('ready', () => {
+      getVersionFromOpenedZipIfValid(zip)
+        .then(version => {
+          zip.close()
+          resolve({ version, path })
+        })
+        .catch(err => {
+          zip.close()
+          reject(err)
+        })
+    })
+    zip.on('error', err => {
+      zip.close()
+      reject(err)
+    })
+  })
+
+const fakeReleaseNotesForMassStorage = (version: string): string => `
+# Opentrons Robot Software Version ${version}
+
+This update is from a USB mass storage device connected to your flex, and release notes cannot be shown.
+`
+
+export const getLatestMassStorageUpdateFiles = (
+  filePaths: string[],
+  dispatch: Dispatch
+): Promise<unknown> =>
+  Promise.all(
+    filePaths.map(path =>
+      path.endsWith('.zip')
+        ? getVersionFromZipIfValid(path).catch(() => null)
+        : new Promise<null>(resolve => {
+            resolve(null)
+          })
+    )
+  ).then(values => {
+    const update = values.reduce(
+      (prev, current) =>
+        prev === null
+          ? current === null
+            ? prev
+            : current
+          : current === null
+          ? prev
+          : Semver.gt(current.version, prev.version)
+          ? current
+          : prev,
+      null
+    )
+    if (update === null) {
+      console.log('no updates found in mass storage device')
+    } else {
+      console.log(`found update to version ${update.version} on mass storage`)
+      const releaseNotes = fakeReleaseNotesForMassStorage(update.version)
+      massStorageUpdateSet = { system: update.path, releaseNotes }
+      dispatchUpdateInfo(
+        { version: update.version, releaseNotes, force: true },
+        dispatch
+      )
+    }
+  })
+
+const dispatchUpdateInfo = (
+  info: { version: string | null; releaseNotes: string | null; force: boolean },
+  dispatch: Dispatch
+): void => {
+  const { version, releaseNotes, force } = info
+  dispatch({
+    type: 'robotUpdate:UPDATE_INFO',
+    payload: { releaseNotes, version, force, target: 'flex' },
+  })
+  dispatch({
+    type: 'robotUpdate:UPDATE_VERSION',
+    payload: { version, force, target: 'flex' },
+  })
 }
 
 // Get latest system update version
@@ -129,9 +279,12 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
 export function getLatestSystemUpdateFiles(
   dispatch: Dispatch
 ): Promise<unknown> {
-  const fileDownloadDir = path.join(getSystemUpdateDir(), getLatestVersion())
+  const fileDownloadDir = path.join(
+    getSystemUpdateDir(),
+    'robot-system-updates'
+  )
 
-  return ensureDir(fileDownloadDir)
+  return ensureDir(getSystemUpdateDir())
     .then(() => getLatestSystemUpdateUrls())
     .then(urls => {
       if (urls === null) {
@@ -151,11 +304,13 @@ export function getLatestSystemUpdateFiles(
         if (size !== null) {
           const percentDone = Math.round((downloaded / size) * 100)
           if (Math.abs(percentDone - prevPercentDone) > 0) {
-            dispatch({
-              // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
-              type: 'robotUpdate:DOWNLOAD_PROGRESS',
-              payload: { progress: percentDone, target: 'flex' },
-            })
+            if (massStorageUpdateSet === null) {
+              dispatch({
+                // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
+                type: 'robotUpdate:DOWNLOAD_PROGRESS',
+                payload: { progress: percentDone, target: 'flex' },
+              })
+            }
             prevPercentDone = percentDone
           }
         }
@@ -165,16 +320,11 @@ export function getLatestSystemUpdateFiles(
         .then(filepaths => {
           return cacheUpdateSet(filepaths)
         })
-        .then(({ version, releaseNotes }) => {
-          dispatch({
-            type: 'robotUpdate:UPDATE_INFO',
-            payload: { releaseNotes, version, target: 'flex' },
-          })
-          dispatch({
-            type: 'robotUpdate:UPDATE_VERSION',
-            payload: { version, target: 'flex' },
-          })
-        })
+        .then(
+          updateInfo =>
+            massStorageUpdateSet === null &&
+            dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
+        )
         .catch((error: Error) => {
           return dispatch({
             type: 'robotUpdate:DOWNLOAD_ERROR',
@@ -182,7 +332,7 @@ export function getLatestSystemUpdateFiles(
           })
         })
         .then(() =>
-          cleanupReleaseFiles(getSystemUpdateDir(), getLatestVersion())
+          cleanupReleaseFiles(getSystemUpdateDir(), 'robot-system-updates')
         )
         .catch((error: Error) => {
           log.warn('Unable to cleanup old release files', { error })
@@ -190,12 +340,42 @@ export function getLatestSystemUpdateFiles(
     })
 }
 
+export function getCachedSystemUpdateFiles(
+  dispatch: Dispatch
+): Promise<unknown> {
+  if (systemUpdateSet) {
+    return getInfoFromUpdateSet(systemUpdateSet)
+      .then(updateInfo =>
+        dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
+      )
+      .catch(err => console.log(`Could not get info from update set: ${err}`))
+  } else {
+    dispatchUpdateInfo(
+      { version: null, releaseNotes: null, force: false },
+      dispatch
+    )
+    return new Promise(resolve => resolve('no files'))
+  }
+}
+
+function getInfoFromUpdateSet(
+  filepaths: ReleaseSetFilepaths
+): Promise<{ version: string; releaseNotes: string | null }> {
+  const version = getLatestVersion()
+  const releaseNotesContentPromise = filepaths.releaseNotes
+    ? readFile(filepaths.releaseNotes, 'utf8')
+    : new Promise<string | null>(resolve => resolve(null))
+  return releaseNotesContentPromise
+    .then(releaseNotes => ({
+      version: version,
+      releaseNotes,
+    }))
+    .catch(() => ({ version: version, releaseNotes: '' }))
+}
+
 function cacheUpdateSet(
   filepaths: ReleaseSetFilepaths
-): Promise<{ version: string; releaseNotes: string }> {
-  updateSet = filepaths
-  return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({
-    version: getLatestVersion(),
-    releaseNotes,
-  }))
+): Promise<{ version: string; releaseNotes: string | null }> {
+  systemUpdateSet = filepaths
+  return getInfoFromUpdateSet(systemUpdateSet)
 }

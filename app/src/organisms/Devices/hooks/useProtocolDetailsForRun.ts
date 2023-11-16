@@ -1,6 +1,6 @@
 import * as React from 'react'
 import last from 'lodash/last'
-import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   useProtocolQuery,
   useRunQuery,
@@ -61,10 +61,10 @@ export function useProtocolDetailsForRun(
     protocolData: mostRecentAnalysis ?? null,
     protocolKey: protocolRecord?.data.key ?? null,
     isProtocolAnalyzing: protocolRecord != null && mostRecentAnalysis == null,
-    // this should be deleted as soon as analysis tells us intended robot type
     robotType:
-      mostRecentAnalysis?.status === 'completed'
-        ? getRobotTypeFromLoadedLabware(mostRecentAnalysis.labware)
-        : 'OT-2 Standard',
+      protocolRecord?.data.robotType ??
+      (mostRecentAnalysis?.status === 'completed'
+        ? mostRecentAnalysis?.robotType ?? FLEX_ROBOT_TYPE
+        : FLEX_ROBOT_TYPE),
   }
 }

@@ -151,7 +151,7 @@ describe('ModuleRow', () => {
     ).toBe('GEN1')
     expect(
       wrapper.find(LabeledValue).filter({ label: 'Position' }).prop('value')
-    ).toBe('Slot 1')
+    ).toBe('1')
   })
 
   it('does not display module model and slot when module has not been added to protocol', () => {

@@ -171,6 +171,7 @@ class GCodeEngine:
                                 deck_type.for_simulation(robot_type=robot_type)
                             ),
                         ),
+                        load_fixed_trash=deck_type.should_load_fixed_trash(config),
                     ),
                     hardware_api=hardware,  # type: ignore
                 )

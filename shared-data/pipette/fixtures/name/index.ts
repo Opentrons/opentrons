@@ -16,3 +16,4 @@ export const fixtureP300Multi: PipetteNameSpecs =
   pipetteNameSpecFixtures.p300_multi
 export const fixtureP1000Single: PipetteNameSpecs =
   pipetteNameSpecFixtures.p1000_single
+export const fixtureP100096: PipetteNameSpecs = pipetteNameSpecFixtures.p1000_96

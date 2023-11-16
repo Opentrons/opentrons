@@ -51,6 +51,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(null)
     },
   }
+
   const is96Channel =
     instrument != null &&
     instrument.ok &&
@@ -149,17 +150,20 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               justifyContent={JUSTIFY_CENTER}
             />
-            <MediumButton
-              flex="1"
-              onClick={handleRecalibrate}
-              buttonText={
-                instrument.data.calibratedOffset?.last_modified == null
-                  ? t('calibrate')
-                  : t('recalibrate')
-              }
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              justifyContent={JUSTIFY_CENTER}
-            />
+            {instrument.mount === 'extension' ||
+            instrument.data.calibratedOffset?.last_modified == null ? (
+              <MediumButton
+                flex="1"
+                onClick={handleRecalibrate}
+                buttonText={
+                  instrument.data.calibratedOffset?.last_modified == null
+                    ? t('calibrate')
+                    : t('recalibrate')
+                }
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
+                justifyContent={JUSTIFY_CENTER}
+              />
+            ) : null}
           </Flex>
         </>
       ) : null}

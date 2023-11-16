@@ -1,9 +1,5 @@
 import * as React from 'react'
-
-import {
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
 import { Btn, Flex, Text } from '../../primitives'
@@ -11,7 +7,7 @@ import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
 
 // TODO: replace stubs with JSON definitions when available
 const trashBinDef = {
@@ -32,6 +28,7 @@ const trashBinDef = {
 }
 
 interface TrashBinConfigFixtureProps {
+  deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
 }
@@ -39,21 +36,19 @@ interface TrashBinConfigFixtureProps {
 export function TrashBinConfigFixture(
   props: TrashBinConfigFixtureProps
 ): JSX.Element {
-  const { handleClickRemove, fixtureLocation } = props
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const { deckDefinition, handleClickRemove, fixtureLocation } = props
 
-  // TODO: migrate to fixture location for v4
-  const trashBinSlot = deckDef.locations.orderedSlots.find(
+  const trashBinSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === fixtureLocation
   )
   const [xSlotPosition = 0, ySlotPosition = 0] = trashBinSlot?.position ?? []
   // TODO: remove adjustment when reading from fixture position
   // adjust x differently for right side/left side
   const isLeftSideofDeck =
-    fixtureLocation === 'A1' ||
-    fixtureLocation === 'B1' ||
-    fixtureLocation === 'C1' ||
-    fixtureLocation === 'D1'
+    fixtureLocation === 'cutoutA1' ||
+    fixtureLocation === 'cutoutB1' ||
+    fixtureLocation === 'cutoutC1' ||
+    fixtureLocation === 'cutoutD1'
   const xAdjustment = isLeftSideofDeck ? -101.5 : -17
   const x = xSlotPosition + xAdjustment
   const yAdjustment = -10
@@ -70,15 +65,7 @@ export function TrashBinConfigFixture(
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex
-        alignItems={ALIGN_CENTER}
-        backgroundColor={COLORS.grey2}
-        borderRadius={BORDERS.radiusSoftCorners}
-        color={COLORS.white}
-        gridGap={SPACING.spacing8}
-        justifyContent={JUSTIFY_CENTER}
-        width="100%"
-      >
+      <Flex css={TRASH_BIN_CONFIG_STYLE}>
         <Text css={TYPOGRAPHY.bodyTextSemiBold}>
           {trashBinDef.metadata.displayName}
         </Text>
@@ -95,3 +82,24 @@ export function TrashBinConfigFixture(
     </RobotCoordsForeignObject>
   )
 }
+
+const TRASH_BIN_CONFIG_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  background-color: ${COLORS.grey2};
+  border-radius: ${BORDERS.borderRadiusSize1};
+  color: ${COLORS.white};
+  justify-content: ${JUSTIFY_CENTER};
+  grid-gap: ${SPACING.spacing8};
+  width: 100%;
+
+  &:active {
+    background-color: ${COLORS.darkBlack90};
+  }
+
+  &:hover {
+    background-color: ${COLORS.grey1};
+  }
+
+  &:focus-visible {
+  }
+`

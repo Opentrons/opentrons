@@ -35,17 +35,14 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
-  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
     t('map_view')
   )
   const isFlex = useIsFlex(robotName)
 
-  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
-    robotName,
-    runId
-  )
+  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(runId)
   const moduleModels = map(
     moduleRenderInfoById,
     ({ moduleDef }) => moduleDef.model
@@ -65,16 +62,12 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
         {selectedValue === t('list_view') ? (
           <SetupLabwareList
             attachedModuleInfo={moduleRenderInfoById}
-            commands={protocolData?.commands ?? []}
+            commands={protocolAnalysis?.commands ?? []}
             extraAttentionModules={moduleTypesThatRequireExtraAttention}
             isFlex={isFlex}
           />
         ) : (
-          <SetupLabwareMap
-            runId={runId}
-            commands={protocolData?.commands ?? []}
-            robotName={robotName}
-          />
+          <SetupLabwareMap runId={runId} protocolAnalysis={protocolAnalysis} />
         )}
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing16}>

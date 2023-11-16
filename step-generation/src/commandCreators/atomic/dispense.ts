@@ -11,6 +11,7 @@ import {
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
 } from '../../utils'
+import { COLUMN_4_SLOTS } from '../../constants'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
@@ -82,6 +83,10 @@ export const dispense: CommandCreator<DispenseParams> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
+  }
+
+  if (COLUMN_4_SLOTS.includes(slotName)) {
+    errors.push(errorCreators.pipettingIntoColumn4({ typeOfStep: actionName }))
   }
 
   if (
