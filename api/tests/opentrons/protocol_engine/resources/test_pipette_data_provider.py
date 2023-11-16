@@ -163,7 +163,6 @@ def test_load_virtual_pipette_nozzle_layout(
     assert result.configuration.value == "COLUMN"
 
 
-
 def test_get_pipette_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
