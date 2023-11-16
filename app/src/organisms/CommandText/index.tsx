@@ -54,6 +54,7 @@ export function CommandText(props: Props): JSX.Element | null {
 
   switch (command.commandType) {
     case 'aspirate':
+    case 'aspirateInPlace':
     case 'dispense':
     case 'dispenseInPlace':
     case 'blowout':

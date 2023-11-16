@@ -1,6 +1,7 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
   | AspirateRunTimeCommand
+  | AspirateInPlaceRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
   | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
@@ -14,6 +15,7 @@ export type PipettingRunTimeCommand =
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
+  | AspirateInPlaceCreateCommand
   | BlowoutCreateCommand
   | BlowoutInPlaceCreateCommand
   | ConfigureForVolumeCreateCommand
@@ -47,6 +49,16 @@ export interface AspirateCreateCommand extends CommonCommandCreateInfo {
 export interface AspirateRunTimeCommand
   extends CommonCommandRunTimeInfo,
     AspirateCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
+
+export interface AspirateInPlaceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'aspirateInPlace'
+  params: AspirateInPlaceParams
+}
+export interface AspirateInPlaceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AspirateInPlaceCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -174,6 +186,11 @@ export interface DispenseInPlaceParams {
   pushOut?: number
 }
 
+export interface AspirateInPlaceParams {
+  pipetteId: string
+  volume: number
+  flowRate: number // µL/s
+}
 interface FlowRateParams {
   flowRate: number // µL/s
 }

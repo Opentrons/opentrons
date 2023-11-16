@@ -126,6 +126,10 @@ export const PipettingCommandText = ({
       const { flowRate } = command.params
       return t('blowout_in_place', { flow_rate: flowRate })
     }
+    case 'aspirateInPlace': {
+      const { flowRate, volume } = command.params
+      return t('aspirate_in_place', { volume, flow_rate: flowRate })
+    }
     default: {
       console.warn(
         'PipettingCommandText encountered a command with an unrecognized commandType: ',
