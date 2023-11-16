@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import without from 'lodash/without'
 import { Form, Formik, useFormikContext } from 'formik'
 import {
   BUTTON_TYPE_SUBMIT,
@@ -24,6 +23,7 @@ import {
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
+import { getStagingAreaSlots } from '../../utils'
 import { i18n } from '../../localization'
 import {
   createDeckFixture,
@@ -32,8 +32,7 @@ import {
 import { getSlotIsEmpty } from '../../step-forms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { PDAlert } from '../alerts/PDAlert'
-import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import { getStagingAreaSlots } from '../../utils'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 export interface StagingAreasValues {
   selectedSlots: string[]
