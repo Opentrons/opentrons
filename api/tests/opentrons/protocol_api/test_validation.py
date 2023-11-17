@@ -25,6 +25,7 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import validation as subject, Well, Labware
+from opentrons.protocol_api._types import StagingSlotName
 
 
 @pytest.mark.parametrize(
@@ -131,6 +132,11 @@ def test_ensure_pipette_input_invalid(input_value: str) -> None:
         ("a3", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_A3),
         ("A3", APIVersion(2, 15), "OT-2 Standard", DeckSlotName.FIXED_TRASH),
         ("A3", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_A3),
+        # Staging slots:
+        ("A4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_A4),
+        ("b4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_B4),
+        ("C4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_C4),
+        ("d4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_D4),
     ],
 )
 def test_ensure_and_convert_deck_slot(
@@ -162,6 +168,7 @@ def test_ensure_and_convert_deck_slot(
             APIVersionError,
             '"A1" requires apiLevel 2.15. Increase your protocol\'s apiLevel, or use slot "10" instead.',
         ),
+        ("A4", APIVersion(2, 15), APIVersionError, "Using a staging deck slot"),
     ],
 )
 @pytest.mark.parametrize("input_robot_type", ["OT-2 Standard", "OT-3 Standard"])
