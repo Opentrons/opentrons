@@ -44,14 +44,14 @@ export function useUpdateDeckConfigurationMutation(
     DeckConfiguration
   >(
     [host, 'deck_configuration'],
-    (fixture: DeckConfiguration) =>
-      updateDeckConfiguration(host as HostConfig, fixture).then(response => {
+    (deckConfig: DeckConfiguration) =>
+      updateDeckConfiguration(host as HostConfig, deckConfig).then(response => {
         queryClient
           .invalidateQueries([host, 'deck_configuration'])
           .catch((e: Error) => {
             throw e
           })
-        return response.data
+        return response.data?.data?.cutoutFixtures ?? []
       }),
     options
   )
