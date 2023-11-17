@@ -54,7 +54,7 @@ export function WasteChuteConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Flex css={WASTE_CHUTE_CONFIG_STYLE}>
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold }>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
           {WASTE_CHUTE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (

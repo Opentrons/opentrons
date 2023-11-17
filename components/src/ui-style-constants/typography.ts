@@ -217,10 +217,10 @@ export const smallBodyTextBold = css`
   font-weight: ${fontWeightBold};
 `
 
-export const smallBodyTextSemiBold  = css`
-font-size: ${fontSize20};
-line-height: ${lineHeight24};
-font-weight: ${fontWeightSemiBold};
+export const smallBodyTextSemiBold = css`
+  font-size: ${fontSize20};
+  line-height: ${lineHeight24};
+  font-weight: ${fontWeightSemiBold};
 `
 
 export const smallBodyTextRegular = css`

@@ -45,9 +45,7 @@ export function StagingAreaConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Flex css={STAGING_AREA_CONFIG_STYLE}>
-        <Text
-          css={TYPOGRAPHY.smallBodyTextSemiBold }
-        >
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
           {STAGING_AREA_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
