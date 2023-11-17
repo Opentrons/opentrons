@@ -98,7 +98,7 @@
   "mount": "{{side}} Mount",
   "na_speed": "Target: N/A",
   "na_temp": "Target: N/A",
-  "no_deck_fixtures":"No deck fixtures",
+  "no_deck_fixtures": "No deck fixtures",
   "no_protocol_runs": "No protocol runs yet!",
   "no_protocols_found": "No protocols found",
   "no_recent_runs_description": "After you run some protocols, they will appear here.",
@@ -185,5 +185,5 @@
   "waste_chute": "Waste chute",
   "welcome_modal_description": "A place to run protocols, manage your instruments, and view robot status.",
   "welcome_to_your_dashboard": "Welcome to your dashboard!",
-  "yes_update_now": "Yes, update now",
+  "yes_update_now": "Yes, update now"
 }

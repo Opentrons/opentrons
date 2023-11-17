@@ -65,7 +65,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   )
   const wasteChuteFixtures = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) =>
-      cutoutFixtureId != null && WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)
+      cutoutFixtureId != null &&
+      WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)
   )
   const wasteChuteStagingAreaFixtures = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) =>
