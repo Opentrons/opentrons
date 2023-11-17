@@ -51,7 +51,7 @@ describe('useModuleMatchResults', () => {
       .calledWith(mockConnectedRobot.name)
       .mockReturnValue(mockConnectedRobot)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(mockConnectedRobot.name, '1')
+      .calledWith('1')
       .mockReturnValue({})
 
     when(mockUseAttachedModules)
@@ -67,7 +67,7 @@ describe('useModuleMatchResults', () => {
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
     const moduleId = 'fakeMagBlockId'
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(mockConnectedRobot.name, '1')
+      .calledWith('1')
       .mockReturnValue({
         [moduleId]: {
           moduleId: moduleId,
@@ -94,7 +94,7 @@ describe('useModuleMatchResults', () => {
   it('should return 1 missing moduleId if requested model not attached', () => {
     const moduleId = 'fakeMagModuleId'
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(mockConnectedRobot.name, '1')
+      .calledWith('1')
       .mockReturnValue({
         [moduleId]: {
           moduleId: moduleId,
@@ -121,7 +121,7 @@ describe('useModuleMatchResults', () => {
   it('should return no missing moduleId if compatible model is attached', () => {
     const moduleId = 'someTempModule'
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(mockConnectedRobot.name, '1')
+      .calledWith('1')
       .mockReturnValue({
         [moduleId]: {
           moduleId: moduleId,
@@ -147,7 +147,7 @@ describe('useModuleMatchResults', () => {
   it('should return one missing moduleId if nocompatible model is attached', () => {
     const moduleId = 'someTempModule'
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(mockConnectedRobot.name, '1')
+      .calledWith('1')
       .mockReturnValue({
         [moduleId]: {
           moduleId: moduleId,

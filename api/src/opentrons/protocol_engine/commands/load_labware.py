@@ -7,8 +7,13 @@ from typing_extensions import Literal
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareIsNotAllowedInLocationError
-from ..resources import labware_validation
-from ..types import LabwareLocation, OnLabwareLocation, DeckSlotLocation
+from ..resources import labware_validation, fixture_validation
+from ..types import (
+    LabwareLocation,
+    OnLabwareLocation,
+    DeckSlotLocation,
+    AddressableAreaLocation,
+)
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -104,6 +109,12 @@ class LoadLabwareImplementation(
             raise LabwareIsNotAllowedInLocationError(
                 f"{params.loadName} is not allowed in slot {params.location.slotName}"
             )
+
+        if isinstance(params.location, AddressableAreaLocation):
+            if not fixture_validation.is_deck_slot(params.location.addressableAreaName):
+                raise LabwareIsNotAllowedInLocationError(
+                    f"Cannot load {params.loadName} onto addressable area {params.location.addressableAreaName}"
+                )
 
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,

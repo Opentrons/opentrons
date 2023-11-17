@@ -8,6 +8,7 @@ from opentrons.protocol_engine.types import DeckType
 
 from . import defaults
 from . import models
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 
 # TODO(mm, 2023-11-17): Add unit tests for DeckConfigurationStore.
@@ -41,6 +42,14 @@ class DeckConfigurationStore:
                 cutoutFixtures=self._last_update.cutout_fixtures,
                 lastUpdatedAt=self._last_update.timestamp,
             )
+
+    async def get_deck_configuration(self) -> DeckConfigurationType:
+        """Get the robot's current deck configuration in an expected typing."""
+        to_convert = await self.get()
+        converted = [
+            (item.cutoutId, item.cutoutFixtureId) for item in to_convert.cutoutFixtures
+        ]
+        return converted
 
 
 @dataclass

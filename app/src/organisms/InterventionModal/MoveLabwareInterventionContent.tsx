@@ -33,7 +33,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
-  getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 import {
   getRunLabwareRenderInfo,
@@ -103,6 +102,7 @@ export interface MoveLabwareInterventionProps {
   command: MoveLabwareRunTimeCommand
   analysis: CompletedProtocolAnalysis | null
   run: RunData
+  robotType: RobotType
   isOnDevice: boolean
 }
 
@@ -110,13 +110,13 @@ export function MoveLabwareInterventionContent({
   command,
   analysis,
   run,
+  robotType,
   isOnDevice,
 }: MoveLabwareInterventionProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
-  const robotType = getRobotTypeFromLoadedLabware(run.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const moduleRenderInfo = getRunModuleRenderInfo(
@@ -197,7 +197,7 @@ export function MoveLabwareInterventionContent({
               loadedModules={run.modules}
               loadedLabware={run.labware}
               // TODO(bh, 2023-07-19): remove when StyledDeck removed from MoveLabwareOnDeck
-              trashLocation={
+              trashCutoutId={
                 robotType === 'OT-3 Standard' ? 'cutoutA3' : undefined
               }
               backgroundItems={

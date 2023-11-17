@@ -104,7 +104,7 @@ export const SelectNetwork = ({
             <ResultModal
               type={changeState.type}
               ssid={changeState.ssid}
-              isPending={requestState.status === RobotApi.PENDING}
+              requestStatus={requestState.status}
               error={
                 'error' in requestState &&
                 requestState.error != null &&

@@ -15,5 +15,5 @@ import type { HostConfig } from '../types'
 export function getDeckConfiguration(
   config: HostConfig
 ): Promise<{ data: DeckConfiguration }> {
-  return Promise.resolve({ data: Object.values(DECK_CONFIG_STUB) })
+  return Promise.resolve({ data: DECK_CONFIG_STUB })
 }

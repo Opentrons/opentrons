@@ -18,7 +18,7 @@ export function FlexModuleTag(props: FlexModuleTagProps): JSX.Element {
   return (
     <RobotCoordsForeignDiv
       width={dimensions.labwareInterfaceXDimension}
-      height={16}
+      height={20}
       y={-22}
       innerDivProps={{
         backgroundColor: COLORS.darkGreyEnabled,

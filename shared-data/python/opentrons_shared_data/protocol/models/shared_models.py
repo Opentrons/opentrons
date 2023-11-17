@@ -81,6 +81,7 @@ class Location(BaseModel):
     slotName: Optional[str]
     moduleId: Optional[str]
     labwareId: Optional[str]
+    addressableAreaName: Optional[str]
 
 
 class ProfileStep(BaseModel):

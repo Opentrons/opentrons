@@ -308,6 +308,8 @@ def _make_ot3_pe_ctx(
             use_virtual_pipettes=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
+            # TODO figure out if we will want to use a "real" deck config here or if we are fine with simulated
+            use_simulated_deck_config=True,
             block_on_door_open=False,
         ),
         drop_tips_after_run=False,

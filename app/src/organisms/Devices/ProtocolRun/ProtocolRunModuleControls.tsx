@@ -70,7 +70,6 @@ export const ProtocolRunModuleControls = ({
   const { attachPipetteRequired, updatePipetteFWRequired } = usePipetteIsReady()
 
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(

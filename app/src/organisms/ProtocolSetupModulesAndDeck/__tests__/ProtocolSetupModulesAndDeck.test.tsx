@@ -7,12 +7,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
-  DeckConfiguration,
-  Fixture,
   getDeckDefFromRobotType,
-  STAGING_AREA_LOAD_NAME,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
 import { useChainLiveCommands } from '../../../resources/runs/hooks'
@@ -37,6 +35,8 @@ import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 import { ProtocolSetupModulesAndDeck } from '..'
+
+import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
@@ -103,7 +103,7 @@ const mockModulesAndDeckMapViewModal = ModulesAndDeckMapViewModal as jest.Mocked
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const mockSetSetupScreen = jest.fn()
-const mockSetFixtureLocation = jest.fn()
+const mockSetCutoutId = jest.fn()
 const mockSetProvidedFixtureOptions = jest.fn()
 
 const calibratedMockApiHeaterShaker = {
@@ -118,11 +118,10 @@ const calibratedMockApiHeaterShaker = {
     last_modified: '2023-06-01T14:42:20.131798+00:00',
   },
 }
-const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: '10' as any,
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+const mockFixture: CutoutConfig = {
+  cutoutId: 'cutoutD3',
+  cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+}
 
 const render = () => {
   return renderWithProviders(
@@ -130,7 +129,7 @@ const render = () => {
       <ProtocolSetupModulesAndDeck
         runId={RUN_ID}
         setSetupScreen={mockSetSetupScreen}
-        setFixtureLocation={mockSetFixtureLocation}
+        setCutoutId={mockSetCutoutId}
         setProvidedFixtureOptions={mockSetProvidedFixtureOptions}
       />
     </MemoryRouter>,
@@ -363,6 +362,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: calibratedMockApiHeaterShaker,
+        slotName: 'D3',
       },
     ])
     const [{ getByText }] = render()

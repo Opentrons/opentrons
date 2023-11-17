@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 from .types import (
     Quirks,
@@ -54,57 +54,29 @@ MUTABLE_CONFIGS_V2 = [
 
 RESTRICTED_MUTABLE_CONFIG_KEYS = [*VALID_QUIRKS, "model"]
 
-_MAP_KEY_TO_V2: Dict[str, Dict[str, str]] = {
-    "top": {
-        "top_level_name": "plungerPositionsConfigurations",
-        "nested_name": "top",
-        "liquid_class": "default",
-    },
-    "bottom": {
-        "top_level_name": "plungerPositionsConfigurations",
-        "nested_name": "bottom",
-        "liquid_class": "default",
-    },
-    "blowout": {
-        "top_level_name": "plungerPositionsConfigurations",
-        "nested_name": "blowout",
-        "liquid_class": "default",
-    },
-    "dropTip": {
-        "top_level_name": "plungerPositionsConfigurations",
-        "nested_name": "drop",
-        "liquid_class": "default",
-    },
-    "pickUpCurrent": {
-        "top_level_name": "partialTipConfigurations",
-        "nested_name": "perTipPickupCurrent",
-    },
-    "pickUpDistance": {
-        "top_level_name": "pickUpTipConfigurations",
-        "nested_name": "distance",
-    },
-    "pickUpIncrement": {
-        "top_level_name": "pickUpTipConfigurations",
-        "nested_name": "increment",
-    },
-    "pickUpPresses": {
-        "top_level_name": "pickUpTipConfigurations",
-        "nested_name": "presses",
-    },
-    "pickUpSpeed": {
-        "top_level_name": "pickUpTipConfigurations",
-        "nested_name": "speed",
-    },
-    "plungerCurrent": {
-        "top_level_name": "plungerMotorConfigurations",
-        "nested_name": "run",
-    },
-    "dropTipCurrent": {
-        "top_level_name": "dropTipConfigurations",
-        "nested_name": "current",
-    },
-    "dropTipSpeed": {"top_level_name": "dropTipConfigurations", "nested_name": "speed"},
-    "tipLength": {"top_level_name": "supportedTips", "nested_name": "defaultTipLength"},
+
+_MAP_KEY_TO_V2: Dict[str, List[str]] = {
+    "top": ["plungerPositionsConfigurations", "default", "top"],
+    "bottom": ["plungerPositionsConfigurations", "default", "bottom"],
+    "blowout": ["plungerPositionsConfigurations", "default", "blowout"],
+    "dropTip": ["plungerPositionsConfigurations", "default", "drop"],
+    "pickUpCurrent": ["pickUpTipConfigurations", "pressFit", "currentByTipCount"],
+    "pickUpDistance": ["pickUpTipConfigurations", "pressFit", "distance"],
+    "pickUpIncrement": ["pickUpTipConfigurations", "pressFit", "increment"],
+    "pickUpPresses": ["pickUpTipConfigurations", "pressFit", "presses"],
+    "pickUpSpeed": ["pickUpTipConfigurations", "pressFit", "speed"],
+    "plungerCurrent": ["plungerMotorConfigurations", "run"],
+    "dropTipCurrent": ["dropTipConfigurations", "plungerEject", "current"],
+    "dropTipSpeed": ["dropTipConfigurations", "plungerEject", "speed"],
+    "maxVolume": ["liquid_properties", "default", "maxVolume"],
+    "minVolume": ["liquid_properties", "default", "minVolume"],
+    "tipLength": [
+        "liquid_properties",
+        "default",
+        "supportedTips",
+        "##EACHTIP##",
+        "defaultTipLength",
+    ],
 }
 
 

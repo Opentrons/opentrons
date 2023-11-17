@@ -154,6 +154,14 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -275,6 +283,7 @@ Command = Union[
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
+    MoveToAddressableArea,
     PrepareToAspirate,
     WaitForResume,
     WaitForDuration,
@@ -333,6 +342,7 @@ CommandParams = Union[
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
+    MoveToAddressableAreaParams,
     PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
@@ -392,6 +402,7 @@ CommandType = Union[
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
+    MoveToAddressableAreaCommandType,
     PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
@@ -450,6 +461,7 @@ CommandCreate = Union[
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
+    MoveToAddressableAreaCreate,
     PrepareToAspirateCreate,
     WaitForResumeCreate,
     WaitForDurationCreate,
@@ -508,6 +520,7 @@ CommandResult = Union[
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
+    MoveToAddressableAreaResult,
     PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,

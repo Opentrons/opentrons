@@ -22,6 +22,8 @@ from opentrons_shared_data.errors.exceptions import (
 )
 from opentrons_shared_data.pipette.pipette_definition import (
     liquid_class_for_volume_between_default_and_defaultlowvolume,
+    PressFitPickUpTipConfiguration,
+    CamActionPickUpTipConfiguration,
 )
 
 from opentrons import types as top_types
@@ -729,7 +731,7 @@ class OT3PipetteHandler:
 
         return []
 
-    def plan_ht_pick_up_tip(self) -> TipActionSpec:
+    def plan_ht_pick_up_tip(self, tip_count: int) -> TipActionSpec:
         # Prechecks: ready for pickup tip and press/increment are valid
         mount = OT3Mount.LEFT
         instrument = self.get_pipette(mount)
@@ -737,25 +739,32 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
+        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        if not isinstance(pick_up_config, CamActionPickUpTipConfiguration):
+            raise CommandPreconditionViolated(
+                f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"
+            )
+
         tip_motor_moves = self._build_tip_motor_moves(
-            prep_move_dist=instrument.pick_up_configurations.prep_move_distance,
-            clamp_move_dist=instrument.pick_up_configurations.distance,
-            prep_move_speed=instrument.pick_up_configurations.prep_move_speed,
-            clamp_move_speed=instrument.pick_up_configurations.speed,
+            prep_move_dist=pick_up_config.prep_move_distance,
+            clamp_move_dist=pick_up_config.distance,
+            prep_move_speed=pick_up_config.prep_move_speed,
+            clamp_move_speed=pick_up_config.speed,
             plunger_current=instrument.plunger_motor_current.run,
-            tip_motor_current=instrument.nozzle_manager.get_tip_configuration_current(),
+            tip_motor_current=pick_up_config.current_by_tip_count[tip_count],
         )
 
         return TipActionSpec(
             tip_action_moves=tip_motor_moves,
             shake_off_moves=[],
-            z_distance_to_tiprack=(-1 * instrument.connect_tiprack_distance_mm),
-            ending_z_retract_distance=instrument.end_tip_action_retract_distance_mm,
+            z_distance_to_tiprack=(-1 * pick_up_config.connect_tiprack_distance_mm),
+            ending_z_retract_distance=instrument.config.end_tip_action_retract_distance_mm,
         )
 
     def plan_lt_pick_up_tip(
         self,
         mount: OT3Mount,
+        tip_count: int,
         presses: Optional[int],
         increment: Optional[float],
     ) -> TipActionSpec:
@@ -765,17 +774,22 @@ class OT3PipetteHandler:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
+        pick_up_config = instrument.get_pick_up_configuration_for_tip_count(tip_count)
+        if not isinstance(pick_up_config, PressFitPickUpTipConfiguration):
+            raise CommandPreconditionViolated(
+                f"Low-throughput pick up tip got wrong config for {instrument.name} on {mount.name}"
+            )
         if presses is None or presses < 0:
-            checked_presses = instrument.pick_up_configurations.presses
+            checked_presses = pick_up_config.presses
         else:
             checked_presses = presses
 
         if not increment or increment < 0:
-            check_incr = instrument.pick_up_configurations.increment
+            check_incr = pick_up_config.increment
         else:
             check_incr = increment
 
-        pick_up_speed = instrument.pick_up_configurations.speed
+        pick_up_speed = pick_up_config.speed
 
         def build_presses() -> List[TipActionMoveSpec]:
             # Press the nozzle into the tip <presses> number of times,
@@ -783,18 +797,15 @@ class OT3PipetteHandler:
             press_moves = []
             for i in range(checked_presses):
                 # move nozzle down into the tip
-                press_dist = (
-                    -1.0 * instrument.pick_up_configurations.distance
-                    + -1.0 * check_incr * i
-                )
+                press_dist = -1.0 * pick_up_config.distance + -1.0 * check_incr * i
                 press_moves.append(
                     TipActionMoveSpec(
                         distance=press_dist,
                         speed=pick_up_speed,
                         currents={
-                            Axis.by_mount(
-                                mount
-                            ): instrument.nozzle_manager.get_tip_configuration_current()
+                            Axis.by_mount(mount): pick_up_config.current_by_tip_count[
+                                tip_count
+                            ]
                         },
                     )
                 )
@@ -840,15 +851,17 @@ class OT3PipetteHandler:
         mount: OT3Mount,
     ) -> TipActionSpec:
         instrument = self.get_pipette(mount)
-
+        config = instrument.drop_configurations.plunger_eject
+        if not config:
+            raise CommandPreconditionViolated(
+                f"No plunger-eject drop tip configurations for {instrument.name} on {mount.name}"
+            )
         drop_seq = [
             TipActionMoveSpec(
                 distance=instrument.plunger_positions.drop_tip,
-                speed=instrument.drop_configurations.speed,
+                speed=config.speed,
                 currents={
-                    Axis.of_main_tool_actuator(
-                        mount
-                    ): instrument.drop_configurations.current,
+                    Axis.of_main_tool_actuator(mount): config.current,
                 },
             ),
             TipActionMoveSpec(
@@ -870,14 +883,19 @@ class OT3PipetteHandler:
     def plan_ht_drop_tip(self) -> TipActionSpec:
         mount = OT3Mount.LEFT
         instrument = self.get_pipette(mount)
+        config = instrument.drop_configurations.cam_action
+        if not config:
+            raise CommandPreconditionViolated(
+                f"No cam-action drop tip configurations for {instrument.name} on {mount.name}"
+            )
 
         drop_seq = self._build_tip_motor_moves(
-            prep_move_dist=instrument.drop_configurations.prep_move_distance,
-            clamp_move_dist=instrument.drop_configurations.distance,
-            prep_move_speed=instrument.drop_configurations.prep_move_speed,
-            clamp_move_speed=instrument.drop_configurations.speed,
+            prep_move_dist=config.prep_move_distance,
+            clamp_move_dist=config.distance,
+            prep_move_speed=config.prep_move_speed,
+            clamp_move_speed=config.speed,
             plunger_current=instrument.plunger_motor_current.run,
-            tip_motor_current=instrument.drop_configurations.current,
+            tip_motor_current=config.current,
         )
 
         return TipActionSpec(

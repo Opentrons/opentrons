@@ -4,8 +4,13 @@ import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, TYPOGRAPHY } from '../../ui-style-constants'
+import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  JUSTIFY_CENTER,
+  TEXT_ALIGN_CENTER,
+} from '../../styles'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
@@ -69,32 +74,38 @@ interface WasteChuteProps {
 
 /**
  * a deck map foreign object representing the physical location of the waste chute connected to the deck
- * based on preliminary designs
- * TODO(bh, 2023-10-11): when designs and definitions settled, resolve position details etc
  */
 export function WasteChute(props: WasteChuteProps): JSX.Element {
   const { wasteIconColor, backgroundColor } = props
 
   return (
     <RobotCoordsForeignObject
-      width={145}
-      height={104}
+      width={130}
+      height={138}
       x={322}
-      y={-13}
+      y={-51}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColor}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius="6px"
         color={wasteIconColor}
         flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
         justifyContent={JUSTIFY_CENTER}
+        padding={SPACING.spacing8}
         width="100%"
       >
-        <Icon name="trash" color={wasteIconColor} height="3.5rem" />
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>Waste chute</Text>
+        <Icon name="trash" color={wasteIconColor} height="2rem" />
+        <Text
+          color={COLORS.white}
+          textAlign={TEXT_ALIGN_CENTER}
+          css={TYPOGRAPHY.bodyTextSemiBold}
+        >
+          Waste chute
+        </Text>
       </Flex>
     </RobotCoordsForeignObject>
   )

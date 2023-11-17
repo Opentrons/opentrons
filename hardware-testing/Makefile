@@ -97,6 +97,12 @@ test-photometric-single:
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --dye-well-col-offset 3
 	-$(MAKE) remove-patches-gravimetric
 
+.PHONY: test-photometric-multi
+test-photometric-multi:
+	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 8 --tip 50
+	-$(MAKE) remove-patches-gravimetric
+
 .PHONY: test-photometric
 test-photometric:
 	-$(MAKE) apply-patches-gravimetric

@@ -6,7 +6,12 @@ from time import sleep
 from typing import List, Tuple
 from typing_extensions import Final, Literal
 
+from hardware_testing.data import ui
 from opentrons.types import Point
+
+from serial.tools.list_ports import comports  # type: ignore[import]
+from serial import SerialException
+from hardware_testing.drivers import list_ports_and_select
 
 FIXTURE_REBOOT_TIME = 2
 FIXTURE_NUM_CHANNELS: Final[int] = 8
@@ -96,6 +101,40 @@ class SimPressureFixture(PressureFixtureBase):
         """Read Pressure for all channels."""
         pressure = [random.uniform(2.5, 2) for _ in range(FIXTURE_NUM_CHANNELS)]
         return pressure
+
+
+def connect_to_fixture(
+    simulate: bool, side: str = "left", autosearch: bool = True
+) -> PressureFixtureBase:
+    """Try to find and return an presure fixture, if not found return a simulator."""
+    ui.print_title("Connecting to presure fixture")
+    if not simulate:
+        if not autosearch:
+            port = list_ports_and_select(device_name="Pressure fixture")
+            fixture = PressureFixture.create(port=port, slot_side=side)
+            fixture.connect()
+            ui.print_info(f"Found fixture on port {port}")
+            return fixture
+        else:
+            ports = comports()
+            assert ports
+            for _port in ports:
+                port = _port.device  # type: ignore[attr-defined]
+                try:
+                    ui.print_info(
+                        f"Trying to connect to Pressure fixture on port {port}"
+                    )
+                    fixture = PressureFixture.create(port=port, slot_side=side)
+                    fixture.connect()
+                    ui.print_info(f"Found fixture on port {port}")
+                    return fixture
+                except:  # noqa: E722
+                    pass
+            use_sim = ui.get_user_answer("No pressure sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no fixture found returning simulator")
+    return SimPressureFixture()
 
 
 class PressureFixture(PressureFixtureBase):
