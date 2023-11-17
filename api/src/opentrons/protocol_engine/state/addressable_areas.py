@@ -24,8 +24,9 @@ from ..types import (
     AddressableAreaLocation,
     AddressableArea,
     PotentialCutoutFixture,
+    DeckConfigurationType,
 )
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, UpdateCommandAction, PlayAction
 from .config import Config
 from .abstract_store import HasState, HandlesActions
 
@@ -69,7 +70,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     def __init__(
         self,
-        deck_configuration: DeckConfiguration,
+        deck_configuration: DeckConfigurationType,
         config: Config,
         deck_definition: DeckDefinitionV4,
     ) -> None:
@@ -77,14 +78,12 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         if config.use_simulated_deck_config:
             loaded_addressable_areas_by_name = {}
         else:
-            addressable_areas = self._get_addressable_areas_from_deck_configuration(
-                deck_configuration,
-                deck_definition,
+            loaded_addressable_areas_by_name = (
+                self._get_addressable_areas_from_deck_configuration(
+                    deck_configuration,
+                    deck_definition,
+                )
             )
-            loaded_addressable_areas_by_name = {
-                area.area_name: area for area in addressable_areas
-            }
-
         self._state = AddressableAreaState(
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
@@ -96,7 +95,15 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
-        # TODO have an action to reload the deck configuration.
+        if isinstance(action, PlayAction):
+            current_state = self._state
+            if action.deck_configuration is not None:
+                self._state.loaded_addressable_areas_by_name = (
+                    self._get_addressable_areas_from_deck_configuration(
+                        deck_config=action.deck_configuration,
+                        deck_definition=current_state.deck_definition,
+                    )
+                )
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -120,7 +127,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
     @staticmethod
     def _get_addressable_areas_from_deck_configuration(
         deck_config: DeckConfiguration, deck_definition: DeckDefinitionV4
-    ) -> List[AddressableArea]:
+    ) -> Dict[str, AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
         # TODO uncomment once execute is hooked up with this properly
         # assert (
@@ -144,7 +151,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                         deck_definition,
                     )
                 )
-        return addressable_areas
+        return {area.area_name: area for area in addressable_areas}
 
     def _check_location_is_addressable_area(
         self, location: Union[DeckSlotLocation, AddressableAreaLocation, str]

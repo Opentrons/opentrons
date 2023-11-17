@@ -138,6 +138,30 @@ def test_load_virtual_pipette_nozzle_layout(
     assert result.front_right == "E1"
     assert result.back_left == "A1"
 
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-pipette", "p300_multi_v2.1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-pipette")
+    assert result.configuration.value == "FULL"
+
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-96-pipette", "p1000_96_v3.5", "A1", "A12", "A1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
+    assert result.configuration.value == "ROW"
+
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-96-pipette", "p1000_96_v3.5", "A1", "A1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
+    assert result.configuration.value == "SINGLE"
+
+    subject_instance.configure_virtual_pipette_nozzle_layout(
+        "my-96-pipette", "p1000_96_v3.5", "A1", "H1"
+    )
+    result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
+    assert result.configuration.value == "COLUMN"
+
 
 def test_get_pipette_static_config(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,

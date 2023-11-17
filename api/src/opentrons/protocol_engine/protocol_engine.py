@@ -24,6 +24,7 @@ from .types import (
     Liquid,
     HexColor,
     PostRunHardwareState,
+    DeckConfigurationType,
 )
 from .execution import (
     QueueWorker,
@@ -133,13 +134,13 @@ class ProtocolEngine:
         """Add a plugin to the engine to customize behavior."""
         self._plugin_starter.start(plugin)
 
-    def play(self) -> None:
+    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume executing commands in the queue."""
         requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
         action = self._state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=requested_at)
+            PlayAction(requested_at=requested_at, deck_configuration=deck_configuration)
         )
         self._action_dispatcher.dispatch(action)
 

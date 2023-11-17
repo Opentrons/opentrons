@@ -4,7 +4,6 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-# from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
     MovementMixin,
@@ -48,7 +47,7 @@ class MoveToAddressableAreaImplementation(
         self, params: MoveToAddressableAreaParams
     ) -> MoveToAddressableAreaResult:
         """Move the requested pipette to the requested addressable area."""
-        raise NotImplementedError()
+        return MoveToAddressableAreaResult()
 
 
 class MoveToAddressableArea(

@@ -125,7 +125,11 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           fixtureLocation={cutoutId}
         />
       ))}
-      <SlotLabels robotType={FLEX_ROBOT_TYPE} color={darkFill} />
+      <SlotLabels
+        robotType={FLEX_ROBOT_TYPE}
+        color={darkFill}
+        show4thColumn={stagingAreaFixtures.length > 0}
+      />
       {children}
     </RobotCoordinateSpace>
   )

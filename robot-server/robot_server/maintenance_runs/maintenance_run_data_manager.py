@@ -14,6 +14,8 @@ from opentrons.protocol_engine import (
 from .maintenance_engine_store import MaintenanceEngineStore
 from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 
+from opentrons.protocol_engine.types import DeckConfigurationType
+
 
 def _build_run(
     run_id: str,
@@ -73,6 +75,7 @@ class MaintenanceRunDataManager:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
     ) -> MaintenanceRun:
         """Create a new, current maintenance run.
 
@@ -91,6 +94,7 @@ class MaintenanceRunDataManager:
             run_id=run_id,
             created_at=created_at,
             labware_offsets=labware_offsets,
+            deck_configuration=deck_configuration,
         )
 
         return _build_run(

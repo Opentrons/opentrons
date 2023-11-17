@@ -12,9 +12,12 @@ import {
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
+  getWellRange,
 } from './utils'
-
-import type { PipettingRunTimeCommand } from '@opentrons/shared-data'
+import type {
+  PipetteName,
+  PipettingRunTimeCommand,
+} from '@opentrons/shared-data'
 
 interface PipettingCommandTextProps {
   command: PipettingRunTimeCommand
@@ -109,8 +112,20 @@ export const PipettingCommandText = ({
           })
     }
     case 'pickUpTip': {
+      const pipetteId = command.params.pipetteId
+      const pipetteName:
+        | PipetteName
+        | undefined = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
       return t('pickup_tip', {
-        well_name: wellName,
+        well_range: getWellRange(
+          pipetteId,
+          allPreviousCommands,
+          wellName,
+          pipetteName
+        ),
         labware: getLabwareName(robotSideAnalysis, labwareId),
         labware_location: displayLocation,
       })
@@ -125,6 +140,10 @@ export const PipettingCommandText = ({
     case 'blowOutInPlace': {
       const { flowRate } = command.params
       return t('blowout_in_place', { flow_rate: flowRate })
+    }
+    case 'aspirateInPlace': {
+      const { flowRate, volume } = command.params
+      return t('aspirate_in_place', { volume, flow_rate: flowRate })
     }
     default: {
       console.warn(

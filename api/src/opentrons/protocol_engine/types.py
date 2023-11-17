@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field, validator
-from typing import Optional, Union, List, Dict, Any, NamedTuple
+from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -774,3 +774,6 @@ NozzleLayoutConfigurationType = Union[
     RowNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
 ]
+
+# TODO make the below some sort of better type
+DeckConfigurationType = List[Tuple[str, str]]

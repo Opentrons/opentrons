@@ -1756,14 +1756,14 @@ def test_is_edge_move_unsafe(
             lazy_fixture("thermocycler_v2_def"),
             LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=5.6),
             ),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0.5),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=1.0),
             ),
         ),
         (

@@ -112,7 +112,9 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                 labwareLocation: location,
                 definition: labwareDef,
               },
-            ]}
+            ].filter(
+              () => !('moduleModel' in location && location.moduleModel != null)
+            )}
             deckConfig={deckConfig}
           />
         </Flex>

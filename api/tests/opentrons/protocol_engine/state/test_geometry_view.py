@@ -1116,15 +1116,22 @@ def test_get_tip_drop_location_with_non_tiprack(
     )
 
 
-def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
+def test_get_tip_drop_explicit_location(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    subject: GeometryView,
+    tip_rack_def: LabwareDefinition,
+) -> None:
     """It should pass the location through if origin is not WellOrigin.DROP_TIP."""
+    decoy.when(labware_view.get_definition("tip-rack-id")).then_return(tip_rack_def)
+
     input_location = DropTipWellLocation(
         origin=DropTipWellOrigin.TOP,
         offset=WellOffset(x=1, y=2, z=3),
     )
 
     result = subject.get_checked_tip_drop_location(
-        pipette_id="pipette-id", labware_id="labware-id", well_location=input_location
+        pipette_id="pipette-id", labware_id="tip-rack-id", well_location=input_location
     )
 
     assert result == WellLocation(
