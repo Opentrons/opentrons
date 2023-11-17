@@ -129,6 +129,9 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from None
 
 
+# TODO(jbl 11-17-2023) this function's original purpose was ensure a valid deck slot for a given robot type
+#   With deck configuration, the shape of this should change to better represent it checking if a deck slot
+#   (and maybe any addressable area) being valid for that deck configuration
 def ensure_and_convert_deck_slot(
     deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
 ) -> Union[DeckSlotName, StagingSlotName]:
@@ -153,7 +156,7 @@ def ensure_and_convert_deck_slot(
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
-    if deck_slot in {"A4", "B4", "C4", "D4"}:
+    if str(deck_slot).upper() in {"A4", "B4", "C4", "D4"}:
         if api_version < APIVersion(2, 16):
             raise APIVersionError(
                 f"Using a staging deck slot requires apiLevel {_STAGING_DECK_SLOT_VERSION_GATE}."

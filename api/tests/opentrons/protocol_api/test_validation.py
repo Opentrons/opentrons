@@ -134,9 +134,9 @@ def test_ensure_pipette_input_invalid(input_value: str) -> None:
         ("A3", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_A3),
         # Staging slots:
         ("A4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_A4),
-        ("B4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_B4),
+        ("b4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_B4),
         ("C4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_C4),
-        ("D4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_D4),
+        ("d4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_D4),
     ],
 )
 def test_ensure_and_convert_deck_slot(

@@ -19,6 +19,7 @@ See :ref:`off-deck-location` for details on using ``OFF_DECK`` with :py:obj:`Pro
 """
 
 
+# TODO(jbl 11-17-2023) move this away from being an Enum and make this a NewType or something similar
 class StagingSlotName(enum.Enum):
     """Staging slot identifiers."""
 
@@ -29,7 +30,7 @@ class StagingSlotName(enum.Enum):
 
     @classmethod
     def from_primitive(cls, value: str) -> StagingSlotName:
-        str_val = str(value).upper()
+        str_val = value.upper()
         return cls(str_val)
 
     @property
