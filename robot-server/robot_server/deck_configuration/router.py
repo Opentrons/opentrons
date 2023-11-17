@@ -37,6 +37,13 @@ router = fastapi.APIRouter()
         " configuration, such as loading a labware into a staging area slot that this deck"
         " configuration doesn't provide, the run command will fail with an error."
         "\n\n"
+        "**Warning:**"
+        " Currently, you can call this endpoint at any time, even while there is an active run."
+        " However, the robot can't adapt to deck configuration changes in the middle of a run."
+        " The robot will effectively take a snapshot of the deck configuration when the run is"
+        " first played. In the future, this endpoint may error if you try to call it in the middle"
+        " of an active run, so don't rely on being able to do that."
+        "\n\n"
         "After you set the deck configuration, it will persist, even across reboots,"
         " until you set it to something else."
     ),
