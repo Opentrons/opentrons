@@ -23,14 +23,12 @@ import {
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  getDeckDefFromRobotType,
   AddressableAreaName,
-  CutoutId,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
-import { uuid } from '../../utils'
+import { getCutoutIdByAddressableArea, uuid } from '../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -50,8 +48,6 @@ import {
   COLUMN_4_SLOTS,
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
-  OT_2_TRASH_DEF_URI,
-  FLEX_TRASH_DEF_URI,
 } from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
 import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
@@ -1335,11 +1331,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
       const isFlex = file.robot.model === FLEX_ROBOT_TYPE
-      const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-      const cutoutFixtures = deckDef.cutoutFixtures
-      const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot')
-      )?.providesAddressableAreas
 
       const hasGripperCommands = Object.values(file.commands).some(
         (command): command is MoveLabwareCreateCommand =>
@@ -1392,26 +1383,13 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ]),
       ]
 
-      const findCutoutIdByAddressableArea = (
-        addressableAreaName: AddressableAreaName
-      ): CutoutId | null => {
-        if (providesAddressableAreasForAddressableArea != null) {
-          for (const cutoutId in providesAddressableAreasForAddressableArea) {
-            if (
-              providesAddressableAreasForAddressableArea[
-                cutoutId as keyof typeof providesAddressableAreasForAddressableArea
-              ].includes(addressableAreaName)
-            ) {
-              return cutoutId as CutoutId
-            }
-          }
-        }
-        return null
-      }
-
       const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
         const stagingAreaId = `${uuid()}:stagingArea`
-        const cutoutId = findCutoutIdByAddressableArea(slot)
+        const cutoutId = getCutoutIdByAddressableArea(
+          slot,
+          'stagingAreaRightSlot',
+          isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+        )
         return {
           ...acc,
           [stagingAreaId]: {
@@ -1434,8 +1412,10 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         trashBinCommand?.params.addressableAreaName
 
       const trashBinId = `${uuid()}:trashBin`
-      const trashCutoutId = findCutoutIdByAddressableArea(
-        trashAddressableAreaName as AddressableAreaName
+      const trashCutoutId = getCutoutIdByAddressableArea(
+        trashAddressableAreaName as AddressableAreaName,
+        isFlex ? 'trashBinAdapter' : 'fixedTrashSlot',
+        isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
       )
       const trashBin =
         trashAddressableAreaName != null

@@ -1,11 +1,7 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {
-  getIsTiprack,
-  getLabwareDisplayName,
-  getLabwareHasQuirk,
-} from '@opentrons/shared-data'
+import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   AdditionalEquipmentEntity,
   COLUMN_4_SLOTS,
@@ -164,7 +160,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
     )
 
     const trashOption: Options =
-      trash != null ? [{ name: TRASH, value: trash?.id }] : []
+      trash != null ? [{ name: TRASH, value: trash?.id ?? '' }] : []
 
     const options = [...trashOption, ...labwareOptions]
 
@@ -178,17 +174,13 @@ export const getDisposalLabwareOptions: Selector<Options> = createSelector(
   additionalEquipment =>
     reduce(
       additionalEquipment,
-      (
-        acc: Options,
-        additionalEquipment: AdditionalEquipmentEntity,
-        aeId
-      ): Options =>
+      (acc: Options, additionalEquipment: AdditionalEquipmentEntity): Options =>
         additionalEquipment.name === 'trashBin'
           ? [
               ...acc,
               {
                 name: TRASH,
-                value: aeId,
+                value: additionalEquipment.location ?? '',
               },
             ]
           : acc,

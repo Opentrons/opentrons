@@ -32,8 +32,6 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-  OT_2_TRASH_DEF_URI,
-  FLEX_TRASH_DEF_URI,
 } from '../../constants'
 import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -91,15 +89,10 @@ export const getLabwareDefinitionsInUse = (
   ])
 
   return labwareDefURIsInUse.reduce<LabwareDefByDefURI>(
-    (acc, labwareDefURI: string) => {
-      if (
-        labwareDefURI !== FLEX_TRASH_DEF_URI &&
-        labwareDefURI !== OT_2_TRASH_DEF_URI
-      ) {
-        acc[labwareDefURI] = allLabwareDefsByURI[labwareDefURI]
-      }
-      return acc
-    },
+    (acc, labwareDefURI: string) => ({
+      ...acc,
+      [labwareDefURI]: allLabwareDefsByURI[labwareDefURI],
+    }),
     {}
   )
 }
