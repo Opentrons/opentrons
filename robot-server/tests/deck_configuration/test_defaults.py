@@ -1,3 +1,5 @@
+from typing_extensions import Final
+
 import pytest
 
 from opentrons_shared_data import deck
@@ -7,7 +9,7 @@ from robot_server.deck_configuration import validation
 from robot_server.deck_configuration import validation_mapping
 
 
-DECK_DEFINITION_VERSION = 4
+DECK_DEFINITION_VERSION: Final = 4
 
 
 @pytest.mark.parametrize(
