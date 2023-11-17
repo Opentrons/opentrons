@@ -18,6 +18,9 @@ stages:
           - id: deckCalibration
             name: Deck Calibration
             description: !re_search 'Clear deck calibration'
+          - id: deckConfiguration
+            name: Deck Configuration
+            description: !re_search 'Clear deck configuration'
           - id: pipetteOffsetCalibrations
             name: Pipette Offset Calibrations
             description: !re_search 'Clear pipette offset calibrations'
@@ -26,7 +29,7 @@ stages:
             description: !re_search 'Clear tip length calibrations'
           - id: runsHistory
             name: Clear Runs History
-            description: !re_search 'Erase this device''s stored history of protocols and runs.'
+            description: !re_search "Erase this device's stored history of protocols and runs."
           - id: authorizedKeys
             name: SSH Authorized Keys
             description: !re_search 'Clear the ssh authorized keys'
@@ -84,6 +87,32 @@ stages:
       json:
         message: 'Nothing to do'
 ---
+test_name: POST Reset deck configuration option
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+stages:
+  - name: POST Reset deckCalibration true
+    request:
+      url: '{ot2_server_base_url}/settings/reset'
+      method: POST
+      json:
+        deckConfiguration: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'deck_configuration' were reset"
+  - name: POST Reset deckConfiguration false
+    request:
+      url: '{ot2_server_base_url}/settings/reset'
+      method: POST
+      json:
+        deckConfiguration: false
+    response:
+      status_code: 200
+      json:
+        message: 'Nothing to do'
+---
 test_name: POST Reset pipette offset calibrations option
 marks:
   - usefixtures:
@@ -113,7 +142,7 @@ stages:
 test_name: POST Reset gripper offset calibrations option for OT-2 raises
 marks:
   - usefixtures:
-    - ot2_server_base_url
+      - ot2_server_base_url
 stages:
   - name: POST Reset gripperOffsetCalibrations true fails on OT-2
     request:
@@ -124,8 +153,8 @@ stages:
     response:
       status_code: 403
       json:
-        message: "gripperOffsetCalibrations is not a valid reset option."
-        errorCode: "4000"
+        message: 'gripperOffsetCalibrations is not a valid reset option.'
+        errorCode: '4000'
 ---
 test_name: POST Reset authorizedKeys option
 marks:
@@ -168,4 +197,4 @@ stages:
       status_code: 422
       json:
         message: !re_search 'value is not a valid enumeration member'
-        errorCode: "4000"
+        errorCode: '4000'

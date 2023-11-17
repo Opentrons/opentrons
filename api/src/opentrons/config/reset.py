@@ -9,6 +9,7 @@ from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import (
     delete_robot_deck_attitude,
+    delete_robot_deck_configuration,
     gripper_offset,
     ot2,
     ot3,
@@ -35,6 +36,7 @@ class ResetOptionId(str, Enum):
 
     boot_scripts = "bootScripts"
     deck_calibration = "deckCalibration"
+    deck_configuration = "deckConfiguration"
     pipette_offset = "pipetteOffsetCalibrations"
     gripper_offset = "gripperOffsetCalibrations"
     tip_length_calibrations = "tipLengthCalibrations"
@@ -47,6 +49,7 @@ class ResetOptionId(str, Enum):
 _OT_2_RESET_OPTIONS = [
     ResetOptionId.boot_scripts,
     ResetOptionId.deck_calibration,
+    ResetOptionId.deck_configuration,
     ResetOptionId.pipette_offset,
     ResetOptionId.tip_length_calibrations,
     ResetOptionId.runs_history,
@@ -54,6 +57,7 @@ _OT_2_RESET_OPTIONS = [
 ]
 _FLEX_RESET_OPTIONS = [
     ResetOptionId.boot_scripts,
+    ResetOptionId.deck_configuration,
     ResetOptionId.pipette_offset,
     ResetOptionId.gripper_offset,
     ResetOptionId.runs_history,
@@ -69,6 +73,10 @@ _settings_reset_options = {
     ResetOptionId.deck_calibration: CommonResetOption(
         name="Deck Calibration",
         description="Clear deck calibration (will also clear pipette offset)",
+    ),
+    ResetOptionId.deck_configuration: CommonResetOption(
+        name="Deck Configuration",
+        description="Clear deck configuration",
     ),
     ResetOptionId.pipette_offset: CommonResetOption(
         name="Pipette Offset Calibrations",
@@ -128,6 +136,9 @@ def reset(options: Set[ResetOptionId], robot_type: RobotTypeEnum) -> None:
     if ResetOptionId.deck_calibration in options:
         reset_deck_calibration(robot_type)
 
+    if ResetOptionId.deck_configuration in options:
+        reset_deck_configuration()
+
     if ResetOptionId.pipette_offset in options:
         reset_pipette_offset(robot_type)
 
@@ -155,6 +166,10 @@ def reset_boot_scripts() -> None:
 def reset_deck_calibration(robot_type: RobotTypeEnum) -> None:
     delete_robot_deck_attitude()
     ot2.clear_pipette_offset_calibrations() if robot_type is RobotTypeEnum.OT2 else ot3.clear_pipette_offset_calibrations()
+
+
+def reset_deck_configuration() -> None:
+    delete_robot_deck_configuration()
 
 
 def reset_pipette_offset(robot_type: RobotTypeEnum) -> None:

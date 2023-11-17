@@ -34,6 +34,12 @@ def mock_reset_deck_calibration() -> Generator[MagicMock, None, None]:
 
 
 @pytest.fixture
+def mock_reset_deck_configuration() -> Generator[MagicMock, None, None]:
+    with patch("opentrons.config.reset.reset_deck_configuration") as m:
+        yield m
+
+
+@pytest.fixture
 def mock_reset_tip_length_calibrations() -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.reset.reset_tip_length_calibrations") as m:
         yield m
@@ -92,6 +98,7 @@ def test_reset_empty_set(
     mock_reset_boot_scripts: MagicMock,
     mock_reset_pipette_offset: MagicMock,
     mock_reset_deck_calibration: MagicMock,
+    mock_reset_deck_configuration: MagicMock,
     mock_reset_tip_length_calibrations: MagicMock,
     mock_cal_module_offset: MagicMock,
     robot_type_enum: RobotTypeEnum,
@@ -100,6 +107,7 @@ def test_reset_empty_set(
     mock_reset_boot_scripts.assert_not_called()
     mock_reset_pipette_offset.assert_not_called()
     mock_reset_deck_calibration.assert_not_called()
+    mock_reset_deck_configuration.assert_not_called()
     mock_reset_tip_length_calibrations.assert_not_called()
     mock_cal_module_offset.assert_not_called()
 
@@ -115,6 +123,7 @@ def test_reset_all_set(
         {
             reset.ResetOptionId.boot_scripts,
             reset.ResetOptionId.deck_calibration,
+            reset.ResetOptionId.deck_configuration,
             reset.ResetOptionId.pipette_offset,
             reset.ResetOptionId.tip_length_calibrations,
         },
@@ -122,6 +131,7 @@ def test_reset_all_set(
     )
     mock_reset_boot_scripts.assert_called_once()
     mock_reset_pipette_offset.assert_called_once()
+    mock_reset_deck_calibration.assert_called_once()
     mock_reset_deck_calibration.assert_called_once()
     mock_reset_tip_length_calibrations.assert_called_once()
 

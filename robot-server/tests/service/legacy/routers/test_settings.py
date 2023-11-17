@@ -511,6 +511,7 @@ def test_available_resets(api_client):
     assert sorted(
         [
             "deckCalibration",
+            "deckConfiguration",
             "pipetteOffsetCalibrations",
             "bootScripts",
             "tipLengthCalibrations",

@@ -206,7 +206,7 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
 
 @router.get(
     "/settings/reset/options",
-    description="Get the settings that can be reset as part of " "factory reset",
+    description="Get the settings that can be reset as part of factory reset",
     response_model=FactoryResetOptions,
 )
 async def get_settings_reset_options(
