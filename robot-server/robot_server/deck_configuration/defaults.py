@@ -1,14 +1,6 @@
-"""Default deck configurations.
-
-When a user has not yet said which fixtures (standard slots, expansion slots, etc.) are on
-a robot, the robot will fall back to these.
-
-Protocol analysis should *not* use these. It's supposed to determine the protocol's deck
-configuration requirements, instead of assuming some default deck configuration.
-"""
+"""Default deck configurations."""
 
 
-from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from . import models
 
 
@@ -97,6 +89,18 @@ _for_ot2 = models.DeckConfigurationRequest.construct(
 
 
 def for_deck_definition(deck_definition_name: str) -> models.DeckConfigurationRequest:
+    """Return a default configuration for the given deck definition.
+
+    When a user has not yet configured which fixtures are on a robot, the robot should fall back to
+    this for the purposes of running protocols.
+
+    Protocol analysis should *not* use this default. Analysis is supposed to *determine* the
+    protocol's deck configuration requirements, instead of assuming some default.
+
+    Params:
+        deck_definition_name: The name of a deck definition loadable through
+            `opentrons_shared_data.deck`.
+    """
     try:
         return {
             "ot2_standard": _for_ot2,

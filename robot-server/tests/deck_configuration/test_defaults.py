@@ -1,3 +1,6 @@
+"""Unit tests for robot_server.deck_configuration.defaults."""
+
+
 from typing_extensions import Final
 
 import pytest
@@ -16,6 +19,7 @@ DECK_DEFINITION_VERSION: Final = 4
     "deck_definition_name", deck.list_names(DECK_DEFINITION_VERSION)
 )
 def test_defaults(deck_definition_name: str) -> None:
+    """Make sure there's a valid default for every possible deck definition."""
     deck_definition = deck.load(deck_definition_name, DECK_DEFINITION_VERSION)
     result = subject.for_deck_definition(deck_definition_name)
     assert (
