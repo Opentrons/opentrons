@@ -142,21 +142,21 @@ export function FixtureListItem({
 
   return (
     <>
-      {showNotConfiguredModal && cutoutFixtureId != null ? (
+      {showNotConfiguredModal ? (
         <NotConfiguredModal
           onCloseClick={() => setShowNotConfiguredModal(false)}
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
-      {showLocationConflictModal && cutoutFixtureId != null ? (
+      {showLocationConflictModal ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
-      {showSetupInstructionsModal && cutoutFixtureId != null ? (
+      {showSetupInstructionsModal ? (
         <DeckFixtureSetupInstructionsModal
           setShowSetupInstructionsModal={setShowSetupInstructionsModal}
         />
