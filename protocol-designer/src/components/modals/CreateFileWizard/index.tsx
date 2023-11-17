@@ -220,16 +220,12 @@ export function CreateFileWizard(): JSX.Element | null {
       ) {
         // defaulting trash to appropriate locations
         dispatch(
-          labwareIngredActions.createContainer({
-            labwareDefURI:
-              values.fields.robotType === FLEX_ROBOT_TYPE
-                ? FLEX_TRASH_DEF_URI
-                : OT_2_TRASH_DEF_URI,
-            slot:
-              values.fields.robotType === FLEX_ROBOT_TYPE
-                ? getTrashSlot(values)
-                : 'cutout12',
-          })
+          createDeckFixture(
+            'trashBin',
+            values.fields.robotType === FLEX_ROBOT_TYPE
+              ? 'cutoutA3'
+              : 'cutout12'
+          )
         )
       }
 

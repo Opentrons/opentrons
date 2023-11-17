@@ -1187,38 +1187,7 @@ export const labwareInvariantProperties: Reducer<
           {}
         ),
       }
-
-      const trashBinCommand = Object.values(file.commands).find(
-        (command): command is MoveToAddressableAreaCreateCommand =>
-          command.commandType === 'moveToAddressableArea' &&
-          (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-            command.params.addressableAreaName
-          ) ||
-            command.params.addressableAreaName === 'fixedTrash')
-      )
-      const trashAddressableAreaName =
-        trashBinCommand?.params.addressableAreaName
-
-      const trashBinId = `${uuid()}:trashBin`
-      const trashBin: NormalizedLabwareById | null =
-        trashBinCommand != null
-          ? {
-              [trashBinId]: {
-                labwareDefURI:
-                  trashAddressableAreaName === 'fixedTrash'
-                    ? OT_2_TRASH_DEF_URI
-                    : FLEX_TRASH_DEF_URI,
-              },
-            }
-          : null
-
-      if (trashBinCommand == null && file.robot.model === OT2_ROBOT_TYPE) {
-        console.error(
-          'expected to find a fixedTrash command for the OT-2 but could not'
-        )
-      }
-
-      return { ...labware, ...trashBin, ...state }
+      return { ...labware, ...state }
     },
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,
@@ -1453,6 +1422,39 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         }
       }, {})
 
+      const trashBinCommand = Object.values(file.commands).find(
+        (command): command is MoveToAddressableAreaCreateCommand =>
+          command.commandType === 'moveToAddressableArea' &&
+          (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+            command.params.addressableAreaName
+          ) ||
+            command.params.addressableAreaName === 'fixedTrash')
+      )
+      const trashAddressableAreaName =
+        trashBinCommand?.params.addressableAreaName
+
+      const trashBinId = `${uuid()}:trashBin`
+      const trashCutoutId = findCutoutIdByAddressableArea(
+        trashAddressableAreaName as AddressableAreaName
+      )
+      const trashBin =
+        trashAddressableAreaName != null
+          ? {
+              [trashBinId]: {
+                name: 'trashBin' as const,
+                id: trashBinId,
+                //  TODO(should be type cutoutId when location is type cutoutId)
+                location: trashCutoutId as string,
+              },
+            }
+          : null
+
+      if (trashBinCommand == null && file.robot.model === OT2_ROBOT_TYPE) {
+        console.error(
+          'expected to find a fixedTrash command for the OT-2 but could not'
+        )
+      }
+
       const gripperId = `${uuid()}:gripper`
       const gripper = hasGripperCommands
         ? {
@@ -1464,9 +1466,15 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         : {}
 
       if (isFlex) {
-        return { ...state, ...gripper, ...wasteChute, ...stagingAreas }
+        return {
+          ...state,
+          ...gripper,
+          ...trashBin,
+          ...wasteChute,
+          ...stagingAreas,
+        }
       } else {
-        return { ...state }
+        return { ...state, ...trashBin }
       }
     },
 

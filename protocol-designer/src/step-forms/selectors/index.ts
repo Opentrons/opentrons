@@ -230,11 +230,15 @@ const _getInitialDeckSetup = (
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
 
   // filtering only the additionalEquipmentEntities that are rendered on the deck
-  // which for now is wasteChute and stagingArea
+  // which for now is wasteChute, trashBin, and stagingArea
   const additionalEquipmentEntitiesOnDeck = Object.values(
     additionalEquipmentEntities
   ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
-    if (ae.name === 'wasteChute' || ae.name === 'stagingArea') {
+    if (
+      ae.name === 'wasteChute' ||
+      ae.name === 'stagingArea' ||
+      ae.name === 'trashBin'
+    ) {
       aeEntities[ae.id] = ae
     }
     return aeEntities

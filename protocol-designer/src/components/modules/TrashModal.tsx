@@ -25,9 +25,10 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
-import { createContainer, deleteContainer } from '../../labware-ingred/actions'
-import { FLEX_TRASH_DEF_URI } from '../../constants'
-import { createDeckFixture } from '../../step-forms/actions/additionalItems'
+import {
+  createDeckFixture,
+  deleteDeckFixture,
+} from '../../step-forms/actions/additionalItems'
 import { getSlotIsEmpty } from '../../step-forms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { SlotDropdown } from '../modals/EditModulesModal/SlotDropdown'
@@ -161,24 +162,10 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
 
   const onSaveClick = (values: TrashValues): void => {
     if (trashName === 'trashBin' && trashBinId == null) {
-      dispatch(
-        createContainer({
-          labwareDefURI: FLEX_TRASH_DEF_URI,
-          slot: values.selectedSlot,
-        })
-      )
+      dispatch(createDeckFixture('trashBin', values.selectedSlot))
     } else if (trashName === 'trashBin' && trashBinId != null) {
-      dispatch(
-        deleteContainer({
-          labwareId: trashBinId,
-        })
-      )
-      dispatch(
-        createContainer({
-          labwareDefURI: FLEX_TRASH_DEF_URI,
-          slot: values.selectedSlot,
-        })
-      )
+      dispatch(deleteDeckFixture(trashBinId))
+      dispatch(createDeckFixture('trashBin', values.selectedSlot))
     } else if (trashName === 'wasteChute') {
       dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
     }

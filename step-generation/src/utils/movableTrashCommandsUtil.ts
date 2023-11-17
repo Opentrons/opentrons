@@ -11,7 +11,6 @@ import {
 } from '../commandCreators/atomic'
 import * as errorCreators from '../errorCreators'
 import { reduceCommandCreators } from './reduceCommandCreators'
-import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type {
@@ -42,11 +41,10 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
   const { pipetteId, type, volume, flowRate } = args
   const errors: CommandCreatorError[] = []
   const pipetteName = invariantContext.pipetteEntities[pipetteId]?.name
-  const trashId = Object.values(invariantContext.labwareEntities).find(
-    labware =>
-      labware.labwareDefURI === FLEX_TRASH_DEF_URI ||
-      labware.labwareDefURI === OT_2_TRASH_DEF_URI
-  )?.id
+  const trashId = Object.values(
+    invariantContext.additionalEquipmentEntities
+  ).find(aE => aE.name === 'trashBin')?.id
+
   const trashLocation =
     trashId != null ? (prevRobotState.labware[trashId].slot as CutoutId) : null
 
