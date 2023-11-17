@@ -52,9 +52,7 @@ export function TrashBinConfigFixture(
     >
       <Flex css={TRASH_BIN_CONFIG_STYLE}>
         <Text
-          fontSize={TYPOGRAPHY.fontSize20}
-          lineHeight={TYPOGRAPHY.lineHeight24}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          css={TYPOGRAPHY.smallBodyTextSemiBold }
         >
           {TRASH_BIN_DISPLAY_NAME}
         </Text>

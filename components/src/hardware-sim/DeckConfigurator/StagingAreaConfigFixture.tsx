@@ -46,9 +46,7 @@ export function StagingAreaConfigFixture(
     >
       <Flex css={STAGING_AREA_CONFIG_STYLE}>
         <Text
-          fontSize={TYPOGRAPHY.fontSize20}
-          lineHeight={TYPOGRAPHY.lineHeight24}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          css={TYPOGRAPHY.smallBodyTextSemiBold }
         >
           {STAGING_AREA_DISPLAY_NAME}
         </Text>
