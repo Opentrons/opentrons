@@ -6,26 +6,13 @@ import { Btn, Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import {
+  FIXTURE_HEIGHT,
+  SINGLE_SLOT_FIXTURE_WIDTH,
+  TRASH_BIN_DISPLAY_NAME,
+} from './constants'
 
 import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
-
-// TODO: replace stubs with JSON definitions when available
-const trashBinDef = {
-  schemaVersion: 1,
-  version: 1,
-  namespace: 'opentrons',
-  metadata: {
-    displayName: 'Trash bin',
-  },
-  parameters: {
-    loadName: 'trash_bin',
-  },
-  boundingBox: {
-    xDimension: 246.5,
-    yDimension: 106.0,
-    zDimension: 0,
-  },
-}
 
 interface TrashBinConfigFixtureProps {
   deckDefinition: DeckDefinition
@@ -54,20 +41,18 @@ export function TrashBinConfigFixture(
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = trashBinDef.boundingBox
-
   return (
     <RobotCoordsForeignObject
-      width={xDimension}
-      height={yDimension}
+      width={SINGLE_SLOT_FIXTURE_WIDTH}
+      height={FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
       <Flex css={TRASH_BIN_CONFIG_STYLE}>
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>
-          {trashBinDef.metadata.displayName}
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
+          {TRASH_BIN_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Btn

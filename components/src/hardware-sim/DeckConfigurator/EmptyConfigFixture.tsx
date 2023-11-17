@@ -6,26 +6,9 @@ import { Btn, Flex } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import { FIXTURE_HEIGHT, SINGLE_SLOT_FIXTURE_WIDTH } from './constants'
 
 import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
-
-// TODO: replace stubs with JSON definitions when available
-const standardSlotDef = {
-  schemaVersion: 1,
-  version: 1,
-  namespace: 'opentrons',
-  metadata: {
-    displayName: 'standard slot',
-  },
-  parameters: {
-    loadName: 'standard_slot',
-  },
-  boundingBox: {
-    xDimension: 246.5,
-    yDimension: 106.0,
-    zDimension: 0,
-  },
-}
 
 interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition
@@ -56,12 +39,10 @@ export function EmptyConfigFixture(
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = standardSlotDef.boundingBox
-
   return (
     <RobotCoordsForeignObject
-      width={xDimension}
-      height={yDimension}
+      width={SINGLE_SLOT_FIXTURE_WIDTH}
+      height={FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
