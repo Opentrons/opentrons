@@ -20,6 +20,7 @@ from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
+    AddressableAreaLocation,
     ModuleLocation,
     OnLabwareLocation,
     ModuleModel as EngineModuleModel,
@@ -41,7 +42,7 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType, OFF_DECK
+from ..._types import OffDeckType, OFF_DECK, StagingSlotName
 from ..._liquid import Liquid
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
@@ -143,7 +144,12 @@ class ProtocolCore(
         self,
         load_name: str,
         location: Union[
-            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
         ],
         label: Optional[str],
         namespace: Optional[str],
@@ -204,7 +210,13 @@ class ProtocolCore(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
@@ -255,6 +267,7 @@ class ProtocolCore(
         labware_core: LabwareCore,
         new_location: Union[
             DeckSlotName,
+            StagingSlotName,
             LabwareCore,
             ModuleCore,
             NonConnectedModuleCore,
@@ -652,7 +665,12 @@ class ProtocolCore(
     def _convert_labware_location(
         self,
         location: Union[
-            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
         ],
     ) -> LabwareLocation:
         if isinstance(location, LabwareCore):
@@ -662,7 +680,13 @@ class ProtocolCore(
 
     @staticmethod
     def _get_non_stacked_location(
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
+        ]
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)
@@ -670,3 +694,5 @@ class ProtocolCore(
             return OFF_DECK_LOCATION
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
+        elif isinstance(location, StagingSlotName):
+            return AddressableAreaLocation(addressableAreaName=location.id)
