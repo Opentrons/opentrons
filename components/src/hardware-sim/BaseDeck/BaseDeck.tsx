@@ -22,6 +22,7 @@ import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../ui-style-constants'
 
+import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
@@ -66,7 +67,10 @@ interface BaseDeckProps {
   darkFill?: string
   children?: React.ReactNode
   showSlotLabels?: boolean
-  isOnDevice?: boolean
+  /** whether to make wrapping svg tag animatable via @react-spring/web, defaults to false */
+  animatedSVG?: boolean
+  /** extra props to pass to svg tag */
+  svgProps?: React.ComponentProps<typeof Svg>
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
@@ -81,7 +85,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     showExpansion = true,
     children,
     showSlotLabels = true,
-    isOnDevice = false,
+    animatedSVG = false,
+    svgProps = {},
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -112,6 +117,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+      animated={animatedSVG}
+      {...svgProps}
     >
       {robotType === OT2_ROBOT_TYPE ? (
         <DeckFromLayers
@@ -222,7 +229,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     definition={nestedLabwareDef}
                     onLabwareClick={onLabwareClick}
                     wellFill={nestedLabwareWellFill}
-                    isOnDevice={isOnDevice}
                   />
                 ) : null}
                 {moduleChildren}
@@ -260,7 +266,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   definition={definition}
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
-                  isOnDevice={isOnDevice}
                 />
                 {labwareChildren}
               </g>

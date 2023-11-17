@@ -46,6 +46,8 @@ export interface LabwareRenderProps {
   wellStroke?: WellStroke
   /** CSS color to stroke the labware outline */
   labwareStroke?: CSSProperties['stroke']
+  /** adds thicker blue border with blur to labware */
+  highlight?: boolean
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
@@ -54,12 +56,7 @@ export interface LabwareRenderProps {
     allows drag-to-select behavior */
   selectableWellClass?: string
   gRef?: React.RefObject<SVGGElement>
-  // adds blue border with drop shadow to labware
-  hover?: boolean
   onLabwareClick?: () => void
-  highlightLabware?: boolean
-  /** This will be used for displaying outline of labware */
-  isOnDevice?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -76,23 +73,21 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
         selectableWellClass={props.selectableWellClass}
-        hover={props.hover}
         onLabwareClick={props.onLabwareClick}
-        highlightLabware={props.highlightLabware}
-        isOnDevice={props.isOnDevice}
+        highlight={props.highlight}
       />
-      {props.wellStroke && (
+      {props.wellStroke != null ? (
         <StrokedWells
           definition={props.definition}
           strokeByWell={props.wellStroke}
         />
-      )}
-      {props.wellFill && (
+      ) : null}
+      {props.wellFill != null ? (
         <FilledWells
           definition={props.definition}
           fillByWell={props.wellFill}
         />
-      )}
+      ) : null}
       {props.disabledWells != null
         ? props.disabledWells.map((well, index) => (
             <StyledWells
@@ -103,36 +98,36 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
             />
           ))
         : null}
-      {props.highlightedWells && (
+      {props.highlightedWells != null ? (
         <StyledWells
           className={styles.highlighted_well}
           definition={props.definition}
           wells={props.highlightedWells}
         />
-      )}
-      {props.selectedWells && (
+      ) : null}
+      {props.selectedWells != null ? (
         <StyledWells
           className={styles.selected_well}
           definition={props.definition}
           wells={props.selectedWells}
         />
-      )}
-      {props.missingTips && (
+      ) : null}
+      {props.missingTips != null ? (
         <StyledWells
           className={styles.missing_tip}
           definition={props.definition}
           wells={props.missingTips}
         />
-      )}
-      {props.wellLabelOption &&
-        props.definition.metadata.displayCategory !== 'adapter' && (
-          <WellLabels
-            definition={props.definition}
-            wellLabelOption={props.wellLabelOption}
-            wellLabelColor={props.wellLabelColor}
-            highlightedWellLabels={props.highlightedWellLabels}
-          />
-        )}
+      ) : null}
+      {props.wellLabelOption != null &&
+      props.definition.metadata.displayCategory !== 'adapter' ? (
+        <WellLabels
+          definition={props.definition}
+          wellLabelOption={props.wellLabelOption}
+          wellLabelColor={props.wellLabelColor}
+          highlightedWellLabels={props.highlightedWellLabels}
+        />
+      ) : null}
     </g>
   )
 }

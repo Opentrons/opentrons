@@ -11,23 +11,25 @@ import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 
 export interface StaticLabwareProps {
+  /** Labware definition to render */
   definition: LabwareDefinition2
-  selectableWellClass?: string
-  onMouseEnterWell?: (e: WellMouseEvent) => unknown
-  onMouseLeaveWell?: (e: WellMouseEvent) => unknown
-  hover?: boolean
+  /** Add thicker blurred blue border to labware, defaults to false */
+  highlight?: boolean
+  /** Optional callback to be executed when entire labware element is clicked */
   onLabwareClick?: () => void
-  highlightLabware?: boolean
-  isOnDevice?: boolean
+  /** Optional callback to be executed when mouse enters a well element */
+  onMouseEnterWell?: (e: WellMouseEvent) => unknown
+  /** Optional callback to be executed when mouse leaves a well element */
+  onMouseLeaveWell?: (e: WellMouseEvent) => unknown
+  /** [legacy] css class to be added to well component if it is selectable */
+  selectableWellClass?: string
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
   well: LabwareWell
 }) {
   const { well } = props
-  // @ts-expect-error(mc, 2021-04-27): refine well type before accessing `diameter`
-  if (well.diameter) {
-    // @ts-expect-error(mc, 2021-04-27): refine well type before accessing `diameter`
+  if ('diameter' in well && well.diameter != null) {
     const radius = well.diameter / 2
     return (
       <circle className={styles.tip} cx={well.x} cy={well.y} r={radius - 1} />
@@ -44,9 +46,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
       <g className={styles.labware_detail_group}>
         <LabwareOutline
           definition={props.definition}
-          hover={props.hover}
-          highlight={props.highlightLabware === true}
-          isOnDevice={props.isOnDevice}
+          highlight={props.highlight}
         />
       </g>
       <g>
