@@ -18,7 +18,10 @@ import {
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../resources/deck_configuration/utils'
+import {
+  getRequiredDeckConfig,
+  getSimplestDeckConfigForProtocolCommands,
+} from '../../../resources/deck_configuration/utils'
 import {
   useIsFlex,
   useRobot,
@@ -121,7 +124,9 @@ export function ProtocolRunSetup({
     protocolAnalysis?.commands ?? []
   )
 
-  const hasFixtures = protocolDeckConfig.length > 0
+  const requiredDeckConfig = getRequiredDeckConfig(protocolDeckConfig)
+
+  const hasFixtures = requiredDeckConfig.length > 0
 
   let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
     count: modules.length,

@@ -344,13 +344,3 @@ export const getDeckDefFromRobotType = (
     ? standardFlexDeckDef
     : standardOt2DeckDef
 }
-
-// TODO(bh, 2023-11-09): delete this function
-export const getDeckDefFromRobotTypeV4 = (
-  robotType: RobotType
-): DeckDefinition => {
-  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard'
-    ? standardFlexDeckDef
-    : standardOt2DeckDef
-}

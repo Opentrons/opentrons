@@ -1,22 +1,21 @@
 import { parseAllAddressableAreas } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getAddressableAreaFromSlotId,
-  getDeckDefFromRobotTypeV4,
+  getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
 import type {
+  CutoutConfig,
   CutoutId,
   RunTimeCommand,
-  CutoutFixtureId,
   CutoutFixture,
   AddressableAreaName,
   DeckDefinition,
 } from '@opentrons/shared-data'
 
-export interface CutoutConfigProtocolSpec {
-  cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId | null
+export interface CutoutConfigProtocolSpec extends CutoutConfig {
   requiredAddressableAreas: AddressableAreaName[]
 }
 
@@ -87,7 +86,7 @@ export function getSimplestDeckConfigForProtocolCommands(
   protocolAnalysisCommands: RunTimeCommand[]
 ): CutoutConfigProtocolSpec[] {
   // TODO(BC, 2023-11-06): abstract out the robot type
-  const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const addressableAreas = parseAllAddressableAreas(protocolAnalysisCommands)
   const simplestDeckConfig = addressableAreas.reduce<
@@ -225,4 +224,22 @@ export function getSimplestFixtureForAddressableAreas(
     cutoutFixturesForCutoutId
   )
   return nextCompatibleCutoutFixtures?.[0] ?? null
+}
+
+export function getRequiredDeckConfig<T extends CutoutConfigProtocolSpec>(
+  deckConfigProtocolSpec: T[]
+): T[] {
+  const nonSingleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
+    ({ requiredAddressableAreas }) =>
+      // required AA list includes a non-single-slot AA
+      !requiredAddressableAreas.every(aa =>
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+      )
+  )
+  // fixture includes at least 1 required AA
+  const requiredDeckConfigProtocolSpec = nonSingleSlotDeckConfigCompatibility.filter(
+    fixture => fixture.requiredAddressableAreas.length > 0
+  )
+
+  return requiredDeckConfigProtocolSpec
 }

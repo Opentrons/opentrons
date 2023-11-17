@@ -195,6 +195,12 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render text and buttons', () => {
+    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+      {
+        ...mockProtocolModuleInfo[0],
+        attachedModuleMatch: calibratedMockApiHeaterShaker,
+      },
+    ])
     const [{ getByRole, getByText }] = render()
     getByText('Module')
     getByText('Location')
