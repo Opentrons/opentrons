@@ -54,6 +54,8 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
                 yDimension={dimensions.yDimension}
                 filter="url(#feOffset)"
                 stroke='#74B0FF'
+                rx="8"
+                ry="8"
               />
               <LabwareBorder
                 borderThickness={1.5 * OUTLINE_THICKNESS_MM}
@@ -61,6 +63,8 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
                 yDimension={dimensions.yDimension}
                 stroke={COLORS.blueEnabled}
                 fill={backgroundFill}
+                rx="8"
+                ry="8"
               />
             </>
           ) : (
