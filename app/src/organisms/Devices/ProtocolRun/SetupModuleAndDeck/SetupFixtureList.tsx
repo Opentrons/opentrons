@@ -25,6 +25,7 @@ import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from './LocationConflictModal'
 import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
+import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
 
@@ -134,6 +135,11 @@ export function FixtureListItem({
     setShowNotConfiguredModal,
   ] = React.useState<boolean>(false)
 
+  const [
+    showSetupInstructionsModal,
+    setShowSetupInstructionsModal,
+  ] = React.useState<boolean>(false)
+
   return (
     <>
       {showNotConfiguredModal && cutoutFixtureId != null ? (
@@ -148,6 +154,11 @@ export function FixtureListItem({
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutId}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
+        />
+      ) : null}
+      {showSetupInstructionsModal && cutoutFixtureId != null ? (
+        <DeckFixtureSetupInstructionsModal
+          setShowSetupInstructionsModal={setShowSetupInstructionsModal}
         />
       ) : null}
       <Box
@@ -194,8 +205,7 @@ export function FixtureListItem({
                   }
                 `}
                 marginTop={SPACING.spacing4}
-                //  TODO(jr, 10/4/23): wire up the instructions modal
-                onClick={() => console.log('wire this up')}
+                onClick={() => setShowSetupInstructionsModal(true)}
               >
                 <StyledText marginLeft={SPACING.spacing4} as="p">
                   {t('view_setup_instructions')}
