@@ -12,7 +12,10 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
+import {
+  getRequiredDeckConfig,
+  getSimplestDeckConfigForProtocolCommands,
+} from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useIsFlex,
@@ -83,6 +86,9 @@ const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
 const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
   typeof getSimplestDeckConfigForProtocolCommands
 >
+const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
+  typeof getRequiredDeckConfig
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -147,6 +153,7 @@ describe('ProtocolRunSetup', () => {
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
     when(mockGetSimplestDeckConfigForProtocolCommands).mockReturnValue([])
+    when(mockGetRequiredDeckConfig).mockReturnValue([])
   })
   afterEach(() => {
     resetAllWhenMocks()
