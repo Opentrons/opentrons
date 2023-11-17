@@ -125,4 +125,12 @@ describe('DeviceDetailsDeckConfiguration', () => {
     getByText('Deck configuration is not available when the robot is busy')
     getByText('disabled mock DeckConfigurator')
   })
+
+  it('should render no deck fixtures, if deck configs are not set', () => {
+    when(mockUseDeckConfigurationQuery)
+      .calledWith()
+      .mockReturnValue([] as any)
+    const [{ getByText }] = render(props)
+    getByText('No deck fixtures')
+  })
 })

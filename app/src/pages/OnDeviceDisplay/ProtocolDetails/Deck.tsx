@@ -22,11 +22,7 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
   return (
     <Flex height="26.9375rem">
       {mostRecentAnalysis != null ? (
-        <DeckThumbnail
-          protocolAnalysis={mostRecentAnalysis}
-          showSlotLabels
-          isOnDevice
-        />
+        <DeckThumbnail protocolAnalysis={mostRecentAnalysis} showSlotLabels />
       ) : null}
     </Flex>
   )

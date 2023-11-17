@@ -6,7 +6,8 @@ import {
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_ONLY_FIXTURES,
+  WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../ui-style-constants'
@@ -64,7 +65,13 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   )
   const wasteChuteFixtures = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) =>
-      cutoutFixtureId != null && WASTE_CHUTE_FIXTURES.includes(cutoutFixtureId)
+      cutoutFixtureId != null &&
+      WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)
+  )
+  const wasteChuteStagingAreaFixtures = configurableDeckConfig.filter(
+    ({ cutoutFixtureId }) =>
+      cutoutFixtureId != null &&
+      WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
   )
   const emptyFixtures = readOnly
     ? []
@@ -115,6 +122,15 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={cutoutId}
+        />
+      ))}
+      {wasteChuteStagingAreaFixtures.map(({ cutoutId }) => (
+        <WasteChuteConfigFixture
+          key={cutoutId}
+          deckDefinition={deckDef}
+          handleClickRemove={readOnly ? undefined : handleClickRemove}
+          fixtureLocation={cutoutId}
+          hasStagingAreas
         />
       ))}
       {trashBinFixtures.map(({ cutoutId }) => (

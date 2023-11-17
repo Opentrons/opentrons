@@ -42,9 +42,12 @@ def _get_slot_name(
     slot_key: DeckLocation, api_version: APIVersion, robot_type: RobotType
 ) -> DeckSlotName:
     try:
-        return validation.ensure_and_convert_deck_slot(
+        slot = validation.ensure_and_convert_deck_slot(
             slot_key, api_version, robot_type
         )
+        if not isinstance(slot, DeckSlotName):
+            raise ValueError("Cannot currently load staging slots from Deck.")
+        return slot
     except (TypeError, ValueError) as error:
         raise KeyError(slot_key) from error
 

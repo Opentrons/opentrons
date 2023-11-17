@@ -190,8 +190,8 @@ export function DeviceDetailsDeckConfiguration({
                 <StyledText>{t('location')}</StyledText>
                 <StyledText>{t('fixture')}</StyledText>
               </Flex>
-              {fixtureDisplayList.map(fixture => {
-                return (
+              {fixtureDisplayList.length > 0 ? (
+                fixtureDisplayList.map(fixture => (
                   <Flex
                     key={fixture.cutoutId}
                     backgroundColor={COLORS.fundamentalsBackground}
@@ -207,8 +207,18 @@ export function DeviceDetailsDeckConfiguration({
                       {getFixtureDisplayName(fixture.cutoutFixtureId)}
                     </StyledText>
                   </Flex>
-                )
-              })}
+                ))
+              ) : (
+                <Flex
+                  backgroundColor={COLORS.fundamentalsBackground}
+                  gridGap={SPACING.spacing60}
+                  padding={SPACING.spacing8}
+                  width={SIZE_5}
+                  css={TYPOGRAPHY.labelRegular}
+                >
+                  <StyledText>{t('no_deck_fixtures')}</StyledText>
+                </Flex>
+              )}
             </Flex>
           </Flex>
         </Flex>

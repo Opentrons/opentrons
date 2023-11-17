@@ -77,7 +77,9 @@ async def test_create_run(
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
     )
-    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
     decoy.when(
         await mock_run_data_manager.create(
             run_id=run_id,
@@ -146,7 +148,9 @@ async def test_create_protocol_run(
         status=pe_types.EngineStatus.IDLE,
         liquids=[],
     )
-    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
     decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
         protocol_resource
     )
@@ -184,7 +188,9 @@ async def test_create_protocol_run_bad_protocol_id(
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
-    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
     decoy.when(mock_protocol_store.get(protocol_id="protocol-id")).then_raise(error)
 
     with pytest.raises(ApiError) as exc_info:
@@ -207,7 +213,9 @@ async def test_create_run_conflict(
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
 
-    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
     decoy.when(
         await mock_run_data_manager.create(
             run_id="run-id",

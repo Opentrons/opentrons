@@ -70,7 +70,9 @@ async def test_create_run(
         liquids=[],
     )
 
-    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
     decoy.when(
         await mock_maintenance_run_data_manager.create(
             run_id=run_id,
@@ -102,7 +104,9 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
 ) -> None:
     """It should respond with a conflict error if protocol run is active during maintenance run creation."""
     created_at = datetime(year=2021, month=1, day=1)
-    decoy.when(mock_deck_configuration_store.get_deck_configuration()).then_return([])
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
     with pytest.raises(ApiError) as exc_info:
         await create_run(
             run_id="run-id",

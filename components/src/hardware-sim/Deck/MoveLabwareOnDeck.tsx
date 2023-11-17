@@ -13,7 +13,7 @@ import {
 
 import { COLORS } from '../../ui-style-constants'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
-import { StyledDeck } from './StyledDeck'
+import { BaseDeck } from '../BaseDeck'
 
 import type {
   Coordinates,
@@ -21,6 +21,7 @@ import type {
   LabwareLocation,
   RobotType,
   DeckDefinition,
+  DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 import type { TrashCutoutId } from './FlexTrash'
@@ -137,6 +138,7 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
+  deckConfig: DeckConfiguration
   backgroundItems?: React.ReactNode
   deckFill?: string
   trashCutoutId?: TrashCutoutId
@@ -151,9 +153,8 @@ export function MoveLabwareOnDeck(
     initialLabwareLocation,
     finalLabwareLocation,
     loadedModules,
+    deckConfig,
     backgroundItems = null,
-    deckFill = '#e6e6e6',
-    trashCutoutId,
     ...styleProps
   } = props
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
@@ -215,27 +216,16 @@ export function MoveLabwareOnDeck(
 
   if (deckDef == null) return null
 
-  const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
-  const [deckXDimension, deckYDimension] = deckDef.dimensions
-  const wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
-
   return (
-    <AnimatedSvg
-      viewBox={wholeDeckViewBox}
-      opacity="1"
-      style={{ opacity: springProps.deckOpacity }}
-      transform="scale(1, -1)" // reflect horizontally about the center
-      {...styleProps}
+    <BaseDeck
+      deckConfig={deckConfig}
+      robotType={robotType}
+      svgProps={{
+        style: { opacity: springProps.deckOpacity },
+        ...styleProps,
+      }}
+      animatedSVG
     >
-      {deckDef != null && (
-        // TODO(bh, 2023-11-06): change reference to BaseDeck, pass in deck config as prop, render animation as children
-        <StyledDeck
-          deckFill={deckFill}
-          layerBlocklist={[]}
-          robotType={robotType}
-          trashCutoutId={trashCutoutId}
-        />
-      )}
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g
@@ -276,7 +266,7 @@ export function MoveLabwareOnDeck(
           </AnimatedG>
         </g>
       </AnimatedG>
-    </AnimatedSvg>
+    </BaseDeck>
   )
 }
 
@@ -284,7 +274,6 @@ export function MoveLabwareOnDeck(
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
 const AnimatedG = styled(animated.g)<any>``
-const AnimatedSvg = styled(animated.svg)<any>``
 
 interface WellProps {
   wellDef: LabwareWell
