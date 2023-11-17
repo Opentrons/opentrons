@@ -6,11 +6,17 @@ import type { CSSProperties } from 'styled-components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export interface LabwareOutlineProps {
+  /** Labware definition to outline */
   definition?: LabwareDefinition2
+  /** x dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 127.76 */
   width?: number
+  /** y dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to 85.48 */
   height?: number
+  /** if this labware is a tip rack, darken background and lighten borderx dimension in mm of this labware, used if definition doesn't supply dimensions, defaults to false */
   isTiprack?: boolean
+  /** adds thicker blue border with blur to labware, defaults to false */
   highlight?: boolean
+  /** [legacy] override the border color */
   stroke?: CSSProperties['stroke']
 }
 
@@ -21,16 +27,16 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     definition,
     width = SLOT_RENDER_WIDTH,
     height = SLOT_RENDER_HEIGHT,
-    isTiprack,
-    stroke,
+    isTiprack = false,
     highlight = false,
+    stroke,
   } = props
   const {
     parameters = { isTiprack },
     dimensions = { xDimension: width, yDimension: height },
   } = definition ?? {}
 
-  const backgroundFill = parameters.isTiprack === true ? '#CCCCCC' : COLORS.white
+  const backgroundFill = parameters.isTiprack ? '#CCCCCC' : COLORS.white
   return (
     <>
       {
@@ -62,7 +68,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
               borderThickness={OUTLINE_THICKNESS_MM}
               xDimension={dimensions.xDimension}
               yDimension={dimensions.yDimension}
-              stroke={stroke ?? (parameters.isTiprack === true ? '#979797' : COLORS.black)}
+              stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black)}
               fill={backgroundFill}
             />
           )}
