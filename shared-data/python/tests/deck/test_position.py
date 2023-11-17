@@ -2,7 +2,10 @@ from typing import Dict, Generator, List, Set, Tuple
 
 import pytest
 
-from opentrons_shared_data.deck import load as load_deck_definition
+from opentrons_shared_data.deck import (
+    list_names as list_deck_definition_names,
+    load as load_deck_definition,
+)
 from opentrons_shared_data.deck.dev_types import (
     AddressableArea,
     Cutout,
@@ -10,8 +13,6 @@ from opentrons_shared_data.deck.dev_types import (
     DeckDefinitionV3,
     DeckDefinitionV4,
 )
-
-from . import list_deck_def_paths
 
 
 def as_tuple(list: List[float]) -> Tuple[float, float, float]:
@@ -91,7 +92,7 @@ def get_v4_slot_positions(
     return set(slot_positions)
 
 
-@pytest.mark.parametrize("definition_name", list_deck_def_paths(version=4))
+@pytest.mark.parametrize("definition_name", list_deck_definition_names(version=4))
 def test_v3_and_v4_positional_equivalence(definition_name: str) -> None:
     deck_v3 = load_deck_definition(name=definition_name, version=3)
     deck_v4 = load_deck_definition(name=definition_name, version=4)

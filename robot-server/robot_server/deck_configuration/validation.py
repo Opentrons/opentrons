@@ -43,9 +43,10 @@ class InvalidLocationError:
 
 @dataclass(frozen=True)
 class UnrecognizedCutoutFixtureError:
-    """When an cutout has been mounted that's not defined by the deck definition."""
+    """When an cutout fixture has been mounted that's not defined by the deck definition."""
 
     cutout_fixture_id: str
+    allowed_cutout_fixture_ids: FrozenSet[str]
 
 
 ConfigurationError = Union[
@@ -104,11 +105,18 @@ def get_configuration_errors(
 def _find_cutout_fixture(
     deck_definition: deck_types.DeckDefinitionV4, cutout_fixture_id: str
 ) -> Union[deck_types.CutoutFixture, UnrecognizedCutoutFixtureError]:
+    cutout_fixtures = deck_definition["cutoutFixtures"]
     try:
         return next(
             cutout_fixture
-            for cutout_fixture in deck_definition["cutoutFixtures"]
+            for cutout_fixture in cutout_fixtures
             if cutout_fixture["id"] == cutout_fixture_id
         )
-    except StopIteration:
-        return UnrecognizedCutoutFixtureError(cutout_fixture_id=cutout_fixture_id)
+    except StopIteration:  # No match found.
+        allowed_cutout_fixture_ids = frozenset(
+            cutout_fixture["id"] for cutout_fixture in cutout_fixtures
+        )
+        return UnrecognizedCutoutFixtureError(
+            cutout_fixture_id=cutout_fixture_id,
+            allowed_cutout_fixture_ids=allowed_cutout_fixture_ids,
+        )

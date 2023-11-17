@@ -8,6 +8,7 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
+  wasteChuteCommandsUtil,
 } from '../../utils'
 import { configureForVolume } from '../atomic/configureForVolume'
 import {
@@ -95,6 +96,25 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getWellDepth(destLabwareDef, args.destWell) + AIR_GAP_OFFSET_FROM_TOP
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
+
+  const isWasteChute =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation] != null
+
+  const addressableAreaName =
+    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
+      ? '96ChannelWasteChute'
+      : '1and8ChannelWasteChute'
+
+  const dropTipCommand = isWasteChute
+    ? curryCommandCreator(wasteChuteCommandsUtil, {
+        type: 'dropTip',
+        pipetteId: args.pipette,
+        addressableAreaName,
+      })
+    : curryCommandCreator(dropTip, {
+        pipette: args.pipette,
+        dropTipLocation: args.dropTipLocation,
+      })
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -302,14 +322,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           : []
       // if using dispense > air gap, drop or change the tip at the end
       const dropTipAfterDispenseAirGap =
-        airGapAfterDispenseCommands.length > 0
-          ? [
-              curryCommandCreator(dropTip, {
-                pipette: args.pipette,
-                dropTipLocation: dropTipLocation,
-              }),
-            ]
-          : []
+        airGapAfterDispenseCommands.length > 0 ? [dropTipCommand] : []
       const blowoutCommand = blowoutUtil({
         pipette: args.pipette,
         sourceLabwareId: args.sourceLabware,

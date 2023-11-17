@@ -50,7 +50,9 @@ async def json_protocol_source(tmp_path: Path) -> ProtocolSource:
 
 async def test_create_engine(subject: EngineStore) -> None:
     """It should create an engine for a run."""
-    result = await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    result = await subject.create(
+        run_id="run-id", labware_offsets=[], protocol=None, deck_configuration=[]
+    )
 
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
@@ -78,6 +80,7 @@ async def test_create_engine_with_protocol(
     result = await subject.create(
         run_id="run-id",
         labware_offsets=[],
+        deck_configuration=[],
         protocol=protocol,
     )
     assert subject.current_run_id == "run-id"
@@ -99,7 +102,9 @@ async def test_create_engine_uses_robot_type(
         hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
     )
 
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    await subject.create(
+        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+    )
 
     assert subject.engine.state_view.config.robot_type == robot_type
 
@@ -115,6 +120,7 @@ async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
     result = await subject.create(
         run_id="run-id",
         labware_offsets=[labware_offset],
+        deck_configuration=[],
         protocol=None,
     )
 
@@ -131,18 +137,24 @@ async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
 
 async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> None:
     """It should not create more than one engine / runner pair."""
-    await subject.create(run_id="run-id-1", labware_offsets=[], protocol=None)
+    await subject.create(
+        run_id="run-id-1", labware_offsets=[], deck_configuration=[], protocol=None
+    )
 
     with pytest.raises(EngineConflictError):
-        await subject.create(run_id="run-id-2", labware_offsets=[], protocol=None)
+        await subject.create(
+            run_id="run-id-2", labware_offsets=[], deck_configuration=[], protocol=None
+        )
 
     assert subject.current_run_id == "run-id-1"
 
 
 async def test_clear_engine(subject: EngineStore) -> None:
     """It should clear a stored engine entry."""
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
-    await subject.runner.run()
+    await subject.create(
+        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+    )
+    await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
 
     assert subject.current_run_id is None
@@ -159,8 +171,10 @@ async def test_clear_engine_not_stopped_or_idle(
     subject: EngineStore, json_protocol_source: ProtocolSource
 ) -> None:
     """It should raise a conflict if the engine is not stopped."""
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
-    subject.runner.play()
+    await subject.create(
+        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+    )
+    subject.runner.play(deck_configuration=[])
 
     with pytest.raises(EngineConflictError):
         await subject.clear()
@@ -168,7 +182,9 @@ async def test_clear_engine_not_stopped_or_idle(
 
 async def test_clear_idle_engine(subject: EngineStore) -> None:
     """It should successfully clear engine if idle (not started)."""
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    await subject.create(
+        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+    )
     assert subject.engine is not None
     assert subject.runner is not None
 
@@ -210,7 +226,9 @@ async def test_get_default_engine_robot_type(
 
 async def test_get_default_engine_current_unstarted(subject: EngineStore) -> None:
     """It should allow a default engine if another engine current but unstarted."""
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    await subject.create(
+        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+    )
 
     result = await subject.get_default_engine()
     assert isinstance(result, ProtocolEngine)
@@ -218,7 +236,9 @@ async def test_get_default_engine_current_unstarted(subject: EngineStore) -> Non
 
 async def test_get_default_engine_conflict(subject: EngineStore) -> None:
     """It should not allow a default engine if another engine is executing commands."""
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    await subject.create(
+        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+    )
     subject.engine.play()
 
     with pytest.raises(EngineConflictError):
@@ -227,7 +247,9 @@ async def test_get_default_engine_conflict(subject: EngineStore) -> None:
 
 async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
     """It allow a default engine if another engine is terminal."""
-    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    await subject.create(
+        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+    )
     await subject.engine.finish()
 
     result = await subject.get_default_engine()

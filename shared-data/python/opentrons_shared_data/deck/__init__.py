@@ -1,11 +1,11 @@
 """
 opentrons_shared_data.deck: types and bindings for deck definitions
 """
-from typing import Dict, NamedTuple, cast, overload, TYPE_CHECKING
+from typing import Dict, List, NamedTuple, cast, overload, TYPE_CHECKING
 from typing_extensions import Final
 import json
 
-from .. import load_shared_data
+from .. import get_shared_data_root, load_shared_data
 
 if TYPE_CHECKING:
     from .dev_types import (
@@ -58,6 +58,14 @@ def load_schema(version: int) -> "DeckSchema":
     return cast(
         "DeckSchema", json.loads(load_shared_data(f"deck/schemas/{version}.json"))
     )
+
+
+def list_names(version: int) -> List[str]:
+    """Return all loadable deck definition names, for the given schema version."""
+    definitions_directory = (
+        get_shared_data_root() / "deck" / "definitions" / f"{version}"
+    )
+    return [file.stem for file in definitions_directory.iterdir()]
 
 
 def get_calibration_square_position_in_slot(slot: int) -> Offset:

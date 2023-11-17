@@ -15,7 +15,7 @@ from opentrons.hardware_control.modules import LiveData
 from opentrons_shared_data.errors import EnumeratedError
 
 from ..commands import Command, CommandCreate, CommandPrivateResult
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid, DeckConfigurationType
 
 
 @dataclass(frozen=True)
@@ -23,6 +23,7 @@ class PlayAction:
     """Start or resume processing commands in the engine."""
 
     requested_at: datetime
+    deck_configuration: Optional[DeckConfigurationType]
 
 
 class PauseSource(str, Enum):

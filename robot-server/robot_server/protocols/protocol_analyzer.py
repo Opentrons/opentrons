@@ -30,7 +30,9 @@ class ProtocolAnalyzer:
             robot_type=protocol_resource.source.robot_type,
             protocol_config=protocol_resource.source.config,
         )
-        result = await runner.run(protocol_resource.source)
+        result = await runner.run(
+            protocol_source=protocol_resource.source, deck_configuration=[]
+        )
 
         log.info(f'Completed analysis "{analysis_id}".')
 
