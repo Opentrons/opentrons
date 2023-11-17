@@ -158,10 +158,8 @@ def ensure_and_convert_deck_slot(
             raise APIVersionError(
                 f"Using a staging deck slot requires apiLevel {_STAGING_DECK_SLOT_VERSION_GATE}."
             )
-        try:
-            parsed_staging_slot = StagingSlotName.from_primitive(str(deck_slot))
-        except ValueError as e:
-            raise ValueError(f"'{deck_slot}' is not a valid staging slot") from e
+        # Don't need a try/except since we're already pre-validating this
+        parsed_staging_slot = StagingSlotName.from_primitive(str(deck_slot))
         return parsed_staging_slot
     else:
         try:
