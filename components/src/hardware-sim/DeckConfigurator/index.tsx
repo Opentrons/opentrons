@@ -7,6 +7,7 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
 } from '@opentrons/shared-data'
 
@@ -65,7 +66,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   )
   const wasteChuteFixtures = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) =>
-      cutoutFixtureId != null && WASTE_CHUTE_FIXTURES.includes(cutoutFixtureId)
+      cutoutFixtureId != null &&
+      (WASTE_CHUTE_FIXTURES.includes(cutoutFixtureId) ||
+        WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId))
   )
   const wasteChuteStagingAreaFixtures = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) =>
