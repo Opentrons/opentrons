@@ -21,7 +21,7 @@ import {
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  getDeckDefFromRobotTypeV4,
+  getDeckDefFromRobotType,
   AddressableAreaName,
   CutoutId,
 } from '@opentrons/shared-data'
@@ -1331,7 +1331,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
       const isFlex = file.robot.model === FLEX_ROBOT_TYPE
-      const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+      const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
       const cutoutFixtures = deckDef.cutoutFixtures
       const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
         cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot')

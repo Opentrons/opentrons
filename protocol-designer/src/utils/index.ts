@@ -3,7 +3,7 @@ import {
   WellSetHelpers,
   makeWellSetHelpers,
   AddressableAreaName,
-  getDeckDefFromRobotTypeV4,
+  getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
   CutoutId,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -145,7 +145,7 @@ export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
 export const getStagingAreaAddressableAreas = (
   cutoutIds: CutoutId[]
 ): AddressableAreaName[] => {
-  const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const cutoutFixtures = deckDef.cutoutFixtures
 
   return cutoutIds
