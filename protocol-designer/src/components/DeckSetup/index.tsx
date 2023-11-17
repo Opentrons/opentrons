@@ -23,7 +23,6 @@ import {
 } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
-  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getLabwareHasQuirk,
@@ -34,9 +33,9 @@ import {
   inferModuleOrientationFromXCoordinate,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
+  STAGING_AREA_CUTOUTS,
   THERMOCYCLER_MODULE_TYPE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
@@ -540,16 +539,12 @@ export const DeckSetup = (): JSX.Element => {
   ]
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE =>
-    WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aE.name as AddressableAreaName)
-  )
+  ).filter(aE => WASTE_CHUTE_CUTOUT.includes(aE.location as CutoutId))
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE =>
-    FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
-      aE.name as AddressableAreaName
-    )
-  )
+  ).filter(aE => STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId))
+
+  const hasWasteChute = wasteChuteFixtures.length > 0
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
@@ -561,7 +556,11 @@ export const DeckSetup = (): JSX.Element => {
         <RobotCoordinateSpaceWithDOMCoords
           height="100%"
           deckDef={deckDef}
-          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
+            hasWasteChute
+              ? deckDef.cornerOffsetFromOrigin[1] - 30
+              : deckDef.cornerOffsetFromOrigin[1]
+          } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
           {({ getRobotCoordsFromDOMCoords }) => (
             <>
@@ -647,6 +646,7 @@ export const DeckSetup = (): JSX.Element => {
               <SlotLabels
                 robotType={robotType}
                 hasStagingAreas={stagingAreaFixtures.length > 0}
+                hasWasteChute={hasWasteChute}
               />
             </>
           )}
