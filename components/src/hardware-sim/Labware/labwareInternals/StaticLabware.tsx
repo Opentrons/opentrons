@@ -44,7 +44,10 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   return (
     <g onClick={props.onLabwareClick}>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline definition={props.definition} highlight={props.highlight} />
+        <LabwareOutline
+          definition={props.definition}
+          highlight={props.highlight}
+        />
       </g>
       <g>
         {flatMap(

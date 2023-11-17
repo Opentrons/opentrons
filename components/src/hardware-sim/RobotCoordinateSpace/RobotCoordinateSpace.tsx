@@ -11,8 +11,8 @@ export function RobotCoordinateSpace(
 ): JSX.Element {
   const { animated = false, children, ...restProps } = props
   const allPassThroughProps = {
-    transform: "scale(1, -1)",
-    ...restProps
+    transform: 'scale(1, -1)',
+    ...restProps,
   }
   return animated ? (
     <AnimatedSvg {...allPassThroughProps}>{children}</AnimatedSvg>
@@ -24,4 +24,4 @@ export function RobotCoordinateSpace(
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedSvg = styled(animated.svg) <any>``
+const AnimatedSvg = styled(animated.svg)<any>``

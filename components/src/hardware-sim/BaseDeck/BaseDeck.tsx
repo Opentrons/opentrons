@@ -86,7 +86,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     children,
     showSlotLabels = true,
     animatedSVG = false,
-    svgProps = {}
+    svgProps = {},
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 

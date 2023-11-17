@@ -32,11 +32,7 @@ interface DeckThumbnailProps extends StyleProps {
 }
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
-  const {
-    protocolAnalysis,
-    showSlotLabels = false,
-    ...styleProps
-  } = props
+  const { protocolAnalysis, showSlotLabels = false, ...styleProps } = props
   const attachedModules = useAttachedModules()
 
   if (protocolAnalysis == null || protocolAnalysis.errors.length) return null

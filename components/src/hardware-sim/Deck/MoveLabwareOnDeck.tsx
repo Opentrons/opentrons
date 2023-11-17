@@ -94,10 +94,10 @@ function getLabwareCoordinates({
     )
     return loadedAdapterSlotPosition != null
       ? {
-        x: loadedAdapterSlotPosition[0],
-        y: loadedAdapterSlotPosition[1],
-        z: loadedAdapterSlotPosition[2],
-      }
+          x: loadedAdapterSlotPosition[0],
+          y: loadedAdapterSlotPosition[1],
+          z: loadedAdapterSlotPosition[2],
+        }
       : null
   } else if ('addressableAreaName' in location) {
     const slotCoordinateTuple = getPositionFromSlotId(
@@ -106,10 +106,10 @@ function getLabwareCoordinates({
     )
     return slotCoordinateTuple != null
       ? {
-        x: slotCoordinateTuple[0],
-        y: slotCoordinateTuple[1],
-        z: slotCoordinateTuple[2],
-      }
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
+        }
       : null
   } else if ('slotName' in location) {
     const slotCoordinateTuple = getPositionFromSlotId(
@@ -118,10 +118,10 @@ function getLabwareCoordinates({
     )
     return slotCoordinateTuple != null
       ? {
-        x: slotCoordinateTuple[0],
-        y: slotCoordinateTuple[1],
-        z: slotCoordinateTuple[2],
-      }
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
+        }
       : null
   } else {
     return getModulePosition(deckDef, location.moduleId, loadedModules)
@@ -163,7 +163,7 @@ export function MoveLabwareOnDeck(
 
   const initialSlotId =
     initialLabwareLocation === 'offDeck' ||
-      !('slotName' in initialLabwareLocation)
+    !('slotName' in initialLabwareLocation)
       ? deckDef.locations.addressableAreas[1].id
       : initialLabwareLocation.slotName
 
@@ -217,15 +217,15 @@ export function MoveLabwareOnDeck(
   if (deckDef == null) return null
 
   return (
-
     <BaseDeck
       deckConfig={deckConfig}
       robotType={robotType}
       svgProps={{
         style: { opacity: springProps.deckOpacity },
-        ...styleProps
+        ...styleProps,
       }}
-      animatedSVG >
+      animatedSVG
+    >
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g
@@ -266,7 +266,6 @@ export function MoveLabwareOnDeck(
           </AnimatedG>
         </g>
       </AnimatedG>
-
     </BaseDeck>
   )
 }
@@ -274,7 +273,7 @@ export function MoveLabwareOnDeck(
 /**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedG = styled(animated.g) <any>``
+const AnimatedG = styled(animated.g)<any>``
 
 interface WellProps {
   wellDef: LabwareWell

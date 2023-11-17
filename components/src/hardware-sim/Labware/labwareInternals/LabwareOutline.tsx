@@ -39,43 +39,41 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
   const backgroundFill = parameters.isTiprack ? '#CCCCCC' : COLORS.white
   return (
     <>
-      {
-        highlight
-          ? (
-            <>
-              <defs>
-                <filter id="feOffset" filterUnits="objectBoundingBox">
-                  <feGaussianBlur stdDeviation="6" />
-                </filter>
-              </defs>
-              <LabwareBorder
-                borderThickness={1.5 * OUTLINE_THICKNESS_MM}
-                xDimension={dimensions.xDimension}
-                yDimension={dimensions.yDimension}
-                filter="url(#feOffset)"
-                stroke='#74B0FF'
-                rx="8"
-                ry="8"
-              />
-              <LabwareBorder
-                borderThickness={1.5 * OUTLINE_THICKNESS_MM}
-                xDimension={dimensions.xDimension}
-                yDimension={dimensions.yDimension}
-                stroke={COLORS.blueEnabled}
-                fill={backgroundFill}
-                rx="8"
-                ry="8"
-              />
-            </>
-          ) : (
-            <LabwareBorder
-              borderThickness={OUTLINE_THICKNESS_MM}
-              xDimension={dimensions.xDimension}
-              yDimension={dimensions.yDimension}
-              stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black)}
-              fill={backgroundFill}
-            />
-          )}
+      {highlight ? (
+        <>
+          <defs>
+            <filter id="feOffset" filterUnits="objectBoundingBox">
+              <feGaussianBlur stdDeviation="6" />
+            </filter>
+          </defs>
+          <LabwareBorder
+            borderThickness={1.5 * OUTLINE_THICKNESS_MM}
+            xDimension={dimensions.xDimension}
+            yDimension={dimensions.yDimension}
+            filter="url(#feOffset)"
+            stroke="#74B0FF"
+            rx="8"
+            ry="8"
+          />
+          <LabwareBorder
+            borderThickness={1.5 * OUTLINE_THICKNESS_MM}
+            xDimension={dimensions.xDimension}
+            yDimension={dimensions.yDimension}
+            stroke={COLORS.blueEnabled}
+            fill={backgroundFill}
+            rx="8"
+            ry="8"
+          />
+        </>
+      ) : (
+        <LabwareBorder
+          borderThickness={OUTLINE_THICKNESS_MM}
+          xDimension={dimensions.xDimension}
+          yDimension={dimensions.yDimension}
+          stroke={stroke ?? (parameters.isTiprack ? '#979797' : COLORS.black)}
+          fill={backgroundFill}
+        />
+      )}
     </>
   )
 }
