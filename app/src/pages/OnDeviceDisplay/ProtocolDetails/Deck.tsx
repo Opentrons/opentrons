@@ -25,7 +25,6 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
         <DeckThumbnail
           protocolAnalysis={mostRecentAnalysis}
           showSlotLabels
-          isOnDevice
         />
       ) : null}
     </Flex>
