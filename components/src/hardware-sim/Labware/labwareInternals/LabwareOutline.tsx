@@ -61,8 +61,8 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
             yDimension={dimensions.yDimension}
             stroke={COLORS.blueEnabled}
             fill={backgroundFill}
-            rx="8"
-            ry="8"
+            rx="4"
+            ry="4"
           />
         </>
       ) : (
