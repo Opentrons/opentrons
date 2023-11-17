@@ -15,7 +15,7 @@ stages:
           # lastUpdatedAt is deliberately omitted from this expected object.
           # A lastUpdatedAt that's omitted or null means the deck configuration has never been set.
           #
-          # Unfortunately, this makes this test order-dependent with anything other tests
+          # Unfortunately, this makes this test order-dependent with any other tests
           # that modify the deck configuration, even if they try to restore the original value
           # after they're done. We probably need some kind of deck configuration factory-reset.
           #
