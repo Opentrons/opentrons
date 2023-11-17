@@ -17,6 +17,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   JUSTIFY_END,
+  DropdownOption,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -24,7 +25,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
-import { OUTER_SLOTS_FLEX } from '../../modules'
 import { createContainer, deleteContainer } from '../../labware-ingred/actions'
 import { FLEX_TRASH_DEF_URI } from '../../constants'
 import { createDeckFixture } from '../../step-forms/actions/additionalItems'
@@ -37,6 +37,41 @@ export interface TrashValues {
   selectedSlot: string
 }
 
+export const MOVABLE_TRASH_CUTOUTS: DropdownOption[] = [
+  {
+    name: 'Slot A1',
+    value: 'cutoutA1',
+  },
+  {
+    name: 'Slot A3',
+    value: 'cutoutA3',
+  },
+  {
+    name: 'Slot B1',
+    value: 'cutoutB1',
+  },
+  {
+    name: 'Slot B3',
+    value: 'cutoutB3',
+  },
+  {
+    name: 'Slot C1',
+    value: 'cutoutC1',
+  },
+  {
+    name: 'Slot C3',
+    value: 'cutoutC3',
+  },
+  {
+    name: 'Slot D1',
+    value: 'cutoutD1',
+  },
+  {
+    name: 'Slot D3',
+    value: 'cutoutD3',
+  },
+]
+
 const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   const { onCloseClick, trashName } = props
   const { values } = useFormikContext<TrashValues>()
@@ -48,6 +83,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
   )
   const flexDeck = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const [field] = useField('selectedSlot')
+  const slotFromCutout = field.value.replace('cutout', '')
 
   return (
     <Form>
@@ -65,7 +101,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
                 <Box width="8rem">
                   <SlotDropdown
                     fieldName="selectedSlot"
-                    options={OUTER_SLOTS_FLEX}
+                    options={MOVABLE_TRASH_CUTOUTS}
                     disabled={false}
                     tabIndex={1}
                   />
@@ -90,7 +126,7 @@ const TrashModalComponent = (props: TrashModalProps): JSX.Element => {
         <Flex height="20rem" justifyContent={JUSTIFY_CENTER}>
           <DeckLocationSelect
             deckDef={flexDeck}
-            selectedLocation={{ slotName: field.value }}
+            selectedLocation={{ slotName: slotFromCutout }}
             theme="grey"
           />
         </Flex>
@@ -154,7 +190,8 @@ export const TrashModal = (props: TrashModalProps): JSX.Element => {
     <Formik
       onSubmit={onSaveClick}
       initialValues={{
-        selectedSlot: trashName === 'trashBin' ? 'A3' : 'D3',
+        selectedSlot:
+          trashName === 'trashBin' ? 'cutoutA3' : WASTE_CHUTE_CUTOUT,
       }}
     >
       <ModalShell width="48rem">

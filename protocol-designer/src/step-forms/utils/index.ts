@@ -133,14 +133,15 @@ export const getSlotIsEmpty = (
           additionalEquipment.location?.includes(slot) &&
           additionalEquipment.name !== 'stagingArea'
       )
-
   return (
     [
-      ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>
-        slot.includes(moduleOnDeck.slot)
+      ...values(initialDeckSetup.modules).filter(
+        (moduleOnDeck: ModuleOnDeck) =>
+          slot.includes(moduleOnDeck.slot) || moduleOnDeck.slot.includes(slot)
       ),
-      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
-        slot.includes(labware.slot)
+      ...values(initialDeckSetup.labware).filter(
+        (labware: LabwareOnDeckType) =>
+          slot.includes(labware.slot) || labware.slot.includes(slot)
       ),
       ...filteredAdditionalEquipmentOnDeck,
     ].length === 0

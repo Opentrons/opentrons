@@ -1,4 +1,9 @@
 import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
+import {
   blowOutInPlace,
   dispenseInPlace,
   dropTipInPlace,
@@ -8,6 +13,7 @@ import * as errorCreators from '../errorCreators'
 import { reduceCommandCreators } from './reduceCommandCreators'
 import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
+import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
@@ -27,7 +33,7 @@ interface MovableTrashCommandArgs {
   volume?: number
   flowRate?: number
 }
-/** Helper fn for waste chute dispense, drop tip and blow_out commands */
+/** Helper fn for movable trash commands for dispense, aspirate, air gap, drop tip and blow out commands */
 export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> = (
   args,
   invariantContext,
@@ -42,7 +48,8 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
       labware.labwareDefURI === OT_2_TRASH_DEF_URI
   )?.id
   const trashLocation =
-    trashId != null ? prevRobotState.labware[trashId].slot : null
+    trashId != null ? (prevRobotState.labware[trashId].slot as CutoutId) : null
+
   let actionName: string = ''
   switch (type) {
     case 'blowOut':
@@ -80,8 +87,47 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
     )
   }
 
+  const deckDef = getDeckDefFromRobotType(
+    trashLocation === ('cutout12' as CutoutId)
+      ? OT2_ROBOT_TYPE
+      : FLEX_ROBOT_TYPE
+  )
+  let cutouts: Record<CutoutId, AddressableAreaName[]> | null = null
+  if (deckDef.robot.model === FLEX_ROBOT_TYPE) {
+    cutouts =
+      deckDef.cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
+      )?.providesAddressableAreas ?? null
+  } else if (deckDef.robot.model === OT2_ROBOT_TYPE) {
+    cutouts =
+      deckDef.cutoutFixtures.find(
+        // @ts-expect-error: delete this expect error when ot2 deck is wired up?
+        cutoutFixture => cutoutFixture.id === 'fixedTrashSlot'
+      )?.providesAddressableAreas ?? null
+  }
+
+  const addressableAreaName = (trashLocation != null && cutouts != null
+    ? cutouts[trashLocation] ?? ['']
+    : [''])[0]
+
   let commands: CurriedCommandCreator[] = []
   switch (type) {
+    case 'airGap':
+    case 'aspirate': {
+      commands = !prevRobotState.tipState.pipettes[pipetteId]
+        ? []
+        : [
+            curryCommandCreator(moveToAddressableArea, {
+              pipetteId,
+              addressableAreaName,
+            }),
+            //   curryCommandCreator(aspirateInPlace, {
+            //     pipetteId,
+            //   }),
+          ]
+
+      break
+    }
     case 'dropTip': {
       commands = !prevRobotState.tipState.pipettes[pipetteId]
         ? []

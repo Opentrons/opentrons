@@ -9,6 +9,7 @@ import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 import {
   FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -16,6 +17,7 @@ import {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
   MoveLabwareCreateCommand,
+  MoveToAddressableAreaCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   PipetteName,
@@ -24,6 +26,7 @@ import {
   getDeckDefFromRobotType,
   AddressableAreaName,
   CutoutId,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
@@ -47,6 +50,8 @@ import {
   COLUMN_4_SLOTS,
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
+  OT_2_TRASH_DEF_URI,
+  FLEX_TRASH_DEF_URI,
 } from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
 import { SaveStepFormAction } from '../../ui/steps/actions/thunks'
@@ -1183,7 +1188,37 @@ export const labwareInvariantProperties: Reducer<
         ),
       }
 
-      return Object.keys(labware).length > 0 ? labware : state
+      const trashBinCommand = Object.values(file.commands).find(
+        (command): command is MoveToAddressableAreaCreateCommand =>
+          command.commandType === 'moveToAddressableArea' &&
+          (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+            command.params.addressableAreaName
+          ) ||
+            command.params.addressableAreaName === 'fixedTrash')
+      )
+      const trashAddressableAreaName =
+        trashBinCommand?.params.addressableAreaName
+
+      const trashBinId = `${uuid()}:trashBin`
+      const trashBin: NormalizedLabwareById | null =
+        trashBinCommand != null
+          ? {
+              [trashBinId]: {
+                labwareDefURI:
+                  trashAddressableAreaName === 'fixedTrash'
+                    ? OT_2_TRASH_DEF_URI
+                    : FLEX_TRASH_DEF_URI,
+              },
+            }
+          : null
+
+      if (trashBinCommand == null && file.robot.model === OT2_ROBOT_TYPE) {
+        console.error(
+          'expected to find a fixedTrash command for the OT-2 but could not'
+        )
+      }
+
+      return { ...labware, ...trashBin, ...state }
     },
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,

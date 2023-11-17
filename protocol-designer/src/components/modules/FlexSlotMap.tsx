@@ -41,7 +41,6 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
       width="100%"
     />
   )
-
   return (
     <RobotCoordinateSpace
       height="100px"
@@ -63,14 +62,15 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
           getPositionFromSlotId(slotFromCutout, deckDef) ?? []
 
         const isLeftSideofDeck =
-          selectedSlot === 'A1' ||
-          selectedSlot === 'B1' ||
-          selectedSlot === 'C1' ||
-          selectedSlot === 'D1'
+          slotFromCutout === 'A1' ||
+          slotFromCutout === 'B1' ||
+          slotFromCutout === 'C1' ||
+          slotFromCutout === 'D1'
         const xAdjustment = isLeftSideofDeck
           ? X_ADJUSTMENT_LEFT_SIDE
           : X_ADJUSTMENT
         const x = xSlotPosition + xAdjustment
+
         const yAdjustment = -10
         const y = ySlotPosition + yAdjustment
 
