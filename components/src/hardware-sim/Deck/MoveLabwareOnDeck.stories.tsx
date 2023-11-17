@@ -23,7 +23,7 @@ const meta: Meta<React.ComponentProps<typeof MoveLabwareOnDeckComponent>> = {
 export default meta
 type Story = StoryObj<React.ComponentProps<typeof MoveLabwareOnDeckComponent>>
 
-export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
+const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   {
     cutoutId: 'cutoutA1',
     cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,

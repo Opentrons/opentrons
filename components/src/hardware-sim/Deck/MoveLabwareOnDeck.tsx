@@ -13,6 +13,7 @@ import {
 
 import { COLORS } from '../../ui-style-constants'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
+import { BaseDeck } from '../BaseDeck'
 
 import type {
   Coordinates,
@@ -24,7 +25,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
 import type { TrashCutoutId } from './FlexTrash'
-import { BaseDeck } from '../BaseDeck'
 
 const getModulePosition = (
   deckDef: DeckDefinition,
