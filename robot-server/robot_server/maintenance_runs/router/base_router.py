@@ -172,7 +172,7 @@ async def create_run(
         ).as_error(status.HTTP_409_CONFLICT)
 
     offsets = request_body.data.labwareOffsets if request_body is not None else []
-    deck_configuration = deck_configuration_store.get_deck_configuration()
+    deck_configuration = await deck_configuration_store.get_deck_configuration()
 
     run_data = await run_data_manager.create(
         run_id=run_id,

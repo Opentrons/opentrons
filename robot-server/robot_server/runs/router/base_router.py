@@ -161,7 +161,7 @@ async def create_run(
     offsets = request_body.data.labwareOffsets if request_body is not None else []
     protocol_resource = None
 
-    deck_configuration = deck_configuration_store.get_deck_configuration()
+    deck_configuration = await deck_configuration_store.get_deck_configuration()
 
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.
