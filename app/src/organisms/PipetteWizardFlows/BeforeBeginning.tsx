@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { UseMutateFunction } from 'react-query'
 import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
@@ -11,7 +12,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
