@@ -20,6 +20,7 @@ from opentrons.protocol_engine.state.addressable_areas import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     Dimensions,
     DeckPoint,
@@ -60,6 +61,7 @@ def test_get_loaded_addressable_area() -> None:
     """It should get the loaded addressable area."""
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -86,6 +88,7 @@ def test_get_addressable_area_for_simulation_already_loaded() -> None:
     """It should get the addressable area for a simulation that has not been loaded yet."""
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -112,6 +115,7 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
 
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -176,6 +180,7 @@ def test_get_addressable_area_position() -> None:
         loaded_addressable_areas_by_name={
             "abc": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -196,6 +201,7 @@ def test_get_addressable_area_center() -> None:
         loaded_addressable_areas_by_name={
             "abc": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -216,6 +222,7 @@ def test_get_slot_definition() -> None:
         loaded_addressable_areas_by_name={
             "6": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=1, y=2, z=3),
                 position=AddressableOffsetVector(x=7, y=8, z=9),

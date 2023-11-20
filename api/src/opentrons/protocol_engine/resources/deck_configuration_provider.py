@@ -7,6 +7,7 @@ from opentrons.types import Point
 
 from ..types import (
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
@@ -125,6 +126,7 @@ def get_addressable_area_from_name(
 
             return AddressableArea(
                 area_name=addressable_area["id"],
+                area_type=AreaType(addressable_area["areaType"]),
                 display_name=addressable_area["displayName"],
                 bounding_box=bounding_box,
                 position=position,

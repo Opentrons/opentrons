@@ -17,6 +17,7 @@ from opentrons.protocol_engine.errors import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
@@ -242,6 +243,7 @@ def test_get_potential_cutout_fixtures_raises(
             "1",
             AddressableArea(
                 area_name="1",
+                area_type=AreaType.SLOT,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -259,6 +261,7 @@ def test_get_potential_cutout_fixtures_raises(
             "1",
             AddressableArea(
                 area_name="1",
+                area_type=AreaType.SLOT,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -276,6 +279,7 @@ def test_get_potential_cutout_fixtures_raises(
             "D1",
             AddressableArea(
                 area_name="D1",
+                area_type=AreaType.SLOT,
                 display_name="Slot D1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -293,6 +297,7 @@ def test_get_potential_cutout_fixtures_raises(
             "movableTrashB3",
             AddressableArea(
                 area_name="movableTrashB3",
+                area_type=AreaType.MOVABLE_TRASH,
                 display_name="Trash Bin",
                 bounding_box=Dimensions(x=246.5, y=91.5, z=40),
                 position=AddressableOffsetVector(x=-16, y=-0.75, z=3),
@@ -306,6 +311,7 @@ def test_get_potential_cutout_fixtures_raises(
             "gripperWasteChute",
             AddressableArea(
                 area_name="gripperWasteChute",
+                area_type=AreaType.WASTE_CHUTE,
                 display_name="Gripper Waste Chute",
                 bounding_box=Dimensions(x=155.0, y=86.0, z=154.0),
                 position=AddressableOffsetVector(x=-12.5, y=2, z=3),
