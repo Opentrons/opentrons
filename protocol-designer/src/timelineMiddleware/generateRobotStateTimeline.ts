@@ -107,6 +107,7 @@ export const generateRobotStateTimeline = (
             {
               type: 'dropTip',
               pipetteId: pipetteId,
+              isGantryAtAddressableArea: false,
             }
           )
         }

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import i18n from 'i18next'
 import { waitFor } from '@testing-library/react'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
 
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
@@ -9,9 +10,7 @@ import {
   createDeckFixture,
   deleteDeckFixture,
 } from '../../../step-forms/actions/additionalItems'
-import { FLEX_TRASH_DEF_URI } from '../../../constants'
 import { TrashModal } from '../TrashModal'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 jest.mock('../../../step-forms')
 jest.mock('../../../step-forms/selectors')

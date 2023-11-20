@@ -211,6 +211,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       curryCommandCreator(movableTrashCommandsUtil, {
         type: 'dropTip',
         pipetteId: pipette,
+        isGantryAtAddressableArea: false,
       }),
       curryCommandCreator(_pickUpTip, {
         pipette,

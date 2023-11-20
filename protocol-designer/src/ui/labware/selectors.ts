@@ -160,7 +160,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
     )
 
     const trashOption: Options =
-      trash != null ? [{ name: TRASH, value: trash?.id ?? '' }] : []
+      trash != null && !moveLabwarePresavedStep
+        ? [{ name: TRASH, value: trash?.id ?? '' }]
+        : []
 
     const options = [...trashOption, ...labwareOptions]
 
@@ -180,7 +182,7 @@ export const getDisposalOptions: Selector<Options> = createSelector(
               ...acc,
               {
                 name: TRASH,
-                value: additionalEquipment.location ?? '',
+                value: additionalEquipment.id ?? '',
               },
             ]
           : acc,

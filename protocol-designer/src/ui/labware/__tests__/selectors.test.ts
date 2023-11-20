@@ -108,7 +108,7 @@ describe('labware selectors', () => {
       expect(
         // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalOptions.resultFunc(additionalEquipmentEntities)
-      ).toEqual([{ name: 'Trash Bin', value: 'cutoutA3' }])
+      ).toEqual([{ name: 'Trash Bin', value: mockTrashId }])
     })
     it('filters out additional equipment that is NOT trash when multiple trash bins present', () => {
       const mockTrashId = 'mockTrashId'
@@ -135,8 +135,8 @@ describe('labware selectors', () => {
         // @ts-expect-error(sa, 2021-6-15): resultFunc
         getDisposalOptions.resultFunc(additionalEquipmentEntities)
       ).toEqual([
-        { name: 'Trash Bin', value: 'cutoutA3' },
-        { name: 'Trash Bin', value: 'cutoutA1' },
+        { name: 'Trash Bin', value: mockTrashId },
+        { name: 'Trash Bin', value: mockTrashId2 },
       ])
     })
   })
