@@ -55,6 +55,11 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
+        <StyledText css={BODY_STYLE}>
+          {isSingleMountPipette
+            ? t('align_the_connector')
+            : t('hold_pipette_carefully')}
+        </StyledText>
         {!isSingleMountPipette ? (
           <Banner
             type="warning"
@@ -64,11 +69,6 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
             {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
           </Banner>
         ) : null}
-        <StyledText css={BODY_STYLE}>
-          {isSingleMountPipette
-            ? t('align_the_connector')
-            : t('hold_pipette_carefully')}
-        </StyledText>
       </>
     )
   }

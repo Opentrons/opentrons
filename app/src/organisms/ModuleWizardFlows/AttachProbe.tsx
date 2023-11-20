@@ -4,6 +4,7 @@ import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   LEFT,
   THERMOCYCLER_MODULE_MODELS,
@@ -15,8 +16,10 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
+  SIZE_1,
 } from '@opentrons/components'
 
+import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
@@ -59,26 +62,34 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isOnDevice,
     slotName,
   } = props
-  const { t, i18n } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation([
+    'module_wizard_flows',
+    'pipette_wizard_flows',
+  ])
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   const attachedPipetteChannels = attachedPipette.data.channels
-  let pipetteAttachProbeVideoSource, i18nKey
+  let pipetteAttachProbeVideoSource, probeLocation
   switch (attachedPipetteChannels) {
     case 1:
       pipetteAttachProbeVideoSource = attachProbe1
-      i18nKey = 'install_probe'
+      probeLocation = ''
       break
     case 8:
       pipetteAttachProbeVideoSource = attachProbe8
-      i18nKey = 'install_probe_8_channel'
+      probeLocation = t('pipette_wizard_flows:backmost')
       break
     case 96:
       pipetteAttachProbeVideoSource = attachProbe96
-      i18nKey = 'install_probe_96_channel'
+      probeLocation = t('pipette_wizard_flows:ninety_six_probe_location')
       break
   }
+  const wasteChuteConflict =
+    slotName === 'C3' && attachedPipette.data.channels === 96
+  const deckConfig = useDeckConfigurationQuery().data
+  const isWasteChuteOnDeck =
+    deckConfig?.find(fixture => fixture.loadName === 'wasteChute') ?? false
 
   const pipetteAttachProbeVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
@@ -135,19 +146,30 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       </InProgressModal>
     )
 
-  const bodyText =
-    attachedPipetteChannels === 8 || attachedPipetteChannels === 96 ? (
+  const bodyText = (
+    <>
       <Trans
         t={t}
-        i18nKey={i18nKey}
+        i18nKey={'pipette_wizard_flows:install_probe'}
+        values={{ location: probeLocation }}
         components={{
           strong: <strong />,
           block: <StyledText css={BODY_STYLE} />,
         }}
       />
-    ) : (
-      <StyledText css={BODY_STYLE}>{t('install_probe')}</StyledText>
-    )
+      {wasteChuteConflict && (
+        <Banner
+          type={isWasteChuteOnDeck ? 'error' : 'warning'}
+          size={isOnDevice ? '1.5rem' : SIZE_1}
+          marginY={SPACING.spacing4}
+        >
+          {isWasteChuteOnDeck
+            ? t('pipette_wizard_flows:waste_chute_error')
+            : t('pipette_wizard_flows:waste_chute_warning')}
+        </Banner>
+      )}
+    </>
+  )
 
   const handleBeginCalibration = (): void => {
     if (adapterId == null) {

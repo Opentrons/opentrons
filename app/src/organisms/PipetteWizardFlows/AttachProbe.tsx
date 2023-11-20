@@ -7,10 +7,15 @@ import {
   COLORS,
   SPACING,
   RESPONSIVENESS,
+  SIZE_1,
 } from '@opentrons/components'
 import { LEFT, MotorAxes } from '@opentrons/shared-data'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -75,6 +80,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     (instrument): instrument is PipetteData =>
       instrument.ok && instrument.mount === mount
   )
+  const deckConfig = useDeckConfigurationQuery().data
+  const isWasteChuteOnDeck =
+    deckConfig?.find(fixture => fixture.loadName === 'wasteChute') ?? false
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
@@ -214,16 +222,29 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
-        <StyledText css={BODY_STYLE}>
-          <Trans
-            t={t}
-            i18nKey={'install_probe'}
-            values={{ location: probeLocation }}
-            components={{
-              bold: <strong />,
-            }}
-          />
-        </StyledText>
+        <>
+          <StyledText css={BODY_STYLE}>
+            <Trans
+              t={t}
+              i18nKey={'install_probe'}
+              values={{ location: probeLocation }}
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </StyledText>
+          {is96Channel && (
+            <Banner
+              type={isWasteChuteOnDeck ? 'error' : 'warning'}
+              size={isOnDevice ? '1.5rem' : SIZE_1}
+              // marginY={SPACING.}
+            >
+              {isWasteChuteOnDeck
+                ? t('waste_chute_error')
+                : t('waste_chute_warning')}
+            </Banner>
+          )}
+        </>
       }
       proceedButtonText={t('begin_calibration')}
       proceed={handleOnClick}
