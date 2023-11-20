@@ -2,41 +2,46 @@
 
 .. _protocol-api-reference:
 
+***********************
 API Version 2 Reference
-=======================
+***********************
 
 .. _protocol_api-protocols-and-instruments:
 
-Protocols and Instruments
--------------------------
+Protocols
+=========
 .. module:: opentrons.protocol_api
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands, load_waste_chute
+   :exclude-members: location_cache, cleanup, clear_commands
 
+Instruments
+===========
 .. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
-   :exclude-members: delay, configure_nozzle_layout, prepare_to_aspirate
-
-.. autoclass:: opentrons.protocol_api.Liquid
+   :exclude-members: delay
 
 .. _protocol-api-labware:
 
-Labware and Wells
------------------
+Labware
+=======
 .. autoclass:: opentrons.protocol_api.Labware
    :members:
    :exclude-members: next_tip, use_tips, previous_tip, return_tips
 
+Wells and Liquids
+=================
 .. autoclass:: opentrons.protocol_api.Well
    :members:
    :exclude-members: geometry
 
+.. autoclass:: opentrons.protocol_api.Liquid
+
 .. _protocol-api-modules:
 
 Modules
--------
+=======
 
 .. autoclass:: opentrons.protocol_api.HeaterShakerContext
    :members:
@@ -66,8 +71,8 @@ Modules
 
 .. _protocol-api-types:
 
-Useful Types and Definitions
-----------------------------
+Useful Types
+============
 
 ..
    The opentrons.types module contains a mixture of public Protocol API things and private internal things.
@@ -80,7 +85,7 @@ Useful Types and Definitions
    :no-value:
 
 Executing and Simulating Protocols
-----------------------------------
+==================================
 
 .. automodule:: opentrons.execute
    :members:
