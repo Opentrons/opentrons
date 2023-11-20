@@ -10,10 +10,10 @@ export type AdditionalEquipment =
   | 'gripper'
   | 'wasteChute'
   | 'trashBin'
-  | 'stagingArea_A3'
-  | 'stagingArea_B3'
-  | 'stagingArea_C3'
-  | 'stagingArea_D3'
+  | 'stagingArea_cutoutA3'
+  | 'stagingArea_cutoutB3'
+  | 'stagingArea_cutoutC3'
+  | 'stagingArea_cutoutD3'
 export interface FormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount

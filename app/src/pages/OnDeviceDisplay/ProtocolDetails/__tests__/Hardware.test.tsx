@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
-  STAGING_AREA_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
@@ -62,13 +62,13 @@ describe('Hardware', () => {
           },
           {
             hardwareType: 'fixture',
-            fixtureName: WASTE_CHUTE_LOAD_NAME,
+            cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
             location: { cutout: WASTE_CHUTE_CUTOUT },
             hasSlotConflict: false,
           },
           {
             hardwareType: 'fixture',
-            fixtureName: STAGING_AREA_LOAD_NAME,
+            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
             location: { cutout: 'cutoutB3' },
             hasSlotConflict: false,
           },
@@ -93,7 +93,7 @@ describe('Hardware', () => {
     })
     getByRole('row', { name: '1 Heater-Shaker Module GEN1' })
     getByRole('row', { name: '3 Temperature Module GEN2' })
-    getByRole('row', { name: 'D3 Waste Chute' })
-    getByRole('row', { name: 'B3 Staging Area Slot' })
+    getByRole('row', { name: 'D3 Waste chute only' })
+    getByRole('row', { name: 'B3 Staging area slot' })
   })
 })

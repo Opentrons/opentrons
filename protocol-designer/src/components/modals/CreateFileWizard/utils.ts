@@ -4,6 +4,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { COLUMN_3_SLOTS } from '../../../constants'
 import { OUTER_SLOTS_FLEX } from '../../../modules'
 import { isModuleWithCollisionIssue } from '../../modules'
 import {
@@ -81,12 +82,14 @@ export const getTrashBinOptionDisabled = (values: FormState): boolean => {
 }
 
 export const getTrashSlot = (values: FormState): string => {
-  const stagingAreaLocations = values.additionalEquipment
-    .filter(equipment => equipment.includes('stagingArea'))
-    .map(stagingArea => stagingArea.split('_')[1])
+  const stagingAddressableAreas = values.additionalEquipment.filter(equipment =>
+    equipment.includes('stagingArea')
+  )
+  const cutouts = stagingAddressableAreas.flatMap(aa =>
+    COLUMN_3_SLOTS.filter(cutout => aa.includes(cutout))
+  )
 
-  //   return default trash slot A3 if staging area is not on slot
-  if (!stagingAreaLocations.includes(FLEX_TRASH_DEFAULT_SLOT)) {
+  if (!cutouts.includes(FLEX_TRASH_DEFAULT_SLOT)) {
     return FLEX_TRASH_DEFAULT_SLOT
   }
 
@@ -103,11 +106,8 @@ export const getTrashSlot = (values: FormState): string => {
     },
     []
   )
-
   const unoccupiedSlot = OUTER_SLOTS_FLEX.find(
-    slot =>
-      !stagingAreaLocations.includes(slot.value) &&
-      !moduleSlots.includes(slot.value)
+    slot => !cutouts.includes(slot.value) && !moduleSlots.includes(slot.value)
   )
   if (unoccupiedSlot == null) {
     console.error(

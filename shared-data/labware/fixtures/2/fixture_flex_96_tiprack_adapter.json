@@ -1,0 +1,41 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Fixture",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Fixture Flex 96 Tip Rack Adapter",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 156.5,
+    "yDimension": 93,
+    "zDimension": 132
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "fixture_flex_96_tiprack_adapter"
+  },
+  "namespace": "fixture",
+  "version": 1,
+  "schemaVersion": 2,
+  "allowedRoles": ["adapter"],
+  "cornerOffsetFromSlot": {
+    "x": -14.25,
+    "y": -3.5,
+    "z": 0
+  }
+}

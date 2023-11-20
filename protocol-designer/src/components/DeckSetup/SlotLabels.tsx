@@ -15,6 +15,7 @@ import type { RobotType } from '@opentrons/shared-data'
 interface SlotLabelsProps {
   robotType: RobotType
   hasStagingAreas: boolean
+  hasWasteChute: boolean
 }
 
 /**
@@ -25,6 +26,7 @@ interface SlotLabelsProps {
 export const SlotLabels = ({
   robotType,
   hasStagingAreas,
+  hasWasteChute,
 }: SlotLabelsProps): JSX.Element | null => {
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
@@ -59,7 +61,7 @@ export const SlotLabels = ({
         height="2.5rem"
         width={hasStagingAreas ? '40.5rem' : '30.375rem'}
         x="-15"
-        y="-65"
+        y={hasWasteChute ? '-90' : '-65'}
       >
         <Flex
           alignItems={ALIGN_CENTER}

@@ -28,6 +28,7 @@ from opentrons.protocol_api import (
     validation as mock_validation,
     Liquid,
 )
+from opentrons.protocol_api._types import StagingSlotName
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.common import (
@@ -383,6 +384,52 @@ def test_load_labware_off_deck_raises(
         )
 
 
+def test_load_labware_on_staging_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create a labware on a staging slot using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=StagingSlotName.SLOT_B4,
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        location=42,
+        label="some_display_name",
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -449,6 +496,47 @@ def test_load_adapter(
         mock_core.load_adapter(
             load_name="lowercase_adapter",
             location=DeckSlotName.SLOT_5,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_adapter(
+        load_name="UPPERCASE_ADAPTER",
+        location=42,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+def test_load_adapter_on_staging_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create an adapter on a staging slot using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
+        "lowercase_adapter"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+
+    decoy.when(
+        mock_core.load_adapter(
+            load_name="lowercase_adapter",
+            location=StagingSlotName.SLOT_B4,
             namespace="some_namespace",
             version=1337,
         )
@@ -591,6 +679,50 @@ def test_move_labware_to_slot(
         mock_core.move_labware(
             labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
+            use_gripper=False,
+            pause_for_manual_move=True,
+            pick_up_offset=None,
+            drop_offset=(1, 2, 3),
+        )
+    )
+
+
+def test_move_labware_to_staging_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should move labware to new slot location."""
+    drop_offset = {"x": 4, "y": 5, "z": 6}
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+    decoy.when(
+        mock_validation.ensure_valid_labware_offset_vector(drop_offset)
+    ).then_return((1, 2, 3))
+    subject.move_labware(
+        labware=movable_labware,
+        new_location=42,
+        drop_offset=drop_offset,
+    )
+
+    decoy.verify(
+        mock_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=StagingSlotName.SLOT_B4,
             use_gripper=False,
             pause_for_manual_move=True,
             pick_up_offset=None,
@@ -783,6 +915,26 @@ def test_load_module_with_mag_block_raises(subject: ProtocolContext) -> None:
             location=42,
             configuration="semi",
         )
+
+
+def test_load_module_on_staging_slot_raises(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should raise when attempting to load a module onto a staging slot."""
+    decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
+        TemperatureModuleModel.TEMPERATURE_V1
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+
+    with pytest.raises(ValueError, match="Cannot load a module onto a staging slot."):
+        subject.load_module(module_name="spline reticulator", location=42)
 
 
 def test_loaded_modules(

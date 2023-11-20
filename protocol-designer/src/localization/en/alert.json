@@ -163,6 +163,10 @@
       "ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST": {
         "title": "{{additionalEquipment}} does not exist",
         "body": "Attempting to interact with an unknown entity."
+      },
+      "GRIPPER_REQUIRED": {
+        "title": "A gripper is required to complete this action",
+        "body": "Attempting to move a labware without a gripper into the waste chute. Please add a gripper to this step."
       }
     },
     "warning": {

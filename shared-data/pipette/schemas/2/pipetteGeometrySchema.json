@@ -7,6 +7,20 @@
       "items": { "type": "number" },
       "minItems": 3,
       "maxItems": 3
+    },
+    "nozzleName": {
+      "type": "string",
+      "pattern": "[A-Z]+[0-9]+"
+    },
+    "rowName": {
+      "type": "string",
+      "pattern": "[A-Z]+",
+      "description": "The name of a row of nozzles"
+    },
+    "columnName": {
+      "type": "string",
+      "pattern": "[0-9]+",
+      "description": "The name of a column of nozzles"
     }
   },
   "type": "object",
@@ -22,6 +36,38 @@
       "description": "path to the gltf file representing the 3D pipette model",
       "type": "string",
       "pattern": "^pipette/definitions/[2]/geometry/([a-z]*_[a-z]*)+/p[0-9]{2,4}/[a-z]*[.]gltf"
+    },
+    "orderedRows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "A row of nozzle keys",
+        "required": ["key", "orderedNozzles"],
+        "properties": {
+          "key": { "$ref": "#/definitions/rowName" },
+          "orderedNozzles": {
+            "type": "array",
+            "description": "The list of nozzle names in this row",
+            "items": { "$ref": "#/definitions/nozzleName" }
+          }
+        }
+      }
+    },
+    "orderedColumns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "A column of nozzle keys",
+        "required": ["key", "orderedNozzles"],
+        "properties": {
+          "key": { "$ref": "#/definitions/columnName" },
+          "orderedNozzles": {
+            "type": "array",
+            "description": "The list of nozzle names in this column",
+            "items": { "$ref": "#/definitions/nozzleName" }
+          }
+        }
+      }
     },
     "nozzleMap": {
       "type": "object",

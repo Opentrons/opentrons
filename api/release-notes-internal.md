@@ -4,52 +4,27 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.14.0
+# Internal Release 1.1.0
 
 ## New Stuff In This Release
 
-- Return tip heights and some other pipette behaviors are now properly executed based on the kind of tip being used
-- Release Flex robot software builds are now cryptographically signed. If you run a release build, you can only install other properly signed release builds. Note that if the robot was previously on a non-release build this won't latch; remove the update server config file at ``/var/lib/otupdate/config.json`` to go back to signed builds only. 
-- Error handling has been overhauled; all errors now display with an error code for easier reporting. Many of those error codes are the 4000 catchall still but this will improve over time.
-- If there's an error during the post-run cleanup steps, where the robot homes and drops tips, the run should no longer get stuck in a permanent "finishing" state. It should get marked as failed.
-- Further updates to Flex motion control parameters from hardware testing for both gantry and plunger speeds and acceleration
-- Pipette overpressure detection is now integrated.
-- All instrument flows should now show errors if they occur instead of skipping a step
-- Fixes to several incorrect status displays in ODD (i.e. protocols skipping the full-color outcome splash)
-- Robot can now handle json protocol v7
-- Support for PVT (v1.1) grippers
-- Update progress should get displayed after restart for firmware updates
-- Removed `use_pick_up_location_lpc_offset` and `use_drop_location_lpc_offset` from `protocol_context.move_labware` arguments. So they should be removed from any protocols that used them. This change also requires resetting the protocol run database on the robot.
-- Added 'contextual' gripper offsets to deck, labware and module definitions. So, any labware movement offsets that were previously being specified in the protocol should now be removed or adjusted or they will get added twice.
+This is a tracking internal release coming off of the edge branch to contain rapid dev on new features for 7.1.0. Features will change drastically between successive alphas even over the course of the day. For this reason, these release notes will not be in their usual depth.
 
+The biggest new features, however, are
+- There is a new protocol API version, 2.16, which changes how the default trash is loaded and gates features like partial tip pickup and waste chute usage:
+  - Protocols do not load a trash by default. To load the normal trash, load ``opentrons_1_trash_3200ml_fixed`` in slot ``A3``.
+    - But also you can load it in any other edge slot if you want (columns 1 and 3).
+  - Protocols can load trash chutes; the details of exactly how this works are still in flux.
+  - Protocols can configure their 96 and 8 channel pipettes to pick up only a subset of tips using ``configure_nozzle_layout``.
+- Support for json protocol V8 and command V8, which adds JSON protocol support for the above features.
+- ODD support for rendering the above features in protocols
+- ODD support for configuring the loaded deck fixtures like trash chutes
+- Labware position check now uses the calibration probe (the same one used for pipette and module calibration) instead of a tip; this should increase the accuracy of LPC.
+- Support for P1000S v3.6
+- Updated liquid handling functions for all 96 channel pipettes
 
-## Big Things That Don't Work Yet So Don't Report Bugs About Them
+## Known Issues 
 
-### Robot Control
-- Pipette pressure sensing for liquid-level sensing purposes
-- Labware pick up failure with gripper
-- E-stop integrated handling especially with modules
-
-## Big Things That Do Work Please Do Report Bugs About Them
-### Robot Control
-- Protocol behavior
-- Labware movement between slots/modules, both manual and with gripper, from python protocols
-- Labware drop/gripper crash errors, but they're very insensitive
-- Pipette and gripper automated offset calibration
-- Network connectivity and discoverability
-- Firmware update for all devices 
-- Cancelling a protocol run. We're even more sure we fixed this so definitely tell us if it's not.
-- USB connectivity
-- Stall detection firing basically ever unless you clearly ran into something
-
-### ODD
-- Protocol execution including end-of-protocol screen
-- Protocol run monitoring
-- Attach and calibrate
-- Network connection management, including viewing IP addresses and connecting to wifi networks
-- Automatic updates of robot software when new internal releases are created
-- Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
-- After a while, the ODD should go into idle; if you touch it, it will come back online
-
-
-
+- The ``MoveToAddressableArea`` command will noop. This means that all commands that use the movable trash bin will not "move to the trash bin". The command will analyze successfully.
+- The deck configuration on the robot is not persistent, this means that between boots of a robot, you must PUT a deck configuration on the robot via HTTP.
+ 

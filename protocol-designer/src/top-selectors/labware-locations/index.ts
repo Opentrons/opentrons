@@ -7,7 +7,12 @@ import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
+  CutoutId,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  isAddressableAreaStandardSlot,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
@@ -108,9 +113,13 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
     additionalEquipmentEntities
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
-    const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
+    const cutoutFixtures = deckDef.cutoutFixtures
     const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
+      .filter(aE => aE.name === 'stagingArea')
+      //  TODO(jr, 11/13/23): fix AdditionalEquipment['location'] from type string to CutoutId
+      .map(aE => aE.location as CutoutId)
 
     if (robotState == null) return null
 
@@ -189,16 +198,39 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       []
     )
 
+    const stagingAreaAddressableAreaNames = stagingAreaCutoutIds
+      .flatMap(cutoutId => {
+        const addressableAreasOnCutout = cutoutFixtures.find(
+          cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
+        )?.providesAddressableAreas[cutoutId]
+        return addressableAreasOnCutout ?? []
+      })
+      .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
+
+    //  TODO(jr, 11/13/23): update COLUMN_4_SLOTS usage to FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS
+    const notSelectedStagingAreaAddressableAreas = COLUMN_4_SLOTS.filter(slot =>
+      stagingAreaAddressableAreaNames.every(
+        addressableArea => addressableArea !== slot
+      )
+    )
+
     const unoccupiedSlotOptions = allSlotIds
-      .filter(
-        slotId =>
+      .filter(slotId => {
+        const isTrashSlot =
+          robotType === FLEX_ROBOT_TYPE
+            ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
+            : slotId === 'fixedTrash'
+
+        return (
           !slotIdsOccupiedByModules.includes(slotId) &&
           !Object.values(labware)
             .map(lw => lw.slot)
             .includes(slotId) &&
-          slotId !== trashSlot &&
-          (hasWasteChute ? !(slotId in WASTE_CHUTE_ADDRESSABLE_AREAS) : true)
-      )
+          !isTrashSlot &&
+          !WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotId) &&
+          !notSelectedStagingAreaAddressableAreas.includes(slotId)
+        )
+      })
       .map(slotId => ({ name: slotId, value: slotId }))
     const offDeck = { name: 'Off-deck', value: 'offDeck' }
     const wasteChuteSlot = {

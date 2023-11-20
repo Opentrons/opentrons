@@ -13,10 +13,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -28,17 +30,18 @@ import { getSlotsForThermocycler } from './utils'
 
 import type {
   LoadModuleRunTimeCommand,
-  LoadFixtureRunTimeCommand,
   PipetteName,
   RobotType,
+  SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
+import type { CutoutConfigProtocolSpec } from '../../resources/deck_configuration/utils'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
   extensionInstrumentName: string | null
   requiredModuleDetails: LoadModuleRunTimeCommand[]
-  requiredFixtureDetails: LoadFixtureRunTimeCommand[]
+  requiredFixtureDetails: CutoutConfigProtocolSpec[]
   isLoading: boolean
   robotType: RobotType | null
 }
@@ -110,6 +113,14 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
+  // filter out single slot fixtures
+  const nonStandardRequiredFixtureDetails = requiredFixtureDetails.filter(
+    fixture =>
+      !SINGLE_SLOT_FIXTURES.includes(
+        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
+      )
+  )
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
       <RobotConfigurationDetailsItem
@@ -176,15 +187,15 @@ export const RobotConfigurationDetails = (
           </React.Fragment>
         )
       })}
-      {requiredFixtureDetails.map((fixture, index) => {
+      {nonStandardRequiredFixtureDetails.map((fixture, index) => {
         return (
           <React.Fragment key={`fixture_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />
             <RobotConfigurationDetailsItem
-              label={fixture.params.location.cutout}
+              label={getCutoutDisplayName(fixture.cutoutId)}
               item={
                 <StyledText as="p">
-                  {getFixtureDisplayName(fixture.params.loadName)}
+                  {getFixtureDisplayName(fixture.cutoutFixtureId)}
                 </StyledText>
               }
             />

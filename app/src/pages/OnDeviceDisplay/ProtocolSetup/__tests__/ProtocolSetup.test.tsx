@@ -18,7 +18,7 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  STAGING_AREA_LOAD_NAME,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
@@ -46,6 +46,7 @@ import {
   useRunStatus,
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ProtocolSetup } from '..'
 
@@ -53,7 +54,6 @@ import type { UseQueryResult } from 'react-query'
 import type {
   DeckConfiguration,
   CompletedProtocolAnalysis,
-  Fixture,
 } from '@opentrons/shared-data'
 
 // Mock IntersectionObserver
@@ -88,6 +88,7 @@ jest.mock('../../../../organisms/ModuleCard/hooks')
 jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
 jest.mock('../../../../organisms/ToasterOven')
+jest.mock('../../../../resources/deck_configuration/hooks')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -163,6 +164,9 @@ const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.Mocked
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
 >
+const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
+  typeof useDeckConfigurationCompatibility
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -230,10 +234,9 @@ const mockDoorStatus = {
   },
 }
 const mockFixture = {
-  fixtureId: 'mockId',
-  fixtureLocation: 'cutoutD1',
-  loadName: STAGING_AREA_LOAD_NAME,
-} as Fixture
+  cutoutId: 'cutoutD1',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
 
 const MOCK_MAKE_SNACKBAR = jest.fn()
 
@@ -332,6 +335,7 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(({
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
+    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
   })
 
   afterEach(() => {

@@ -1,27 +1,25 @@
 import { parseAllAddressableAreas } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotTypeV4,
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  getAddressableAreaFromSlotId,
+  getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
 import type {
+  CutoutConfig,
   CutoutId,
-  DeckConfiguration,
   RunTimeCommand,
-  Cutout,
-  CutoutFixtureId,
   CutoutFixture,
   AddressableAreaName,
-  FixtureLoadName,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 
-interface CutoutConfig {
-  cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId
+export interface CutoutConfigProtocolSpec extends CutoutConfig {
   requiredAddressableAreas: AddressableAreaName[]
 }
 
-export const FLEX_SIMPLEST_DECK_CONFIG: CutoutConfig[] = [
+export const FLEX_SIMPLEST_DECK_CONFIG: CutoutConfigProtocolSpec[] = [
   {
     cutoutId: 'cutoutA1',
     cutoutFixtureId: 'singleLeftSlot',
@@ -86,93 +84,79 @@ export const FLEX_SIMPLEST_DECK_CONFIG: CutoutConfig[] = [
 
 export function getSimplestDeckConfigForProtocolCommands(
   protocolAnalysisCommands: RunTimeCommand[]
-): CutoutConfig[] {
+): CutoutConfigProtocolSpec[] {
   // TODO(BC, 2023-11-06): abstract out the robot type
-  const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const addressableAreas = parseAllAddressableAreas(protocolAnalysisCommands)
-  const simplestDeckConfig = addressableAreas.reduce<CutoutConfig[]>(
-    (acc, addressableArea) => {
-      const cutoutFixturesForAddressableArea = getCutoutFixturesForAddressableAreas(
-        [addressableArea],
-        deckDef.cutoutFixtures
-      )
-      const cutoutIdForAddressableArea = getCutoutIdForAddressableArea(
-        addressableArea,
-        cutoutFixturesForAddressableArea
-      )
-      const cutoutFixturesForCutoutId =
-        cutoutIdForAddressableArea != null
-          ? getCutoutFixturesForCutoutId(
-              cutoutIdForAddressableArea,
-              deckDef.cutoutFixtures
-            )
-          : null
+  const simplestDeckConfig = addressableAreas.reduce<
+    CutoutConfigProtocolSpec[]
+  >((acc, addressableArea) => {
+    const cutoutFixturesForAddressableArea = getCutoutFixturesForAddressableAreas(
+      [addressableArea],
+      deckDef.cutoutFixtures
+    )
+    const cutoutIdForAddressableArea = getCutoutIdForAddressableArea(
+      addressableArea,
+      cutoutFixturesForAddressableArea
+    )
+    const cutoutFixturesForCutoutId =
+      cutoutIdForAddressableArea != null
+        ? getCutoutFixturesForCutoutId(
+            cutoutIdForAddressableArea,
+            deckDef.cutoutFixtures
+          )
+        : null
 
-      const existingCutoutConfig = acc.find(
-        cutoutConfig => cutoutConfig.cutoutId === cutoutIdForAddressableArea
+    const existingCutoutConfig = acc.find(
+      cutoutConfig => cutoutConfig.cutoutId === cutoutIdForAddressableArea
+    )
+
+    if (
+      existingCutoutConfig != null &&
+      cutoutFixturesForCutoutId != null &&
+      cutoutIdForAddressableArea != null
+    ) {
+      const indexOfExistingFixture = cutoutFixturesForCutoutId.findIndex(
+        ({ id }) => id === existingCutoutConfig.cutoutFixtureId
+      )
+      const accIndex = acc.findIndex(
+        ({ cutoutId }) => cutoutId === cutoutIdForAddressableArea
+      )
+      const previousRequiredAAs = acc[accIndex]?.requiredAddressableAreas
+      const allNextRequiredAddressableAreas = previousRequiredAAs.includes(
+        addressableArea
+      )
+        ? previousRequiredAAs
+        : [...previousRequiredAAs, addressableArea]
+      const nextCompatibleCutoutFixture = getSimplestFixtureForAddressableAreas(
+        cutoutIdForAddressableArea,
+        allNextRequiredAddressableAreas,
+        cutoutFixturesForCutoutId
+      )
+      const indexOfCurrentFixture = cutoutFixturesForCutoutId.findIndex(
+        ({ id }) => id === nextCompatibleCutoutFixture?.id
       )
 
       if (
-        existingCutoutConfig != null &&
-        cutoutFixturesForCutoutId != null &&
-        cutoutIdForAddressableArea != null
+        nextCompatibleCutoutFixture != null &&
+        indexOfCurrentFixture > indexOfExistingFixture
       ) {
-        const indexOfExistingFixture = cutoutFixturesForCutoutId.findIndex(
-          ({ id }) => id === existingCutoutConfig.cutoutFixtureId
-        )
-        const accIndex = acc.findIndex(
-          ({ cutoutId }) => cutoutId === cutoutIdForAddressableArea
-        )
-        const previousRequiredAAs = acc[accIndex]?.requiredAddressableAreas
-        const allNextRequiredAddressableAreas = previousRequiredAAs.includes(
-          addressableArea
-        )
-          ? previousRequiredAAs
-          : [...previousRequiredAAs, addressableArea]
-        const nextCompatibleCutoutFixture = getSimplestFixtureForAddressableAreas(
-          cutoutIdForAddressableArea,
-          allNextRequiredAddressableAreas,
-          cutoutFixturesForCutoutId
-        )
-        const indexOfCurrentFixture = cutoutFixturesForCutoutId.findIndex(
-          ({ id }) => id === nextCompatibleCutoutFixture?.id
-        )
-
-        if (
-          nextCompatibleCutoutFixture != null &&
-          indexOfCurrentFixture > indexOfExistingFixture
-        ) {
-          return [
-            ...acc.slice(0, accIndex),
-            {
-              cutoutId: cutoutIdForAddressableArea,
-              cutoutFixtureId: nextCompatibleCutoutFixture.id,
-              requiredAddressableAreas: allNextRequiredAddressableAreas,
-            },
-            ...acc.slice(accIndex + 1),
-          ]
-        }
+        return [
+          ...acc.slice(0, accIndex),
+          {
+            cutoutId: cutoutIdForAddressableArea,
+            cutoutFixtureId: nextCompatibleCutoutFixture.id,
+            requiredAddressableAreas: allNextRequiredAddressableAreas,
+          },
+          ...acc.slice(accIndex + 1),
+        ]
       }
-      return acc
-    },
-    FLEX_SIMPLEST_DECK_CONFIG
-  )
+    }
+    return acc
+  }, FLEX_SIMPLEST_DECK_CONFIG)
 
   return simplestDeckConfig
-}
-
-// TODO(BC, 11/7/23): remove this function in favor of getSimplestDeckConfigForProtocolCommands
-export function getDeckConfigFromProtocolCommands(
-  commands: RunTimeCommand[]
-): DeckConfiguration {
-  return getSimplestDeckConfigForProtocolCommands(commands).map(
-    ({ cutoutId, cutoutFixtureId }) => ({
-      fixtureId: cutoutFixtureId,
-      fixtureLocation: cutoutId as Cutout,
-      loadName: cutoutFixtureId as FixtureLoadName,
-    })
-  )
 }
 
 export function getCutoutFixturesForAddressableAreas(
@@ -193,6 +177,22 @@ export function getCutoutFixturesForCutoutId(
   return cutoutFixtures.filter(cutoutFixture =>
     cutoutFixture.mayMountTo.some(mayMountTo => mayMountTo.includes(cutoutId))
   )
+}
+
+export function getCutoutIdForSlotName(
+  slotName: string,
+  deckDef: DeckDefinition
+): CutoutId | null {
+  const addressableArea = getAddressableAreaFromSlotId(slotName, deckDef)
+  const cutoutIdForSlotName =
+    addressableArea != null
+      ? getCutoutIdForAddressableArea(
+          addressableArea.id,
+          deckDef.cutoutFixtures
+        )
+      : null
+
+  return cutoutIdForSlotName
 }
 
 export function getCutoutIdForAddressableArea(
@@ -224,4 +224,22 @@ export function getSimplestFixtureForAddressableAreas(
     cutoutFixturesForCutoutId
   )
   return nextCompatibleCutoutFixtures?.[0] ?? null
+}
+
+export function getRequiredDeckConfig<T extends CutoutConfigProtocolSpec>(
+  deckConfigProtocolSpec: T[]
+): T[] {
+  const nonSingleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
+    ({ requiredAddressableAreas }) =>
+      // required AA list includes a non-single-slot AA
+      !requiredAddressableAreas.every(aa =>
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+      )
+  )
+  // fixture includes at least 1 required AA
+  const requiredDeckConfigProtocolSpec = nonSingleSlotDeckConfigCompatibility.filter(
+    fixture => fixture.requiredAddressableAreas.length > 0
+  )
+
+  return requiredDeckConfigProtocolSpec
 }

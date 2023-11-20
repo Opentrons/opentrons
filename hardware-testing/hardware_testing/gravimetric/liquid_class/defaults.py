@@ -8,8 +8,9 @@ from .definition import (
     interpolate,
 )
 
-_default_submerge_aspirate_mm = 2.5
-_default_submerge_dispense_mm = 2.5
+_default_submerge_aspirate_mm = 1.5
+_p50_multi_submerge_aspirate_mm = 1.5
+_default_submerge_dispense_mm = 1.5
 _default_retract_mm = 5.0
 _default_retract_discontinuity = 20
 
@@ -498,7 +499,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
         50: {  # P50
             50: {  # T50
                 1: AspirateSettings(  # 1uL
-                    z_submerge_depth=_default_submerge_aspirate_mm,
+                    z_submerge_depth=_p50_multi_submerge_aspirate_mm,
                     plunger_acceleration=_default_accel_p50_ul_sec_sec,
                     plunger_flow_rate=35,  # ul/sec
                     delay=_default_aspirate_delay_seconds,
@@ -508,7 +509,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     trailing_air_gap=0.1,
                 ),
                 10: AspirateSettings(  # 10uL
-                    z_submerge_depth=_default_submerge_aspirate_mm,
+                    z_submerge_depth=_p50_multi_submerge_aspirate_mm,
                     plunger_acceleration=_default_accel_p50_ul_sec_sec,
                     plunger_flow_rate=23.5,  # ul/sec
                     delay=_default_aspirate_delay_seconds,
@@ -518,7 +519,7 @@ _aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]]
                     trailing_air_gap=0.1,
                 ),
                 50: AspirateSettings(  # 50uL
-                    z_submerge_depth=_default_submerge_aspirate_mm,
+                    z_submerge_depth=_p50_multi_submerge_aspirate_mm,
                     plunger_acceleration=_default_accel_p50_ul_sec_sec,
                     plunger_flow_rate=35,  # ul/sec
                     delay=_default_aspirate_delay_seconds,

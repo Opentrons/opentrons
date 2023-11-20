@@ -6,37 +6,31 @@ import { Btn, Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import {
+  WASTE_CHUTE_DISPLAY_NAME,
+  FIXTURE_HEIGHT,
+  STAGING_AREA_FIXTURE_WIDTH,
+  SINGLE_SLOT_FIXTURE_WIDTH,
+} from './constants'
 
 import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
-
-// TODO: replace stubs with JSON definitions when available
-const wasteChuteDef = {
-  schemaVersion: 1,
-  version: 1,
-  namespace: 'opentrons',
-  metadata: {
-    displayName: 'Waste chute',
-  },
-  parameters: {
-    loadName: 'trash_chute',
-  },
-  boundingBox: {
-    xDimension: 286.5,
-    yDimension: 106.0,
-    zDimension: 0,
-  },
-}
 
 interface WasteChuteConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
+  hasStagingAreas?: boolean
 }
 
 export function WasteChuteConfigFixture(
   props: WasteChuteConfigFixtureProps
 ): JSX.Element {
-  const { deckDefinition, handleClickRemove, fixtureLocation } = props
+  const {
+    deckDefinition,
+    handleClickRemove,
+    fixtureLocation,
+    hasStagingAreas = false,
+  } = props
 
   const wasteChuteSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === fixtureLocation
@@ -48,20 +42,20 @@ export function WasteChuteConfigFixture(
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = wasteChuteDef.boundingBox
-
   return (
     <RobotCoordsForeignObject
-      width={xDimension}
-      height={yDimension}
+      width={
+        hasStagingAreas ? STAGING_AREA_FIXTURE_WIDTH : SINGLE_SLOT_FIXTURE_WIDTH
+      }
+      height={FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
       <Flex css={WASTE_CHUTE_CONFIG_STYLE}>
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>
-          {wasteChuteDef.metadata.displayName}
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
+          {WASTE_CHUTE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Btn

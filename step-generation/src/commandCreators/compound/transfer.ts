@@ -9,6 +9,7 @@ import {
   curryCommandCreator,
   getDispenseAirGapLocation,
   reduceCommandCreators,
+  wasteChuteCommandsUtil,
 } from '../../utils'
 import {
   aspirate,
@@ -91,6 +92,26 @@ export const transfer: CommandCreator<TransferArgs> = (
       errors,
     }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
+
+  const isWasteChute =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation] != null
+
+  const addressableAreaName =
+    pipetteSpec.channels === 96
+      ? '96ChannelWasteChute'
+      : '1and8ChannelWasteChute'
+
+  const dropTipCommand = isWasteChute
+    ? curryCommandCreator(wasteChuteCommandsUtil, {
+        type: 'dropTip',
+        pipetteId: args.pipette,
+        addressableAreaName: addressableAreaName,
+      })
+    : curryCommandCreator(dropTip, {
+        pipette: args.pipette,
+        dropTipLocation: args.dropTipLocation,
+      })
+
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
   // to the action of aspiration of dispensing in a given command, they are actually values bound
   // to a given labware associated with a command (e.g. Source, Destination). For this reason we
@@ -407,12 +428,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           // if using dispense > air gap, drop or change the tip at the end
           const dropTipAfterDispenseAirGap =
             airGapAfterDispenseCommands.length > 0 && isLastChunk && isLastPair
-              ? [
-                  curryCommandCreator(dropTip, {
-                    pipette: args.pipette,
-                    dropTipLocation: args.dropTipLocation,
-                  }),
-                ]
+              ? [dropTipCommand]
               : []
           const blowoutCommand = blowoutUtil({
             pipette: args.pipette,

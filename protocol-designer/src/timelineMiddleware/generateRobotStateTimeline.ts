@@ -2,6 +2,7 @@ import takeWhile from 'lodash/takeWhile'
 import * as StepGeneration from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import type { StepArgsAndErrorsById } from '../steplist/types'
+
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
   orderedStepIds: string[]
@@ -65,18 +66,36 @@ export const generateRobotStateTimeline = (
           // @ts-expect-error(sa, 2021-6-20): not a valid type narrow, use in operator
           nextStepArgsForPipette.changeTip === 'never'
 
+        const isWasteChute =
+          invariantContext.additionalEquipmentEntities[dropTipLocation] != null
+
+        const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
+
+        const addressableAreaName =
+          pipetteSpec.channels === 96
+            ? '96ChannelWasteChute'
+            : '1and8ChannelWasteChute'
+
+        const dropTipCommand = isWasteChute
+          ? StepGeneration.curryCommandCreator(
+              StepGeneration.wasteChuteCommandsUtil,
+              {
+                type: 'dropTip',
+                pipetteId: pipetteId,
+                addressableAreaName,
+              }
+            )
+          : StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
+              pipette: pipetteId,
+              dropTipLocation,
+            })
+
         if (!willReuseTip) {
           return [
             ...acc,
             (_invariantContext, _prevRobotState) =>
               StepGeneration.reduceCommandCreators(
-                [
-                  curriedCommandCreator,
-                  StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
-                    pipette: pipetteId,
-                    dropTipLocation,
-                  }),
-                ],
+                [curriedCommandCreator, dropTipCommand],
                 _invariantContext,
                 _prevRobotState
               ),

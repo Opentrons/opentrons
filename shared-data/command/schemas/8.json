@@ -69,6 +69,9 @@
       "$ref": "#/definitions/MoveToWellCreate"
     },
     {
+      "$ref": "#/definitions/MoveToAddressableAreaCreate"
+    },
+    {
       "$ref": "#/definitions/PrepareToAspirateCreate"
     },
     {
@@ -1232,6 +1235,19 @@
       },
       "required": ["labwareId"]
     },
+    "AddressableAreaLocation": {
+      "title": "AddressableAreaLocation",
+      "description": "The location of something place in an addressable area. This is a superset of deck slots.",
+      "type": "object",
+      "properties": {
+        "addressableAreaName": {
+          "title": "Addressableareaname",
+          "description": "The name of the addressable area that you want to use. Valid values are the `id`s of `addressableArea`s in the [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck).",
+          "type": "string"
+        }
+      },
+      "required": ["addressableAreaName"]
+    },
     "LoadLabwareParams": {
       "title": "LoadLabwareParams",
       "description": "Payload required to load a labware into a slot.",
@@ -1253,6 +1269,9 @@
             {
               "enum": ["offDeck"],
               "type": "string"
+            },
+            {
+              "$ref": "#/definitions/AddressableAreaLocation"
             }
           ]
         },
@@ -1580,6 +1599,9 @@
             {
               "enum": ["offDeck"],
               "type": "string"
+            },
+            {
+              "$ref": "#/definitions/AddressableAreaLocation"
             }
           ]
         },
@@ -1853,6 +1875,70 @@
         },
         "params": {
           "$ref": "#/definitions/MoveToWellParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "MoveToAddressableAreaParams": {
+      "title": "MoveToAddressableAreaParams",
+      "description": "Payload required to move a pipette to a specific addressable area.",
+      "type": "object",
+      "properties": {
+        "minimumZHeight": {
+          "title": "Minimumzheight",
+          "description": "Optional minimal Z margin in mm. If this is larger than the API's default safe Z margin, it will make the arc higher. If it's smaller, it will have no effect.",
+          "type": "number"
+        },
+        "forceDirect": {
+          "title": "Forcedirect",
+          "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+          "default": false,
+          "type": "boolean"
+        },
+        "speed": {
+          "title": "Speed",
+          "description": "Override the travel speed in mm/s. This controls the straight linear speed of motion.",
+          "type": "number"
+        },
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "addressableAreaName": {
+          "title": "Addressableareaname",
+          "description": "The name of the addressable area that you want to use. Valid values are the `id`s of `addressableArea`s in the [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck).",
+          "type": "string"
+        }
+      },
+      "required": ["pipetteId", "addressableAreaName"]
+    },
+    "MoveToAddressableAreaCreate": {
+      "title": "MoveToAddressableAreaCreate",
+      "description": "Move to addressable area command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "moveToAddressableArea",
+          "enum": ["moveToAddressableArea"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/MoveToAddressableAreaParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

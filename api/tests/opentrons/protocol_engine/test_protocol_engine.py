@@ -343,15 +343,23 @@ def test_play(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+            PlayAction(
+                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+            )
         ),
-    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+    ).then_return(
+        PlayAction(
+            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+        )
+    )
 
-    subject.play()
+    subject.play(deck_configuration=[])
 
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
+            PlayAction(
+                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+            )
         ),
         hardware_api.resume(HardwarePauseType.PAUSE),
     )
@@ -371,17 +379,25 @@ def test_play_blocked_by_door(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+            PlayAction(
+                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+            )
         ),
-    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+    ).then_return(
+        PlayAction(
+            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+        )
+    )
     decoy.when(state_store.commands.get_is_door_blocking()).then_return(True)
 
-    subject.play()
+    subject.play(deck_configuration=[])
 
     decoy.verify(hardware_api.resume(HardwarePauseType.PAUSE), times=0)
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
+            PlayAction(
+                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+            )
         ),
         hardware_api.pause(HardwarePauseType.PAUSE),
     )

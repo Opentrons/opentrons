@@ -81,7 +81,7 @@ import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
 
-import type { Cutout, FixtureLoadName } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import type { ProtocolHardware, ProtocolFixture } from '../../Protocols/hooks'
 import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -463,7 +463,7 @@ function PrepareToRun({
   const missingFixturesText =
     missingFixtures.length === 1
       ? `${t('missing')} ${getFixtureDisplayName(
-          missingFixtures[0].fixtureName
+          missingFixtures[0].cutoutFixtureId
         )}`
       : t('multiple_fixtures_missing', { count: missingFixtures.length })
 
@@ -691,11 +691,9 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
   )
-  const [fixtureLocation, setFixtureLocation] = React.useState<Cutout>(
-    '' as Cutout
-  )
+  const [cutoutId, setCutoutId] = React.useState<CutoutId | null>(null)
   const [providedFixtureOptions, setProvidedFixtureOptions] = React.useState<
-    FixtureLoadName[]
+    CutoutFixtureId[]
   >([])
 
   // orchestrate setup subpages/components
@@ -719,7 +717,7 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupModulesAndDeck
         runId={runId}
         setSetupScreen={setSetupScreen}
-        setFixtureLocation={setFixtureLocation}
+        setCutoutId={setCutoutId}
         setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
@@ -731,7 +729,7 @@ export function ProtocolSetup(): JSX.Element {
     ),
     'deck configuration': (
       <ProtocolSetupDeckConfiguration
-        fixtureLocation={fixtureLocation}
+        cutoutId={cutoutId}
         runId={runId}
         setSetupScreen={setSetupScreen}
         providedFixtureOptions={providedFixtureOptions}

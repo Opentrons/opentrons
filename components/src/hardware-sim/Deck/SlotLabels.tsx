@@ -10,6 +10,7 @@ import type { RobotType } from '@opentrons/shared-data'
 interface SlotLabelsProps {
   robotType: RobotType
   color?: string
+  show4thColumn?: boolean
 }
 
 /**
@@ -19,7 +20,11 @@ interface SlotLabelsProps {
 export const SlotLabels = ({
   robotType,
   color,
+  show4thColumn = false,
 }: SlotLabelsProps): JSX.Element | null => {
+  const widthSmallRem = 10.5
+  const widthLargeRem = 15.25
+
   return robotType === FLEX_ROBOT_TYPE ? (
     <>
       <RobotCoordsForeignObject
@@ -71,37 +76,56 @@ export const SlotLabels = ({
       </RobotCoordsForeignObject>
       <RobotCoordsForeignObject
         height="2.5rem"
-        width="30.375rem"
-        x="-15"
+        width={`${
+          show4thColumn
+            ? widthSmallRem * 2 + widthLargeRem * 2
+            : widthSmallRem + widthLargeRem * 2
+        }rem`}
+        x="-100"
         y="-55"
       >
         <Flex
           alignItems={ALIGN_CENTER}
           flex="1"
-          width="30.375rem"
+          width={`${
+            show4thColumn
+              ? widthSmallRem * 2 + widthLargeRem * 2
+              : widthSmallRem + widthLargeRem * 2
+          }rem`}
           height="2.5rem"
         >
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            flex="1"
+            width={`${widthLargeRem}rem`}
           >
             <LocationIcon color={color} slotName="1" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            flex="1"
+            width={`${widthSmallRem}rem`}
           >
             <LocationIcon color={color} slotName="2" height="100%" />
           </Flex>
           <Flex
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
-            flex="1"
+            width={
+              show4thColumn ? `${widthSmallRem}rem` : `${widthLargeRem}rem`
+            }
           >
             <LocationIcon color={color} slotName="3" height="100%" />
           </Flex>
+          {show4thColumn ? (
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_CENTER}
+              width={`${widthSmallRem}rem`}
+            >
+              <LocationIcon color={color} slotName="4" height="100%" />
+            </Flex>
+          ) : null}
         </Flex>
       </RobotCoordsForeignObject>
     </>

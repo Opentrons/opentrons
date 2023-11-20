@@ -31,6 +31,7 @@ from opentrons.types import Point, DeckSlotName
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -573,6 +574,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         return self._blow_out_flow_rate * rate
+
+    def get_nozzle_configuration(self) -> NozzleConfigurationType:
+        return self._engine_client.state.pipettes.get_nozzle_layout_type(
+            self._pipette_id
+        )
 
     def set_flow_rate(
         self,

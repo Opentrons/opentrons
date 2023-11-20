@@ -160,6 +160,27 @@ describe('moveToWell', () => {
       type: 'LABWARE_OFF_DECK',
     })
   })
+  it('should return an error when dispensing from the 4th column', () => {
+    robotStateWithTip = {
+      ...robotStateWithTip,
+      labware: {
+        [SOURCE_LABWARE]: { slot: 'A4' },
+      },
+    }
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'PIPETTING_INTO_COLUMN_4',
+    })
+  })
   it('should return an error when moving to well in a thermocycler with pipette collision', () => {
     mockThermocyclerPipetteCollision.mockImplementationOnce(
       (
