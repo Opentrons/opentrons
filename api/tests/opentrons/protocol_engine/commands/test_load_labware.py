@@ -166,7 +166,7 @@ async def test_load_labware_on_labware(
     )
 
 
-async def test_load_labware_raises_if_location_occupied(
+async def test_load_labware_checks_config_and_raises_if_location_occupied(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     equipment: EquipmentHandler,
@@ -180,9 +180,12 @@ async def test_load_labware_raises_if_location_occupied(
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
-        displayName="My custom display name",
     )
 
+    # Config asks to ensure location is empty before loading equipment
+    decoy.when(state_view.config.ensure_empty_location_for_equipment_load).then_return(
+        True
+    )
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
@@ -191,3 +194,27 @@ async def test_load_labware_raises_if_location_occupied(
 
     with pytest.raises(LocationIsOccupiedError):
         await subject.execute(data)
+
+    # Config asks to NOT check whether location is empty before loading equipment
+    decoy.when(state_view.config.ensure_empty_location_for_equipment_load).then_return(
+        False
+    )
+    decoy.when(
+        await equipment.load_labware(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            load_name="some-load-name",
+            namespace="opentrons-test",
+            version=1,
+            labware_id=None,
+        )
+    ).then_return(
+        LoadedLabwareData(
+            labware_id="labware-id",
+            definition=well_plate_def,
+            offsetId="labware-offset-id",
+        )
+    )
+    decoy.when(
+        labware_validation.validate_definition_is_labware(well_plate_def)
+    ).then_return(True)
+    await subject.execute(data)  # No error is raised

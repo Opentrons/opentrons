@@ -37,3 +37,4 @@ class Config:
     use_virtual_gripper: bool = False
     use_simulated_deck_config: bool = False
     block_on_door_open: bool = False
+    ensure_empty_location_for_equipment_load: bool = True
