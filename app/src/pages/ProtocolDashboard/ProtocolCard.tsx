@@ -70,10 +70,11 @@ export function ProtocolCard(props: {
   )
 
   const isFailedAnalysis =
-    (mostRecentAnalysis != null &&
-      'result' in mostRecentAnalysis &&
-      (mostRecentAnalysis.result === 'error' ||
-        mostRecentAnalysis.result === 'not-ok')) ??
+    (mostRecentAnalysis == null ||
+      (mostRecentAnalysis != null &&
+        'result' in mostRecentAnalysis &&
+        (mostRecentAnalysis.result === 'error' ||
+          mostRecentAnalysis.result === 'not-ok'))) ??
     false
 
   const handleProtocolClick = (
