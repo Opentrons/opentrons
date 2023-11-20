@@ -16,12 +16,12 @@ import type {
   CommandV8Mixin,
   LabwareV2Mixin,
   LiquidV1Mixin,
+  LoadPipetteCreateCommand,
   OT2RobotMixin,
   OT3RobotMixin,
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV8'
-import type { LoadPipetteCreateCommand } from '@opentrons/shared-data/protocol/types/schemav7'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration is to schema v8 and updates fixed trash by
