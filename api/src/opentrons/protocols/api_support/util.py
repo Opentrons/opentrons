@@ -18,8 +18,6 @@ from typing import (
 )
 
 from opentrons import types as top_types
-from opentrons.protocol_reader.protocol_source import ProtocolConfig, \
-    PythonProtocolConfig
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
@@ -37,8 +35,6 @@ if TYPE_CHECKING:
     )
 
 MODULE_LOG = logging.getLogger(__name__)
-ENSURE_EMPTY_LOCATION_PYTHON_PROTOCOL_VERSION = APIVersion(2, 16)
-ENSURE_EMPTY_LOCATION_JSON_SCHEMA_VERSION = 8
 
 
 class APIVersionError(Exception):
@@ -397,11 +393,3 @@ class ModifiedList(list):
             if name == item.replace("-", "_").lower():
                 return True
         return False
-
-
-def should_ensure_empty_location_for_equipment_load(protocol_config: ProtocolConfig) -> bool:
-    """Decide whether to ensure that a location is empty before load an equipment on it."""
-    if isinstance(protocol_config, PythonProtocolConfig):
-        return protocol_config.api_version >= ENSURE_EMPTY_LOCATION_PYTHON_PROTOCOL_VERSION
-    else:
-        return protocol_config.schema_version >= ENSURE_EMPTY_LOCATION_JSON_SCHEMA_VERSION
