@@ -4,6 +4,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
+  aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
   dropTipInPlace,
@@ -126,14 +127,16 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
   switch (type) {
     case 'airGap':
     case 'aspirate': {
-      inPlaceCommands = !prevRobotState.tipState.pipettes[pipetteId]
-        ? []
-        : [
-            //  TODO(jr 11/20/23): create aspirateInPlace atomic command and wire up)
-            //   curryCommandCreator(aspirateInPlace, {
-            //     pipetteId,
-            //   }),
-          ]
+      inPlaceCommands =
+        flowRate != null && volume != null
+          ? [
+              curryCommandCreator(aspirateInPlace, {
+                pipetteId,
+                volume,
+                flowRate,
+              }),
+            ]
+          : []
 
       break
     }

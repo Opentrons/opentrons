@@ -134,55 +134,54 @@ describe('movableTrashCommandsUtil', () => {
       },
     ])
   })
-  //    TODO(jr, 11/20/23): wait until we have support for aspirateInPlace
-  //   it('returns correct commands for aspirate in place (air gap)', () => {
-  //     initialRobotState.tipState.pipettes[mockId] = true
-  //     const result = movableTrashCommandsUtil(
-  //       {
-  //         ...args,
-  //         type: 'airGap',
-  //       },
-  //       invariantContext,
-  //       initialRobotState
-  //     )
-  //     const res = getSuccessResult(result)
-  //     expect(res.commands).toEqual([
-  //       mockMoveToAddressableArea,
-  //       {
-  //         commandType: 'aspirateInPlace',
-  //         key: expect.any(String),
-  //         params: {
-  //           pipetteId: mockId,
-  //           volume: 10,
-  //           flowRate: 10,
-  //         },
-  //       },
-  //     ])
-  //   })
-  //   it('returns correct commands for aspirate in place', () => {
-  //     initialRobotState.tipState.pipettes[mockId] = true
-  //     const result = movableTrashCommandsUtil(
-  //       {
-  //         ...args,
-  //         type: 'aspirate',
-  //       },
-  //       invariantContext,
-  //       initialRobotState
-  //     )
-  //     const res = getSuccessResult(result)
-  //     expect(res.commands).toEqual([
-  //       mockMoveToAddressableArea,
-  //       {
-  //         commandType: 'aspirateInPlace',
-  //         key: expect.any(String),
-  //         params: {
-  //           pipetteId: mockId,
-  //           volume: 10,
-  //           flowRate: 10,
-  //         },
-  //       },
-  //     ])
-  //   })
+  it('returns correct commands for aspirate in place (air gap)', () => {
+    initialRobotState.tipState.pipettes[mockId] = true
+    const result = movableTrashCommandsUtil(
+      {
+        ...args,
+        type: 'airGap',
+      },
+      invariantContext,
+      initialRobotState
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      mockMoveToAddressableArea,
+      {
+        commandType: 'aspirateInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: mockId,
+          volume: 10,
+          flowRate: 10,
+        },
+      },
+    ])
+  })
+  it('returns correct commands for aspirate in place', () => {
+    initialRobotState.tipState.pipettes[mockId] = true
+    const result = movableTrashCommandsUtil(
+      {
+        ...args,
+        type: 'aspirate',
+      },
+      invariantContext,
+      initialRobotState
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      mockMoveToAddressableArea,
+      {
+        commandType: 'aspirateInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: mockId,
+          volume: 10,
+          flowRate: 10,
+        },
+      },
+    ])
+  })
   it('returns no pip attached error', () => {
     const result = movableTrashCommandsUtil(
       {
