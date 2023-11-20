@@ -492,15 +492,7 @@ class GeometryView:
         self, location: _LabwareLocation
     ) -> _LabwareLocation:
         """Ensure that the location does not already have either Labware or a Module in it."""
-        if isinstance(
-            location,
-            (
-                DeckSlotLocation,
-                ModuleLocation,
-                OnLabwareLocation,
-                AddressableAreaLocation,
-            ),
-        ):
+        if isinstance(location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation)):
             self._labware.raise_if_labware_in_location(location)
         if isinstance(location, DeckSlotLocation):
             self._modules.raise_if_module_in_location(location)

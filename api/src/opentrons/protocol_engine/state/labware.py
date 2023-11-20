@@ -659,8 +659,7 @@ class LabwareView(HasState[LabwareState]):
         return self.get_fixed_trash_id() == labware_id
 
     def raise_if_labware_in_location(
-        self,
-        location: OnDeckLabwareLocation,
+        self, location: OnDeckLabwareLocation,
     ) -> None:
         """Raise an error if the specified location has labware in it."""
         for labware in self.get_all():

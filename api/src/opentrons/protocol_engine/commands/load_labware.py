@@ -116,12 +116,9 @@ class LoadLabwareImplementation(
                     f"Cannot load {params.loadName} onto addressable area {params.location.addressableAreaName}"
                 )
 
-        verified_location = params.location
-        if self._state_view.config.ensure_empty_location_for_equipment_load:
-            verified_location = self._state_view.geometry.ensure_location_not_occupied(
-                params.location
-            )
-
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location
+        )
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
             namespace=params.namespace,
