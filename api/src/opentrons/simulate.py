@@ -189,7 +189,7 @@ class _CommandScraper:
             #
             # TODO(mm, 2023-10-03): This is a bit too intrusive for something whose job is just to
             # "scrape." The entry point function should be responsible for setting the underlying
-            # logger's level.
+            # logger's level. Also, we should probably restore the original level when we're done.
             level = getattr(logging, self._level.upper(), logging.WARNING)
             self._logger.setLevel(level)
 

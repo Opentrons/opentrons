@@ -360,6 +360,7 @@ def execute(  # noqa: C901
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
+    # TODO(mm, 2023-11-20): We should restore the original log settings when we're done.
 
     # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
     # to match documented behavior.
