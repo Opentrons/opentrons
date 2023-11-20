@@ -263,9 +263,15 @@ export function CreateFileWizard(): JSX.Element | null {
       const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
-      newTiprackModels.forEach(tiprackDefURI => {
+      newTiprackModels.forEach((tiprackDefURI, index) => {
+        const ot2Slots = index === 0 ? '2' : '5'
+        const flexSlots = index === 0 ? 'C2' : 'B2'
         dispatch(
           labwareIngredActions.createContainer({
+            slot:
+              values.fields.robotType === FLEX_ROBOT_TYPE
+                ? flexSlots
+                : ot2Slots,
             labwareDefURI: tiprackDefURI,
             adapterUnderLabwareDefURI:
               values.pipettesByMount.left.pipetteName === 'p1000_96'
