@@ -235,5 +235,6 @@ const DECK_CONFIG_SECTION_STYLE = css`
   @media screen and (max-width: 1024px) {
     flex-direction: ${DIRECTION_COLUMN};
     align-items: ${ALIGN_CENTER};
+    grid-gap: ${SPACING.spacing32};
   }
 `
