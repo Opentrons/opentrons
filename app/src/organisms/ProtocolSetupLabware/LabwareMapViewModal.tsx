@@ -5,7 +5,7 @@ import { BaseDeck } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
 
 import { Modal } from '../../molecules/Modal'
-import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
@@ -42,7 +42,7 @@ export function LabwareMapViewModal(
     mostRecentAnalysis,
   } = props
   const { t } = useTranslation('protocol_setup')
-  const deckConfig = getDeckConfigFromProtocolCommands(
+  const deckConfig = getSimplestDeckConfigForProtocolCommands(
     mostRecentAnalysis?.commands ?? []
   )
   const labwareRenderInfo =

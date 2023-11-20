@@ -4,6 +4,7 @@
   "disabled_cannot_delete_trash": "A Trash Bin or Waste Chute is required",
   "disabled_off_deck": "Off-deck labware cannot be modified unless on starting deck state.",
   "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
+  "disabled_no_space_additional_items": "No space for this combination of staging area slots and modules.",
   "not_in_beta": "ⓘ Coming Soon",
 
   "step_description": {

@@ -24,5 +24,7 @@ export const forDropTipInPlace = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  //   TODO(jr, 11/6/23): update state
+  const { pipetteId } = params
+  const { robotState } = robotStateAndWarnings
+  robotState.tipState.pipettes[pipetteId] = false
 }

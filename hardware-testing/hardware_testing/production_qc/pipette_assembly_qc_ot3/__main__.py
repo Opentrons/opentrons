@@ -34,10 +34,9 @@ from opentrons.hardware_control.ot3_calibration import (
 )
 
 from hardware_testing import data
-from hardware_testing.drivers import list_ports_and_select
 from hardware_testing.drivers.pressure_fixture import (
-    PressureFixture,
-    SimPressureFixture,
+    PressureFixtureBase,
+    connect_to_fixture,
 )
 from .pressure import (  # type: ignore[import]
     PRESSURE_FIXTURE_TIP_VOLUME,
@@ -468,15 +467,10 @@ async def _aspirate_and_look_for_droplets(
     return leak_test_passed
 
 
-def _connect_to_fixture(test_config: TestConfig) -> PressureFixture:
-    if not test_config.simulate and not test_config.skip_fixture:
-        if not test_config.fixture_port:
-            _port = list_ports_and_select("pressure-fixture")
-        else:
-            _port = ""
-        fixture = PressureFixture.create(port=_port, slot_side=test_config.fixture_side)
-    else:
-        fixture = SimPressureFixture()  # type: ignore[assignment]
+def _connect_to_fixture(test_config: TestConfig) -> PressureFixtureBase:
+    fixture = connect_to_fixture(
+        test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
+    )
     fixture.connect()
     return fixture
 
@@ -485,7 +479,7 @@ async def _read_pressure_and_check_results(
     api: OT3API,
     pipette_channels: int,
     pipette_volume: int,
-    fixture: PressureFixture,
+    fixture: PressureFixtureBase,
     tag: PressureEvent,
     write_cb: Callable,
     accumulate_raw_data_cb: Callable,
@@ -599,7 +593,7 @@ async def _fixture_check_pressure(
     api: OT3API,
     mount: OT3Mount,
     test_config: TestConfig,
-    fixture: PressureFixture,
+    fixture: PressureFixtureBase,
     write_cb: Callable,
     accumulate_raw_data_cb: Callable,
 ) -> bool:
@@ -694,7 +688,7 @@ async def _test_for_leak(
     mount: OT3Mount,
     test_config: TestConfig,
     tip_volume: int,
-    fixture: Optional[PressureFixture],
+    fixture: Optional[PressureFixtureBase],
     write_cb: Optional[Callable],
     accumulate_raw_data_cb: Optional[Callable],
     droplet_wait_seconds: int = 30,

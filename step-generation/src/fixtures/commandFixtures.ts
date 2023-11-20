@@ -90,6 +90,7 @@ export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => (
 // =================
 export const DEFAULT_PIPETTE = 'p300SingleId'
 export const MULTI_PIPETTE = 'p300MultiId'
+export const PIPETTE_96 = 'p100096Id'
 export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'
 export const TROUGH_LABWARE = 'troughId'
@@ -308,5 +309,27 @@ export const pickUpTipHelper = (
     labwareId: 'tiprack1Id',
     ...params,
     wellName: typeof tip === 'string' ? tip : tiprackWellNamesFlat[tip],
+  },
+})
+export const dropTipInPlaceHelper = (params?: {
+  pipetteId?: string
+}): CreateCommand => ({
+  commandType: 'dropTipInPlace',
+  key: expect.any(String),
+  params: {
+    pipetteId: DEFAULT_PIPETTE,
+    ...params,
+  },
+})
+export const moveToAddressableAreaHelper = (params?: {
+  pipetteId?: string
+  addressableAreaName: string
+}): CreateCommand => ({
+  commandType: 'moveToAddressableArea',
+  key: expect.any(String),
+  params: {
+    pipetteId: DEFAULT_PIPETTE,
+    addressableAreaName: '1and8ChannelWasteChute',
+    ...params,
   },
 })

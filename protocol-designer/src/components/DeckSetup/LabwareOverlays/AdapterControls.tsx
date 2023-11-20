@@ -23,7 +23,7 @@ import {
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
 
-import type { DeckSlot as DeckSlotDefinition } from '@opentrons/shared-data'
+import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 
@@ -37,7 +37,8 @@ interface DNDP {
 }
 
 interface OP {
-  slot: DeckSlotDefinition & { id: DeckSlot }
+  slotPosition: CoordinateTuple
+  slotBoundingBox: Dimensions
   //    labwareId is the adapter's labwareId
   labwareId: string
   allLabware: LabwareOnDeck[]
@@ -61,7 +62,8 @@ export const AdapterControlsComponents = (
   props: SlotControlsProps
 ): JSX.Element | null => {
   const {
-    slot,
+    slotPosition,
+    slotBoundingBox,
     addLabware,
     selectedTerminalItemId,
     isOver,
@@ -104,18 +106,18 @@ export const AdapterControlsComponents = (
     <g>
       {slotBlocked ? (
         <BlockedSlot
-          x={slot.position[0]}
-          y={slot.position[1]}
-          width={slot.boundingBox.xDimension}
-          height={slot.boundingBox.yDimension}
+          x={slotPosition[0]}
+          y={slotPosition[1]}
+          width={slotBoundingBox.xDimension}
+          height={slotBoundingBox.yDimension}
           message="LABWARE_INCOMPATIBLE_WITH_ADAPTER"
         />
       ) : (
         <RobotCoordsForeignDiv
-          x={onDeck ? slot.position[0] : 0}
-          y={onDeck ? slot.position[1] : 0}
-          width={slot.boundingBox.xDimension}
-          height={slot.boundingBox.yDimension}
+          x={onDeck ? slotPosition[0] : 0}
+          y={onDeck ? slotPosition[1] : 0}
+          width={slotBoundingBox.xDimension}
+          height={slotBoundingBox.yDimension}
           innerDivProps={{
             className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
               [styles.appear]: isOver,

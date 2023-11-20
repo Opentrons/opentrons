@@ -20,6 +20,8 @@ import {
   TOOLTIP_LEFT,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -33,6 +35,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
+import { getCutoutIdForSlotName } from '../../../../resources/deck_configuration/utils'
 import { useChainLiveCommands } from '../../../../resources/runs/hooks'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
@@ -42,6 +45,7 @@ import {
   ModuleRenderInfoForProtocol,
   useIsFlex,
   useModuleRenderInfoForProtocolById,
+  useRobot,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../hooks'
@@ -50,7 +54,11 @@ import { MultipleModulesModal } from './MultipleModulesModal'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'
 
-import type { Cutout, ModuleModel, Fixture } from '@opentrons/shared-data'
+import type {
+  CutoutConfig,
+  DeckDefinition,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
 import type { ProtocolCalibrationStatus } from '../../hooks'
 
@@ -63,7 +71,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId } = props
   const { t } = useTranslation('protocol_setup')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const {
@@ -72,6 +79,8 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   } = useUnmatchedModulesForProtocol(robotName, runId)
 
   const isFlex = useIsFlex(robotName)
+  const { robotModel } = useRobot(robotName) ?? {}
+  const deckDef = getDeckDefFromRobotType(robotModel ?? FLEX_ROBOT_TYPE)
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
@@ -188,6 +197,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
                 isFlex={isFlex}
                 calibrationStatus={calibrationStatus}
                 conflictedFixture={conflictedFixture}
+                deckDef={deckDef}
               />
             )
           }
@@ -205,7 +215,8 @@ interface ModulesListItemProps {
   heaterShakerModuleFromProtocol: ModuleRenderInfoForProtocol | null
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
-  conflictedFixture?: Fixture
+  deckDef: DeckDefinition
+  conflictedFixture?: CutoutConfig
 }
 
 export function ModulesListItem({
@@ -217,6 +228,7 @@ export function ModulesListItem({
   isFlex,
   calibrationStatus,
   conflictedFixture,
+  deckDef,
 }: ModulesListItemProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
   const moduleConnectionStatus =
@@ -346,13 +358,16 @@ export function ModulesListItem({
     )
   }
 
+  // convert slot name to cutout id
+  const cutoutIdForSlotName = getCutoutIdForSlotName(slotName, deckDef)
+
   return (
     <>
-      {showLocationConflictModal ? (
+      {showLocationConflictModal && cutoutIdForSlotName != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
-          cutout={slotName as Cutout}
+          cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
         />
       ) : null}

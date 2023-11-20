@@ -25,7 +25,7 @@ class JsonFileReader:
                 message=f"Cannot execute {name} as a JSON protocol",
                 detail={
                     "kind": "non-json-file-in-json-file-reader",
-                    "metadata-name": protocol_source.metadata.get("name"),
+                    "metadata-name": str(protocol_source.metadata.get("name")),
                     "file-name": protocol_source.main_file.name,
                 },
             )
@@ -40,7 +40,9 @@ class JsonFileReader:
                 message=f"{name} is a JSON protocol v{protocol_source.config.schema_version} which this robot cannot execute",
                 detail={
                     "kind": "schema-version-unknown",
-                    "requested-schema-version": protocol_source.config.schema_version,
+                    "requested-schema-version": str(
+                        protocol_source.config.schema_version
+                    ),
                     "minimum-handled-schema-version": "6",
                     "maximum-handled-shcema-version": "8",
                 },

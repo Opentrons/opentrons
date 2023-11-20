@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -23,11 +23,13 @@ import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import {
   startRobotUpdate,
   clearRobotUpdateSession,
+  getRobotUpdateDownloadError,
 } from '../../../../redux/robot-update'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 import successIcon from '../../../../assets/images/icon_success.png'
 
-import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
+import type { State } from '../../../../redux/types'
+import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '../../../../redux/robot-update/types'
 import type { UpdateStep } from './useRobotUpdateInfo'
 
@@ -66,8 +68,15 @@ export function RobotUpdateProgressModal({
   const completeRobotUpdateHandler = (): void => {
     if (closeUpdateBuildroot != null) closeUpdateBuildroot()
   }
-  const { error } = session || { error: null }
-  const { updateStep, progressPercent } = useRobotUpdateInfo(session)
+
+  const { updateStep, progressPercent } = useRobotUpdateInfo(robotName, session)
+
+  let { error } = session || { error: null }
+  const downloadError = useSelector((state: State) =>
+    getRobotUpdateDownloadError(state, robotName)
+  )
+  if (error == null && downloadError != null) error = downloadError
+
   useStatusBarAnimation(error != null)
   useCleanupRobotUpdateSessionOnDismount()
 
@@ -89,11 +98,27 @@ export function RobotUpdateProgressModal({
     progressPercent
   )
 
-  let modalBodyText = t('installing_update')
+  let modalBodyText = ''
   let subProgressBarText = t('do_not_turn_off')
-  if (updateStep === 'restart') modalBodyText = t('restarting_robot')
-  if (updateStep === 'restart' && letUserExitUpdate) {
-    subProgressBarText = t('restart_taking_too_long', { robotName })
+  switch (updateStep) {
+    case 'initial':
+    case 'error':
+      modalBodyText = ''
+      break
+    case 'download':
+      modalBodyText = t('downloading_update')
+      break
+    case 'install':
+      modalBodyText = t('installing_update')
+      break
+    case 'restart':
+      modalBodyText = t('restarting_robot')
+      if (letUserExitUpdate) {
+        subProgressBarText = t('restart_taking_too_long', { robotName })
+      }
+      break
+    default:
+      modalBodyText = t('installing_update')
   }
 
   return (
@@ -209,7 +234,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
 export const TIME_BEFORE_ALLOWING_EXIT_MS = 600000 // 10 mins
 
 function useAllowExitIfUpdateStalled(
-  updateStep: UpdateStep,
+  updateStep: UpdateStep | null,
   progressPercent: number
 ): boolean {
   const [letUserExitUpdate, setLetUserExitUpdate] = React.useState<boolean>(

@@ -16,6 +16,8 @@ from typing import (
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
 from traceback import format_exception_only, TracebackException
 from contextlib import contextmanager
+
+from opentrons_shared_data import deck
 from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
 
 from opentrons import initialize as initialize_api, should_use_ot3
@@ -282,6 +284,13 @@ async def get_robot_type_enum() -> RobotTypeEnum:
 async def get_deck_type() -> DeckType:
     """Return what kind of deck the robot that this server is running on has."""
     return DeckType(guess_deck_type_from_global_config())
+
+
+async def get_deck_definition(
+    deck_type: DeckType = Depends(get_deck_type),
+) -> deck.dev_types.DeckDefinitionV4:
+    """Return this robot's deck definition."""
+    return deck.load(deck_type, version=4)
 
 
 async def _postinit_ot2_tasks(

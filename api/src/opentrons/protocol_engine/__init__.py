@@ -35,6 +35,7 @@ from .types import (
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     OFF_DECK_LOCATION,
     Dimensions,
     EngineStatus,
@@ -52,6 +53,11 @@ from .types import (
     ModuleModel,
     ModuleDefinition,
     Liquid,
+    EmptyNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
+    QuadrantNozzleLayoutConfiguration,
 )
 
 
@@ -88,6 +94,7 @@ __all__ = [
     "DeckType",
     "ModuleLocation",
     "OnLabwareLocation",
+    "AddressableAreaLocation",
     "OFF_DECK_LOCATION",
     "Dimensions",
     "EngineStatus",
@@ -105,6 +112,11 @@ __all__ = [
     "ModuleModel",
     "ModuleDefinition",
     "Liquid",
+    "EmptyNozzleLayoutConfiguration",
+    "SingleNozzleLayoutConfiguration",
+    "RowNozzleLayoutConfiguration",
+    "ColumnNozzleLayoutConfiguration",
+    "QuadrantNozzleLayoutConfiguration",
     # plugins
     "AbstractPlugin",
 ]

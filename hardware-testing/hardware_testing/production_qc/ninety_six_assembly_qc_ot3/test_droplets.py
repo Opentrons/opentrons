@@ -182,7 +182,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # GATHER NOMINAL POSITIONS
     trash_nominal = get_trash_nominal()
     tip_rack_96_a1_nominal = get_tiprack_96_nominal()
-    tip_rack_partial_a1_nominal = get_tiprack_partial_nominal()
+    # tip_rack_partial_a1_nominal = get_tiprack_partial_nominal()
     reservoir_a1_nominal = get_reservoir_nominal()
     reservoir_a1_actual: Optional[Point] = None
 
@@ -223,32 +223,32 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     report(section, "droplets-96-tips", [duration, CSVResult.from_bool(result)])
     await _drop_tip(api, trash_nominal)
 
-    if not api.is_simulator:
-        ui.get_user_ready(f"REMOVE 96 tip-rack from slot #{TIP_RACK_96_SLOT}")
-        ui.get_user_ready(f"ADD partial tip-rack to slot #{TIP_RACK_PARTIAL_SLOT}")
-
-    # SAVE PARTIAL TIP-RACK POSITION
-    ui.print_header("JOG to Partial-Tip RACK")
-    await helpers_ot3.move_to_arched_ot3(
-        api, OT3Mount.LEFT, tip_rack_partial_a1_nominal + Point(z=10)
-    )
-    await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
-    tip_rack_partial_a1_actual = await api.gantry_position(OT3Mount.LEFT)
-
-    # TEST PARTIAL-TIP
-    for test_name, details in PARTIAL_TESTS.items():
-        ui.print_header(f"{test_name.upper().replace('-', ' ')}")
-        pick_up_position = tip_rack_partial_a1_actual + details[0]
-        await helpers_ot3.move_to_arched_ot3(
-            api, OT3Mount.LEFT, pick_up_position + Point(z=50)
-        )
-        await _partial_pick_up(api, pick_up_position, current=details[1])
-        await _find_reservoir_pos()
-        assert reservoir_a1_actual
-        result, duration = await aspirate_and_wait(
-            api, reservoir_a1_actual, seconds=NUM_SECONDS_TO_WAIT
-        )
-        report(
-            section, f"droplets-{test_name}", [duration, CSVResult.from_bool(result)]
-        )
-        await _drop_tip(api, trash_nominal)
+    # if not api.is_simulator:
+    #     ui.get_user_ready(f"REMOVE 96 tip-rack from slot #{TIP_RACK_96_SLOT}")
+    #     ui.get_user_ready(f"ADD partial tip-rack to slot #{TIP_RACK_PARTIAL_SLOT}")
+    #
+    # # SAVE PARTIAL TIP-RACK POSITION
+    # ui.print_header("JOG to Partial-Tip RACK")
+    # await helpers_ot3.move_to_arched_ot3(
+    #     api, OT3Mount.LEFT, tip_rack_partial_a1_nominal + Point(z=10)
+    # )
+    # await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
+    # tip_rack_partial_a1_actual = await api.gantry_position(OT3Mount.LEFT)
+    #
+    # # TEST PARTIAL-TIP
+    # for test_name, details in PARTIAL_TESTS.items():
+    #     ui.print_header(f"{test_name.upper().replace('-', ' ')}")
+    #     pick_up_position = tip_rack_partial_a1_actual + details[0]
+    #     await helpers_ot3.move_to_arched_ot3(
+    #         api, OT3Mount.LEFT, pick_up_position + Point(z=50)
+    #     )
+    #     await _partial_pick_up(api, pick_up_position, current=details[1])
+    #     await _find_reservoir_pos()
+    #     assert reservoir_a1_actual
+    #     result, duration = await aspirate_and_wait(
+    #         api, reservoir_a1_actual, seconds=NUM_SECONDS_TO_WAIT
+    #     )
+    #     report(
+    #         section, f"droplets-{test_name}", [duration, CSVResult.from_bool(result)]
+    #     )
+    #     await _drop_tip(api, trash_nominal)

@@ -9,9 +9,12 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
     DeckPoint,
+    ModuleModel,
+    ModuleDefinition,
     MovementAxis,
     WellLocation,
     LabwareLocation,
+    DeckSlotLocation,
     LabwareMovementStrategy,
 )
 
@@ -150,6 +153,30 @@ def create_load_pipette_command(
     result = cmd.LoadPipetteResult(pipetteId=pipette_id)
 
     return cmd.LoadPipette(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_load_module_command(
+    module_id: str,
+    location: DeckSlotLocation,
+    model: ModuleModel,
+) -> cmd.LoadModule:
+    """Get a completed LoadModule command."""
+    params = cmd.LoadModuleParams(moduleId=module_id, location=location, model=model)
+    result = cmd.LoadModuleResult(
+        moduleId=module_id,
+        model=model,
+        serialNumber=None,
+        definition=ModuleDefinition.construct(),  # type: ignore[call-arg]
+    )
+
+    return cmd.LoadModule(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

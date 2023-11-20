@@ -35,6 +35,7 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
   },
   currentStep: 'labwareLoaded',
   labware: [mockTipLengthTipRack, mockTipLengthCalBlock],
+  supportedCommands: [],
 }
 
 export const mockTipLengthCalibrationSessionParams: TipLengthCalibrationSessionParams = {

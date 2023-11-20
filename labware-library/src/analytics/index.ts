@@ -1,6 +1,5 @@
 import { getAnalyticsState } from './utils'
 import { trackWithMixpanel } from './mixpanel'
-import { fullstoryEvent } from './fullstory'
 import type { AnalyticsEvent } from './types'
 
 // NOTE: right now we report with only mixpanel, this fn is meant
@@ -13,6 +12,5 @@ export const reportEvent = (event: AnalyticsEvent): void => {
   console.debug('Trackable event', { event, optedIn })
   if (optedIn) {
     trackWithMixpanel(event.name, event.properties)
-    fullstoryEvent(event.name, event.properties)
   }
 }

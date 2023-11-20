@@ -627,7 +627,9 @@ def _run_file_pe(
         try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-            result = await protocol_runner.run(protocol_source)
+            result = await protocol_runner.run(
+                deck_configuration=[], protocol_source=protocol_source
+            )
         finally:
             unsubscribe()
 
@@ -653,6 +655,8 @@ def _get_protocol_engine_config() -> Config:
         # We deliberately omit ignore_pause=True because, in the current implementation of
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
+        use_simulated_deck_config=True,
+        # TODO the above is not correct for this and it should use the robot's actual config
     )
 
 

@@ -3,23 +3,25 @@ from fastapi import APIRouter, Depends, status
 
 from .constants import V1_TAG
 from .errors import LegacyErrorResponse
-from .health import health_router
-from .protocols import protocols_router
-from .runs import runs_router
-from .maintenance_runs.router import maintenance_runs_router
-from .commands import commands_router
-from .modules import modules_router
-from .instruments import instruments_router
-from .system import system_router
 from .versioning import check_version_header
-from .service.legacy.routers import legacy_routes
-from .service.session.router import router as deprecated_session_router
-from .service.pipette_offset.router import router as pip_os_router
-from .service.labware.router import router as labware_router
-from .service.tip_length.router import router as tl_router
-from .service.notifications.router import router as notifications_router
-from .subsystems.router import subsystems_router
+
+from .commands import commands_router
+from .deck_configuration.router import router as deck_configuration_router
+from .health import health_router
+from .instruments import instruments_router
+from .maintenance_runs.router import maintenance_runs_router
+from .modules import modules_router
+from .protocols import protocols_router
 from .robot.router import robot_router
+from .runs import runs_router
+from .service.labware.router import router as labware_router
+from .service.legacy.routers import legacy_routes
+from .service.notifications.router import router as notifications_router
+from .service.pipette_offset.router import router as pip_os_router
+from .service.session.router import router as deprecated_session_router
+from .service.tip_length.router import router as tl_router
+from .subsystems.router import subsystems_router
+from .system import system_router
 
 router = APIRouter()
 
@@ -70,6 +72,12 @@ router.include_router(
 )
 
 router.include_router(
+    router=deck_configuration_router,
+    tags=["Deck Configuration"],
+    dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
     router=modules_router,
     tags=["Attached Modules"],
     dependencies=[Depends(check_version_header)],
@@ -77,7 +85,7 @@ router.include_router(
 
 router.include_router(
     router=instruments_router,
-    tags=["Attached instruments"],
+    tags=["Attached Instruments"],
     dependencies=[Depends(check_version_header)],
 )
 

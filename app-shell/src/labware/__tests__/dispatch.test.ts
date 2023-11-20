@@ -229,7 +229,13 @@ describe('labware module dispatches', () => {
     return flush().then(() => {
       expect(showOpenFileDialog).toHaveBeenCalledWith(mockMainWindow, {
         defaultPath: '__mock-app-path__',
-        filters: [{ name: 'JSON Labware Definitions', extensions: ['json'] }],
+        filters: [
+          {
+            name: 'JSON Labware Definitions',
+            extensions: ['json'],
+          },
+        ],
+        properties: ['multiSelections'],
       })
       expect(dispatch).not.toHaveBeenCalled()
     })

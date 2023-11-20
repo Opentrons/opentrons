@@ -3,7 +3,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
@@ -11,7 +10,6 @@ import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_st
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   BaseDeck,
-  EXTENDED_DECK_CONFIG_FIXTURE,
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
@@ -24,7 +22,7 @@ import {
 import { i18n } from '../../../i18n'
 import { useAttachedModules } from '../../../organisms/Devices/hooks'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
-import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
+import { getSimplestDeckConfigForProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { getAttachedProtocolModuleMatches } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getLabwareRenderInfo } from '../../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo'
@@ -34,7 +32,6 @@ import { DeckThumbnail } from '../'
 
 import type {
   LabwareDefinition2,
-  LoadedLabware,
   ModuleModel,
   ModuleType,
   RunTimeCommand,
@@ -50,10 +47,6 @@ jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../organisms/Devices/ProtocolRun/utils/getLabwareRenderInfo')
 
-const mockGetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<
-  typeof getRobotTypeFromLoadedLabware
->
-
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
 >
@@ -66,8 +59,8 @@ const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.Mocked
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
-const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
-  typeof getDeckConfigFromProtocolCommands
+const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocolCommands
 >
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
   typeof getLabwareRenderInfo
@@ -80,9 +73,11 @@ const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as
 >
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
 
-const protocolAnalysis = simpleAnalysisFileFixture as any
+const protocolAnalysis = {
+  ...simpleAnalysisFileFixture,
+  robotType: OT2_ROBOT_TYPE,
+} as any
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
-const labware: LoadedLabware[] = simpleAnalysisFileFixture.labware as any
 const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const MOCK_SECOND_MAGNETIC_MODULE_COORDS = [100, 200, 0]
@@ -112,9 +107,6 @@ const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
 
 describe('DeckThumbnail', () => {
   beforeEach(() => {
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(labware)
-      .mockReturnValue(OT2_ROBOT_TYPE)
     when(mockGetDeckDefFromRobotType)
       .calledWith(OT2_ROBOT_TYPE)
       .mockReturnValue(ot2StandardDeckDef as any)
@@ -127,9 +119,11 @@ describe('DeckThumbnail', () => {
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    when(mockGetDeckConfigFromProtocolCommands)
+    when(mockGetSimplestDeckConfigForProtocolCommands)
       .calledWith(commands)
-      .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
+      .mockReturnValue([])
+    // TODO(bh, 2023-11-13): mock the cutout config protocol spec
+    // .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
     when(mockGetLabwareRenderInfo).mockReturnValue({})
     when(mockGetProtocolModulesInfo)
       .calledWith(protocolAnalysis, ot2StandardDeckDef as any)
@@ -188,6 +182,21 @@ describe('DeckThumbnail', () => {
     getByText('mock BaseDeck')
   })
 
+  it('returns null when there is no protocolAnalysis or the protocolAnalysis contains an error', () => {
+    const { queryByText } = render({
+      protocolAnalysis: null,
+    })
+    expect(queryByText('mock BaseDeck')).not.toBeInTheDocument()
+
+    render({
+      protocolAnalysis: {
+        ...protocolAnalysis,
+        errors: 'test error',
+      },
+    })
+    expect(queryByText('mock BaseDeck')).not.toBeInTheDocument()
+  })
+
   it('renders an OT-3 deck view when the protocol is an OT-3 protocol', () => {
     // ToDo (kk:11/06/2023) update this test later
     // const mockLabwareLocations = [
@@ -212,9 +221,6 @@ describe('DeckThumbnail', () => {
     //     nestedLabwareDef: null,
     //   },
     // ]
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(labware)
-      .mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockGetDeckDefFromRobotType)
       .calledWith(FLEX_ROBOT_TYPE)
       .mockReturnValue(ot3StandardDeckDef as any)
@@ -224,9 +230,11 @@ describe('DeckThumbnail', () => {
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    when(mockGetDeckConfigFromProtocolCommands)
+    when(mockGetSimplestDeckConfigForProtocolCommands)
       .calledWith(commands)
-      .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
+      .mockReturnValue([])
+    // TODO(bh, 2023-11-13): mock the cutout config protocol spec
+    // .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
     when(mockGetLabwareRenderInfo).mockReturnValue({
       [MOCK_300_UL_TIPRACK_ID]: {
         labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -280,7 +288,6 @@ describe('DeckThumbnail', () => {
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(
             FLEX_ROBOT_TYPE
           ),
-          deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
           labwareLocations: expect.anything(),
           moduleLocations: expect.anything(),
         })

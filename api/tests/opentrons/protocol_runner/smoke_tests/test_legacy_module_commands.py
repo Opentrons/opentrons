@@ -64,7 +64,7 @@ async def test_runner_with_modules_in_legacy_python(
         robot_type="OT-2 Standard",
         protocol_config=protocol_source.config,
     )
-    result = await subject.run(protocol_source)
+    result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
     commands_result = result.commands
 
     assert len(commands_result) == 6

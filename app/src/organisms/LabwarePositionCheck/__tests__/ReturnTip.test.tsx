@@ -7,11 +7,16 @@ import { ReturnTip } from '../ReturnTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis } from '../__fixtures__'
 import { useProtocolMetadata } from '../../Devices/hooks'
+import { getIsOnDevice } from '../../../redux/config'
 
 jest.mock('../../Devices/hooks')
+jest.mock('../../../redux/config')
 
 const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
   typeof useProtocolMetadata
+>
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
 >
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
@@ -37,6 +42,7 @@ describe('ReturnTip', () => {
 
   beforeEach(() => {
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
+    mockGetIsOnDevice.mockReturnValue(false)
     props = {
       section: SECTIONS.RETURN_TIP,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -55,7 +61,7 @@ describe('ReturnTip', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it('renders correct copy', () => {
+  it('renders correct copy on desktop', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Return tip rack to Slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
@@ -65,6 +71,17 @@ describe('ReturnTip', () => {
       )
     )
     getByRole('link', { name: 'Need help?' })
+  })
+  it('renders correct copy on device', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText, getByRole } = render(props)
+    getByRole('heading', { name: 'Return tip rack to Slot D1' })
+    getByText('Clear all deck slots of labware')
+    getByText(
+      matchTextWithSpans(
+        'Place the Mock TipRack Definition that you used before back into Slot D1. The pipette will return tips to their original location in the rack.'
+      )
+    )
   })
   it('executes correct chained commands when CTA is clicked', async () => {
     const { getByRole } = render(props)

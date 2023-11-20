@@ -177,6 +177,14 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -272,6 +280,14 @@ from .prepare_to_aspirate import (
     PrepareToAspirateParams,
     PrepareToAspirateResult,
     PrepareToAspirateCommandType,
+)
+
+from .configure_nozzle_layout import (
+    ConfigureNozzleLayout,
+    ConfigureNozzleLayoutCreate,
+    ConfigureNozzleLayoutParams,
+    ConfigureNozzleLayoutResult,
+    ConfigureNozzleLayoutCommandType,
 )
 
 __all__ = [
@@ -396,6 +412,12 @@ __all__ = [
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
+    # move to addressable area command models
+    "MoveToAddressableArea",
+    "MoveToAddressableAreaParams",
+    "MoveToAddressableAreaCreate",
+    "MoveToAddressableAreaResult",
+    "MoveToAddressableAreaCommandType",
     # wait for resume command models
     "WaitForResume",
     "WaitForResumeParams",
@@ -477,4 +499,10 @@ __all__ = [
     "PrepareToAspirateParams",
     "PrepareToAspirateResult",
     "PrepareToAspirateCommandType",
+    # configure nozzle layout command bundle
+    "ConfigureNozzleLayout",
+    "ConfigureNozzleLayoutCreate",
+    "ConfigureNozzleLayoutParams",
+    "ConfigureNozzleLayoutResult",
+    "ConfigureNozzleLayoutCommandType",
 ]

@@ -136,7 +136,10 @@ export const LoadCommandText = ({
           ? t('load_labware_info_protocol_setup_off_deck', { labware })
           : t('load_labware_info_protocol_setup_no_module', {
               labware,
-              slot_name: command.params.location?.slotName,
+              slot_name:
+                'addressableAreaName' in command.params.location
+                  ? command.params.location.addressableAreaName
+                  : command.params.location.slotName,
             })
       }
     }

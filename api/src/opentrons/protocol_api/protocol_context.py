@@ -31,7 +31,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._types import OffDeckType
+from ._types import OffDeckType, StagingSlotName
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -360,7 +360,7 @@ class ProtocolContext(CommandPublisher):
             )
 
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, LabwareCore]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
@@ -493,7 +493,7 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName]
         if isinstance(location, OffDeckType):
             load_location = location
         else:
@@ -599,7 +599,14 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[ModuleCore, LabwareCore, WasteChute, OffDeckType, DeckSlotName]
+        location: Union[
+            ModuleCore,
+            LabwareCore,
+            WasteChute,
+            OffDeckType,
+            DeckSlotName,
+            StagingSlotName,
+        ]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
         elif isinstance(new_location, (OffDeckType, WasteChute)):
@@ -709,6 +716,8 @@ class ProtocolContext(CommandPublisher):
                 location, self._api_version, self._core.robot_type
             )
         )
+        if isinstance(deck_slot, StagingSlotName):
+            raise ValueError("Cannot load a module onto a staging slot.")
 
         module_core = self._core.load_module(
             model=requested_model,

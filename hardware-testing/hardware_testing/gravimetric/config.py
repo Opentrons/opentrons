@@ -301,6 +301,7 @@ QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
     },
     ConfigType.photometric: {
         1: 8,
+        8: 12,
         96: 5,
     },
 }

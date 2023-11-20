@@ -39,6 +39,7 @@ export type UpdateSessionStage =
 export type UpdateSessionStep =
   | 'premigration'
   | 'premigrationRestart'
+  | 'downloadFile'
   | 'getToken'
   | 'uploadFile'
   | 'processFile'
@@ -48,7 +49,7 @@ export type UpdateSessionStep =
   | 'finished'
 
 export interface RobotUpdateSession {
-  robotName: string
+  robotName: string | null
   fileInfo: RobotUpdateFileInfo | null
   token: string | null
   pathPrefix: string | null
@@ -56,6 +57,7 @@ export interface RobotUpdateSession {
   stage: UpdateSessionStage | null
   progress: number | null
   error: string | null
+  target?: RobotUpdateTarget
 }
 
 export interface PerTargetRobotUpdateState {
@@ -181,3 +183,5 @@ export type RobotUpdateAction =
   | { type: 'robotUpdate:CLEAR_SESSION' }
   | { type: 'robotUpdate:SET_UPDATE_SEEN'; meta: { robotName: string } }
   | { type: 'robotUpdate:FILE_UPLOAD_PROGRESS'; payload: number }
+  | { type: 'robotUpdate:CHECKING_FOR_UPDATE'; payload: RobotUpdateTarget }
+  | { type: 'robotUpdate:DOWNLOAD_DONE'; payload: RobotUpdateTarget }
