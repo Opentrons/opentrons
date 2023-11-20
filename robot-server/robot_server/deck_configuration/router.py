@@ -59,7 +59,7 @@ router = fastapi.APIRouter()
 async def put_deck_configuration(  # noqa: D103
     request_body: RequestModel[models.DeckConfigurationRequest],
     store: DeckConfigurationStore = fastapi.Depends(get_deck_configuration_store),
-    last_updated_at: datetime = fastapi.Depends(get_current_time),
+    now: datetime = fastapi.Depends(get_current_time),
     deck_definition: DeckDefinitionV4 = fastapi.Depends(get_deck_definition),
 ) -> PydanticResponse[
     Union[
@@ -70,7 +70,7 @@ async def put_deck_configuration(  # noqa: D103
     placements = validation_mapping.map_in(request_body.data)
     validation_errors = validation.get_configuration_errors(deck_definition, placements)
     if len(validation_errors) == 0:
-        success_data = await store.set(request_body.data, last_updated_at)
+        success_data = await store.set(request=request_body.data, last_modified_at=now)
         return await PydanticResponse.create(
             content=SimpleBody.construct(data=success_data)
         )

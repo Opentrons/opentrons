@@ -12,14 +12,14 @@ stages:
     response:
       json:
         data:
-          # lastUpdatedAt is deliberately omitted from this expected object.
-          # A lastUpdatedAt that's omitted or null means the deck configuration has never been set.
+          # lastModifiedAt is deliberately omitted from this expected object.
+          # A lastModifiedAt that's omitted or null means the deck configuration has never been set.
           #
           # Unfortunately, this makes this test order-dependent with any other tests
           # that modify the deck configuration, even if they try to restore the original value
           # after they're done. We probably need some kind of deck configuration factory-reset.
           #
-          # lastUpdatedAt: null
+          # lastModifiedAt: null
           cutoutFixtures:
             - cutoutFixtureId: singleLeftSlot
               cutoutId: cutoutA1
@@ -86,11 +86,11 @@ stages:
     response:
       json:
         data:
-          lastUpdatedAt: !anystr
+          lastModifiedAt: !anystr
           cutoutFixtures: *expectedCutoutFixtures
       save:
         json:
-          last_updated_at: data.lastUpdatedAt
+          last_modified_at: data.lastModifiedAt
 
   - name: Set an invalid deck configuration
     request:
@@ -142,5 +142,5 @@ stages:
     response:
       json:
         data:
-          lastUpdatedAt: '{last_updated_at}'
+          lastModifiedAt: '{last_modified_at}'
           cutoutFixtures: *expectedCutoutFixtures
