@@ -46,8 +46,9 @@ export const migrateFile = (
       .labwareLocationUpdate
 
   const robotType = robot.model
+  const trashId = `${uuid()}:trashBin`
   const trashAddressableArea =
-    robotType === FLEX_ROBOT_TYPE ? 'moveableTrashA3' : 'fixedTrash'
+    robotType === FLEX_ROBOT_TYPE ? 'movableTrashA3' : 'fixedTrash'
 
   const pipetteId = Object.values(commands).find(
     (command): command is LoadPipetteCreateCommand =>
@@ -81,9 +82,9 @@ export const migrateFile = (
       const sharedParams = {
         blowout_location:
           stepForm.blowout_location === 'fixedTrash'
-            ? trashAddressableArea
+            ? trashId
             : stepForm.blowout_location,
-        dropTip_location: trashAddressableArea,
+        dropTip_location: trashId,
       }
 
       if (stepForm.stepType === 'moveLiquid') {
@@ -91,11 +92,11 @@ export const migrateFile = (
           ...stepForm,
           aspirate_labware:
             stepForm.aspirate_labware === 'fixedTrash'
-              ? trashAddressableArea
+              ? trashId
               : stepForm.aspirate_labware,
           dispense_labware:
             stepForm.dispense_labware === 'fixedTrash'
-              ? trashAddressableArea
+              ? trashId
               : stepForm.dispense_labware,
           ...sharedParams,
         }
@@ -103,9 +104,7 @@ export const migrateFile = (
         return {
           ...stepForm,
           labware:
-            stepForm.labware === 'fixedTrash'
-              ? trashAddressableArea
-              : stepForm.labware,
+            stepForm.labware === 'fixedTrash' ? trashId : stepForm.labware,
           ...sharedParams,
         }
       }

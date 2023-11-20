@@ -2,6 +2,7 @@ import { connect } from 'react-redux'
 import {
   getAreSlotsHorizontallyAdjacent,
   HEATERSHAKER_MODULE_TYPE,
+  PipetteChannels,
 } from '@opentrons/shared-data'
 import {
   LabwareSelectionModal as LabwareSelectionModalComponent,
@@ -28,7 +29,7 @@ interface SP {
   moduleModel: LabwareSelectionModalProps['moduleModel']
   permittedTipracks: LabwareSelectionModalProps['permittedTipracks']
   isNextToHeaterShaker: boolean
-  has96Channel: boolean
+  pipetteChannelsInUse: PipetteChannels
   adapterDefUri?: string
   adapterLoadName?: string
 }
@@ -37,6 +38,9 @@ function mapStateToProps(state: BaseState): SP {
   const slot = labwareIngredSelectors.selectedAddLabwareSlot(state) || null
   const pipettes = getPipetteEntities(state)
   const has96Channel = getHas96Channel(pipettes)
+  const pipetteChannelsInUse = Object.values(pipettes).map(
+    pip => pip.spec.channels
+  )[0]
 
   // TODO: Ian 2019-10-29 needs revisit to support multiple manualIntervention steps
   const modulesById = stepFormSelectors.getInitialDeckSetup(state).modules
@@ -65,7 +69,7 @@ function mapStateToProps(state: BaseState): SP {
     parentSlot,
     moduleModel,
     isNextToHeaterShaker,
-    has96Channel,
+    pipetteChannelsInUse,
     adapterDefUri: has96Channel ? adapter96ChannelDefUri : undefined,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
     adapterLoadName: adapterLoadNameOnDeck,

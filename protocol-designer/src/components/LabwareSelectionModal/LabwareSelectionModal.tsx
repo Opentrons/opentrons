@@ -56,7 +56,6 @@ export interface Props {
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: string[]
   isNextToHeaterShaker: boolean
-  has96Channel: boolean
   adapterLoadName?: string
 }
 
@@ -139,7 +138,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
     selectLabware,
     isNextToHeaterShaker,
     adapterLoadName,
-    has96Channel,
   } = props
   const defs = getOnlyLatestDefs()
   const moduleType = moduleModel != null ? getModuleType(moduleModel) : null

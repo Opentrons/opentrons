@@ -504,6 +504,7 @@ export const DeckSetup = (): JSX.Element => {
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
+
   const trashSlot = trash?.location
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()

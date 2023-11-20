@@ -1410,15 +1410,57 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       )
       const trashAddressableAreaName =
         trashBinCommand?.params.addressableAreaName
+      const savedStepForms = file.designerApplication?.data?.savedStepForms
+      const moveLiquidStep =
+        savedStepForms != null
+          ? Object.values(savedStepForms).find(
+              stepForm =>
+                stepForm.stepType === 'moveLiquid' &&
+                (stepForm.aspirate_labware.includes('trashBin') ||
+                  stepForm.dispense_labware.includes('trashBin') ||
+                  stepForm.dropTip_location.includes('trashBin') ||
+                  stepForm.blowout_location.includes('trashBin'))
+            )
+          : null
+      const mixStep =
+        savedStepForms != null
+          ? Object.values(savedStepForms).find(
+              stepForm =>
+                stepForm.stepType === 'mix' &&
+                (stepForm.labware.includes('trashBin') ||
+                  stepForm.dropTip_location.includes('trashBin') ||
+                  stepForm.blowout_location.includes('trashBin'))
+            )
+          : null
 
-      const trashBinId = `${uuid()}:trashBin`
+      let trashBinId: string | null = null
+      if (moveLiquidStep != null) {
+        if (moveLiquidStep.aspirate_labware.includes('trashBin')) {
+          trashBinId = moveLiquidStep.aspirate_labware
+        } else if (moveLiquidStep.dispense_labware.includes('trashBin')) {
+          trashBinId = moveLiquidStep.dispense_labware
+        } else if (moveLiquidStep.dropTip_location.includes('trashBin')) {
+          trashBinId = moveLiquidStep.dropTip_location
+        } else if (moveLiquidStep.blowOut_location.includes('trashBin')) {
+          trashBinId = moveLiquidStep.blowOut_location
+        }
+      } else if (mixStep != null) {
+        if (mixStep.aspirate_labware.includes('trashBin')) {
+          trashBinId = mixStep.labware
+        } else if (mixStep.dropTip_location.includes('trashBin')) {
+          trashBinId = mixStep.dropTip_location
+        } else if (mixStep.blowOut_location.includes('trashBin')) {
+          trashBinId = mixStep.blowOut_location
+        }
+      }
+
       const trashCutoutId = getCutoutIdByAddressableArea(
         trashAddressableAreaName as AddressableAreaName,
         isFlex ? 'trashBinAdapter' : 'fixedTrashSlot',
         isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
       )
       const trashBin =
-        trashAddressableAreaName != null
+        trashAddressableAreaName != null && trashBinId != null
           ? {
               [trashBinId]: {
                 name: 'trashBin' as const,

@@ -198,7 +198,12 @@ const _createCustomLabwareDef: (
           isOverwriteMismatched: getIsOverwriteMismatched(
             // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
             parsedLabwareDef,
+<<<<<<< Updated upstream
             matchingDefs[0]
+=======
+            matchingDefs[0],
+            pipetteChannelsInUse
+>>>>>>> Stashed changes
           ),
         })
       )
