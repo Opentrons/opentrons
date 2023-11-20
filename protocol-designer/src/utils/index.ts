@@ -165,7 +165,7 @@ export const getCutoutIdByAddressableArea = (
   cutoutFixtureId: CutoutFixtureId,
   robotType: RobotType
 ): CutoutId => {
-  const deckDef = getDeckDefFromRobotTypeV4(robotType)
+  const deckDef = getDeckDefFromRobotType(robotType)
   const cutoutFixtures = deckDef.cutoutFixtures
   const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
     cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)

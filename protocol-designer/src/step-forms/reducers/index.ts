@@ -1371,9 +1371,11 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               command.commandType === commandType &&
               command.params[locationKey] !== 'offDeck' &&
               'slotName' in command.params[locationKey] &&
-              COLUMN_4_SLOTS.includes(command.params[locationKey].slotName)
+              COLUMN_4_SLOTS.includes(
+                command.params[locationKey].addressableAreaName
+              )
           )
-          .map(command => command.params[locationKey].slotName)
+          .map(command => command.params[locationKey].addressableAreaName)
       }
 
       const stagingAreaSlotNames = [

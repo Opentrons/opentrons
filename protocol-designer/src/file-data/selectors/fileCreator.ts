@@ -11,6 +11,7 @@ import {
   OT2_STANDARD_MODEL,
   FLEX_STANDARD_DECKID,
   SPAN7_8_10_11_SLOT,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import { selectors as dismissSelectors } from '../../dismiss'
 import {
@@ -41,6 +42,7 @@ import {
   LabwareEntities,
   PipetteEntities,
   RobotState,
+  COLUMN_4_SLOTS,
 } from '@opentrons/step-generation'
 import type {
   CommandAnnotationV1Mixin,
@@ -275,6 +277,17 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const namespace = def.namespace
         const loadName = def.parameters.loadName
         const version = def.version
+        const isAddressableAreaName = COLUMN_4_SLOTS.includes(labware.slot)
+
+        let location: LabwareLocation = { slotName: labware.slot }
+        if (isOnTopOfModule) {
+          location = { moduleId: labware.slot }
+        } else if (isOnAdapter) {
+          location = { labwareId: labware.slot }
+        } else if (isAddressableAreaName) {
+          location = { addressableAreaName: labware.slot }
+        }
+
         const loadLabwareCommands = {
           key: uuid(),
           commandType: 'loadLabware' as const,
@@ -285,11 +298,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             loadName,
             namespace: namespace,
             version: version,
-            location: isOnTopOfModule
-              ? { moduleId: labware.slot }
-              : isOnAdapter
-              ? { labwareId: labware.slot }
-              : { slotName: labware.slot },
+            location,
           },
         }
 
