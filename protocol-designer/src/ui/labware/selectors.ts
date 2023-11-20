@@ -169,7 +169,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
 )
 
 /** Returns options for disposal (e.g. trash) */
-export const getDisposalLabwareOptions: Selector<Options> = createSelector(
+export const getDisposalOptions: Selector<Options> = createSelector(
   stepFormSelectors.getAdditionalEquipment,
   additionalEquipment =>
     reduce(

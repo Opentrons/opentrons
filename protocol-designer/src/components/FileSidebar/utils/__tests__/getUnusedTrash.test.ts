@@ -1,36 +1,42 @@
-import { FLEX_TRASH_DEF_URI } from '../../../../constants'
 import { getUnusedTrash } from '../getUnusedTrash'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { InitialDeckSetup } from '../../../../step-forms'
 import type { AdditionalEquipment } from '../../FileSidebar'
 
 describe('getUnusedTrash', () => {
   it('returns true for unused trash bin', () => {
-    const labwareId = 'mockLabwareId'
-    const mockTrash = ({
-      [labwareId]: { labwareDefURI: FLEX_TRASH_DEF_URI, id: labwareId },
-    } as unknown) as InitialDeckSetup['labware']
+    const mockTrashId = 'mockTrashId'
+    const mockTrash = {
+      [mockTrashId]: {
+        name: 'trashBin',
+        id: mockTrashId,
+        location: 'cutoutA3',
+      },
+    } as AdditionalEquipment
 
-    expect(getUnusedTrash(mockTrash, {}, [])).toEqual({
+    expect(getUnusedTrash(mockTrash, [])).toEqual({
       trashBinUnused: true,
       wasteChuteUnused: false,
     })
   })
   it('returns false for unused trash bin', () => {
-    const labwareId = 'mockLabwareId'
-    const mockTrash = ({
-      [labwareId]: { labwareDefURI: FLEX_TRASH_DEF_URI, id: labwareId },
-    } as unknown) as InitialDeckSetup['labware']
+    const mockTrashId = 'mockTrashId'
+    const mockTrash = {
+      [mockTrashId]: {
+        name: 'trashBin',
+        id: mockTrashId,
+        location: 'cutoutA3',
+      },
+    } as AdditionalEquipment
     const mockCommand = ([
       {
         labwareId: {
-          commandType: 'dropTip',
-          params: { labwareId: labwareId },
+          commandType: 'moveToAddressableArea',
+          params: { adressableAreaName: 'cutoutA3' },
         },
       },
     ] as unknown) as CreateCommand[]
 
-    expect(getUnusedTrash(mockTrash, {}, mockCommand)).toEqual({
+    expect(getUnusedTrash(mockTrash, mockCommand)).toEqual({
       trashBinUnused: true,
       wasteChuteUnused: false,
     })
@@ -44,7 +50,7 @@ describe('getUnusedTrash', () => {
         location: 'cutoutD3',
       },
     } as AdditionalEquipment
-    expect(getUnusedTrash({}, mockAdditionalEquipment, [])).toEqual({
+    expect(getUnusedTrash(mockAdditionalEquipment, [])).toEqual({
       trashBinUnused: false,
       wasteChuteUnused: true,
     })
@@ -69,7 +75,7 @@ describe('getUnusedTrash', () => {
         },
       },
     ] as unknown) as CreateCommand[]
-    expect(getUnusedTrash({}, mockAdditionalEquipment, mockCommand)).toEqual({
+    expect(getUnusedTrash(mockAdditionalEquipment, mockCommand)).toEqual({
       trashBinUnused: false,
       wasteChuteUnused: true,
     })

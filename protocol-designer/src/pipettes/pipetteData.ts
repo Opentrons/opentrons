@@ -3,7 +3,6 @@ import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 import {
   getPipetteNameSpecs,
   getTiprackVolume,
-  PipetteChannels,
   PipetteName,
 } from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
@@ -63,25 +62,4 @@ export function getMinPipetteVolume(pipetteEntity: PipetteEntity): number {
     `Expected spec for pipette ${pipetteEntity ? pipetteEntity.id : '???'}`
   )
   return NaN
-}
-
-export function getPipetteChannelsFromName(
-  pipetteName: PipetteName
-): PipetteChannels {
-  switch (pipetteName) {
-    case 'p1000_96': {
-      return 96
-    }
-    case 'p1000_multi_flex':
-    case 'p50_multi_flex':
-    case 'p300_multi_gen2':
-    case 'p300_multi':
-    case 'p50_multi':
-    case 'p10_multi':
-    case 'p20_multi_gen2': {
-      return 8
-    }
-    default:
-      return 1
-  }
 }

@@ -18,10 +18,7 @@ import {
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { getEnableDeckModification } from '../../feature-flags/selectors'
-import {
-  getAdditionalEquipment,
-  getInitialDeckSetup,
-} from '../../step-forms/selectors'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
 import {
   deleteDeckFixture,
   toggleIsGripperRequired,
@@ -43,7 +40,6 @@ export interface Props {
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
   const enableDeckModification = useSelector(getEnableDeckModification)
-  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )

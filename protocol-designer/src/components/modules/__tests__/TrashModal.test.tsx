@@ -5,18 +5,16 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getSlotIsEmpty } from '../../../step-forms'
-import { createDeckFixture } from '../../../step-forms/actions/additionalItems'
 import {
-  createContainer,
-  deleteContainer,
-} from '../../../labware-ingred/actions'
+  createDeckFixture,
+  deleteDeckFixture,
+} from '../../../step-forms/actions/additionalItems'
 import { FLEX_TRASH_DEF_URI } from '../../../constants'
 import { TrashModal } from '../TrashModal'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 jest.mock('../../../step-forms')
 jest.mock('../../../step-forms/selectors')
-jest.mock('../../../labware-ingred/actions')
 jest.mock('../../../step-forms/actions/additionalItems')
 
 const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
@@ -25,14 +23,11 @@ const mockGetInitialDeckSetup = getInitialDeckSetup as jest.MockedFunction<
 const mockGetSlotIsEmpty = getSlotIsEmpty as jest.MockedFunction<
   typeof getSlotIsEmpty
 >
-const mockCreateContainer = createContainer as jest.MockedFunction<
-  typeof createContainer
->
-const mockDeleteContainer = deleteContainer as jest.MockedFunction<
-  typeof deleteContainer
->
 const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
   typeof createDeckFixture
+>
+const mockDeleteDeckFixture = deleteDeckFixture as jest.MockedFunction<
+  typeof deleteDeckFixture
 >
 const render = (props: React.ComponentProps<typeof TrashModal>) => {
   return renderWithProviders(<TrashModal {...props} />, {
@@ -71,10 +66,7 @@ describe('TrashModal ', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
     getByRole('button', { name: 'save' }).click()
     await waitFor(() => {
-      expect(mockCreateContainer).toHaveBeenCalledWith({
-        labwareDefURI: FLEX_TRASH_DEF_URI,
-        slot: 'A3',
-      })
+      expect(mockCreateDeckFixture).toHaveBeenCalledWith('trashBin', 'cutoutA3')
     })
   })
   it('call delete then create container when trash is already on the slot', async () => {
@@ -87,13 +79,8 @@ describe('TrashModal ', () => {
     getByText('Trash Bin')
     getByRole('button', { name: 'save' }).click()
     await waitFor(() => {
-      expect(mockDeleteContainer).toHaveBeenCalledWith({
-        labwareId: mockId,
-      })
-      expect(mockCreateContainer).toHaveBeenCalledWith({
-        labwareDefURI: FLEX_TRASH_DEF_URI,
-        slot: 'A3',
-      })
+      expect(mockDeleteDeckFixture).toHaveBeenCalledWith(mockId)
+      expect(mockCreateDeckFixture).toHaveBeenCalledWith('trashBin', 'cutoutA3')
     })
   })
   it('renders the button as disabled when the slot is full for trash bin', () => {

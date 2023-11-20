@@ -32,11 +32,6 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import {
-  getPipetteCapacity,
-  getPipetteChannelsFromName,
-} from '../../../pipettes/pipetteData'
-
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
@@ -98,7 +93,6 @@ export function PipetteFields(props: Props): JSX.Element {
   const allow96Channel = useSelector(getAllow96Channel)
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
-  const test = getPipetteCapacity
   const initialTabIndex = props.initialTabIndex || 1
 
   React.useEffect(() => {
@@ -236,23 +230,7 @@ export function PipetteFields(props: Props): JSX.Element {
           {i18n.t('button.upload_custom_tip_rack')}
           <input
             type="file"
-<<<<<<< Updated upstream
             onChange={e => dispatch(createCustomTiprackDef(e))}
-=======
-            onChange={e =>
-              dispatch(
-                createCustomTiprackDef(
-                  e,
-                  getPipetteChannelsFromName(
-                    values.left.pipetteName as PipetteName
-                  ) ??
-                    getPipetteChannelsFromName(
-                      values.right.pipetteName as PipetteName
-                    )
-                )
-              )
-            }
->>>>>>> Stashed changes
           />
         </OutlineButton>
       </div>

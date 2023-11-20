@@ -41,12 +41,11 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
   const { pipetteId, type, volume, flowRate } = args
   const errors: CommandCreatorError[] = []
   const pipetteName = invariantContext.pipetteEntities[pipetteId]?.name
-  const trashId = Object.values(
+  const trash = Object.values(
     invariantContext.additionalEquipmentEntities
-  ).find(aE => aE.name === 'trashBin')?.id
+  ).find(aE => aE.name === 'trashBin')
 
-  const trashLocation =
-    trashId != null ? (prevRobotState.labware[trashId].slot as CutoutId) : null
+  const trashLocation = trash != null ? (trash.location as CutoutId) : null
 
   let actionName: string = ''
   switch (type) {
@@ -99,7 +98,6 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
   } else if (deckDef.robot.model === OT2_ROBOT_TYPE) {
     cutouts =
       deckDef.cutoutFixtures.find(
-        // @ts-expect-error: delete this expect error when ot2 deck is wired up?
         cutoutFixture => cutoutFixture.id === 'fixedTrashSlot'
       )?.providesAddressableAreas ?? null
   }
@@ -119,6 +117,7 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
               pipetteId,
               addressableAreaName,
             }),
+            //  TODO(create aspirateInPlace atomic command and wire up)
             //   curryCommandCreator(aspirateInPlace, {
             //     pipetteId,
             //   }),

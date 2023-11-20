@@ -8,7 +8,6 @@ import uniq from 'lodash/uniq'
 import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
-import { OT_2_TRASH_DEF_URI } from '@opentrons/step-generation'
 import {
   ModuleType,
   ModuleModel,
@@ -34,10 +33,7 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import {
-  FLEX_TRASH_DEF_URI,
-  INITIAL_DECK_SETUP_STEP_ID,
-} from '../../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
@@ -223,7 +219,7 @@ export function CreateFileWizard(): JSX.Element | null {
           createDeckFixture(
             'trashBin',
             values.fields.robotType === FLEX_ROBOT_TYPE
-              ? 'cutoutA3'
+              ? getTrashSlot(values)
               : 'cutout12'
           )
         )
