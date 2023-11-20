@@ -68,7 +68,7 @@ describe('AttachProbe', () => {
     mockUseDeckConfigurationQuery.mockReturnValue({
       data: [
         {
-          loadName: 'wasteChute',
+          cutoutId: 'cutoutD3',
         } as any,
       ],
     } as any)
