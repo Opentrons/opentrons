@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from typing import Optional, overload
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette.pipette_load_name_conversions import convert_to_pipette_name_type
+from opentrons_shared_data.pipette.types import PipetteGenerationType
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -27,6 +29,7 @@ from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
+    HardwareNotSupportedError,
 )
 from ..resources import (
     LabwareDataProvider,

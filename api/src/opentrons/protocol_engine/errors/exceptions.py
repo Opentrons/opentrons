@@ -93,6 +93,19 @@ class PipetteNotAttachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, details, wrapping)
 
 
+class InvalidPipetteSpecificationsError(ProtocolEngineError):
+    """Raised when a LoadPipette command specifies invalid params."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidPipetteSpecificationsErrpr."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class TipNotAttachedError(ProtocolEngineError):
     """Raised when an operation's required pipette tip is not attached."""
 
