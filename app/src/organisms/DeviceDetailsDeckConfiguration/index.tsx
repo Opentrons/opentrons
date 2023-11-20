@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -10,6 +11,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SIZE_5,
@@ -162,7 +164,7 @@ export function DeviceDetailsDeckConfiguration({
               {t('deck_configuration_is_not_available_when_robot_is_busy')}
             </Banner>
           ) : null}
-          <Flex gridGap={SPACING.spacing40}>
+          <Flex css={DECK_CONFIG_SECTION_STYLE}>
             <Flex
               // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
               marginLeft={`-${SPACING.spacing32}`}
@@ -197,7 +199,7 @@ export function DeviceDetailsDeckConfiguration({
                     backgroundColor={COLORS.fundamentalsBackground}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
-                    width={SIZE_5}
+                    width="100%"
                     css={TYPOGRAPHY.labelRegular}
                   >
                     <StyledText>
@@ -213,7 +215,7 @@ export function DeviceDetailsDeckConfiguration({
                   backgroundColor={COLORS.fundamentalsBackground}
                   gridGap={SPACING.spacing60}
                   padding={SPACING.spacing8}
-                  width={SIZE_5}
+                  width="100%"
                   css={TYPOGRAPHY.labelRegular}
                 >
                   <StyledText>{t('no_deck_fixtures')}</StyledText>
@@ -226,3 +228,12 @@ export function DeviceDetailsDeckConfiguration({
     </>
   )
 }
+
+const DECK_CONFIG_SECTION_STYLE = css`
+  flex-direction: ${DIRECTION_ROW};
+  grid-gap: ${SPACING.spacing40};
+  @media screen and (max-width: 1024px) {
+    flex-direction: ${DIRECTION_COLUMN};
+    align-items: ${ALIGN_CENTER};
+  }
+`
