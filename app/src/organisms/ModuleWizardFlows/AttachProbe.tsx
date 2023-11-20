@@ -161,7 +161,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         <Banner
           type={isWasteChuteOnDeck ? 'error' : 'warning'}
           size={isOnDevice ? '1.5rem' : SIZE_1}
-          marginY={SPACING.spacing4}
+          marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
         >
           {isWasteChuteOnDeck
             ? t('pipette_wizard_flows:waste_chute_error')
