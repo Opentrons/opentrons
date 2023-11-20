@@ -7,9 +7,8 @@ import {
   COLORS,
   SPACING,
   RESPONSIVENESS,
-  SIZE_1,
 } from '@opentrons/components'
-import { LEFT, MotorAxes } from '@opentrons/shared-data'
+import { LEFT, MotorAxes, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   useDeckConfigurationQuery,
   useInstrumentsQuery,
@@ -82,7 +81,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   )
   const deckConfig = useDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.loadName === 'wasteChute') ?? false
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
@@ -236,7 +236,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           {is96Channel && (
             <Banner
               type={isWasteChuteOnDeck ? 'error' : 'warning'}
-              size={isOnDevice ? '1.5rem' : SIZE_1}
+              size={isOnDevice ? '1.5rem' : '1rem'}
               marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
             >
               {isWasteChuteOnDeck

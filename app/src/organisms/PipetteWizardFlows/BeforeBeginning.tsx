@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
-import {
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SIZE_1,
-  SPACING,
-} from '@opentrons/components'
+import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -14,6 +8,7 @@ import {
   WEIGHT_OF_96_CHANNEL,
   LoadedPipette,
   getPipetteNameSpecs,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { Trans, useTranslation } from 'react-i18next'
@@ -86,7 +81,8 @@ export const BeforeBeginning = (
     flowType === FLOWS.ATTACH
   const deckConfig = useDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.loadName === 'wasteChute') ?? false
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
 
   if (
     pipetteId == null &&
@@ -261,7 +257,7 @@ export const BeforeBeginning = (
           (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH) ? (
             <Banner
               type={isWasteChuteOnDeck ? 'error' : 'warning'}
-              size={isOnDevice ? '1.5rem' : SIZE_1}
+              size={isOnDevice ? '1.5rem' : '1rem'}
               marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
             >
               {isWasteChuteOnDeck
@@ -271,7 +267,7 @@ export const BeforeBeginning = (
           ) : (
             <Banner
               type="warning"
-              size={isOnDevice ? '1.5rem' : SIZE_1}
+              size={isOnDevice ? '1.5rem' : '1rem'}
               marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
             >
               {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}

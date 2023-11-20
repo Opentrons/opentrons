@@ -5,6 +5,7 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   LEFT,
   THERMOCYCLER_MODULE_MODELS,
@@ -16,7 +17,6 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  SIZE_1,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
@@ -89,7 +89,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     slotName === 'C3' && attachedPipette.data.channels === 96
   const deckConfig = useDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.loadName === 'wasteChute') ?? false
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
 
   const pipetteAttachProbeVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
@@ -160,7 +161,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       {wasteChuteConflict && (
         <Banner
           type={isWasteChuteOnDeck ? 'error' : 'warning'}
-          size={isOnDevice ? '1.5rem' : SIZE_1}
+          size={isOnDevice ? '1.5rem' : '1rem'}
           marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
         >
           {isWasteChuteOnDeck
