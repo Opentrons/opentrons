@@ -15,6 +15,10 @@ from opentrons.hardware_control.types import (
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
+from opentrons.protocols.api_support.util import (
+    should_ensure_empty_location_for_equipment_load,
+)
+
 from opentrons.protocol_runner import (
     AnyRunner,
     JsonRunner,
@@ -160,7 +164,7 @@ class EngineStore:
             run_id: The run resource the engine is assigned to.
             labware_offsets: Labware offsets to create the engine with.
             protocol: The protocol to load the runner with, if any.
-
+            deck_configuration: the deck configuration of the robot
         Returns:
             The initial equipment and status summary of the engine.
 
@@ -170,8 +174,12 @@ class EngineStore:
         """
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
+            ensure_empty_location_for_equipment_load = (
+                should_ensure_empty_location_for_equipment_load(protocol.source.config)
+            )
         else:
             load_fixed_trash = False
+            ensure_empty_location_for_equipment_load = True
 
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
@@ -181,6 +189,7 @@ class EngineStore:
                 block_on_door_open=feature_flags.enable_door_safety_switch(
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
+                ensure_empty_location_for_equipment_load=ensure_empty_location_for_equipment_load,
             ),
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
