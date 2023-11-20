@@ -21,11 +21,11 @@ class _DeckConfigurationModel(pydantic.BaseModel):
     """The on-filesystem representation of a deck configuration."""
 
     cutoutFixtures: List[_CutoutFixturePlacementModel]
-    lastUpdatedAt: datetime
+    lastModified: datetime
 
 
 def save_robot_deck_configuration(
-    cutout_fixture_placements: List[CutoutFixturePlacement], last_updated_at: datetime
+    cutout_fixture_placements: List[CutoutFixturePlacement], last_modified: datetime
 ) -> None:
     """Replace the stored deck configuration in the filesystem."""
     data = _DeckConfigurationModel.construct(
@@ -35,7 +35,7 @@ def save_robot_deck_configuration(
             )
             for e in cutout_fixture_placements
         ],
-        lastUpdatedAt=last_updated_at,
+        lastModified=last_modified,
     )
     io.save_pydantic_model_to_file(_get_directory_path(), _FILE_NAME, data)
 
@@ -57,7 +57,7 @@ def get_robot_deck_configuration() -> (
             )
             for e in parsed.cutoutFixtures
         ]
-        return cutout_fixture_placements, parsed.lastUpdatedAt
+        return cutout_fixture_placements, parsed.lastModified
 
 
 def delete_robot_deck_configuration() -> None:

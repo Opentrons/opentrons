@@ -40,7 +40,7 @@ class DeckConfigurationStore:
                     )
                     for e in request.cutoutFixtures
                 ],
-                last_updated_at=last_updated_at,
+                last_modified=last_updated_at,
             )
             return await self._get_assuming_locked()
 
