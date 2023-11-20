@@ -11,10 +11,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Link,
-  SIZE_5,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
