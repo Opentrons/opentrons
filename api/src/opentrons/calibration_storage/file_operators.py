@@ -94,7 +94,9 @@ def save_to_file(
 
     :param directory_path: path to the directory in which to save the data
     :param file_name: name of the file within the directory, *without the extension*.
-    :param data: data to save
+    :param data: The data to save. Either a Pydantic model, or a JSON-like dict to pass to
+        `json.dumps()`. If you're storing a Pydantic model, prefer `save_pydantic_model_to_file()`
+        and `read_pydantic_model_from_file()` for new code.
     :param encoder: if there is any specialized encoder needed.
     The default encoder is the date time encoder.
     """
@@ -130,7 +132,7 @@ def read_pydantic_model_from_file(
     file_path: Path,
     model: typing.Type[_ModelT],
 ) -> typing.Optional[_ModelT]:
-    """Safely read a JSON file into a Pydantic model.
+    """Safely read a file stored by `save_pydantic_model_to_file()` back into a Pydantic model.
 
     Returns `None` if the file is missing or corrupt.
     """

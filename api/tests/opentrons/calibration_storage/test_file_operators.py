@@ -129,6 +129,6 @@ def test_read_pydantic_model_from_file_invalid_model(tmp_path: Path) -> None:
 
     assert io.read_pydantic_model_from_file(not_model_path, DummyModel) is None
 
-    # Ideally we would assert that the subject logged a message saying "malformed",
+    # Ideally we would assert that the subject logged a message saying "does not match model",
     # but the opentrons.simulate and opentrons.execute tests interfere with the process's logger
     # settings and prevent that message from showing up in pytest's caplog fixture.
