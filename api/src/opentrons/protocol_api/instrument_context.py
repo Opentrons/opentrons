@@ -1660,6 +1660,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         self._core.prepare_to_aspirate()
 
+    @requires_version(2, 16)
     def configure_nozzle_layout(
         self,
         style: NozzleLayout,
