@@ -447,13 +447,13 @@
     },
     "AllNozzleLayoutConfiguration": {
       "title": "AllNozzleLayoutConfiguration",
-      "description": "Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default.",
+      "description": "All basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default.",
       "type": "object",
       "properties": {
         "style": {
           "title": "Style",
-          "default": "EMPTY",
-          "enum": ["EMPTY"],
+          "default": "ALL",
+          "enum": ["ALL"],
           "type": "string"
         }
       }
