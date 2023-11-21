@@ -1,12 +1,7 @@
 import * as React from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { UseMutateFunction } from 'react-query'
-import {
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SIZE_1,
-  SPACING,
-} from '@opentrons/components'
+import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -14,8 +9,9 @@ import {
   WEIGHT_OF_96_CHANNEL,
   LoadedPipette,
   getPipetteNameSpecs,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { Trans, useTranslation } from 'react-i18next'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -83,6 +79,10 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
+  const deckConfig = useDeckConfigurationQuery().data
+  const isWasteChuteOnDeck =
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
 
   if (
     pipetteId == null &&
@@ -234,21 +234,9 @@ export const BeforeBeginning = (
   ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
-      //  TODO(jr, 11/3/22): wire up this URL and unhide the link!
-      // getHelp={BEFORE_YOU_BEGIN_URL}
       rightHandBody={rightHandBody}
       bodyText={
         <>
-          {selectedPipette === NINETY_SIX_CHANNEL &&
-          (flowType === FLOWS.DETACH || flowType === FLOWS.ATTACH) ? (
-            <Banner
-              type="warning"
-              size={isOnDevice ? '1.5rem' : SIZE_1}
-              marginY={SPACING.spacing4}
-            >
-              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-            </Banner>
-          ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
             <Trans
               t={t}
@@ -257,7 +245,34 @@ export const BeforeBeginning = (
                 block: <StyledText css={BODY_STYLE} />,
               }}
             />
+            {selectedPipette === NINETY_SIX_CHANNEL &&
+              flowType === FLOWS.ATTACH &&
+              !isOnDevice && (
+                <StyledText css={BODY_STYLE}>
+                  {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+                </StyledText>
+              )}
           </Flex>
+          {selectedPipette === NINETY_SIX_CHANNEL &&
+          (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH) ? (
+            <Banner
+              type={isWasteChuteOnDeck ? 'error' : 'warning'}
+              size={isOnDevice ? '1.5rem' : '1rem'}
+              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+            >
+              {isWasteChuteOnDeck
+                ? t('waste_chute_error')
+                : t('waste_chute_warning')}
+            </Banner>
+          ) : (
+            <Banner
+              type="warning"
+              size={isOnDevice ? '1.5rem' : '1rem'}
+              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+            >
+              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+            </Banner>
+          )}
         </>
       }
       proceedButtonText={proceedButtonText}

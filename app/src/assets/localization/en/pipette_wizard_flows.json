@@ -46,7 +46,7 @@
   "hold_and_loosen": "Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.",
   "hold_pipette_carefully": "Hold onto the pipette so it does not fall. Connect the pipette by aligning the two protruding rods on the mounting plate. Ensure a secure attachment by screwing in the four front screws with the provided screwdriver.",
   "how_to_reattach": "<block>Push the right pipette mount up to the top of the z-axis. Then tighten the captive screw at the top right of the gantry carriage.</block><block>When reattached, the right mount should no longer freely move up and down.</block>",
-  "install_probe": "Take the calibration probe from its storage location. Ensure its collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the <bold>{{location}}</bold> pipette nozzle as far as it can go. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.",
+  "install_probe": "Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the <bold>{{location}}</bold> pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.",
   "loose_detach": "Loosen screws and detach ",
   "move_gantry_to_front": "Move gantry to front",
   "must_detach_mounting_plate": "You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.",
@@ -84,6 +84,8 @@
   "unscrew_and_detach": "Loosen Screws and Detach Mounting Plate",
   "unscrew_at_top": "<block>Loosen the captive screw on the top right of the  carriage. This releases the right pipette mount, which should then freely move up and down.</block>",
   "unscrew_carriage": "unscrew z-axis carriage",
+  "waste_chute_error": "Remove the waste chute from the deck plate adapter before proceeding.",
+  "waste_chute_warning": "If the waste chute is installed, remove it from the deck plate adapter before proceeding.",
   "wrong_pip": "wrong instrument installed",
   "z_axis_still_attached": "z-axis screw still secure"
 }
