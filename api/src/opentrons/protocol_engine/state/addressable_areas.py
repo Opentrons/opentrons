@@ -1,6 +1,6 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
-from typing import Dict, Set, Union, List, Tuple
+from typing import Dict, Set, Union, List
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
@@ -57,10 +57,6 @@ def _get_conflicting_addressable_areas(
         )
     loaded_areas_on_cutout.intersection_update(loaded_addressable_areas)
     return loaded_areas_on_cutout
-
-
-# TODO make the below some sort of better type
-DeckConfiguration = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id
 
 
 class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
@@ -126,7 +122,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     @staticmethod
     def _get_addressable_areas_from_deck_configuration(
-        deck_config: DeckConfiguration, deck_definition: DeckDefinitionV4
+        deck_config: DeckConfigurationType, deck_definition: DeckDefinitionV4
     ) -> Dict[str, AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
         # TODO uncomment once execute is hooked up with this properly
