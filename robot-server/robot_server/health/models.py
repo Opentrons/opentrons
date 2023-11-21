@@ -21,10 +21,15 @@ class HealthLinks(BaseModel):
     serverLog: str = Field(
         ...,
         description="The path to the HTTP server logs endpoint",
+        examples=["/logs/server.log"],
     )
     oddLog: typing.Optional[str] = Field(
         None,
-        description="The path to the ODD app logs endpoint",
+        description=(
+            "The path to the on-device display app logs endpoint"
+            " (only present on the Opentrons Flex)"
+        ),
+        examples=["/logs/touchscreen.log"],
     )
     apiSpec: str = Field(
         ...,
