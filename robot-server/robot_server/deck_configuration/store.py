@@ -20,11 +20,11 @@ class DeckConfigurationStore:
         self._last_update: Optional[_LastUpdate] = None
 
     async def set(
-        self, request: models.DeckConfigurationRequest, last_updated_at: datetime
+        self, request: models.DeckConfigurationRequest, last_modified_at: datetime
     ) -> models.DeckConfigurationResponse:
         """Set the robot's current deck configuration."""
         self._last_update = _LastUpdate(
-            cutout_fixtures=request.cutoutFixtures, timestamp=last_updated_at
+            cutout_fixtures=request.cutoutFixtures, timestamp=last_modified_at
         )
         return await self.get()
 
@@ -35,12 +35,12 @@ class DeckConfigurationStore:
                 cutoutFixtures=defaults.for_deck_definition(
                     self._deck_type.value
                 ).cutoutFixtures,
-                lastUpdatedAt=None,
+                lastModifiedAt=None,
             )
         else:
             return models.DeckConfigurationResponse.construct(
                 cutoutFixtures=self._last_update.cutout_fixtures,
-                lastUpdatedAt=self._last_update.timestamp,
+                lastModifiedAt=self._last_update.timestamp,
             )
 
     async def get_deck_configuration(self) -> DeckConfigurationType:
