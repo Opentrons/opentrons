@@ -1683,7 +1683,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
-            - ``EMPTY`` or ``None`` resets the pipette to use all of its nozzles.
+            - ``ALL`` resets the pipette to use all of its nozzles. Calling ``configure_nozzle_layout`` with no arguments also resets the pipette.
 
         :type style: ``NozzleLayout`` or ``None``
         :param start: The nozzle at the back left of the layout, which the robot uses
