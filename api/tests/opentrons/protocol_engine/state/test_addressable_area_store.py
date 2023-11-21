@@ -16,9 +16,9 @@ from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaState,
-    DeckConfiguration,
 )
 from opentrons.protocol_engine.types import (
+    DeckConfigurationType,
     DeckType,
     ModuleModel,
     LabwareMovementStrategy,
@@ -33,7 +33,7 @@ from .command_fixtures import (
 )
 
 
-def _make_deck_config() -> DeckConfiguration:
+def _make_deck_config() -> DeckConfigurationType:
     return [
         ("cutoutA1", "singleLeftSlot"),
         ("cutoutB1", "singleLeftSlot"),
