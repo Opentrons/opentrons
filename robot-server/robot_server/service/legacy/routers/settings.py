@@ -23,6 +23,10 @@ from opentrons.config import (
     feature_flags as ff,
     get_opentrons_path,
 )
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware, get_robot_type, get_robot_type_enum
@@ -231,6 +235,9 @@ async def get_settings_reset_options(
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
+    deck_configuration_store: DeckConfigurationStore = Depends(
+        get_deck_configuration_store
+    ),
     robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> V1BasicResponse:
     reset_options = reset_util.reset_options(robot_type)
@@ -254,6 +261,9 @@ async def post_settings_reset_options(
 
     if factory_reset_commands.get(reset_util.ResetOptionId.on_device_display, False):
         await reset_odd.mark_odd_for_reset_next_boot()
+
+    if factory_reset_commands.get(reset_util.ResetOptionId.deck_configuration, False):
+        await deck_configuration_store.delete()
 
     # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
     # The message returned to the client will be printed in the wrong order.

@@ -9,7 +9,6 @@ from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import (
     delete_robot_deck_attitude,
-    delete_robot_deck_configuration,
     gripper_offset,
     ot2,
     ot3,
@@ -49,19 +48,19 @@ class ResetOptionId(str, Enum):
 _OT_2_RESET_OPTIONS = [
     ResetOptionId.boot_scripts,
     ResetOptionId.deck_calibration,
-    ResetOptionId.deck_configuration,
     ResetOptionId.pipette_offset,
     ResetOptionId.tip_length_calibrations,
     ResetOptionId.runs_history,
+    ResetOptionId.deck_configuration,
     ResetOptionId.authorized_keys,
 ]
 _FLEX_RESET_OPTIONS = [
     ResetOptionId.boot_scripts,
-    ResetOptionId.deck_configuration,
     ResetOptionId.pipette_offset,
     ResetOptionId.gripper_offset,
     ResetOptionId.runs_history,
     ResetOptionId.on_device_display,
+    ResetOptionId.deck_configuration,
     ResetOptionId.module_calibration,
     ResetOptionId.authorized_keys,
 ]
@@ -73,10 +72,6 @@ _settings_reset_options = {
     ResetOptionId.deck_calibration: CommonResetOption(
         name="Deck Calibration",
         description="Clear deck calibration (will also clear pipette offset)",
-    ),
-    ResetOptionId.deck_configuration: CommonResetOption(
-        name="Deck Configuration",
-        description="Clear deck configuration",
     ),
     ResetOptionId.pipette_offset: CommonResetOption(
         name="Pipette Offset Calibrations",
@@ -90,8 +85,8 @@ _settings_reset_options = {
         name="Tip Length Calibrations",
         description="Clear tip length calibrations (will also clear pipette offset)",
     ),
-    # TODO(mm, 2022-05-23): runs_history and on_device_display are robot-server things,
-    # and are not concepts known to this package (the `opentrons` library).
+    # TODO(mm, 2022-05-23): runs_history, on_device_display, and deck_configuration are
+    # robot-server things, and are not concepts known to this package (the `opentrons` library).
     # This option is defined here only as a convenience for robot-server.
     # Find a way to split things up and define this in robot-server instead.
     ResetOptionId.runs_history: CommonResetOption(
@@ -101,6 +96,10 @@ _settings_reset_options = {
     ResetOptionId.on_device_display: CommonResetOption(
         name="On-Device Display Configuration",
         description="Clear the configuration of the on-device display (touchscreen)",
+    ),
+    ResetOptionId.deck_configuration: CommonResetOption(
+        name="Deck Configuration",
+        description="Clear deck configuration",
     ),
     ResetOptionId.module_calibration: CommonResetOption(
         name="Module Calibrations", description="Clear module offset calibrations"
@@ -136,9 +135,6 @@ def reset(options: Set[ResetOptionId], robot_type: RobotTypeEnum) -> None:
     if ResetOptionId.deck_calibration in options:
         reset_deck_calibration(robot_type)
 
-    if ResetOptionId.deck_configuration in options:
-        reset_deck_configuration()
-
     if ResetOptionId.pipette_offset in options:
         reset_pipette_offset(robot_type)
 
@@ -166,10 +162,6 @@ def reset_boot_scripts() -> None:
 def reset_deck_calibration(robot_type: RobotTypeEnum) -> None:
     delete_robot_deck_attitude()
     ot2.clear_pipette_offset_calibrations() if robot_type is RobotTypeEnum.OT2 else ot3.clear_pipette_offset_calibrations()
-
-
-def reset_deck_configuration() -> None:
-    delete_robot_deck_configuration()
 
 
 def reset_pipette_offset(robot_type: RobotTypeEnum) -> None:
