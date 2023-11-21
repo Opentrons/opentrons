@@ -776,4 +776,4 @@ NozzleLayoutConfigurationType = Union[
 ]
 
 # TODO make the below some sort of better type
-DeckConfigurationType = List[Tuple[str, str]]
+DeckConfigurationType = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id

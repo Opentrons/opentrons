@@ -197,7 +197,7 @@
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
-      "body": "Slot {{selectedSlot}} is occupied. Clear the slot to continue."
+      "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue."
     },
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",

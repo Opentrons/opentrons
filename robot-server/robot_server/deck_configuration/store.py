@@ -29,7 +29,7 @@ class DeckConfigurationStore:
         self._calibration_storage_lock = asyncio.Lock()
 
     async def set(
-        self, request: models.DeckConfigurationRequest, last_updated_at: datetime
+        self, request: models.DeckConfigurationRequest, last_modified_at: datetime
     ) -> models.DeckConfigurationResponse:
         """Set the robot's current deck configuration."""
         async with self._calibration_storage_lock:
@@ -40,7 +40,7 @@ class DeckConfigurationStore:
                     )
                     for e in request.cutoutFixtures
                 ],
-                last_modified=last_updated_at,
+                last_modified=last_modified_at,
             )
             return await self._get_assuming_locked()
 
@@ -66,10 +66,10 @@ class DeckConfigurationStore:
                 cutoutFixtures=defaults.for_deck_definition(
                     self._deck_type.value
                 ).cutoutFixtures,
-                lastUpdatedAt=None,
+                lastModifiedAt=None,
             )
         else:
-            cutout_fixtures_from_storage, last_updated_at = from_storage
+            cutout_fixtures_from_storage, last_modified_at = from_storage
             cutout_fixtures = [
                 models.CutoutFixture.construct(
                     cutoutFixtureId=e.cutout_fixture_id,
@@ -79,5 +79,5 @@ class DeckConfigurationStore:
             ]
         return models.DeckConfigurationResponse.construct(
             cutoutFixtures=cutout_fixtures,
-            lastUpdatedAt=last_updated_at,
+            lastModifiedAt=last_modified_at,
         )
