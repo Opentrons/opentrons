@@ -245,7 +245,7 @@ describe('AttachProbe', () => {
     }
     const { getByText } = render(props)
     getByText(
-      'Remove the Waste Chute from the Deck Plate Adaptor before proceeding.'
+      'Remove the waste chute from the deck plate adapter before proceeding.'
     )
   })
 })
