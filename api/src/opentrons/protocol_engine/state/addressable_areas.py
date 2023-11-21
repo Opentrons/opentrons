@@ -59,6 +59,36 @@ def _get_conflicting_addressable_areas(
     return loaded_areas_on_cutout
 
 
+CUTOUT_TO_DECK_SLOT_MAP: Dict[str, DeckSlotName] = {
+    # OT-2
+    "cutout1": DeckSlotName.SLOT_1,
+    "cutout2": DeckSlotName.SLOT_2,
+    "cutout3": DeckSlotName.SLOT_3,
+    "cutout4": DeckSlotName.SLOT_4,
+    "cutout5": DeckSlotName.SLOT_5,
+    "cutout6": DeckSlotName.SLOT_6,
+    "cutout7": DeckSlotName.SLOT_7,
+    "cutout8": DeckSlotName.SLOT_8,
+    "cutout9": DeckSlotName.SLOT_9,
+    "cutout10": DeckSlotName.SLOT_10,
+    "cutout11": DeckSlotName.SLOT_11,
+    "cutout12": DeckSlotName.FIXED_TRASH,
+    # Flex
+    "cutoutA1": DeckSlotName.SLOT_A1,
+    "cutoutA2": DeckSlotName.SLOT_A2,
+    "cutoutA3": DeckSlotName.SLOT_A3,
+    "cutoutB1": DeckSlotName.SLOT_B1,
+    "cutoutB2": DeckSlotName.SLOT_B2,
+    "cutoutB3": DeckSlotName.SLOT_B3,
+    "cutoutC1": DeckSlotName.SLOT_C1,
+    "cutoutC2": DeckSlotName.SLOT_C2,
+    "cutoutC3": DeckSlotName.SLOT_C3,
+    "cutoutD1": DeckSlotName.SLOT_D1,
+    "cutoutD2": DeckSlotName.SLOT_D2,
+    "cutoutD3": DeckSlotName.SLOT_D3,
+}
+
+
 class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
     """Addressable area state container."""
 
@@ -139,12 +169,14 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             cutout_position = deck_configuration_provider.get_cutout_position(
                 cutout_id, deck_definition
             )
+            base_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
             for addressable_area_name in provided_addressable_areas:
                 addressable_areas.append(
                     deck_configuration_provider.get_addressable_area_from_name(
-                        addressable_area_name,
-                        cutout_position,
-                        deck_definition,
+                        addressable_area_name=addressable_area_name,
+                        cutout_position=cutout_position,
+                        base_slot=base_slot,
+                        deck_definition=deck_definition,
                     )
                 )
         return {area.area_name: area for area in addressable_areas}
@@ -171,9 +203,13 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             cutout_position = deck_configuration_provider.get_cutout_position(
                 cutout_id, self._state.deck_definition
             )
+            base_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
             addressable_area = (
                 deck_configuration_provider.get_addressable_area_from_name(
-                    addressable_area_name, cutout_position, self._state.deck_definition
+                    addressable_area_name=addressable_area_name,
+                    cutout_position=cutout_position,
+                    base_slot=base_slot,
+                    deck_definition=self._state.deck_definition,
                 )
             )
             self._state.loaded_addressable_areas_by_name[
@@ -289,8 +325,12 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         cutout_position = deck_configuration_provider.get_cutout_position(
             cutout_id, self._state.deck_definition
         )
+        base_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
         return deck_configuration_provider.get_addressable_area_from_name(
-            addressable_area_name, cutout_position, self._state.deck_definition
+            addressable_area_name=addressable_area_name,
+            cutout_position=cutout_position,
+            base_slot=base_slot,
+            deck_definition=self._state.deck_definition,
         )
 
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:

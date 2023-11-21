@@ -3,7 +3,7 @@ from typing import List, Set, Tuple, Optional
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, CutoutFixture
 
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 
 from ..types import (
     AddressableArea,
@@ -86,6 +86,7 @@ def get_potential_cutout_fixtures(
 def get_addressable_area_from_name(
     addressable_area_name: str,
     cutout_position: DeckPoint,
+    base_slot: DeckSlotName,
     deck_definition: DeckDefinitionV4,
 ) -> AddressableArea:
     """Given a name and a cutout position, get an addressable area on the deck."""
@@ -127,6 +128,7 @@ def get_addressable_area_from_name(
             return AddressableArea(
                 area_name=addressable_area["id"],
                 area_type=AreaType(addressable_area["areaType"]),
+                base_slot=base_slot,
                 display_name=addressable_area["displayName"],
                 bounding_box=bounding_box,
                 position=position,

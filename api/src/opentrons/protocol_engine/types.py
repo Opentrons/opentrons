@@ -687,6 +687,7 @@ class AddressableArea:
 
     area_name: str
     area_type: AreaType
+    base_slot: DeckSlotName
     display_name: str
     bounding_box: Dimensions
     position: AddressableOffsetVector
