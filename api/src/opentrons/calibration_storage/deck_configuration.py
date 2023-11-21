@@ -1,15 +1,10 @@
 from datetime import datetime
-from pathlib import Path
 from typing import List, Optional, Tuple
 
 import pydantic
 
-from opentrons import config
 from .types import CutoutFixturePlacement
 from . import file_operators as io
-
-
-_FILE_NAME = "deck_configuration.json"
 
 
 class _CutoutFixturePlacementModel(pydantic.BaseModel):
@@ -24,10 +19,10 @@ class _DeckConfigurationModel(pydantic.BaseModel):
     lastModified: datetime
 
 
-def save_robot_deck_configuration(
+def serialize_deck_configuration(
     cutout_fixture_placements: List[CutoutFixturePlacement], last_modified: datetime
-) -> None:
-    """Replace the stored deck configuration in the filesystem."""
+) -> bytes:
+    """Serialize a deck configuration for storing on the filesystem."""
     data = _DeckConfigurationModel.construct(
         cutoutFixtures=[
             _CutoutFixturePlacementModel.construct(
@@ -37,17 +32,19 @@ def save_robot_deck_configuration(
         ],
         lastModified=last_modified,
     )
-    io.save_pydantic_model_to_file(_get_directory_path(), _FILE_NAME, data)
+    return io.serialize_pydantic_model(data)
 
 
-def get_robot_deck_configuration() -> (
-    Optional[Tuple[List[CutoutFixturePlacement], datetime]]
-):
-    """Return the currently stored deck configuration and its last-modified time.
+# TODO(mm, 2023-11-21): If the data is corrupt, we should propagate the underlying error.
+# And there should be an enumerated "corrupt storage" error in shared-data.
+def deserialize_deck_configuration(
+    serialized: bytes,
+) -> Optional[Tuple[List[CutoutFixturePlacement], datetime]]:
+    """Deserialize bytes previously serialized by `serialize_deck_configuration()`.
 
-    Or `None`, if the file is missing or corrupt.
+    Returns a tuple `(deck_configuration, last_modified_time)`, or `None` if the data is corrupt.
     """
-    parsed = io.read_pydantic_model_from_file(_get_file_path(), _DeckConfigurationModel)
+    parsed = io.deserialize_pydantic_model(serialized, _DeckConfigurationModel)
     if parsed is None:
         return None
     else:
@@ -58,15 +55,3 @@ def get_robot_deck_configuration() -> (
             for e in parsed.cutoutFixtures
         ]
         return cutout_fixture_placements, parsed.lastModified
-
-
-def delete_robot_deck_configuration() -> None:
-    io.delete_file(_get_file_path())
-
-
-def _get_directory_path() -> Path:
-    return config.get_opentrons_path("robot_calibration_dir")
-
-
-def _get_file_path() -> Path:
-    return _get_directory_path() / _FILE_NAME

@@ -80,55 +80,24 @@ def test_malformed_calibration(
         io.read_cal_file(malformed_calibration_path)
 
 
-def test_save_pydantic_model_to_file(tmp_path: Path) -> None:
-    directory_path = tmp_path / "nonexistent 1" / "nonexistent 2" / "nonexistent 3"
-    file_name = "test.json"
-    assert not directory_path.exists()
-
-    io.save_pydantic_model_to_file(
-        directory_path,
-        file_name,
-        DummyModel.construct(integer_field=123, aliased_field="abc"),
-    )
-
-    assert json.loads((directory_path / file_name).read_text(encoding="utf-8")) == {
-        "integer_field": 123,
-        "! aliased field !": "abc",
-    }
-
-
-def test_read_pydantic_model_from_file_valid(tmp_path: Path) -> None:
-    valid_path = tmp_path / "valid.json"
-    valid_path.write_text(
-        '{"integer_field": 123, "! aliased field !": "abc"}', encoding="utf-8"
-    )
-    assert io.read_pydantic_model_from_file(
-        valid_path, DummyModel
+def test_deserialize_pydantic_model_valid() -> None:
+    serialized = b'{"integer_field": 123, "! aliased field !": "abc"}'
+    assert io.deserialize_pydantic_model(
+        serialized, DummyModel
     ) == DummyModel.construct(integer_field=123, aliased_field="abc")
 
 
-def test_read_pydantic_model_from_file_nonexistent_path(tmp_path: Path) -> None:
-    nonexistent_path = tmp_path / "nonexistent.json"
-    assert io.read_pydantic_model_from_file(nonexistent_path, DummyModel) is None
-
-
-def test_read_pydantic_model_from_file_invalid_json(tmp_path: Path) -> None:
-    not_json_path = tmp_path / "not_json.json"
-    not_json_path.write_text("😾", encoding="utf-8")
-
-    assert io.read_pydantic_model_from_file(not_json_path, DummyModel) is None
-
+def test_deserialize_pydantic_model_invalid_as_json() -> None:
+    serialized = "😾".encode("utf-8")
+    assert io.deserialize_pydantic_model(serialized, DummyModel) is None
     # Ideally we would assert that the subject logged a message saying "not valid JSON",
     # but the opentrons.simulate and opentrons.execute tests interfere with the process's logger
     # settings and prevent that message from showing up in pytest's caplog fixture.
 
 
 def test_read_pydantic_model_from_file_invalid_model(tmp_path: Path) -> None:
-    not_model_path = tmp_path / "not_model.json"
-    not_model_path.write_text('{"integer_field": "not an integer"}', encoding="utf-8")
-
-    assert io.read_pydantic_model_from_file(not_model_path, DummyModel) is None
-
+    serialized = b'{"integer_field": "not an integer"}'
+    assert io.deserialize_pydantic_model(serialized, DummyModel) is None
     # Ideally we would assert that the subject logged a message saying "does not match model",
     # but the opentrons.simulate and opentrons.execute tests interfere with the process's logger
     # settings and prevent that message from showing up in pytest's caplog fixture.

@@ -110,13 +110,9 @@ def save_to_file(
     file_path.write_text(json_data, encoding="utf-8")
 
 
-def save_pydantic_model_to_file(
-    directory_path: Path, file_name: str, data: pydantic.BaseModel
-) -> None:
-    """Safely serialize data from a Pydantic model into a JSON file."""
-    directory_path.mkdir(parents=True, exist_ok=True)
-    file_path = directory_path / file_name
-    file_path.write_text(data.json(by_alias=True), encoding="utf-8")
+def serialize_pydantic_model(data: pydantic.BaseModel) -> bytes:
+    """Safely serialize data from a Pydantic model into a form suitable for storing on disk."""
+    return data.json(by_alias=True).encode("utf-8")
 
 
 _ModelT = typing.TypeVar("_ModelT", bound=pydantic.BaseModel)
@@ -128,22 +124,19 @@ _ModelT = typing.TypeVar("_ModelT", bound=pydantic.BaseModel)
 # safe-ish to fall back to a default because the Opentrons App will let the user confirm everything
 # before starting the run. But when running protocols through the non-interactive
 # `opentrons_execute`, we don't want it to silently use default data if the file is corrupt.
-def read_pydantic_model_from_file(
-    file_path: Path,
+def deserialize_pydantic_model(
+    serialized: bytes,
     model: typing.Type[_ModelT],
 ) -> typing.Optional[_ModelT]:
-    """Safely read a file stored by `save_pydantic_model_to_file()` back into a Pydantic model.
+    """Safely read bytes from `serialize_pydantic_model()` back into a Pydantic model.
 
     Returns `None` if the file is missing or corrupt.
     """
     try:
-        return model.parse_file(file_path)
-    except FileNotFoundError:
-        _log.info(f"File {file_path} not found.")
-        return None
+        return model.parse_raw(serialized)
     except json.JSONDecodeError:
-        _log.warning(f"File {file_path} is not valid JSON.", exc_info=True)
+        _log.warning("Data is not valid JSON.", exc_info=True)
         return None
     except pydantic.ValidationError:
-        _log.warning(f"File {file_path} is malformed as a {model}.", exc_info=True)
+        _log.warning(f"Data is malformed as a {model}.", exc_info=True)
         return None
