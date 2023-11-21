@@ -1,6 +1,6 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
-from typing import Dict, Set, Union, List, Tuple
+from typing import Dict, Set, Union, List
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
