@@ -54,10 +54,10 @@ from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
 )
-from opentrons_hardware.hardware_control.move_group_runner import (
+from opentrons_hardware.hardware_control.move_execution import (
     MoveGroupRunner,
-    MoveScheduler,
-    _CompletionPacket,
+    MoveDispatcher,
+    CompletionPacket,
 )
 
 from opentrons_hardware.hardware_control.types import (
@@ -775,7 +775,7 @@ async def test_single_move(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
 ) -> None:
     """It should send a start group command."""
-    subject = MoveScheduler(move_groups=move_group_single)
+    subject = MoveDispatcher(move_groups=move_group_single)
     mock_sender = MockSendMoveCompleter(move_group_single, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
@@ -806,7 +806,7 @@ async def test_home_timeout(
     mock_can_messenger: AsyncMock, move_group_home_single: MoveGroups
 ) -> None:
     """It should send a start group command."""
-    subject = MoveScheduler(move_groups=move_group_home_single)
+    subject = MoveDispatcher(move_groups=move_group_home_single)
     mock_sender = MockSendMoveCompleter(move_group_home_single, subject, ack_id=3)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
@@ -825,9 +825,9 @@ async def test_tip_action_move_runner_receives_two_responses(
     mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, request: Any
 ) -> None:
     """The magic call function should receive two responses for a tip action."""
-    with patch.object(MoveScheduler, "_handle_move_completed") as mock_move_complete:
+    with patch.object(MoveDispatcher, "_handle_move_completed") as mock_move_complete:
         move_group_tip_action = request.getfixturevalue(move_group_tip_action)
-        subject = MoveScheduler(move_groups=move_group_tip_action)
+        subject = MoveDispatcher(move_groups=move_group_tip_action)
         mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
         mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
         mock_can_messenger.send.side_effect = mock_sender.mock_send
@@ -853,7 +853,7 @@ async def test_tip_action_move_runner_position_updated(
 ) -> None:
     """Two responses from a tip action move are properly handled."""
     move_group_tip_action = request.getfixturevalue(move_group_tip_action)
-    subject = MoveScheduler(move_groups=move_group_tip_action)
+    subject = MoveDispatcher(move_groups=move_group_tip_action)
     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
@@ -878,7 +878,7 @@ async def test_tip_action_move_runner_fail_receives_one_response(
 ) -> None:
     """Tip action move should fail if one or less responses received."""
     move_group_tip_action = request.getfixturevalue(move_group_tip_action)
-    subject = MoveScheduler(move_groups=move_group_tip_action)
+    subject = MoveDispatcher(move_groups=move_group_tip_action)
     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
     mock_can_messenger.send.side_effect = mock_sender.mock_send_failure
@@ -891,7 +891,7 @@ async def test_multi_group_move(
     mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
 ) -> None:
     """It should start next group once the prior has completed."""
-    subject = MoveScheduler(move_groups=move_group_multiple)
+    subject = MoveDispatcher(move_groups=move_group_multiple)
     mock_sender = MockSendMoveCompleter(move_group_multiple, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
@@ -964,7 +964,7 @@ async def test_multi_gripper_group_move(
     mock_can_messenger: AsyncMock, move_group_gripper_multiple: MoveGroups
 ) -> None:
     """It should start next group once the prior has completed."""
-    subject = MoveScheduler(move_groups=move_group_gripper_multiple)
+    subject = MoveDispatcher(move_groups=move_group_gripper_multiple)
     mock_sender = MockGripperSendMoveCompleter(move_group_gripper_multiple, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
@@ -1151,7 +1151,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
     ],
 )
 def test_accumulate_move_completions(
-    completions: List[_CompletionPacket],
+    completions: List[CompletionPacket],
     position_map: NodeMap[MotorPositionStatus],
 ) -> None:
     """Build correct move results."""
@@ -1202,7 +1202,7 @@ async def test_handles_unknown_group_ids(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
 ) -> None:
     """Acks with unknown group ids should not cause crashes."""
-    subject = MoveScheduler(move_group_single)
+    subject = MoveDispatcher(move_group_single)
     mock_sender = MockSendMoveCompleterWithUnknown(move_group_single, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
@@ -1214,7 +1214,7 @@ async def test_groups_from_nonzero_index(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
 ) -> None:
     """Callers can specify a non-zero starting group."""
-    subject = MoveScheduler(move_group_single, 1)
+    subject = MoveDispatcher(move_group_single, 1)
     mock_sender = MockSendMoveCompleter(move_group_single, subject, 1)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
@@ -1313,7 +1313,7 @@ async def test_single_move_error(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
 ) -> None:
     """It should send a start group command."""
-    subject = MoveScheduler(move_groups=move_group_single)
+    subject = MoveDispatcher(move_groups=move_group_single)
     mock_sender = MockSendMoveErrorCompleter(move_group_single, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
@@ -1352,7 +1352,7 @@ async def test_multiple_move_error(
     mock_can_messenger: AsyncMock, move_group_multiple_axes: MoveGroups
 ) -> None:
     """It should receive all of the errors."""
-    subject = MoveScheduler(move_groups=move_group_multiple_axes)
+    subject = MoveDispatcher(move_groups=move_group_multiple_axes)
     mock_sender = MockSendMoveErrorCompleter(move_group_multiple_axes, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
@@ -1365,7 +1365,7 @@ async def test_multiple_move_error_estop_filtering(
     mock_can_messenger: AsyncMock, move_group_multiple_axes: MoveGroups
 ) -> None:
     """It should receive all of the errors but only report the Estop one."""
-    subject = MoveScheduler(move_groups=move_group_multiple_axes)
+    subject = MoveDispatcher(move_groups=move_group_multiple_axes)
     mock_sender = MockSendMoveErrorCompleter(
         move_group_multiple_axes, subject, estop_errors_to_send=1
     )
@@ -1408,7 +1408,7 @@ async def test_moves_removed_on_stall_detected(
     mock_can_messenger: AsyncMock, move_group_with_stall: MoveGroups
 ) -> None:
     """Check that remaining moves for a node are removed when it stops on stall."""
-    subject = MoveScheduler(move_groups=move_group_with_stall)
+    subject = MoveDispatcher(move_groups=move_group_with_stall)
     mock_sender = MockSendMoveCompleter(
         move_group_with_stall,
         subject,
