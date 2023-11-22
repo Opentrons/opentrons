@@ -364,8 +364,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           : t('calibration_needed')
     }
 
-    console.log('calibrationStatusModules', calibrationStatusModules)
-
     if (stepKey === MODULE_SETUP_KEY)
       console.log('moduleAndDeckStatus', moduleAndDeckStatus)
 
