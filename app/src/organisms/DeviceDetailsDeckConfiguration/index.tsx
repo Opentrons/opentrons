@@ -94,9 +94,6 @@ export function DeviceDetailsDeckConfiguration({
       !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
   )
 
-  console.log('isRunRunning', isRunRunning)
-  console.log('isMaintenanceRunExisting', isMaintenanceRunExisting)
-
   return (
     <>
       {showAddFixtureModal && targetCutoutId != null ? (
