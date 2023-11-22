@@ -15,9 +15,6 @@ stages:
           - id: bootScripts
             name: Boot Scripts
             description: Clear custom boot scripts
-          - id: deckConfiguration
-            name: Deck Configuration
-            description: Clear deck configuration
           - id: pipetteOffsetCalibrations
             name: Pipette Offset Calibrations
             description: !re_search 'Clear pipette offset calibrations'
@@ -30,6 +27,9 @@ stages:
           - id: onDeviceDisplay
             name: On-Device Display Configuration
             description: !re_search 'on-device display'
+          - id: deckConfiguration
+            name: Deck Configuration
+            description: Clear deck configuration
           - id: moduleCalibration
             name: Module Calibrations
             description: !re_search 'Clear module offset calibrations'

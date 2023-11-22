@@ -18,9 +18,6 @@ stages:
           - id: deckCalibration
             name: Deck Calibration
             description: !re_search 'Clear deck calibration'
-          - id: deckConfiguration
-            name: Deck Configuration
-            description: !re_search 'Clear deck configuration'
           - id: pipetteOffsetCalibrations
             name: Pipette Offset Calibrations
             description: !re_search 'Clear pipette offset calibrations'
@@ -30,6 +27,9 @@ stages:
           - id: runsHistory
             name: Clear Runs History
             description: !re_search "Erase this device's stored history of protocols and runs."
+          - id: deckConfiguration
+            name: Deck Configuration
+            description: !re_search 'Clear deck configuration'
           - id: authorizedKeys
             name: SSH Authorized Keys
             description: !re_search 'Clear the ssh authorized keys'
