@@ -19,6 +19,10 @@ from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 
 from robot_server import app
+from robot_server.deck_configuration.fastapi_dependencies import (
+    get_deck_configuration_store,
+)
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.persistence import PersistenceResetter, get_persistence_resetter
 
 
@@ -541,6 +545,22 @@ def mock_persistence_resetter(
     del app.dependency_overrides[get_persistence_resetter]
 
 
+@pytest.fixture
+def mock_deck_configuration_store(
+    decoy: Decoy,
+) -> Generator[DeckConfigurationStore, None, None]:
+    mock_deck_configuration_store = decoy.mock(cls=DeckConfigurationStore)
+
+    async def mock_get_deck_configuration_store() -> DeckConfigurationStore:
+        return mock_deck_configuration_store
+
+    app.dependency_overrides[
+        get_deck_configuration_store
+    ] = mock_get_deck_configuration_store
+    yield mock_deck_configuration_store
+    del app.dependency_overrides[get_deck_configuration_store]
+
+
 @pytest.mark.parametrize(
     argnames="body,called_with",
     argvalues=[
@@ -576,8 +596,9 @@ def mock_persistence_resetter(
                 ResetOptionId.pipette_offset,
                 ResetOptionId.tip_length_calibrations,
                 # TODO(mm, 2022-10-25): Verify that the subject endpoint function calls
-                # PersistenceResetter.mark_directory_reset(). Currently blocked by
-                # mark_directory_reset() being an async method, and api_client having
+                # PersistenceResetter.mark_directory_reset() and
+                # DeckConfigurationStore.reset().
+                # Currently blocked by those methods being async, and api_client having
                 # its own event loop that interferes with making this test async.
                 ResetOptionId.runs_history,
                 ResetOptionId.authorized_keys,
@@ -590,14 +611,21 @@ def mock_persistence_resetter(
     ],
 )
 def test_reset_success(
-    api_client, mock_reset, mock_persistence_resetter, body, called_with
+    api_client,
+    mock_reset,
+    mock_persistence_resetter: PersistenceResetter,
+    mock_deck_configuration_store: DeckConfigurationStore,
+    body,
+    called_with,
 ):
     resp = api_client.post("/settings/reset", json=body)
     assert resp.status_code == 200
     mock_reset.assert_called_once_with(called_with, RobotTypeEnum.OT2)
 
 
-def test_reset_invalid_option(api_client, mock_reset, mock_persistence_resetter):
+def test_reset_invalid_option(
+    api_client, mock_reset, mock_persistence_resetter, mock_deck_configuration_store
+):
     resp = api_client.post("/settings/reset", json={"aksgjajhadjasl": False})
     assert resp.status_code == 422
     body = resp.json()
