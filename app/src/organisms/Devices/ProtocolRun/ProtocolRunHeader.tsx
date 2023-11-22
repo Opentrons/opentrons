@@ -188,12 +188,12 @@ export function ProtocolRunHeader({
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
   )
-  const notConfigured = !requiredDeckConfigCompatibility.some(dc => {
-    return (
-      dc.cutoutFixtureId != null &&
-      dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
-    )
-  })
+  const notCompatible =
+    requiredDeckConfigCompatibility.map(
+      dc =>
+        dc.cutoutFixtureId == null ||
+        !dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
+    ).length > 0
 
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
@@ -409,7 +409,7 @@ export function ProtocolRunHeader({
                 protocolData == null || !!isProtocolAnalyzing
               }
               isDoorOpen={isDoorOpen}
-              notConfigured={notConfigured}
+              notCompatible={notCompatible}
             />
           </Flex>
         </Box>
@@ -551,7 +551,7 @@ interface ActionButtonProps {
   runStatus: RunStatus | null
   isProtocolAnalyzing: boolean
   isDoorOpen: boolean
-  notConfigured: boolean
+  notCompatible: boolean
 }
 function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
@@ -560,7 +560,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     runStatus,
     isProtocolAnalyzing,
     isDoorOpen,
-    notConfigured,
+    notCompatible,
   } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
@@ -616,7 +616,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isResetRunLoading ||
     isOtherRunCurrent ||
     isProtocolAnalyzing ||
-    notConfigured ||
+    notCompatible ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
     (isDoorOpen &&

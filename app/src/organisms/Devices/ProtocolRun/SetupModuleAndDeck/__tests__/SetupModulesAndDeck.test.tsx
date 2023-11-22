@@ -63,7 +63,7 @@ describe('SetupModuleAndDeck', () => {
       expandLabwarePositionCheckStep: () => jest.fn(),
       hasModules: true,
       commands: [],
-      notConfigured: false,
+      notCompatible: false,
     }
     mockSetupFixtureList.mockReturnValue(<div>Mock setup fixture list</div>)
     mockSetupModulesList.mockReturnValue(<div>Mock setup modules list</div>)
@@ -160,10 +160,10 @@ describe('SetupModuleAndDeck', () => {
     getByText('Mock setup modules map')
   })
 
-  it('should render disabled button when deck configuration is not confitured', () => {
+  it('should render disabled button when deck config is not configured or there is a conflict', () => {
     props = {
       ...props,
-      notConfigured: true,
+      notCompatible: true,
     }
     const { getByRole } = render(props)
     const button = getByRole('button', {

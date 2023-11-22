@@ -27,8 +27,12 @@ import {
   useDoorQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import {
+  getPipetteModelSpecs,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+} from '@opentrons/shared-data'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 
 import { i18n } from '../../../../i18n'
 import {
@@ -85,6 +89,9 @@ import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import { RunFailedModal } from '../RunFailedModal'
 import { DISENGAGED, NOT_PRESENT } from '../../../EmergencyStop'
 import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWithTipAttached'
+import { getRequiredDeckConfig } from '../../../../resources/deck_configuration/utils'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -130,6 +137,9 @@ jest.mock('../RunFailedModal')
 jest.mock('../../../../redux/robot-update/selectors')
 jest.mock('../../../../redux/robot-settings/selectors')
 jest.mock('../../../DropTipWizard/getPipettesWithTipAttached')
+jest.mock('../../../../resources/deck_configuration/utils')
+jest.mock('../../../../resources/deck_configuration/hooks')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -227,6 +237,15 @@ const mockGetPipettesWithTipAttached = getPipettesWithTipAttached as jest.Mocked
 const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
   typeof getPipetteModelSpecs
 >
+const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
+  typeof getRequiredDeckConfig
+>
+const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
+  typeof useDeckConfigurationCompatibility
+>
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -241,6 +260,7 @@ const mockSettings = {
   value: true,
   restart_required: false,
 }
+const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
 
@@ -410,6 +430,14 @@ describe('ProtocolRunHeader', () => {
       ]) as any
     )
     mockGetPipetteModelSpecs.mockReturnValue('p10_single_v1' as any)
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        ...noModulesProtocol,
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+      } as any)
+    mockUseDeckConfigurationCompatibility.mockReturnValue([])
+    mockGetRequiredDeckConfig.mockReturnValue([])
   })
 
   afterEach(() => {
@@ -542,6 +570,32 @@ describe('ProtocolRunHeader', () => {
     getByText(
       'A software update is available for this robot. Update to run protocols.'
     )
+  })
+
+  it('disables the Start Run button when a fixture is not configured or conflicted', () => {
+    mockUseDeckConfigurationCompatibility.mockReturnValue([
+      {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        requiredAddressableAreas: ['D4'],
+        compatibleCutoutFixtureIds: [
+          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        ],
+      },
+    ])
+    when(mockGetRequiredDeckConfig).mockReturnValue([
+      {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        requiredAddressableAreas: ['D4'],
+        compatibleCutoutFixtureIds: [
+          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        ],
+      },
+    ] as any)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Start run' })
+    expect(button).toBeDisabled()
   })
 
   it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {

@@ -31,7 +31,7 @@ interface SetupModuleAndDeckProps {
   runId: string
   hasModules: boolean
   commands: RunTimeCommand[]
-  notConfigured: boolean
+  notCompatible: boolean
 }
 
 export const SetupModuleAndDeck = ({
@@ -40,7 +40,7 @@ export const SetupModuleAndDeck = ({
   runId,
   hasModules,
   commands,
-  notConfigured,
+  notCompatible,
 }: SetupModuleAndDeckProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
@@ -86,7 +86,7 @@ export const SetupModuleAndDeck = ({
         <PrimaryButton
           disabled={
             missingModuleIds.length > 0 ||
-            notConfigured ||
+            notCompatible ||
             runHasStarted ||
             !moduleCalibrationStatus.complete
           }

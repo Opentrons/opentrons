@@ -7,8 +7,6 @@ import {
   renderWithProviders,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
   ProtocolAnalysisOutput,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -28,7 +26,6 @@ import {
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
   useRobot,
-  useRobotType,
   useRunCalibrationStatus,
   useRunHasStarted,
   useStoredProtocolAnalysis,
@@ -97,9 +94,6 @@ const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForPro
 >
 const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
   typeof getRequiredDeckConfig
->
-const mockUseRobotType = useRobotType as jest.MockedFunction<
-  typeof useRobotType
 >
 const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof useUnmatchedModulesForProtocol
@@ -171,14 +165,11 @@ describe('ProtocolRunSetup', () => {
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
     when(mockGetSimplestDeckConfigForProtocolCommands).mockReturnValue([])
+    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
     when(mockGetRequiredDeckConfig).mockReturnValue([])
-    when(mockUseRobotType)
-      .calledWith(ROBOT_NAME)
-      .mockReturnValue(OT2_ROBOT_TYPE)
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -231,9 +222,6 @@ describe('ProtocolRunSetup', () => {
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
     it('renders robot calibration setup for OT-3', () => {
-      when(mockUseRobotType)
-        .calledWith(ROBOT_NAME)
-        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       const { getByText } = render()
 
@@ -297,9 +285,6 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders calibration ready if robot is Flex and modules are calibrated', () => {
-      when(mockUseRobotType)
-        .calledWith(ROBOT_NAME)
-        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -310,9 +295,6 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
-      when(mockUseRobotType)
-        .calledWith(ROBOT_NAME)
-        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -338,9 +320,6 @@ describe('ProtocolRunSetup', () => {
           missingModuleIds: ['temperatureModuleV1'],
           remainingAttachedModules: [],
         })
-      when(mockUseRobotType)
-        .calledWith(ROBOT_NAME)
-        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -353,19 +332,26 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders action needed if robot is Flex and deck config is not configured', () => {
-      when(mockUseRobotType)
-        .calledWith(ROBOT_NAME)
-        .mockReturnValue(FLEX_ROBOT_TYPE)
       mockUseDeckConfigurationCompatibility.mockReturnValue([
         {
-          cutoutId: 'cutoutD3',
-          cutoutFixtureId: null,
+          cutoutId: 'cutoutA1',
+          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           requiredAddressableAreas: ['D4'],
           compatibleCutoutFixtureIds: [
             STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           ],
         },
       ])
+      when(mockGetRequiredDeckConfig).mockReturnValue([
+        {
+          cutoutId: 'cutoutA1',
+          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          requiredAddressableAreas: ['D4'],
+          compatibleCutoutFixtureIds: [
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          ],
+        },
+      ] as any)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -440,9 +426,6 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for modules and fixtures', () => {
-      when(mockUseRobotType)
-        .calledWith(ROBOT_NAME)
-        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)

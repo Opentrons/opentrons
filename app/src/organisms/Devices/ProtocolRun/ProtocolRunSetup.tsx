@@ -13,6 +13,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
@@ -27,7 +28,6 @@ import {
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
   useRobot,
-  useRobotType,
   useRunCalibrationStatus,
   useRunHasStarted,
   useStoredProtocolAnalysis,
@@ -79,27 +79,28 @@ export function ProtocolRunSetup({
   const calibrationStatusRobot = useRunCalibrationStatus(robotName, runId)
   const calibrationStatusModules = useModuleCalibrationStatus(robotName, runId)
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
-  const robotType = useRobotType(robotName)
-  const deckConfigCompatibility = useDeckConfigurationCompatibility(
-    robotType,
-    protocolAnalysis?.commands ?? []
-  )
   const isFlex = useIsFlex(robotName)
   const runHasStarted = useRunHasStarted(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const [expandedStepKey, setExpandedStepKey] = React.useState<StepKey | null>(
     null
   )
+  const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    protocolAnalysis?.commands ?? []
+  )
+
   const isMissingModule = missingModuleIds.length > 0
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
   )
-  const notConfigured = !requiredDeckConfigCompatibility.some(dc => {
-    return (
-      dc.cutoutFixtureId != null &&
-      dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
-    )
-  })
+  const notCompatible =
+    requiredDeckConfigCompatibility.map(
+      dc =>
+        dc.cutoutFixtureId == null ||
+        !dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
+    ).length > 0
 
   const stepsKeysInOrder =
     protocolAnalysis != null
@@ -191,7 +192,7 @@ export function ProtocolRunSetup({
           runId={runId}
           hasModules={hasModules}
           commands={protocolAnalysis?.commands ?? []}
-          notConfigured={notConfigured}
+          notCompatible={notCompatible}
         />
       ),
       description: moduleDescription,
@@ -293,7 +294,7 @@ export function ProtocolRunSetup({
                             calibrationStatusModules,
                             isFlex,
                             isMissingModule,
-                            notConfigured,
+                            notCompatible,
                           }}
                         />
                       }
@@ -325,7 +326,7 @@ interface StepRightElementProps {
   runHasStarted: boolean
   isFlex: boolean
   isMissingModule: boolean
-  notConfigured: boolean
+  notCompatible: boolean
 }
 function StepRightElement(props: StepRightElementProps): JSX.Element | null {
   const {
@@ -335,19 +336,19 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
     calibrationStatusModules,
     isFlex,
     isMissingModule,
-    notConfigured,
+    notCompatible,
   } = props
   const { t } = useTranslation('protocol_setup')
+  const isActionNeeded = isMissingModule || notCompatible
 
   if (
     !runHasStarted &&
     (stepKey === ROBOT_CALIBRATION_STEP_KEY ||
       (stepKey === MODULE_SETUP_KEY && isFlex))
   ) {
-    const moduleAndDeckStatus =
-      isMissingModule || notConfigured
-        ? { complete: false }
-        : calibrationStatusModules
+    const moduleAndDeckStatus = isActionNeeded
+      ? { complete: false }
+      : calibrationStatusModules
     const calibrationStatus =
       stepKey === ROBOT_CALIBRATION_STEP_KEY
         ? calibrationStatusRobot
@@ -360,10 +361,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
     ) {
       statusText = t('calibration_needed')
     } else if (stepKey === MODULE_SETUP_KEY && !calibrationStatus?.complete) {
-      statusText =
-        isMissingModule || notConfigured
-          ? t('action_needed')
-          : t('calibration_needed')
+      statusText = isActionNeeded ? t('action_needed') : t('calibration_needed')
     }
 
     return (
