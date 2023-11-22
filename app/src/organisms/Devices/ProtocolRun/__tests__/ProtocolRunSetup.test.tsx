@@ -6,7 +6,11 @@ import {
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import {
+  ProtocolAnalysisOutput,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
@@ -26,6 +30,7 @@ import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useStoredProtocolAnalysis,
+  useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -93,6 +98,9 @@ const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
 const mockUseRobotType = useRobotType as jest.MockedFunction<
   typeof useRobotType
 >
+const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
+  typeof useUnmatchedModulesForProtocol
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -158,6 +166,12 @@ describe('ProtocolRunSetup', () => {
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
     when(mockGetSimplestDeckConfigForProtocolCommands).mockReturnValue([])
     when(mockGetRequiredDeckConfig).mockReturnValue([])
+    when(mockUseRobotType)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(OT2_ROBOT_TYPE)
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -210,6 +224,9 @@ describe('ProtocolRunSetup', () => {
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
     it('renders robot calibration setup for OT-3', () => {
+      when(mockUseRobotType)
+        .calledWith(ROBOT_NAME)
+        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       const { getByText } = render()
 
@@ -273,6 +290,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders calibration ready if robot is Flex and modules are calibrated', () => {
+      when(mockUseRobotType)
+        .calledWith(ROBOT_NAME)
+        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -283,6 +303,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders calibration needed if robot is Flex and modules are not calibrated', () => {
+      when(mockUseRobotType)
+        .calledWith(ROBOT_NAME)
+        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)
@@ -364,6 +387,9 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for modules and fixtures', () => {
+      when(mockUseRobotType)
+        .calledWith(ROBOT_NAME)
+        .mockReturnValue(FLEX_ROBOT_TYPE)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
