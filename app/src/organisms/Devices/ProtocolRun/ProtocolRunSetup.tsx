@@ -190,6 +190,7 @@ export function ProtocolRunSetup({
           runId={runId}
           hasModules={hasModules}
           commands={protocolAnalysis?.commands ?? []}
+          notConfigured={notConfigured}
         />
       ),
       description: moduleDescription,
