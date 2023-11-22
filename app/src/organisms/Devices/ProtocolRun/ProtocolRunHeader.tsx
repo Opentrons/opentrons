@@ -103,6 +103,9 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import { getHighestPriorityError } from '../../OnDeviceDisplay/RunningProtocol'
 import { RunFailedModal } from './RunFailedModal'
 import { RunProgressMeter } from '../../RunProgressMeter'
+import { getRequiredDeckConfig } from '../../../resources/deck_configuration/utils'
+import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -175,10 +178,26 @@ export function ProtocolRunHeader({
   const robotSettings = useSelector((state: State) =>
     getRobotSettings(state, robotName)
   )
+  const isFlex = useIsFlex(robotName)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+  const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    robotProtocolAnalysis?.commands ?? []
+  )
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
+  )
+  const notConfigured = !requiredDeckConfigCompatibility.some(dc => {
+    return (
+      dc.cutoutFixtureId != null &&
+      dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
+    )
+  })
+
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
   )
-  const isFlex = useIsFlex(robotName)
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
@@ -390,6 +409,7 @@ export function ProtocolRunHeader({
                 protocolData == null || !!isProtocolAnalyzing
               }
               isDoorOpen={isDoorOpen}
+              notConfigured={notConfigured}
             />
           </Flex>
         </Box>
@@ -531,9 +551,17 @@ interface ActionButtonProps {
   runStatus: RunStatus | null
   isProtocolAnalyzing: boolean
   isDoorOpen: boolean
+  notConfigured: boolean
 }
 function ActionButton(props: ActionButtonProps): JSX.Element {
-  const { runId, robotName, runStatus, isProtocolAnalyzing, isDoorOpen } = props
+  const {
+    runId,
+    robotName,
+    runStatus,
+    isProtocolAnalyzing,
+    isDoorOpen,
+    notConfigured,
+  } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
@@ -588,6 +616,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isResetRunLoading ||
     isOtherRunCurrent ||
     isProtocolAnalyzing ||
+    notConfigured ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
     (isDoorOpen &&
