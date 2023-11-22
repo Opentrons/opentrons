@@ -1705,7 +1705,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param style: The requested nozzle layout should specify the shape that you
         wish to configure your pipette to. Certain pipettes are restricted to a subset of `NozzleLayout`
         types. See the note below on the different `NozzleLayout` types.
-        :type requested_nozzle_layout: `NozzleLayout.COLUMN`, `NozzleLayout.EMPTY` or None.
+        :type requested_nozzle_layout: `NozzleLayout.COLUMN`, `NozzleLayout.ALL` or None.
         :param start: Signifies the nozzle that the robot will use to determine how to perform moves to different locations on the deck.
         :type start: string or None.
         :param front_right: Signifies the ending nozzle in your partial configuration. It is not required for NozzleLayout.COLUMN, NozzleLayout.ROW, or NozzleLayout.SINGLE
@@ -1719,15 +1719,15 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. code-block:: python
 
-            from opentrons.protocol_api import COLUMN, EMPTY
+            from opentrons.protocol_api import COLUMN, ALL
 
             # Sets a pipette to a full single column pickup using "A1" as the primary nozzle. Implicitly, "H1" is the ending nozzle.
             instr.configure_nozzle_layout(style=COLUMN, start="A1")
 
             # Resets the pipette configuration to default
-            instr.configure_nozzle_layout(style=EMPTY)
+            instr.configure_nozzle_layout(style=ALL)
         """
-        if style != NozzleLayout.EMPTY:
+        if style != NozzleLayout.ALL:
             if start is None:
                 raise ValueError(
                     f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."

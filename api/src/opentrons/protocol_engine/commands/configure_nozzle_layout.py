@@ -16,7 +16,7 @@ from .configuring_common import (
     PipetteNozzleLayoutResultMixin,
 )
 from ..types import (
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
@@ -34,7 +34,7 @@ class ConfigureNozzleLayoutParams(PipetteIdMixin):
     """Parameters required to configure the nozzle layout for a specific pipette."""
 
     configuration_params: Union[
-        EmptyNozzleLayoutConfiguration,
+        AllNozzleLayoutConfiguration,
         SingleNozzleLayoutConfiguration,
         RowNozzleLayoutConfiguration,
         ColumnNozzleLayoutConfiguration,
