@@ -94,11 +94,12 @@ export function ProtocolRunSetup({
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
   )
-  const notConfigured = requiredDeckConfigCompatibility.some(
-    dc =>
-      dc.cutoutFixtureId === null ||
-      !dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
-  )
+  const notConfigured = !requiredDeckConfigCompatibility.some(dc => {
+    return (
+      dc.cutoutFixtureId != null &&
+      dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
+    )
+  })
 
   const stepsKeysInOrder =
     protocolAnalysis != null
@@ -364,9 +365,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           ? t('action_needed')
           : t('calibration_needed')
     }
-
-    if (stepKey === MODULE_SETUP_KEY)
-      console.log('moduleAndDeckStatus', moduleAndDeckStatus)
 
     return (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
