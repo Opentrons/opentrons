@@ -19,19 +19,20 @@ import {
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useIsFlex,
-  useRobot,
-  useRunCalibrationStatus,
   useModuleCalibrationStatus,
-  useRunHasStarted,
   useProtocolAnalysisErrors,
+  useRobot,
+  useRobotType,
+  useRunCalibrationStatus,
+  useRunHasStarted,
   useStoredProtocolAnalysis,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
-import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
+import { ProtocolRunSetup } from '../ProtocolRunSetup'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
@@ -88,6 +89,9 @@ const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForPro
 >
 const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
   typeof getRequiredDeckConfig
+>
+const mockUseRobotType = useRobotType as jest.MockedFunction<
+  typeof useRobotType
 >
 
 const ROBOT_NAME = 'otie'
