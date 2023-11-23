@@ -190,6 +190,7 @@ class AsairSensor(AsairSensorBase):
         data_packet = "{}0300000002{}".format(serial_addr, addrs[serial_addr])
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
+        print(1)
         try:
             self._th_sensor.flushInput()
             self._th_sensor.flushOutput()
@@ -200,6 +201,8 @@ class AsairSensor(AsairSensorBase):
             res = self._th_sensor.read(length)
             log.debug(f"received {res}")
             dev_id = res[6:14]
+            print(2)
+            print(dev_id.decode())
             return dev_id.decode()
 
         except (IndexError, ValueError) as e:
