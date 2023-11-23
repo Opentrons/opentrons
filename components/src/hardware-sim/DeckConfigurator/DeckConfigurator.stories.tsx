@@ -1,17 +1,16 @@
 import * as React from 'react'
-import { v4 as uuidv4 } from 'uuid'
 
 import {
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { DeckConfigurator } from '.'
 
 import type { Story, Meta } from '@storybook/react'
-import type { Fixture } from '@opentrons/shared-data'
+import type { CutoutConfig } from '@opentrons/shared-data'
 
 export default {
   title: 'Library/Molecules/Simulation/DeckConfigurator',
@@ -20,62 +19,52 @@ export default {
 const Template: Story<React.ComponentProps<typeof DeckConfigurator>> = args => (
   <DeckConfigurator {...args} />
 )
-const deckConfig: Fixture[] = [
+const deckConfig: CutoutConfig[] = [
   {
-    fixtureLocation: 'cutoutA1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'cutoutB1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'cutoutC1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'cutoutD1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'cutoutA3',
-    loadName: TRASH_BIN_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
   },
   {
-    fixtureLocation: 'cutoutB3',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB3',
+    cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'cutoutC3',
-    loadName: STAGING_AREA_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'cutoutD3',
-    loadName: WASTE_CHUTE_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   },
 ]
 
 export const Default = Template.bind({})
 Default.args = {
   deckConfig,
-  handleClickAdd: fixtureLocation => console.log(`add at ${fixtureLocation}`),
-  handleClickRemove: fixtureLocation =>
-    console.log(`remove at ${fixtureLocation}`),
+  handleClickAdd: cutoutId => console.log(`add at ${cutoutId}`),
+  handleClickRemove: cutoutId => console.log(`remove at ${cutoutId}`),
 }
 
 export const ReadOnly = Template.bind({})
 ReadOnly.args = {
   deckConfig,
-  handleClickAdd: fixtureLocation => console.log(`add at ${fixtureLocation}`),
-  handleClickRemove: fixtureLocation =>
-    console.log(`remove at ${fixtureLocation}`),
-  readOnly: true,
+  handleClickAdd: undefined,
+  handleClickRemove: undefined,
+  readonly: true,
 }
