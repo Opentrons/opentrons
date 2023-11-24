@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import {
+  SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -37,6 +38,22 @@ const deckConfig: CutoutConfig[] = [
     cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    cutoutId: 'cutoutA2',
+  },
+  {
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    cutoutId: 'cutoutB2',
+  },
+  {
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    cutoutId: 'cutoutC2',
+  },
+  {
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+    cutoutId: 'cutoutD2',
+  },
+  {
     cutoutId: 'cutoutA3',
     cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
   },
@@ -64,7 +81,7 @@ Default.args = {
 export const ReadOnly = Template.bind({})
 ReadOnly.args = {
   deckConfig,
-  handleClickAdd: undefined,
-  handleClickRemove: undefined,
-  readonly: true,
+  handleClickAdd: cutoutId => console.log(`add at ${cutoutId}`),
+  handleClickRemove: cutoutId => console.log(`remove at ${cutoutId}`),
+  readOnly: true,
 }
