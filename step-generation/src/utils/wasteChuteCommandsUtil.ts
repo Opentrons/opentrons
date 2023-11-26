@@ -48,7 +48,6 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
   const hasWasteChute = getHasWasteChute(
     invariantContext.additionalEquipmentEntities
   )
-
   const addressableAreaCommand: CurriedCommandCreator[] = isGantryAtAddressableArea
     ? []
     : [
@@ -86,13 +85,11 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
   let inPlaceCommands: CurriedCommandCreator[] = []
   switch (type) {
     case 'dropTip': {
-      inPlaceCommands = !prevRobotState.tipState.pipettes[pipetteId]
-        ? []
-        : [
-            curryCommandCreator(dropTipInPlace, {
-              pipetteId,
-            }),
-          ]
+      inPlaceCommands = [
+        curryCommandCreator(dropTipInPlace, {
+          pipetteId,
+        }),
+      ]
 
       break
     }
@@ -140,6 +137,10 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     return {
       errors,
     }
-  const allCommands = [...addressableAreaCommand, ...inPlaceCommands]
+  const allCommands =
+    type === 'dropTip' && !prevRobotState.tipState.pipettes[pipetteId]
+      ? []
+      : [...addressableAreaCommand, ...inPlaceCommands]
+
   return reduceCommandCreators(allCommands, invariantContext, prevRobotState)
 }

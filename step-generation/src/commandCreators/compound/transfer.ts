@@ -13,7 +13,6 @@ import {
   getWasteChuteOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  gantryIsAtAddressableArea,
 } from '../../utils'
 import {
   aspirate,
@@ -122,21 +121,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'wasteChute'
 
-  const addressableAreaName =
+  const addressableAreaNameWasteChute =
     pipetteSpec.channels === 96
       ? '96ChannelWasteChute'
       : '1and8ChannelWasteChute'
-
-  const dropTipCommand = isWasteChute
-    ? curryCommandCreator(wasteChuteCommandsUtil, {
-        type: 'dropTip',
-        pipetteId: args.pipette,
-        addressableAreaName: addressableAreaName,
-      })
-    : curryCommandCreator(dropTip, {
-        pipette: args.pipette,
-        dropTipLocation: args.dropTipLocation,
-      })
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
   // to the action of aspiration of dispensing in a given command, they are actually values bound
@@ -427,18 +415,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             }),
           ]
 
-          const prevDelayCommands = [
-            ...tipCommands,
-            ...preWetTipCommands,
-            ...mixBeforeAspirateCommands,
-            ...configureForVolumeCommand,
-            ...aspirateCommand,
-            ...delayAfterAspirateCommands,
-            ...touchTipAfterAspirateCommands,
-            ...airGapAfterAspirateCommands,
-            ...dispenseCommand,
-          ]
-
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
@@ -447,11 +423,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destinationId: args.destLabware,
                     well: destinationWell ?? undefined,
                     zOffset: dispenseDelay.mmFromBottom,
-                    isGantryAtAddressableArea: gantryIsAtAddressableArea({
-                      prevCommands: prevDelayCommands,
-                      invariantContext,
-                      prevRobotState,
-                    }),
+                    isGantryAtAddressableArea: true,
                   }),
                   curryCommandCreator(delay, {
                     commandCreatorFnName: 'delay',
@@ -463,13 +435,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
 
-          const prevBlowoutCommands = [
-            ...prevDelayCommands,
-            ...delayAfterDispenseCommands,
-            ...mixInDestinationCommands,
-            ...touchTipAfterDispenseCommands,
-          ]
-
           const blowoutCommand = blowoutUtil({
             pipette: args.pipette,
             sourceLabwareId: args.sourceLabware,
@@ -480,14 +445,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
             invariantContext,
-            isGantryAtAddressableArea: gantryIsAtAddressableArea({
-              prevCommands: prevBlowoutCommands,
-              invariantContext,
-              prevRobotState,
-            }),
+            isGantryAtAddressableArea: true,
           })
-
-          const prevAirGapCommands = [...prevBlowoutCommands, ...blowoutCommand]
 
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
@@ -502,11 +461,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
-                    isGantryAtAddressableArea: gantryIsAtAddressableArea({
-                      prevCommands: prevAirGapCommands,
-                      invariantContext,
-                      prevRobotState,
-                    }),
+                    isGantryAtAddressableArea: false,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -521,6 +476,19 @@ export const transfer: CommandCreator<TransferArgs> = (
                     : []),
                 ]
               : []
+
+          const dropTipCommand = isWasteChute
+            ? curryCommandCreator(wasteChuteCommandsUtil, {
+                type: 'dropTip',
+                pipetteId: args.pipette,
+                addressableAreaName: addressableAreaNameWasteChute,
+                isGantryAtAddressableArea: false,
+              })
+            : curryCommandCreator(dropTip, {
+                pipette: args.pipette,
+                dropTipLocation: args.dropTipLocation,
+              })
+
           // if using dispense > air gap, drop or change the tip at the end
           const dropTipAfterDispenseAirGap =
             airGapAfterDispenseCommands.length > 0 && isLastChunk && isLastPair
@@ -528,7 +496,19 @@ export const transfer: CommandCreator<TransferArgs> = (
               : []
 
           const nextCommands = [
-            ...prevAirGapCommands,
+            ...tipCommands,
+            ...preWetTipCommands,
+            ...mixBeforeAspirateCommands,
+            ...configureForVolumeCommand,
+            ...aspirateCommand,
+            ...delayAfterAspirateCommands,
+            ...touchTipAfterAspirateCommands,
+            ...airGapAfterAspirateCommands,
+            ...dispenseCommand,
+            ...delayAfterDispenseCommands,
+            ...mixInDestinationCommands,
+            ...touchTipAfterDispenseCommands,
+            ...blowoutCommand,
             ...airGapAfterDispenseCommands,
             ...dropTipAfterDispenseAirGap,
           ]

@@ -9,6 +9,7 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
+  CreateCommand,
 } from '@opentrons/shared-data'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -662,50 +663,4 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
-}
-
-interface gantryIsAtAddressableAreaType {
-  prevCommands: CurriedCommandCreator[]
-  invariantContext: InvariantContext
-  prevRobotState: RobotState
-}
-export function gantryIsAtAddressableArea(
-  props: gantryIsAtAddressableAreaType
-): boolean {
-  const { prevCommands, invariantContext, prevRobotState } = props
-
-  for (let i = 0; i < prevCommands.length; i++) {
-    const curriedCommand = prevCommands[i]
-    const result = curriedCommand(invariantContext, prevRobotState)
-
-    if ('commands' in result) {
-      const commandIndex = result.commands.findIndex(
-        command => command.commandType === 'moveToAddressableArea'
-      )
-
-      // If the commandType is found in 'result.commands'
-      if (commandIndex !== -1) {
-        const lengthOfCommands = result.commands.length
-        // Check if the command is the last command
-        if (lengthOfCommands === commandIndex) {
-          return true
-        } else {
-          // Check if following commands move out of the addressable area
-          const followingCommandsMoveOutOfArea = result.commands.some(
-            command =>
-              ![
-                'dispenseInPlace',
-                'dropTipInPlace',
-                'aspirateInPlace',
-                'blowOutInPlace',
-              ].includes(command.commandType)
-          )
-
-          // Return true if there are no following commands that move out of addressable area
-          return !followingCommandsMoveOutOfArea
-        }
-      }
-    }
-  }
-  return false
 }
