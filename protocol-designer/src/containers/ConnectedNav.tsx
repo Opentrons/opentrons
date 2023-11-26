@@ -29,6 +29,7 @@ function Nav(props: Props): JSX.Element {
             id="NavTab_file"
             iconName="ot-file"
             title={i18n.t('nav.tab_name.file')}
+            testID="file-button"
             selected={
               props.currentPage === 'file-splash' ||
               props.currentPage === 'file-detail'

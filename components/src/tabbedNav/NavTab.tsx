@@ -30,6 +30,8 @@ export interface NavTabProps {
   notification?: boolean
   /** selected styling (can also use react-router & `activeClassName`) */
   selected?: boolean
+  /** testing id for locating in automated tests */
+  testID?: string
 }
 
 export function NavTab(props: NavTabProps): JSX.Element {
@@ -45,6 +47,7 @@ export function NavTab(props: NavTabProps): JSX.Element {
     className: className,
     disabled: props.disabled,
     onClick: props.onClick,
+    testID: props.testID,
   }
 
   if (url) {
@@ -57,7 +60,7 @@ export function NavTab(props: NavTabProps): JSX.Element {
   }
 
   return (
-    <Button {...buttonProps}>
+    <Button {...buttonProps} data-testid={props.testID}>
       <NotificationIcon
         name={props.iconName}
         childName={props.notification ? 'circle' : null}

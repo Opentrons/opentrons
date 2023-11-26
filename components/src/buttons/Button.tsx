@@ -50,6 +50,7 @@ export interface ButtonProps {
   tabIndex?: number
   /** catch all prop for pass-through props */
   [name: string]: any
+  testID?: string
 }
 
 // props to strip if using a custom component
@@ -87,11 +88,16 @@ export function Button(props: ButtonProps): JSX.Element {
         onClick,
       }
 
+
   // TODO(mc, 2019-04-02): hoverTooltipHandlers should probably be named more
   // generically, and the Button component should probably be configured as a
   // ref forwarder
   return (
-    <Component {...props.hoverTooltipHandlers} {...buttonProps}>
+    <Component
+      {...props.hoverTooltipHandlers}
+      {...buttonProps}
+      data-testid={props.testID}
+    >
       {props.iconName && <Icon name={props.iconName} className={styles.icon} />}
       {props.children}
     </Component>

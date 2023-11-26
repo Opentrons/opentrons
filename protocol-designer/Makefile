@@ -68,6 +68,17 @@ test-e2e:
 test:
 	$(MAKE) -C .. test-js-protocol-designer tests="$(tests)" test_opts="$(test_opts)"
 
+
+.PHONY: derek-test
+derek-test:
+	concurrently \
+	"$(MAKE) dev CYPRESS=1" \
+	"wait-on http://localhost:8080/ && cypress run --browser chrome --record false --spec 'cypress/integration/import.spec.js'"
+
+.PHONY: open-cypress
+open-cypress:
+	wait-on http://localhost:8080/ && cypress open --browser chrome --env host=0.0.0.0port=8080
+
 .PHONY: test-cov
 test-cov:
 	make -C .. test-js-protocol-designer tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
