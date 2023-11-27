@@ -158,16 +158,12 @@ class MotionView:
             pipette_id
         )
 
-        # TODO this will need to probably change
-        base_destination = self._addressable_areas.get_addressable_area_center(
-            addressable_area_name
+        base_destination = (
+            self._addressable_areas.get_addressable_area_move_to_location(
+                addressable_area_name
+            )
         )
-        area_height = self._addressable_areas.get_addressable_area_height(
-            addressable_area_name
-        )
-        destination = base_destination + Point(
-            x=offset.x, y=offset.y, z=offset.z + area_height
-        )
+        destination = base_destination + Point(x=offset.x, y=offset.y, z=offset.z)
 
         # TODO I think this is what we always want but honestly unsure
         destination_cp = CriticalPoint.XY_CENTER

@@ -349,6 +349,19 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
 
+    def get_addressable_area_move_to_location(
+        self, addressable_area_name: str
+    ) -> Point:
+        """Get the move to position (top center) for an addressable area."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        position = addressable_area.position
+        bounding_box = addressable_area.bounding_box
+        return Point(
+            x=position.x + bounding_box.x / 2,
+            y=position.y + bounding_box.y / 2,
+            z=position.z + bounding_box.z,
+        )
+
     def get_addressable_area_center(self, addressable_area_name: str) -> Point:
         """Get the (x, y, z) position of the center of the area."""
         addressable_area = self.get_addressable_area(addressable_area_name)
