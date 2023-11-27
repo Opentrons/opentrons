@@ -154,16 +154,16 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     }
   )
 
-  const requiredFixtures = requiredDeckConfigCompatibility
-    .filter(({ requiredAddressableAreas }) => requiredAddressableAreas)
-    .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
+  const requiredFixtures = requiredDeckConfigCompatibility.map(
+    ({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
       hardwareType: 'fixture' as const,
       cutoutFixtureId: compatibleCutoutFixtureIds[0],
       location: { cutout: cutoutId },
       hasSlotConflict:
         cutoutFixtureId != null &&
         !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
-    }))
+    })
+  )
 
   return {
     requiredProtocolHardware: [
