@@ -6,7 +6,6 @@ export type PipettingRunTimeCommand =
   | BlowoutInPlaceRunTimeCommand
   | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
-  | ConfigureNozzleLayoutCreateCommand
   | DispenseInPlaceRunTimeCommand
   | DispenseRunTimeCommand
   | DropTipInPlaceRunTimeCommand
@@ -21,7 +20,6 @@ export type PipettingCreateCommand =
   | BlowoutCreateCommand
   | BlowoutInPlaceCreateCommand
   | ConfigureForVolumeCreateCommand
-  | ConfigureNozzleLayoutCreateCommand
   | DispenseCreateCommand
   | DispenseInPlaceCreateCommand
   | DropTipCreateCommand
@@ -86,17 +84,6 @@ export interface DispenseInPlaceRunTimeCommand
   result?: BasicLiquidHandlingResult
 }
 
-export interface ConfigureNozzleLayoutCreateCommand
-  extends CommonCommandCreateInfo {
-  commandType: 'configureNozzleLayout'
-  params: ConfigureNozzleLayoutParams
-}
-
-export interface ConfigureNozzleLayoutRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    ConfigureNozzleLayoutCreateCommand {
-  result?: {}
-}
 export interface BlowoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'blowout'
   params: BlowoutParams
@@ -238,27 +225,4 @@ interface WellLocationParam {
 
 interface BasicLiquidHandlingResult {
   volume: number // Amount of liquid in uL handled in the operation
-}
-
-export const COLUMN = 'COLUMN'
-const SINGLE = 'SINGLE'
-const ROW = 'ROW'
-const QUADRANT = 'QUADRANT'
-export const ALL = 'ALL'
-
-export type NozzleConfigurationStyle =
-  | typeof COLUMN
-  | typeof SINGLE
-  | typeof ROW
-  | typeof QUADRANT
-  | typeof ALL
-
-export interface NozzleConfigurationParams {
-  primary_nozzle: string
-  style: NozzleConfigurationStyle
-}
-
-interface ConfigureNozzleLayoutParams {
-  pipetteId: string
-  configuration_params: NozzleConfigurationParams
 }

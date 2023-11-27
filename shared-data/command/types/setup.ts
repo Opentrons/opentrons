@@ -175,11 +175,11 @@ interface LoadFixtureParams {
   fixtureId?: string
 }
 
-const COLUMN = 'COLUMN'
+export const COLUMN = 'COLUMN'
 const SINGLE = 'SINGLE'
 const ROW = 'ROW'
 const QUADRANT = 'QUADRANT'
-const ALL = 'ALL'
+export const ALL = 'ALL'
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
