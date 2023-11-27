@@ -129,10 +129,21 @@ lint:
 format:
 	$(python) -m black .
 
-.PHONY: dev
-dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
-dev:
+.PHONY: _dev
+_dev:
 	$(pipenv) run $(run_dev)
+
+.PHONY: dev
+dev: dev-ot2
+
+.PHONY: dev-flex
+dev-flex: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev-flex.env
+dev-flex: _dev
+
+.PHONY: dev-ot2
+dev-ot2: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
+dev-ot2: _dev
+
 
 .PHONY: dev-with-emulator
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
