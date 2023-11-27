@@ -7,7 +7,7 @@ TODO: These should be moved into shared-data and interpreted by Protocol Engine.
 from opentrons.types import Point
 
 
-SLOT_ORIGIN_TO_1_OR_8_TIP_A1 = Point(64, 21.91, 144)
+SLOT_ORIGIN_TO_1_OR_8_TIP_A1 = Point(64, 21.91, 115)
 SLOT_ORIGIN_TO_96_TIP_A1 = Point(14.445, 42.085, 115)
 
 # TODO: This z-coord is misleading. We need to account for the labware height and the paddle height;

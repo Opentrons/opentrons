@@ -364,11 +364,11 @@
         "boundingBox": {
           "xDimension": 155.0,
           "yDimension": 86.0,
-          "zDimension": 154.0
+          "zDimension": 125.0
         },
         "displayName": "1/8 Channel Waste Chute",
         "ableToDropTips": true,
-        "dropTipsOffset": [64.0, 21.91, 144.0]
+        "dropTipsOffset": [64.0, 21.91, 115.0]
       },
       {
         "id": "96ChannelWasteChute",
@@ -377,7 +377,7 @@
         "boundingBox": {
           "xDimension": 155.0,
           "yDimension": 86.0,
-          "zDimension": 154.0
+          "zDimension": 125.0
         },
         "displayName": "96 Channel Waste Chute",
         "ableToDropTips": true,
@@ -390,7 +390,7 @@
         "boundingBox": {
           "xDimension": 155.0,
           "yDimension": 86.0,
-          "zDimension": 154.0
+          "zDimension": 125.0
         },
         "displayName": "Gripper Waste Chute",
         "ableToDropLabware": true,
