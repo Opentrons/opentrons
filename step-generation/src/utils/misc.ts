@@ -221,7 +221,6 @@ export const blowoutUtil = (args: {
   offsetFromTopMm: number
   invariantContext: InvariantContext
   destWell: BlowoutParams['well'] | null
-  isGantryAtAddressableArea: boolean
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -233,7 +232,6 @@ export const blowoutUtil = (args: {
     flowRate,
     offsetFromTopMm,
     invariantContext,
-    isGantryAtAddressableArea,
   } = args
   if (!blowoutLocation) return []
   const addressableAreaName =
@@ -292,7 +290,6 @@ export const blowoutUtil = (args: {
           type: 'blowOut',
           flowRate,
           addressableAreaName,
-          isGantryAtAddressableArea,
         }),
       ]
 }
@@ -447,7 +444,6 @@ interface DispenseLocationHelperArgs {
   pipetteId: string
   volume: number
   flowRate: number
-  isGantryAtAddressableArea: boolean
   offsetFromBottomMm?: number
   well?: string
 }
@@ -463,7 +459,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     flowRate,
     offsetFromBottomMm,
     well,
-    isGantryAtAddressableArea,
   } = args
 
   const wasteChuteOrLabware = getWasteChuteOrLabware(
@@ -493,7 +488,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = [
       curryCommandCreator(wasteChuteCommandsUtil, {
-        isGantryAtAddressableArea,
         type: 'dispense',
         pipetteId,
         volume,
@@ -514,7 +508,6 @@ interface MoveHelperArgs {
   destinationId: string
   pipetteId: string
   zOffset: number
-  isGantryAtAddressableArea: boolean
   well?: string
 }
 export const moveHelper: CommandCreator<MoveHelperArgs> = (
@@ -522,13 +515,7 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const {
-    destinationId,
-    pipetteId,
-    zOffset,
-    well,
-    isGantryAtAddressableArea,
-  } = args
+  const { destinationId, pipetteId, zOffset, well } = args
 
   const wasteChuteOrLabware = getWasteChuteOrLabware(
     invariantContext.labwareEntities,
@@ -550,17 +537,15 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   } else {
     const pipetteChannels =
       invariantContext.pipetteEntities[pipetteId].spec.channels
-    commands = isGantryAtAddressableArea
-      ? []
-      : [
-          curryCommandCreator(moveToAddressableArea, {
-            pipetteId,
-            addressableAreaName:
-              pipetteChannels === 96
-                ? '96ChannelWasteChute'
-                : '1and8ChannelWasteChute',
-          }),
-        ]
+    commands = [
+      curryCommandCreator(moveToAddressableArea, {
+        pipetteId,
+        addressableAreaName:
+          pipetteChannels === 96
+            ? '96ChannelWasteChute'
+            : '1and8ChannelWasteChute',
+      }),
+    ]
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
@@ -574,7 +559,6 @@ interface AirGapArgs {
   offsetFromBottomMm: number
   pipetteId: string
   volume: number
-  isGantryAtAddressableArea: boolean
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
@@ -594,7 +578,6 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     sourceId,
     sourceWell,
     volume,
-    isGantryAtAddressableArea,
   } = args
 
   const wasteChuteOrLabware = getWasteChuteOrLabware(
@@ -648,7 +631,6 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = [
       curryCommandCreator(wasteChuteCommandsUtil, {
-        isGantryAtAddressableArea,
         type: 'airGap',
         pipetteId,
         volume,

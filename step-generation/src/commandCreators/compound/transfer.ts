@@ -411,7 +411,6 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: destinationWell ?? undefined,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
-              isGantryAtAddressableArea: false,
             }),
           ]
 
@@ -423,7 +422,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destinationId: args.destLabware,
                     well: destinationWell ?? undefined,
                     zOffset: dispenseDelay.mmFromBottom,
-                    isGantryAtAddressableArea: true,
                   }),
                   curryCommandCreator(delay, {
                     commandCreatorFnName: 'delay',
@@ -445,7 +443,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
             invariantContext,
-            isGantryAtAddressableArea: true,
           })
 
           const airGapAfterDispenseCommands =
@@ -461,7 +458,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
-                    isGantryAtAddressableArea: false,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -482,7 +478,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                 type: 'dropTip',
                 pipetteId: args.pipette,
                 addressableAreaName: addressableAreaNameWasteChute,
-                isGantryAtAddressableArea: false,
               })
             : curryCommandCreator(dropTip, {
                 pipette: args.pipette,

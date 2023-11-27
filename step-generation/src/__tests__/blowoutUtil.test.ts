@@ -33,7 +33,6 @@ let blowoutArgs: {
   flowRate: number
   offsetFromTopMm: number
   invariantContext: InvariantContext
-  isGantryAtAddressableArea: boolean
 }
 describe('blowoutUtil', () => {
   let invariantContext: InvariantContext
@@ -42,7 +41,6 @@ describe('blowoutUtil', () => {
     invariantContext = makeContext()
 
     blowoutArgs = {
-      isGantryAtAddressableArea: false,
       pipette: DEFAULT_PIPETTE,
       sourceLabwareId: SOURCE_LABWARE,
       sourceWell: 'A1',
@@ -93,7 +91,6 @@ describe('blowoutUtil', () => {
         addressableAreaName: '1and8ChannelWasteChute',
         type: 'blowOut',
         pipetteId: blowoutArgs.pipette,
-        isGantryAtAddressableArea: false,
         flowRate: 2.3,
       }
     )

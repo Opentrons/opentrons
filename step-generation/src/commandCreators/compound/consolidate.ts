@@ -308,7 +308,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           well: destinationWell ?? undefined,
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
-          isGantryAtAddressableArea: false,
         }),
       ]
 
@@ -320,7 +319,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destinationId: args.destLabware,
                 well: destinationWell ?? undefined,
                 zOffset: dispenseDelay.mmFromBottom,
-                isGantryAtAddressableArea: true,
               }),
               curryCommandCreator(delay, {
                 commandCreatorFnName: 'delay',
@@ -342,7 +340,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
-        isGantryAtAddressableArea: true,
       })
 
       const willReuseTip = args.changeTip !== 'always' && !isLastChunk
@@ -356,7 +353,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destWell: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
-                isGantryAtAddressableArea: false,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -377,7 +373,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             type: 'dropTip',
             pipetteId: args.pipette,
             addressableAreaName: addressableAreaNameWasteChute,
-            isGantryAtAddressableArea: false,
           })
         : curryCommandCreator(dropTip, {
             pipette: args.pipette,
