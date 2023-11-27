@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
-import { Btn, Flex, Text } from '../../primitives'
+import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
@@ -53,25 +53,26 @@ export function WasteChuteConfigFixture(
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex css={WASTE_CHUTE_CONFIG_STYLE}>
+      <Btn
+        css={WASTE_CHUTE_CONFIG_STYLE}
+        cursor={handleClickRemove != null ? 'pointer' : 'none'}
+        onClick={
+          handleClickRemove != null
+            ? () => handleClickRemove(fixtureLocation)
+            : () => {}
+        }
+      >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
           {WASTE_CHUTE_DISPLAY_NAME}
         </Text>
-        {handleClickRemove != null ? (
-          <Btn
-            display={DISPLAY_FLEX}
-            justifyContent={JUSTIFY_CENTER}
-            onClick={() => handleClickRemove(fixtureLocation)}
-          >
-            <Icon name="remove" color={COLORS.white} height="2.25rem" />
-          </Btn>
-        ) : null}
-      </Flex>
+        <Icon name="remove" color={COLORS.white} size="2rem" />
+      </Btn>
     </RobotCoordsForeignObject>
   )
 }
 
 const WASTE_CHUTE_CONFIG_STYLE = css`
+  display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.grey2};
   border-radius: ${BORDERS.borderRadiusSize1};

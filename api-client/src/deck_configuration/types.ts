@@ -9,6 +9,6 @@ export interface UpdateDeckConfigurationRequest {
 export interface DeckConfigurationResponse {
   data: {
     cutoutFixtures: DeckConfiguration
-    lastUpdatedAt: string
+    lastModifiedAt: string
   }
 }

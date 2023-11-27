@@ -727,10 +727,10 @@ NOZZLE_NAME_REGEX = "[A-Z][0-100]"
 PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 
-class EmptyNozzleLayoutConfiguration(BaseModel):
-    """Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
+class AllNozzleLayoutConfiguration(BaseModel):
+    """All basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
 
-    style: Literal["EMPTY"] = "EMPTY"
+    style: Literal["ALL"] = "ALL"
 
 
 class SingleNozzleLayoutConfiguration(BaseModel):
@@ -779,7 +779,7 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
 
 
 NozzleLayoutConfigurationType = Union[
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
@@ -787,4 +787,4 @@ NozzleLayoutConfigurationType = Union[
 ]
 
 # TODO make the below some sort of better type
-DeckConfigurationType = List[Tuple[str, str]]
+DeckConfigurationType = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id

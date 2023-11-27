@@ -8,9 +8,13 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { LEFT, MotorAxes } from '@opentrons/shared-data'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { LEFT, MotorAxes, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import {
+  useDeckConfigurationQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -75,6 +79,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     (instrument): instrument is PipetteData =>
       instrument.ok && instrument.mount === mount
   )
+  const deckConfig = useDeckConfigurationQuery().data
+  const isWasteChuteOnDeck =
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
@@ -214,16 +222,29 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
-        <StyledText css={BODY_STYLE}>
-          <Trans
-            t={t}
-            i18nKey={'install_probe'}
-            values={{ location: probeLocation }}
-            components={{
-              bold: <strong />,
-            }}
-          />
-        </StyledText>
+        <>
+          <StyledText css={BODY_STYLE}>
+            <Trans
+              t={t}
+              i18nKey={'install_probe'}
+              values={{ location: probeLocation }}
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </StyledText>
+          {is96Channel && (
+            <Banner
+              type={isWasteChuteOnDeck ? 'error' : 'warning'}
+              size={isOnDevice ? '1.5rem' : '1rem'}
+              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+            >
+              {isWasteChuteOnDeck
+                ? t('waste_chute_error')
+                : t('waste_chute_warning')}
+            </Banner>
+          )}
+        </>
       }
       proceedButtonText={t('begin_calibration')}
       proceed={handleOnClick}
