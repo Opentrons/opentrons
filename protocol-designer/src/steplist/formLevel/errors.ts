@@ -139,7 +139,7 @@ export type FormErrorChecker = (arg: unknown) => FormError | null
  ** Error Checkers **
  ********************/
 // TODO: real HydratedFormData type
-type HydratedFormData = any
+type HydratedFormData = { [key: string]: any }
 export const incompatibleLabware = (
   fields: HydratedFormData
 ): FormError | null => {

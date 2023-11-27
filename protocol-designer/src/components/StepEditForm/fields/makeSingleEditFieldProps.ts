@@ -24,7 +24,7 @@ export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
   formData: FormData,
   handleChangeFormInput: (name: string, value: unknown) => void,
-  hydratedForm: any //  TODO: create real HydratedFormData type
+  hydratedForm: { [key: string]: any } //  TODO: create real HydratedFormData type
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
   const fieldNames: string[] = Object.keys(

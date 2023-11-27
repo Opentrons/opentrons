@@ -8,7 +8,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { maskField } from '../../steplist/fieldLevel'
 import {
   getInvariantContext,
-  _getHydratedForm,
+  getHydratedForm,
 } from '../../step-forms/selectors'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
@@ -133,7 +133,7 @@ const StepEditFormManager = (
     return null
   }
 
-  const hydratedForm = _getHydratedForm(formData, invariantContext)
+  const hydratedForm = getHydratedForm(formData, invariantContext)
 
   const focusHandlers = {
     focusedField,

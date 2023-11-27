@@ -517,7 +517,7 @@ const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
 }
 
 // TODO: Ian 2019-01-25 type with hydrated form type, see #3161
-export function _getHydratedForm(
+export function getHydratedForm(
   rawForm: FormData,
   invariantContext: InvariantContext
 ): FormData {
@@ -657,7 +657,7 @@ export const getHydratedUnsavedForm: Selector<
   (unsavedForm, invariantContext) => {
     if (unsavedForm == null) return null
 
-    const hydratedForm = _getHydratedForm(unsavedForm, invariantContext)
+    const hydratedForm = getHydratedForm(unsavedForm, invariantContext)
 
     return hydratedForm ?? null
   }
@@ -703,7 +703,7 @@ export const getArgsAndErrorsByStepId: Selector<
     return reduce(
       stepForms,
       (acc, stepForm) => {
-        const hydratedForm = _getHydratedForm(stepForm, contextualState)
+        const hydratedForm = getHydratedForm(stepForm, contextualState)
 
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
@@ -757,7 +757,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   (unsavedForm, contextualState) => {
     if (!unsavedForm) return []
 
-    const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
+    const hydratedForm = getHydratedForm(unsavedForm, contextualState)
 
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
@@ -772,7 +772,7 @@ export const getFormLevelWarningsPerStep: Selector<
     mapValues(forms, (form, stepId) => {
       if (!form) return []
 
-      const hydratedForm = _getHydratedForm(form, contextualState)
+      const hydratedForm = getHydratedForm(form, contextualState)
 
       return getFormWarnings(form.stepType, hydratedForm)
     })
