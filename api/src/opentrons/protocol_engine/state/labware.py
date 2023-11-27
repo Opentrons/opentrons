@@ -288,7 +288,7 @@ class LabwareView(HasState[LabwareState]):
         slot_name: DeckSlotName,
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
-        loaded_labware = reversed(list(self._state.labware_by_id.values()))
+        loaded_labware = list(self._state.labware_by_id.values())
 
         for labware in loaded_labware:
             if (

@@ -492,6 +492,10 @@ class GeometryView:
         self, location: _LabwareLocation
     ) -> _LabwareLocation:
         """Ensure that the location does not already have either Labware or a Module in it."""
+        # TODO (spp, 2023-11-27): Slot locations can also be addressable areas
+        #  so we will need to cross-check against items loaded in both location types.
+        #  Something like 'check if an item is in lists of both- labware on addressable areas
+        #  as well as labware on slots'. Same for modules.
         if isinstance(
             location,
             (
@@ -588,9 +592,6 @@ class GeometryView:
             return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_slot_item(
         self,
         slot_name: DeckSlotName,
