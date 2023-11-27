@@ -282,7 +282,9 @@ export const LocationConflictModal = (
                 {i18n.format(t('shared:cancel'), 'capitalize')}
               </SecondaryButton>
               <PrimaryButton onClick={handleUpdateDeck}>
-                {t('update_deck')}
+                {requiredModule != null
+                  ? t('confirm_removal')
+                  : t('update_deck')}
               </PrimaryButton>
             </Flex>
           </Flex>
