@@ -1690,7 +1690,7 @@ class InstrumentContext(publisher.CommandPublisher):
             to determine how it will move to different locations on the deck. The string
             should be of the same format used when identifying wells by name. Use
             ``"A1"`` to have the pipette use its leftmost nozzles to pick up tips
-            *left-to-right* from a tip rack. Use ``"H1"`` to have the pipette use its
+            *left-to-right* from a tip rack. Use ``"A12"`` to have the pipette use its
             rightmost nozzles to pick up tips *right-to-left* from a tip rack.
         :type start: str or ``None``
         """
