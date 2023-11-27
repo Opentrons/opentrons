@@ -445,15 +445,15 @@
       },
       "required": ["params"]
     },
-    "EmptyNozzleLayoutConfiguration": {
-      "title": "EmptyNozzleLayoutConfiguration",
-      "description": "Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default.",
+    "AllNozzleLayoutConfiguration": {
+      "title": "AllNozzleLayoutConfiguration",
+      "description": "All basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default.",
       "type": "object",
       "properties": {
         "style": {
           "title": "Style",
-          "default": "EMPTY",
-          "enum": ["EMPTY"],
+          "default": "ALL",
+          "enum": ["ALL"],
           "type": "string"
         }
       }
@@ -558,7 +558,7 @@
           "title": "Configuration Params",
           "anyOf": [
             {
-              "$ref": "#/definitions/EmptyNozzleLayoutConfiguration"
+              "$ref": "#/definitions/AllNozzleLayoutConfiguration"
             },
             {
               "$ref": "#/definitions/SingleNozzleLayoutConfiguration"

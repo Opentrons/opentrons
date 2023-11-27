@@ -94,7 +94,10 @@ export const transfer: CommandCreator<TransferArgs> = (
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
 
   const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] != null
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
+      null &&
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
+      'wasteChute'
 
   const addressableAreaName =
     pipetteSpec.channels === 96

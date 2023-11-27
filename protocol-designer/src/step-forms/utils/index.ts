@@ -133,7 +133,6 @@ export const getSlotIsEmpty = (
           additionalEquipment.location?.includes(slot) &&
           additionalEquipment.name !== 'stagingArea'
       )
-
   return (
     [
       ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>

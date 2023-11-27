@@ -276,12 +276,12 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
         additionalEquipmentOnDeck: {},
       }
 
-    // only allow wasteChute since its the only additional equipment that is like an entity
-    // that deck setup needs to be aware of
     const filteredAdditionalEquipment = Object.fromEntries(
       Object.entries(additionalEquipmentEntities).filter(
         ([_, entity]) =>
-          entity.name === 'wasteChute' || entity.name === 'stagingArea'
+          entity.name === 'wasteChute' ||
+          entity.name === 'stagingArea' ||
+          entity.name === 'trashBin'
       )
     )
     return {

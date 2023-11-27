@@ -44,8 +44,13 @@ import {
   LabwareEntities,
   AdditionalEquipmentEntities,
 } from '@opentrons/step-generation'
-import { StepFieldName } from '../../form-types'
-import type { LabwareLocation } from '@opentrons/shared-data'
+import { getStagingAreaAddressableAreas } from '../../utils'
+import type { StepFieldName } from '../../form-types'
+import type {
+  AddressableAreaName,
+  CutoutId,
+  LabwareLocation,
+} from '@opentrons/shared-data'
 
 export type { StepFieldName }
 
@@ -65,18 +70,42 @@ const getIsAdapterLocation = (
     labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
   )
 }
-const getIsWasteChuteLocation = (
+const getIsAdditionalEquipmentLocation = (
   newLocation: string,
   additionalEquipmentEntities: AdditionalEquipmentEntities
-): boolean =>
-  Object.values(additionalEquipmentEntities).find(
-    aE => aE.location === newLocation && aE.name === 'wasteChute'
-  ) != null
+): boolean => {
+  const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'wasteChute'
+  )
+  const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
+    .filter(aE => aE.name === 'stagingArea')
+    ?.map(equipment => {
+      return equipment.location ?? ''
+    })
+  const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
+    stagingAreaCutoutIds as CutoutId[]
+  )
+
+  const isNewLocationInWasteChute =
+    wasteChuteEntity?.name === 'wasteChute' &&
+    wasteChuteEntity?.location === newLocation
+
+  const isNewLocationInStagingArea =
+    stagingAreaCutoutIds != null &&
+    stagingAreaAddressableAreaNames.includes(newLocation as AddressableAreaName)
+
+  return isNewLocationInWasteChute || isNewLocationInStagingArea
+}
 
 const getLabwareLocation = (
   state: InvariantContext,
   newLocationString: string
 ): LabwareLocation | null => {
+  const isWasteChuteLocation =
+    Object.values(state.additionalEquipmentEntities).find(
+      aE => aE.location === newLocationString && aE.name === 'wasteChute'
+    ) != null
+
   if (newLocationString === 'offDeck') {
     return 'offDeck'
   } else if (newLocationString in state.moduleEntities) {
@@ -87,13 +116,15 @@ const getLabwareLocation = (
   ) {
     return { labwareId: newLocationString }
   } else if (
-    getIsWasteChuteLocation(
+    getIsAdditionalEquipmentLocation(
       newLocationString,
       state.additionalEquipmentEntities
     )
   ) {
     return {
-      addressableAreaName: 'gripperWasteChute',
+      addressableAreaName: isWasteChuteLocation
+        ? 'gripperWasteChute'
+        : newLocationString,
     }
   } else {
     return { slotName: newLocationString }

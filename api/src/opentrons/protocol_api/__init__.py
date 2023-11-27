@@ -27,7 +27,7 @@ from ._types import OFF_DECK
 from ._waste_chute import WasteChute
 from ._nozzle_layout import (
     COLUMN,
-    EMPTY,
+    ALL,
 )
 
 from .create_protocol_context import (
@@ -53,7 +53,7 @@ __all__ = [
     "Well",
     "Liquid",
     "COLUMN",
-    "EMPTY",
+    "ALL",
     "OFF_DECK",
     # For internal Opentrons use only:
     "create_protocol_context",

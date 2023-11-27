@@ -12,15 +12,15 @@ stages:
     response:
       json:
         data:
-          # lastUpdatedAt is deliberately omitted from this expected object.
-          # A lastUpdatedAt that's omitted or null means the deck configuration has never been set.
+          # lastModifiedAt is deliberately omitted from this expected object.
+          # A lastModifiedAt that's omitted or null means the deck configuration has never been set.
           #
           # Unfortunately, this makes this test order-dependent with any other tests
           # that modify the deck configuration, even if they try to restore the original value
           # after they're done. We probably need some kind of deck configuration factory-reset.
           #
-          # lastUpdatedAt: null
-          cutoutFixtures:
+          # lastModifiedAt: null
+          cutoutFixtures: &expectedDefaultCutoutFixtures
             - cutoutFixtureId: singleLeftSlot
               cutoutId: cutoutA1
             - cutoutFixtureId: singleLeftSlot
@@ -52,7 +52,7 @@ stages:
       method: PUT
       json:
         data:
-          cutoutFixtures: &expectedCutoutFixtures
+          cutoutFixtures: &expectedNonDefaultCutoutFixtures
             - cutoutFixtureId: singleLeftSlot
               cutoutId: cutoutA1
             - cutoutFixtureId: singleLeftSlot
@@ -86,11 +86,11 @@ stages:
     response:
       json:
         data:
-          lastUpdatedAt: !anystr
-          cutoutFixtures: *expectedCutoutFixtures
+          lastModifiedAt: !anystr
+          cutoutFixtures: *expectedNonDefaultCutoutFixtures
       save:
         json:
-          last_updated_at: data.lastUpdatedAt
+          last_modified_at: data.lastModifiedAt
 
   - name: Set an invalid deck configuration
     request:
@@ -142,5 +142,25 @@ stages:
     response:
       json:
         data:
-          lastUpdatedAt: '{last_updated_at}'
-          cutoutFixtures: *expectedCutoutFixtures
+          lastModifiedAt: '{last_modified_at}'
+          cutoutFixtures: *expectedNonDefaultCutoutFixtures
+
+  # We test this here even though there are separate Tavern tests for POST /settings/reset
+  # because this is a convenient place to check that the reset actually takes effect.
+  - name: Reset the deck configuration
+    request:
+      url: '{ot3_server_base_url}/settings/reset'
+      method: POST
+      json:
+        deckConfiguration: true
+    response: {} # Expecting any non-error response.
+
+  - name: Get the deck configuration after the reset and make sure it's immediately gone back to the default
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+    response:
+      json:
+        data:
+          # lastModifiedAt is deliberately omitted from this expected object.
+          # See notes above.
+          cutoutFixtures: *expectedDefaultCutoutFixtures

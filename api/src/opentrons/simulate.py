@@ -189,7 +189,7 @@ class _CommandScraper:
             #
             # TODO(mm, 2023-10-03): This is a bit too intrusive for something whose job is just to
             # "scrape." The entry point function should be responsible for setting the underlying
-            # logger's level.
+            # logger's level. Also, we should probably restore the original level when we're done.
             level = getattr(logging, self._level.upper(), logging.WARNING)
             self._logger.setLevel(level)
 
@@ -901,7 +901,10 @@ def _run_file_pe(
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
             result = await protocol_runner.run(
-                deck_configuration=[], protocol_source=protocol_source
+                # deck_configuration=[] is a placeholder value, ignored because
+                # the Protocol Engine config specifies use_simulated_deck_config=True.
+                deck_configuration=[],
+                protocol_source=protocol_source,
             )
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:

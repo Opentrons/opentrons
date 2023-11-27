@@ -78,7 +78,7 @@ async def _available_for_nozzle_layout(
         raise CommandPreconditionViolated(
             message=f"Cannot configure nozzle layout with a {channels} channel pipette."
         )
-    if style == "EMPTY":
+    if style == "ALL":
         return {}
     if style == "ROW" and channels == 8:
         raise CommandParameterLimitViolated(

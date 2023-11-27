@@ -2,7 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
-import { Btn, Flex } from '../../primitives'
+import { Btn } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
@@ -48,20 +48,18 @@ export function EmptyConfigFixture(
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex css={EMPTY_CONFIG_STYLE}>
-        <Btn
-          display={DISPLAY_FLEX}
-          justifyContent={JUSTIFY_CENTER}
-          onClick={() => handleClickAdd(fixtureLocation)}
-        >
-          <Icon name="add" color={COLORS.blueEnabled} height="2rem" />
-        </Btn>
-      </Flex>
+      <Btn
+        css={EMPTY_CONFIG_STYLE}
+        onClick={() => handleClickAdd(fixtureLocation)}
+      >
+        <Icon name="add" color={COLORS.blueEnabled} size="2rem" />
+      </Btn>
     </RobotCoordsForeignObject>
   )
 }
 
 const EMPTY_CONFIG_STYLE = css`
+  display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   justify-content: ${JUSTIFY_CENTER};
   background-color: ${COLORS.mediumBlueEnabled};

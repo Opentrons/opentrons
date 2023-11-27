@@ -98,8 +98,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
 
   const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] != null
-
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
+      null &&
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
+      'wasteChute'
   const addressableAreaName =
     invariantContext.pipetteEntities[args.pipette].spec.channels === 96
       ? '96ChannelWasteChute'

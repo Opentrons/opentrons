@@ -1,12 +1,11 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 import {
-  getIsTiprack,
-  getLabwareDisplayName,
-  getLabwareHasQuirk,
-} from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
+  AdditionalEquipmentEntity,
+  COLUMN_4_SLOTS,
+} from '@opentrons/step-generation'
 import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
@@ -59,11 +58,14 @@ export const getLabwareOptions: Selector<Options> = createSelector(
     additionalEquipmentEntities
   ) => {
     const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
+    const trash = Object.values(additionalEquipmentEntities).find(
+      aE => aE.name === 'trashBin'
+    )
     const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )?.location
 
-    const options = reduce(
+    const labwareOptions = reduce(
       labwareEntities,
       (
         acc: Options,
@@ -122,8 +124,6 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           nickName = `${nicknamesById[labwareId]} in ${module}`
         } else if (isOffDeck) {
           nickName = `Off-deck - ${nicknamesById[labwareId]}`
-        } else if (nickName === 'Opentrons Fixed Trash') {
-          nickName = TRASH
         } else if (isInColumn4) {
           nickName = `${nicknamesById[labwareId]} in staging area slot`
         }
@@ -145,9 +145,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         } else {
           //  filter out moving trash, aluminum blocks, adapters and labware in
           //  waste chute for moveLabware
-          return nickName === TRASH ||
-            isAdapterOrAluminumBlock ||
-            isLabwareInWasteChute
+          return isAdapterOrAluminumBlock || isLabwareInWasteChute
             ? acc
             : [
                 ...acc,
@@ -160,23 +158,31 @@ export const getLabwareOptions: Selector<Options> = createSelector(
       },
       []
     )
+
+    const trashOption: Options =
+      trash != null && !moveLabwarePresavedStep
+        ? [{ name: TRASH, value: trash?.id ?? '' }]
+        : []
+
+    const options = [...trashOption, ...labwareOptions]
+
     return _sortLabwareDropdownOptions(options)
   }
 )
 
 /** Returns options for disposal (e.g. trash) */
-export const getDisposalLabwareOptions: Selector<Options> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  labwareEntities =>
+export const getDisposalOptions: Selector<Options> = createSelector(
+  stepFormSelectors.getAdditionalEquipment,
+  additionalEquipment =>
     reduce(
-      labwareEntities,
-      (acc: Options, labware: LabwareEntity, labwareId): Options =>
-        getLabwareHasQuirk(labware.def, 'fixedTrash')
+      additionalEquipment,
+      (acc: Options, additionalEquipment: AdditionalEquipmentEntity): Options =>
+        additionalEquipment.name === 'trashBin'
           ? [
               ...acc,
               {
                 name: TRASH,
-                value: labwareId,
+                value: additionalEquipment.id ?? '',
               },
             ]
           : acc,
