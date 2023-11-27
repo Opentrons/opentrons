@@ -10,10 +10,12 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
+  getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { getCutoutIdForSlotName } from '../../../resources/deck_configuration/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -73,9 +75,11 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   } = useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const robotType = FLEX_ROBOT_TYPE
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const { data: deckConfig = [] } = useDeckConfigurationQuery()
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
-    FLEX_ROBOT_TYPE,
+    robotType,
     analysis?.commands ?? []
   )
 
@@ -112,13 +116,12 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         moduleModel: model,
         slot: location.slotName,
         connected: handleModuleConnectionCheckFor(attachedModules, model),
-        hasSlotConflict:
-          deckConfig?.find(
-            ({ cutoutId, cutoutFixtureId }) =>
-              cutoutId === location.slotName &&
-              cutoutFixtureId != null &&
-              !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-          ) != null,
+        hasSlotConflict: deckConfig.some(
+          ({ cutoutId, cutoutFixtureId }) =>
+            cutoutId === getCutoutIdForSlotName(location.slotName, deckDef) &&
+            cutoutFixtureId != null &&
+            !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+        ),
       }
     }
   )
@@ -139,30 +142,28 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     })
   )
 
-  const nonSingleSlotDeckConfigCompatibility = deckConfigCompatibility.filter(
-    ({ requiredAddressableAreas }) =>
-      // required AA list includes a non-single-slot AA
-      !requiredAddressableAreas.every(aa =>
-        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+  // fixture includes at least 1 required addressableArea AND it doesn't ONLY include a single slot addressableArea
+  const requiredDeckConfigCompatibility = deckConfigCompatibility.filter(
+    ({ requiredAddressableAreas }) => {
+      const atLeastOneAA = requiredAddressableAreas.length > 0
+      const notOnlySingleSlot = !(
+        requiredAddressableAreas.length === 1 &&
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(requiredAddressableAreas[0])
       )
-  )
-  // fixture includes at least 1 required AA
-  const requiredDeckConfigCompatibility = nonSingleSlotDeckConfigCompatibility.filter(
-    fixture => fixture.requiredAddressableAreas.length > 0
+      return atLeastOneAA && notOnlySingleSlot
+    }
   )
 
-  const requiredFixtures = requiredDeckConfigCompatibility.map(
-    ({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
+  const requiredFixtures = requiredDeckConfigCompatibility
+    .filter(({ requiredAddressableAreas }) => requiredAddressableAreas)
+    .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
       hardwareType: 'fixture' as const,
-      cutoutFixtureId,
+      cutoutFixtureId: compatibleCutoutFixtureIds[0],
       location: { cutout: cutoutId },
       hasSlotConflict:
         cutoutFixtureId != null &&
-        !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-          ? compatibleCutoutFixtureIds.includes(cutoutFixtureId)
-          : false,
-    })
-  )
+        !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
+    }))
 
   return {
     requiredProtocolHardware: [
@@ -235,7 +236,7 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
   conflictedSlots: string[]
   isLoading: boolean
 } => {
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const { data: deckConfig = [] } = useDeckConfigurationQuery()
 
   // determine missing or conflicted hardware
   return {
@@ -245,7 +246,7 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
         return !hardware.connected
       } else {
         // fixtures
-        return !deckConfig?.some(
+        return !deckConfig.some(
           ({ cutoutId, cutoutFixtureId }) =>
             hardware.location.cutout === cutoutId &&
             hardware.cutoutFixtureId === cutoutFixtureId

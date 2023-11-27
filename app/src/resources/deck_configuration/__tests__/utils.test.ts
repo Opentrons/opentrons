@@ -1,6 +1,6 @@
 import { RunTimeCommand } from '@opentrons/shared-data'
 import {
-  FLEX_SIMPLEST_DECK_CONFIG,
+  FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getSimplestDeckConfigForProtocolCommands,
 } from '../utils'
 
@@ -18,7 +18,7 @@ const RUN_TIME_COMMAND_STUB_MIXIN: Pick<
 describe('getSimplestDeckConfigForProtocolCommands', () => {
   it('returns simplest deck if no commands alter addressable areas', () => {
     expect(getSimplestDeckConfigForProtocolCommands([])).toEqual(
-      FLEX_SIMPLEST_DECK_CONFIG
+      FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC
     )
   })
   it('returns staging area fixtures if commands address column 4 areas', () => {
@@ -65,7 +65,7 @@ describe('getSimplestDeckConfigForProtocolCommands', () => {
       },
     ])
     expect(cutoutConfigs).toEqual([
-      ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 8),
+      ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 8),
       {
         cutoutId: 'cutoutA3',
         cutoutFixtureId: 'stagingAreaRightSlot',
@@ -101,7 +101,7 @@ describe('getSimplestDeckConfigForProtocolCommands', () => {
       },
     ])
     expect(cutoutConfigs).toEqual([
-      ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 11),
+      ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 11),
       {
         cutoutId: 'cutoutD3',
         cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
@@ -131,7 +131,7 @@ describe('getSimplestDeckConfigForProtocolCommands', () => {
       },
     ])
     expect(cutoutConfigs).toEqual([
-      ...FLEX_SIMPLEST_DECK_CONFIG.slice(0, 11),
+      ...FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC.slice(0, 11),
       {
         cutoutId: 'cutoutD3',
         cutoutFixtureId: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover',
