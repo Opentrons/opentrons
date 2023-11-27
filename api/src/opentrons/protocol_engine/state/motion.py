@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from opentrons.types import MountType, Point
+from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_slots,
@@ -16,6 +16,7 @@ from ..types import WellLocation, CurrentWell, MotorAxis
 from .config import Config
 from .labware import LabwareView
 from .pipettes import PipetteView
+from .addressable_areas import AddressableAreaView
 from .geometry import GeometryView
 from .modules import ModuleView
 from .module_substates import HeaterShakerModuleId
@@ -37,6 +38,7 @@ class MotionView:
         config: Config,
         labware_view: LabwareView,
         pipette_view: PipetteView,
+        addressable_area_view: AddressableAreaView,
         geometry_view: GeometryView,
         module_view: ModuleView,
     ) -> None:
@@ -44,6 +46,7 @@ class MotionView:
         self._config = config
         self._labware = labware_view
         self._pipettes = pipette_view
+        self._addressable_areas = addressable_area_view
         self._geometry = geometry_view
         self._modules = module_view
 
@@ -87,6 +90,7 @@ class MotionView:
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
+        addressable_area_name = self._pipettes.get_current_addressable_area(pipette_id)
         center_destination = self._labware.get_has_quirk(
             labware_id,
             "centerMultichannelOnWells",
@@ -105,9 +109,23 @@ class MotionView:
         min_travel_z = self._geometry.get_min_travel_z(
             pipette_id, labware_id, location, minimum_z_height
         )
+
+        destination_slot = self._geometry.get_ancestor_slot_name(labware_id)
+        origin_slot: Optional[DeckSlotName] = None
+        extra_waypoints = []
         # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
-        #  could crash onto the thermocycler if current well is not known.
-        extra_waypoints = self._geometry.get_extra_waypoints(labware_id, location)
+        #  could crash onto the thermocycler if current well or addressable area is not known.
+        if location is not None:
+            origin_slot = self._geometry.get_ancestor_slot_name(location.labware_id)
+        elif addressable_area_name is not None:
+            origin_slot = self._addressable_areas.get_addressable_area_base_slot(
+                addressable_area_name
+            )
+
+        if origin_slot is not None:
+            extra_waypoints = self._geometry.get_extra_waypoints(
+                from_slot=origin_slot, to_slot=destination_slot
+            )
 
         try:
             return motion_planning.get_waypoints(

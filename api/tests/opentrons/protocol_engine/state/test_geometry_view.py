@@ -1323,11 +1323,10 @@ def test_get_labware_grip_point_for_labware_on_module(
 
 
 @pytest.mark.parametrize(
-    argnames=["location", "should_dodge", "expected_waypoints"],
+    argnames=["should_dodge", "expected_waypoints"],
     argvalues=[
-        (None, True, []),
-        (CurrentWell("pipette-id", "from-labware-id", "well-name"), False, []),
-        (CurrentWell("pipette-id", "from-labware-id", "well-name"), True, [(11, 22)]),
+        (False, []),
+        (True, [(11, 22)]),
     ],
 )
 def test_get_extra_waypoints(
@@ -1335,29 +1334,11 @@ def test_get_extra_waypoints(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    location: Optional[CurrentWell],
     should_dodge: bool,
     expected_waypoints: List[Tuple[float, float]],
     subject: GeometryView,
 ) -> None:
     """It should return extra waypoints if thermocycler should be dodged."""
-    decoy.when(labware_view.get("from-labware-id")).then_return(
-        LoadedLabware(
-            id="labware1",
-            loadName="load-name1",
-            definitionUri="1234",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        )
-    )
-    decoy.when(labware_view.get("to-labware-id")).then_return(
-        LoadedLabware(
-            id="labware2",
-            loadName="load-name2",
-            definitionUri="4567",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        )
-    )
-
     decoy.when(
         module_view.should_dodge_thermocycler(
             from_slot=DeckSlotName.SLOT_1, to_slot=DeckSlotName.SLOT_2
@@ -1370,7 +1351,9 @@ def test_get_extra_waypoints(
         )
     ).then_return(Point(x=11, y=22, z=33))
 
-    extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
+    extra_waypoints = subject.get_extra_waypoints(
+        DeckSlotName.SLOT_1, DeckSlotName.SLOT_2
+    )
 
     assert extra_waypoints == expected_waypoints
 

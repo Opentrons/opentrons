@@ -562,12 +562,11 @@ class GeometryView:
         )
 
     def get_extra_waypoints(
-        self, labware_id: str, location: Optional[CurrentWell]
+        self, from_slot: DeckSlotName, to_slot: DeckSlotName
     ) -> List[Tuple[float, float]]:
         """Get extra waypoints for movement if thermocycler needs to be dodged."""
-        if location is not None and self._modules.should_dodge_thermocycler(
-            from_slot=self.get_ancestor_slot_name(location.labware_id),
-            to_slot=self.get_ancestor_slot_name(labware_id),
+        if self._modules.should_dodge_thermocycler(
+            from_slot=from_slot, to_slot=to_slot
         ):
             middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
                 self._config.robot_type

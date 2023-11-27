@@ -510,7 +510,7 @@ class PipetteView(HasState[PipetteState]):
             return current_deck_point.deck_point
         return None
 
-    def get_addressable_area(self, pipette_id: str) -> Optional[str]:
+    def get_current_addressable_area(self, pipette_id: str) -> Optional[str]:
         """Get the addressable area of a pipette by ID, or None if not associated with the last move operation."""
         loaded_pipette = self.get(pipette_id)
         current_addressable_area = self._state.current_addressable_area

@@ -333,6 +333,13 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             deck_definition=self._state.deck_definition,
         )
 
+    def get_addressable_area_base_slot(
+        self, addressable_area_name: str
+    ) -> DeckSlotName:
+        """Get the base slot the addressable area is associated with."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        return addressable_area.base_slot
+
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:
         """Get the position of an addressable area."""
         # TODO This should be the regular `get_addressable_area` once Robot Server deck config and tests is hooked up

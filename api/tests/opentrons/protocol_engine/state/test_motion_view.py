@@ -22,6 +22,7 @@ from opentrons.protocol_engine.state import PipetteLocationData, move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
 from opentrons.protocol_engine.state.modules import ModuleView
@@ -60,6 +61,7 @@ def subject(
     mock_engine_config: Config,
     labware_view: LabwareView,
     pipette_view: PipetteView,
+    addressable_area_view: AddressableAreaView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
 ) -> MotionView:
@@ -68,6 +70,7 @@ def subject(
         config=mock_engine_config,
         labware_view=labware_view,
         pipette_view=pipette_view,
+        addressable_area_view=addressable_area_view,
         geometry_view=geometry_view,
         module_view=mock_module_view,
     )
@@ -233,9 +236,17 @@ def test_get_movement_waypoints_to_well(
     decoy.when(
         geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
     ).then_return(42.0)
-    decoy.when(geometry_view.get_extra_waypoints("labware-id", location)).then_return(
-        [(456, 789)]
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_2
     )
+    decoy.when(geometry_view.get_ancestor_slot_name("456")).then_return(
+        DeckSlotName.SLOT_1
+    )
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(DeckSlotName.SLOT_1, DeckSlotName.SLOT_2)
+    ).then_return([(456, 789)])
 
     waypoints = [
         motion_planning.Waypoint(
