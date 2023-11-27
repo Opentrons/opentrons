@@ -207,6 +207,28 @@ def test_get_addressable_area_position() -> None:
     assert result == Point(1, 2, 3)
 
 
+def test_get_addressable_area_move_to_location() -> None:
+    """It should get the absolute location of an addressable area's move to location."""
+    subject = get_addressable_area_view(
+        loaded_addressable_areas_by_name={
+            "abc": AddressableArea(
+                area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
+                display_name="fancy name",
+                bounding_box=Dimensions(x=10, y=20, z=30),
+                position=AddressableOffsetVector(x=1, y=2, z=3),
+                compatible_module_types=[],
+                drop_tip_location=None,
+                drop_labware_location=None,
+            )
+        }
+    )
+
+    result = subject.get_addressable_area_move_to_location("abc")
+    assert result == Point(6, 12, 33)
+
+
 def test_get_addressable_area_center() -> None:
     """It should get the absolute location of an addressable area's center."""
     subject = get_addressable_area_view(
