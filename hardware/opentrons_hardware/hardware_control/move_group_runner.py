@@ -80,8 +80,8 @@ from .types import NodeDict, MotorPositionStatus
 log = logging.getLogger(__name__)
 
 _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
-_CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
-_Completions = List[_CompletionPacket]
+CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
+Completions = List[CompletionPacket]
 
 
 class MoveGroupRunner:
@@ -169,7 +169,7 @@ class MoveGroupRunner:
 
     @staticmethod
     def _accumulate_move_completions(
-        completions: _Completions,
+        completions: Completions,
     ) -> NodeDict[MotorPositionStatus]:
         position: NodeDict[
             List[Tuple[Tuple[int, int], MotorPositionStatus]]
@@ -353,9 +353,9 @@ class MoveGroupRunner:
 
     async def _move(
         self, can_messenger: CanMessenger, start_at_index: int
-    ) -> _Completions:
+    ) -> Completions:
         """Run all the move groups."""
-        scheduler = MoveScheduler(self._move_groups, start_at_index)
+        scheduler = MoveDispatcher(self._move_groups, start_at_index)
         try:
             can_messenger.add_listener(scheduler)
             completions = await scheduler.run(can_messenger)
@@ -364,7 +364,7 @@ class MoveGroupRunner:
         return completions
 
 
-class MoveScheduler:
+class MoveDispatcher:
     """A message listener that manages the sending of execute move group messages."""
 
     def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
@@ -402,7 +402,7 @@ class MoveScheduler:
             self._durations.append(duration)
             self._expected_tip_action_motors.append(expected_motors)
         log.debug(f"Move scheduler running for groups {move_groups}")
-        self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
+        self._completion_queue: asyncio.Queue[CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
         self._errors: List[EnumeratedError] = []
         self._current_group: Optional[int] = None
@@ -628,14 +628,14 @@ class MoveScheduler:
             log.exception("canceling move group scheduler")
             raise PythonException(e) from e
 
-    async def run(self, can_messenger: CanMessenger) -> _Completions:
+    async def run(self, can_messenger: CanMessenger) -> Completions:
         """Start each move group after the prior has completed."""
         for group_id in range(
             self._start_at_index, self._start_at_index + len(self._moves)
         ):
             await self._run_one_group(group_id, can_messenger)
 
-        def _reify_queue_iter() -> Iterator[_CompletionPacket]:
+        def _reify_queue_iter() -> Iterator[CompletionPacket]:
             while not self._completion_queue.empty():
                 yield self._completion_queue.get_nowait()
 

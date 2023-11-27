@@ -1,4 +1,4 @@
-"""Class that schedules motion on can bus."""
+"""Class that dispatch motion on can bus."""
 import asyncio
 import logging
 from typing import List, Set, Tuple, Iterator, Union, Optional
