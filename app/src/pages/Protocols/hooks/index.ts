@@ -23,6 +23,8 @@ import type {
   CutoutId,
   ModuleModel,
   PipetteName,
+  RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -230,29 +232,38 @@ export const useRequiredProtocolLabware = (
 
 const useMissingProtocolHardwareFromRequiredProtocolHardware = (
   requiredProtocolHardware: ProtocolHardware[],
-  isLoading: boolean
+  isLoading: boolean,
+  robotType: RobotType,
+  protocolCommands: RunTimeCommand[]
 ): {
   missingProtocolHardware: ProtocolHardware[]
   conflictedSlots: string[]
   isLoading: boolean
 } => {
-  const { data: deckConfig = [] } = useDeckConfigurationQuery()
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    protocolCommands
+  )
 
   // determine missing or conflicted hardware
   return {
-    missingProtocolHardware: requiredProtocolHardware.filter(hardware => {
-      if ('connected' in hardware) {
-        // instruments and modules
-        return !hardware.connected
-      } else {
-        // fixtures
-        return !deckConfig.some(
-          ({ cutoutId, cutoutFixtureId }) =>
-            hardware.location.cutout === cutoutId &&
-            hardware.cutoutFixtureId === cutoutFixtureId
+    missingProtocolHardware: [
+      ...requiredProtocolHardware.filter(
+        hardware => 'connected' in hardware && !hardware.connected
+      ),
+      ...deckConfigCompatibility
+        .filter(
+          ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+            cutoutFixtureId != null &&
+            !compatibleCutoutFixtureIds.some(id => id === cutoutFixtureId)
         )
-      }
-    }),
+        .map(({ compatibleCutoutFixtureIds, cutoutId }) => ({
+          hardwareType: 'fixture' as const,
+          cutoutFixtureId: compatibleCutoutFixtureIds[0],
+          location: { cutout: cutoutId },
+          hasSlotConflict: true,
+        })),
+    ],
     conflictedSlots: requiredProtocolHardware
       .filter(
         (hardware): hardware is ProtocolModule | ProtocolFixture =>
@@ -271,6 +282,7 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
 }
 
 export const useMissingProtocolHardwareFromAnalysis = (
+  robotType: RobotType,
   analysis?: CompletedProtocolAnalysis | null
 ): {
   missingProtocolHardware: ProtocolHardware[]
@@ -284,7 +296,9 @@ export const useMissingProtocolHardwareFromAnalysis = (
 
   return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,
-    isLoading
+    isLoading,
+    robotType,
+    analysis?.commands ?? []
   )
 }
 
@@ -295,12 +309,21 @@ export const useMissingProtocolHardware = (
   conflictedSlots: string[]
   isLoading: boolean
 } => {
-  const { requiredProtocolHardware, isLoading } = useRequiredProtocolHardware(
-    protocolId
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
   )
+  const {
+    requiredProtocolHardware,
+    isLoading,
+  } = useRequiredProtocolHardwareFromAnalysis(analysis)
 
   return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,
-    isLoading
+    isLoading,
+    FLEX_ROBOT_TYPE,
+    analysis?.commands ?? []
   )
 }

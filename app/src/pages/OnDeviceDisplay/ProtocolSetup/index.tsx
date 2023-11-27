@@ -315,6 +315,7 @@ function PrepareToRun({
       : 0
 
   const missingProtocolHardware = useMissingProtocolHardwareFromAnalysis(
+    robotType,
     mostRecentAnalysis
   )
   const isLocationConflict = missingProtocolHardware.conflictedSlots.length > 0
