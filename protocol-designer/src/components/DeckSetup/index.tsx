@@ -38,7 +38,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
@@ -502,12 +501,11 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const trash = Object.values(activeDeckSetup.labware).find(
-    lw =>
-      lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-      lw.labwareDefURI === FLEX_TRASH_DEF_URI
+  const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
+    ae => ae.name === 'trashBin'
   )
-  const trashSlot = trash?.slot
+
+  const trashSlot = trash?.location
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
@@ -524,16 +522,9 @@ export const DeckSetup = (): JSX.Element => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
     },
   })
-
   const trashBinFixtures = [
     {
-      cutoutId:
-        trash?.slot != null
-          ? getCutoutIdForAddressableArea(
-              trash?.slot as AddressableAreaName,
-              deckDef.cutoutFixtures
-            )
-          : null,
+      cutoutId: trash?.location as CutoutId,
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]

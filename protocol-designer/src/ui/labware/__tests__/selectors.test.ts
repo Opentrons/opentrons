@@ -10,7 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import {
-  getDisposalLabwareOptions,
+  getDisposalOptions,
   getLabwareOptions,
   _sortLabwareDropdownOptions,
 } from '../selectors'
@@ -70,51 +70,73 @@ describe('labware selectors', () => {
     }
   })
 
-  describe('getDisposalLabwareOptions', () => {
-    it('returns an empty list when labware is NOT provided', () => {
+  describe('getDisposalOptions', () => {
+    it('returns an empty list when additionalEquipment is NOT provided', () => {
       expect(
         // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getDisposalLabwareOptions.resultFunc([], names)
+        getDisposalOptions.resultFunc([])
       ).toEqual([])
     })
-    it('returns empty list when trash is NOT present', () => {
-      const labwareEntities = {
-        ...tipracks,
-      }
-      expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getDisposalLabwareOptions.resultFunc(labwareEntities, names)
-      ).toEqual([])
-    })
-    it('filters out labware that is NOT trash when one trash bin present', () => {
-      const labwareEntities = {
-        ...tipracks,
-        ...trash,
-      }
-
-      expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getDisposalLabwareOptions.resultFunc(labwareEntities, names)
-      ).toEqual([{ name: 'Trash Bin', value: mockTrash }])
-    })
-    it('filters out labware that is NOT trash when multiple trash bins present', () => {
-      const trash2 = {
-        mockTrash2: {
-          def: { ...fixtureTrash },
+    it('returns empty list when trash bin is NOT present', () => {
+      const additionalEquipmentEntities = {
+        stagingArea: {
+          name: 'stagingArea',
+          location: 'cutoutB3',
+          id: 'staginAreaId',
         },
       }
-      const labwareEntities = {
-        ...tipracks,
-        ...trash,
-        ...trash2,
+      expect(
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
+        getDisposalOptions.resultFunc(additionalEquipmentEntities)
+      ).toEqual([])
+    })
+    it('filters out additional equipment that is not trash when a trash is present', () => {
+      const mockTrashId = 'mockTrashId'
+      const additionalEquipmentEntities = {
+        stagingArea: {
+          name: 'stagingArea',
+          location: 'cutoutB3',
+          id: 'staginAreaId',
+        },
+        [mockTrashId]: {
+          name: 'trashBin',
+          location: 'cutoutA3',
+          id: mockTrashId,
+        },
       }
 
       expect(
         // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getDisposalLabwareOptions.resultFunc(labwareEntities, names)
+        getDisposalOptions.resultFunc(additionalEquipmentEntities)
+      ).toEqual([{ name: 'Trash Bin', value: mockTrashId }])
+    })
+    it('filters out additional equipment that is NOT trash when multiple trash bins present', () => {
+      const mockTrashId = 'mockTrashId'
+      const mockTrashId2 = 'mockTrashId2'
+      const additionalEquipmentEntities = {
+        stagingArea: {
+          name: 'stagingArea',
+          location: 'cutoutB3',
+          id: 'staginAreaId',
+        },
+        [mockTrashId]: {
+          name: 'trashBin',
+          location: 'cutoutA3',
+          id: mockTrashId,
+        },
+        [mockTrashId2]: {
+          name: 'trashBin',
+          location: 'cutoutA1',
+          id: mockTrashId2,
+        },
+      }
+
+      expect(
+        // @ts-expect-error(sa, 2021-6-15): resultFunc
+        getDisposalOptions.resultFunc(additionalEquipmentEntities)
       ).toEqual([
-        { name: 'Trash Bin', value: mockTrash },
-        { name: 'Trash Bin', value: mockTrash2 },
+        { name: 'Trash Bin', value: mockTrashId },
+        { name: 'Trash Bin', value: mockTrashId2 },
       ])
     })
   })
@@ -123,10 +145,13 @@ describe('labware selectors', () => {
     it('should return an empty list when no labware is present', () => {
       expect(
         // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getDisposalLabwareOptions.resultFunc(
+        getLabwareOptions.resultFunc(
           {},
           {},
-          { labware: {}, modules: {}, pipettes: {} }
+          { labware: {}, modules: {}, pipettes: {} },
+          {},
+          {},
+          {}
         )
       ).toEqual([])
     })

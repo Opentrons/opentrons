@@ -23,10 +23,8 @@ export const BlowoutLocationField = (
     value,
   } = props
 
-  const disposalLabwareOptions = useSelector(
-    uiLabwareSelectors.getDisposalLabwareOptions
-  )
-  const options = [...disposalLabwareOptions, ...props.options]
+  const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
+  const options = [...disposalOptions, ...props.options]
 
   return (
     <DropdownField

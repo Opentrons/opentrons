@@ -8,6 +8,8 @@ import {
   CutoutId,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   isAddressableAreaStandardSlot,
+  CutoutFixtureId,
+  RobotType,
 } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
@@ -156,4 +158,41 @@ export const getStagingAreaAddressableAreas = (
       return addressableAreasOnCutout ?? []
     })
     .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
+}
+
+export const getCutoutIdByAddressableArea = (
+  addressableAreaName: AddressableAreaName,
+  cutoutFixtureId: CutoutFixtureId,
+  robotType: RobotType
+): CutoutId => {
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const cutoutFixtures = deckDef.cutoutFixtures
+  const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
+    cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)
+  )?.providesAddressableAreas
+
+  const findCutoutIdByAddressableArea = (
+    addressableAreaName: AddressableAreaName
+  ): CutoutId | null => {
+    if (providesAddressableAreasForAddressableArea != null) {
+      for (const cutoutId in providesAddressableAreasForAddressableArea) {
+        if (
+          providesAddressableAreasForAddressableArea[
+            cutoutId as keyof typeof providesAddressableAreasForAddressableArea
+          ].includes(addressableAreaName)
+        ) {
+          return cutoutId as CutoutId
+        }
+      }
+    }
+    return null
+  }
+  const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
+
+  if (cutoutId == null) {
+    throw Error(
+      `expected to find cutoutId from addressableAreaName ${addressableAreaName} but could not`
+    )
+  }
+  return cutoutId
 }
