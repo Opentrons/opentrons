@@ -25,15 +25,15 @@ const batchEditClickOptions = { [isMacOSX ? 'metaKey' : 'ctrlKey']: true }
 //   })
 // }
 
-function openDesignTab() {
-  cy.get('button[id=NavTab_design]').click()
-  cy.get('button').contains('ok').click()
+// function openDesignTab() {
+//   cy.get('button[id=NavTab_design]').click()
+//   cy.get('button').contains('ok').click()
 
-  // Verify the Design Page
-  cy.get('#TitleBar_main > h1').contains('Multi select banner test protocol')
-  cy.get('#TitleBar_main > h2').contains('STARTING DECK STATE')
-  cy.get('button[id=StepCreationButton]').contains('+ Add Step')
-}
+//   // Verify the Design Page
+//   cy.get('#TitleBar_main > h1').contains('Multi select banner test protocol')
+//   cy.get('#TitleBar_main > h2').contains('STARTING DECK STATE')
+//   cy.get('button[id=StepCreationButton]').contains('+ Add Step')
+// }
 
 function enterBatchEdit() {
   cy.get('[data-test="StepItem_1"]').click(batchEditClickOptions)
