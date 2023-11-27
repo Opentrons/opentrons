@@ -21,6 +21,7 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
     CurrentDeckPoint,
+    CurrentAddressableArea,
     HardwarePipette,
     StaticPipetteConfig,
 )
@@ -35,6 +36,10 @@ def get_pipette_view(
     current_deck_point: CurrentDeckPoint = CurrentDeckPoint(
         mount=None, deck_point=None
     ),
+    current_addressable_area: CurrentAddressableArea = CurrentAddressableArea(
+        mount=None,
+        addressable_area_name=None,
+    ),
     attached_tip_by_id: Optional[Dict[str, Optional[TipGeometry]]] = None,
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
@@ -47,6 +52,7 @@ def get_pipette_view(
         aspirated_volume_by_id=aspirated_volume_by_id or {},
         current_well=current_well,
         current_deck_point=current_deck_point,
+        current_addressable_area=current_addressable_area,
         attached_tip_by_id=attached_tip_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
         static_config_by_id=static_config_by_id or {},

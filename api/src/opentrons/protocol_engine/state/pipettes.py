@@ -31,6 +31,7 @@ from ..commands import (
     MoveToCoordinatesResult,
     MoveToWellResult,
     MoveRelativeResult,
+    MoveToAddressableAreaResult,
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
@@ -72,6 +73,14 @@ class CurrentDeckPoint:
 
 
 @dataclass(frozen=True)
+class CurrentAddressableArea:
+    """The latest addressable area name and mount the robot has accessed."""
+
+    mount: Optional[MountType]
+    addressable_area_name: Optional[str]
+
+
+@dataclass(frozen=True)
 class StaticPipetteConfig:
     """Static config for a pipette."""
 
@@ -97,6 +106,7 @@ class PipetteState:
     aspirated_volume_by_id: Dict[str, Optional[float]]
     current_well: Optional[CurrentWell]
     current_deck_point: CurrentDeckPoint
+    current_addressable_area: CurrentAddressableArea
     attached_tip_by_id: Dict[str, Optional[TipGeometry]]
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
@@ -117,6 +127,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             attached_tip_by_id={},
             current_well=None,
             current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
+            current_addressable_area=CurrentAddressableArea(
+                mount=None, addressable_area_name=None
+            ),
             movement_speed_by_id={},
             static_config_by_id={},
             flow_rates_by_id={},
@@ -135,6 +148,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     ) -> None:
         self._update_current_well(command)
         self._update_deck_point(command)
+        self._update_current_addressable_area(command)
 
         if isinstance(private_result, PipetteConfigUpdateResultMixin):
             config = private_result.config
@@ -272,6 +286,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 HomeResult,
                 RetractAxisResult,
                 MoveToCoordinatesResult,
+                MoveToAddressableAreaResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
             ),
@@ -314,6 +329,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 MoveToWellResult,
                 MoveToCoordinatesResult,
                 MoveRelativeResult,
+                MoveToAddressableAreaResult,
                 PickUpTipResult,
                 DropTipResult,
                 AspirateResult,
@@ -363,6 +379,61 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _clear_deck_point(self) -> None:
         """Reset last deck point to default None value for mount and point."""
         self._state.current_deck_point = CurrentDeckPoint(mount=None, deck_point=None)
+
+    def _update_current_addressable_area(self, command: Command) -> None:
+        if isinstance(command.result, MoveToAddressableAreaResult):
+            pipette_id = command.params.pipetteId
+            area_name = command.params.addressableAreaName
+
+            try:
+                loaded_pipette = self._state.pipettes_by_id[pipette_id]
+            except KeyError:
+                self._clear_current_addressable_area()
+            else:
+                self._state.current_addressable_area = CurrentAddressableArea(
+                    mount=loaded_pipette.mount, addressable_area_name=area_name
+                )
+
+        elif isinstance(
+            command.result,
+            (
+                MoveToWellResult,
+                MoveToCoordinatesResult,
+                MoveRelativeResult,
+                PickUpTipResult,
+                DropTipResult,
+                AspirateResult,
+                DispenseResult,
+                BlowOutResult,
+                TouchTipResult,
+                HomeResult,
+                RetractAxisResult,
+                thermocycler.OpenLidResult,
+                thermocycler.CloseLidResult,
+            ),
+        ):
+            self._clear_current_addressable_area()
+
+        elif isinstance(
+            command.result,
+            (
+                heater_shaker.SetAndWaitForShakeSpeedResult,
+                heater_shaker.OpenLabwareLatchResult,
+            ),
+        ):
+            if command.result.pipetteRetracted:
+                self._clear_current_addressable_area()
+
+        elif isinstance(command.result, MoveLabwareResult):
+            if command.params.strategy == "usingGripper":
+                # All mounts will have been retracted.
+                self._clear_current_addressable_area()
+
+    def _clear_current_addressable_area(self) -> None:
+        """Reset last accessed addressable area to default None value for mount and point."""
+        self._state.current_addressable_area = CurrentAddressableArea(
+            mount=None, addressable_area_name=None
+        )
 
 
 class PipetteView(HasState[PipetteState]):
@@ -437,6 +508,14 @@ class PipetteView(HasState[PipetteState]):
         current_deck_point = self._state.current_deck_point
         if loaded_pipette.mount == current_deck_point.mount:
             return current_deck_point.deck_point
+        return None
+
+    def get_addressable_area(self, pipette_id: str) -> Optional[str]:
+        """Get the addressable area of a pipette by ID, or None if not associated with the last move operation."""
+        loaded_pipette = self.get(pipette_id)
+        current_addressable_area = self._state.current_addressable_area
+        if loaded_pipette.mount == current_addressable_area.mount:
+            return current_addressable_area.addressable_area_name
         return None
 
     def get_attached_tip(self, pipette_id: str) -> Optional[TipGeometry]:
