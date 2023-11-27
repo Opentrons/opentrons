@@ -9,7 +9,6 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
-  CreateCommand,
 } from '@opentrons/shared-data'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'

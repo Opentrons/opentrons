@@ -66,7 +66,7 @@ export const transfer: CommandCreator<TransferArgs> = (
       args.sourceWells.length === args.destWells.length) ||
     (wasteChuteOrLabware === 'wasteChute' &&
       args.destWells == null &&
-      args.sourceWells.length === 1)
+      args.sourceWells.length > 1)
   ) {
     // No assertion failure, continue with the logic
   } else {

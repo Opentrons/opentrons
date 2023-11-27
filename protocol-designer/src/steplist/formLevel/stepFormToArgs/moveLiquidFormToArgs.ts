@@ -205,12 +205,6 @@ export const moveLiquidFormToArgs = (
     'expected sourceWells to have length > 0'
   )
   assert(
-    sourceWellsUnordered.length === 1 ||
-      dispWells.length === 1 ||
-      sourceWellsUnordered.length === dispWells.length,
-    `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${sourceWellsUnordered.length}) nor dest (${destWellsUnordered.length}) equal 1`
-  )
-  assert(
     !(
       path === 'multiDispense' &&
       blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION

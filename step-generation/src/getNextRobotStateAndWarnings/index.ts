@@ -122,15 +122,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'aspirateInPlace':
-      forAspirateInPlace(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
-
-      break
-
     case 'touchTip':
     case 'waitForDuration':
     case 'waitForResume':
