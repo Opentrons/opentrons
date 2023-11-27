@@ -23,7 +23,7 @@ describe('configureNozzleLayout', () => {
         commandType: 'configureNozzleLayout',
         key: expect.any(String),
         params: {
-          pipettID: mockPipette,
+          pipetteId: mockPipette,
           configuration_params: { primary_nozzle: 'A1', style: ALL },
         },
       },
