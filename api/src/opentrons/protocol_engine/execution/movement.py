@@ -14,6 +14,7 @@ from ..types import (
     MovementAxis,
     MotorAxis,
     CurrentWell,
+    AddressableOffsetVector,
 )
 from ..state import StateStore
 from ..resources import ModelUtils
@@ -119,6 +120,71 @@ class MovementHandler:
             origin_cp=origin_cp,
             max_travel_z=max_travel_z,
             current_well=current_well,
+            force_direct=force_direct,
+            minimum_z_height=minimum_z_height,
+        )
+
+        speed = self._state_store.pipettes.get_movement_speed(
+            pipette_id=pipette_id, requested_speed=speed
+        )
+
+        final_point = await self._gantry_mover.move_to(
+            pipette_id=pipette_id, waypoints=waypoints, speed=speed
+        )
+
+        return final_point
+
+    async def move_to_addressable_area(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+        speed: Optional[float] = None,
+    ) -> Point:
+        """Move to a specific well."""
+        # TODO need to check that there is no labware or module on top of deck slot?
+
+        # Check for presence of heater shakers on deck, and if planned
+        # pipette movement is allowed
+        hs_movement_restrictors = (
+            self._state_store.modules.get_heater_shaker_movement_restrictors()
+        )
+
+        dest_slot_int = (
+            self._state_store.addressable_areas.get_addressable_area_base_slot(
+                addressable_area_name
+            ).as_int()
+        )
+
+        self._hs_movement_flagger.raise_if_movement_restricted(
+            hs_movement_restrictors=hs_movement_restrictors,
+            destination_slot=dest_slot_int,
+            is_multi_channel=(
+                self._state_store.tips.get_pipette_channels(pipette_id) > 1
+            ),
+            destination_is_tip_rack=False,
+        )
+
+        # get the pipette's mount and current critical point, if applicable
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+            current_well=None,
+        )
+        origin_cp = pipette_location.critical_point
+
+        origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
+        max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
+
+        # calculate the movement's waypoints
+        waypoints = self._state_store.motion.get_movement_waypoints_to_addressable_area(
+            pipette_id=pipette_id,
+            addressable_area_name=addressable_area_name,
+            offset=offset,
+            origin=origin,
+            origin_cp=origin_cp,
+            max_travel_z=max_travel_z,
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
         )

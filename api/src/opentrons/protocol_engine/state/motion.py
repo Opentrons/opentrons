@@ -12,7 +12,7 @@ from opentrons import motion_planning
 
 from . import move_types
 from .. import errors
-from ..types import WellLocation, CurrentWell, MotorAxis
+from ..types import WellLocation, CurrentWell, MotorAxis, AddressableOffsetVector
 from .config import Config
 from .labware import LabwareView
 from .pipettes import PipetteView
@@ -120,6 +120,81 @@ class MotionView:
         elif addressable_area_name is not None:
             origin_slot = self._addressable_areas.get_addressable_area_base_slot(
                 addressable_area_name
+            )
+
+        if origin_slot is not None:
+            extra_waypoints = self._geometry.get_extra_waypoints(
+                from_slot=origin_slot, to_slot=destination_slot
+            )
+
+        try:
+            return motion_planning.get_waypoints(
+                move_type=move_type,
+                origin=origin,
+                origin_cp=origin_cp,
+                dest=destination,
+                dest_cp=destination_cp,
+                min_travel_z=min_travel_z,
+                max_travel_z=max_travel_z,
+                xy_waypoints=extra_waypoints,
+            )
+        except motion_planning.MotionPlanningError as error:
+            raise errors.FailedToPlanMoveError(str(error))
+
+    def get_movement_waypoints_to_addressable_area(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        origin: Point,
+        origin_cp: Optional[CriticalPoint],
+        max_travel_z: float,
+        force_direct: bool = False,
+        minimum_z_height: Optional[float] = None,
+    ) -> List[motion_planning.Waypoint]:
+        """Calculate waypoints to a destination that's specified as a well."""
+        location = self._pipettes.get_current_well()
+        current_addressable_area = self._pipettes.get_current_addressable_area(
+            pipette_id
+        )
+
+        # TODO this will need to probably change
+        base_destination = self._addressable_areas.get_addressable_area_center(
+            addressable_area_name
+        )
+        area_height = self._addressable_areas.get_addressable_area_height(
+            addressable_area_name
+        )
+        destination = base_destination + Point(
+            x=offset.x, y=offset.y, z=offset.z + area_height
+        )
+
+        # TODO I think this is what we always want but honestly unsure
+        destination_cp = CriticalPoint.XY_CENTER
+
+        all_labware_highest_z = self._geometry.get_all_labware_highest_z()
+        if minimum_z_height is None:
+            minimum_z_height = float("-inf")
+        min_travel_z = max(all_labware_highest_z, minimum_z_height)
+
+        move_type = (
+            motion_planning.MoveType.DIRECT
+            if force_direct
+            else motion_planning.MoveType.GENERAL_ARC
+        )
+
+        destination_slot = self._addressable_areas.get_addressable_area_base_slot(
+            addressable_area_name
+        )
+        origin_slot: Optional[DeckSlotName] = None
+        extra_waypoints = []
+        # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
+        #  could crash onto the thermocycler if current well or addressable area is not known.
+        if location is not None:
+            origin_slot = self._geometry.get_ancestor_slot_name(location.labware_id)
+        elif current_addressable_area is not None:
+            origin_slot = self._addressable_areas.get_addressable_area_base_slot(
+                current_addressable_area
             )
 
         if origin_slot is not None:

@@ -4,6 +4,7 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..types import DeckPoint, AddressableOffsetVector
 from .pipetting_common import (
     PipetteIdMixin,
     MovementMixin,
@@ -21,11 +22,16 @@ class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
     """Payload required to move a pipette to a specific addressable area."""
 
     addressableAreaName: str = Field(
+        ...,
         description=(
             "The name of the addressable area that you want to use."
             " Valid values are the `id`s of `addressableArea`s in the"
             " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
-        )
+        ),
+    )
+    offset: AddressableOffsetVector = Field(
+        AddressableOffsetVector(x=0, y=0, z=0),
+        description="Relative offset of addressable area to move pipette's critical point.",
     )
 
 
@@ -47,7 +53,16 @@ class MoveToAddressableAreaImplementation(
         self, params: MoveToAddressableAreaParams
     ) -> MoveToAddressableAreaResult:
         """Move the requested pipette to the requested addressable area."""
-        return MoveToAddressableAreaResult()
+        x, y, z = await self._movement.move_to_addressable_area(
+            pipette_id=params.pipetteId,
+            addressable_area_name=params.addressableAreaName,
+            offset=params.offset,
+            force_direct=params.forceDirect,
+            minimum_z_height=params.minimumZHeight,
+            speed=params.speed,
+        )
+
+        return MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z))
 
 
 class MoveToAddressableArea(
