@@ -232,8 +232,8 @@ settings = [
     ),
     SettingDefinition(
         _id="disableOverpressureDetection",
-        title="Disable overpressure detection on pipettes.",
-        description="This setting disables overpressure detection on pipettes, do not turn this feature off unless recommended.",
+        title="Disable pipette pressure sensing.",
+        description="This setting disables pressure sensing capability on pipettes. This will prevent errors when overpressuring the pipette. Do not set this setting unless you are intentionally causing >8kPa inside the pipette air channel.",
         robot_type=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
