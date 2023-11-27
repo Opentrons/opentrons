@@ -1892,6 +1892,26 @@
       },
       "required": ["params"]
     },
+    "AddressableOffsetVector": {
+      "title": "AddressableOffsetVector",
+      "description": "Offset, in deck coordinates, from nominal to actual position of an addressable area.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        },
+        "z": {
+          "title": "Z",
+          "type": "number"
+        }
+      },
+      "required": ["x", "y", "z"]
+    },
     "MoveToAddressableAreaParams": {
       "title": "MoveToAddressableAreaParams",
       "description": "Payload required to move a pipette to a specific addressable area.",
@@ -1922,6 +1942,20 @@
           "title": "Addressableareaname",
           "description": "The name of the addressable area that you want to use. Valid values are the `id`s of `addressableArea`s in the [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck).",
           "type": "string"
+        },
+        "offset": {
+          "title": "Offset",
+          "description": "Relative offset of addressable area to move pipette's critical point.",
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/AddressableOffsetVector"
+            }
+          ]
         }
       },
       "required": ["pipetteId", "addressableAreaName"]
