@@ -30,7 +30,6 @@ export type MovableTrashCommandsTypes =
 interface MovableTrashCommandArgs {
   type: MovableTrashCommandsTypes
   pipetteId: string
-  isGantryAtAddressableArea: boolean
   volume?: number
   flowRate?: number
 }
@@ -40,7 +39,7 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, type, isGantryAtAddressableArea, volume, flowRate } = args
+  const { pipetteId, type, volume, flowRate } = args
   const errors: CommandCreatorError[] = []
   const pipetteName = invariantContext.pipetteEntities[pipetteId]?.name
   const trash = Object.values(
@@ -114,14 +113,12 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
     )
   }
 
-  const addressableAreaCommand: CurriedCommandCreator[] = isGantryAtAddressableArea
-    ? []
-    : [
-        curryCommandCreator(moveToAddressableArea, {
-          pipetteId,
-          addressableAreaName,
-        }),
-      ]
+  const addressableAreaCommand: CurriedCommandCreator[] = [
+    curryCommandCreator(moveToAddressableArea, {
+      pipetteId,
+      addressableAreaName,
+    }),
+  ]
 
   let inPlaceCommands: CurriedCommandCreator[] = []
   switch (type) {
