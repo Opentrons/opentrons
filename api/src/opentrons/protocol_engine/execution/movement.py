@@ -179,7 +179,6 @@ class MovementHandler:
 
         # calculate the movement's waypoints
         waypoints = self._state_store.motion.get_movement_waypoints_to_addressable_area(
-            pipette_id=pipette_id,
             addressable_area_name=addressable_area_name,
             offset=offset,
             origin=origin,

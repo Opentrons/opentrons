@@ -26,6 +26,7 @@ from ..types import (
     ModuleOffsetData,
     DeckType,
     CurrentWell,
+    CurrentPipetteLocation,
     TipGeometry,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
@@ -119,12 +120,12 @@ class GeometryView:
         self,
         pipette_id: str,
         labware_id: str,
-        location: Optional[CurrentWell],
+        location: Optional[CurrentPipetteLocation],
         minimum_z_height: Optional[float],
     ) -> float:
         """Get the minimum allowed travel height of an arc move."""
         if (
-            location is not None
+            isinstance(location, CurrentWell)
             and pipette_id == location.pipette_id
             and labware_id == location.labware_id
         ):

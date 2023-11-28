@@ -12,7 +12,14 @@ from opentrons import motion_planning
 
 from . import move_types
 from .. import errors
-from ..types import WellLocation, CurrentWell, MotorAxis, AddressableOffsetVector
+from ..types import (
+    MotorAxis,
+    WellLocation,
+    CurrentWell,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
+    AddressableOffsetVector,
+)
 from .config import Config
 from .labware import LabwareView
 from .pipettes import PipetteView
@@ -53,7 +60,7 @@ class MotionView:
     def get_pipette_location(
         self,
         pipette_id: str,
-        current_well: Optional[CurrentWell] = None,
+        current_well: Optional[CurrentPipetteLocation] = None,
     ) -> PipetteLocationData:
         """Get the critical point of a pipette given the current location."""
         current_well = current_well or self._pipettes.get_current_well()
@@ -65,7 +72,7 @@ class MotionView:
         # if the pipette was last used to move to a labware that requires
         # centering, set the critical point to XY_CENTER
         if (
-            current_well is not None
+            isinstance(current_well, CurrentWell)
             and current_well.pipette_id == pipette_id
             and self._labware.get_has_quirk(
                 current_well.labware_id,
@@ -90,7 +97,7 @@ class MotionView:
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
-        addressable_area_name = self._pipettes.get_current_addressable_area(pipette_id)
+
         center_destination = self._labware.get_has_quirk(
             labware_id,
             "centerMultichannelOnWells",
@@ -115,11 +122,11 @@ class MotionView:
         extra_waypoints = []
         # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
         #  could crash onto the thermocycler if current well or addressable area is not known.
-        if location is not None:
+        if isinstance(location, CurrentWell):
             origin_slot = self._geometry.get_ancestor_slot_name(location.labware_id)
-        elif addressable_area_name is not None:
+        elif isinstance(location, CurrentAddressableArea):
             origin_slot = self._addressable_areas.get_addressable_area_base_slot(
-                addressable_area_name
+                location.addressable_area_name
             )
 
         if origin_slot is not None:
@@ -143,7 +150,6 @@ class MotionView:
 
     def get_movement_waypoints_to_addressable_area(
         self,
-        pipette_id: str,
         addressable_area_name: str,
         offset: AddressableOffsetVector,
         origin: Point,
@@ -154,9 +160,6 @@ class MotionView:
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = self._pipettes.get_current_well()
-        current_addressable_area = self._pipettes.get_current_addressable_area(
-            pipette_id
-        )
 
         base_destination = (
             self._addressable_areas.get_addressable_area_move_to_location(
@@ -186,11 +189,11 @@ class MotionView:
         extra_waypoints = []
         # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
         #  could crash onto the thermocycler if current well or addressable area is not known.
-        if location is not None:
+        if isinstance(location, CurrentWell):
             origin_slot = self._geometry.get_ancestor_slot_name(location.labware_id)
-        elif current_addressable_area is not None:
+        elif isinstance(location, CurrentAddressableArea):
             origin_slot = self._addressable_areas.get_addressable_area_base_slot(
-                current_addressable_area
+                location.addressable_area_name
             )
 
         if origin_slot is not None:
@@ -264,9 +267,16 @@ class MotionView:
         pipette_blocking = True
         current_well = self._pipettes.get_current_well()
         if current_well is not None:
-            pipette_deck_slot = self._geometry.get_ancestor_slot_name(
-                current_well.labware_id
-            ).as_int()
+            if isinstance(current_well, CurrentWell):
+                pipette_deck_slot = self._geometry.get_ancestor_slot_name(
+                    current_well.labware_id
+                ).as_int()
+            else:
+                pipette_deck_slot = (
+                    self._addressable_areas.get_addressable_area_base_slot(
+                        current_well.addressable_area_name
+                    ).as_int()
+                )
             hs_deck_slot = self._modules.get_location(hs_module_id).slotName.as_int()
             conflicting_slots = get_east_west_slots(hs_deck_slot) + [hs_deck_slot]
             pipette_blocking = pipette_deck_slot in conflicting_slots
@@ -279,9 +289,16 @@ class MotionView:
         pipette_blocking = True
         current_well = self._pipettes.get_current_well()
         if current_well is not None:
-            pipette_deck_slot = self._geometry.get_ancestor_slot_name(
-                current_well.labware_id
-            ).as_int()
+            if isinstance(current_well, CurrentWell):
+                pipette_deck_slot = self._geometry.get_ancestor_slot_name(
+                    current_well.labware_id
+                ).as_int()
+            else:
+                pipette_deck_slot = (
+                    self._addressable_areas.get_addressable_area_base_slot(
+                        current_well.addressable_area_name
+                    ).as_int()
+                )
             hs_deck_slot = self._modules.get_location(hs_module_id).slotName.as_int()
             conflicting_slots = get_adjacent_slots(hs_deck_slot) + [hs_deck_slot]
             pipette_blocking = pipette_deck_slot in conflicting_slots

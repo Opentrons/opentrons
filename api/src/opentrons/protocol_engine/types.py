@@ -222,6 +222,17 @@ class CurrentWell:
 
 
 @dataclass(frozen=True)
+class CurrentAddressableArea:
+    """The latest addressable area the robot has accessed."""
+
+    pipette_id: str
+    addressable_area_name: str
+
+
+CurrentPipetteLocation = Union[CurrentWell, CurrentAddressableArea]
+
+
+@dataclass(frozen=True)
 class TipGeometry:
     """Tip geometry data.
 

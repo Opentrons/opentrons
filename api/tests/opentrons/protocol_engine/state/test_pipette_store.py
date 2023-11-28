@@ -26,7 +26,6 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
     PipetteState,
     CurrentDeckPoint,
-    CurrentAddressableArea,
     StaticPipetteConfig,
 )
 from opentrons.protocol_engine.resources.pipette_data_provider import (
@@ -66,9 +65,6 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
         aspirated_volume_by_id={},
         current_well=None,
         current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
-        current_addressable_area=CurrentAddressableArea(
-            mount=None, addressable_area_name=None
-        ),
         attached_tip_by_id={},
         movement_speed_by_id={},
         static_config_by_id={},

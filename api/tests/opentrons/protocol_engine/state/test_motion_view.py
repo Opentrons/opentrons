@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LoadedPipette,
     DeckSlotLocation,
     CurrentWell,
+    CurrentAddressableArea,
     MotorAxis,
     AddressableOffsetVector,
 )
@@ -296,10 +297,9 @@ def test_get_movement_waypoints_to_well_last_location_addressable_area(
     subject: MotionView,
 ) -> None:
     """It should call get_waypoints() with the correct args when the last move was to an addressable area."""
-    decoy.when(pipette_view.get_current_well()).then_return(None)
-    decoy.when(
-        pipette_view.get_current_addressable_area(pipette_id="pipette-id")
-    ).then_return("xyz")
+    location = CurrentAddressableArea(pipette_id="123", addressable_area_name="xyz")
+
+    decoy.when(pipette_view.get_current_well()).then_return(location)
     decoy.when(
         labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
     ).then_return(True)
@@ -310,11 +310,11 @@ def test_get_movement_waypoints_to_well_last_location_addressable_area(
 
     decoy.when(
         move_types.get_move_type_to_well(
-            "pipette-id", "labware-id", "well-name", None, True
+            "pipette-id", "labware-id", "well-name", location, True
         )
     ).then_return(motion_planning.MoveType.GENERAL_ARC)
     decoy.when(
-        geometry_view.get_min_travel_z("pipette-id", "labware-id", None, 123)
+        geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
     ).then_return(42.0)
 
     decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
@@ -429,9 +429,6 @@ def test_get_movement_waypoints_to_addressable_area(
     """It should call get_waypoints() with the correct args to move to an addressable area."""
     decoy.when(pipette_view.get_current_well()).then_return(None)
     decoy.when(
-        pipette_view.get_current_addressable_area(pipette_id="pipette-id")
-    ).then_return(None)
-    decoy.when(
         addressable_area_view.get_addressable_area_move_to_location("area-name")
     ).then_return(Point(x=3, y=3, z=3))
     decoy.when(geometry_view.get_all_labware_highest_z()).then_return(42)
@@ -459,7 +456,6 @@ def test_get_movement_waypoints_to_addressable_area(
     ).then_return(waypoints)
 
     result = subject.get_movement_waypoints_to_addressable_area(
-        pipette_id="pipette-id",
         addressable_area_name="area-name",
         offset=AddressableOffsetVector(x=1, y=2, z=3),
         origin=Point(x=1, y=2, z=3),

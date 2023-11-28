@@ -346,7 +346,6 @@ async def test_move_to_addressable_area(
 
     decoy.when(
         state_store.motion.get_movement_waypoints_to_addressable_area(
-            pipette_id="pipette-id",
             addressable_area_name="area-name",
             offset=AddressableOffsetVector(x=9, y=8, z=7),
             origin=Point(1, 1, 1),
