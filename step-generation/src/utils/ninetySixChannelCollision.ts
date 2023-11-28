@@ -55,7 +55,7 @@ export const getIsTallLabwareWestOf96Channel = (
           labwareEntities[sourceLabwareId].def.dimensions.zDimension
         //  TODO(jr, 11/6/23): update height differences when we know
         return (
-          westLabwareHeight > sourceLabwareHeight + tipLength - SAFETY_MARGIN
+          westLabwareHeight < sourceLabwareHeight + tipLength - SAFETY_MARGIN
         )
       }
     }
