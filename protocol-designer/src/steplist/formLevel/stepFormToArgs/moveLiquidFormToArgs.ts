@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { getWellsDepth } from '@opentrons/shared-data'
+import { getWellsDepth, LabwareDefinition2 } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -80,7 +80,7 @@ export const moveLiquidFormToArgs = (
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
-    sourceLabware.def.ordering,
+    sourceLabware.def,
     fields.aspirate_wellOrder_first,
     fields.aspirate_wellOrder_second
   )
@@ -88,22 +88,22 @@ export const moveLiquidFormToArgs = (
   const dispenseInWasteChute =
     'name' in destLabware && destLabware.name === 'wasteChute'
 
-  let ordering: string[][] = []
+  let def: LabwareDefinition2 | null = null
   let dispWells: string[] = []
 
   if ('def' in destLabware) {
-    ordering = destLabware.def.ordering
+    def = destLabware.def
     dispWells = destWellsUnordered
   }
-
-  let destWells = dispenseInWasteChute
-    ? null
-    : getOrderedWells(
-        dispWells,
-        ordering,
-        fields.dispense_wellOrder_first,
-        fields.dispense_wellOrder_second
-      )
+  let destWells =
+    !dispenseInWasteChute && def != null
+      ? getOrderedWells(
+          dispWells,
+          def,
+          fields.dispense_wellOrder_first,
+          fields.dispense_wellOrder_second
+        )
+      : null
 
   // 1:many with single path: spread well array of length 1 to match other well array
   // distribute 1:many can not happen into the waste chute

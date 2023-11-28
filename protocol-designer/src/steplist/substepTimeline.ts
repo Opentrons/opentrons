@@ -12,8 +12,13 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-import type { CreateCommand } from '@opentrons/shared-data'
+import {
+  AddressableAreaName,
+  CreateCommand,
+  FLEX_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
+import { getCutoutIdByAddressableArea } from '../utils'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
@@ -50,7 +55,8 @@ const _createNextTimelineFrame = (args: {
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
   }
   const newTimelineFrame =
-    args.command.commandType === 'aspirate'
+    args.command.commandType === 'aspirate' ||
+    args.command.commandType === 'aspirateInPlace'
       ? { ..._newTimelineFrameKeys, source: args.wellInfo }
       : { ..._newTimelineFrameKeys, dest: args.wellInfo }
   return newTimelineFrame
@@ -84,32 +90,12 @@ export const substepTimelineSingleChannel = (
       ) {
         const { wellName, volume, labwareId } = command.params
 
-        let preIngreds = {}
-        if (acc.prevRobotState.liquidState.labware[labwareId] != null) {
-          preIngreds =
-            acc.prevRobotState.liquidState.labware[labwareId][wellName]
-        } else if (
-          acc.prevRobotState.liquidState.additionalEquipment[labwareId] != null
-        ) {
-          preIngreds =
-            acc.prevRobotState.liquidState.additionalEquipment[labwareId]
-        }
-
-        let postIngreds = {}
-        if (nextRobotState.liquidState.labware[labwareId] != null) {
-          postIngreds = nextRobotState.liquidState.labware[labwareId][wellName]
-        } else if (
-          nextRobotState.liquidState.additionalEquipment[labwareId] != null
-        ) {
-          postIngreds =
-            nextRobotState.liquidState.additionalEquipment[labwareId]
-        }
-
         const wellInfo = {
           labwareId,
-          wells: [wellName] ?? [],
-          preIngreds: preIngreds,
-          postIngreds: postIngreds,
+          wells: [wellName],
+          preIngreds:
+            acc.prevRobotState.liquidState.labware[labwareId][wellName],
+          postIngreds: nextRobotState.liquidState.labware[labwareId][wellName],
         }
         return {
           ...acc,
@@ -126,7 +112,78 @@ export const substepTimelineSingleChannel = (
           ],
           prevRobotState: nextRobotState,
         }
-      } else {
+      } else if (
+        command.commandType === 'dispenseInPlace' ||
+        command.commandType === 'aspirateInPlace'
+      ) {
+        const { volume } = command.params
+        const prevCommand =
+          'commands' in nextFrame ? nextFrame.commands[index - 1] : null
+
+        const moveToAddressableAreaCommand =
+          prevCommand?.commandType === 'moveToAddressableArea'
+            ? prevCommand
+            : null
+        if (moveToAddressableAreaCommand == null) {
+          console.error(
+            `expected to find moveToAddressableArea command assosciated with the ${command.commandType} but could not`
+          )
+        }
+        const cutoutFixture =
+          moveToAddressableAreaCommand?.params.addressableAreaName ===
+            '1and8ChannelWasteChute' ||
+          moveToAddressableAreaCommand?.params.addressableAreaName ===
+            '96ChannelWasteChute'
+            ? 'wasteChuteRightAdapterNoCover'
+            : 'trashBinAdapter'
+
+        const cutoutId = getCutoutIdByAddressableArea(
+          moveToAddressableAreaCommand?.params
+            .addressableAreaName as AddressableAreaName,
+          cutoutFixture,
+          FLEX_ROBOT_TYPE
+        )
+        const additionalEquipmentId = Object.entries(
+          invariantContext.additionalEquipmentEntities
+        ).find(([id, aE]) => aE.location === cutoutId)?.[0]
+
+        if (additionalEquipmentId == null) {
+          console.error(
+            `expected to find an additional equipment id from cutoutId ${cutoutId} but ocould not`
+          )
+        }
+
+        const wellInfo = {
+          additionalEquipmentId,
+          wells: [],
+          preIngreds:
+            acc.prevRobotState.liquidState.additionalEquipment[
+              additionalEquipmentId ?? ''
+            ],
+          postIngreds:
+            nextRobotState.liquidState.additionalEquipment[
+              additionalEquipmentId ?? ''
+            ],
+        }
+
+        return {
+          ...acc,
+          timeline: [
+            ...acc.timeline,
+            _createNextTimelineFrame({
+              volume,
+              index,
+              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
+              nextFrame,
+              command,
+              wellInfo,
+            }),
+          ],
+          prevRobotState: nextRobotState,
+        }
+      }
+
+      {
         return { ...acc, prevRobotState: nextRobotState }
       }
     },
@@ -172,36 +229,88 @@ export const substepTimelineMultiChannel = (
           labwareDef &&
           getWellsForTips(channels, labwareDef, wellName).wellsForTips
 
-        let preIngreds = {}
-        let wells: string[] | null = null
-
-        if (acc.prevRobotState.liquidState.labware[labwareId] != null) {
-          preIngreds =
-            acc.prevRobotState.liquidState.labware[labwareId][wellName]
-          wells = wellsForTips
-        } else if (
-          acc.prevRobotState.liquidState.additionalEquipment[labwareId] != null
-        ) {
-          preIngreds =
-            acc.prevRobotState.liquidState.additionalEquipment[labwareId]
+        const wellInfo = {
+          labwareId,
+          wells: wellsForTips || [],
+          preIngreds: wellsForTips
+            ? pick(
+                acc.prevRobotState.liquidState.labware[labwareId],
+                wellsForTips
+              )
+            : {},
+          postIngreds: wellsForTips
+            ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
+            : {},
         }
+        return {
+          ...acc,
+          timeline: [
+            ...acc.timeline,
+            _createNextTimelineFrame({
+              volume,
+              index,
+              // @ts-expect-error(sa, 2021-6-14): after type narrowing (see comment above) this expect error should not be necessary
+              nextFrame,
+              command,
+              wellInfo,
+            }),
+          ],
+          prevRobotState: nextRobotState,
+        }
+      } else if (
+        command.commandType === 'dispenseInPlace' ||
+        command.commandType === 'aspirateInPlace'
+      ) {
+        const { volume } = command.params
+        const prevCommand =
+          'commands' in nextFrame ? nextFrame.commands[index - 1] : null
 
-        let postIngreds = {}
-        if (nextRobotState.liquidState.labware[labwareId] != null) {
-          postIngreds = nextRobotState.liquidState.labware[labwareId][wellName]
-        } else if (
-          nextRobotState.liquidState.additionalEquipment[labwareId] != null
-        ) {
-          postIngreds =
-            nextRobotState.liquidState.additionalEquipment[labwareId]
+        const moveToAddressableAreaCommand =
+          prevCommand?.commandType === 'moveToAddressableArea'
+            ? prevCommand
+            : null
+        if (moveToAddressableAreaCommand == null) {
+          console.error(
+            `expected to find moveToAddressableArea command assosciated with the ${command.commandType} but could not`
+          )
+        }
+        const cutoutFixture =
+          moveToAddressableAreaCommand?.params.addressableAreaName ===
+            '1and8ChannelWasteChute' ||
+          moveToAddressableAreaCommand?.params.addressableAreaName ===
+            '96ChannelWasteChute'
+            ? 'wasteChuteRightAdapterNoCover'
+            : 'trashBinAdapter'
+
+        const cutoutId = getCutoutIdByAddressableArea(
+          moveToAddressableAreaCommand?.params
+            .addressableAreaName as AddressableAreaName,
+          cutoutFixture,
+          FLEX_ROBOT_TYPE
+        )
+        const additionalEquipmentId = Object.entries(
+          invariantContext.additionalEquipmentEntities
+        ).find(([id, aE]) => aE.location === cutoutId)?.[0]
+
+        if (additionalEquipmentId == null) {
+          console.error(
+            `expected to find an additional equipment id from cutoutId ${cutoutId} but ocould not`
+          )
         }
 
         const wellInfo = {
-          labwareId,
-          wells: wells ?? [],
-          preIngreds: wells ? pick(preIngreds, wells) : {},
-          postIngreds: wells ? pick(postIngreds, wells) : {},
+          additionalEquipmentId,
+          wells: [],
+          preIngreds:
+            acc.prevRobotState.liquidState.additionalEquipment[
+              additionalEquipmentId ?? ''
+            ],
+          postIngreds:
+            nextRobotState.liquidState.additionalEquipment[
+              additionalEquipmentId ?? ''
+            ],
         }
+
         return {
           ...acc,
           timeline: [

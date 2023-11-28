@@ -43,17 +43,7 @@ export const blowout: CommandCreator<BlowoutParams> = (
     )
   }
 
-  let labwareExists: boolean = false
-  if (labware != null && prevRobotState.labware[labware]) {
-    labwareExists = true
-  } else if (
-    labware != null &&
-    invariantContext.additionalEquipmentEntities[labware]
-  ) {
-    labwareExists = true
-  }
-
-  if (!labwareExists) {
+  if (!labware || !prevRobotState.labware[labware]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
@@ -74,7 +64,6 @@ export const blowout: CommandCreator<BlowoutParams> = (
     }
   }
 
-  //  TODO(jr, 10/26/23): wire up params for waste chute
   const commands: CreateCommand[] = [
     {
       commandType: 'blowout',

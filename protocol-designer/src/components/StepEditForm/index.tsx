@@ -4,12 +4,12 @@ import { connect } from 'react-redux'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { maskField } from '../../steplist/fieldLevel'
 import {
-  getInvariantContext,
   getHydratedForm,
-} from '../../step-forms/selectors'
+  selectors as stepFormSelectors,
+} from '../../step-forms'
+import { maskField } from '../../steplist/fieldLevel'
+import { getInvariantContext } from '../../step-forms/selectors'
 import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { AutoAddPauseUntilHeaterShakerTempStepModal } from '../modals/AutoAddPauseUntilHeaterShakerTempStepModal'
 import {

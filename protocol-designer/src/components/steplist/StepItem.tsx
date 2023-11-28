@@ -41,6 +41,7 @@ import {
   WellIngredientNames,
 } from '../../steplist/types'
 import { MoveLabwareHeader } from './MoveLabwareHeader'
+import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 
 export interface StepItemProps {
   description?: string | null
@@ -125,6 +126,7 @@ export interface StepItemContentsProps {
 
   ingredNames: WellIngredientNames
   labwareNicknamesById: { [labwareId: string]: string }
+  additionalEquipmentEntities: AdditionalEquipmentEntities
 
   highlightSubstep: (substepIdentifier: SubstepIdentifier) => unknown
   hoveredSubstep: SubstepIdentifier | null | undefined
@@ -297,6 +299,7 @@ export const StepItemContents = (
     labwareNicknamesById,
     highlightSubstep,
     hoveredSubstep,
+    additionalEquipmentEntities,
   } = props
 
   if (!rawForm) {
@@ -487,16 +490,21 @@ export const StepItemContents = (
   // headers
   if (stepType === 'moveLiquid') {
     const sourceLabwareId = rawForm.aspirate_labware
-    const destLabwareId = rawForm.dispense_labware
+    const destLabware = rawForm.dispense_labware
+
+    let nickname: string = labwareNicknamesById[destLabware]
+
+    if (additionalEquipmentEntities[destLabware].name === 'wasteChute') {
+      nickname = 'Waste chute'
+    } else if (additionalEquipmentEntities[destLabware].name === 'trashBin') {
+      nickname = 'Trash bin'
+    }
 
     result.push(
       <AspirateDispenseHeader
         key="moveLiquid-header"
         sourceLabwareNickname={labwareNicknamesById[sourceLabwareId]}
-        //  assuming that if labware isn't listed in the nicknames, it is a waste chute
-        destLabwareNickname={
-          labwareNicknamesById[destLabwareId] ?? 'Waste chute'
-        }
+        destLabwareNickname={nickname}
       />
     )
   }

@@ -1,5 +1,4 @@
 import {
-  aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
   dropTipInPlace,
@@ -15,11 +14,7 @@ import type {
   CurriedCommandCreator,
 } from '../types'
 
-export type WasteChuteCommandsTypes =
-  | 'dispense'
-  | 'blowOut'
-  | 'dropTip'
-  | 'airGap'
+export type WasteChuteCommandsTypes = 'dispense' | 'blowOut' | 'dropTip'
 
 interface WasteChuteCommandArgs {
   type: WasteChuteCommandsTypes
@@ -28,7 +23,7 @@ interface WasteChuteCommandArgs {
   volume?: number
   flowRate?: number
 }
-/** Helper fn for waste chute dispense, drop tip, air_gap and blow_out commands */
+/** Helper fn for waste chute dispense, drop tip and blow_out commands */
 export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
   args,
   invariantContext,
@@ -46,8 +41,6 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     actionName = 'blow out'
   } else if (type === 'dropTip') {
     actionName = 'drop tip'
-  } else if (type === 'airGap') {
-    actionName = 'air gap'
   }
 
   if (pipetteName == null) {
@@ -69,18 +62,17 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
   let commands: CurriedCommandCreator[] = []
   switch (type) {
     case 'dropTip': {
-      commands =
-        type === 'dropTip' && !prevRobotState.tipState.pipettes[pipetteId]
-          ? []
-          : [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
-              curryCommandCreator(dropTipInPlace, {
-                pipetteId,
-              }),
-            ]
+      commands = !prevRobotState.tipState.pipettes[pipetteId]
+        ? []
+        : [
+            curryCommandCreator(moveToAddressableArea, {
+              pipetteId,
+              addressableAreaName,
+            }),
+            curryCommandCreator(dropTipInPlace, {
+              pipetteId,
+            }),
+          ]
 
       break
     }
@@ -111,23 +103,6 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
               }),
               curryCommandCreator(blowOutInPlace, {
                 pipetteId,
-                flowRate,
-              }),
-            ]
-          : []
-      break
-    }
-    case 'airGap': {
-      commands =
-        flowRate != null && volume != null
-          ? [
-              curryCommandCreator(moveToAddressableArea, {
-                pipetteId,
-                addressableAreaName,
-              }),
-              curryCommandCreator(aspirateInPlace, {
-                pipetteId,
-                volume,
                 flowRate,
               }),
             ]

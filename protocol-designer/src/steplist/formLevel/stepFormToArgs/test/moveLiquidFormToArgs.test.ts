@@ -109,19 +109,19 @@ describe('move liquid step form -> command creator args', () => {
     expect(mockGetOrderedWells).toHaveBeenCalledTimes(2)
     expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
-      sourceLabwareDef.ordering,
+      sourceLabwareDef,
       'l2r',
       't2b'
     )
     expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [DISPENSE_WELL],
-      destLabwareDef.ordering,
+      destLabwareDef,
       'r2l',
       'b2t'
     )
   })
 
-  it('moveLiquidFormToArgs calls getOrderedWells correctly for dispensing into a waste chute', () => {
+  it('moveLiquidFormToArgs calls getOrderedWells only for aspirate when dispensing is into a waste chute', () => {
     moveLiquidFormToArgs({
       ...hydratedForm,
       fields: {
@@ -137,7 +137,7 @@ describe('move liquid step form -> command creator args', () => {
     expect(mockGetOrderedWells).toHaveBeenCalledTimes(1)
     expect(mockGetOrderedWells).toHaveBeenCalledWith(
       [ASPIRATE_WELL],
-      sourceLabwareDef.ordering,
+      sourceLabwareDef,
       'l2r',
       't2b'
     )

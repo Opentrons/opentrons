@@ -31,10 +31,10 @@ import {
   getProfileFormErrors,
 } from '../../steplist/formLevel/profileErrors'
 import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
-import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
-import { denormalizePipetteEntities } from '../utils'
+import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 import {
   selectors as labwareDefSelectors,
   LabwareDefByDefURI,
@@ -51,7 +51,6 @@ import type {
   LabwareEntity,
   LabwareEntities,
   ModuleEntities,
-  ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { FormWarning } from '../../steplist/formLevel'
@@ -511,38 +510,6 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
   BaseState,
   boolean
 > = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
-
-const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
-  return state.moduleEntities[id]
-}
-
-// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
-export function getHydratedForm(
-  rawForm: FormData,
-  invariantContext: InvariantContext
-): FormData {
-  const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(invariantContext, name, value)
-  )
-  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
-  // It's confusing that pipette is an ID string before this,
-  // but a PipetteEntity object after this.
-  // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'meta' key,
-  // following what we're doing with 'module'.
-  // See #3161
-  hydratedForm.meta = {}
-
-  if (rawForm?.moduleId != null) {
-    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
-    hydratedForm.meta.module = getModuleEntity(
-      invariantContext,
-      rawForm.moduleId
-    )
-  }
-  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
-  return hydratedForm
-}
 
 // TODO type with hydrated form type
 const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {

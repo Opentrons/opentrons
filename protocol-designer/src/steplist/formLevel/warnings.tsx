@@ -92,7 +92,7 @@ export const maxDispenseWellVolume = (
   const hasExceeded = dispense_wells.some((well: string) => {
     const maximum =
       'name' in dispense_labware && dispense_labware.name === 'wasteChute'
-        ? 10000000 // some randomly selected high number since waste chute is huge
+        ? Infinity // some randomly selected high number since waste chute is huge
         : getWellTotalVolume(dispense_labware.def, well)
     return maximum && volume > maximum
   })

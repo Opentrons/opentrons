@@ -80,7 +80,7 @@ const WELL_RATIO_MOVE_LIQUID: FormError = {
   dependentFields: ['aspirate_wells', 'dispense_wells'],
 }
 const WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE: FormError = {
-  title: 'Well selection must be 1 to many, many to 1, or N to N',
+  title: 'Well selection must be many to 1, or 1 to 1',
   dependentFields: ['aspirate_wells'],
 }
 const MAGNET_ACTION_TYPE_REQUIRED: FormError = {
@@ -216,15 +216,15 @@ export const wellRatioMoveLiquid = (
     dispenseLabware != null ? dispenseLabware === 'wasteChute' : false
   if (!aspirate_wells || (!isDispensingIntoWasteChute && !dispense_wells))
     return null
-  let dispenseWells = dispense_wells
-  if (isDispensingIntoWasteChute) {
-    dispenseWells = null
-  }
   const wellRatioFormError = isDispensingIntoWasteChute
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
 
-  return getWellRatio(aspirate_wells, dispenseWells, isDispensingIntoWasteChute)
+  return getWellRatio(
+    aspirate_wells,
+    dispense_wells,
+    isDispensingIntoWasteChute
+  )
     ? null
     : wellRatioFormError
 }
