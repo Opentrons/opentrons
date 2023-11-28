@@ -536,7 +536,7 @@ export const DeckSetup = (): JSX.Element => {
   ).filter(
     aE =>
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
-      aE.location === 'stagingArea'
+      aE.name === 'stagingArea'
   )
 
   const hasWasteChute = wasteChuteFixtures.length > 0
