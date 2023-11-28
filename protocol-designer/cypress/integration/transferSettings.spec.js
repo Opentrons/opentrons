@@ -50,7 +50,7 @@ describe('Advanced Settings for Transfer Form', () => {
   })
 
   it.skip('Verify functionality of advanced settings with different pipette and labware', () => {
-    enterBatchEdit()
+    // enterBatchEdit()
 
     // Different Pipette disbales aspirate and dispense Flowrate and Mix settings
     // step 6 has different pipette than step 1
