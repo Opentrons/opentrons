@@ -174,14 +174,6 @@
               "ableToDropLabware": {
                 "description": "Whether labware is allowed to be dropped (different then being placed) into this area.",
                 "type": "boolean"
-              },
-              "dropTipsOffset": {
-                "description": "Relative positional offset of where the pipette should drop tips from.",
-                "$ref": "#/definitions/xyzArray"
-              },
-              "dropLabwareOffset": {
-                "description": "Relative positional offset of where the gripper should drop labware from.",
-                "$ref": "#/definitions/xyzArray"
               }
             }
           }
