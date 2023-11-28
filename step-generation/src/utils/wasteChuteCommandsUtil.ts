@@ -1,4 +1,5 @@
 import {
+  aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
   dropTipInPlace,
@@ -14,7 +15,11 @@ import type {
   CurriedCommandCreator,
 } from '../types'
 
-export type WasteChuteCommandsTypes = 'dispense' | 'blowOut' | 'dropTip'
+export type WasteChuteCommandsTypes =
+  | 'dispense'
+  | 'blowOut'
+  | 'dropTip'
+  | 'airGap'
 
 interface WasteChuteCommandArgs {
   type: WasteChuteCommandsTypes
@@ -41,6 +46,8 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     actionName = 'blow out'
   } else if (type === 'dropTip') {
     actionName = 'drop tip'
+  } else if (type === 'airGap') {
+    actionName = 'air gap'
   }
 
   if (pipetteName == null) {
@@ -104,6 +111,23 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
               curryCommandCreator(blowOutInPlace, {
                 pipetteId,
                 flowRate,
+              }),
+            ]
+          : []
+      break
+    }
+    case 'airGap': {
+      commands =
+        flowRate != null && volume != null
+          ? [
+              curryCommandCreator(moveToAddressableArea, {
+                pipetteId,
+                addressableAreaName,
+              }),
+              curryCommandCreator(aspirateInPlace, {
+                pipetteId,
+                flowRate,
+                volume,
               }),
             ]
           : []
