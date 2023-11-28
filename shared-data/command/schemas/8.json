@@ -1914,7 +1914,7 @@
     },
     "MoveToAddressableAreaParams": {
       "title": "MoveToAddressableAreaParams",
-      "description": "Payload required to move a pipette to a specific addressable area.",
+      "description": "Payload required to move a pipette to a specific addressable area.\n\nAn *addressable area* is a space in the robot that may or may not be usable depending on how\nthe robot's deck is configured. For example, if a Flex is configured with a waste chute, it will\nhave additional addressable areas representing the opening of the waste chute, where tips and\nlabware can be dropped.\n\nThis moves the pipette so all of its nozzles are centered over the addressable area.\nIf the pipette is currently configured with a partial tip layout, this centering is over all\nthe pipette's physical nozzles, not just the nozzles that are active.\n\nThe z-position will be chosen to put the bottom of the tips---or the bottom of the nozzles,\nif there are no tips---level with the top of the addressable area.\n\nWhen this command is executed, Protocol Engine will make sure the robot's deck is configured\nsuch that the requested addressable area actually exists. For example, if you request\nthe addressable area B4, it will make sure the robot is set up with a B3/B4 staging area slot.\nIf that's not the case, the command will fail.",
       "type": "object",
       "properties": {
         "minimumZHeight": {
