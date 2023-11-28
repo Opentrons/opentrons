@@ -1896,8 +1896,8 @@ class SmoothieDriver:
             "stdout": asyncio.subprocess.PIPE,
             "stderr": asyncio.subprocess.PIPE,
         }
-        if loop:
-            kwargs["loop"] = loop
+        #if loop:
+        #    kwargs["loop"] = loop
         log.info(update_cmd)
         before = time()
         proc = await asyncio.create_subprocess_shell(update_cmd, **kwargs)
