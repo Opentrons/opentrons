@@ -19,6 +19,8 @@ from ..types import (
     FlowRates,
     DeckPoint,
     CurrentWell,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
     TipGeometry,
 )
 from ..commands import (
@@ -31,6 +33,7 @@ from ..commands import (
     MoveToCoordinatesResult,
     MoveToWellResult,
     MoveRelativeResult,
+    MoveToAddressableAreaResult,
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
@@ -95,7 +98,7 @@ class PipetteState:
 
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, Optional[float]]
-    current_well: Optional[CurrentWell]
+    current_location: Optional[CurrentPipetteLocation]
     current_deck_point: CurrentDeckPoint
     attached_tip_by_id: Dict[str, Optional[TipGeometry]]
     movement_speed_by_id: Dict[str, Optional[float]]
@@ -115,7 +118,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipettes_by_id={},
             aspirated_volume_by_id={},
             attached_tip_by_id={},
-            current_well=None,
+            current_location=None,
             current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
             movement_speed_by_id={},
             static_config_by_id={},
@@ -133,7 +136,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _handle_command(  # noqa: C901
         self, command: Command, private_result: CommandPrivateResult
     ) -> None:
-        self._update_current_well(command)
+        self._update_current_location(command)
         self._update_deck_point(command)
 
         if isinstance(private_result, PipetteConfigUpdateResultMixin):
@@ -240,9 +243,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = 0
 
-    def _update_current_well(self, command: Command) -> None:
-        # These commands leave the pipette in a new well.
-        # Update current_well to reflect that.
+    def _update_current_location(self, command: Command) -> None:
+        # These commands leave the pipette in a new location.
+        # Update current_location to reflect that.
         if isinstance(
             command.result,
             (
@@ -255,17 +258,23 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 TouchTipResult,
             ),
         ):
-            self._state.current_well = CurrentWell(
+            self._state.current_location = CurrentWell(
                 pipette_id=command.params.pipetteId,
                 labware_id=command.params.labwareId,
                 well_name=command.params.wellName,
             )
 
+        elif isinstance(command.result, MoveToAddressableAreaResult):
+            self._state.current_location = CurrentAddressableArea(
+                pipette_id=command.params.pipetteId,
+                addressable_area_name=command.params.addressableAreaName,
+            )
+
         # These commands leave the pipette in a place that we can't logically associate
-        # with a well. Clear current_well to reflect the fact that it's now unknown.
+        # with a well. Clear current_location to reflect the fact that it's now unknown.
         #
-        # TODO(mc, 2021-11-12): Wipe out current_well on movement failures, too.
-        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current well
+        # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
+        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current location
         elif isinstance(
             command.result,
             (
@@ -276,7 +285,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 thermocycler.CloseLidResult,
             ),
         ):
-            self._state.current_well = None
+            self._state.current_location = None
 
         # Heater-Shaker commands may have left the pipette in a place that we can't
         # associate with a logical location, depending on their result.
@@ -288,10 +297,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ),
         ):
             if command.result.pipetteRetracted:
-                self._state.current_well = None
+                self._state.current_location = None
 
         # A moveLabware command may have moved the labware that contains the current
-        # well out from under the pipette. Clear the current well to reflect the
+        # well out from under the pipette. Clear the current location to reflect the
         # fact that the pipette is no longer over any labware.
         #
         # This is necessary for safe motion planning in case the next movement
@@ -300,12 +309,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             moved_labware_id = command.params.labwareId
             if command.params.strategy == "usingGripper":
                 # All mounts will have been retracted.
-                self._state.current_well = None
+                self._state.current_location = None
             elif (
-                self._state.current_well is not None
-                and self._state.current_well.labware_id == moved_labware_id
+                isinstance(self._state.current_location, CurrentWell)
+                and self._state.current_location.labware_id == moved_labware_id
             ):
-                self._state.current_well = None
+                self._state.current_location = None
 
     def _update_deck_point(self, command: Command) -> None:
         if isinstance(
@@ -314,6 +323,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 MoveToWellResult,
                 MoveToCoordinatesResult,
                 MoveRelativeResult,
+                MoveToAddressableAreaResult,
                 PickUpTipResult,
                 DropTipResult,
                 AspirateResult,
@@ -427,9 +437,9 @@ class PipetteView(HasState[PipetteState]):
 
         return HardwarePipette(mount=hw_mount, config=hw_config)
 
-    def get_current_well(self) -> Optional[CurrentWell]:
-        """Get the last accessed well and which pipette accessed it."""
-        return self._state.current_well
+    def get_current_location(self) -> Optional[CurrentPipetteLocation]:
+        """Get the last accessed location and which pipette accessed it."""
+        return self._state.current_location
 
     def get_deck_point(self, pipette_id: str) -> Optional[DeckPoint]:
         """Get the deck point of a pipette by ID, or None if it was not associated with the last move operation."""

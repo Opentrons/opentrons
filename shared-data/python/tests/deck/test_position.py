@@ -100,13 +100,6 @@ def test_v3_and_v4_positional_equivalence(definition_name: str) -> None:
     v3_slot_positions = get_v3_slot_positions(deck_v3)
     v4_slot_positions = get_v4_slot_positions(deck_v4)
 
-    # Exclude v4 staging area slots from this comparison, because they won't be present in v3 deck schemas.
-    v4_slot_positions = set(
-        (slot_id, slot_position)
-        for slot_id, slot_position in v4_slot_positions
-        if slot_id not in {"A4", "B4", "C4", "D4"}
-    )
-
     # For the purposes of this comparison, the v4 addressable areas named "fixedTrash" and
     # "shortFixedTrash" should be compared to slot 12 in v3.
     v4_slot_positions = set(

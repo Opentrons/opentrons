@@ -33,6 +33,8 @@ from opentrons.protocol_engine.types import (
     OverlapOffset,
     DeckType,
     CurrentWell,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
     LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state import move_types
@@ -1326,8 +1328,11 @@ def test_get_labware_grip_point_for_labware_on_module(
     argnames=["location", "should_dodge", "expected_waypoints"],
     argvalues=[
         (None, True, []),
+        (None, False, []),
         (CurrentWell("pipette-id", "from-labware-id", "well-name"), False, []),
         (CurrentWell("pipette-id", "from-labware-id", "well-name"), True, [(11, 22)]),
+        (CurrentAddressableArea("pipette-id", "area-name"), False, []),
+        (CurrentAddressableArea("pipette-id", "area-name"), True, [(11, 22)]),
     ],
 )
 def test_get_extra_waypoints(
@@ -1335,7 +1340,7 @@ def test_get_extra_waypoints(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    location: Optional[CurrentWell],
+    location: Optional[CurrentPipetteLocation],
     should_dodge: bool,
     expected_waypoints: List[Tuple[float, float]],
     subject: GeometryView,
@@ -1349,14 +1354,10 @@ def test_get_extra_waypoints(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         )
     )
-    decoy.when(labware_view.get("to-labware-id")).then_return(
-        LoadedLabware(
-            id="labware2",
-            loadName="load-name2",
-            definitionUri="4567",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        )
-    )
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("area-name")
+    ).then_return(DeckSlotName.SLOT_1)
 
     decoy.when(
         module_view.should_dodge_thermocycler(
@@ -1370,7 +1371,7 @@ def test_get_extra_waypoints(
         )
     ).then_return(Point(x=11, y=22, z=33))
 
-    extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
+    extra_waypoints = subject.get_extra_waypoints(location, DeckSlotName.SLOT_2)
 
     assert extra_waypoints == expected_waypoints
 

@@ -18,8 +18,8 @@ from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaState,
 )
 from opentrons.protocol_engine.types import (
-    DeckConfigurationType,
     DeckType,
+    DeckConfigurationType,
     ModuleModel,
     LabwareMovementStrategy,
     DeckSlotLocation,
