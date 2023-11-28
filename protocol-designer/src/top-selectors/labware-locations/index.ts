@@ -98,7 +98,7 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
 )
 
 //  TODO(jr, 9/20/23): we should test this util since it does a lot.
-export const getUnocuppiedLabwareLocationOptions: Selector<
+export const getUnoccupiedLabwareLocationOptions: Selector<
   Option[] | null
 > = createSelector(
   getRobotStateAtActiveItem,
