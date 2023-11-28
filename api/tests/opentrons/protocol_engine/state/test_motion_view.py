@@ -84,7 +84,7 @@ def test_get_pipette_location_with_no_current_location(
     subject: MotionView,
 ) -> None:
     """It should return mount and critical_point=None if no location."""
-    decoy.when(pipette_view.get_current_well()).then_return(None)
+    decoy.when(pipette_view.get_current_location()).then_return(None)
 
     decoy.when(pipette_view.get("pipette-id")).then_return(
         LoadedPipette(
@@ -106,7 +106,7 @@ def test_get_pipette_location_with_current_location_with_quirks(
     subject: MotionView,
 ) -> None:
     """It should return cp=XY_CENTER if location labware has center quirk."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(pipette_id="pipette-id", labware_id="reservoir-id", well_name="A1")
     )
 
@@ -140,7 +140,7 @@ def test_get_pipette_location_with_current_location_different_pipette(
     subject: MotionView,
 ) -> None:
     """It should return mount and cp=None if location used other pipette."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(
             pipette_id="other-pipette-id",
             labware_id="reservoir-id",
@@ -201,7 +201,7 @@ def test_get_pipette_location_override_current_location(
 
     result = subject.get_pipette_location(
         pipette_id="pipette-id",
-        current_well=current_well,
+        current_location=current_well,
     )
 
     assert result == PipetteLocationData(
@@ -221,7 +221,7 @@ def test_get_movement_waypoints_to_well(
     """It should call get_waypoints() with the correct args to move to a well."""
     location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
 
-    decoy.when(pipette_view.get_current_well()).then_return(location)
+    decoy.when(pipette_view.get_current_location()).then_return(location)
     decoy.when(
         labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
     ).then_return(True)
@@ -299,7 +299,7 @@ def test_get_movement_waypoints_to_well_last_location_addressable_area(
     """It should call get_waypoints() with the correct args when the last move was to an addressable area."""
     location = CurrentAddressableArea(pipette_id="123", addressable_area_name="xyz")
 
-    decoy.when(pipette_view.get_current_well()).then_return(location)
+    decoy.when(pipette_view.get_current_location()).then_return(location)
     decoy.when(
         labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
     ).then_return(True)
@@ -379,7 +379,7 @@ def test_get_movement_waypoints_to_well_raises(
             well_location=None,
         )
     ).then_return(Point(x=4, y=5, z=6))
-    decoy.when(pipette_view.get_current_well()).then_return(None)
+    decoy.when(pipette_view.get_current_location()).then_return(None)
     decoy.when(
         geometry_view.get_min_travel_z("pipette-id", "labware-id", None, None)
     ).then_return(456)
@@ -427,7 +427,7 @@ def test_get_movement_waypoints_to_addressable_area(
     subject: MotionView,
 ) -> None:
     """It should call get_waypoints() with the correct args to move to an addressable area."""
-    decoy.when(pipette_view.get_current_well()).then_return(None)
+    decoy.when(pipette_view.get_current_location()).then_return(None)
     decoy.when(
         addressable_area_view.get_addressable_area_move_to_location("area-name")
     ).then_return(Point(x=3, y=3, z=3))
@@ -597,7 +597,7 @@ def test_check_pipette_blocking_hs_latch(
     expected_result: bool,
 ) -> None:
     """It should return True if pipette is blocking opening the latch."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1")
     )
 
@@ -637,7 +637,7 @@ def test_check_pipette_blocking_hs_shake(
     expected_result: bool,
 ) -> None:
     """It should return True if pipette is blocking the h/s from shaking."""
-    decoy.when(pipette_view.get_current_well()).then_return(
+    decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1")
     )
 

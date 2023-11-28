@@ -103,7 +103,7 @@ class MovementHandler:
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
-            current_well=current_well,
+            current_location=current_well,
         )
         origin_cp = pipette_location.critical_point
 
@@ -170,7 +170,7 @@ class MovementHandler:
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(
             pipette_id=pipette_id,
-            current_well=None,
+            current_location=None,
         )
         origin_cp = pipette_location.critical_point
 

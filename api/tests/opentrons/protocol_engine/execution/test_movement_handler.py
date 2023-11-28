@@ -112,7 +112,7 @@ async def test_move_to_well(
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
-            current_well=None,
+            current_location=None,
         )
     ).then_return(
         PipetteLocationData(
@@ -226,7 +226,7 @@ async def test_move_to_well_from_starting_location(
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
-            current_well=current_well,
+            current_location=current_well,
         )
     ).then_return(
         PipetteLocationData(
@@ -319,7 +319,7 @@ async def test_move_to_addressable_area(
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
-            current_well=None,
+            current_location=None,
         )
     ).then_return(
         PipetteLocationData(

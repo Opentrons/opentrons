@@ -60,10 +60,10 @@ class MotionView:
     def get_pipette_location(
         self,
         pipette_id: str,
-        current_well: Optional[CurrentPipetteLocation] = None,
+        current_location: Optional[CurrentPipetteLocation] = None,
     ) -> PipetteLocationData:
         """Get the critical point of a pipette given the current location."""
-        current_well = current_well or self._pipettes.get_current_well()
+        current_location = current_location or self._pipettes.get_current_location()
         pipette_data = self._pipettes.get(pipette_id)
 
         mount = pipette_data.mount
@@ -72,10 +72,10 @@ class MotionView:
         # if the pipette was last used to move to a labware that requires
         # centering, set the critical point to XY_CENTER
         if (
-            isinstance(current_well, CurrentWell)
-            and current_well.pipette_id == pipette_id
+            isinstance(current_location, CurrentWell)
+            and current_location.pipette_id == pipette_id
             and self._labware.get_has_quirk(
-                current_well.labware_id,
+                current_location.labware_id,
                 "centerMultichannelOnWells",
             )
         ):
@@ -96,7 +96,7 @@ class MotionView:
         minimum_z_height: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
-        location = current_well or self._pipettes.get_current_well()
+        location = current_well or self._pipettes.get_current_location()
 
         center_destination = self._labware.get_has_quirk(
             labware_id,
@@ -159,7 +159,7 @@ class MotionView:
         minimum_z_height: Optional[float] = None,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
-        location = self._pipettes.get_current_well()
+        location = self._pipettes.get_current_location()
 
         base_destination = (
             self._addressable_areas.get_addressable_area_move_to_location(
@@ -265,16 +265,16 @@ class MotionView:
     ) -> bool:
         """Check if pipette would block h/s latch from opening if it is east, west or on module."""
         pipette_blocking = True
-        current_well = self._pipettes.get_current_well()
-        if current_well is not None:
-            if isinstance(current_well, CurrentWell):
+        current_location = self._pipettes.get_current_location()
+        if current_location is not None:
+            if isinstance(current_location, CurrentWell):
                 pipette_deck_slot = self._geometry.get_ancestor_slot_name(
-                    current_well.labware_id
+                    current_location.labware_id
                 ).as_int()
             else:
                 pipette_deck_slot = (
                     self._addressable_areas.get_addressable_area_base_slot(
-                        current_well.addressable_area_name
+                        current_location.addressable_area_name
                     ).as_int()
                 )
             hs_deck_slot = self._modules.get_location(hs_module_id).slotName.as_int()
@@ -287,16 +287,16 @@ class MotionView:
     ) -> bool:
         """Check if pipette would block h/s latch from starting shake if it is adjacent or on module."""
         pipette_blocking = True
-        current_well = self._pipettes.get_current_well()
-        if current_well is not None:
-            if isinstance(current_well, CurrentWell):
+        current_location = self._pipettes.get_current_location()
+        if current_location is not None:
+            if isinstance(current_location, CurrentWell):
                 pipette_deck_slot = self._geometry.get_ancestor_slot_name(
-                    current_well.labware_id
+                    current_location.labware_id
                 ).as_int()
             else:
                 pipette_deck_slot = (
                     self._addressable_areas.get_addressable_area_base_slot(
-                        current_well.addressable_area_name
+                        current_location.addressable_area_name
                     ).as_int()
                 )
             hs_deck_slot = self._modules.get_location(hs_module_id).slotName.as_int()
