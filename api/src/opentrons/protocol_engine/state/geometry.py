@@ -26,6 +26,7 @@ from ..types import (
     ModuleOffsetData,
     DeckType,
     CurrentWell,
+    CurrentPipetteLocation,
     TipGeometry,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
@@ -122,12 +123,12 @@ class GeometryView:
         self,
         pipette_id: str,
         labware_id: str,
-        location: Optional[CurrentWell],
+        location: Optional[CurrentPipetteLocation],
         minimum_z_height: Optional[float],
     ) -> float:
         """Get the minimum allowed travel height of an arc move."""
         if (
-            location is not None
+            isinstance(location, CurrentWell)
             and pipette_id == location.pipette_id
             and labware_id == location.labware_id
         ):
@@ -576,20 +577,28 @@ class GeometryView:
         )
 
     def get_extra_waypoints(
-        self, labware_id: str, location: Optional[CurrentWell]
+        self, location: Optional[CurrentPipetteLocation], to_slot: DeckSlotName
     ) -> List[Tuple[float, float]]:
         """Get extra waypoints for movement if thermocycler needs to be dodged."""
-        if location is not None and self._modules.should_dodge_thermocycler(
-            from_slot=self.get_ancestor_slot_name(location.labware_id),
-            to_slot=self.get_ancestor_slot_name(labware_id),
-        ):
-            middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
-                self._config.robot_type
-            )
-            middle_slot_center = self._addressable_areas.get_addressable_area_center(
-                addressable_area_name=middle_slot.id,
-            )
-            return [(middle_slot_center.x, middle_slot_center.y)]
+        if location is not None:
+            if isinstance(location, CurrentWell):
+                from_slot = self.get_ancestor_slot_name(location.labware_id)
+            else:
+                from_slot = self._addressable_areas.get_addressable_area_base_slot(
+                    location.addressable_area_name
+                )
+            if self._modules.should_dodge_thermocycler(
+                from_slot=from_slot, to_slot=to_slot
+            ):
+                middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                    self._config.robot_type
+                )
+                middle_slot_center = (
+                    self._addressable_areas.get_addressable_area_center(
+                        addressable_area_name=middle_slot.id,
+                    )
+                )
+                return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
     def get_slot_item(
