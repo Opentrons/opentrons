@@ -165,7 +165,7 @@ class MotionView:
         )
         destination = base_destination + Point(x=offset.x, y=offset.y, z=offset.z)
 
-        # TODO I think this is what we always want but honestly unsure
+        # TODO Is this correct for partial tip configurations on a 96-channel?
         destination_cp = CriticalPoint.XY_CENTER
 
         all_labware_highest_z = self._geometry.get_all_labware_highest_z()

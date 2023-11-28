@@ -59,6 +59,10 @@ def _get_conflicting_addressable_areas(
     return loaded_areas_on_cutout
 
 
+# This is a temporary shim while Protocol Engine's conflict-checking code
+# can only take deck slots as input.
+# Long-term solution: Check for conflicts based on bounding boxes, not slot adjacencies.
+# Shorter-term: Change the conflict-checking code to take cutouts instead of deck slots.
 CUTOUT_TO_DECK_SLOT_MAP: Dict[str, DeckSlotName] = {
     # OT-2
     "cutout1": DeckSlotName.SLOT_1,

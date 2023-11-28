@@ -19,7 +19,25 @@ MoveToAddressableAreaCommandType = Literal["moveToAddressableArea"]
 
 
 class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
-    """Payload required to move a pipette to a specific addressable area."""
+    """Payload required to move a pipette to a specific addressable area.
+
+    An *addressable area* is a space in the robot that may or may not be usable depending on how
+    the robot's deck is configured. For example, if a Flex is configured with a waste chute, it will
+    have additional addressable areas representing the opening of the waste chute, where tips and
+    labware can be dropped.
+
+    This moves the pipette so all of its nozzles are centered over the addressable area.
+    If the pipette is currently configured with a partial tip layout, this centering is over all
+    the pipette's physical nozzles, not just the nozzles that are active.
+
+    The z-position will be chosen to put the bottom of the tips---or the bottom of the nozzles,
+    if there are no tips---level with the top of the addressable area.
+
+    When this command is executed, Protocol Engine will make sure the robot's deck is configured
+    such that the requested addressable area actually exists. For example, if you request
+    the addressable area B4, it will make sure the robot is set up with a B3/B4 staging area slot.
+    If that's not the case, the command will fail.
+    """
 
     addressableAreaName: str = Field(
         ...,

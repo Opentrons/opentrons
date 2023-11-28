@@ -671,8 +671,8 @@ class PotentialCutoutFixture:
     cutout_fixture_id: str
 
 
-class AreaType(str, Enum):
-    """Strategy to use for labware movement."""
+class AreaType(Enum):
+    """The type of addressable area."""
 
     SLOT = "slot"
     STAGING_SLOT = "stagingSlot"
