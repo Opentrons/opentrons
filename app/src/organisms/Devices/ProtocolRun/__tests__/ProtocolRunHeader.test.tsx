@@ -89,7 +89,7 @@ import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import { RunFailedModal } from '../RunFailedModal'
 import { DISENGAGED, NOT_PRESENT } from '../../../EmergencyStop'
 import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWithTipAttached'
-import { getRequiredDeckConfig } from '../../../../resources/deck_configuration/utils'
+import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
@@ -237,8 +237,8 @@ const mockGetPipettesWithTipAttached = getPipettesWithTipAttached as jest.Mocked
 const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
   typeof getPipetteModelSpecs
 >
-const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
-  typeof getRequiredDeckConfig
+const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
+  typeof getIsFixtureMismatch
 >
 const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
   typeof useDeckConfigurationCompatibility
@@ -437,7 +437,7 @@ describe('ProtocolRunHeader', () => {
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as any)
     mockUseDeckConfigurationCompatibility.mockReturnValue([])
-    mockGetRequiredDeckConfig.mockReturnValue([])
+    when(mockGetIsFixtureMismatch).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -583,16 +583,7 @@ describe('ProtocolRunHeader', () => {
         ],
       },
     ])
-    when(mockGetRequiredDeckConfig).mockReturnValue([
-      {
-        cutoutId: 'cutoutA1',
-        cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-        requiredAddressableAreas: ['D4'],
-        compatibleCutoutFixtureIds: [
-          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-        ],
-      },
-    ] as any)
+    when(mockGetIsFixtureMismatch).mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()

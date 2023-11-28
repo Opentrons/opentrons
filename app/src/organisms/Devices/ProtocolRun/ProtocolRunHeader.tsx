@@ -103,7 +103,7 @@ import { EMPTY_TIMESTAMP } from '../constants'
 import { getHighestPriorityError } from '../../OnDeviceDisplay/RunningProtocol'
 import { RunFailedModal } from './RunFailedModal'
 import { RunProgressMeter } from '../../RunProgressMeter'
-import { getRequiredDeckConfig } from '../../../resources/deck_configuration/utils'
+import { getIsFixtureMismatch } from '../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
@@ -185,15 +185,7 @@ export function ProtocolRunHeader({
     robotType,
     robotProtocolAnalysis?.commands ?? []
   )
-  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
-    deckConfigCompatibility
-  )
-  const notCompatible =
-    requiredDeckConfigCompatibility.map(
-      dc =>
-        dc.cutoutFixtureId == null ||
-        !dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
-    ).length > 0
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 
   const doorSafetySetting = robotSettings.find(
     setting => setting.id === 'enableDoorSafetySwitch'
@@ -409,7 +401,7 @@ export function ProtocolRunHeader({
                 protocolData == null || !!isProtocolAnalyzing
               }
               isDoorOpen={isDoorOpen}
-              notCompatible={notCompatible}
+              isFixtureMismatch={isFixtureMismatch}
             />
           </Flex>
         </Box>
@@ -551,7 +543,7 @@ interface ActionButtonProps {
   runStatus: RunStatus | null
   isProtocolAnalyzing: boolean
   isDoorOpen: boolean
-  notCompatible: boolean
+  isFixtureMismatch: boolean
 }
 function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
@@ -560,7 +552,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     runStatus,
     isProtocolAnalyzing,
     isDoorOpen,
-    notCompatible,
+    isFixtureMismatch,
   } = props
   const history = useHistory()
   const { t } = useTranslation(['run_details', 'shared'])
@@ -616,7 +608,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     isResetRunLoading ||
     isOtherRunCurrent ||
     isProtocolAnalyzing ||
-    notCompatible ||
+    isFixtureMismatch ||
     (runStatus != null && DISABLED_STATUSES.includes(runStatus)) ||
     isRobotOnWrongVersionOfSoftware ||
     (isDoorOpen &&
@@ -659,7 +651,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   let buttonIconName: IconName | null = null
   let disableReason = null
 
-  if (currentRunId === runId && !isSetupComplete) {
+  if (currentRunId === runId && (!isSetupComplete || isFixtureMismatch)) {
     disableReason = t('setup_incomplete')
   } else if (isOtherRunCurrent) {
     disableReason = t('shared:robot_is_busy')

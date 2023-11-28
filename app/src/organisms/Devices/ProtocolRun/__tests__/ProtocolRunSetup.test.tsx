@@ -16,6 +16,7 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 import { i18n } from '../../../../i18n'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import {
+  getIsFixtureMismatch,
   getRequiredDeckConfig,
   getSimplestDeckConfigForProtocolCommands,
 } from '../../../../resources/deck_configuration/utils'
@@ -101,6 +102,9 @@ const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jes
 const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
   typeof useDeckConfigurationCompatibility
 >
+const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
+  typeof getIsFixtureMismatch
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -170,6 +174,7 @@ describe('ProtocolRunSetup', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+    when(mockGetIsFixtureMismatch).mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -352,6 +357,7 @@ describe('ProtocolRunSetup', () => {
           ],
         },
       ] as any)
+      when(mockGetIsFixtureMismatch).mockReturnValue(true)
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       when(mockUseModuleCalibrationStatus)
         .calledWith(ROBOT_NAME, RUN_ID)

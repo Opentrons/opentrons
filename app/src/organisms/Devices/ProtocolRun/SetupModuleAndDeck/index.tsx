@@ -11,7 +11,11 @@ import {
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '../../../../resources/deck_configuration/utils'
+import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+  // getUnmatchedSingleSlotFixtures,
+} from '../../../../resources/deck_configuration/utils'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   useRunHasStarted,
@@ -31,7 +35,6 @@ interface SetupModuleAndDeckProps {
   runId: string
   hasModules: boolean
   commands: RunTimeCommand[]
-  notCompatible: boolean
 }
 
 export const SetupModuleAndDeck = ({
@@ -40,7 +43,6 @@ export const SetupModuleAndDeck = ({
   runId,
   hasModules,
   commands,
-  notCompatible,
 }: SetupModuleAndDeckProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
@@ -58,6 +60,14 @@ export const SetupModuleAndDeck = ({
     robotType,
     commands
   )
+
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+
+  // TODO(bh, 2023-11-28): there is an unimplemented scenario where unmatched single slot fixtures need to be updated
+  // will need to additionally filter out module conflict unmatched fixtures, as these are represented in SetupModulesList
+  // const unmatchedSingleSlotFixtures = getUnmatchedSingleSlotFixtures(
+  //   deckConfigCompatibility
+  // )
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
@@ -86,7 +96,7 @@ export const SetupModuleAndDeck = ({
         <PrimaryButton
           disabled={
             missingModuleIds.length > 0 ||
-            notCompatible ||
+            isFixtureMismatch ||
             runHasStarted ||
             !moduleCalibrationStatus.complete
           }

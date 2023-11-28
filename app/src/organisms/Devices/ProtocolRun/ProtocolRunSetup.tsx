@@ -19,6 +19,7 @@ import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
+  getIsFixtureMismatch,
   getRequiredDeckConfig,
   getSimplestDeckConfigForProtocolCommands,
 } from '../../../resources/deck_configuration/utils'
@@ -91,16 +92,9 @@ export function ProtocolRunSetup({
     protocolAnalysis?.commands ?? []
   )
 
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+
   const isMissingModule = missingModuleIds.length > 0
-  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
-    deckConfigCompatibility
-  )
-  const notCompatible =
-    requiredDeckConfigCompatibility.map(
-      dc =>
-        dc.cutoutFixtureId == null ||
-        !dc.compatibleCutoutFixtureIds.includes(dc.cutoutFixtureId)
-    ).length > 0
 
   const stepsKeysInOrder =
     protocolAnalysis != null
@@ -192,7 +186,6 @@ export function ProtocolRunSetup({
           runId={runId}
           hasModules={hasModules}
           commands={protocolAnalysis?.commands ?? []}
-          notCompatible={notCompatible}
         />
       ),
       description: moduleDescription,
@@ -294,7 +287,7 @@ export function ProtocolRunSetup({
                             calibrationStatusModules,
                             isFlex,
                             isMissingModule,
-                            notCompatible,
+                            isFixtureMismatch,
                           }}
                         />
                       }
@@ -326,7 +319,7 @@ interface StepRightElementProps {
   runHasStarted: boolean
   isFlex: boolean
   isMissingModule: boolean
-  notCompatible: boolean
+  isFixtureMismatch: boolean
 }
 function StepRightElement(props: StepRightElementProps): JSX.Element | null {
   const {
@@ -336,10 +329,10 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
     calibrationStatusModules,
     isFlex,
     isMissingModule,
-    notCompatible,
+    isFixtureMismatch,
   } = props
   const { t } = useTranslation('protocol_setup')
-  const isActionNeeded = isMissingModule || notCompatible
+  const isActionNeeded = isMissingModule || isFixtureMismatch
 
   if (
     !runHasStarted &&
