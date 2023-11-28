@@ -168,11 +168,11 @@
                 }
               },
               "ableToDropTips": {
-                "description": "Whether tips are allowed to be dropped into this area.",
+                "description": "Whether tips are allowed to be dropped into this area. If `true`, the top-center of the `boundingBox` should be a good location for the bottom-center of all the tips when they're dropped.",
                 "type": "boolean"
               },
               "ableToDropLabware": {
-                "description": "Whether labware is allowed to be dropped (different then being placed) into this area.",
+                "description": "Whether labware is allowed to be dropped (different from being placed) into this area. If `true`, the top-center of the `boundingBox` should be a good location for the bottom-center of the labware when it's dropped.",
                 "type": "boolean"
               }
             }
