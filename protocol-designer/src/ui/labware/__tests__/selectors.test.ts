@@ -82,7 +82,7 @@ describe('labware selectors', () => {
         stagingArea: {
           name: 'stagingArea',
           location: 'cutoutB3',
-          id: 'staginAreaId',
+          id: 'stagingAreaId',
         },
       }
       expect(

@@ -78,7 +78,6 @@ export const generateRobotStateTimeline = (
             'trashBin'
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-
         const addressableAreaName =
           pipetteSpec.channels === 96
             ? '96ChannelWasteChute'
@@ -91,6 +90,7 @@ export const generateRobotStateTimeline = (
             dropTipLocation,
           }
         )
+
         if (isWasteChute) {
           dropTipCommands = StepGeneration.curryCommandCreator(
             StepGeneration.wasteChuteCommandsUtil,
@@ -110,7 +110,6 @@ export const generateRobotStateTimeline = (
             }
           )
         }
-
         if (!willReuseTip) {
           return [
             ...acc,
