@@ -143,7 +143,7 @@ class MovementHandler:
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
     ) -> Point:
-        """Move to a specific well."""
+        """Move to a specific addressable area."""
         # Check for presence of heater shakers on deck, and if planned
         # pipette movement is allowed
         hs_movement_restrictors = (
