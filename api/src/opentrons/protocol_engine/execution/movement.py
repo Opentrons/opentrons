@@ -144,8 +144,6 @@ class MovementHandler:
         speed: Optional[float] = None,
     ) -> Point:
         """Move to a specific well."""
-        # TODO need to check that there is no labware or module on top of deck slot?
-
         # Check for presence of heater shakers on deck, and if planned
         # pipette movement is allowed
         hs_movement_restrictors = (
@@ -166,6 +164,9 @@ class MovementHandler:
             ),
             destination_is_tip_rack=False,
         )
+
+        # TODO(jbl 11-28-2023) check if addressable area is a deck slot, and if it is check if there are no labware
+        #   or modules on top.
 
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(

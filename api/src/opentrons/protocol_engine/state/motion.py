@@ -157,7 +157,7 @@ class MotionView:
         )
         destination = base_destination + Point(x=offset.x, y=offset.y, z=offset.z)
 
-        # TODO Is this correct for partial tip configurations on a 96-channel?
+        # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
         destination_cp = CriticalPoint.XY_CENTER
 
         all_labware_highest_z = self._geometry.get_all_labware_highest_z()

@@ -356,7 +356,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
     def get_addressable_area_move_to_location(
         self, addressable_area_name: str
     ) -> Point:
-        """Get the move to position (top center) for an addressable area."""
+        """Get the move-to position (top center) for an addressable area."""
         addressable_area = self.get_addressable_area(addressable_area_name)
         position = addressable_area.position
         bounding_box = addressable_area.bounding_box
