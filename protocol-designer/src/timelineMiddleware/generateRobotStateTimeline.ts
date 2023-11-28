@@ -1,9 +1,5 @@
 import takeWhile from 'lodash/takeWhile'
 import * as StepGeneration from '@opentrons/step-generation'
-import {
-  dropTipInPlace,
-  moveToAddressableArea,
-} from '@opentrons/step-generation/src/commandCreators/atomic'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 
@@ -82,51 +78,44 @@ export const generateRobotStateTimeline = (
             'trashBin'
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-        console.log('is waste chute', isWasteChute)
         const addressableAreaName =
           pipetteSpec.channels === 96
             ? '96ChannelWasteChute'
             : '1and8ChannelWasteChute'
 
-        let dropTipCommands = [
-          curriedCommandCreator,
-          StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
+        let dropTipCommands = StepGeneration.curryCommandCreator(
+          StepGeneration.dropTip,
+          {
             pipette: pipetteId,
             dropTipLocation,
-          }),
-        ]
+          }
+        )
 
         if (isWasteChute) {
-          dropTipCommands = [
-            curriedCommandCreator,
-            StepGeneration.curryCommandCreator(moveToAddressableArea, {
-              pipetteId,
+          dropTipCommands = StepGeneration.curryCommandCreator(
+            StepGeneration.wasteChuteCommandsUtil,
+            {
+              type: 'dropTip',
+              pipetteId: pipetteId,
               addressableAreaName,
-            }),
-            StepGeneration.curryCommandCreator(dropTipInPlace, {
-              pipetteId,
-            }),
-          ]
+            }
+          )
         }
         if (isTrashBin) {
-          dropTipCommands = [
-            curriedCommandCreator,
-            StepGeneration.curryCommandCreator(
-              StepGeneration.movableTrashCommandsUtil,
-              {
-                type: 'dropTip',
-                pipetteId: pipetteId,
-              }
-            ),
-          ]
+          dropTipCommands = StepGeneration.curryCommandCreator(
+            StepGeneration.movableTrashCommandsUtil,
+            {
+              type: 'dropTip',
+              pipetteId: pipetteId,
+            }
+          )
         }
-        console.log('drop tip commands', dropTipCommands)
         if (!willReuseTip) {
           return [
             ...acc,
             (_invariantContext, _prevRobotState) =>
               StepGeneration.reduceCommandCreators(
-                dropTipCommands,
+                [curriedCommandCreator, dropTipCommands],
                 _invariantContext,
                 _prevRobotState
               ),
