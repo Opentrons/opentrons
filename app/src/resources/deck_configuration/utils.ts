@@ -14,6 +14,7 @@ import type {
   AddressableAreaName,
   DeckDefinition,
   DeckConfiguration,
+  CutoutFixtureId,
 } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from './hooks'
 
@@ -214,7 +215,8 @@ export function getUnmatchedSingleSlotFixtures(
   )
   // fixture includes at least 1 required AA
   const unmatchedSingleSlotDeckConfigCompatibility = singleSlotDeckConfigCompatibility.filter(
-    fixture => !isMatchedFixture(fixture)
+    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+      !isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
   )
 
   return unmatchedSingleSlotDeckConfigCompatibility
@@ -223,19 +225,19 @@ export function getUnmatchedSingleSlotFixtures(
 export function getIsFixtureMismatch(
   deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
 ): boolean {
-  const isFixtureMismatch = !deckConfigProtocolSpec.every(fixture =>
-    isMatchedFixture(fixture)
+  const isFixtureMismatch = !deckConfigProtocolSpec.every(
+    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+      isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
   )
   return isFixtureMismatch
 }
 
 function isMatchedFixture(
-  fixtureCompatibility: CutoutConfigAndCompatibility
+  cutoutFixtureId: CutoutFixtureId | null,
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
 ): boolean {
   return (
-    fixtureCompatibility.cutoutFixtureId == null ||
-    fixtureCompatibility.compatibleCutoutFixtureIds.includes(
-      fixtureCompatibility.cutoutFixtureId
-    )
+    cutoutFixtureId == null ||
+    compatibleCutoutFixtureIds.includes(cutoutFixtureId)
   )
 }
