@@ -533,7 +533,11 @@ export const DeckSetup = (): JSX.Element => {
   ).filter(aE => WASTE_CHUTE_CUTOUT.includes(aE.location as CutoutId))
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId))
+  ).filter(
+    aE =>
+      STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
+      aE.location === 'stagingArea'
+  )
 
   const hasWasteChute = wasteChuteFixtures.length > 0
 
