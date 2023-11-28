@@ -1,24 +1,24 @@
 from typing import Optional
 from typing_extensions import Protocol
 
-from opentrons.types import Mount
+from .types import MountArgType, CalibrationType
 
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
 from .configurable import Configurable
-from .calibratable import Calibratable, CalibrationType
+from .calibratable import Calibratable
 
 
 class LiquidHandler(
-    InstrumentConfigurer,
-    MotionController,
+    InstrumentConfigurer[MountArgType],
+    MotionController[MountArgType],
     Configurable,
     Calibratable[CalibrationType],
-    Protocol[CalibrationType],
+    Protocol[CalibrationType, MountArgType],
 ):
     async def update_nozzle_configuration_for_mount(
         self,
-        mount: Mount,
+        mount: MountArgType,
         back_left_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
         starting_nozzle: Optional[str] = None,
@@ -40,7 +40,7 @@ class LiquidHandler(
         """
         ...
 
-    async def configure_for_volume(self, mount: Mount, volume: float) -> None:
+    async def configure_for_volume(self, mount: MountArgType, volume: float) -> None:
         """
         Configure a pipette to handle the specified volume.
 
@@ -53,7 +53,9 @@ class LiquidHandler(
         """
         ...
 
-    async def prepare_for_aspirate(self, mount: Mount, rate: float = 1.0) -> None:
+    async def prepare_for_aspirate(
+        self, mount: MountArgType, rate: float = 1.0
+    ) -> None:
         """
         Prepare the pipette for aspiration.
 
@@ -75,7 +77,7 @@ class LiquidHandler(
 
     async def aspirate(
         self,
-        mount: Mount,
+        mount: MountArgType,
         volume: Optional[float] = None,
         rate: float = 1.0,
     ) -> None:
@@ -102,7 +104,7 @@ class LiquidHandler(
 
     async def dispense(
         self,
-        mount: Mount,
+        mount: MountArgType,
         volume: Optional[float] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
@@ -119,7 +121,9 @@ class LiquidHandler(
         """
         ...
 
-    async def blow_out(self, mount: Mount, volume: Optional[float] = None) -> None:
+    async def blow_out(
+        self, mount: MountArgType, volume: Optional[float] = None
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
@@ -128,7 +132,7 @@ class LiquidHandler(
 
     async def pick_up_tip(
         self,
-        mount: Mount,
+        mount: MountArgType,
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
@@ -154,7 +158,7 @@ class LiquidHandler(
 
     async def drop_tip(
         self,
-        mount: Mount,
+        mount: MountArgType,
         home_after: bool = True,
     ) -> None:
         """

@@ -28,7 +28,7 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
@@ -87,7 +87,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[RobotCalibration],
+    HardwareControlInterface[RobotCalibration, top_types.Mount],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -286,6 +286,9 @@ class API(
     def __repr__(self) -> str:
         return "<{} using backend {}>".format(type(self), type(self._backend))
 
+    def get_robot_type(self) -> RobotTypeEnum:
+        return RobotTypeEnum.OT2
+
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()
 
@@ -409,6 +412,9 @@ class API(
         return await self._backend.update_firmware(
             firmware_file, checked_loop, explicit_modeset
         )
+
+    def has_gripper(self) -> bool:
+        return False
 
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None

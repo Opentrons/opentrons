@@ -33,7 +33,7 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
 )
@@ -120,7 +120,7 @@ from .errors import (
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
-from .protocols import HardwareControlInterface
+from .protocols import FlexHardwareControlInterface
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
@@ -196,7 +196,7 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[OT3Transforms],
+    FlexHardwareControlInterface[OT3Transforms, Union[top_types.Mount, OT3Mount]],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -285,6 +285,9 @@ class OT3API(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
         await self._backend.update_to_default_current_settings(gantry_load)
+
+    def get_robot_type(self) -> RobotTypeEnum:
+        return RobotTypeEnum.FLEX
 
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()
@@ -2492,29 +2495,6 @@ class OT3API(
         retract_after: bool = True,
         probe: Optional[InstrumentProbeType] = None,
     ) -> Tuple[float, bool]:
-        """Determine the position of something using the capacitive sensor.
-
-        This function orchestrates detecting the position of a collision between the
-        capacitive probe on the tool on the specified mount, and some fixed element
-        of the robot.
-
-        When calling this function, the mount's probe critical point should already
-        be aligned in the probe axis with the item to be probed.
-
-        It will move the mount's probe critical point to a small distance behind
-        the expected position of the element (which is target_pos, in deck coordinates,
-        in the axis to be probed) while running the tool's capacitive sensor. When the
-        sensor senses contact, the mount stops.
-
-        This function moves away and returns the sensed position.
-
-        This sensed position can be used in several ways, including
-        - To get an absolute position in deck coordinates of whatever was
-        targeted, if something was guaranteed to be physically present.
-        - To detect whether a collision occured at all. If this function
-        returns a value far enough past the anticipated position, then it indicates
-        there was no material there.
-        """
         if moving_axis not in [
             Axis.X,
             Axis.Y,

@@ -6,7 +6,7 @@ from .hardware_manager import HardwareManager
 from .chassis_accessory_manager import ChassisAccessoryManager
 from .event_sourcer import EventSourcer
 from .liquid_handler import LiquidHandler
-from .calibratable import Calibratable, CalibrationType
+from .calibratable import Calibratable
 from .configurable import Configurable
 from .motion_controller import MotionController
 from .instrument_configurer import InstrumentConfigurer
@@ -14,18 +14,24 @@ from .execution_controllable import ExecutionControllable
 from .asyncio_configurable import AsyncioConfigurable
 from .stoppable import Stoppable
 from .simulatable import Simulatable
+from .identifiable import Identifiable
+from .gripper_controller import GripperController
+from .flex_calibratable import FlexCalibratable
+
+from .types import CalibrationType, MountArgType
 
 
 class HardwareControlInterface(
     ModuleProvider,
     ExecutionControllable,
-    LiquidHandler[CalibrationType],
+    LiquidHandler[CalibrationType, MountArgType],
     ChassisAccessoryManager,
     HardwareManager,
     AsyncioConfigurable,
     Stoppable,
     Simulatable,
-    Protocol[CalibrationType],
+    Identifiable,
+    Protocol[CalibrationType, MountArgType],
 ):
     """A mypy protocol for a hardware controller.
 
@@ -44,8 +50,24 @@ class HardwareControlInterface(
     ...
 
 
+class FlexHardwareControlInterface(
+    HardwareControlInterface[CalibrationType, MountArgType],
+    GripperController,
+    FlexCalibratable,
+    Protocol[CalibrationType, MountArgType],
+):
+    """A mypy protocol for a hardware controller with Flex-specific extensions.
+
+    The interface for the Flex controller is mostly in-line with the OT-2 interface,
+    with some additional functionality and parameterization not supported on the OT-2.
+    """
+
+    ...
+
+
 __all__ = [
     "HardwareControlAPI",
+    "FlexHardwareControlInterface",
     "Simulatable",
     "Stoppable",
     "AsyncioConfigurable",
@@ -59,4 +81,6 @@ __all__ = [
     "ChassisAccessoryManager",
     "HardwareManager",
     "ModuleProvider",
+    "Identifiable",
+    "FlexCalibratable",
 ]
