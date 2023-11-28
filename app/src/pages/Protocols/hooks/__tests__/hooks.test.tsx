@@ -254,6 +254,14 @@ describe('useMissingProtocolHardware', () => {
           connected: false,
           hasSlotConflict: true,
         },
+        {
+          hardwareType: 'fixture',
+          cutoutFixtureId: 'singleRightSlot',
+          location: {
+            cutout: 'cutoutD3',
+          },
+          hasSlotConflict: true,
+        },
       ],
       conflictedSlots: ['D3'],
     })
@@ -326,7 +334,16 @@ describe('useMissingProtocolHardware', () => {
       { wrapper }
     )
     expect(result.current).toEqual({
-      missingProtocolHardware: [],
+      missingProtocolHardware: [
+        {
+          hardwareType: 'fixture',
+          cutoutFixtureId: 'singleRightSlot',
+          location: {
+            cutout: 'cutoutD3',
+          },
+          hasSlotConflict: true,
+        },
+      ],
       isLoading: false,
       conflictedSlots: ['D3'],
     })

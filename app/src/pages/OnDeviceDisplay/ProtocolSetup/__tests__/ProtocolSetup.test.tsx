@@ -20,7 +20,7 @@ import {
   getDeckDefFromRobotType,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../../i18n'
 import { useToaster } from '../../../../organisms/ToasterOven'
