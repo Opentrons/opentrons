@@ -492,11 +492,11 @@ export const StepItemContents = (
     const sourceLabwareId = rawForm.aspirate_labware
     const destLabware = rawForm.dispense_labware
 
-    let nickname: string = labwareNicknamesById[destLabware]
+    let nickname: string | null = labwareNicknamesById[destLabware]
 
-    if (additionalEquipmentEntities[destLabware].name === 'wasteChute') {
+    if (additionalEquipmentEntities[destLabware]?.name === 'wasteChute') {
       nickname = 'Waste chute'
-    } else if (additionalEquipmentEntities[destLabware].name === 'trashBin') {
+    } else if (additionalEquipmentEntities[destLabware]?.name === 'trashBin') {
       nickname = 'Trash bin'
     }
 
