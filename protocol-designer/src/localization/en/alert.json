@@ -169,8 +169,8 @@
         "body": "Attempting to move a labware without a gripper into the waste chute. Please add a gripper to this step."
       },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
-        "title": "Remove 96-channel tip rack adapter",
-        "body": "The tip rack cannot be placed in an adapter when pick up partial 96 tips."
+        "title": "Do not use tip rack adapter for partial tip pickup",
+        "body": "Partial tip pickup requires a tip rack placed directly on the deck. Remove the adapter, or add a new tip rack without an adapter."
       }
     },
     "warning": {
