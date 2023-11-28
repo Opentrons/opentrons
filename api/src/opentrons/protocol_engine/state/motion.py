@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from opentrons.types import MountType, Point, DeckSlotName
+from opentrons.types import MountType, Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_slots,
@@ -16,7 +16,6 @@ from ..types import (
     MotorAxis,
     WellLocation,
     CurrentWell,
-    CurrentAddressableArea,
     CurrentPipetteLocation,
     AddressableOffsetVector,
 )
@@ -118,21 +117,11 @@ class MotionView:
         )
 
         destination_slot = self._geometry.get_ancestor_slot_name(labware_id)
-        origin_slot: Optional[DeckSlotName] = None
-        extra_waypoints = []
         # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
         #  could crash onto the thermocycler if current well or addressable area is not known.
-        if isinstance(location, CurrentWell):
-            origin_slot = self._geometry.get_ancestor_slot_name(location.labware_id)
-        elif isinstance(location, CurrentAddressableArea):
-            origin_slot = self._addressable_areas.get_addressable_area_base_slot(
-                location.addressable_area_name
-            )
-
-        if origin_slot is not None:
-            extra_waypoints = self._geometry.get_extra_waypoints(
-                from_slot=origin_slot, to_slot=destination_slot
-            )
+        extra_waypoints = self._geometry.get_extra_waypoints(
+            location=location, to_slot=destination_slot
+        )
 
         try:
             return motion_planning.get_waypoints(
@@ -185,21 +174,11 @@ class MotionView:
         destination_slot = self._addressable_areas.get_addressable_area_base_slot(
             addressable_area_name
         )
-        origin_slot: Optional[DeckSlotName] = None
-        extra_waypoints = []
         # TODO (spp, 11-29-2021): Should log some kind of warning that pipettes
         #  could crash onto the thermocycler if current well or addressable area is not known.
-        if isinstance(location, CurrentWell):
-            origin_slot = self._geometry.get_ancestor_slot_name(location.labware_id)
-        elif isinstance(location, CurrentAddressableArea):
-            origin_slot = self._addressable_areas.get_addressable_area_base_slot(
-                location.addressable_area_name
-            )
-
-        if origin_slot is not None:
-            extra_waypoints = self._geometry.get_extra_waypoints(
-                from_slot=origin_slot, to_slot=destination_slot
-            )
+        extra_waypoints = self._geometry.get_extra_waypoints(
+            location=location, to_slot=destination_slot
+        )
 
         try:
             return motion_planning.get_waypoints(

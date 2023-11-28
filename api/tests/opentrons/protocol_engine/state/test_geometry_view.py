@@ -33,6 +33,8 @@ from opentrons.protocol_engine.types import (
     OverlapOffset,
     DeckType,
     CurrentWell,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
     LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state import move_types
@@ -1323,10 +1325,14 @@ def test_get_labware_grip_point_for_labware_on_module(
 
 
 @pytest.mark.parametrize(
-    argnames=["should_dodge", "expected_waypoints"],
+    argnames=["location", "should_dodge", "expected_waypoints"],
     argvalues=[
-        (False, []),
-        (True, [(11, 22)]),
+        (None, True, []),
+        (None, False, []),
+        (CurrentWell("pipette-id", "from-labware-id", "well-name"), False, []),
+        (CurrentWell("pipette-id", "from-labware-id", "well-name"), True, [(11, 22)]),
+        (CurrentAddressableArea("pipette-id", "area-name"), False, []),
+        (CurrentAddressableArea("pipette-id", "area-name"), True, [(11, 22)]),
     ],
 )
 def test_get_extra_waypoints(
@@ -1334,11 +1340,25 @@ def test_get_extra_waypoints(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
+    location: Optional[CurrentPipetteLocation],
     should_dodge: bool,
     expected_waypoints: List[Tuple[float, float]],
     subject: GeometryView,
 ) -> None:
     """It should return extra waypoints if thermocycler should be dodged."""
+    decoy.when(labware_view.get("from-labware-id")).then_return(
+        LoadedLabware(
+            id="labware1",
+            loadName="load-name1",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        )
+    )
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("area-name")
+    ).then_return(DeckSlotName.SLOT_1)
+
     decoy.when(
         module_view.should_dodge_thermocycler(
             from_slot=DeckSlotName.SLOT_1, to_slot=DeckSlotName.SLOT_2
@@ -1351,9 +1371,7 @@ def test_get_extra_waypoints(
         )
     ).then_return(Point(x=11, y=22, z=33))
 
-    extra_waypoints = subject.get_extra_waypoints(
-        DeckSlotName.SLOT_1, DeckSlotName.SLOT_2
-    )
+    extra_waypoints = subject.get_extra_waypoints(location, DeckSlotName.SLOT_2)
 
     assert extra_waypoints == expected_waypoints
 
