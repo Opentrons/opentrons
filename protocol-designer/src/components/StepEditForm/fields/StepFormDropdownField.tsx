@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
 import { StepFieldName } from '../../../steplist/fieldLevel'
-import { getWasteChuteOption } from '../../../ui/labware/selectors'
+import { getDisposalOptions } from '../../../ui/labware/selectors'
 import styles from '../StepEditForm.css'
 import type { FieldProps } from '../types'
 
@@ -24,11 +24,9 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
     updateValue,
     errorToShow,
   } = props
-  const wasteChuteOption = useSelector(getWasteChuteOption)
+  const disposalOptions = useSelector(getDisposalOptions)
   const fullOptions =
-    wasteChuteOption != null && name === 'dispense_labware'
-      ? [...options, wasteChuteOption]
-      : options
+    name === 'dispense_labware' ? [...options, ...disposalOptions] : options
 
   // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: unknown) => {}
   // blank out the dropdown if labware id does not exist

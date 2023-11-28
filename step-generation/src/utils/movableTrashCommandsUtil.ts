@@ -22,10 +22,10 @@ import type {
 
 export type MovableTrashCommandsTypes =
   | 'airGap'
-  | 'aspirate'
   | 'blowOut'
   | 'dispense'
   | 'dropTip'
+  | 'moveToWell'
 
 interface MovableTrashCommandArgs {
   type: MovableTrashCommandsTypes
@@ -59,11 +59,11 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
     case 'airGap':
       actionName = 'air gap'
       break
-    case 'aspirate':
-      actionName = 'aspirate'
-      break
     case 'dispense':
       actionName = 'dispense'
+      break
+    case 'moveToWell':
+      actionName = 'move to well'
       break
     default:
       break
@@ -122,8 +122,7 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
 
   let inPlaceCommands: CurriedCommandCreator[] = []
   switch (type) {
-    case 'airGap':
-    case 'aspirate': {
+    case 'airGap': {
       inPlaceCommands =
         flowRate != null && volume != null
           ? [
@@ -172,6 +171,9 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
             ]
           : []
       break
+    }
+    case 'moveToWell': {
+      inPlaceCommands = addressableAreaCommand
     }
   }
 

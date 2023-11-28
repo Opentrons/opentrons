@@ -58,9 +58,6 @@ export const getLabwareOptions: Selector<Options> = createSelector(
     additionalEquipmentEntities
   ) => {
     const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
-    const trash = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'trashBin'
-    )
     const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )?.location
@@ -159,14 +156,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
       []
     )
 
-    const trashOption: Options =
-      trash != null && !moveLabwarePresavedStep
-        ? [{ name: TRASH, value: trash?.id ?? '' }]
-        : []
-
-    const options = [...trashOption, ...labwareOptions]
-
-    return _sortLabwareDropdownOptions(options)
+    return _sortLabwareDropdownOptions(labwareOptions)
   }
 )
 

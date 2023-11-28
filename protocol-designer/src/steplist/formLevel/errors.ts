@@ -215,19 +215,17 @@ export const wellRatioMoveLiquid = (
 ): FormError | null => {
   const { aspirate_wells, dispense_wells, dispense_labware } = fields
   const dispenseLabware = dispense_labware?.name ?? null
-  const isDispensingIntoWasteChute =
-    dispenseLabware != null ? dispenseLabware === 'wasteChute' : false
-  if (!aspirate_wells || (!isDispensingIntoWasteChute && !dispense_wells))
+  const isDispensingIntoTrash =
+    dispenseLabware != null
+      ? dispenseLabware === 'wasteChute' || dispenseLabware === 'trashBin'
+      : false
+  if (!aspirate_wells || (!isDispensingIntoTrash && !dispense_wells))
     return null
-  const wellRatioFormError = isDispensingIntoWasteChute
+  const wellRatioFormError = isDispensingIntoTrash
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
 
-  return getWellRatio(
-    aspirate_wells,
-    dispense_wells,
-    isDispensingIntoWasteChute
-  )
+  return getWellRatio(aspirate_wells, dispense_wells, isDispensingIntoTrash)
     ? null
     : wellRatioFormError
 }

@@ -2,6 +2,7 @@ import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
 import { COLUMN_4_SLOTS } from '../../constants'
 import { dropTip } from './dropTip'
+import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
   getLabwareSlot,
@@ -18,7 +19,6 @@ import type {
   CurriedCommandCreator,
   CommandCreator,
 } from '../../types'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 interface PickUpTipArgs {
   pipette: string
   tiprack: string

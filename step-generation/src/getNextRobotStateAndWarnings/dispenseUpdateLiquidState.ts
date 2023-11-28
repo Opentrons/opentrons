@@ -39,17 +39,18 @@ export function dispenseUpdateLiquidState(
     wellName,
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-  const wasteChuteId = Object.values(
+  const trashId = Object.values(
     invariantContext.additionalEquipmentEntities
-  ).find(aE => aE.name === 'wasteChute')?.id
+  ).find(aE => aE.name === 'wasteChute' || aE.name === 'trashBin')?.id
+
   const sourceId =
     labwareId != null
       ? invariantContext.labwareEntities[labwareId].id
-      : wasteChuteId ?? ''
+      : trashId ?? ''
 
   if (sourceId === '') {
     console.error(
-      `expected to find a waste chute entity id but could not, with wasteChuteId ${wasteChuteId}`
+      `expected to find a trash entity id but could not, with trash id ${trashId}`
     )
   }
 
@@ -75,7 +76,7 @@ export function dispenseUpdateLiquidState(
     prevLiquidState.labware[sourceId] != null
       ? prevLiquidState.labware[sourceId]
       : null
-  const liquidWasteChute =
+  const liquidTrash =
     prevLiquidState.additionalEquipment[sourceId] != null
       ? prevLiquidState.additionalEquipment[sourceId]
       : null
@@ -101,6 +102,7 @@ export function dispenseUpdateLiquidState(
   )
 
   let mergeLiquidtoSingleWell = null
+  //  a labware will always have a well
   if (well != null && liquidLabware != null) {
     mergeLiquidtoSingleWell = {
       [well]: reduce(
@@ -116,15 +118,15 @@ export function dispenseUpdateLiquidState(
       ),
     }
   }
-
-  if (well == null && liquidWasteChute != null) {
+  //  waste chute and trash bin don't have wells
+  if (well == null && liquidTrash != null) {
     mergeLiquidtoSingleWell = reduce(
       splitLiquidStates,
       (wellLiquidStateAcc, splitLiquidStateForTip: SourceAndDest) => {
         const res = mergeLiquid(wellLiquidStateAcc, splitLiquidStateForTip.dest)
         return res
       },
-      liquidWasteChute
+      liquidTrash
     )
   }
 
