@@ -36,6 +36,7 @@ import {
 import { getIsAdapter } from '../../utils'
 import type { RobotState } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
+import type { AddressableAreaName } from '@opentrons/shared-data'
 
 interface Option {
   name: string
@@ -114,8 +115,13 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const allSlotIds = deckDef.locations.addressableAreas.reduce(
+      (acc, slot) => {
+        return hasWasteChute && slot.id === 'D3' ? acc : [...acc, slot.id]
+      },
+      [] as AddressableAreaName[]
+    )
     const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
       .filter(aE => aE.name === 'stagingArea')
       //  TODO(jr, 11/13/23): fix AdditionalEquipment['location'] from type string to CutoutId
