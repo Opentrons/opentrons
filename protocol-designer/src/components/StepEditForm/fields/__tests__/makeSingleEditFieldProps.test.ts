@@ -5,7 +5,7 @@ import {
 } from '../../../../steplist/formLevel'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import * as stepEditFormUtils from '../../utils'
-import { FormData, HydratedFormdata } from '../../../../form-types'
+import { HydratedFormdata } from '../../../../form-types'
 jest.mock('../../../../steplist/formLevel')
 jest.mock('../../../../steplist/fieldLevel')
 

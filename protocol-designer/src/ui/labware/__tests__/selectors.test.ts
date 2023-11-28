@@ -8,7 +8,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { DropdownOption } from '@opentrons/components'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import {
   getDisposalOptions,
@@ -32,7 +31,6 @@ describe('labware selectors', () => {
   let tipracks: LabwareEntities
   let trash: LabwareEntities
   let otherLabware: LabwareEntities
-  let wasteChuteOption: DropdownOption
 
   const mockTrash = 'mockTrash'
   const mockTrash2 = 'mockTrash2'
@@ -70,7 +68,6 @@ describe('labware selectors', () => {
 
       wellPlateId: 'Source Plate',
     }
-    wasteChuteOption = { name: 'mock waste chute', value: 'mockId' }
   })
 
   describe('getDisposalOptions', () => {

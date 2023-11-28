@@ -12,7 +12,6 @@ import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
-export { createPresavedStepForm } from './createPresavedStepForm'
 import {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
@@ -31,6 +30,7 @@ import type {
   ModuleEntity,
 } from '@opentrons/step-generation'
 import type { FormData } from '../../form-types'
+export { createPresavedStepForm } from './createPresavedStepForm'
 
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],

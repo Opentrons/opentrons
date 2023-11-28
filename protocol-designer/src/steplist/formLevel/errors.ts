@@ -132,7 +132,9 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-type HydratedFormData = { [key: string]: any }
+interface HydratedFormData {
+  [key: string]: any
+}
 
 export type FormErrorChecker = (arg: HydratedFormData) => FormError | null
 // TODO: test these

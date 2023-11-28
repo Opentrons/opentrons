@@ -181,9 +181,7 @@ export const substepTimelineSingleChannel = (
           ],
           prevRobotState: nextRobotState,
         }
-      }
-
-      {
+      } else {
         return { ...acc, prevRobotState: nextRobotState }
       }
     },
