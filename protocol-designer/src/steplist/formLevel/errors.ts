@@ -132,14 +132,15 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-export type FormErrorChecker = (arg: unknown) => FormError | null
+type HydratedFormData = { [key: string]: any }
+
+export type FormErrorChecker = (arg: HydratedFormData) => FormError | null
 // TODO: test these
 
 /*******************
  ** Error Checkers **
  ********************/
 // TODO: real HydratedFormData type
-type HydratedFormData = { [key: string]: any }
 export const incompatibleLabware = (
   fields: HydratedFormData
 ): FormError | null => {
@@ -354,7 +355,7 @@ export const engageHeightRangeExceeded = (
  ********************/
 type ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
-) => (arg: unknown) => FormError[]
+) => (arg: HydratedFormData) => FormError[]
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
 ) => value =>
