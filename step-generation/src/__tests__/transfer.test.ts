@@ -231,6 +231,7 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
       params: {
         addressableAreaName: '1and8ChannelWasteChute',
         pipetteId: 'p300SingleId',
+        offset: { x: 0, y: 0, z: 0 },
       },
     },
     {

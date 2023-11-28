@@ -29,6 +29,7 @@ const mockMoveToAddressableArea = {
   params: {
     pipetteId: mockId,
     addressableAreaName: 'movableTrashA3',
+    offset: { x: 0, y: 0, z: 0 },
   },
 }
 
