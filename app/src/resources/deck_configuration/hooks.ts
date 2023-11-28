@@ -39,6 +39,7 @@ export function useDeckConfigurationCompatibility(
           getCutoutIdForAddressableArea(aa, fixturesThatMountToCutoutId) ===
           cutoutId
       )
+
       return [
         ...acc,
         {

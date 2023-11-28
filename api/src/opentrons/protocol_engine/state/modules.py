@@ -9,7 +9,6 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
-    Set,
     Type,
     TypeVar,
     Union,
@@ -43,7 +42,6 @@ from ..types import (
     LabwareOffsetVector,
     HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
-    ModuleLocation,
     DeckType,
     LabwareMovementOffsetData,
 )
@@ -493,17 +491,15 @@ class ModuleView(HasState[ModuleState]):
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_by_slot(
-        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+        self,
+        slot_name: DeckSlotName,
     ) -> Optional[LoadedModule]:
         """Get the module located in a given slot, if any."""
         slots_by_id = reversed(list(self._state.slot_by_module_id.items()))
 
         for module_id, module_slot in slots_by_id:
-            if module_slot == slot_name and module_id in allowed_ids:
+            if module_slot == slot_name:
                 return self.get(module_id)
 
         return None
@@ -932,7 +928,8 @@ class ModuleView(HasState[ModuleState]):
         return hs_restrictors
 
     def raise_if_module_in_location(
-        self, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        location: DeckSlotLocation,
     ) -> None:
         """Raise if the given location has a module in it."""
         for module in self.get_all():

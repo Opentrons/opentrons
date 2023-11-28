@@ -21,10 +21,6 @@ export function forDropTip(
     )
   }
   const { robotState } = robotStateAndWarnings
-  //  TODO(jr, 10/02/23): wire this up properly when we support dispensing into waste chute
-  //  i honestly am not sure why we even need to update the liquid state for dropping tip? I guess
-  //  it is to account for if a user diliberately drops tip with liquid still in it which I didn't realize
-  //  is supported into PD???? Maybe it is error handling?
   dispenseUpdateLiquidState({
     invariantContext,
     prevLiquidState: robotState.liquidState,

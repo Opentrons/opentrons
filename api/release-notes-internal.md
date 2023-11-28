@@ -27,4 +27,8 @@ The biggest new features, however, are
 
 - The ``MoveToAddressableArea`` command will noop. This means that all commands that use the movable trash bin will not "move to the trash bin". The command will analyze successfully.
 - The deck configuration on the robot is not persistent, this means that between boots of a robot, you must PUT a deck configuration on the robot via HTTP.
- 
+
+## Other changes
+
+- Protocol engine now does not allow loading any items in locations (whether deck slot/ module/ adapter) that are already occupied. 
+Previously there were gaps in our checks for this in the API. Also, one could write HTTP/ JSON protocols (not PD generated) that loaded multiple items in a given location. Protocols were most likely exploiting this loophole to perform labware movement prior to DSM support. They should now use the correct labware movement API instead.

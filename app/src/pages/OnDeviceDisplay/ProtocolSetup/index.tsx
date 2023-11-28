@@ -204,7 +204,6 @@ interface PrepareToRunProps {
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   play: () => void
-  setupScreen: SetupScreens
 }
 
 function PrepareToRun({
@@ -212,7 +211,6 @@ function PrepareToRun({
   setSetupScreen,
   confirmAttachment,
   play,
-  setupScreen,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
@@ -317,9 +315,9 @@ function PrepareToRun({
       : 0
 
   const missingProtocolHardware = useMissingProtocolHardwareFromAnalysis(
+    robotType,
     mostRecentAnalysis
   )
-
   const isLocationConflict = missingProtocolHardware.conflictedSlots.length > 0
 
   const missingPipettes = missingProtocolHardware.missingProtocolHardware.filter(
@@ -707,7 +705,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         play={play}
-        setupScreen={setupScreen}
       />
     ),
     instruments: (

@@ -71,7 +71,7 @@ function _getSelectedWellsForStep(
       wells.push(...getWells(stepArgs.sourceWells))
     }
 
-    if (stepArgs.destLabware === labwareId) {
+    if (stepArgs.destLabware === labwareId && stepArgs.destWells != null) {
       wells.push(...getWells(stepArgs.destWells))
     }
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
@@ -79,7 +79,7 @@ function _getSelectedWellsForStep(
       wells.push(...getWells(stepArgs.sourceWells))
     }
 
-    if (stepArgs.destLabware === labwareId) {
+    if (stepArgs.destLabware === labwareId && stepArgs.destWell != null) {
       wells.push(...getWells([stepArgs.destWell]))
     }
   } else if (stepArgs.commandCreatorFnName === 'distribute') {

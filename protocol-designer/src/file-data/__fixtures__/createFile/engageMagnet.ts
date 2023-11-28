@@ -31,6 +31,7 @@ export const initialRobotState: RobotState = {
   liquidState: {
     labware: {},
     pipettes: {},
+    additionalEquipment: {},
   },
   tipState: {
     tipracks: {},
