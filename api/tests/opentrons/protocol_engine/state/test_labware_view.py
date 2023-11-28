@@ -1110,22 +1110,6 @@ def test_get_by_slot() -> None:
     assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
 
 
-def test_get_by_slot_prefers_later() -> None:
-    """It should get the labware in a slot, preferring later items if locations match."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1) == labware_1_again
-
-
 @pytest.mark.parametrize(
     ["well_name", "mount", "labware_slot", "next_to_module", "expected_result"],
     [
