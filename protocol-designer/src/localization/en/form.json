@@ -53,7 +53,7 @@
         "label": "nozzles",
         "option": { "ALL": "All", "COLUMN": "Column" },
         "option_tooltip": {
-          "COLUMN": "A tiprack without an adapter is required in order to select column partial tip pick up."
+          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
         }
       },
       "airGap": { "label": "air gap" },

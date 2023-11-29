@@ -172,6 +172,7 @@ export const mix: CommandCreator<MixArgs> = (
     return {
       errors: [
         errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'mix',
           labware:
             invariantContext.labwareEntities[labware].def.metadata.displayName,
         }),

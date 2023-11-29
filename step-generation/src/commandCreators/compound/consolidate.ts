@@ -101,6 +101,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return {
       errors: [
         errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'aspirate',
           labware:
             invariantContext.labwareEntities[args.sourceLabware].def.metadata
               .displayName,
@@ -122,6 +123,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return {
       errors: [
         errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'dispense',
           labware:
             invariantContext.labwareEntities[args.destLabware].def.metadata
               .displayName,

@@ -1,4 +1,3 @@
-import { FLEX_TRASH_DEF_URI } from '../constants'
 import type { RobotState, InvariantContext } from '../types'
 
 const SAFETY_MARGIN = 10
@@ -19,8 +18,8 @@ export const getIsTallLabwareWestOf96Channel = (
   const tipLength = pipetteHasTip
     ? pipetteEntities[pipetteId].tiprackLabwareDef.parameters.tipLength ?? 0
     : 0
-  // early exit if source labware is the waste chute since there
-  // are no collision warnings with the waste chute
+  // early exit if source labware is the waste chute or trash bin since there
+  // are no collision warnings with those
   if (additionalEquipmentEntities[sourceLabwareId] != null) {
     return false
   }
@@ -28,11 +27,6 @@ export const getIsTallLabwareWestOf96Channel = (
   const labwareSlot = labwareState[sourceLabwareId].slot
   const letter = labwareSlot.charAt(0)
   const number = labwareSlot.charAt(1)
-
-  // no collision warnings when source labware is trash bin
-  if (labwareEntities[sourceLabwareId].labwareDefURI === FLEX_TRASH_DEF_URI) {
-    return false
-  }
 
   if (number === '2' || number === '3' || number === '4') {
     const westNumber = String.fromCharCode(number.charCodeAt(0) - 1)
@@ -53,9 +47,12 @@ export const getIsTallLabwareWestOf96Channel = (
           labwareEntities[westLabwareId].def.dimensions.zDimension
         const sourceLabwareHeight =
           labwareEntities[sourceLabwareId].def.dimensions.zDimension
-        //  TODO(jr, 11/6/23): update height differences when we know
+        if (westLabwareHeight === sourceLabwareHeight) {
+          return false
+        }
+
         return (
-          westLabwareHeight < sourceLabwareHeight + tipLength - SAFETY_MARGIN
+          westLabwareHeight > sourceLabwareHeight + tipLength - SAFETY_MARGIN
         )
       }
     }

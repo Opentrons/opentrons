@@ -169,11 +169,12 @@ export const tallLabwareEastWestOfHeaterShaker = (
 }
 
 export const tallLabwareWestOf96ChannelPipetteLabware = (args: {
+  source: string
   labware: string
 }): CommandCreatorError => {
   return {
     type: 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE',
-    message: `Labware to the left of the ${args.labware} is too tall and will collide with the 96-channel.`,
+    message: `Labware to the left of the ${args.source} ${args.labware} is too tall and will collide with the 96-channel.`,
   }
 }
 

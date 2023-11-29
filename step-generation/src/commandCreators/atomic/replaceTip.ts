@@ -169,6 +169,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     return {
       errors: [
         errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'tiprack',
           labware:
             invariantContext.labwareEntities[nextTiprack.tiprackId].def.metadata
               .displayName,

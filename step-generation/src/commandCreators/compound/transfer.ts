@@ -139,6 +139,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   ) {
     errors.push(
       errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        source: 'aspirate',
         labware:
           invariantContext.labwareEntities[args.sourceLabware].def.metadata
             .displayName,
@@ -158,6 +159,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   ) {
     errors.push(
       errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        source: 'dispense',
         labware:
           invariantContext.labwareEntities[args.destLabware].def.metadata
             .displayName,
