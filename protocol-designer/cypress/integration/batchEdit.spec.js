@@ -1,3 +1,6 @@
+// Completely covered by other tests
+// Marking this file for complete removal
+
 describe('Batch Edit Transform', () => {
   beforeEach(() => {
     cy.visit('/')
@@ -18,7 +21,12 @@ describe('Batch Edit Transform', () => {
 
     cy.get('button').contains('exit batch edit').should('exist')
 
-    // Range selection with shift
+    ///////////////////////////////////////////////////////////////////
+    // E2E Test Name: Range selection with shift
+    // Existing Coverage: True
+    // Existing Coverage File: protocol-designer/src/containers/__tests__/ConnectedStepItem.test.tsx
+    // Existing Coverage Test Case: when PD in batch edit mode -> it should select multiple steps
+
     cy.get('[data-test="StepItem_3"]').click({
       shiftKey: true,
     })
@@ -26,8 +34,14 @@ describe('Batch Edit Transform', () => {
     cy.get('#StepSelectionBannerComponent_numberStepsSelected')
       .contains('3 steps selected')
       .should('exist')
+    ///////////////////////////////////////////////////////////////////
 
-    // Change the Flowrate to 100 and Save
+    ///////////////////////////////////////////////////////////////////
+    // E2E Test Name: Change the Flowrate to 100 and Save
+    // Existing Coverage: True
+    // Existing Coverage File: protocol-designer/src/components/BatchEditForm/__tests__/makeBatchEditFieldProps.test.ts
+    // Existing Coverage Test Case: makeBatchEditFieldProps -> should create correct props for all fields with the given MultiselectFieldValues obj
+
     cy.get('[name="aspirate_flowRate"]').click()
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
     cy.get('button').contains('Done').click()
@@ -38,8 +52,13 @@ describe('Batch Edit Transform', () => {
       shiftKey: true,
     })
     cy.get('input[name="aspirate_flowRate"]').should('have.value', 100)
+    ///////////////////////////////////////////////////////////////////
 
-    // Verify that transfer and other step selection does not support multistep editing
+    ///////////////////////////////////////////////////////////////////
+    // E2E Test Name: Verify that transfer and other step selection does not support multistep editing
+    // Existing Coverage: True
+    // Existing Coverage File: protocol-designer/src/components/BatchEditForm/__tests__/makeBatchEditFieldProps.test.tsall steps
+    // Existing Coverage Test Case: makeBatchEditFieldProps -> should make field disabled if it is represented in disabledFields, and show disabled explanation tooltip
     cy.get('[data-test="StepItem_4"]').click({
       [isMacOSX ? 'metaKey' : 'ctrlKey']: true,
     })
@@ -50,6 +69,19 @@ describe('Batch Edit Transform', () => {
     cy.get('[id=Text_noSharedSettings]').contains(
       'Batch editing of settings is only available for Transfer or Mix steps'
     )
+    ///////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////   
+    // E2E Test Name: Expanding / Selecting / Deselecting / Deleting / Duplicating 
+    // Existing Coverage: True
+    // Existing Coverage File: protocol-designer/src/components/steplist/__tests__/MultiSelectToolbar.test.tsx
+    // Existing Coverage Test Cases: 
+    //  MultiSelectToolbar -> 
+    //    should have a checked checkbox when all steps are selected, and deselect them all when clicked
+    //    should have a minus box when not all steps are selected, and select them all when clicked
+    //    when clicking on expand/collapse -> 
+    //      should expand/collapse all steps
+    //      should toggle the expand/collapse icon
 
     // Expand ALL steps
     cy.get('#ClickableIcon_expand').click()
@@ -84,6 +116,7 @@ describe('Batch Edit Transform', () => {
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
     cy.get('button').contains('+ Add Step').should('not.be.disabled')
+    ///////////////////////////////////////////////////////////////////
   })
 })
 
