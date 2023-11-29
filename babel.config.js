@@ -54,17 +54,17 @@ module.exports = {
     {
       test: 'app-shell/**/*',
       plugins: [['react-hot-loader/babel', false]],
-      presets: [['@babel/preset-env', { targets: { electron: '6' } }]],
+      presets: [['@babel/preset-env', { targets: { electron: '27.1.2' } }]],
     },
     {
       test: 'app-shell-odd/**/*',
       plugins: [['react-hot-loader/babel', false]],
-      presets: [['@babel/preset-env', { targets: { electron: '6' } }]],
+      presets: [['@babel/preset-env', { targets: { electron: '27.1.2' } }]],
     },
     {
       test: ['discovery-client/**/*'],
       plugins: [['react-hot-loader/babel', false]],
-      presets: [['@babel/preset-env', { targets: { node: '8' } }]],
+      presets: [['@babel/preset-env', { targets: { node: '20' } }]],
     },
     // apps that should be polyfilled
     // these projects require `core-js` in their package.json `dependencies`

@@ -27,7 +27,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": "^18.16.1"
+    "node": ">=18.17.0 <22.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -87,8 +87,8 @@
     "cz-conventional-changelog": "2.1.0",
     "decompress": "4.2.1",
     "download": "8.0.0",
-    "electron": "26.3.0",
-    "electron-builder": "24.6.3",
+    "electron": "27.1.2",
+    "electron-builder": "24.9.1",
     "enzyme": "^3.11.0",
     "enzyme-to-json": "^3.4.4",
     "eslint": "^7.22.0",

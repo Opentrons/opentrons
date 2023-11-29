@@ -23,6 +23,7 @@ ssh_opts ?= $(default_ssh_opts)
 
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
+	--config.electronVersion=27.1.2 \
 	--publish never
   
 electron := yarn electron . \
