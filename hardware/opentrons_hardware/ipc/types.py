@@ -321,3 +321,4 @@ class JSONRPCBatchResponse(object):
     def __iter__(self) -> Iterable[JSONRPCResponse]:
         """Iterable that returns the responses"""
         return iter(self.responses)
+

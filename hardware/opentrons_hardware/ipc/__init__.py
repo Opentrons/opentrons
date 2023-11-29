@@ -1,6 +1,6 @@
 """Module to talk to other processes using json-rpc over async sockets."""
 
-from .dispatcher import JSONRPCDispatcher
+from .dispatcher import JSONRPCDispatcher, Dispatcher, ipc_expose
 from .manager import JSONRPCResponseManager
 from .messenger import IPCMessenger
 from .types import (
@@ -19,6 +19,7 @@ ipc_dispatcher = JSONRPCDispatcher()
 
 
 __all__ = [
+    "Dispatcher",
     "ipc_dispatcher",
     "JSONRPCDispatcher",
     "JSONRPCResponseManager",

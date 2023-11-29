@@ -1,4 +1,5 @@
 """This module is responsible for executing and formulating an rpc response."""
+import inspect
 import asyncio
 import json
 from typing import Any, Optional, AsyncGenerator, List, Dict
@@ -55,15 +56,35 @@ class JSONRPCResponseManager:
 
     async def handle(self, request_str: str) -> Optional[JSONRPCResponse]:
         """Validate that this data is a json-rpc message and execute its method, returning a JSONRPCResponse if applicable."""
+        print("YOO")
+        print(request_str)
         try:
             data = json.loads(request_str)
         except (TypeError, ValueError, json.JSONDecodeError):
+            print("yoooooo")
             return JSONRPCResponse(error=JSONRPCParseError())
+
+
+        # todo: for testing
+        print(f"got data: {data}")
+
+        # handle here for testing
+        path = data.get('path')
+        if not path:
+            print(f"unknown path {path}")
+            return
+
+        obj = self._dispatcher.registered[path]
+
+
+
+        # ------------------------
 
         # Validate the data request
         try:
             request = JSONRPCRequest.from_data(data)
         except JSONRPCInvalidRequestException as e:
+            print("problem")
             return JSONRPCResponse(error=JSONRPCInvalidRequestError())
         return await self._handle_request(request)
 
@@ -74,6 +95,8 @@ class JSONRPCResponseManager:
         """Execute a valid json-rpc request and return a response."""
         rs = request if isinstance(request, JSONRPCBatchRequest) \
             else [request]
+
+        print("handle!")
 
         # lets collect our responses
         responses = [resp async for resp in self._get_responses(rs)]
@@ -95,6 +118,8 @@ class JSONRPCResponseManager:
     ) -> JSONRPCResponse:
         """ Response for each single JSON-RPC Request."""
 
+        print("get response")
+
         # response helper
         def _make_response(
             request: JSONRPCRequest,
@@ -109,16 +134,24 @@ class JSONRPCResponseManager:
             return response if not request.is_notification else None
 
         for request in requests:
+            print("help me")
             if request.version != JSONRPC_VERSION:
+                print("invalid version")
                 yield _make_response(request, error=JSONRPCVersionNotSupported())
                 return
 
             # attempt get the method from the dispatcher
             try:
-                method = self._dispatcher.methods[request.method]
+                method = self._dispatcher.registered[request.method]
             except KeyError:
+                print("Invalid method!")
                 yield _make_response(request, error=JSONRPCMethodNotFoundError())
                 return
+            except Exception as e:
+                print("problem")
+                print(e)
+
+            print("whats going on??")
 
             # get the args and kwargs
             args = req_args = request.args
@@ -128,13 +161,34 @@ class JSONRPCResponseManager:
                 args = tuple(pos_args)
 
             # add context object if available
-            context_arg = self._dispatcher.context.get(method.name)
-            context_obj = self._context.get(context_arg)
-            if context_arg and context_obj:
-                # add context to the args
-                args = (context_obj, *args)
+            #context_arg = self._dispatcher.context.get(method.name)
+            #context_obj = self._context.get(context_arg)
+            #if context_arg and context_obj:
+            #    # add context to the args
+            #    args = (context_obj, *args)
 
-           # execute the command and get the response
+
+            # get type of object
+            obj = method.object  # fix name
+            print("handle", obj)
+            if inspect.isfunction(obj):
+                print("im a function")
+                if asyncio.iscoroutinefunction(obj):
+                    result = await obj(*args, **kwargs)
+                else:
+                    result = obj(*args, **kwargs)
+                yield _make_response(request, result=result)
+            # this is a class instance
+            elif isinstance(obj, object) and not inspect.isclass(obj):
+                print("im a class, return serialized obj")
+                result = method.data  # fix name
+                yield _make_response(request, result=result)
+            else:
+                print(f"what am I?? {obj}")
+                yield _make_response(request, error=JSONRPCServerError())
+
+            # execute the command and get the response
+            print(method)
             try:
                 function = method.method
                 if asyncio.iscoroutinefunction(function):

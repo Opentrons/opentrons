@@ -51,8 +51,9 @@ class IPCMessenger:
 
         # register helper with the dispatcher
         self._dispatcher = dispatcher
-        async def _get_health() -> bool: return True
-        self._dispatcher.add_method(_get_health, name="get_health")
+        print("type", type(dispatcher))
+        # def _get_health() -> bool: return True
+        self._dispatcher.register(lambda: True, "/hardware/get_health")
         self._handler = JSONRPCResponseManager(self._dispatcher, context=context)
 
         # state variables
@@ -83,9 +84,14 @@ class IPCMessenger:
         # client sends its name when it connects
         data = await reader.readline()
         name = data.decode().strip()
-        logger.info(f"Client connected: {name}")
+        print(f"Client connected: {name}")
         self._clients[name] = (reader, writer)
-        # writer.write("\n".encode())
+
+        # send exposed methods to the client
+        registered_data = self._dispatcher.json
+        print(registered_data)
+
+        writer.write(registered_data.encode())
         await writer.drain()
         await asyncio.sleep(2)
 
@@ -95,10 +101,10 @@ class IPCMessenger:
             message = data.decode().strip()
             if data:
                 # received a message, handle and respond
-                logger.info(f"Received IPC message: {message}")
+                print(f"Received IPC message: {message}")
                 response = await self._handler.handle(message)
                 if response:
-                    logger.debug(f"Sending IPC response: {response.json}")
+                    print(f"Sending IPC response: {response.json}")
                     writer.write(response.json.encode() + b'\n')
                     await writer.drain()
             else:
@@ -111,7 +117,7 @@ class IPCMessenger:
                 await asyncio.sleep(2)
 
         # The client got disconnected
-        logger.info(f"Client disconnected: {name}")
+        log.info(f"Client disconnected: {name}")
         writer.close()
 
         # remove the client from list
@@ -200,16 +206,13 @@ class IPCMessenger:
             request._id = self._req_id
 
         self._req_id = self._req_id % 255
-
         response: Optional[JSONRPCResponse] = None
-        # port = DESTINATION_PORT[target]
         path = SOCKET_PATHNAMES[target]
-        logger.debug(f"Sending: {self._source.name} -> {target.name} \n{request}")
-
+        print(f"Sending: {self._source.name} -> {target.name} \n{request}")
         try:
             client = self._clients.get(target)
             if client is None:
-                logger.debug(f"Re-connecting to {target}")
+                log.debug(f"Re-connecting to {target}")
                 reader, writer = await asyncio.open_unix_connection(path=path)
                 msg = f"{self._source.value}\n"
                 writer.write(msg.encode())
@@ -227,7 +230,7 @@ class IPCMessenger:
             data = await reader.readline()
 
             # return the response
-            logger.debug(f"Received IPC response: {data.decode()}")
+            log.debug(f"Received IPC response: {data.decode()}")
 
             # todo: deal with batch response
             response = JSONRPCResponse.from_json(data)
