@@ -1,7 +1,7 @@
 from typing import Optional
 from typing_extensions import Protocol
 
-from .types import MountArgType, CalibrationType
+from .types import MountArgType, CalibrationType, ConfigType
 
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
@@ -12,9 +12,9 @@ from .calibratable import Calibratable
 class LiquidHandler(
     InstrumentConfigurer[MountArgType],
     MotionController[MountArgType],
-    Configurable,
+    Configurable[ConfigType],
     Calibratable[CalibrationType],
-    Protocol[CalibrationType, MountArgType],
+    Protocol[CalibrationType, MountArgType, ConfigType],
 ):
     async def update_nozzle_configuration_for_mount(
         self,

@@ -196,7 +196,9 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    FlexHardwareControlInterface[OT3Transforms, Union[top_types.Mount, OT3Mount]],
+    FlexHardwareControlInterface[
+        OT3Transforms, Union[top_types.Mount, OT3Mount], OT3Config
+    ],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -1288,6 +1290,9 @@ class OT3API(
                 )
         except GripperNotPresentError:
             pass
+
+    def gripper_jaw_can_home(self) -> bool:
+        return self._gripper_handler.is_ready_for_jaw_home()
 
     def _build_moves(
         self,

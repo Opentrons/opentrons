@@ -46,10 +46,8 @@ from opentrons.config.robot_configs import (
 )
 from .util import DeckTransformState
 
-from opentrons.hardware_control import OT3HardwareControlAPI
-
 if TYPE_CHECKING:
-    from .ot3api import OT3API
+    from opentrons.hardware_control import OT3HardwareControlAPI
 
 LOG = getLogger(__name__)
 

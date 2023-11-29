@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Mapping, TypeVar
+from typing import Dict, List, Optional, Mapping
 from typing_extensions import Protocol
 
 from opentrons.types import Point

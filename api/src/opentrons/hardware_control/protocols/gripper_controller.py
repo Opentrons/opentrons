@@ -4,11 +4,7 @@ from typing_extensions import Protocol
 
 
 class GripperController(Protocol):
-    """A protocol specifying gripper API functions.
-
-    All functions other than `has_gripper` may be unimplemented on some systems
-    due to a lack of gripper support.
-    """
+    """A protocol specifying gripper API functions."""
 
     async def grip(
         self, force_newtons: Optional[float] = None, stay_engaged: bool = True
@@ -24,4 +20,12 @@ class GripperController(Protocol):
 
     async def idle_gripper(self) -> None:
         """Move gripper to its idle, gripped position."""
+        ...
+
+    def gripper_jaw_can_home(self) -> bool:
+        """Check if it is valid to home the gripper jaw.
+
+        This should return False if the API believes that the gripper is
+        currently holding something.
+        """
         ...

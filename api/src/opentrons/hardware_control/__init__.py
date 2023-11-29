@@ -23,6 +23,7 @@ from .instruments import AbstractInstrument, Gripper
 from typing import Union
 from .ot3_calibration import OT3Transforms
 from .robot_calibration import RobotCalibration
+from opentrons.config.types import RobotConfig, OT3Config
 
 from opentrons.types import Mount
 
@@ -31,9 +32,9 @@ from opentrons.types import Mount
 # and 2. how to properly export an ot2 and ot3 pipette.
 from .instruments.ot2.pipette import Pipette
 
-OT2HardwareControlAPI = HardwareControlInterface[RobotCalibration, Mount]
+OT2HardwareControlAPI = HardwareControlInterface[RobotCalibration, Mount, RobotConfig]
 OT3HardwareControlAPI = FlexHardwareControlInterface[
-    OT3Transforms, Union[Mount, OT3Mount]
+    OT3Transforms, Union[Mount, OT3Mount], OT3Config
 ]
 HardwareControlAPI = Union[OT2HardwareControlAPI, OT3HardwareControlAPI]
 
@@ -59,4 +60,6 @@ __all__ = [
     "ThreadedAsyncForbidden",
     "ThreadManagedHardware",
     "SyncHardwareAPI",
+    "OT2HardwareControlAPI",
+    "OT3HardwareControlAPI",
 ]

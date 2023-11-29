@@ -18,20 +18,20 @@ from .identifiable import Identifiable
 from .gripper_controller import GripperController
 from .flex_calibratable import FlexCalibratable
 
-from .types import CalibrationType, MountArgType
+from .types import CalibrationType, MountArgType, ConfigType
 
 
 class HardwareControlInterface(
     ModuleProvider,
     ExecutionControllable,
-    LiquidHandler[CalibrationType, MountArgType],
+    LiquidHandler[CalibrationType, MountArgType, ConfigType],
     ChassisAccessoryManager,
     HardwareManager,
     AsyncioConfigurable,
     Stoppable,
     Simulatable,
     Identifiable,
-    Protocol[CalibrationType, MountArgType],
+    Protocol[CalibrationType, MountArgType, ConfigType],
 ):
     """A mypy protocol for a hardware controller.
 
@@ -51,10 +51,10 @@ class HardwareControlInterface(
 
 
 class FlexHardwareControlInterface(
-    HardwareControlInterface[CalibrationType, MountArgType],
+    HardwareControlInterface[CalibrationType, MountArgType, ConfigType],
     GripperController,
     FlexCalibratable,
-    Protocol[CalibrationType, MountArgType],
+    Protocol[CalibrationType, MountArgType, ConfigType],
 ):
     """A mypy protocol for a hardware controller with Flex-specific extensions.
 
