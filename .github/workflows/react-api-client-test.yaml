@@ -39,7 +39,7 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '18'
+          node-version: '21'
       - name: 'install libudev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
