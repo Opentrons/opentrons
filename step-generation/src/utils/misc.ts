@@ -13,13 +13,13 @@ import {
 } from '@opentrons/shared-data'
 import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
 import {
+  aspirate,
+  configureNozzleLayout,
+  dispense,
   moveToAddressableArea,
   moveToWell,
-  aspirate,
-  dispense,
 } from '../commandCreators/atomic'
 import { blowout } from '../commandCreators/atomic/blowout'
-import { configureNozzleLayout } from '../commandCreators/atomic'
 import { curryCommandCreator } from './curryCommandCreator'
 import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
 import type {

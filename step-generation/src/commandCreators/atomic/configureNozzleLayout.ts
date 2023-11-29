@@ -21,7 +21,7 @@ export const configureNozzleLayout: CommandCreator<configureNozzleLayoutArgs> = 
       params: {
         pipetteId,
         configuration_params: {
-          primary_nozzle: 'A1', // TODO(jr, 11/16/23): wire this up when we support other nozzle configurations
+          primary_nozzle: nozzles === 'COLUMN' ? 'A12' : 'A1', // TODO(jr, 11/16/23): wire this up when we support other nozzle configurations
           style: nozzles,
         },
       },

@@ -1,6 +1,6 @@
 import { getSuccessResult } from '../fixtures'
-import { configureNozzleLayout } from '../commandCreators/atomic/configureNozzleLayout'
 import { ALL } from '@opentrons/shared-data'
+import { configureNozzleLayout } from '../commandCreators/atomic/configureNozzleLayout'
 
 const getRobotInitialState = (): any => {
   return {}

@@ -95,7 +95,9 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     return {
       errors: [errorCreators.missingAdapter()],
     }
-  } else if (
+  }
+
+  if (
     nextTiprack == null &&
     channels === 96 &&
     nozzles === COLUMN &&
@@ -104,7 +106,9 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     return {
       errors: [errorCreators.removeAdapter()],
     }
-  } else if (nextTiprack == null) {
+  }
+
+  if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
     return {
       errors: [errorCreators.insufficientTips()],

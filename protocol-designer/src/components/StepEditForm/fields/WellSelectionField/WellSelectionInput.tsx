@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import { COLUMN } from '@opentrons/shared-data'
 import { FormGroup, InputField } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
@@ -15,7 +16,6 @@ import styles from '../../StepEditForm.css'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, NozzleType } from '../../../../types'
 import type { FieldProps } from '../../types'
-import { COLUMN } from '@opentrons/shared-data'
 
 export interface SP {
   stepId?: StepIdType | null
