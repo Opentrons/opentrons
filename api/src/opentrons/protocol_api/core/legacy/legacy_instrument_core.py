@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from opentrons import types
 from opentrons.hardware_control import CriticalPoint
@@ -19,6 +19,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
@@ -284,11 +285,13 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
-    def drop_tip_in_waste_chute(
-        self, waste_chute: WasteChute, home_after: Optional[bool]
+    def drop_tip_in_disposal_location(
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool]
     ) -> None:
         raise APIVersionError(
-            "Dropping tips in a waste chute is not supported in this API Version."
+            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
         )
 
     def home(self) -> None:

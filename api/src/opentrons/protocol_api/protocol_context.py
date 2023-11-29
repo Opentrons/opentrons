@@ -47,6 +47,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
@@ -439,6 +440,20 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 16)
+    # TODO: Confirm official naming of "trash bin".
+    def load_trash_bin(
+        self,
+        location: Optional[DeckLocation] = None
+    ) -> TrashBin:
+        location = validation.ensure_trash_bin_location(
+            location,
+            self._core.robot_type
+        )
+        trash_bin = TrashBin(location=location)
+        self._core.append_disposal_location(trash_bin)
+        return trash_bin
+
+    @requires_version(2, 16)
     # TODO: Confirm official naming of "waste chute".
     def load_waste_chute(
         self,
@@ -450,7 +465,9 @@ class ProtocolContext(CommandPublisher):
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."
             )
-        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        waste_chute = WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        self._core.append_disposal_location(waste_chute)
+        return waste_chute
 
     @requires_version(2, 15)
     def load_adapter(
@@ -1010,7 +1027,7 @@ class ProtocolContext(CommandPublisher):
 
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._core.fixed_trash
-        if fixed_trash_core is not None:
+        if fixed_trash_core is not None and self._api_version < APIVersion(2, 16):
             fixed_trash = Labware(
                 core=fixed_trash_core,
                 api_version=self._api_version,

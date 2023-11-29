@@ -82,6 +82,10 @@ class LabwareDefinitionIsNotLabwareError(ValueError):
     """An error raised when a labware is not loaded using `load_labware`."""
 
 
+class InvalidTrashBinLocationError(ValueError):
+    """An error raised when attempting to load trash bins in invalid slots."""
+
+
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
     """Ensure that an input value represents a valid Mount."""
     if mount in [Mount.EXTENSION, "extension"]:
@@ -259,6 +263,27 @@ def ensure_module_model(load_name: str) -> ModuleModel:
         )
 
     return model
+
+
+def ensure_trash_bin_location(
+    deck_slot: Union[int, str],
+    robot_type: RobotType
+) -> DeckSlotName:
+
+    """Ensure trash bin load location is valid."""
+
+    if robot_type == 'OT-2 Standard':
+        raise InvalidTrashBinLocationError('Cannot load trash on OT-2.')
+
+    validated_slot = ensure_and_convert_deck_slot(deck_slot)
+    slot_name_ot3 = validated_slot.to_ot3_equivalent()
+    valid_trash_bin_slots = {'A1', 'B1', 'C1', 'D1', 'A3', 'B3', 'C3', 'D3'}
+    if slot_name_ot3 not in valid_trash_bin_slots:
+        raise InvalidTrashBinLocationError(
+            f'Invalid location for trash bin: {slot_name_ot3}.\n'
+            f'Valid slots: {",".join(valid_trash_bin_slots)}')
+
+    return slot_name_ot3
 
 
 def ensure_hold_time_seconds(

@@ -32,6 +32,7 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from ._nozzle_layout import NozzleLayout
 from . import labware, validation
@@ -893,6 +894,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[
                 types.Location,
                 labware.Well,
+                TrashBin,
                 WasteChute,
             ]
         ] = None,
@@ -939,9 +941,18 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
-            well = self.trash_container.wells()[0]
+            trash_container = self.trash_container
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
+            if isinstance(trash_container, labware.Well):
+                well = self.trash_container.wells()[0]
+            else:  # implicit drop tip in disposal location, not well
+                self._core.drop_tip_in_disposal_location(
+                    trash_container,
+                    home_after=home_after
+                )
+                self._last_tip_picked_up_from = None
+                return self
 
         elif isinstance(location, labware.Well):
             well = location
@@ -961,9 +972,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
             well = maybe_well
 
-        elif isinstance(location, WasteChute):
+        elif isinstance(location, (TrashBin, WasteChute)):
             # TODO: Publish to run log.
-            self._core.drop_tip_in_waste_chute(location, home_after=home_after)
+            self._core.drop_tip_in_disposal_location(
+                location,
+                home_after=home_after
+            )
             self._last_tip_picked_up_from = None
             return self
 
@@ -1447,22 +1461,32 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(self) -> labware.Labware:
-        """The trash container associated with this pipette.
+    def trash_container(
+        self
+    ) -> Union[labware.Labware, TrashBin, WasteChute]:
+        """The trash container(s) associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        By default, the trash container is in slot A3 on Flex and in slot 12 on OT-2.
+        By default, the trash container is in slot 12 on OT-2 and in slot A3 on Flex
+        for API Versions < 2.16. For API Versions >= 2.16, we search the protocol
+        core's set of disposal locations for the first valid location if it exists.
         """
+
         if self._trash is None:
-            raise NoTrashDefinedError(
-                "No trash container has been defined in this protocol."
-            )
+            if len(self._protocol_core._disposal_locations) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            return self._protocol_core._disposal_locations[0]
         return self._trash
 
     @trash_container.setter
-    def trash_container(self, trash: labware.Labware) -> None:
+    def trash_container(
+        self,
+        trash: Union[labware.Labware, TrashBin, WasteChute]
+    ) -> None:
         self._trash = trash
 
     @property  # type: ignore

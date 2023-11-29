@@ -44,6 +44,7 @@ from opentrons.protocol_engine.errors import (
 from ... import validation
 from ..._types import OffDeckType, OFF_DECK, StagingSlotName
 from ..._liquid import Liquid
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -91,6 +92,7 @@ class ProtocolCore(
         self._module_cores_by_id: Dict[
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
+        self._disposal_locations: List[Union[TrashBin, WasteChute]] = []
         self._load_fixed_trash()
 
     @property
@@ -111,12 +113,20 @@ class ProtocolCore(
         return None
 
     def _load_fixed_trash(self) -> None:
-        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
-            self._labware_cores_by_id[trash_id] = LabwareCore(
-                labware_id=trash_id,
-                engine_client=self._engine_client,
-            )
+        if self.robot_type == 'OT-2 STANDARD' or self._api_version < APIVersion(2, 16):
+            trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+            if trash_id is not None:
+                self._labware_cores_by_id[trash_id] = LabwareCore(
+                    labware_id=trash_id,
+                    engine_client=self._engine_client,
+                )
+
+    def append_disposal_location(
+        self,
+        disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Append a disposal location object to the core"""
+        self._disposal_locations.append(disposal_location)
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
