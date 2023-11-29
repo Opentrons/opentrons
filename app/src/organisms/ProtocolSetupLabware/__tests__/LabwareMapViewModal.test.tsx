@@ -82,7 +82,7 @@ describe('LabwareMapViewModal', () => {
   })
 
   it('should render a deck with modules and labware', () => {
-    const mockLabwareLocations = [
+    const mockLabwareOnDeck = [
       {
         labwareLocation: { slotName: 'C1' },
         definition: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -91,7 +91,7 @@ describe('LabwareMapViewModal', () => {
         labwareChildren: null,
       },
     ]
-    const mockModuleLocations = [
+    const mockModulesOnDeck = [
       {
         moduleModel: 'heaterShakerModuleV1' as ModuleModel,
         moduleLocation: { slotName: 'B1' },
@@ -107,8 +107,8 @@ describe('LabwareMapViewModal', () => {
         robotType: FLEX_ROBOT_TYPE,
         deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
         deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
-        labwareLocations: mockLabwareLocations,
-        moduleLocations: mockModuleLocations,
+        labwareOnDeck: mockLabwareOnDeck,
+        modulesOnDeck: mockModulesOnDeck,
       })
       .mockReturnValue(<div>mock base deck</div>)
     mockGetLabwareRenderInfo.mockReturnValue({

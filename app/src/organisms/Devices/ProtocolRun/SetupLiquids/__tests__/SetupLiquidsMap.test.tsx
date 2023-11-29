@@ -345,8 +345,8 @@ describe('SetupLiquidsMap', () => {
           ),
           robotType: FLEX_ROBOT_TYPE,
           // ToDo (kk:11/03/2023) Update the following part later
-          labwareLocations: expect.anything(),
-          moduleLocations: expect.anything(),
+          labwareOnDeck: expect.anything(),
+          modulesOndeck: expect.anything(),
         })
       )
       .mockReturnValue(<div>mock BaseDeck</div>)

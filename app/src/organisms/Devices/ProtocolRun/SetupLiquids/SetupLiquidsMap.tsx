@@ -82,7 +82,7 @@ export function SetupLiquidsMap(
     protocolModulesInfo
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => {
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
     const labwareInAdapterInMod =
       module.nestedLabwareId != null
         ? initialLoadedLabwareByAdapter[module.nestedLabwareId]
@@ -148,8 +148,8 @@ export function SetupLiquidsMap(
         deckConfig={deckConfig}
         deckLayerBlocklist={deckLayerBlocklist}
         robotType={robotType}
-        labwareLocations={[]}
-        moduleLocations={moduleLocations}
+        labwareOnDeck={[]}
+        modulesOnDeck={modulesOnDeck}
       >
         {map(
           labwareRenderInfo,

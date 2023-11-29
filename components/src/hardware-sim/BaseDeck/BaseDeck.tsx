@@ -66,8 +66,8 @@ export interface ModuleOnDeck {
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
-  labwareLocations?: LabwareOnDeck[]
-  moduleLocations?: ModuleOnDeck[]
+  labwareOnDeck?: LabwareOnDeck[]
+  modulesOnDeck?: ModuleOnDeck[]
   deckLayerBlocklist?: string[]
   showExpansion?: boolean
   lightFill?: string
@@ -83,8 +83,8 @@ interface BaseDeckProps {
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
   const {
     robotType,
-    moduleLocations = [],
-    labwareLocations = [],
+    modulesOnDeck = [],
+    labwareOnDeck = [],
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
     deckLayerBlocklist = [],
@@ -204,7 +204,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         </>
       )}
       <>
-        {moduleLocations.map(
+        {modulesOnDeck.map(
           ({
             moduleModel,
             moduleLocation,
@@ -243,7 +243,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             ) : null
           }
         )}
-        {labwareLocations.map(
+        {labwareOnDeck.map(
           ({
             labwareLocation,
             definition,

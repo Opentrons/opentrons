@@ -40,7 +40,7 @@ export function ModulesAndDeckMapViewModal({
     protocolAnalysis.commands
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => ({
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
     moduleModel: module.moduleDef.model,
     moduleLocation: { slotName: module.slotName },
     moduleChildren: (
@@ -63,8 +63,8 @@ export function ModulesAndDeckMapViewModal({
         deckConfig={deckConfig}
         deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
         robotType={FLEX_ROBOT_TYPE}
-        labwareLocations={[]}
-        moduleLocations={moduleLocations}
+        labwareOnDeck={[]}
+        modulesOnDeck={modulesOnDeck}
       />
     </Modal>
   )
