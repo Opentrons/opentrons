@@ -36,9 +36,9 @@ from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
-from .._trash_bin import TrashBin
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
-from .._trash_bin_dimensions import trash_bin_dimensions
+from ... import _trash_bin_dimensions
 from ... import _waste_chute_dimensions
 
 if TYPE_CHECKING:
@@ -418,7 +418,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     ) -> None:
 
         if isinstance(disposal_location, TrashBin):
-            dimensions = trash_bin_dimensions
+            dimensions = _trash_bin_dimensions
             slot_name = disposal_location._location
             minimum_z = None
         else:
