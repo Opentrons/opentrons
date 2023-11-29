@@ -18,6 +18,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
     DeckType,
+    AddressableAreaLocation,
 )
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands.move_labware import (
@@ -241,6 +242,88 @@ async def test_gripper_move_labware_implementation(
                 pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
                 dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
             ),
+            delay_after_drop=None,
+        ),
+    )
+    assert result == MoveLabwareResult(
+        offsetId="wowzers-a-new-offset-id",
+    )
+
+
+async def test_gripper_move_to_waste_chute_implementation(
+    decoy: Decoy,
+    equipment: EquipmentHandler,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+    run_control: RunControlHandler,
+) -> None:
+    """It should drop the labware with a delay added."""
+    subject = MoveLabwareImplementation(
+        state_view=state_view,
+        equipment=equipment,
+        labware_movement=labware_movement,
+        run_control=run_control,
+    )
+    from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    new_location = AddressableAreaLocation(addressableAreaName="gripperWasteChute")
+
+    data = MoveLabwareParams(
+        labwareId="my-cool-labware-id",
+        newLocation=new_location,
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+        pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+        dropOffset=None,
+    )
+    decoy.when(
+        state_view.labware.get_definition(labware_id="my-cool-labware-id")
+    ).then_return(
+        LabwareDefinition.construct(namespace="my-cool-namespace")  # type: ignore[call-arg]
+    )
+    decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
+        LoadedLabware(
+            id="my-cool-labware-id",
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=from_location,
+            offsetId=None,
+        )
+    )
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(
+            location=new_location,
+        )
+    ).then_return(new_location)
+    decoy.when(
+        equipment.find_applicable_labware_offset_id(
+            labware_definition_uri="opentrons-test/load-name/1",
+            labware_location=new_location,
+        )
+    ).then_return("wowzers-a-new-offset-id")
+
+    decoy.when(
+        state_view.geometry.ensure_valid_gripper_location(from_location)
+    ).then_return(from_location)
+    decoy.when(
+        state_view.geometry.ensure_valid_gripper_location(new_location)
+    ).then_return(new_location)
+    decoy.when(
+        labware_validation.validate_gripper_compatible(
+            LabwareDefinition.construct(namespace="my-cool-namespace")  # type: ignore[call-arg]
+        )
+    ).then_return(True)
+
+    result = await subject.execute(data)
+    decoy.verify(
+        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id"),
+        await labware_movement.move_labware_with_gripper(
+            labware_id="my-cool-labware-id",
+            current_location=from_location,
+            new_location=new_location,
+            user_offset_data=LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+            ),
+            delay_after_drop=1.0,
         ),
     )
     assert result == MoveLabwareResult(
