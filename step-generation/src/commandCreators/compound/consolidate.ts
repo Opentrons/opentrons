@@ -63,9 +63,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }
   }
 
-  //  TODO(jr, 11/28/23): wire this up fully, need to add additionalEquipmentEntities
-  //  to RobotState
-  if (!args.destLabware) {
+  if (
+    !args.destLabware ||
+    (!invariantContext.labwareEntities[args.destLabware] &&
+      !invariantContext.additionalEquipmentEntities[args.destLabware])
+  ) {
     return { errors: [errorCreators.equipmentDoesNotExist()] }
   }
 

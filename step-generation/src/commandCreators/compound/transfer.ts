@@ -103,9 +103,11 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
   }
 
-  //  TODO(jr, 11/28/23): wire this up fully, need to add additionalEquipmentEntities
-  //  to RobotState
-  if (!args.destLabware) {
+  if (
+    !args.destLabware ||
+    (!invariantContext.labwareEntities[args.destLabware] &&
+      !invariantContext.additionalEquipmentEntities[args.destLabware])
+  ) {
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
@@ -115,7 +117,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
-
+  console.log('errors', errors)
   if (errors.length > 0)
     return {
       errors,
