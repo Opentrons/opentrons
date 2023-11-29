@@ -22,6 +22,7 @@ import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { DropTipWizard } from '../../../organisms/DropTipWizard'
+import { PlateFillWizard } from '../../../organisms/PlateFillWizard'
 import { FLOWS } from '../../../organisms/PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../../../organisms/GripperWizardFlows/constants'
 
@@ -43,6 +44,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
     const { t } = useTranslation('robot_controls')
     const modal = useModal()
     const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
+    const [showPlateFillWizard, setShowPlateFillWizard] = React.useState(false)
     const [wizardProps, setWizardProps] = React.useState<
       | React.ComponentProps<typeof GripperWizardFlows>
       | React.ComponentProps<typeof PipetteWizardFlows>
@@ -70,19 +72,19 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
         setWizardProps(
           instrument.mount === 'extension'
             ? {
-                ...sharedGripperWizardProps,
-                flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
-              }
+              ...sharedGripperWizardProps,
+              flowType: GRIPPER_FLOW_TYPES.RECALIBRATE,
+            }
             : {
-                closeFlow: () => {
-                  modal.remove()
-                },
-                mount: instrument.mount,
-                selectedPipette: is96Channel
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
-                flowType: FLOWS.CALIBRATE,
-              }
+              closeFlow: () => {
+                modal.remove()
+              },
+              mount: instrument.mount,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
+              flowType: FLOWS.CALIBRATE,
+            }
         )
       }
     }
@@ -110,25 +112,46 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
             </MenuItem>
           ) : null}
           {instrument.mount !== 'extension' ? (
-            <MenuItem
-              key="drop-tips"
-              onClick={() => setShowDropTipWizard(true)}
-            >
-              <Flex alignItems={ALIGN_CENTER}>
-                <Icon
-                  name="reset-position"
-                  aria-label="reset-position_icon"
-                  size="2.5rem"
-                />
-                <StyledText
-                  as="h4"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  marginLeft={SPACING.spacing12}
-                >
-                  {t('drop_tips')}
-                </StyledText>
-              </Flex>
-            </MenuItem>
+            <>
+              <MenuItem
+                key="drop-tips"
+                onClick={() => setShowDropTipWizard(true)}
+              >
+                <Flex alignItems={ALIGN_CENTER}>
+                  <Icon
+                    name="reset-position"
+                    aria-label="reset-position_icon"
+                    size="2.5rem"
+                  />
+                  <StyledText
+                    as="h4"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    marginLeft={SPACING.spacing12}
+                  >
+                    {t('drop_tips')}
+                  </StyledText>
+                </Flex>
+              </MenuItem>
+              <MenuItem
+                key="fill-plate"
+                onClick={() => setShowPlateFillWizard(true)}
+              >
+                <Flex alignItems={ALIGN_CENTER}>
+                  <Icon
+                    name="reset-position"
+                    aria-label="reset-position_icon"
+                    size="2.5rem"
+                  />
+                  <StyledText
+                    as="h4"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    marginLeft={SPACING.spacing12}
+                  >
+                    {t('fill_plate')}
+                  </StyledText>
+                </Flex>
+              </MenuItem>
+            </>
           ) : null}
         </MenuList>
         {wizardProps != null && 'mount' in wizardProps ? (
@@ -138,9 +161,19 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
           <GripperWizardFlows {...wizardProps} />
         ) : null}
         {showDropTipWizard &&
-        instrument.mount !== 'extension' &&
-        pipetteModelSpecs != null ? (
+          instrument.mount !== 'extension' &&
+          pipetteModelSpecs != null ? (
           <DropTipWizard
+            robotType={FLEX_ROBOT_TYPE}
+            mount={instrument.mount}
+            instrumentModelSpecs={pipetteModelSpecs}
+            closeFlow={modal.remove}
+          />
+        ) : null}
+        {showPlateFillWizard &&
+          instrument.mount !== 'extension' &&
+          pipetteModelSpecs != null ? (
+          <PlateFillWizard
             robotType={FLEX_ROBOT_TYPE}
             mount={instrument.mount}
             instrumentModelSpecs={pipetteModelSpecs}

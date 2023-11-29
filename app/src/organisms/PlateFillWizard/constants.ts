@@ -1,0 +1,18 @@
+export const INTRODUCTION = 'INTRODUCTION' as const
+export const CHOOSE_TIP_RACK = 'CHOOSE_TIP_RACK' as const
+export const CHOOSE_SOURCE = 'CHOOSE_SOURCE' as const
+export const CHOOSE_DESTINATION = 'CHOOSE_DESTINATION' as const
+export const SUCCESS = 'SUCCESS' as const
+
+export const PLATE_FILL_STEPS = [
+  INTRODUCTION,
+  CHOOSE_TIP_RACK,
+  CHOOSE_SOURCE,
+  CHOOSE_DESTINATION,
+  SUCCESS,
+]
+
+
+export const TIP_RACK_SLOT_NAME = 'B2'
+export const SOURCE_LABWARE_SLOT_NAME = 'C2'
+export const DESTINATION_LABWARE_SLOT_NAME = 'D2'
