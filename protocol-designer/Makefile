@@ -45,7 +45,7 @@ benchmarks: export NODE_ENV := test
 benchmarks:
 	shx mkdir -p benchmarks/output
 	node ../scripts/runBenchmarks "./benchmarks/*.js" | \
-	ntee "./benchmarks/output/$(benchmark_output)"
+	ntee "./benchmarks/output/$(benchmark_ouservertput)"
 
 .PHONY: dev
 dev: export NODE_ENV := development
@@ -67,6 +67,12 @@ test-e2e:
 .PHONY: test
 test:
 	$(MAKE) -C .. test-js-protocol-designer tests="$(tests)" test_opts="$(test_opts)"
+
+.PHONY: open-cypress
+open-cypress:
+	concurrently \
+	"$(MAKE) dev CYPRESS=1" \
+	"wait-on http://localhost:8080/ && CYPRESS_WATCH_FOR_FILE_CHANGES=false cypress open --browser chrome --env host=0.0.0.0port=8080"
 
 .PHONY: test-cov
 test-cov:
