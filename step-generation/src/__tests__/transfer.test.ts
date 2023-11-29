@@ -1,3 +1,4 @@
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
@@ -19,8 +20,6 @@ import {
   SOURCE_LABWARE,
   makeDispenseAirGapHelper,
   AIR_GAP_META,
-  dropTipInPlaceHelper,
-  moveToAddressableAreaHelper,
 } from '../fixtures'
 import { FIXED_TRASH_ID } from '../constants'
 import {
@@ -29,7 +28,6 @@ import {
 } from '../utils/misc'
 import { transfer } from '../commandCreators/compound/transfer'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
@@ -134,16 +132,12 @@ describe('pick up tip if no tip on pipette', () => {
     const result = transfer(noTipArgs, invariantContext, robotStateWithTip)
 
     const res = getSuccessResult(result)
-
+    console.log(res.commands)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 30),
       dispenseHelper('B2', 30),
       airGapHelper('B2', 5, { labwareId: 'destPlateId' }),
-      moveToAddressableAreaHelper({
-        addressableAreaName: '1and8ChannelWasteChute',
-      }),
-      dropTipInPlaceHelper(),
     ])
   })
 

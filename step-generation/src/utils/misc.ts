@@ -230,6 +230,7 @@ export const blowoutUtil = (args: {
   offsetFromTopMm: number
   invariantContext: InvariantContext
   destWell: BlowoutParams['well'] | null
+  prevRobotState: RobotState
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -241,6 +242,7 @@ export const blowoutUtil = (args: {
     flowRate,
     offsetFromTopMm,
     invariantContext,
+    prevRobotState,
   } = args
   if (!blowoutLocation) return []
   const addressableAreaName =
@@ -283,7 +285,6 @@ export const blowoutUtil = (args: {
     'def' in labware && well != null ? getWellsDepth(labware.def, [well]) : 0
 
   const offsetFromBottomMm = wellDepth + offsetFromTopMm
-
   if (well != null && trashOrLabware === 'labware') {
     return [
       curryCommandCreator(blowout, {
@@ -295,22 +296,21 @@ export const blowoutUtil = (args: {
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    return [
-      curryCommandCreator(wasteChuteCommandsUtil, {
-        pipetteId: pipette,
-        type: 'blowOut',
-        flowRate,
-        addressableAreaName,
-      }),
-    ]
+    return wasteChuteCommandsUtil({
+      pipetteId: pipette,
+      type: 'blowOut',
+      flowRate,
+      addressableAreaName,
+      prevRobotState,
+    })
   } else {
-    return [
-      curryCommandCreator(movableTrashCommandsUtil, {
-        pipetteId: pipette,
-        type: 'blowOut',
-        flowRate,
-      }),
-    ]
+    return movableTrashCommandsUtil({
+      pipetteId: pipette,
+      type: 'blowOut',
+      prevRobotState,
+      invariantContext,
+      flowRate,
+    })
   }
 }
 export function createEmptyLiquidState(
@@ -509,27 +509,26 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
   } else if (trashOrLabware === 'wasteChute') {
     const pipetteChannels =
       invariantContext.pipetteEntities[pipetteId].spec.channels
-    commands = [
-      curryCommandCreator(wasteChuteCommandsUtil, {
-        type: 'dispense',
-        pipetteId,
-        volume,
-        flowRate,
-        addressableAreaName:
-          pipetteChannels === 96
-            ? '96ChannelWasteChute'
-            : '1and8ChannelWasteChute',
-      }),
-    ]
+    commands = wasteChuteCommandsUtil({
+      type: 'dispense',
+      pipetteId,
+      volume,
+      flowRate,
+      prevRobotState,
+      addressableAreaName:
+        pipetteChannels === 96
+          ? '96ChannelWasteChute'
+          : '1and8ChannelWasteChute',
+    })
   } else {
-    commands = [
-      curryCommandCreator(movableTrashCommandsUtil, {
-        type: 'dispense',
-        pipetteId,
-        volume,
-        flowRate,
-      }),
-    ]
+    commands = movableTrashCommandsUtil({
+      type: 'dispense',
+      pipetteId,
+      volume,
+      flowRate,
+      invariantContext,
+      prevRobotState,
+    })
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
@@ -579,12 +578,12 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
       }),
     ]
   } else {
-    commands = [
-      curryCommandCreator(movableTrashCommandsUtil, {
-        pipetteId,
-        type: 'moveToWell',
-      }),
-    ]
+    commands = movableTrashCommandsUtil({
+      pipetteId,
+      type: 'moveToWell',
+      invariantContext,
+      prevRobotState,
+    })
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
@@ -668,27 +667,26 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
   } else if (trashOrLabware === 'wasteChute') {
     const pipetteChannels =
       invariantContext.pipetteEntities[pipetteId].spec.channels
-    commands = [
-      curryCommandCreator(wasteChuteCommandsUtil, {
-        type: 'airGap',
-        pipetteId,
-        volume,
-        flowRate,
-        addressableAreaName:
-          pipetteChannels === 96
-            ? '96ChannelWasteChute'
-            : '1and8ChannelWasteChute',
-      }),
-    ]
+    commands = wasteChuteCommandsUtil({
+      type: 'airGap',
+      pipetteId,
+      volume,
+      flowRate,
+      prevRobotState,
+      addressableAreaName:
+        pipetteChannels === 96
+          ? '96ChannelWasteChute'
+          : '1and8ChannelWasteChute',
+    })
   } else {
-    commands = [
-      curryCommandCreator(movableTrashCommandsUtil, {
-        type: 'airGap',
-        pipetteId,
-        volume,
-        flowRate,
-      }),
-    ]
+    commands = movableTrashCommandsUtil({
+      type: 'airGap',
+      pipetteId,
+      volume,
+      flowRate,
+      invariantContext,
+      prevRobotState,
+    })
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)

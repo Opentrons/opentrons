@@ -194,10 +194,11 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ]
   if (isWasteChute) {
     commandCreators = [
-      curryCommandCreator(wasteChuteCommandsUtil, {
+      ...wasteChuteCommandsUtil({
         type: 'dropTip',
         pipetteId: pipette,
         addressableAreaName: wasteChuteAddressableAreaName,
+        prevRobotState,
       }),
       curryCommandCreator(_pickUpTip, {
         pipette,
@@ -208,9 +209,11 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
   if (isTrashBin) {
     commandCreators = [
-      curryCommandCreator(movableTrashCommandsUtil, {
+      ...movableTrashCommandsUtil({
         type: 'dropTip',
         pipetteId: pipette,
+        prevRobotState,
+        invariantContext,
       }),
       curryCommandCreator(_pickUpTip, {
         pipette,

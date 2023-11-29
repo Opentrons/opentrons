@@ -103,6 +103,12 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
   }
 
+  //  TODO(jr, 11/28/23): wire this up fully, need to add additionalEquipmentEntities
+  //  to RobotState
+  if (!args.destLabware) {
+    errors.push(errorCreators.equipmentDoesNotExist())
+  }
+
   if (
     !invariantContext.labwareEntities[args.dropTipLocation] &&
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
@@ -447,6 +453,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
             invariantContext,
+            prevRobotState,
           })
 
           const airGapAfterDispenseCommands =
@@ -477,28 +484,33 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
 
-          let dropTipCommand = curryCommandCreator(dropTip, {
-            pipette: args.pipette,
-            dropTipLocation: args.dropTipLocation,
-          })
+          let dropTipCommand = [
+            curryCommandCreator(dropTip, {
+              pipette: args.pipette,
+              dropTipLocation: args.dropTipLocation,
+            }),
+          ]
           if (isWasteChute) {
-            dropTipCommand = curryCommandCreator(wasteChuteCommandsUtil, {
+            dropTipCommand = wasteChuteCommandsUtil({
               type: 'dropTip',
               pipetteId: args.pipette,
+              prevRobotState,
               addressableAreaName: addressableAreaNameWasteChute,
             })
           }
           if (isTrashBin) {
-            dropTipCommand = curryCommandCreator(movableTrashCommandsUtil, {
+            dropTipCommand = movableTrashCommandsUtil({
               type: 'dropTip',
               pipetteId: args.pipette,
+              invariantContext,
+              prevRobotState,
             })
           }
 
           // if using dispense > air gap, drop or change the tip at the end
           const dropTipAfterDispenseAirGap =
             airGapAfterDispenseCommands.length > 0 && isLastChunk && isLastPair
-              ? [dropTipCommand]
+              ? dropTipCommand
               : []
 
           const nextCommands = [

@@ -62,6 +62,7 @@ export const migrateFile = (
       params: {
         addressableAreaName: trashAddressableArea,
         pipetteId: pipetteId ?? '',
+        offset: { x: 0, y: 0, z: 0 },
       },
     },
   ]

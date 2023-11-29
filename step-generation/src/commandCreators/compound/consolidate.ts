@@ -63,6 +63,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }
   }
 
+  //  TODO(jr, 11/28/23): wire this up fully, need to add additionalEquipmentEntities
+  //  to RobotState
+  if (!args.destLabware) {
+    return { errors: [errorCreators.equipmentDoesNotExist()] }
+  }
+
   if (
     !invariantContext.labwareEntities[args.dropTipLocation] &&
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
@@ -347,6 +353,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
+        prevRobotState,
       })
 
       const willReuseTip = args.changeTip !== 'always' && !isLastChunk
@@ -375,27 +382,32 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             ]
           : []
 
-      let dropTipCommand = curryCommandCreator(dropTip, {
-        pipette: args.pipette,
-        dropTipLocation: args.dropTipLocation,
-      })
+      let dropTipCommand = [
+        curryCommandCreator(dropTip, {
+          pipette: args.pipette,
+          dropTipLocation: args.dropTipLocation,
+        }),
+      ]
       if (isWasteChute) {
-        dropTipCommand = curryCommandCreator(wasteChuteCommandsUtil, {
+        dropTipCommand = wasteChuteCommandsUtil({
           type: 'dropTip',
           pipetteId: args.pipette,
+          prevRobotState,
           addressableAreaName: addressableAreaNameWasteChute,
         })
       }
       if (isTrashBin) {
-        dropTipCommand = curryCommandCreator(movableTrashCommandsUtil, {
+        dropTipCommand = movableTrashCommandsUtil({
           type: 'dropTip',
           pipetteId: args.pipette,
+          prevRobotState,
+          invariantContext,
         })
       }
 
       // if using dispense > air gap, drop or change the tip at the end
       const dropTipAfterDispenseAirGap =
-        airGapAfterDispenseCommands.length > 0 ? [dropTipCommand] : []
+        airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
 
       return [
         ...tipCommands,
