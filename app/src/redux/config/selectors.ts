@@ -116,8 +116,8 @@ export const getOnDeviceDisplaySettings: (
     return {
       ...config.onDeviceDisplaySettings,
       unfinishedUnboxingFlowRoute:
-      // @ts-expect-error special casing 0 because there is no null type that gnu make can provide at build time
-      // see dev-shell-odd in app/Makefile (we provide 0 instead of null)
+        // @ts-expect-error special casing 0 because there is no null type that gnu make can provide at build time
+        // see dev-shell-odd in app/Makefile (we provide 0 instead of null)
         config.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute !== 0
           ? config?.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute
           : null,
