@@ -38,3 +38,4 @@ class GripperMovementWaypointsWithJawStatus:
 
     position: Point
     jaw_open: bool
+    dropping: bool

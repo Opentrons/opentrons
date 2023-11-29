@@ -134,7 +134,11 @@ class LabwareMovementHandler:
 
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
+                    if waypoint_data.dropping:
+                        await ot3api.disengage_axes([Axis.Z_G])
                     await ot3api.ungrip()
+                    if waypoint_data.dropping:
+                        await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
                 await ot3api.move_to(

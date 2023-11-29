@@ -255,7 +255,9 @@ async def test_move_labware_with_gripper(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[4]
         ),
+        await ot3_hardware_api.disengage_axes([Axis.Z_G]),
         await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
