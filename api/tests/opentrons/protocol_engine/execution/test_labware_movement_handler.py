@@ -238,9 +238,15 @@ async def test_move_labware_with_gripper(
     )
 
     gripper = OT3Mount.GRIPPER
-    decoy.verify(
-        await ot3_hardware_api.do_delay(delay or 0), times=0 if delay is None else 1
-    )
+    if delay is None:
+        decoy.verify(
+            await ot3_hardware_api.do_delay(),  # type:ignore[call-arg]
+            times=0,
+            ignore_extra_args=True,
+        )
+    else:
+        decoy.verify(await ot3_hardware_api.do_delay(delay))
+
     decoy.verify(
         await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
         await mock_tc_context_manager.__aenter__(),

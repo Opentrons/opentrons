@@ -39,3 +39,4 @@ class GripperMovementWaypointsWithJawStatus:
     position: Point
     jaw_open: bool
     dropping: bool
+    """This flag should only be set to True if this waypoint involves dropping a piece of labware."""

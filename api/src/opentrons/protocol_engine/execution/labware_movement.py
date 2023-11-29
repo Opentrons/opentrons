@@ -136,6 +136,11 @@ class LabwareMovementHandler:
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
                     if waypoint_data.dropping:
+                        # This `disengage_axes` step is important in order to engage
+                        # the electronic brake on the Z axis of the gripper. The brake
+                        # has a stronger holding force on the axis than the hold current,
+                        # and prevents the axis from spuriously dropping when  e.g. the notch
+                        # on the side of a falling tiprack catches the jaw.
                         await ot3api.disengage_axes([Axis.Z_G])
                     await ot3api.ungrip()
                     if waypoint_data.dropping:
