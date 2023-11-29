@@ -71,7 +71,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   }
 
   if (
-    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !args.dropTipLocation ||
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())

@@ -153,7 +153,13 @@ export function makeContext(): InvariantContext {
     },
   }
   const moduleEntities: ModuleEntities = {}
-  const additionalEquipmentEntities: AdditionalEquipmentEntities = {}
+  const additionalEquipmentEntities: AdditionalEquipmentEntities = {
+    [FIXED_TRASH_ID]: {
+      id: FIXED_TRASH_ID,
+      name: 'trashBin',
+      location: 'movableTrashA3',
+    },
+  }
   const pipetteEntities: PipetteEntities = {
     p10SingleId: {
       name: 'p10_single',

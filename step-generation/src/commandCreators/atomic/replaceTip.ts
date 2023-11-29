@@ -127,7 +127,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
   if (
-    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !args.dropTipLocation ||
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }

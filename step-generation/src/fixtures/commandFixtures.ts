@@ -36,7 +36,7 @@ export function getErrorResult(
   return result
 }
 export const replaceTipCommands = (tip: number | string): CreateCommand[] => [
-  dropTipHelper('A1'),
+  ...dropTipHelper(),
   pickUpTipHelper(tip),
 ]
 // NOTE: make sure none of these numbers match each other!
@@ -278,23 +278,23 @@ export const delayWithOffset = (
   },
 ]
 // =================
-export const dropTipHelper = (
-  wellName: string,
-  params?: {
-    pipetteId?: string
-    labwareId?: string
-  }
-): CreateCommand => ({
-  commandType: 'dropTip',
-  key: expect.any(String),
-  params: {
-    pipetteId: DEFAULT_PIPETTE,
-    labwareId: FIXED_TRASH_ID,
-    wellName:
-      typeof wellName === 'string' ? wellName : tiprackWellNamesFlat[wellName],
-    ...params,
+export const dropTipHelper = (pipette?: string): CreateCommand[] => [
+  {
+    commandType: 'moveToAddressableArea',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+      addressableAreaName: 'movableTrashA3',
+    },
   },
-})
+  {
+    commandType: 'dropTipInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+    },
+  },
+]
 export const pickUpTipHelper = (
   tip: number | string,
   params?: {

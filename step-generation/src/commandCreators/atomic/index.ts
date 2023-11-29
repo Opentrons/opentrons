@@ -7,7 +7,6 @@ import { delay } from './delay'
 import { disengageMagnet } from './disengageMagnet'
 import { dispense } from './dispense'
 import { dispenseInPlace } from './dispenseInPlace'
-import { dropAllTips } from './dropAllTips'
 import { dropTip } from './dropTip'
 import { dropTipInPlace } from './dropTipInPlace'
 import { engageMagnet } from './engageMagnet'
@@ -28,7 +27,6 @@ export {
   disengageMagnet,
   dispense,
   dispenseInPlace,
-  dropAllTips,
   dropTip,
   dropTipInPlace,
   engageMagnet,
