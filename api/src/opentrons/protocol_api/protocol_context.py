@@ -1027,7 +1027,7 @@ class ProtocolContext(CommandPublisher):
 
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._core.fixed_trash
-        if fixed_trash_core is not None and self._api_version < APIVersion(2, 16):
+        if fixed_trash_core is not None:
             fixed_trash = Labware(
                 core=fixed_trash_core,
                 api_version=self._api_version,
