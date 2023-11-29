@@ -463,9 +463,19 @@ class ProtocolContext(CommandPublisher):
     def load_waste_chute(
         self,
         *,
-        # TODO: Confirm official naming of "staging area slot".
         with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
+        """Load the waste chute on the deck.
+
+        The waste chute always occupies slot D3.
+
+        :param bool cover: Set to ``True`` when the cover is attached to the top of
+            the waste chute. The hole in the cover can fit up to eight tips in a
+            column configuration. Pipettes can dispense, blow out, or drop tips
+            through the hole in the cover. When the cover is attached, the gripper
+            can't drop labware down the chute. If you try to move labware to the
+            waste chute when ``cover=True``, the API will raise an error.
+        """
         if with_staging_area_slot_d4:
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."
