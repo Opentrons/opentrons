@@ -83,6 +83,7 @@ class LabwareMovementHandler:
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
+        delay_after_drop: Optional[float] = None,
     ) -> None:
         """Move a loaded labware from one location to another using gripper."""
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
@@ -139,6 +140,8 @@ class LabwareMovementHandler:
                     await ot3api.ungrip()
                     if waypoint_data.dropping:
                         await ot3api.home_z(OT3Mount.GRIPPER)
+                        if delay_after_drop is not None:
+                            await ot3api.do_delay(delay_after_drop)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
                 await ot3api.move_to(
