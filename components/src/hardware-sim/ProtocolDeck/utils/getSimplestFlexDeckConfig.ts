@@ -1,7 +1,7 @@
-import { parseAllAddressableAreas } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
+  getAddressableAreasInProtocol,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
@@ -44,7 +44,9 @@ export function getSimplestDeckConfigForProtocolCommands(
   // TODO(BC, 2023-11-06): abstract out the robot type
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const addressableAreas = parseAllAddressableAreas(protocolAnalysisCommands)
+  const addressableAreas = getAddressableAreasInProtocol(
+    protocolAnalysisCommands
+  )
   const simplestDeckConfig = addressableAreas.reduce<
     CutoutConfigProtocolSpec[]
   >((acc, addressableArea) => {

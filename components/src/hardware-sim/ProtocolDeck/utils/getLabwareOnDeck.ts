@@ -1,4 +1,3 @@
-import { parseInitialLoadedLabwareByAdapter, parseLabwareInfoByLiquidId } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   LoadLabwareRunTimeCommand,
@@ -6,13 +5,17 @@ import type {
 } from '@opentrons/shared-data'
 import { getWellFillFromLabwareId } from './getWellFillFromLabwareId'
 import type { LabwareOnDeck } from '../../BaseDeck'
+import { getLabwareInfoByLiquidId } from './getLabwareInfoByLiquidId'
+import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
 
 export const getLabwareOnDeck = (
-  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 ): LabwareOnDeck[] => {
   const { commands, liquids } = protocolAnalysis
-  const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(commands)
-  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
+  const initialLoadedLabwareByAdapter = getInitialLoadedLabwareByAdapter(
+    commands
+  )
+  const labwareByLiquidId = getLabwareInfoByLiquidId(commands)
   return commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
@@ -51,7 +54,8 @@ export const getLabwareOnDeck = (
 
       //  NOTE: only rendering the labware on top most layer so
       //  either the adapter or the labware are rendered but not both
-      const topLabwareDefinition = labwareInAdapter?.result?.definition ?? labwareDef
+      const topLabwareDefinition =
+        labwareInAdapter?.result?.definition ?? labwareDef
       const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
 
       const wellFill = getWellFillFromLabwareId(
@@ -65,8 +69,8 @@ export const getLabwareOnDeck = (
           labwareLocation: { slotName },
           definition: topLabwareDefinition,
           wellFill: wellFill,
-          displayName: displayName
-        }
+          displayName: displayName,
+        },
       ]
     }, [])
 }

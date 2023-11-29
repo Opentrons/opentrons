@@ -14,10 +14,10 @@ const meta: Meta<React.ComponentProps<typeof ProtocolDeckComponent>> = {
 export default meta
 type Story = StoryObj<React.ComponentProps<typeof ProtocolDeckComponent>>
 
-
 export const ProtocolDeck: Story = {
   args: {
-    protocolAnalysis: analysisFileFixture as ProtocolAnalysisOutput
+    // @ts-expect-error typescript can't import JSON as const
+    protocolAnalysis: analysisFileFixture as ProtocolAnalysisOutput,
   },
   render: args => {
     return <ProtocolDeckComponent {...args} />

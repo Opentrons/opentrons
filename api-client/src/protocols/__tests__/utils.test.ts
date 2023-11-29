@@ -8,7 +8,6 @@ import {
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedModulesBySlot,
   parseLiquidsInLoadOrder,
-  parseLabwareInfoByLiquidId,
   parseInitialLoadedLabwareByAdapter,
 } from '../utils'
 import { simpleAnalysisFileFixture } from '../__fixtures__'
@@ -378,56 +377,6 @@ describe('parseLiquidsInLoadOrder', () => {
     expect(
       parseLiquidsInLoadOrder(
         mockLiquids,
-        mockLoadLiquidRunTimeCommands as RunTimeCommand[]
-      )
-    ).toEqual(expected)
-  })
-})
-describe('parseLabwareInfoByLiquidId', () => {
-  it('returns labware info by liquid id', () => {
-    const expected = {
-      '0': [
-        {
-          labwareId: 'mockLabwareId1',
-          volumeByWell: {
-            A1: 33,
-            B1: 33,
-            C1: 33,
-            D1: 33,
-            E1: 33,
-            F1: 33,
-            G1: 33,
-            H1: 33,
-          },
-        },
-      ],
-      '1': [
-        {
-          labwareId: 'mockLabwareId1',
-          volumeByWell: {
-            A2: 20,
-            B2: 20,
-            C2: 20,
-            D2: 20,
-            E2: 20,
-            F2: 20,
-            G2: 20,
-            H2: 20,
-          },
-        },
-        {
-          labwareId: 'mockLabwareId2',
-          volumeByWell: {
-            A3: 33,
-            B3: 33,
-            C3: 33,
-            D3: 40,
-          },
-        },
-      ],
-    }
-    expect(
-      parseLabwareInfoByLiquidId(
         mockLoadLiquidRunTimeCommands as RunTimeCommand[]
       )
     ).toEqual(expected)
