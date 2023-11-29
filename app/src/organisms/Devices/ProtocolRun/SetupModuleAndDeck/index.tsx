@@ -8,10 +8,10 @@ import {
   useHoverTooltip,
   PrimaryButton,
 } from '@opentrons/components'
-import { FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '../../../../resources/deck_configuration/utils'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   useRunHasStarted,
@@ -57,16 +57,8 @@ export const SetupModuleAndDeck = ({
     commands
   )
 
-  const nonSingleSlotDeckConfigCompatibility = deckConfigCompatibility.filter(
-    ({ requiredAddressableAreas }) =>
-      // required AA list includes a non-single-slot AA
-      !requiredAddressableAreas.every(aa =>
-        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
-      )
-  )
-  // fixture includes at least 1 required AA
-  const requiredDeckConfigCompatibility = nonSingleSlotDeckConfigCompatibility.filter(
-    fixture => fixture.requiredAddressableAreas.length > 0
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
   )
 
   return (
@@ -78,9 +70,11 @@ export const SetupModuleAndDeck = ({
             {hasModules ? (
               <SetupModulesList robotName={robotName} runId={runId} />
             ) : null}
-            <SetupFixtureList
-              deckConfigCompatibility={requiredDeckConfigCompatibility}
-            />
+            {requiredDeckConfigCompatibility.length > 0 ? (
+              <SetupFixtureList
+                deckConfigCompatibility={requiredDeckConfigCompatibility}
+              />
+            ) : null}
           </>
         ) : (
           <SetupModulesMap runId={runId} />

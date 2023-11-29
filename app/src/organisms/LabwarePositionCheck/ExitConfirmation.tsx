@@ -5,7 +5,6 @@ import {
   Flex,
   Icon,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   SPACING,
   SIZE_3,
@@ -99,7 +98,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         <Flex
           width="100%"
           marginTop={SPACING.spacing32}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          justifyContent={JUSTIFY_FLEX_END}
           alignItems={ALIGN_CENTER}
         >
           <Flex gridGap={SPACING.spacing8}>
@@ -123,7 +122,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
 
 const ConfirmationHeader = styled.h1`
   margin-top: ${SPACING.spacing24};
-  ${TYPOGRAPHY.level3HeaderSemiBold}
+  ${TYPOGRAPHY.h1Default}
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }

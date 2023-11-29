@@ -1105,41 +1105,9 @@ def test_get_by_slot() -> None:
         labware_by_id={"1": labware_1, "2": labware_2, "3": labware_3}
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == labware_1
-    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == labware_2
-    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
-
-
-def test_get_by_slot_prefers_later() -> None:
-    """It should get the labware in a slot, preferring later items if locations match."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == labware_1_again
-
-
-def test_get_by_slot_filter_ids() -> None:
-    """It should filter labwares in the same slot using IDs."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_2) == labware_2
+    assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
 
 
 @pytest.mark.parametrize(
@@ -1349,7 +1317,7 @@ def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV4) -> No
 
     assert subject.get_deck_default_gripper_offsets() == LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.25),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.75),
     )
 
 

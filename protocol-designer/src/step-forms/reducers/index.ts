@@ -9,6 +9,7 @@ import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 import {
   FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -16,18 +17,18 @@ import {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
   MoveLabwareCreateCommand,
+  MoveToAddressableAreaCreateCommand,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   PipetteName,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
-  getDeckDefFromRobotTypeV4,
   AddressableAreaName,
-  CutoutId,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
-import { uuid } from '../../utils'
+import { getCutoutIdByAddressableArea, uuid } from '../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -1182,8 +1183,7 @@ export const labwareInvariantProperties: Reducer<
           {}
         ),
       }
-
-      return Object.keys(labware).length > 0 ? labware : state
+      return { ...labware, ...state }
     },
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,
@@ -1331,11 +1331,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
     ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
       const isFlex = file.robot.model === FLEX_ROBOT_TYPE
-      const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
-      const cutoutFixtures = deckDef.cutoutFixtures
-      const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id.includes('stagingAreaRightSlot')
-      )?.providesAddressableAreas
 
       const hasGripperCommands = Object.values(file.commands).some(
         (command): command is MoveLabwareCreateCommand =>
@@ -1376,9 +1371,11 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               command.commandType === commandType &&
               command.params[locationKey] !== 'offDeck' &&
               'slotName' in command.params[locationKey] &&
-              COLUMN_4_SLOTS.includes(command.params[locationKey].slotName)
+              COLUMN_4_SLOTS.includes(
+                command.params[locationKey].addressableAreaName
+              )
           )
-          .map(command => command.params[locationKey].slotName)
+          .map(command => command.params[locationKey].addressableAreaName)
       }
 
       const stagingAreaSlotNames = [
@@ -1388,26 +1385,13 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         ]),
       ]
 
-      const findCutoutIdByAddressableArea = (
-        addressableAreaName: AddressableAreaName
-      ): CutoutId | null => {
-        if (providesAddressableAreasForAddressableArea != null) {
-          for (const cutoutId in providesAddressableAreasForAddressableArea) {
-            if (
-              providesAddressableAreasForAddressableArea[
-                cutoutId as keyof typeof providesAddressableAreasForAddressableArea
-              ].includes(addressableAreaName)
-            ) {
-              return cutoutId as CutoutId
-            }
-          }
-        }
-        return null
-      }
-
       const stagingAreas = stagingAreaSlotNames.reduce((acc, slot) => {
         const stagingAreaId = `${uuid()}:stagingArea`
-        const cutoutId = findCutoutIdByAddressableArea(slot)
+        const cutoutId = getCutoutIdByAddressableArea(
+          slot,
+          'stagingAreaRightSlot',
+          isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+        )
         return {
           ...acc,
           [stagingAreaId]: {
@@ -1417,6 +1401,83 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           },
         }
       }, {})
+
+      const trashBinCommand = Object.values(file.commands).find(
+        (command): command is MoveToAddressableAreaCreateCommand =>
+          command.commandType === 'moveToAddressableArea' &&
+          (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+            command.params.addressableAreaName
+          ) ||
+            command.params.addressableAreaName === 'fixedTrash')
+      )
+      const trashAddressableAreaName =
+        trashBinCommand?.params.addressableAreaName
+      const savedStepForms = file.designerApplication?.data?.savedStepForms
+      const moveLiquidStep =
+        savedStepForms != null
+          ? Object.values(savedStepForms).find(
+              stepForm =>
+                stepForm.stepType === 'moveLiquid' &&
+                (stepForm.aspirate_labware.includes('trashBin') ||
+                  stepForm.dispense_labware.includes('trashBin') ||
+                  stepForm.dropTip_location.includes('trashBin') ||
+                  stepForm.blowout_location.includes('trashBin'))
+            )
+          : null
+      const mixStep =
+        savedStepForms != null
+          ? Object.values(savedStepForms).find(
+              stepForm =>
+                stepForm.stepType === 'mix' &&
+                (stepForm.labware.includes('trashBin') ||
+                  stepForm.dropTip_location.includes('trashBin') ||
+                  stepForm.blowout_location.includes('trashBin'))
+            )
+          : null
+
+      let trashBinId: string | null = null
+      if (moveLiquidStep != null) {
+        if (moveLiquidStep.aspirate_labware.includes('trashBin')) {
+          trashBinId = moveLiquidStep.aspirate_labware
+        } else if (moveLiquidStep.dispense_labware.includes('trashBin')) {
+          trashBinId = moveLiquidStep.dispense_labware
+        } else if (moveLiquidStep.dropTip_location.includes('trashBin')) {
+          trashBinId = moveLiquidStep.dropTip_location
+        } else if (moveLiquidStep.blowOut_location.includes('trashBin')) {
+          trashBinId = moveLiquidStep.blowOut_location
+        }
+      } else if (mixStep != null) {
+        if (mixStep.aspirate_labware.includes('trashBin')) {
+          trashBinId = mixStep.labware
+        } else if (mixStep.dropTip_location.includes('trashBin')) {
+          trashBinId = mixStep.dropTip_location
+        } else if (mixStep.blowOut_location.includes('trashBin')) {
+          trashBinId = mixStep.blowOut_location
+        }
+      }
+
+      const trashCutoutId = getCutoutIdByAddressableArea(
+        trashAddressableAreaName as AddressableAreaName,
+        isFlex ? 'trashBinAdapter' : 'fixedTrashSlot',
+        isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+      )
+      const trashBin =
+        trashAddressableAreaName != null && trashBinId != null
+          ? {
+              [trashBinId]: {
+                name: 'trashBin' as const,
+                id: trashBinId,
+                //  TODO(should be type cutoutId when location is type cutoutId)
+                location: trashCutoutId as string,
+              },
+            }
+          : null
+
+      if (trashBinCommand == null && file.robot.model === OT2_ROBOT_TYPE) {
+        console.error(
+          'expected to find a fixedTrash command for the OT-2 but could not'
+        )
+      }
 
       const gripperId = `${uuid()}:gripper`
       const gripper = hasGripperCommands
@@ -1429,9 +1490,15 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
         : {}
 
       if (isFlex) {
-        return { ...state, ...gripper, ...wasteChute, ...stagingAreas }
+        return {
+          ...state,
+          ...gripper,
+          ...trashBin,
+          ...wasteChute,
+          ...stagingAreas,
+        }
       } else {
-        return { ...state }
+        return { ...state, ...trashBin }
       }
     },
 

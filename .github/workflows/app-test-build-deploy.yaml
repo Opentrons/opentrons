@@ -230,7 +230,7 @@ jobs:
              echo "Configuring project, bucket, and folder for ot3"
              echo "project=ot3" >> $GITHUB_OUTPUT
              echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
-             echo "folder=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
+             echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
           fi
       - uses: 'actions/checkout@v3'
         with:

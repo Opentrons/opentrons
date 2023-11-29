@@ -20,6 +20,8 @@ from .engine_store import EngineStore
 from .run_store import RunResource, RunStore
 from .run_models import Run
 
+from opentrons.protocol_engine.types import DeckConfigurationType
+
 
 def _build_run(
     run_resource: RunResource,
@@ -87,6 +89,7 @@ class RunDataManager:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
     ) -> Run:
         """Create a new, current run.
@@ -115,6 +118,7 @@ class RunDataManager:
         state_summary = await self._engine_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
+            deck_configuration=deck_configuration,
             protocol=protocol,
         )
         run_resource = self._run_store.insert(

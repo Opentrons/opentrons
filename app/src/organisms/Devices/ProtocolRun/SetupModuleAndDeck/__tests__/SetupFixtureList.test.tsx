@@ -5,18 +5,25 @@ import { i18n } from '../../../../../i18n'
 import { SetupFixtureList } from '../SetupFixtureList'
 import { NotConfiguredModal } from '../NotConfiguredModal'
 import { LocationConflictModal } from '../LocationConflictModal'
+import { DeckFixtureSetupInstructionsModal } from '../../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
 import type { CutoutConfigAndCompatibility } from '../../../../../resources/deck_configuration/hooks'
 
 jest.mock('../../../../../resources/deck_configuration/hooks')
 jest.mock('../LocationConflictModal')
 jest.mock('../NotConfiguredModal')
+jest.mock(
+  '../../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
+)
 
 const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
   typeof LocationConflictModal
 >
 const mockNotConfiguredModal = NotConfiguredModal as jest.MockedFunction<
   typeof NotConfiguredModal
+>
+const mockDeckFixtureSetupInstructionsModal = DeckFixtureSetupInstructionsModal as jest.MockedFunction<
+  typeof DeckFixtureSetupInstructionsModal
 >
 
 const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
@@ -46,6 +53,9 @@ describe('SetupFixtureList', () => {
       <div>mock location conflict modal</div>
     )
     mockNotConfiguredModal.mockReturnValue(<div>mock not configured modal</div>)
+    mockDeckFixtureSetupInstructionsModal.mockReturnValue(
+      <div>mock DeckFixtureSetupInstructionsModal</div>
+    )
   })
 
   it('should render the headers and a fixture with configured status', () => {
@@ -58,6 +68,13 @@ describe('SetupFixtureList', () => {
     getByText('D3')
     getByText('Configured')
   })
+
+  it('should render the mock setup instructions modal, when clicking view setup instructions', () => {
+    const { getByText, getByRole } = render(props)[0]
+    getByRole('button', { name: 'View setup instructions' }).click()
+    getByText('mock DeckFixtureSetupInstructionsModal')
+  })
+
   // TODO(bh, 2023-11-14): implement test cases when example JSON protocol fixtures exist
   // it('should render the headers and a fixture with conflicted status', () => {
   //   const { getByText, getByRole } = render(props)[0]

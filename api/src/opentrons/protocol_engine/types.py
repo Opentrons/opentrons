@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field, validator
-from typing import Optional, Union, List, Dict, Any, NamedTuple
+from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -219,6 +219,17 @@ class CurrentWell:
     pipette_id: str
     labware_id: str
     well_name: str
+
+
+@dataclass(frozen=True)
+class CurrentAddressableArea:
+    """The latest addressable area the robot has accessed."""
+
+    pipette_id: str
+    addressable_area_name: str
+
+
+CurrentPipetteLocation = Union[CurrentWell, CurrentAddressableArea]
 
 
 @dataclass(frozen=True)
@@ -671,16 +682,27 @@ class PotentialCutoutFixture:
     cutout_fixture_id: str
 
 
+class AreaType(Enum):
+    """The type of addressable area."""
+
+    SLOT = "slot"
+    STAGING_SLOT = "stagingSlot"
+    MOVABLE_TRASH = "movableTrash"
+    FIXED_TRASH = "fixedTrash"
+    WASTE_CHUTE = "wasteChute"
+
+
 @dataclass(frozen=True)
 class AddressableArea:
     """Addressable area that has been loaded."""
 
     area_name: str
+    area_type: AreaType
+    base_slot: DeckSlotName
     display_name: str
     bounding_box: Dimensions
     position: AddressableOffsetVector
     compatible_module_types: List[SharedDataModuleType]
-    # TODO do we need "ableToDropLabware" in the definition?
     drop_tip_location: Optional[Point]
     drop_labware_location: Optional[Point]
 
@@ -716,10 +738,10 @@ NOZZLE_NAME_REGEX = "[A-Z][0-100]"
 PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 
-class EmptyNozzleLayoutConfiguration(BaseModel):
-    """Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
+class AllNozzleLayoutConfiguration(BaseModel):
+    """All basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
 
-    style: Literal["EMPTY"] = "EMPTY"
+    style: Literal["ALL"] = "ALL"
 
 
 class SingleNozzleLayoutConfiguration(BaseModel):
@@ -768,9 +790,12 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
 
 
 NozzleLayoutConfigurationType = Union[
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
 ]
+
+# TODO make the below some sort of better type
+DeckConfigurationType = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id

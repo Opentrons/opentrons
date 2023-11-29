@@ -29,16 +29,10 @@ import type {
 interface DeckThumbnailProps extends StyleProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   showSlotLabels?: boolean
-  isOnDevice?: boolean
 }
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
-  const {
-    protocolAnalysis,
-    showSlotLabels = false,
-    isOnDevice = false,
-    ...styleProps
-  } = props
+  const { protocolAnalysis, showSlotLabels = false, ...styleProps } = props
   const attachedModules = useAttachedModules()
 
   if (protocolAnalysis == null || protocolAnalysis.errors.length) return null
@@ -121,7 +115,6 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element | null {
       labwareLocations={labwareLocations}
       moduleLocations={moduleLocations}
       showSlotLabels={showSlotLabels}
-      isOnDevice={isOnDevice}
       {...styleProps}
     ></BaseDeck>
   )

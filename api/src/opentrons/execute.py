@@ -360,6 +360,7 @@ def execute(  # noqa: C901
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
+    # TODO(mm, 2023-11-20): We should restore the original log settings when we're done.
 
     # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
     # to match documented behavior.
@@ -627,7 +628,10 @@ def _run_file_pe(
         try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-            result = await protocol_runner.run(protocol_source)
+            result = await protocol_runner.run(
+                deck_configuration=entrypoint_util.get_deck_configuration(),
+                protocol_source=protocol_source,
+            )
         finally:
             unsubscribe()
 

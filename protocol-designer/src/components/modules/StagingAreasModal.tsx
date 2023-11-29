@@ -23,6 +23,7 @@ import {
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
+import { getStagingAreaSlots } from '../../utils'
 import { i18n } from '../../localization'
 import {
   createDeckFixture,
@@ -31,8 +32,7 @@ import {
 import { getSlotIsEmpty } from '../../step-forms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { PDAlert } from '../alerts/PDAlert'
-import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
-import { getStagingAreaSlots } from '../../utils'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 export interface StagingAreasValues {
   selectedSlots: string[]
@@ -107,15 +107,15 @@ const StagingAreasModalComponent = (
   const handleClickRemove = (cutoutId: string): void => {
     const modifiedSlots: DeckConfiguration = updatedSlots.map(slot => {
       if (slot.cutoutId === cutoutId) {
-        return { ...slot, loadName: SINGLE_RIGHT_SLOT_FIXTURE }
+        return { ...slot, cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE }
       }
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    const updatedSelectedSlots = values.selectedSlots.filter(
-      item => item !== cutoutId
+    setFieldValue(
+      'selectedSlots',
+      values.selectedSlots.filter(item => item !== cutoutId)
     )
-    setFieldValue('selectedSlots', updatedSelectedSlots)
   }
 
   return (

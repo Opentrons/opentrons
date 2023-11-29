@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { RIGHT } from '@opentrons/shared-data'
+import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   Btn,
@@ -13,9 +13,11 @@ import {
   ALIGN_FLEX_END,
   ALIGN_CENTER,
   SPACING,
+  SIZE_1,
   RESPONSIVENESS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { Skeleton } from '../../atoms/Skeleton'
@@ -153,7 +155,20 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       </>
     )
   } else {
-    bodyText = <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
+    bodyText = (
+      <>
+        <StyledText css={BODY_STYLE}>{t('hold_and_loosen')}</StyledText>
+        {is96ChannelPipette && (
+          <Banner
+            type="warning"
+            size={isOnDevice ? '1.5rem' : SIZE_1}
+            marginY={SPACING.spacing4}
+          >
+            {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+          </Banner>
+        )}
+      </>
+    )
   }
 
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />

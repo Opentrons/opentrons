@@ -187,7 +187,7 @@ export function SetupLiquidsMap(
                   <LabwareRender
                     definition={topLabwareDefinition}
                     wellFill={labwareHasLiquid ? wellFill : undefined}
-                    hover={labwareId === hoverLabwareId && labwareHasLiquid}
+                    highlight={labwareId === hoverLabwareId && labwareHasLiquid}
                   />
                   <LabwareInfoOverlay
                     definition={topLabwareDefinition}

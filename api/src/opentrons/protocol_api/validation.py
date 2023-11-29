@@ -31,6 +31,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
     ThermocyclerStep,
 )
+from ._types import StagingSlotName
 
 if TYPE_CHECKING:
     from .labware import Well
@@ -38,6 +39,9 @@ if TYPE_CHECKING:
 
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
 _COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
+
+# The first APIVersion where Python protocols can specify staging deck slots (e.g. "D4")
+_STAGING_DECK_SLOT_VERSION_GATE = APIVersion(2, 16)
 
 # Mapping of public Python Protocol API pipette load names
 # to names used by the internal Opentrons system
@@ -125,9 +129,12 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from None
 
 
+# TODO(jbl 11-17-2023) this function's original purpose was ensure a valid deck slot for a given robot type
+#   With deck configuration, the shape of this should change to better represent it checking if a deck slot
+#   (and maybe any addressable area) being valid for that deck configuration
 def ensure_and_convert_deck_slot(
     deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
-) -> DeckSlotName:
+) -> Union[DeckSlotName, StagingSlotName]:
     """Ensure that a primitive value matches a named deck slot.
 
     Also, convert the deck slot to match the given `robot_type`.
@@ -149,21 +156,29 @@ def ensure_and_convert_deck_slot(
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
-    try:
-        parsed_slot = DeckSlotName.from_primitive(deck_slot)
-    except ValueError as e:
-        raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+    if str(deck_slot).upper() in {"A4", "B4", "C4", "D4"}:
+        if api_version < APIVersion(2, 16):
+            raise APIVersionError(
+                f"Using a staging deck slot requires apiLevel {_STAGING_DECK_SLOT_VERSION_GATE}."
+            )
+        # Don't need a try/except since we're already pre-validating this
+        parsed_staging_slot = StagingSlotName.from_primitive(str(deck_slot))
+        return parsed_staging_slot
+    else:
+        try:
+            parsed_slot = DeckSlotName.from_primitive(deck_slot)
+        except ValueError as e:
+            raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+        is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
+        if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
+            alternative = parsed_slot.to_ot2_equivalent().id
+            raise APIVersionError(
+                f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
+                f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
+                f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
+            )
 
-    is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
-    if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
-        alternative = parsed_slot.to_ot2_equivalent().id
-        raise APIVersionError(
-            f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
-            f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
-            f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
-        )
-
-    return parsed_slot.to_equivalent_for_robot_type(robot_type)
+        return parsed_slot.to_equivalent_for_robot_type(robot_type)
 
 
 def internal_slot_to_public_string(

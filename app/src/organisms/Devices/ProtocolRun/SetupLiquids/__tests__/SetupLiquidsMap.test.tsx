@@ -20,8 +20,8 @@ import {
   parseLiquidsInLoadOrder,
   simpleAnalysisFileFixture,
 } from '@opentrons/api-client'
-import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { useAttachedModules } from '../../../hooks'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'

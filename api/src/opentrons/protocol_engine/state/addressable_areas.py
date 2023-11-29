@@ -1,6 +1,6 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
-from typing import Dict, Set, Union, List, Tuple
+from typing import Dict, Set, Union, List
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
@@ -24,8 +24,9 @@ from ..types import (
     AddressableAreaLocation,
     AddressableArea,
     PotentialCutoutFixture,
+    DeckConfigurationType,
 )
-from ..actions import Action, UpdateCommandAction
+from ..actions import Action, UpdateCommandAction, PlayAction
 from .config import Config
 from .abstract_store import HasState, HandlesActions
 
@@ -58,8 +59,38 @@ def _get_conflicting_addressable_areas(
     return loaded_areas_on_cutout
 
 
-# TODO make the below some sort of better type
-DeckConfiguration = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id
+# This is a temporary shim while Protocol Engine's conflict-checking code
+# can only take deck slots as input.
+# Long-term solution: Check for conflicts based on bounding boxes, not slot adjacencies.
+# Shorter-term: Change the conflict-checking code to take cutouts instead of deck slots.
+CUTOUT_TO_DECK_SLOT_MAP: Dict[str, DeckSlotName] = {
+    # OT-2
+    "cutout1": DeckSlotName.SLOT_1,
+    "cutout2": DeckSlotName.SLOT_2,
+    "cutout3": DeckSlotName.SLOT_3,
+    "cutout4": DeckSlotName.SLOT_4,
+    "cutout5": DeckSlotName.SLOT_5,
+    "cutout6": DeckSlotName.SLOT_6,
+    "cutout7": DeckSlotName.SLOT_7,
+    "cutout8": DeckSlotName.SLOT_8,
+    "cutout9": DeckSlotName.SLOT_9,
+    "cutout10": DeckSlotName.SLOT_10,
+    "cutout11": DeckSlotName.SLOT_11,
+    "cutout12": DeckSlotName.FIXED_TRASH,
+    # Flex
+    "cutoutA1": DeckSlotName.SLOT_A1,
+    "cutoutA2": DeckSlotName.SLOT_A2,
+    "cutoutA3": DeckSlotName.SLOT_A3,
+    "cutoutB1": DeckSlotName.SLOT_B1,
+    "cutoutB2": DeckSlotName.SLOT_B2,
+    "cutoutB3": DeckSlotName.SLOT_B3,
+    "cutoutC1": DeckSlotName.SLOT_C1,
+    "cutoutC2": DeckSlotName.SLOT_C2,
+    "cutoutC3": DeckSlotName.SLOT_C3,
+    "cutoutD1": DeckSlotName.SLOT_D1,
+    "cutoutD2": DeckSlotName.SLOT_D2,
+    "cutoutD3": DeckSlotName.SLOT_D3,
+}
 
 
 class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
@@ -69,7 +100,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     def __init__(
         self,
-        deck_configuration: DeckConfiguration,
+        deck_configuration: DeckConfigurationType,
         config: Config,
         deck_definition: DeckDefinitionV4,
     ) -> None:
@@ -77,14 +108,12 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         if config.use_simulated_deck_config:
             loaded_addressable_areas_by_name = {}
         else:
-            addressable_areas = self._get_addressable_areas_from_deck_configuration(
-                deck_configuration,
-                deck_definition,
+            loaded_addressable_areas_by_name = (
+                self._get_addressable_areas_from_deck_configuration(
+                    deck_configuration,
+                    deck_definition,
+                )
             )
-            loaded_addressable_areas_by_name = {
-                area.area_name: area for area in addressable_areas
-            }
-
         self._state = AddressableAreaState(
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
@@ -96,7 +125,15 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             self._handle_command(action.command)
-        # TODO have an action to reload the deck configuration.
+        if isinstance(action, PlayAction):
+            current_state = self._state
+            if action.deck_configuration is not None:
+                self._state.loaded_addressable_areas_by_name = (
+                    self._get_addressable_areas_from_deck_configuration(
+                        deck_config=action.deck_configuration,
+                        deck_definition=current_state.deck_definition,
+                    )
+                )
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -119,8 +156,8 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     @staticmethod
     def _get_addressable_areas_from_deck_configuration(
-        deck_config: DeckConfiguration, deck_definition: DeckDefinitionV4
-    ) -> List[AddressableArea]:
+        deck_config: DeckConfigurationType, deck_definition: DeckDefinitionV4
+    ) -> Dict[str, AddressableArea]:
         """Load all provided addressable areas with a valid deck configuration."""
         # TODO uncomment once execute is hooked up with this properly
         # assert (
@@ -136,15 +173,17 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             cutout_position = deck_configuration_provider.get_cutout_position(
                 cutout_id, deck_definition
             )
+            base_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
             for addressable_area_name in provided_addressable_areas:
                 addressable_areas.append(
                     deck_configuration_provider.get_addressable_area_from_name(
-                        addressable_area_name,
-                        cutout_position,
-                        deck_definition,
+                        addressable_area_name=addressable_area_name,
+                        cutout_position=cutout_position,
+                        base_slot=base_slot,
+                        deck_definition=deck_definition,
                     )
                 )
-        return addressable_areas
+        return {area.area_name: area for area in addressable_areas}
 
     def _check_location_is_addressable_area(
         self, location: Union[DeckSlotLocation, AddressableAreaLocation, str]
@@ -168,9 +207,13 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             cutout_position = deck_configuration_provider.get_cutout_position(
                 cutout_id, self._state.deck_definition
             )
+            base_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
             addressable_area = (
                 deck_configuration_provider.get_addressable_area_from_name(
-                    addressable_area_name, cutout_position, self._state.deck_definition
+                    addressable_area_name=addressable_area_name,
+                    cutout_position=cutout_position,
+                    base_slot=base_slot,
+                    deck_definition=self._state.deck_definition,
                 )
             )
             self._state.loaded_addressable_areas_by_name[
@@ -286,9 +329,20 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         cutout_position = deck_configuration_provider.get_cutout_position(
             cutout_id, self._state.deck_definition
         )
+        base_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
         return deck_configuration_provider.get_addressable_area_from_name(
-            addressable_area_name, cutout_position, self._state.deck_definition
+            addressable_area_name=addressable_area_name,
+            cutout_position=cutout_position,
+            base_slot=base_slot,
+            deck_definition=self._state.deck_definition,
         )
+
+    def get_addressable_area_base_slot(
+        self, addressable_area_name: str
+    ) -> DeckSlotName:
+        """Get the base slot the addressable area is associated with."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        return addressable_area.base_slot
 
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:
         """Get the position of an addressable area."""
@@ -298,6 +352,19 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         )
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
+
+    def get_addressable_area_move_to_location(
+        self, addressable_area_name: str
+    ) -> Point:
+        """Get the move-to position (top center) for an addressable area."""
+        addressable_area = self.get_addressable_area(addressable_area_name)
+        position = addressable_area.position
+        bounding_box = addressable_area.bounding_box
+        return Point(
+            x=position.x + bounding_box.x / 2,
+            y=position.y + bounding_box.y / 2,
+            z=position.z + bounding_box.z,
+        )
 
     def get_addressable_area_center(self, addressable_area_name: str) -> Point:
         """Get the (x, y, z) position of the center of the area."""

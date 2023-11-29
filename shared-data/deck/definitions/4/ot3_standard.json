@@ -203,7 +203,7 @@
       },
       {
         "id": "A4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -216,7 +216,7 @@
       },
       {
         "id": "B4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -229,7 +229,7 @@
       },
       {
         "id": "C4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -242,7 +242,7 @@
       },
       {
         "id": "D4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -590,7 +590,7 @@
       "dropOffset": {
         "x": 0,
         "y": 0,
-        "z": -0.25
+        "z": -0.75
       }
     }
   }
