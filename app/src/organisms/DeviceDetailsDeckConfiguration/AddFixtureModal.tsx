@@ -43,7 +43,7 @@ import type {
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
-const WASTE_CHUTE = 'WASTE_CHUTE'
+const GENERIC_WASTE_CHUTE_OPTION = 'WASTE_CHUTE'
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -105,14 +105,16 @@ export function AddFixtureModal({
   }
 
   const fixtureOptions = providedFixtureOptions ?? availableFixtures
-  const fixtureOptionsWithDisplayNames = fixtureOptions.map(fixture => [
-    fixture,
-    getFixtureDisplayName(fixture),
-  ])
+  const fixtureOptionsWithDisplayNames: Array<
+    [CutoutFixtureId | 'WASTE_CHUTE', string]
+  > = fixtureOptions.map(fixture => [fixture, getFixtureDisplayName(fixture)])
 
   const showSelectWasteChuteOptions = cutoutId === WASTE_CHUTE_CUTOUT
   if (showSelectWasteChuteOptions) {
-    fixtureOptionsWithDisplayNames.push([WASTE_CHUTE, t('waste_chute')])
+    fixtureOptionsWithDisplayNames.push([
+      GENERIC_WASTE_CHUTE_OPTION,
+      t('waste_chute'),
+    ])
   }
 
   fixtureOptionsWithDisplayNames.sort((a, b) => a[1].localeCompare(b[1]))
@@ -147,18 +149,18 @@ export function AddFixtureModal({
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {displayedFixtureOptions.map(
-                ([cutoutFixtureId, fixtureDisplayName]) => {
+                ([cutoutFixtureOption, fixtureDisplayName]) => {
                   const isGenericWasteChuteOption =
-                    cutoutFixtureId === WASTE_CHUTE
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
                   const onClickHandler = isGenericWasteChuteOption
                     ? () => setShowWasteChuteOptions(true)
-                    : () => handleAddODD(cutoutFixtureId as CutoutFixtureId)
+                    : () => handleAddODD(cutoutFixtureOption)
                   const buttonText = isGenericWasteChuteOption
                     ? t('select_options')
                     : t('add')
 
                   return (
-                    <React.Fragment key={cutoutFixtureId}>
+                    <React.Fragment key={cutoutFixtureOption}>
                       <Btn
                         onClick={onClickHandler}
                         display="flex"
@@ -189,18 +191,18 @@ export function AddFixtureModal({
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {displayedFixtureOptions.map(
-                ([cutoutFixtureId, fixtureDisplayName]) => {
+                ([cutoutFixtureOption, fixtureDisplayName]) => {
                   const isGenericWasteChuteOption =
-                    cutoutFixtureId === WASTE_CHUTE
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
                   const onClickHandler = isGenericWasteChuteOption
                     ? () => setShowWasteChuteOptions(true)
-                    : () => handleAddDesktop(cutoutFixtureId as CutoutFixtureId)
+                    : () => handleAddDesktop(cutoutFixtureOption)
                   const buttonText = isGenericWasteChuteOption
                     ? t('select_options')
                     : t('add')
 
                   return (
-                    <React.Fragment key={cutoutFixtureId}>
+                    <React.Fragment key={cutoutFixtureOption}>
                       <Flex
                         flexDirection={DIRECTION_ROW}
                         alignItems={ALIGN_CENTER}
