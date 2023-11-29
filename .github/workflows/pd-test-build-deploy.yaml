@@ -80,7 +80,6 @@ jobs:
 
   e2e-test:
     name: 'pd e2e tests'
-    needs: ['js-unit-test']
     timeout-minutes: 30
     strategy:
       matrix:
