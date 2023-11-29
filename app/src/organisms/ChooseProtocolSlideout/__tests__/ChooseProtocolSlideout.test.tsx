@@ -76,23 +76,23 @@ describe('ChooseProtocolSlideout', () => {
     expect(queryAllByText(mockConnectableRobot.name).length).toEqual(0)
   })
   it('renders an available protocol option for every stored protocol if any', () => {
-    const [{ getByText, queryByRole }] = render({
+    const [{ getByText, getByLabelText, queryByRole }] = render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    getByText('mock Deck Thumbnail')
+    getByLabelText('protocol deck map')
     getByText('fakeSrcFileName')
     expect(queryByRole('heading', { name: 'No protocols found' })).toBeNull()
   })
   it('renders an empty state if no protocol options', () => {
     mockGetStoredProtocols.mockReturnValue([])
-    const [{ getByRole, queryByText }] = render({
+    const [{ getByRole, queryByText, queryByLabelText }] = render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    expect(queryByText('mock Deck Thumbnail')).toBeNull()
+    expect(queryByLabelText('protocol deck map')).toBeNull()
     expect(queryByText('fakeSrcFileName')).toBeNull()
     expect(
       getByRole('heading', { name: 'No protocols found' })

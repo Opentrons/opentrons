@@ -26,7 +26,7 @@ interface ProtocolDeckProps {
 export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   const { protocolAnalysis, baseDeckProps } = props
 
-  if (protocolAnalysis == null || protocolAnalysis.errors.length > 0)
+  if (protocolAnalysis == null || (protocolAnalysis?.errors ?? []).length > 0)
     return null
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
@@ -41,7 +41,13 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       robotType={robotType}
       labwareLocations={getLabwareOnDeck(protocolAnalysis)}
       moduleLocations={getModulesOnDeck(protocolAnalysis)}
-      {...baseDeckProps}
+      {...{
+        svgProps: {
+          'aria-label': 'protocol deck map',
+          ...(baseDeckProps?.svgProps ?? {}),
+        },
+        ...baseDeckProps,
+      }}
     />
   )
 }

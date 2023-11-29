@@ -177,7 +177,7 @@ describe('Deck', () => {
   })
 
   it('renders deck view section', () => {
-    const { getByText } = render(props)[0]
-    expect(getByText('mock Deck Thumbnail')).toBeInTheDocument()
+    const { getByLabelText } = render(props)[0]
+    expect(getByLabelText('protocol deck map')).toBeInTheDocument()
   })
 })
