@@ -113,7 +113,7 @@ class ProtocolCore(
         return None
 
     def _load_fixed_trash(self) -> None:
-        if self.robot_type == 'OT-2 STANDARD' or self._api_version < APIVersion(2, 16):
+        if self.robot_type == 'OT-2 Standard' or self._api_version < APIVersion(2, 16):
             trash_id = self._engine_client.state.labware.get_fixed_trash_id()
             if trash_id is not None:
                 self._labware_cores_by_id[trash_id] = LabwareCore(
