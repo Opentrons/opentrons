@@ -63,10 +63,10 @@ class Params(BaseModel):
     namespace: Optional[str]
     version: Optional[int]
     pushOut: Optional[float]
-    # schema v8 add-ons
-    addressableAreaName: Optional[str]
     pickUpOffset: Optional[OffsetVector]
     dropOffset: Optional[OffsetVector]
+    # schema v8 add-ons
+    addressableAreaName: Optional[str]
 
 
 class Command(BaseModel):
