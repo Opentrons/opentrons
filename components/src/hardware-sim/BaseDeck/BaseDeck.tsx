@@ -40,27 +40,34 @@ import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 import type { WellFill } from '../Labware'
 
+export interface LabwareOnDeck {
+  labwareLocation: LabwareLocation
+  definition: LabwareDefinition2
+  wellFill?: WellFill
+  /** user defined name for this instance of the labware */
+  displayName?: string | null
+  /** generic prop to render self-positioned children for each labware */
+  labwareChildren?: React.ReactNode
+  onLabwareClick?: () => void
+}
+
+export interface ModuleOnDeck {
+  moduleModel: ModuleModel
+  moduleLocation: ModuleLocation
+  nestedLabwareDef?: LabwareDefinition2 | null
+  nestedLabwareWellFill?: WellFill
+  /** user defined name for this instance of the nested labware */
+  nestedLabwareDisplayName?: string | null
+  innerProps?: React.ComponentProps<typeof Module>['innerProps']
+  /** generic prop to render self-positioned children for each module */
+  moduleChildren?: React.ReactNode
+  onLabwareClick?: () => void
+}
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
-  labwareLocations?: Array<{
-    labwareLocation: LabwareLocation
-    definition: LabwareDefinition2
-    wellFill?: WellFill
-    // generic prop to render self-positioned children for each labware
-    labwareChildren?: React.ReactNode
-    onLabwareClick?: () => void
-  }>
-  moduleLocations?: Array<{
-    moduleModel: ModuleModel
-    moduleLocation: ModuleLocation
-    nestedLabwareDef?: LabwareDefinition2 | null
-    nestedLabwareWellFill?: WellFill
-    innerProps?: React.ComponentProps<typeof Module>['innerProps']
-    // generic prop to render self-positioned children for each module
-    moduleChildren?: React.ReactNode
-    onLabwareClick?: () => void
-  }>
+  labwareLocations?: LabwareOnDeck[]
+  moduleLocations?: ModuleOnDeck[]
   deckLayerBlocklist?: string[]
   showExpansion?: boolean
   lightFill?: string
