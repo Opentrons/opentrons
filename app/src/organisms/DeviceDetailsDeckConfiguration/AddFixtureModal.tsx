@@ -150,14 +150,14 @@ export function AddFixtureModal({
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {displayedFixtureOptions.map(
                 ([cutoutFixtureOption, fixtureDisplayName]) => {
-                  const isGenericWasteChuteOption =
+                  const onClickHandler =
                     cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
-                  const onClickHandler = isGenericWasteChuteOption
-                    ? () => setShowWasteChuteOptions(true)
-                    : () => handleAddODD(cutoutFixtureOption)
-                  const buttonText = isGenericWasteChuteOption
-                    ? t('select_options')
-                    : t('add')
+                      ? () => setShowWasteChuteOptions(true)
+                      : () => handleAddODD(cutoutFixtureOption)
+                  const buttonText =
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
+                      ? t('select_options')
+                      : t('add')
 
                   return (
                     <React.Fragment key={cutoutFixtureOption}>
@@ -192,14 +192,14 @@ export function AddFixtureModal({
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
               {displayedFixtureOptions.map(
                 ([cutoutFixtureOption, fixtureDisplayName]) => {
-                  const isGenericWasteChuteOption =
+                  const onClickHandler =
                     cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
-                  const onClickHandler = isGenericWasteChuteOption
-                    ? () => setShowWasteChuteOptions(true)
-                    : () => handleAddDesktop(cutoutFixtureOption)
-                  const buttonText = isGenericWasteChuteOption
-                    ? t('select_options')
-                    : t('add')
+                      ? () => setShowWasteChuteOptions(true)
+                      : () => handleAddDesktop(cutoutFixtureOption)
+                  const buttonText =
+                    cutoutFixtureOption === GENERIC_WASTE_CHUTE_OPTION
+                      ? t('select_options')
+                      : t('add')
 
                   return (
                     <React.Fragment key={cutoutFixtureOption}>
