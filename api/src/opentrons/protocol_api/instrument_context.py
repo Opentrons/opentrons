@@ -944,7 +944,7 @@ class InstrumentContext(publisher.CommandPublisher):
             trash_container = self.trash_container
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
-            if isinstance(trash_container, labware.Well):
+            if isinstance(trash_container, labware.Labware):
                 well = self.trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
                 self._core.drop_tip_in_disposal_location(
