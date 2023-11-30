@@ -165,7 +165,7 @@ jobs:
     needs: ['js-unit-test', 'determine-build-type']
     if: needs.determine-build-type.outputs.type == 'publish'
     env: 
-      VERSION_STRING: echo github.ref | tr "refs/tags/components@" ""
+      VERSION_STRING: echo github.ref | sed 's/refs\/tags\/components@//'
     steps:
       - uses: 'actions/checkout@v3'
       # https://github.com/actions/checkout/issues/290
