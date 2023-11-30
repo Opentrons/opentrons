@@ -82,6 +82,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.16    |          7.1.0               |
++-------------+------------------------------+
 |     2.15    |          7.0.0               |
 +-------------+------------------------------+
 |     2.14    |          6.3.0               |
@@ -121,6 +123,24 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 Changes in API Versions
 =======================
+
+Version 2.16
+------------
+
+This version introduces new features for Flex and adds and improves methods for aspirating and dispensing.
+
+- New features
+
+  - Use :py:meth:`.configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See [ref TK].
+  - Specify the deck configuration of your Flex with :py:meth:`.load_waste_chute` and [TK method name for adding trash bins].
+  - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling :py:meth:`.move_labware` with ``use_gripper=True``.
+  - Perform actions in staging area slots by referencing slots A4 through D4. See :ref:`deck-slots`.
+  - Explicitly command a pipette to :py:meth:`.prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
+
+- Improved features
+
+  - :py:meth:`.aspirate`, :py:meth:`.dispense`, and :py:meth:`.mix` will not move any liquid when called with ``volume=0``.
+  - ``opentrons_simulate`` now works for all API versions.
 
 Version 2.15
 ------------
