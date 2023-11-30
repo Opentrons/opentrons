@@ -183,7 +183,7 @@ class MountType(str, enum.Enum):
 class DeckSlotName(str, enum.Enum):
     """Deck slot identifiers."""
 
-    SLOT_1 = "1"
+    FIXED_TRASH = "1"
     SLOT_2 = "2"
     SLOT_3 = "3"
     SLOT_4 = "4"
@@ -194,7 +194,7 @@ class DeckSlotName(str, enum.Enum):
     SLOT_9 = "9"
     SLOT_10 = "10"
     SLOT_11 = "11"
-    FIXED_TRASH = "1"
+    SLOT_12 = "12"
 
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
