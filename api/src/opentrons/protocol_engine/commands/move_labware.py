@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from opentrons.types import Point
 from ..types import (
     LabwareLocation,
     OnLabwareLocation,
@@ -16,6 +17,7 @@ from ..types import (
 from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
@@ -25,8 +27,8 @@ if TYPE_CHECKING:
 MoveLabwareCommandType = Literal["moveLabware"]
 
 
-# Seconds to wait after droppping labware in trash chute
-_TRASH_CHUTE_DROP_DELAY = 1.0
+# Extra buffer on top of minimum distance to move to the right
+_TRASH_CHUTE_DROP_BUFFER_MM = 8
 
 
 # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
@@ -98,7 +100,7 @@ class MoveLabwareImplementation(
             labware_id=params.labwareId
         )
         definition_uri = current_labware.definitionUri
-        delay_after_drop: Optional[float] = None
+        post_drop_slide_offset: Optional[Point] = None
 
         if self._state_view.labware.is_fixed_trash(params.labwareId):
             raise LabwareMovementNotAllowedError(
@@ -114,7 +116,13 @@ class MoveLabwareImplementation(
                     f"Cannot move {current_labware.loadName} to addressable area {area_name}"
                 )
             if fixture_validation.is_gripper_waste_chute(area_name):
-                delay_after_drop = _TRASH_CHUTE_DROP_DELAY
+                post_drop_slide_offset = Point(
+                    x=(current_labware_definition.dimensions.xDimension / 2.0)
+                    + (GRIPPER_PADDLE_WIDTH / 2.0)
+                    + _TRASH_CHUTE_DROP_BUFFER_MM,
+                    y=0,
+                    z=0,
+                )
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
@@ -182,7 +190,7 @@ class MoveLabwareImplementation(
                 current_location=validated_current_loc,
                 new_location=validated_new_loc,
                 user_offset_data=user_offset_data,
-                delay_after_drop=delay_after_drop,
+                post_drop_slide_offset=post_drop_slide_offset,
             )
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
