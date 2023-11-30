@@ -386,6 +386,7 @@ class OT3API(
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
         if feature_flags is None:
+            # If no feature flag set is defined, we will use the default values
             feature_flags = HardwareFeatureFlags()
         if not isinstance(config, OT3Config):
             checked_config = robot_configs.load_ot3()

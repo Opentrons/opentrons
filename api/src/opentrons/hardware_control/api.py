@@ -124,6 +124,7 @@ class API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        # If no feature flag set is defined, we will use the default values
         self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         self._callbacks: Set[HardwareEventHandler] = set()

@@ -627,6 +627,13 @@ class HardwareFeatureFlags:
 
     @classmethod
     def build_from_ff(cls) -> "HardwareFeatureFlags":
+        """Build from the feature flags configuration file on disc.
+
+        Note that, if this class is built from the default constructor, the values
+        of all of the flags are just the default values instead of the values in the
+        feature_flags file or environment variables. Use this constructor to ensure
+        the right values are pulled in.
+        """
         return HardwareFeatureFlags(
             use_old_aspiration_functions=feature_flags.use_old_aspiration_functions(),
             tip_presence_detection_enabled=feature_flags.tip_presence_detection_enabled(),
