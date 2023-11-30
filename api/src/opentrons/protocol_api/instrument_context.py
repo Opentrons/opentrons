@@ -924,12 +924,8 @@ class InstrumentContext(publisher.CommandPublisher):
             - As a :py:class:`~.types.Location`. For example, to drop a tip from an
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
-            - As a :py:class:`.TrashBin`. This uses a default location relative to the
-              TrashBin object. For example,
-              ``pipette.drop_tip(location=trash_bin)``.
-            - As a :py:class:`.WasteChute`. This uses a default location relative to the
-              WasteChute object. For example,
-              ``pipette.drop_tip(location=waste_chute)``.
+            - As a trash bin or waste chute object. This uses a default location
+              relative to the object.
 
         :param location:
             The location to drop the tip.
