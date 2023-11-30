@@ -278,15 +278,15 @@ def test_get_gripper_labware_movement_waypoints() -> None:
     )
     assert result == [
         # move to above "from" slot
-        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False),
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False, False),
         # with jaw open, move to labware on "from" slot
-        GripperMovementWaypointsWithJawStatus(Point(100, 100, 116.5), True),
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 116.5), True, False),
         # grip labware and retract in place
-        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False),
+        GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False, False),
         # with labware gripped, move to above "to" slot
-        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), False),
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), False, False),
         # with labware gripped, move down to labware drop height on "to" slot
-        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 222.5), False),
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 222.5), False, False),
         # ungrip labware and retract in place
-        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True),
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True, True),
     ]

@@ -83,6 +83,7 @@ class LabwareMovementHandler:
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
+        delay_after_drop: Optional[float] = None,
     ) -> None:
         """Move a loaded labware from one location to another using gripper."""
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
@@ -134,7 +135,18 @@ class LabwareMovementHandler:
 
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
+                    if waypoint_data.dropping:
+                        # This `disengage_axes` step is important in order to engage
+                        # the electronic brake on the Z axis of the gripper. The brake
+                        # has a stronger holding force on the axis than the hold current,
+                        # and prevents the axis from spuriously dropping when  e.g. the notch
+                        # on the side of a falling tiprack catches the jaw.
+                        await ot3api.disengage_axes([Axis.Z_G])
                     await ot3api.ungrip()
+                    if waypoint_data.dropping:
+                        await ot3api.home_z(OT3Mount.GRIPPER)
+                        if delay_after_drop is not None:
+                            await ot3api.do_delay(delay_after_drop)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
                 await ot3api.move_to(

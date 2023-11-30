@@ -1,4 +1,4 @@
-"""Data access initialization and management."""
+"""Support for persisting data across device reboots."""
 
 
 from ._database import create_sql_engine, sqlite_rowid

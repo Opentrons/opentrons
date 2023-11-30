@@ -1,5 +1,6 @@
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
+import { COLUMN_4_SLOTS } from '../../constants'
 import { dropTip } from './dropTip'
 import {
   curryCommandCreator,
@@ -10,12 +11,14 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  wasteChuteCommandsUtil,
 } from '../../utils'
 import type {
   CommandCreatorError,
   CurriedCommandCreator,
   CommandCreator,
 } from '../../types'
+import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 interface PickUpTipArgs {
   pipette: string
   tiprack: string
@@ -36,6 +39,11 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
       : null
   if (adapterId == null && pipetteName === 'p1000_96') {
     errors.push(errorCreators.missingAdapter())
+  }
+  if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
+    errors.push(
+      errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
+    )
   }
 
   if (errors.length > 0) {
@@ -98,6 +106,16 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
+  const isWasteChute =
+    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
+    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
+      'wasteChute'
+
+  const isTrashBin =
+    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
+    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
+      'trashBin'
+
   if (!labwareDef) {
     return {
       errors: [
@@ -158,7 +176,12 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const commandCreators: CurriedCommandCreator[] = [
+  const wasteChuteAddressableAreaName =
+    pipetteSpec.channels === 96
+      ? '96ChannelWasteChute'
+      : '1and8ChannelWasteChute'
+
+  let commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(dropTip, {
       pipette,
       dropTipLocation,
@@ -169,6 +192,33 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       well: nextTiprack.well,
     }),
   ]
+  if (isWasteChute) {
+    commandCreators = [
+      curryCommandCreator(wasteChuteCommandsUtil, {
+        type: 'dropTip',
+        pipetteId: pipette,
+        addressableAreaName: wasteChuteAddressableAreaName,
+      }),
+      curryCommandCreator(_pickUpTip, {
+        pipette,
+        tiprack: nextTiprack.tiprackId,
+        well: nextTiprack.well,
+      }),
+    ]
+  }
+  if (isTrashBin) {
+    commandCreators = [
+      curryCommandCreator(movableTrashCommandsUtil, {
+        type: 'dropTip',
+        pipetteId: pipette,
+      }),
+      curryCommandCreator(_pickUpTip, {
+        pipette,
+        tiprack: nextTiprack.tiprackId,
+        well: nextTiprack.well,
+      }),
+    ]
+  }
 
   return reduceCommandCreators(
     commandCreators,

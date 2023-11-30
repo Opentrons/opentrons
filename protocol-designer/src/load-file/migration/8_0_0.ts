@@ -5,20 +5,18 @@ import {
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
-import { getOnlyLatestDefs } from '../../labware-defs'
 import { uuid } from '../../utils'
-import {
-  FLEX_TRASH_DEF_URI,
-  INITIAL_DECK_SETUP_STEP_ID,
-  OT_2_TRASH_DEF_URI,
-} from '../../constants'
-import type { ProtocolFileV7 } from '@opentrons/shared-data'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import type {
+  ProtocolFileV7,
+  MoveToAddressableAreaCreateCommand,
+} from '@opentrons/shared-data'
 import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   LabwareV2Mixin,
   LiquidV1Mixin,
-  LoadLabwareCreateCommand,
+  LoadPipetteCreateCommand,
   OT2RobotMixin,
   OT3RobotMixin,
   ProtocolBase,
@@ -37,13 +35,7 @@ interface LabwareLocationUpdate {
 export const migrateFile = (
   appData: ProtocolFileV7<DesignerApplicationData>
 ): ProtocolFile => {
-  const {
-    designerApplication,
-    commands,
-    robot,
-    labwareDefinitions,
-    liquids,
-  } = appData
+  const { designerApplication, commands, robot, liquids } = appData
 
   if (designerApplication == null || designerApplication.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
@@ -52,37 +44,32 @@ export const migrateFile = (
   const labwareLocationUpdate: LabwareLocationUpdate =
     designerApplication.data.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
       .labwareLocationUpdate
-  const allLatestDefs = getOnlyLatestDefs()
 
   const robotType = robot.model
-  const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
-  const trashDefUri =
-    robotType === FLEX_ROBOT_TYPE ? FLEX_TRASH_DEF_URI : OT_2_TRASH_DEF_URI
+  const trashId = `${uuid()}:trashBin`
+  const trashAddressableArea =
+    robotType === FLEX_ROBOT_TYPE ? 'movableTrashA3' : 'fixedTrash'
 
-  const trashDefinition = allLatestDefs[trashDefUri]
-  const trashId = `${uuid()}:${trashDefUri}`
+  const pipetteId = Object.values(commands).find(
+    (command): command is LoadPipetteCreateCommand =>
+      command.commandType === 'loadPipette'
+  )?.params.pipetteId
 
-  const trashLoadCommand = [
+  const trashMoveToAddressableAreaCommand: MoveToAddressableAreaCreateCommand[] = [
     {
       key: uuid(),
-      commandType: 'loadLabware',
+      commandType: 'moveToAddressableArea',
       params: {
-        location: { slotName: trashSlot },
-        version: 1,
-        namespace: 'opentrons',
-        loadName: trashDefinition.parameters.loadName,
-        displayName: trashDefinition.metadata.displayName,
-        labwareId: trashId,
+        addressableAreaName: trashAddressableArea,
+        pipetteId: pipetteId ?? '',
       },
     },
-  ] as LoadLabwareCreateCommand[]
+  ]
 
   const newLabwareLocationUpdate: LabwareLocationUpdate = Object.keys(
     labwareLocationUpdate
   ).reduce((acc: LabwareLocationUpdate, labwareId: string) => {
-    if (labwareId === 'fixedTrash') {
-      acc[trashId] = trashSlot
-    } else {
+    if (labwareId !== 'fixedTrash') {
       acc[labwareId] = labwareLocationUpdate[labwareId]
     }
     return acc
@@ -135,31 +122,6 @@ export const migrateFile = (
     filteredSavedStepForms
   )
 
-  const loadLabwareCommands: LoadLabwareCreateCommand[] = commands
-    .filter(
-      (command): command is LoadLabwareCreateCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .map(command => {
-      //  protocols that do multiple migrations through 7.0.0 have a loadName === definitionURI
-      //  this ternary below fixes that
-      const loadName =
-        labwareDefinitions[command.params.loadName] != null
-          ? labwareDefinitions[command.params.loadName].parameters.loadName
-          : command.params.loadName
-      return {
-        ...command,
-        params: {
-          ...command.params,
-          loadName,
-        },
-      }
-    })
-
-  const migratedCommandsV8 = commands.filter(
-    command => command.commandType !== 'loadLabware'
-  )
-
   const flexDeckSpec: OT3RobotMixin = {
     robot: {
       model: FLEX_ROBOT_TYPE,
@@ -204,7 +166,6 @@ export const migrateFile = (
   const labwareV2Mixin: LabwareV2Mixin = {
     labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
     labwareDefinitions: {
-      ...{ [trashDefUri]: trashDefinition },
       ...appData.labwareDefinitions,
     },
   }
@@ -216,11 +177,7 @@ export const migrateFile = (
 
   const commandv8Mixin: CommandV8Mixin = {
     commandSchemaId: 'opentronsCommandSchemaV8',
-    commands: [
-      ...migratedCommandsV8,
-      ...loadLabwareCommands,
-      ...trashLoadCommand,
-    ],
+    commands: [...commands, ...trashMoveToAddressableAreaCommand],
   }
 
   const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {

@@ -137,7 +137,13 @@
               "areaType": {
                 "description": "The type of deck item, defining allowed behavior.",
                 "type": "string",
-                "enum": ["slot", "movableTrash", "fixedTrash", "wasteChute"]
+                "enum": [
+                  "slot",
+                  "stagingSlot",
+                  "movableTrash",
+                  "fixedTrash",
+                  "wasteChute"
+                ]
               },
               "offsetFromCutoutFixture": {
                 "$ref": "#/definitions/xyzArray",

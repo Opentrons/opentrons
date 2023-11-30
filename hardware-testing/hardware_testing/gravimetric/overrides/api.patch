@@ -1,8 +1,8 @@
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-index 174a8f76e4..01b81cd6a0 100644
+index 1f6dd0b4b5..1d0cb7b7e3 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 +++ b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-@@ -456,11 +456,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -432,11 +432,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
  
      def set_current_volume(self, new_volume: float) -> None:
          assert new_volume >= 0
@@ -16,7 +16,7 @@ index 174a8f76e4..01b81cd6a0 100644
          self._current_volume += volume_incr
  
      def remove_current_volume(self, volume_incr: float) -> None:
-@@ -468,7 +468,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -444,7 +444,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
          self._current_volume -= volume_incr
  
      def ok_to_add_volume(self, volume_incr: float) -> bool:
@@ -27,10 +27,10 @@ index 174a8f76e4..01b81cd6a0 100644
      def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
          return push_out_dist_mm <= (
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
-index b0ca38d294..f213febabd 100644
+index ea4068934b..1b21cac251 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py
 +++ b/api/src/opentrons/protocol_api/core/legacy/deck.py
-@@ -47,11 +47,11 @@ class DeckItem(Protocol):
+@@ -48,11 +48,11 @@ class DeckItem(Protocol):
  class Deck(UserDict):  # type: ignore[type-arg]
      data: Dict[int, Optional[DeckItem]]
  
@@ -47,7 +47,7 @@ index b0ca38d294..f213febabd 100644
          for slot in self._definition["locations"]["orderedSlots"]:
              self.data[int(slot["id"])] = None
 diff --git a/api/src/opentrons/protocol_api/create_protocol_context.py b/api/src/opentrons/protocol_api/create_protocol_context.py
-index f2d8e492ec..dd4fd9102e 100644
+index 5a64e70cf9..7d5047cc4b 100644
 --- a/api/src/opentrons/protocol_api/create_protocol_context.py
 +++ b/api/src/opentrons/protocol_api/create_protocol_context.py
 @@ -22,6 +22,7 @@ from .deck import Deck

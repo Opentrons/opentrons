@@ -20,7 +20,7 @@ from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
 from .._waste_chute import WasteChute
-from .._types import OffDeckType
+from .._types import OffDeckType, StagingSlotName
 
 
 class AbstractProtocol(
@@ -61,7 +61,9 @@ class AbstractProtocol(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
+        location: Union[
+            DeckSlotName, StagingSlotName, LabwareCoreType, ModuleCoreType, OffDeckType
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -73,7 +75,7 @@ class AbstractProtocol(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
+        location: Union[DeckSlotName, StagingSlotName, ModuleCoreType, OffDeckType],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:
@@ -86,7 +88,12 @@ class AbstractProtocol(
         self,
         labware_core: LabwareCoreType,
         new_location: Union[
-            DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType, WasteChute
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCoreType,
+            ModuleCoreType,
+            OffDeckType,
+            WasteChute,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,

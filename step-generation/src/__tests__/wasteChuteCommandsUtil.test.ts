@@ -1,4 +1,4 @@
-import { WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -7,6 +7,8 @@ import {
 } from '../fixtures'
 import { wasteChuteCommandsUtil } from '../utils/wasteChuteCommandsUtil'
 import type { InvariantContext, RobotState, PipetteEntities } from '../types'
+
+jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
 const mockWasteChuteId = 'mockWasteChuteId'
 const mockAddressableAreaName = 'mockName'
@@ -44,7 +46,7 @@ describe('wasteChuteCommandsUtil', () => {
       additionalEquipmentEntities: {
         [mockWasteChuteId]: {
           name: 'wasteChute',
-          location: WASTE_CHUTE_SLOT,
+          location: WASTE_CHUTE_CUTOUT,
           id: 'mockId',
         },
       },
@@ -110,6 +112,30 @@ describe('wasteChuteCommandsUtil', () => {
         key: expect.any(String),
         params: {
           pipetteId: mockId,
+        },
+      },
+    ])
+  })
+  it('returns correct commands for air gap/aspirate in place', () => {
+    initialRobotState.tipState.pipettes[mockId] = true
+    const result = wasteChuteCommandsUtil(
+      {
+        ...args,
+        type: 'airGap',
+      },
+      invariantContext,
+      initialRobotState
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      mockMoveToAddressableArea,
+      {
+        commandType: 'aspirateInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: mockId,
+          volume: 10,
+          flowRate: 10,
         },
       },
     ])

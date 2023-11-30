@@ -91,6 +91,7 @@ async def test_create(
             run_id=run_id,
             labware_offsets=[],
             created_at=created_at,
+            deck_configuration=[],
         )
     ).then_return(engine_state_summary)
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -100,6 +101,7 @@ async def test_create(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=[],
+        deck_configuration=[],
     )
 
     assert result == MaintenanceRun(
@@ -138,6 +140,7 @@ async def test_create_with_options(
             run_id=run_id,
             labware_offsets=[labware_offset],
             created_at=created_at,
+            deck_configuration=[],
         )
     ).then_return(engine_state_summary)
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -148,6 +151,7 @@ async def test_create_with_options(
         run_id=run_id,
         created_at=created_at,
         labware_offsets=[labware_offset],
+        deck_configuration=[],
     )
 
     assert result == MaintenanceRun(
@@ -179,6 +183,7 @@ async def test_create_engine_error(
             run_id,
             labware_offsets=[],
             created_at=created_at,
+            deck_configuration=[],
         )
     ).then_raise(EngineConflictError("oh no"))
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -190,6 +195,7 @@ async def test_create_engine_error(
             run_id=run_id,
             created_at=created_at,
             labware_offsets=[],
+            deck_configuration=[],
         )
 
 

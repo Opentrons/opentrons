@@ -83,12 +83,11 @@ export function WizardRequiredEquipmentList(
           >
             {t('you_will_need')}
           </StyledText>
-          {equipmentList.length > 1 ? <Divider /> : null}
-          {equipmentList.map((requiredEquipmentProps, index) => (
+          <Divider />
+          {equipmentList.map(requiredEquipmentProps => (
             <RequiredEquipmentCard
               key={requiredEquipmentProps.loadName}
               {...requiredEquipmentProps}
-              bottomDivider={equipmentList.length - 1 !== index}
             />
           ))}
           {footer != null ? (

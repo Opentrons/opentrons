@@ -49,10 +49,10 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v7_protocol_7_0": {
+    "export_v8_protocol_7_1": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "7.0 or higher",
+      "body2": "7.1 or higher",
       "body3": ". Please ensure your robot is updated to the correct version."
     },
     "change_magnet_module_model": {
@@ -161,8 +161,12 @@
         "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
       },
       "ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST": {
-        "title": "{{additionalEquipment}} does not exist",
+        "title": "The trash bin or waste chute does not exist",
         "body": "Attempting to interact with an unknown entity."
+      },
+      "GRIPPER_REQUIRED": {
+        "title": "A gripper is required to complete this action",
+        "body": "Attempting to move a labware without a gripper into the waste chute. Please add a gripper to this step."
       }
     },
     "warning": {
@@ -193,7 +197,7 @@
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
-      "body": "Slot {{selectedSlot}} is occupied. Clear the slot to continue."
+      "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue."
     },
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",

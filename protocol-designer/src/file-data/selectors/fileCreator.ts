@@ -11,6 +11,7 @@ import {
   OT2_STANDARD_MODEL,
   FLEX_STANDARD_DECKID,
   SPAN7_8_10_11_SLOT,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import { selectors as dismissSelectors } from '../../dismiss'
 import {
@@ -36,21 +37,19 @@ import {
 import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 
-import type {
+import {
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
   RobotState,
-  AdditionalEquipmentEntity,
+  COLUMN_4_SLOTS,
 } from '@opentrons/step-generation'
 import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
-  Cutout,
   LabwareV2Mixin,
   LiquidV1Mixin,
-  LoadFixtureCreateCommand,
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
@@ -90,6 +89,7 @@ export const getLabwareDefinitionsInUse = (
     ...tiprackDefURIsInUse,
     ...labwareDefURIsOnDeck,
   ])
+
   return labwareDefURIsInUse.reduce<LabwareDefByDefURI>(
     (acc, labwareDefURI: string) => ({
       ...acc,
@@ -268,7 +268,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ): LoadLabwareCreateCommand[] => {
         const { def } = labwareEntities[labwareId]
         const isAdapter = def.allowedRoles?.includes('adapter')
-        if (isAdapter) return acc
+        if (isAdapter || def.metadata.displayCategory === 'trash') return acc
         const isOnTopOfModule = labware.slot in initialRobotState.modules
         const isOnAdapter =
           loadAdapterCommands.find(
@@ -277,6 +277,17 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const namespace = def.namespace
         const loadName = def.parameters.loadName
         const version = def.version
+        const isAddressableAreaName = COLUMN_4_SLOTS.includes(labware.slot)
+
+        let location: LabwareLocation = { slotName: labware.slot }
+        if (isOnTopOfModule) {
+          location = { moduleId: labware.slot }
+        } else if (isOnAdapter) {
+          location = { labwareId: labware.slot }
+        } else if (isAddressableAreaName) {
+          location = { addressableAreaName: labware.slot }
+        }
+
         const loadLabwareCommands = {
           key: uuid(),
           commandType: 'loadLabware' as const,
@@ -287,39 +298,11 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             loadName,
             namespace: namespace,
             version: version,
-            location: isOnTopOfModule
-              ? { moduleId: labware.slot }
-              : isOnAdapter
-              ? { labwareId: labware.slot }
-              : { slotName: labware.slot },
+            location,
           },
         }
 
         return [...acc, loadLabwareCommands]
-      },
-      []
-    )
-
-    //  TODO(jr, 10/31/23): update to loadAddressableArea
-    const loadFixtureCommands = reduce<
-      AdditionalEquipmentEntity,
-      LoadFixtureCreateCommand[]
-    >(
-      Object.values(additionalEquipmentEntities),
-      (acc, additionalEquipment): LoadFixtureCreateCommand[] => {
-        if (additionalEquipment.name === 'gripper') return acc
-
-        const loadFixtureCommands = {
-          key: uuid(),
-          commandType: 'loadFixture' as const,
-          params: {
-            fixtureId: additionalEquipment.id,
-            location: { cutout: additionalEquipment.location as Cutout },
-            loadName: additionalEquipment.name,
-          },
-        }
-
-        return [...acc, loadFixtureCommands]
       },
       []
     )
@@ -356,7 +339,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       labwareDefsByURI
     )
     const loadCommands: CreateCommand[] = [
-      ...loadFixtureCommands,
       ...loadPipetteCommands,
       ...loadModuleCommands,
       ...loadAdapterCommands,

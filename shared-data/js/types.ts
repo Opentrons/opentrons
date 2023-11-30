@@ -24,15 +24,11 @@ import {
   GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
 } from './constants'
 import type { INode } from 'svgson'
-import type { RunTimeCommand } from '../command/types'
+import type { RunTimeCommand, LabwareLocation } from '../command/types'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
-import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -232,18 +228,6 @@ export type ModuleModelWithLegacy =
   | typeof MAGDECK
   | typeof TEMPDECK
 
-export type FixtureLoadName =
-  | typeof STAGING_AREA_LOAD_NAME
-  | typeof STANDARD_SLOT_LOAD_NAME
-  | typeof TRASH_BIN_LOAD_NAME
-  | typeof WASTE_CHUTE_LOAD_NAME
-
-export interface DeckOffset {
-  x: number
-  y: number
-  z: number
-}
-
 export interface Dimensions {
   xDimension: number
   yDimension: number
@@ -252,13 +236,6 @@ export interface Dimensions {
 
 export interface DeckRobot {
   model: RobotType
-}
-
-export interface DeckFixture {
-  id: string
-  slot: string
-  labware: string
-  displayName: string
 }
 
 export type CoordinateTuple = [number, number, number]
@@ -284,15 +261,52 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
-export interface DeckLocations {
-  orderedSlots: DeckSlot[]
-  calibrationPoints: DeckCalibrationPoint[]
-  fixtures: DeckFixture[]
+export interface CutoutFixture {
+  id: CutoutFixtureId
+  mayMountTo: CutoutId[]
+  displayName: string
+  providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+}
+
+type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'
+
+export interface AddressableArea {
+  id: AddressableAreaName
+  areaType: AreaType
+  offsetFromCutoutFixture: CoordinateTuple
+  boundingBox: Dimensions
+  displayName: string
+  compatibleModuleTypes: ModuleType[]
+  ableToDropLabware?: boolean
+  ableToDropTips?: boolean
+  dropLabwareOffset?: CoordinateTuple
+  dropTipsOffset?: CoordinateTuple
+  matingSurfaceUnitVector?: UnitVectorTuple
 }
 
 export interface DeckMetadata {
   displayName: string
   tags: string[]
+}
+
+export interface DeckCutout {
+  id: string
+  position: CoordinateTuple
+  displayName: string
+}
+
+export interface LegacyFixture {
+  id: string
+  slot: string
+  labware: string
+  displayName: string
+}
+
+export interface DeckLocations {
+  addressableAreas: AddressableArea[]
+  calibrationPoints: DeckCalibrationPoint[]
+  cutouts: DeckCutout[]
+  legacyFixtures: LegacyFixture[]
 }
 
 export interface DeckDefinition {
@@ -302,7 +316,7 @@ export interface DeckDefinition {
   robot: DeckRobot
   locations: DeckLocations
   metadata: DeckMetadata
-  layers: INode[]
+  cutoutFixtures: CutoutFixture[]
 }
 
 export interface ModuleDimensions {
@@ -459,6 +473,7 @@ export interface CompletedProtocolAnalysis {
   liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
+  robotType?: RobotType | null
 }
 
 export interface ResourceFile {
@@ -531,8 +546,35 @@ export type StatusBarAnimation =
 
 export type StatusBarAnimations = StatusBarAnimation[]
 
-// TODO(bh, 2023-09-28): refine types when settled
 export type Cutout =
+  | 'cutoutA1'
+  | 'cutoutB1'
+  | 'cutoutC1'
+  | 'cutoutD1'
+  | 'cutoutA2'
+  | 'cutoutB2'
+  | 'cutoutC2'
+  | 'cutoutD2'
+  | 'cutoutA3'
+  | 'cutoutB3'
+  | 'cutoutC3'
+  | 'cutoutD3'
+
+export type OT2Cutout =
+  | 'cutout1'
+  | 'cutout2'
+  | 'cutout3'
+  | 'cutout4'
+  | 'cutout5'
+  | 'cutout6'
+  | 'cutout7'
+  | 'cutout8'
+  | 'cutout9'
+  | 'cutout10'
+  | 'cutout11'
+  | 'cutout12'
+
+export type FlexSlot =
   | 'A1'
   | 'B1'
   | 'C1'
@@ -545,11 +587,14 @@ export type Cutout =
   | 'B3'
   | 'C3'
   | 'D3'
+  | 'A4'
+  | 'B4'
+  | 'C4'
+  | 'D4'
 
-export interface Fixture {
-  fixtureId: string
-  fixtureLocation: Cutout
-  loadName: FixtureLoadName
+export interface CutoutConfig {
+  cutoutId: CutoutId
+  cutoutFixtureId: CutoutFixtureId | null
 }
 
-export type DeckConfiguration = Fixture[]
+export type DeckConfiguration = CutoutConfig[]

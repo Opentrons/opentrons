@@ -42,10 +42,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   )
   const isFlex = useIsFlex(robotName)
 
-  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
-    robotName,
-    runId
-  )
+  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(runId)
   const moduleModels = map(
     moduleRenderInfoById,
     ({ moduleDef }) => moduleDef.model

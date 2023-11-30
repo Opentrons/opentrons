@@ -2,18 +2,21 @@ import * as React from 'react'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getPositionFromSlotId,
 } from '@opentrons/shared-data'
-import { RobotCoordinateSpace } from '@opentrons/components/src/hardware-sim/RobotCoordinateSpace'
-import { DeckSlotLocation } from '@opentrons/components/src/hardware-sim/DeckSlotLocation'
 import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
   Flex,
   JUSTIFY_CENTER,
+  RobotCoordinateSpace,
   RobotCoordsForeignObject,
+  SingleSlotFixture,
   SPACING,
 } from '@opentrons/components'
+
+import type { Cutout } from '@opentrons/shared-data'
 
 const X_ADJUSTMENT_LEFT_SIDE = -101.5
 const X_ADJUSTMENT = -17
@@ -38,36 +41,36 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
       width="100%"
     />
   )
-
   return (
     <RobotCoordinateSpace
       height="100px"
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
-      {deckDef.locations.orderedSlots.map(slotDef => (
-        <DeckSlotLocation
-          key={slotDef.id}
-          slotName={slotDef.id}
+      {deckDef.locations.cutouts.map(cutout => (
+        <SingleSlotFixture
+          key={cutout.id}
+          cutoutId={cutout.id as Cutout}
           deckDefinition={deckDef}
           slotClipColor={COLORS.transparent}
-          slotBaseColor={COLORS.light1}
+          fixtureBaseColor={COLORS.light1}
         />
       ))}
       {selectedSlots.map((selectedSlot, index) => {
-        const slot = deckDef.locations.orderedSlots.find(
-          slot => slot.id === selectedSlot
-        )
-        const [xSlotPosition = 0, ySlotPosition = 0] = slot?.position ?? []
+        // if selected slot is passed as a cutout id, trim to define as slot id
+        const slotFromCutout = selectedSlot.replace('cutout', '')
+        const [xSlotPosition = 0, ySlotPosition = 0] =
+          getPositionFromSlotId(slotFromCutout, deckDef) ?? []
 
         const isLeftSideofDeck =
-          selectedSlot === 'A1' ||
-          selectedSlot === 'B1' ||
-          selectedSlot === 'C1' ||
-          selectedSlot === 'D1'
+          slotFromCutout === 'A1' ||
+          slotFromCutout === 'B1' ||
+          slotFromCutout === 'C1' ||
+          slotFromCutout === 'D1'
         const xAdjustment = isLeftSideofDeck
           ? X_ADJUSTMENT_LEFT_SIDE
           : X_ADJUSTMENT
         const x = xSlotPosition + xAdjustment
+
         const yAdjustment = -10
         const y = ySlotPosition + yAdjustment
 
@@ -84,7 +87,7 @@ export function FlexSlotMap(props: FlexSlotMapProps): JSX.Element {
 
         return (
           <RobotCoordsForeignObject
-            key={`${selectedSlot}_${slot?.id}_${index}`}
+            key={`${selectedSlot}_${index}`}
             width={xDimension}
             height={yDimension}
             x={x}

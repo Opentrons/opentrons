@@ -60,7 +60,11 @@ export const ModuleWizardFlows = (
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const attachedPipette = attachedPipettes.left ?? attachedPipettes.right
+  const attachedPipette =
+    attachedPipettes.left?.data.calibratedOffset?.last_modified != null
+      ? attachedPipettes.left
+      : attachedPipettes.right
+
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
@@ -193,7 +197,11 @@ export const ModuleWizardFlows = (
         continuePastCommandFailure
       )
   }
-  if (currentStep == null || attachedPipette == null) return null
+  if (
+    currentStep == null ||
+    attachedPipette?.data.calibratedOffset?.last_modified == null
+  )
+    return null
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&

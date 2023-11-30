@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 import {
   GRIPPER_V1,
+  getCutoutDisplayName,
   getGripperDisplayName,
   getModuleDisplayName,
   getModuleType,
@@ -82,7 +83,7 @@ const getHardwareName = (protocolHardware: ProtocolHardware): string => {
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
-    return getFixtureDisplayName(protocolHardware.fixtureName)
+    return getFixtureDisplayName(protocolHardware.cutoutFixtureId)
   }
 }
 
@@ -130,7 +131,11 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           if (hardware.hardwareType === 'module') {
             location = <LocationIcon slotName={hardware.slot} />
           } else if (hardware.hardwareType === 'fixture') {
-            location = <LocationIcon slotName={hardware.location.cutout} />
+            location = (
+              <LocationIcon
+                slotName={getCutoutDisplayName(hardware.location.cutout)}
+              />
+            )
           }
           return (
             <TableRow key={id}>

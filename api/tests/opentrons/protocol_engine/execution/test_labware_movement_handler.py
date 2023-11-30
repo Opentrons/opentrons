@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 from decoy import Decoy, matchers
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union, Optional
 
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.hardware_control import HardwareControlAPI
@@ -120,23 +120,27 @@ def subject(
 #  1. Should write an acceptance test w/ real labware on ot3 deck.
 #  2. This test will be split once waypoints generation is moved to motion planning.
 @pytest.mark.parametrize(
-    argnames=["from_location", "to_location"],
+    argnames=["from_location", "to_location", "delay"],
     argvalues=[
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            None,
         ),
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ModuleLocation(moduleId="module-id"),
+            1.5,
         ),
         (
             OnLabwareLocation(labwareId="a-labware-id"),
             OnLabwareLocation(labwareId="another-labware-id"),
+            None,
         ),
         (
             ModuleLocation(moduleId="a-module-id"),
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            5.3,
         ),
     ],
 )
@@ -149,6 +153,7 @@ async def test_move_labware_with_gripper(
     subject: LabwareMovementHandler,
     from_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
+    delay: Optional[float],
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
     # TODO (spp, 2023-07-26): this test does NOT stub out movement waypoints in order to
@@ -229,9 +234,19 @@ async def test_move_labware_with_gripper(
         current_location=from_location,
         new_location=to_location,
         user_offset_data=user_offset_data,
+        delay_after_drop=delay,
     )
 
     gripper = OT3Mount.GRIPPER
+    if delay is None:
+        decoy.verify(
+            await ot3_hardware_api.do_delay(),  # type:ignore[call-arg]
+            times=0,
+            ignore_extra_args=True,
+        )
+    else:
+        decoy.verify(await ot3_hardware_api.do_delay(delay))
+
     decoy.verify(
         await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
         await mock_tc_context_manager.__aenter__(),
@@ -255,7 +270,9 @@ async def test_move_labware_with_gripper(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[4]
         ),
+        await ot3_hardware_api.disengage_axes([Axis.Z_G]),
         await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[5]
         ),

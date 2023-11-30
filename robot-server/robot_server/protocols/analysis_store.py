@@ -5,6 +5,7 @@ from __future__ import annotations
 from logging import getLogger
 from typing import Dict, List, Optional
 from typing_extensions import Final
+from opentrons_shared_data.robot.dev_types import RobotType
 
 import sqlalchemy
 
@@ -120,6 +121,7 @@ class AnalysisStore:
     async def update(
         self,
         analysis_id: str,
+        robot_type: RobotType,
         commands: List[Command],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
@@ -132,6 +134,7 @@ class AnalysisStore:
         Args:
             analysis_id: The ID of the analysis to promote.
                 Must point to a valid pending analysis.
+            robot_type: See `CompletedAnalysis.robotType`.
             commands: See `CompletedAnalysis.commands`.
             labware: See `CompletedAnalysis.labware`.
             modules: See `CompletedAnalysis.modules`.
@@ -156,6 +159,7 @@ class AnalysisStore:
         completed_analysis = CompletedAnalysis.construct(
             id=analysis_id,
             result=result,
+            robotType=robot_type,
             commands=commands,
             labware=labware,
             modules=modules,

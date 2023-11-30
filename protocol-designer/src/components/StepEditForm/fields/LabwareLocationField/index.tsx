@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { getModuleDisplayName, WASTE_CHUTE_SLOT } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../../localization'
 import {
   getAdditionalEquipmentEntities,
@@ -9,7 +12,7 @@ import {
 } from '../../../../step-forms/selectors'
 import {
   getRobotStateAtActiveItem,
-  getUnocuppiedLabwareLocationOptions,
+  getUnoccupiedLabwareLocationOptions,
 } from '../../../../top-selectors/labware-locations'
 import { getHasWasteChute } from '../../../labware'
 import { StepFormDropdown } from '../StepFormDropdownField'
@@ -33,11 +36,12 @@ export function LabwareLocationField(
     useGripper && hasWasteChute && !isLabwareOffDeck
 
   let unoccupiedLabwareLocationsOptions =
-    useSelector(getUnocuppiedLabwareLocationOptions) ?? []
+    useSelector(getUnoccupiedLabwareLocationOptions) ?? []
 
   if (isLabwareOffDeck && hasWasteChute) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
-      option => option.value !== 'offDeck' && option.value !== WASTE_CHUTE_SLOT
+      option =>
+        option.value !== 'offDeck' && option.value !== WASTE_CHUTE_CUTOUT
     )
   } else if (useGripper || isLabwareOffDeck) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(

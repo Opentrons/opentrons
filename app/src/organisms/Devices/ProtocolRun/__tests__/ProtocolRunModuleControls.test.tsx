@@ -39,7 +39,6 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
 
 const _fixtureAnalysis = (fixtureAnalysis as unknown) as CompletedProtocolAnalysis
 
-const ROBOT_NAME = 'otie'
 const RUN_ID = 'test123'
 
 const mockTempMod = {
@@ -97,7 +96,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a magnetic module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockMagMod.moduleId]: {
           moduleId: 'magModModuleId',
@@ -122,7 +121,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a temperature module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockTempMod.moduleId]: {
           moduleId: 'temperatureModuleId',
@@ -149,7 +148,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a thermocycler module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
@@ -178,7 +177,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a heater-shaker module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',
@@ -206,7 +205,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders correct text when module is not attached but required for protocol', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',

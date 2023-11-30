@@ -10,6 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import detachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import { useChainRunCommands } from '../../resources/runs/hooks'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
@@ -47,7 +48,29 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
   const pipetteName = pipette?.pipetteName
   const pipetteChannels =
     pipetteName != null ? getPipetteNameSpecs(pipetteName)?.channels ?? 1 : 1
+  let probeVideoSrc = detachProbe1
+  if (pipetteChannels === 8) {
+    probeVideoSrc = detachProbe8
+  } else if (pipetteChannels === 96) {
+    probeVideoSrc = detachProbe96
+  }
   const pipetteMount = pipette?.mount
+
+  React.useEffect(() => {
+    // move into correct position for probe detach on mount
+    chainRunCommands(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: pipetteMount ?? 'left',
+          },
+        },
+      ],
+      false
+    ).catch(error => setFatalError(error.message))
+  }, [])
+
   if (pipetteName == null || pipetteMount == null) return null
 
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
@@ -76,7 +99,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
       .then(() => proceed())
       .catch((e: Error) => {
         setFatalError(
-          `DetachProbe failed to move to safe location after probe attach with message: ${e.message}`
+          `DetachProbe failed to move to safe location after probe detach with message: ${e.message}`
         )
       })
   }
@@ -101,7 +124,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element | null => {
           loop={true}
           controls={false}
         >
-          <source src={pipetteChannels > 1 ? detachProbe8 : detachProbe1} />
+          <source src={probeVideoSrc} />
         </video>
       }
       bodyText={

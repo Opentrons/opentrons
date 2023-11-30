@@ -8,12 +8,13 @@ from typing_extensions import Literal
 from ..types import (
     LabwareLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
     LabwareMovementOffsetData,
 )
 from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
-from ..resources import labware_validation
+from ..resources import labware_validation, fixture_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -22,6 +23,10 @@ if TYPE_CHECKING:
 
 
 MoveLabwareCommandType = Literal["moveLabware"]
+
+
+# Seconds to wait after droppping labware in trash chute
+_TRASH_CHUTE_DROP_DELAY = 1.0
 
 
 # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
@@ -83,7 +88,9 @@ class MoveLabwareImplementation(
         self._labware_movement = labware_movement
         self._run_control = run_control
 
-    async def execute(self, params: MoveLabwareParams) -> MoveLabwareResult:
+    async def execute(  # noqa: C901
+        self, params: MoveLabwareParams
+    ) -> MoveLabwareResult:
         """Move a loaded labware to a new location."""
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
@@ -91,11 +98,23 @@ class MoveLabwareImplementation(
             labware_id=params.labwareId
         )
         definition_uri = current_labware.definitionUri
+        delay_after_drop: Optional[float] = None
 
         if self._state_view.labware.is_fixed_trash(params.labwareId):
             raise LabwareMovementNotAllowedError(
                 f"Cannot move fixed trash labware '{current_labware_definition.parameters.loadName}'."
             )
+
+        if isinstance(params.newLocation, AddressableAreaLocation):
+            area_name = params.newLocation.addressableAreaName
+            if not fixture_validation.is_gripper_waste_chute(
+                area_name
+            ) and not fixture_validation.is_deck_slot(area_name):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move {current_labware.loadName} to addressable area {area_name}"
+                )
+            if fixture_validation.is_gripper_waste_chute(area_name):
+                delay_after_drop = _TRASH_CHUTE_DROP_DELAY
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
@@ -163,6 +182,7 @@ class MoveLabwareImplementation(
                 current_location=validated_current_loc,
                 new_location=validated_new_loc,
                 user_offset_data=user_offset_data,
+                delay_after_drop=delay_after_drop,
             )
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
