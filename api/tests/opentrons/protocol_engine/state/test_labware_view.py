@@ -34,6 +34,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     LabwareLocation,
+    AddressableAreaLocation,
     OFF_DECK_LOCATION,
     OverlapOffset,
     LabwareMovementOffsetData,
@@ -1194,6 +1195,67 @@ def test_get_all_labware_definition_empty() -> None:
     result = subject.get_loaded_labware_definitions()
 
     assert result == []
+
+
+def test_raise_if_labware_inaccessible_by_pipette_staging_area() -> None:
+    """It should raise if the labware is on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            )
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_off_deck() -> None:
+    """It should raise if the labware is off-deck."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OFF_DECK_LOCATION,
+            )
+        },
+    )
+
+    with pytest.raises(errors.LocationNotAccessibleByPipetteError, match="off-deck"):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area() -> None:
+    """It should raise if the labware is stacked on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OnLabwareLocation(labwareId="lower-labware-id"),
+            ),
+            "lower-labware-id": LoadedLabware(
+                id="lower-labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            ),
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
 
 
 def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:
