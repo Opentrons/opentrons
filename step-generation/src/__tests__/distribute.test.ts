@@ -168,7 +168,7 @@ describe('tip handling for multiple distribute chunks', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
@@ -200,7 +200,7 @@ describe('tip handling for multiple distribute chunks', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
@@ -208,7 +208,7 @@ describe('tip handling for multiple distribute chunks', () => {
       blowoutSingleToTrash,
 
       // next chunk, change tip
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
       pickUpTipHelper('B1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
@@ -995,7 +995,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            wellName: 'A1',
+            labwareId: 'fixedTrash',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, change tip each aspirate)', () => {
@@ -1012,7 +1020,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip since change tip is always
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1048,7 +1056,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A3', 3, { labwareId: DEST_LABWARE }), // need to air gap here
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
         // mix (asp)
@@ -1081,7 +1097,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
         // skip blowout into trash b/c we're about to drop tip anyway
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in trash, change tip once)', () => {
@@ -1098,7 +1122,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip at the beginning of the step
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1160,7 +1184,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, reuse tip)', () => {
@@ -1240,7 +1272,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, change tip each aspirate)', () => {
@@ -1257,7 +1297,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1295,7 +1335,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // delay after aspirating air
         delayCommand(11),
         // just drop the tip in the trash
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
         // mix (asp)
@@ -1328,7 +1376,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in source, change tip once)', () => {
@@ -1345,7 +1401,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1409,7 +1465,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A1', 3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, reuse tip)', () => {
@@ -1489,7 +1553,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, change tip each aspirate)', () => {
@@ -1506,7 +1578,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1544,7 +1616,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // dispense delay
         delayCommand(11),
         // just drop the tip in the trash
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
         // next chunk from A1: remaining volume
         pickUpTipHelper('B1'),
         // mix (asp)
@@ -1577,7 +1657,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
     it('should create commands in the expected order with expected params (blowout in dest, change tip once)', () => {
@@ -1594,7 +1682,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         // replace tip
-        dropTipHelper('A1'),
+        ...dropTipHelper(),
         pickUpTipHelper('A1'),
         // mix (asp)
         ...mixCommandsWithDelay,
@@ -1659,7 +1747,15 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         airGapHelper('A4', 3, { labwareId: DEST_LABWARE }),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
-        dropTipHelper('A1'),
+        {
+          commandType: 'dropTip',
+          key: expect.any(String),
+          params: {
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            pipetteId: 'p300SingleId',
+          },
+        },
       ])
     })
   })

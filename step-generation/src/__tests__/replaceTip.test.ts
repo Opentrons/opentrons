@@ -243,7 +243,7 @@ describe('replaceTip', () => {
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        ...dropTipHelper(),
+        ...dropTipHelper(p300MultiId),
         pickUpTipHelper('A1', {
           pipetteId: p300MultiId,
         }),

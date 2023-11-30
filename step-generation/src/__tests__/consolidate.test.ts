@@ -102,7 +102,6 @@ beforeEach(() => {
   }
   invariantContext = {
     ...invariantContext,
-    additionalEquipmentEntities: {},
   }
 })
 
@@ -195,7 +194,7 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A1', 150),
       aspirateHelper('A2', 150),
       dispenseHelper('B1', 300),
-      dropTipHelper('A1'),
+      ...dropTipHelper(),
 
       pickUpTipHelper('B1'),
       aspirateHelper('A3', 150),

@@ -841,7 +841,13 @@ Object {
 
 exports[`snapshot tests makeContext 1`] = `
 Object {
-  "additionalEquipmentEntities": Object {},
+  "additionalEquipmentEntities": Object {
+    "fixedTrash": Object {
+      "id": "fixedTrash",
+      "location": "cutoutA3",
+      "name": "trashBin",
+    },
+  },
   "config": Object {
     "OT_PD_DISABLE_MODULE_RESTRICTIONS": false,
   },
