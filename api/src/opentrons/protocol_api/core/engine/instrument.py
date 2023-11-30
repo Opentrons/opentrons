@@ -23,11 +23,11 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import (
     PRIMARY_NOZZLE_LITERAL,
     NozzleLayoutConfigurationType,
+    AddressableOffsetVector
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.types import Point, DeckSlotName, AddressableOffsetVector
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
