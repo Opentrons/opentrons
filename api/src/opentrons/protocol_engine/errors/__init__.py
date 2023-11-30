@@ -59,6 +59,7 @@ from .exceptions import (
     LabwareMovementNotAllowedError,
     LabwareIsNotAllowedInLocationError,
     LocationIsOccupiedError,
+    LocationNotAccessibleByPipetteError,
     InvalidAxisForRobotType,
     NotSupportedOnRobotType,
 )
@@ -126,6 +127,7 @@ __all__ = [
     "LabwareMovementNotAllowedError",
     "LabwareIsNotAllowedInLocationError",
     "LocationIsOccupiedError",
+    "LocationNotAccessibleByPipetteError",
     "InvalidAxisForRobotType",
     "NotSupportedOnRobotType",
     # error occurrence models

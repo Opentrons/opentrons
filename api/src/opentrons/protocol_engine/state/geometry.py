@@ -97,6 +97,12 @@ class GeometryView:
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
                 if lw_data.location != OFF_DECK_LOCATION
+                and not (
+                    isinstance(lw_data.location, AddressableAreaLocation)
+                    and fixture_validation.is_staging_slot(
+                        lw_data.location.addressableAreaName
+                    )
+                )
             ),
             default=0.0,
         )
