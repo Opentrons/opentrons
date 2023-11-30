@@ -307,7 +307,7 @@ def test_get_potential_cutout_fixtures_raises(
             AddressableArea(
                 area_name="gripperWasteChute",
                 display_name="Gripper Waste Chute",
-                bounding_box=Dimensions(x=155.0, y=86.0, z=154.0),
+                bounding_box=Dimensions(x=155.0, y=86.0, z=125.0),
                 position=AddressableOffsetVector(x=-12.5, y=2, z=3),
                 compatible_module_types=[],
                 drop_tip_location=None,
