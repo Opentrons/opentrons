@@ -69,7 +69,7 @@ jobs:
           files: ./coverage/lcov.info
           flags: components
 
-  build-components:
+  build-components-storybook:
     name: 'build components artifact'
     runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
@@ -102,11 +102,32 @@ jobs:
         with:
           name: 'components-artifact'
           path: storybook-static
+
+  determine-build-type:
+      runs-on: 'ubuntu-latest'
+      name: 'Determine build type'
+      outputs:
+        type: ${{steps.determine-build-type.outputs.type}}
+      steps:
+        - id: determine-build-type
+          run: |
+            echo "Determining build type for event ${{github.event_type}} and ref ${{github.ref}}"
+            if [ "${{ format('{0}', github.ref == 'refs/heads/edge') }}" = "true" ] ; then
+              echo "storybook s3 builds for edge"
+              echo 'type=storybook' >> $GITHUB_OUTPUT
+            elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
+              echo "publish builds for components tags"
+              echo 'type=publish' >> $GITHUB_OUTPUT
+            else
+              echo "No build for ref ${{github.ref}} and event ${{github.event_type}}"
+              echo 'type=none' >> $GITHUB_OUTPUT
+            fi
+
   deploy-components:
-    name: 'deploy components artifact to S3'
+    name: 'deploy components storybook artifact to S3'
     runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'build-components']
-    if: github.event_name != 'pull_request'
+    needs: ['js-unit-test', 'build-components-storybook', 'determine-build-type']
+    if: needs.determine-build-type.outputs.type != 'none'
     steps:
       - uses: 'actions/checkout@v3'
       # https://github.com/actions/checkout/issues/290
@@ -137,3 +158,33 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         run: |
           aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
+
+    
+    publish-components:
+      name: 'publish components package to npm'
+      runs-on: 'ubuntu-latest'
+      needs: ['js-unit-test', 'determine-build-type']
+      if: needs.determine-build-type.outputs.type == 'publish'
+      steps:
+        - uses: 'actions/checkout@v3'
+        # https://github.com/actions/checkout/issues/290
+        - name: 'Fix actions/checkout odd handling of tags'
+          if: startsWith(github.ref, 'refs/tags')
+          run: |
+            git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+            git checkout ${{ github.ref }}
+        - uses: 'actions/setup-node@v3'
+          with:
+            node-version: '16'
+        - name: 'set complex environment variables'
+          id: 'set-vars'
+          uses: actions/github-script@v6
+          with:
+            script: |
+              const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+              buildComplexEnvVars(core, context)
+        - uses: JS-DevTools/npm-publish@v3
+          with:
+            token: ${{ secrets.NPM_TOKEN }}
+
+      
