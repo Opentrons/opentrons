@@ -88,7 +88,6 @@ class ConfigureNozzleLayoutImplementation(
         )
 
         return ConfigureNozzleLayoutResult(), ConfigureNozzleLayoutPrivateResult(
-            pipette_id=params.pipetteId,
             nozzle_map=nozzle_map,
         )
 

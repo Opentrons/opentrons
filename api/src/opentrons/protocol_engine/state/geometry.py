@@ -7,6 +7,7 @@ from opentrons.types import Point, DeckSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
+from ..errors import LabwareNotLoadedOnLabwareError, LabwareNotLoadedOnModuleError
 from ..resources import fixture_validation
 from ..types import (
     OFF_DECK_LOCATION,
@@ -135,6 +136,35 @@ class GeometryView:
             highest_module_z,
             highest_fixture_z,
         )
+
+    def get_highest_z_in_slot(self, slot: DeckSlotLocation) -> float:
+        """Get the highest Z-point of all items stacked in the given deck slot."""
+        slot_item = self.get_slot_item(slot.slotName)
+        if isinstance(slot_item, LoadedModule):
+            # get height of module + all labware on it
+            module_id = slot_item.id
+            try:
+                labware_id = self._labware.get_id_by_module(module_id=module_id)
+            except LabwareNotLoadedOnModuleError:
+                return self._modules.get_overall_height(module_id=module_id)
+            else:
+                return self.get_highest_z_of_labware_stack(labware_id)
+        elif isinstance(slot_item, LoadedLabware):
+            # get stacked heights of all labware in the slot
+            return self.get_highest_z_of_labware_stack(slot_item.id)
+        else:
+            return 0
+
+    def get_highest_z_of_labware_stack(self, labware_id: str) -> float:
+        """Get the highest Z-point of the topmost labware in the stack of labware on the given labware.
+
+        If there is no labware on the given labware, returns highest z of the given labware.
+        """
+        try:
+            stacked_labware_id = self._labware.get_id_by_labware(labware_id)
+        except LabwareNotLoadedOnLabwareError:
+            return self.get_labware_highest_z(labware_id)
+        return self.get_highest_z_of_labware_stack(stacked_labware_id)
 
     def get_min_travel_z(
         self,

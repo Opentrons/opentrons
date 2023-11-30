@@ -21,7 +21,6 @@ class PipetteConfigUpdateResultMixin:
 class PipetteNozzleLayoutResultMixin(BaseModel):
     """A nozzle layout result for updating the pipette state."""
 
-    pipette_id: str
     nozzle_map: Optional[NozzleMap] = Field(
         default=None,
         description="A dataclass object holding information about the current nozzle configuration.",
