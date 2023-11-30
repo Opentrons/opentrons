@@ -467,7 +467,9 @@ class ProtocolContext(CommandPublisher):
     ) -> WasteChute:
         """Load the waste chute on the deck.
 
-        The waste chute always occupies slot D3.
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
 
         :param bool cover: Set to ``True`` when the cover is attached to the top of
             the waste chute. The hole in the cover can fit up to eight tips in a
