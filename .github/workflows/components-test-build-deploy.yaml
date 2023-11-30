@@ -176,13 +176,6 @@ jobs:
         - uses: 'actions/setup-node@v3'
           with:
             node-version: '16'
-        - name: 'set complex environment variables'
-          id: 'set-vars'
-          uses: actions/github-script@v6
-          with:
-            script: |
-              const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-              buildComplexEnvVars(core, context)
         - uses: JS-DevTools/npm-publish@v3
           with:
             token: ${{ secrets.NPM_TOKEN }}
