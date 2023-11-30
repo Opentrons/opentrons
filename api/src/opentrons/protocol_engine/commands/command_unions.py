@@ -260,6 +260,22 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutPrivateResult,
 )
 
+from .verify_tip_presence import (
+    VerifyTipPresence,
+    VerifyTipPresenceCreate,
+    VerifyTipPresenceParams,
+    VerifyTipPresenceResult,
+    VerifyTipPresenceCommandType,
+)
+
+from .get_tip_presence import (
+    GetTipPresence,
+    GetTipPresenceCreate,
+    GetTipPresenceParams,
+    GetTipPresenceResult,
+    GetTipPresenceCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -292,6 +308,8 @@ Command = Union[
     SetRailLights,
     TouchTip,
     SetStatusBar,
+    VerifyTipPresence,
+    GetTipPresence,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -351,6 +369,8 @@ CommandParams = Union[
     SetRailLightsParams,
     TouchTipParams,
     SetStatusBarParams,
+    VerifyTipPresenceParams,
+    GetTipPresenceParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -411,6 +431,8 @@ CommandType = Union[
     SetRailLightsCommandType,
     TouchTipCommandType,
     SetStatusBarCommandType,
+    VerifyTipPresenceCommandType,
+    GetTipPresenceCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -470,6 +492,8 @@ CommandCreate = Union[
     SetRailLightsCreate,
     TouchTipCreate,
     SetStatusBarCreate,
+    VerifyTipPresenceCreate,
+    GetTipPresenceCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -529,6 +553,8 @@ CommandResult = Union[
     SetRailLightsResult,
     TouchTipResult,
     SetStatusBarResult,
+    VerifyTipPresenceResult,
+    GetTipPresenceResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
