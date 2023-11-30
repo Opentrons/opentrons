@@ -93,8 +93,8 @@ class PipetteNotAttachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, details, wrapping)
 
 
-class InvalidPipetteSpecificationsError(ProtocolEngineError):
-    """Raised when a LoadPipette command specifies invalid params."""
+class InvalidLoadPipetteSpecsError(ProtocolEngineError):
+    """Raised when a loadPipette uses invalid specifications."""
 
     def __init__(
         self,
@@ -102,7 +102,20 @@ class InvalidPipetteSpecificationsError(ProtocolEngineError):
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an InvalidPipetteSpecificationsErrpr."""
+        """Build an InvalidLoadPipetteSpecsError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidSpecificationForRobotTypeError(ProtocolEngineError):
+    """Raised when a command provides invalid specs for the given robot type."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidSpecificationForRobotTypeError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

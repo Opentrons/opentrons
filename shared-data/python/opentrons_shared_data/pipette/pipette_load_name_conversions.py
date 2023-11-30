@@ -139,7 +139,7 @@ def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationTyp
         PipetteGenerationType: A pipette version object.
 
     """
-    if "flex" in pipette_name_list or "3." in pipette_name_list[-1]:
+    if "flex" in pipette_name_list or "3." in pipette_name_list[-1] or pipette_name_list == ["p1000", "96"]:
         return PipetteGenerationType.FLEX
     elif "gen2" in pipette_name_list or "2." in pipette_name_list[-1]:
         return PipetteGenerationType.GEN2
