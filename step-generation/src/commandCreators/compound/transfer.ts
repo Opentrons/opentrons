@@ -93,7 +93,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       })
     )
   }
-
+  console.log('source lab', args.sourceLabware)
+  console.log('prev robot state', prevRobotState.labware)
   if (!args.sourceLabware || !prevRobotState.labware[args.sourceLabware]) {
     errors.push(
       errorCreators.labwareDoesNotExist({

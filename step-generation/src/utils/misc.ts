@@ -1,4 +1,3 @@
-import assert from 'assert'
 import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
@@ -255,7 +254,7 @@ export const blowoutUtil = (args: {
     invariantContext.additionalEquipmentEntities,
     destLabwareId
   )
-  let labware: LabwareEntity | AdditionalEquipmentEntity | null = null
+  let labware: LabwareEntity | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
     labware = invariantContext.labwareEntities[sourceLabwareId]
@@ -264,28 +263,19 @@ export const blowoutUtil = (args: {
     labware =
       trashOrLabware === 'labware'
         ? invariantContext.labwareEntities[destLabwareId]
-        : invariantContext.additionalEquipmentEntities[destLabwareId]
+        : null
     well = trashOrLabware === 'labware' ? destWell : null
   } else {
     // if it's not one of the magic strings, it's a labware or waste chute or trash bin id
-    labware =
-      invariantContext.labwareEntities?.[blowoutLocation] ??
-      invariantContext.additionalEquipmentEntities[blowoutLocation]
+    labware = invariantContext.labwareEntities?.[blowoutLocation]
     well = trashOrLabware === 'labware' ? 'A1' : null
-
-    if (labware == null) {
-      assert(
-        false,
-        `expected a labwareId for blowoutUtil's "blowoutLocation", got ${blowoutLocation}`
-      )
-      return []
-    }
   }
+
   const wellDepth =
-    'def' in labware && well != null ? getWellsDepth(labware.def, [well]) : 0
+    labware != null && well != null ? getWellsDepth(labware.def, [well]) : 0
 
   const offsetFromBottomMm = wellDepth + offsetFromTopMm
-  if (well != null && trashOrLabware === 'labware') {
+  if (well != null && trashOrLabware === 'labware' && labware != null) {
     return [
       curryCommandCreator(blowout, {
         pipette: pipette,

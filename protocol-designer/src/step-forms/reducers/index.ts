@@ -1424,16 +1424,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
                   stepForm.blowout_location.includes('trashBin'))
             )
           : null
-      const mixStep =
-        savedStepForms != null
-          ? Object.values(savedStepForms).find(
-              stepForm =>
-                stepForm.stepType === 'mix' &&
-                (stepForm.labware.includes('trashBin') ||
-                  stepForm.dropTip_location.includes('trashBin') ||
-                  stepForm.blowout_location.includes('trashBin'))
-            )
-          : null
 
       let trashBinId: string | null = null
       if (moveLiquidStep != null) {
@@ -1445,14 +1435,6 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           trashBinId = moveLiquidStep.dropTip_location
         } else if (moveLiquidStep.blowOut_location.includes('trashBin')) {
           trashBinId = moveLiquidStep.blowOut_location
-        }
-      } else if (mixStep != null) {
-        if (mixStep.aspirate_labware.includes('trashBin')) {
-          trashBinId = mixStep.labware
-        } else if (mixStep.dropTip_location.includes('trashBin')) {
-          trashBinId = mixStep.dropTip_location
-        } else if (mixStep.blowOut_location.includes('trashBin')) {
-          trashBinId = mixStep.blowOut_location
         }
       }
 

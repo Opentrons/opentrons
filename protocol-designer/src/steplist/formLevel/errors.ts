@@ -157,7 +157,11 @@ export const incompatibleDispenseLabware = (
 ): FormError | null => {
   const { dispense_labware, pipette } = fields
   if (!dispense_labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.spec, dispense_labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec,
+    'def' in dispense_labware ? dispense_labware.def : undefined,
+    'name' in dispense_labware ? dispense_labware.name : undefined
+  )
     ? INCOMPATIBLE_DISPENSE_LABWARE
     : null
 }
