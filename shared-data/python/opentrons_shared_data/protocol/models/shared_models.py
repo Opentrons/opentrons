@@ -104,6 +104,8 @@ class Labware(BaseModel):
     displayName: Optional[str]
     definitionId: str
 
-class ConfigurationParams(BaseModel): 
-    primaryNozzle: Optional[str]
+
+class NozzleConfigurationParams(BaseModel):
     style: str
+    primaryNozzle: Optional[str]
+    frontRightNozzle: Optional[str]
