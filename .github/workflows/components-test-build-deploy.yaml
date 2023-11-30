@@ -192,7 +192,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
           npm install -g npm 
-          json -I -f ./components/package.json -e "this.version=\"${{ $VERSION_STRING }}\""
+          json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
       - run: npm publish --provenace --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
