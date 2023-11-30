@@ -159,42 +159,41 @@ jobs:
         run: |
           aws s3 sync ./dist s3://opentrons-components/${{ env.OT_BRANCH}} --acl public-read
 
-    
-    publish-components:
-      name: 'publish components package to npm'
-      runs-on: 'ubuntu-latest'
-      needs: ['js-unit-test', 'determine-build-type']
-      if: needs.determine-build-type.outputs.type == 'publish'
-      steps:
-        - uses: 'actions/checkout@v3'
-        # https://github.com/actions/checkout/issues/290
-        - name: 'Fix actions/checkout odd handling of tags'
-          if: startsWith(github.ref, 'refs/tags')
-          run: |
-            git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-            git checkout ${{ github.ref }}
-        - uses: 'actions/setup-node@v3'
-          with:
-            node-version: '16'
-        - name: 'cache yarn cache'
-          uses: actions/cache@v3
-          with:
-            path: |
-              ${{ github.workspace }}/.yarn-cache
-              ${{ github.workspace }}/.npm-cache
-            key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-            restore-keys: |
-              js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-        - name: 'setup-js'
-          run: |
-            npm config set cache ./.npm-cache
-            yarn config set cache-folder ./.yarn-cache
-            make setup-js
-            npm install -g npm 
-            json -I -f ./components/package.json -e "this.version=\"${{echo github.ref | tr "refs/tags/components@" ""}}\""
-        - run: npm publish --provenace --access public
-          env: 
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-            
+  publish-components:
+    name: 'publish components package to npm'
+    runs-on: 'ubuntu-latest'
+    needs: ['js-unit-test', 'determine-build-type']
+    if: needs.determine-build-type.outputs.type == 'publish'
+    steps:
+      - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+          npm install -g npm 
+          json -I -f ./components/package.json -e "this.version=\"${{echo github.ref | tr "refs/tags/components@" ""}}\""
+      - run: npm publish --provenace --access public
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
 
       
