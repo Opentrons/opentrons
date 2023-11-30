@@ -97,12 +97,6 @@ class GeometryView:
                 self._get_highest_z_from_labware_data(lw_data)
                 for lw_data in self._labware.get_all()
                 if lw_data.location != OFF_DECK_LOCATION
-                and not (
-                    isinstance(lw_data.location, AddressableAreaLocation)
-                    and fixture_validation.is_staging_slot(
-                        lw_data.location.addressableAreaName
-                    )
-                )
             ),
             default=0.0,
         )
@@ -147,8 +141,11 @@ class GeometryView:
 
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
         """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
-        slot_name = self.get_ancestor_slot_name(labware_id)
-        slot_pos = self._addressable_areas.get_addressable_area_position(slot_name.id)
+        try:
+            slot_name = self.get_ancestor_slot_name(labware_id).id
+        except errors.LocationIsStagingSlotError:
+            slot_name = self._get_staging_slot_name(labware_id)
+        slot_pos = self._addressable_areas.get_addressable_area_position(slot_name)
         labware_data = self._labware.get(labware_id)
         offset = self._get_labware_position_offset(labware_id, labware_data.location)
 
@@ -465,6 +462,22 @@ class GeometryView:
             ),
         )
 
+    # TODO(jbl 11-30-2023) fold this function into get_ancestor_slot_name see RSS-411
+    def _get_staging_slot_name(self, labware_id: str) -> str:
+        """Get the staging slot name that the labware is on."""
+        labware_location = self._labware.get(labware_id).location
+        if isinstance(labware_location, OnLabwareLocation):
+            below_labware_id = labware_location.labwareId
+            return self._get_staging_slot_name(below_labware_id)
+        elif isinstance(
+            labware_location, AddressableAreaLocation
+        ) and fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+            return labware_location.addressableAreaName
+        else:
+            raise ValueError(
+                "Cannot get staging slot name for labware not on staging slot."
+            )
+
     def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:
         """Get the slot name of the labware or the module that the labware is on."""
         labware = self._labware.get(labware_id)
@@ -483,7 +496,7 @@ class GeometryView:
             # TODO we might want to eventually return some sort of staging slot name when we're ready to work through
             #   the linting nightmare it will create
             if fixture_validation.is_staging_slot(area_name):
-                raise ValueError(
+                raise errors.LocationIsStagingSlotError(
                     "Cannot get ancestor slot name for labware on staging slot."
                 )
             slot_name = DeckSlotName.from_primitive(area_name)
