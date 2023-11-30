@@ -39,8 +39,8 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
       deckConfig={deckConfig}
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       robotType={robotType}
-      labwareLocations={getLabwareOnDeck(protocolAnalysis)}
-      moduleLocations={getModulesOnDeck(protocolAnalysis)}
+      labwareOnDeck={getLabwareOnDeck(protocolAnalysis)}
+      modulesOnDeck={getModulesOnDeck(protocolAnalysis)}
       {...{
         svgProps: {
           'aria-label': 'protocol deck map',

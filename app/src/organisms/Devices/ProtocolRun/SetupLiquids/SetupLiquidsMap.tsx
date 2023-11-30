@@ -136,7 +136,6 @@ export function SetupLiquidsMap(
         ) : null,
     }
   })
-
   return (
     <Flex
       maxHeight="80vh"
