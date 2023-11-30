@@ -22,6 +22,6 @@
   },
   "OT_PD_ENABLE_MULTI_TIP": {
     "title": "Enable multi tiprack support",
-    "description": "Allow users to use multi tiprack support"
+    "description": "Allow users to select multiple tipracks per pipette"
   }
 }
