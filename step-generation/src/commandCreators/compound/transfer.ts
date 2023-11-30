@@ -93,8 +93,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       })
     )
   }
-  console.log('source lab', args.sourceLabware)
-  console.log('prev robot state', prevRobotState.labware)
   if (!args.sourceLabware || !prevRobotState.labware[args.sourceLabware]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
@@ -118,7 +116,6 @@ export const transfer: CommandCreator<TransferArgs> = (
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
-  console.log('errors', errors)
   if (errors.length > 0)
     return {
       errors,
