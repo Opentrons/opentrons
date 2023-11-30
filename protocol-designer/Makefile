@@ -45,7 +45,7 @@ benchmarks: export NODE_ENV := test
 benchmarks:
 	shx mkdir -p benchmarks/output
 	node ../scripts/runBenchmarks "./benchmarks/*.js" | \
-	ntee "./benchmarks/output/$(benchmark_ouservertput)"
+	ntee "./benchmarks/output/$(benchmark_output)"
 
 .PHONY: dev
 dev: export NODE_ENV := development
