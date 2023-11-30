@@ -281,7 +281,7 @@ def ensure_trash_bin_location(
     if slot_name_ot3 not in valid_trash_bin_slots:
         raise InvalidTrashBinLocationError(
             f'Invalid location for trash bin: {slot_name_ot3}.\n'
-            f'Valid slots: {",".join(valid_trash_bin_slots)}')
+            f'Valid slots: Any slot in column 1 or 3.')
 
     return slot_name_ot3
 

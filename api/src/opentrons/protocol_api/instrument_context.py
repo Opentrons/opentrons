@@ -924,6 +924,12 @@ class InstrumentContext(publisher.CommandPublisher):
             - As a :py:class:`~.types.Location`. For example, to drop a tip from an
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
+            - As a :py:class:`.TrashBin`. This uses a default location relative to the
+              TrashBin object. For example,
+              ``pipette.drop_tip(location=trash_bin)``.
+            - As a :py:class:`.WasteChute`. This uses a default location relative to the
+              WasteChute object. For example,
+              ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
             The location to drop the tip.
@@ -1469,9 +1475,15 @@ class InstrumentContext(publisher.CommandPublisher):
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        By default, the trash container is in slot 12 on OT-2 and in slot A3 on Flex
-        for API Versions < 2.16. For API Versions >= 2.16, we search the protocol
-        core's set of disposal locations for the first valid location if it exists.
+        On a Flex running a protocol with API Version >= 2.16, `trash_container` returns
+        the first TrashBin or WateChute object loaded in the protocol.
+        On a Flex running a protocol with API Version < 2.16, `trash_container` returns
+        a single-well fixed trash labware in slot D3.
+        On a an OT-2, `trash_container` always returns a single-well fixed trash labware
+        in slot 12.
+
+        .. versionchanged:: 2.16
+            Adds the support for TrashBin and WasteChute objects.
         """
 
         if self._trash is None:

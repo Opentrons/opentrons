@@ -440,7 +440,6 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 16)
-    # TODO: Confirm official naming of "trash bin".
     def load_trash_bin(
         self,
         location: Optional[DeckLocation] = None
@@ -454,7 +453,6 @@ class ProtocolContext(CommandPublisher):
         return trash_bin
 
     @requires_version(2, 16)
-    # TODO: Confirm official naming of "waste chute".
     def load_waste_chute(
         self,
         *,
