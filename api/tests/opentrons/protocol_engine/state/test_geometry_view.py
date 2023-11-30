@@ -33,6 +33,8 @@ from opentrons.protocol_engine.types import (
     OverlapOffset,
     DeckType,
     CurrentWell,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
     LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state import move_types
@@ -1190,7 +1192,7 @@ def test_ensure_location_not_occupied_raises(
         subject.ensure_location_not_occupied(location=slot_location)
 
     # Raise if module in location
-    module_location = ModuleLocation(moduleId="module-id")
+    module_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     decoy.when(labware_view.raise_if_labware_in_location(module_location)).then_return(
         None
     )
@@ -1326,8 +1328,11 @@ def test_get_labware_grip_point_for_labware_on_module(
     argnames=["location", "should_dodge", "expected_waypoints"],
     argvalues=[
         (None, True, []),
+        (None, False, []),
         (CurrentWell("pipette-id", "from-labware-id", "well-name"), False, []),
         (CurrentWell("pipette-id", "from-labware-id", "well-name"), True, [(11, 22)]),
+        (CurrentAddressableArea("pipette-id", "area-name"), False, []),
+        (CurrentAddressableArea("pipette-id", "area-name"), True, [(11, 22)]),
     ],
 )
 def test_get_extra_waypoints(
@@ -1335,7 +1340,7 @@ def test_get_extra_waypoints(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    location: Optional[CurrentWell],
+    location: Optional[CurrentPipetteLocation],
     should_dodge: bool,
     expected_waypoints: List[Tuple[float, float]],
     subject: GeometryView,
@@ -1349,14 +1354,10 @@ def test_get_extra_waypoints(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         )
     )
-    decoy.when(labware_view.get("to-labware-id")).then_return(
-        LoadedLabware(
-            id="labware2",
-            loadName="load-name2",
-            definitionUri="4567",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        )
-    )
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("area-name")
+    ).then_return(DeckSlotName.SLOT_1)
 
     decoy.when(
         module_view.should_dodge_thermocycler(
@@ -1370,7 +1371,7 @@ def test_get_extra_waypoints(
         )
     ).then_return(Point(x=11, y=22, z=33))
 
-    extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
+    extra_waypoints = subject.get_extra_waypoints(location, DeckSlotName.SLOT_2)
 
     assert extra_waypoints == expected_waypoints
 
@@ -1382,49 +1383,25 @@ def test_get_slot_item(
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
-    allowed_labware_ids = {"foo", "bar"}
-    allowed_module_ids = {"fizz", "buzz"}
     labware = LoadedLabware.construct(id="cool-labware")  # type: ignore[call-arg]
     module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
 
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_1, allowed_labware_ids)
-    ).then_return(None)
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_2, allowed_labware_ids)
-    ).then_return(labware)
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_3, allowed_labware_ids)
-    ).then_return(None)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
 
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_1, allowed_module_ids)
-    ).then_return(None)
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_2, allowed_module_ids)
-    ).then_return(None)
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_3, allowed_module_ids)
-    ).then_return(module)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(None)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(module)
 
     assert (
         subject.get_slot_item(
-            DeckSlotName.SLOT_1, allowed_labware_ids, allowed_module_ids
+            DeckSlotName.SLOT_1,
         )
         is None
     )
-    assert (
-        subject.get_slot_item(
-            DeckSlotName.SLOT_2, allowed_labware_ids, allowed_module_ids
-        )
-        == labware
-    )
-    assert (
-        subject.get_slot_item(
-            DeckSlotName.SLOT_3, allowed_labware_ids, allowed_module_ids
-        )
-        == module
-    )
+    assert subject.get_slot_item(DeckSlotName.SLOT_2) == labware
+    assert subject.get_slot_item(DeckSlotName.SLOT_3) == module
 
 
 @pytest.mark.parametrize(

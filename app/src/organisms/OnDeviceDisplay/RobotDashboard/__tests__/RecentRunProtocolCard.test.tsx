@@ -177,7 +177,7 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
-      conflictedSlots: ['D3'],
+      conflictedSlots: ['cutoutD3'],
     })
     mockUseHardwareStatusText.mockReturnValue('Location conflicts')
     const [{ getByText }] = render(props)

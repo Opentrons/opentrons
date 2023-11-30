@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
     WellLocation,
     WellOrigin,
     WellOffset,
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
@@ -632,7 +632,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
         else:
-            configuration_model = EmptyNozzleLayoutConfiguration()
+            configuration_model = AllNozzleLayoutConfiguration()
         self._engine_client.configure_nozzle_layout(
             pipette_id=self._pipette_id, configuration_params=configuration_model
         )

@@ -20,6 +20,7 @@ from opentrons.protocol_engine.state.addressable_areas import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     Dimensions,
     DeckPoint,
@@ -60,6 +61,8 @@ def test_get_loaded_addressable_area() -> None:
     """It should get the loaded addressable area."""
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_D3,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -86,6 +89,8 @@ def test_get_addressable_area_for_simulation_already_loaded() -> None:
     """It should get the addressable area for a simulation that has not been loaded yet."""
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_D3,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -105,13 +110,17 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     """It should get the addressable area for a simulation that has not been loaded yet."""
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
-            "123": {PotentialCutoutFixture(cutout_id="123", cutout_fixture_id="blah")}
+            "cutoutA1": {
+                PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")
+            }
         },
         use_simulated_deck_config=True,
     )
 
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_D3,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -125,18 +134,24 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
             "abc", subject.state.deck_definition
         )
     ).then_return(
-        ("123", {PotentialCutoutFixture(cutout_id="123", cutout_fixture_id="blah")})
+        (
+            "cutoutA1",
+            {PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")},
+        )
     )
 
     decoy.when(
         deck_configuration_provider.get_cutout_position(
-            "123", subject.state.deck_definition
+            "cutoutA1", subject.state.deck_definition
         )
     ).then_return(DeckPoint(x=1, y=2, z=3))
 
     decoy.when(
         deck_configuration_provider.get_addressable_area_from_name(
-            "abc", DeckPoint(x=1, y=2, z=3), subject.state.deck_definition
+            "abc",
+            DeckPoint(x=1, y=2, z=3),
+            DeckSlotName.SLOT_A1,
+            subject.state.deck_definition,
         )
     ).then_return(addressable_area)
 
@@ -176,6 +191,8 @@ def test_get_addressable_area_position() -> None:
         loaded_addressable_areas_by_name={
             "abc": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -190,12 +207,36 @@ def test_get_addressable_area_position() -> None:
     assert result == Point(1, 2, 3)
 
 
+def test_get_addressable_area_move_to_location() -> None:
+    """It should get the absolute location of an addressable area's move to location."""
+    subject = get_addressable_area_view(
+        loaded_addressable_areas_by_name={
+            "abc": AddressableArea(
+                area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
+                display_name="fancy name",
+                bounding_box=Dimensions(x=10, y=20, z=30),
+                position=AddressableOffsetVector(x=1, y=2, z=3),
+                compatible_module_types=[],
+                drop_tip_location=None,
+                drop_labware_location=None,
+            )
+        }
+    )
+
+    result = subject.get_addressable_area_move_to_location("abc")
+    assert result == Point(6, 12, 33)
+
+
 def test_get_addressable_area_center() -> None:
     """It should get the absolute location of an addressable area's center."""
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={
             "abc": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -216,6 +257,8 @@ def test_get_slot_definition() -> None:
         loaded_addressable_areas_by_name={
             "6": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=1, y=2, z=3),
                 position=AddressableOffsetVector(x=7, y=8, z=9),

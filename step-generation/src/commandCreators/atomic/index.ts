@@ -1,4 +1,5 @@
 import { aspirate } from './aspirate'
+import { aspirateInPlace } from './aspirateInPlace'
 import { blowout } from './blowout'
 import { blowOutInPlace } from './blowOutInPlace'
 import { deactivateTemperature } from './deactivateTemperature'
@@ -19,6 +20,7 @@ import { touchTip } from './touchTip'
 import { waitForTemperature } from './waitForTemperature'
 export {
   aspirate,
+  aspirateInPlace,
   blowout,
   blowOutInPlace,
   deactivateTemperature,

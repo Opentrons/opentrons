@@ -32,7 +32,6 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
-
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
@@ -94,7 +93,6 @@ export function PipetteFields(props: Props): JSX.Element {
   const allow96Channel = useSelector(getAllow96Channel)
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
-
   const initialTabIndex = props.initialTabIndex || 1
 
   React.useEffect(() => {

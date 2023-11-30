@@ -20,7 +20,7 @@ from opentrons.protocol_engine.commands.configure_nozzle_layout import (
 )
 
 from opentrons.protocol_engine.types import (
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
@@ -329,7 +329,7 @@ NINETY_SIX_MAP = OrderedDict(
             {"primary_nozzle": "A1", "front_right_nozzle": "E1"},
         ],
         [
-            EmptyNozzleLayoutConfiguration(),
+            AllNozzleLayoutConfiguration(),
             None,
             {},
         ],
@@ -340,7 +340,7 @@ async def test_configure_nozzle_layout_implementation(
     equipment: EquipmentHandler,
     tip_handler: TipHandler,
     request_model: Union[
-        EmptyNozzleLayoutConfiguration,
+        AllNozzleLayoutConfiguration,
         ColumnNozzleLayoutConfiguration,
         QuadrantNozzleLayoutConfiguration,
         SingleNozzleLayoutConfiguration,

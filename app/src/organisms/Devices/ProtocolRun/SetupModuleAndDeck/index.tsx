@@ -11,7 +11,11 @@ import {
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '../../../../resources/deck_configuration/utils'
+import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+  // getUnmatchedSingleSlotFixtures,
+} from '../../../../resources/deck_configuration/utils'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   useRunHasStarted,
@@ -57,6 +61,14 @@ export const SetupModuleAndDeck = ({
     commands
   )
 
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+
+  // TODO(bh, 2023-11-28): there is an unimplemented scenario where unmatched single slot fixtures need to be updated
+  // will need to additionally filter out module conflict unmatched fixtures, as these are represented in SetupModulesList
+  // const unmatchedSingleSlotFixtures = getUnmatchedSingleSlotFixtures(
+  //   deckConfigCompatibility
+  // )
+
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
   )
@@ -84,6 +96,7 @@ export const SetupModuleAndDeck = ({
         <PrimaryButton
           disabled={
             missingModuleIds.length > 0 ||
+            isFixtureMismatch ||
             runHasStarted ||
             !moduleCalibrationStatus.complete
           }

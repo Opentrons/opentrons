@@ -18,11 +18,7 @@ import {
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { getEnableDeckModification } from '../../feature-flags/selectors'
-import {
-  getAdditionalEquipment,
-  getInitialDeckSetup,
-  getLabwareEntities,
-} from '../../step-forms/selectors'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
 import {
   deleteDeckFixture,
   toggleIsGripperRequired,
@@ -33,8 +29,6 @@ import { ModuleRow } from './ModuleRow'
 import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
-import { FLEX_TRASH_DEF_URI } from '../../constants'
-import { deleteContainer } from '../../labware-ingred/actions'
 import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import { StagingAreasRow } from './StagingAreasRow'
 
@@ -46,18 +40,13 @@ export interface Props {
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
   const enableDeckModification = useSelector(getEnableDeckModification)
-  const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const labwareEntities = useSelector(getLabwareEntities)
-  //  trash bin can only  be altered for the flex
-  const trashBin = Object.values(labwareEntities).find(
-    lw => lw.labwareDefURI === FLEX_TRASH_DEF_URI
-  )
-  const trashSlot =
-    trashBin != null ? initialDeckSetup.labware[trashBin?.id].slot : null
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
   const additionalEquipment = useSelector(getAdditionalEquipment)
+  const trashBin = Object.values(additionalEquipment).find(
+    equipment => equipment?.name === 'trashBin'
+  )
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
@@ -173,13 +162,13 @@ export function EditModulesCard(props: Props): JSX.Element {
             <AdditionalItemsRow
               handleAttachment={() =>
                 trashBin != null
-                  ? dispatch(deleteContainer({ labwareId: trashBin.id }))
+                  ? dispatch(deleteDeckFixture(trashBin.id))
                   : null
               }
               isEquipmentAdded={trashBin != null}
               name="trashBin"
               hasWasteChute={wasteChute != null}
-              trashBinSlot={trashSlot ?? undefined}
+              trashBinSlot={trashBin?.location ?? undefined}
               trashBinId={trashBin?.id}
             />
             <AdditionalItemsRow

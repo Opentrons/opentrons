@@ -1,12 +1,8 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { DropdownField, DropdownOption, FormGroup } from '@opentrons/components'
-import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../../../constants'
 import { i18n } from '../../../../localization'
-import {
-  getAdditionalEquipmentEntities,
-  getLabwareEntities,
-} from '../../../../step-forms/selectors'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { StepFormDropdown } from '../StepFormDropdownField'
 import styles from '../../StepEditForm.css'
 
@@ -20,15 +16,12 @@ export function DropTipField(
     onFieldFocus,
     updateValue,
   } = props
-  const labware = useSelector(getLabwareEntities)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const wasteChute = Object.values(additionalEquipment).find(
     aE => aE.name === 'wasteChute'
   )
-  const trash = Object.values(labware).find(
-    lw =>
-      lw.labwareDefURI === FLEX_TRASH_DEF_URI ||
-      lw.labwareDefURI === OT_2_TRASH_DEF_URI
+  const trashBin = Object.values(additionalEquipment).find(
+    aE => aE.name === 'trashBin'
   )
   const wasteChuteOption: DropdownOption = {
     name: 'Waste Chute',
@@ -36,12 +29,12 @@ export function DropTipField(
   }
   const trashOption: DropdownOption = {
     name: 'Trash Bin',
-    value: trash?.id ?? '',
+    value: trashBin?.id ?? '',
   }
 
   const options: DropdownOption[] = []
   if (wasteChute != null) options.push(wasteChuteOption)
-  if (trash != null) options.push(trashOption)
+  if (trashBin != null) options.push(trashOption)
 
   const [selectedValue, setSelectedValue] = React.useState(
     dropdownItem || (options[0] && options[0].value)

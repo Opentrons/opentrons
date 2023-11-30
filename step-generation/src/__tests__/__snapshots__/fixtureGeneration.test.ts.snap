@@ -2,6 +2,7 @@
 
 exports[`snapshot tests createEmptyLiquidState 1`] = `
 Object {
+  "additionalEquipment": Object {},
   "labware": Object {
     "destPlateId": Object {
       "A1": Object {},
@@ -14923,6 +14924,7 @@ Object {
     },
   },
   "liquidState": Object {
+    "additionalEquipment": Object {},
     "labware": Object {
       "destPlateId": Object {
         "A1": Object {},
