@@ -1464,7 +1464,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def trash_container(
         self
     ) -> Union[labware.Labware, TrashBin, WasteChute]:
-        """The trash container(s) associated with this pipette.
+        """The trash containers associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
