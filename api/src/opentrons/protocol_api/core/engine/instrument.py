@@ -27,7 +27,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, AddressableOffsetVector
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
@@ -38,7 +38,6 @@ from .well import WellCore
 
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
-from ... import _trash_bin_dimensions
 from ... import _waste_chute_dimensions
 
 if TYPE_CHECKING:
@@ -416,37 +415,58 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         force_direct: bool,
         speed: Optional[float],
     ) -> None:
+        # NOTE: only invoked by `drop_tip_in_disposal_location`, so does not currently accommodate gripper
+
+        # map trash bin location to addressable area
+        map_trash_bin_addressable_area = {
+            'A1': 'movableTrashA1',
+            'B1': 'movableTrashB1',
+            'C1': 'movableTrashC1',
+            'D1': 'movableTrashD1',
+            'A3': 'movableTrashA3',
+            'B3': 'movableTrashB3',
+            'C3': 'movableTrashC3',
+            'D3': 'movableTrashD3',
+        }
+
+        # map pipette channel to waste chute addressable area
+        map_waste_chute_addressable_area: {
+            1: {
+                'addressableAreaName': '1and8ChannelWasteChute',
+                'offset': AddressableOffsetVector(64.0, 21.91, 144.0)
+            },
+            8: {
+                'addressableAreaName': '1and8ChannelWasteChute',
+                'offset': AddressableOffsetVector(64.0, 21.91, 144.0)
+            },
+            96: {
+                'addressableAreaName': '96ChannelWasteChute',
+                'offset': AddressableOffsetVector(14.445, 42.085, 115)
+            },
+        }
+
+        # TODO (nd, 2023-11-30): give appropriate offset when finalized
+        # https://opentrons.atlassian.net/browse/RSS-391
+        offset = AddressableOffsetVector(0, 0, 0)
 
         if isinstance(disposal_location, TrashBin):
-            dimensions = _trash_bin_dimensions
             slot_name = disposal_location._location
-            minimum_z = None
+            miminum_z_height = None
+            addressable_area_name = map_trash_bin_addressable_area[slot_name]
         else:
-            dimensions = _waste_chute_dimensions
             slot_name = DeckSlotName.SLOT_D3
-            minimum_z = _waste_chute_dimensions.ENVELOPE_HEIGHT + 5.0
+            miminum_z_height = _waste_chute_dimensions.ENVELOPE_HEIGHT + 5.0
+            num_channels = self.get_channels()
+            addressable_area_name = map_waste_chute_addressable_area[
+                num_channels]['addressableAreaName']
 
-        if self.get_channels() == 96:
-            slot_origin_to_tip_a1 = dimensions.SLOT_ORIGIN_TO_96_TIP_A1
-        else:
-            slot_origin_to_tip_a1 = dimensions.SLOT_ORIGIN_TO_1_OR_8_TIP_A1
-
-        # TODO: All of this logic to compute the destination coordinate belongs in Protocol Engine.
-        slot = self._protocol_core.get_slot_definition(slot_name)
-        slot_origin = Point(*slot["position"])
-        destination_point = slot_origin + slot_origin_to_tip_a1
-
-        # Normally, we use a 10 mm margin. (DEFAULT_GENERAL_ARC_Z_MARGIN.) Unfortunately, with
-        # 1000µL tips, we have slightly not enough room to meet that margin. We can make the margin
-        # as big as 7.5 mm before the motion planner raises an error. So, use that reduced margin,
-        # with a little more subtracted in order to leave wiggle room for pipette calibration.
-
-        self.move_to(
-            Location(destination_point, labware=None),
-            well_core=None,
+        self._engine_client.move_to_addressable_area(
+            pipette_id=self._pipette_id,
+            addressable_area_name=addressable_area_name,
+            offset=offset,
+            miminum_z_height=miminum_z_height,
             force_direct=force_direct,
-            minimum_z_height=minimum_z,
-            speed=speed,
+            speed=speed
         )
 
     def home(self) -> None:
