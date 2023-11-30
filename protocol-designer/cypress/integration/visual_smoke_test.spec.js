@@ -1,6 +1,5 @@
 describe('Visual Smoke Test', () => {
   describe('The Home Page', () => {
-
     before(() => {
       cy.visit('/')
       cy.closeAnnouncementModal()
@@ -18,23 +17,31 @@ describe('Visual Smoke Test', () => {
       cy.contains('Settings')
       cy.contains('Protocol Designer')
 
-      cy.get("@top-nav").contains("button[class*='navbar__tab__']", 'FILE')
-      .should('not.be.disabled')
+      cy.get('@top-nav')
+        .contains("button[class*='navbar__tab__']", 'FILE')
+        .should('not.be.disabled')
 
-      cy.get("@top-nav").contains("button[class*='navbar__tab__']", 'LIQUIDS')
-      .should('be.disabled')
+      cy.get('@top-nav')
+        .contains("button[class*='navbar__tab__']", 'LIQUIDS')
+        .should('be.disabled')
 
-      cy.get("@top-nav").contains("button[class*='navbar__tab__']", 'DESIGN')
-      .should('be.disabled')
+      cy.get('@top-nav')
+        .contains("button[class*='navbar__tab__']", 'DESIGN')
+        .should('be.disabled')
 
-      cy.get("@bottom-nav").contains("a[class*='navbar__tab__']", 'HELP')
-      .should('not.be.disabled')
-      .should('have.prop', 'href', 'https://support.opentrons.com/s/protocol-designer')
+      cy.get('@bottom-nav')
+        .contains("a[class*='navbar__tab__']", 'HELP')
+        .should('not.be.disabled')
+        .should(
+          'have.prop',
+          'href',
+          'https://support.opentrons.com/s/protocol-designer'
+        )
 
-      cy.get("@bottom-nav").contains("button[class*='navbar__tab__']", 'Settings')
-      .should('not.be.disabled')
+      cy.get('@bottom-nav')
+        .contains("button[class*='navbar__tab__']", 'Settings')
+        .should('not.be.disabled')
     })
-
   })
 
   describe('The Settings Page', () => {
@@ -49,27 +56,50 @@ describe('Visual Smoke Test', () => {
       cy.get('h3').contains('Privacy').as('privacy-section')
       cy.get('h3').contains('Experimental Settings').as('experimental-section')
     })
-  
+
     it('should have the following elements', () => {
-      cy.get('@info-section').should('exist')
-        .next().contains('Protocol Designer Version').should('exist')
+      cy.get('@info-section')
+        .should('exist')
+        .next()
+        .contains('Protocol Designer Version')
+        .should('exist')
 
-      cy.get('@hints-section').should('exist')
-        .next().contains('Restore all hints').should('exist')
+      cy.get('@hints-section')
+        .should('exist')
+        .next()
+        .contains('Restore all hints')
+        .should('exist')
 
-      cy.get('@privacy-section').should('exist')
-      .next().contains("p", "Share sessions").should('exist')
-      .next().should('exist').and('have.attr', 'class').and('match', /toggle/)
+      cy.get('@privacy-section')
+        .should('exist')
+        .next()
+        .contains('p', 'Share sessions')
+        .should('exist')
+        .next()
+        .should('exist')
+        .and('have.attr', 'class')
+        .and('match', /toggle/)
 
-      cy.get('@experimental-section').should('exist')
-      .siblings().contains("p", "Allow all tip rack options").should('exist')
-      .next().should('exist').and('have.attr', 'class').and('match', /toggle/)
-      
       cy.get('@experimental-section')
-      .siblings().contains(exptlSettingText).should('exist')
-      .next().should('exist').and('have.attr', 'class').and('match', /toggle/)
+        .should('exist')
+        .siblings()
+        .contains('p', 'Allow all tip rack options')
+        .should('exist')
+        .next()
+        .should('exist')
+        .and('have.attr', 'class')
+        .and('match', /toggle/)
+
+      cy.get('@experimental-section')
+        .siblings()
+        .contains(exptlSettingText)
+        .should('exist')
+        .next()
+        .should('exist')
+        .and('have.attr', 'class')
+        .and('match', /toggle/)
     })
-  
+
     it('remembers when we enable things', () => {
       // Enable a button
       // We're not using the privacy button because that
@@ -88,6 +118,4 @@ describe('Visual Smoke Test', () => {
         .and('match', /toggled_on/)
     })
   })
-
 })
-
