@@ -85,8 +85,6 @@ class LoadPipetteImplementation(
         robot_type = RobotTypeEnum.robot_literal_to_enum(
             self._state_view.config.robot_type
         )
-        print(f"$$$$$ {self._state_view.config.robot_type}")
-        print(f"@@@@@@@@ gen: {pipette_generation}, robot: {robot_type} @@@@@@@@")
         if (
             (
                 robot_type == RobotTypeEnum.FLEX
@@ -100,12 +98,12 @@ class LoadPipetteImplementation(
             )
         ):
             raise InvalidSpecificationForRobotTypeError(
-                f"Cannot load a {pipette_generation} pipette on {robot_type.name} robot."
+                f"Cannot load a {pipette_generation.value} pipette on {robot_type.name} robot."
             )
 
         if params.mount == MountType.EXTENSION:
             raise InvalidLoadPipetteSpecsError(
-                "Cannot load a pipette on the EXTENSION mount. Use mounts LEFT and RIGHT."
+                "Cannot load a pipette on the EXTENSION mount. Use mount LEFT or RIGHT."
             )
 
         loaded_pipette = await self._equipment.load_pipette(

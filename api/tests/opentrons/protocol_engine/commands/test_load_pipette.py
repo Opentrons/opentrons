@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.types import MountType
 
 from opentrons.protocol_engine.errors import InvalidSpecificationForRobotTypeError
@@ -118,27 +118,32 @@ async def test_load_pipette_implementation_96_channel(
     )
 
 
+@pytest.mark.parametrize(
+    argnames=["pipette_type", "robot_type"],
+    argvalues=[
+        (PipetteNameType.P300_SINGLE, "OT-3 Standard"),
+        (PipetteNameType.P20_MULTI_GEN2, "OT-3 Standard"),
+        (PipetteNameType.P10_MULTI, "OT-3 Standard"),
+        (PipetteNameType.P1000_SINGLE, "OT-3 Standard"),
+        (PipetteNameType.P1000_MULTI_FLEX, "OT-2 Standard"),
+        (PipetteNameType.P50_SINGLE_FLEX, "OT-2 Standard"),
+        (PipetteNameType.P1000_96, "OT-2 Standard"),
+    ],
+)
 async def test_loading_wrong_pipette_for_robot_raises_error(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
+    pipette_type: PipetteNameType,
+    robot_type: RobotType,
 ) -> None:
     """A LoadPipette command should raise error when pipette is not supported on robot."""
     subject = LoadPipetteImplementation(equipment=equipment, state_view=state_view)
     p1000_params = LoadPipetteParams(
-        pipetteName=PipetteNameType.P1000_96,
+        pipetteName=pipette_type,
         mount=MountType.LEFT,
         pipetteId="p1000-id",
     )
-    decoy.when(state_view.config.robot_type).then_return("OT-2 Standard")
+    decoy.when(state_view.config.robot_type).then_return(robot_type)
     with pytest.raises(InvalidSpecificationForRobotTypeError):
         await subject.execute(p1000_params)
-
-    p20_params = LoadPipetteParams(
-        pipetteName=PipetteNameType.P20_SINGLE_GEN2,
-        mount=MountType.RIGHT,
-        pipetteId="p20-id",
-    )
-    decoy.when(state_view.config.robot_type).then_return("OT-3 Standard")
-    with pytest.raises(InvalidSpecificationForRobotTypeError):
-        await subject.execute(p20_params)
