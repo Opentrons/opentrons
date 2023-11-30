@@ -116,6 +116,12 @@ class MoveLabwareImplementation(
                     f"Cannot move {current_labware.loadName} to addressable area {area_name}"
                 )
             if fixture_validation.is_gripper_waste_chute(area_name):
+                # When dropping off labware in the waste chute, some bigger pieces
+                # of labware (namely tipracks) can get stuck between a gripper
+                # paddle and the bottom of the waste chute, even after the gripper
+                # has homed all the way to the top of its travel. We add a "post-drop
+                # slide" to dropoffs in the waste chute in order to guarantee that the
+                # labware can drop fully through the chute before the gripper jaws close.
                 post_drop_slide_offset = Point(
                     x=(current_labware_definition.dimensions.xDimension / 2.0)
                     + (GRIPPER_PADDLE_WIDTH / 2.0)
