@@ -188,7 +188,6 @@ jobs:
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'set version number'
         run: |
-          npm install -g npm 
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
       - run: cd ./components && npm publish --provenace --access public
         env: 
