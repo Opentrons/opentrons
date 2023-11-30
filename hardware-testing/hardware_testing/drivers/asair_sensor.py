@@ -185,8 +185,9 @@ class AsairSensor(AsairSensorBase):
 
     def get_serial(self) -> str:
         """Read the device ID register."""
-        serial_addr = "0A"
-        data_packet = "{}0300000002{}".format(serial_addr, addrs[serial_addr])
+        data_packet = "{}0300000002{}".format(
+            self._sensor_address, addrs[self._sensor_address]
+        )
         log.debug(f"sending {data_packet}")
         command_bytes = codecs.decode(data_packet.encode(), "hex")
         try:
@@ -197,6 +198,7 @@ class AsairSensor(AsairSensorBase):
 
             length = self._th_sensor.inWaiting()
             res = self._th_sensor.read(length)
+            res = codecs.encode(res, "hex")
             log.debug(f"received {res}")
             dev_id = res[6:14]
             return dev_id.decode()
