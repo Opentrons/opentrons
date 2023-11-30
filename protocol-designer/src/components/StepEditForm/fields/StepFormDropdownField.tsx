@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { DropdownField, Options } from '@opentrons/components'
 import cx from 'classnames'
 import { StepFieldName } from '../../../steplist/fieldLevel'
-import { getDisposalOptions } from '../../../ui/labware/selectors'
 import styles from '../StepEditForm.css'
 import type { FieldProps } from '../types'
 
@@ -24,13 +22,9 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
     updateValue,
     errorToShow,
   } = props
-  const disposalOptions = useSelector(getDisposalOptions)
-  const fullOptions =
-    name === 'dispense_labware' ? [...options, ...disposalOptions] : options
-
   // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: unknown) => {}
   // blank out the dropdown if labware id does not exist
-  const availableOptionIds = fullOptions.map(opt => opt.value)
+  const availableOptionIds = options.map(opt => opt.value)
   // @ts-expect-error (ce, 2021-06-21) unknown not assignable to string
   const fieldValue = availableOptionIds.includes(value) ? String(value) : null
 
@@ -39,7 +33,7 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
       name={name}
       error={errorToShow}
       className={cx(styles.large_field, className)}
-      options={fullOptions}
+      options={options}
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
       value={fieldValue}
