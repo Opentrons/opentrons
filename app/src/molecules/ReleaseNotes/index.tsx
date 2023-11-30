@@ -26,7 +26,6 @@ const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   const { source } = props
 
-  console.log(DEFAULT_RELEASE_NOTES)
   return (
     <div className={styles.release_notes}>
       {source != null ? (

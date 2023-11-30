@@ -121,9 +121,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
     stepType,
   })
 
-  const disposalLabwareOptions = uiLabwareSelectors.getDisposalLabwareOptions(
-    state
-  )
+  const disposalOptions = uiLabwareSelectors.getDisposalOptions(state)
 
   const maxDisposalVolume = getMaxDisposalVolumeForMultidispense(
     {
@@ -138,10 +136,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   return {
     maxDisposalVolume,
-    disposalDestinationOptions: [
-      ...disposalLabwareOptions,
-      ...blowoutLocationOptions,
-    ],
+    disposalDestinationOptions: [...disposalOptions, ...blowoutLocationOptions],
   }
 }
 

@@ -65,6 +65,17 @@ exports[`FilterCategory component renders 1`] = `
         Tip Racks
       </Link>
     </li>
+    <li
+      className="filter_category_item"
+      key="adapter"
+    >
+      <Link
+        className="filter_category_link"
+        to="/?category=adapter"
+      >
+        Adapter
+      </Link>
+    </li>
   </ul>
 </Fragment>
 `;

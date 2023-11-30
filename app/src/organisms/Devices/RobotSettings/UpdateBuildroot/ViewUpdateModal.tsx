@@ -27,6 +27,7 @@ export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
   const { robotName, robot, closeModal } = props
+  const [showAppUpdateModal, setShowAppUpdateModal] = React.useState(true)
 
   const updateInfo = useSelector((state: State) =>
     getRobotUpdateInfo(state, robotName)
@@ -38,7 +39,9 @@ export function ViewUpdateModal(
     getRobotUpdateAvailable(state, robot)
   )
   const robotSystemType = getRobotSystemType(robot)
-  const availableAppUpdateVersion = useSelector(getAvailableShellUpdate)
+  const availableAppUpdateVersion = Boolean(
+    useSelector(getAvailableShellUpdate)
+  )
 
   const [
     showMigrationWarning,
@@ -51,12 +54,12 @@ export function ViewUpdateModal(
   }
 
   let releaseNotes = ''
-  if (updateInfo?.releaseNotes) releaseNotes = updateInfo.releaseNotes
+  if (updateInfo?.releaseNotes != null) releaseNotes = updateInfo.releaseNotes
 
-  if (availableAppUpdateVersion)
+  if (availableAppUpdateVersion && showAppUpdateModal)
     return (
       <Portal>
-        <UpdateAppModal closeModal={close} />
+        <UpdateAppModal closeModal={() => setShowAppUpdateModal(false)} />
       </Portal>
     )
 

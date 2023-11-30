@@ -35,6 +35,7 @@ import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent
 import type { RunCommandSummary, RunData } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { useRobotType } from '../Devices/hooks'
 
 const LEARN_ABOUT_MANUAL_STEPS_URL =
   'https://support.opentrons.com/s/article/Manual-protocol-steps'
@@ -108,6 +109,7 @@ export function InterventionModal({
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
   const isOnDevice = useSelector(getIsOnDevice)
 
+  const robotType = useRobotType(robotName)
   const childContent = React.useMemo(() => {
     if (
       command.commandType === 'waitForResume' ||
@@ -122,7 +124,7 @@ export function InterventionModal({
     } else if (command.commandType === 'moveLabware') {
       return (
         <MoveLabwareInterventionContent
-          {...{ command, run, analysis }}
+          {...{ command, run, analysis, robotType }}
           isOnDevice={isOnDevice}
         />
       )

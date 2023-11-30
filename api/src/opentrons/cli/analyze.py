@@ -79,7 +79,7 @@ async def _analyze(
     runner = await create_simulating_runner(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
-    analysis = await runner.run(protocol_source)
+    analysis = await runner.run(deck_configuration=[], protocol_source=protocol_source)
 
     if json_output:
         results = AnalyzeResults.construct(
@@ -145,10 +145,16 @@ class AnalyzeResults(BaseModel):
     See robot-server's analysis models for field documentation.
     """
 
+    # We want to unify this local analysis model with the one that robot-server returns.
+    # Until that happens, we need to keep these fields in sync manually.
+
+    # Fields that are currently unique to this local analysis module, missing from robot-server:
     createdAt: datetime
     files: List[ProtocolFile]
     config: Union[JsonConfig, PythonConfig]
     metadata: Dict[str, Any]
+
+    # Fields that should match robot-server:
     robotType: RobotType
     commands: List[Command]
     labware: List[LoadedLabware]

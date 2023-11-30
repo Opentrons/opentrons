@@ -17,7 +17,7 @@ from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ..._liquid import Liquid
-from ..._types import OffDeckType
+from ..._types import OffDeckType, StagingSlotName
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -152,6 +152,7 @@ class LegacyProtocolCore(
             DeckSlotName,
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
+            StagingSlotName,
             OffDeckType,
         ],
         label: Optional[str],
@@ -167,6 +168,8 @@ class LegacyProtocolCore(
             raise APIVersionError(
                 "Loading a labware onto another labware or adapter is only supported with api version 2.15 and above"
             )
+        elif isinstance(location, StagingSlotName):
+            raise APIVersionError("Using a staging deck slot requires apiLevel 2.16.")
 
         deck_slot = (
             location if isinstance(location, DeckSlotName) else location.get_deck_slot()
@@ -237,7 +240,12 @@ class LegacyProtocolCore(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LegacyLabwareCore:
@@ -250,6 +258,7 @@ class LegacyProtocolCore(
         labware_core: LegacyLabwareCore,
         new_location: Union[
             DeckSlotName,
+            StagingSlotName,
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,

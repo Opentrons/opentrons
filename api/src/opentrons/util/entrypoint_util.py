@@ -27,6 +27,7 @@ from opentrons.calibration_storage import helpers
 from opentrons.protocol_engine.errors.error_occurrence import (
     ErrorOccurrence as ProtocolEngineErrorOccurrence,
 )
+from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 from opentrons.protocols.types import JsonProtocol, Protocol, PythonProtocol
 
@@ -121,6 +122,15 @@ def datafiles_from_paths(paths: Sequence[Union[str, pathlib.Path]]) -> Dict[str,
                 else:
                     log.info(f"ignoring {child} in data path")
     return datafiles
+
+
+def get_deck_configuration() -> DeckConfigurationType:
+    """Return the host robot's current deck configuration."""
+    # TODO: Search for the file where robot-server stores it.
+    # Flex: /var/lib/opentrons-robot-server/deck_configuration.json
+    # OT-2: /data/opentrons_robot_server/deck_configuration.json
+    # https://opentrons.atlassian.net/browse/RSS-400
+    return []
 
 
 @contextlib.contextmanager

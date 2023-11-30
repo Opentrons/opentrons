@@ -229,6 +229,7 @@ export function parseInitialLoadedModulesBySlot(
 export interface LoadedFixturesBySlot {
   [slotName: string]: LoadFixtureRunTimeCommand
 }
+// TODO(bh, 2023-11-09): remove this util, there will be no loadFixture command
 export function parseInitialLoadedFixturesByCutout(
   commands: RunTimeCommand[]
 ): LoadedFixturesBySlot {
@@ -291,12 +292,12 @@ export function parseAllAddressableAreas(
         ...acc,
         command.params.location.addressableAreaName as AddressableAreaName,
       ]
-    }
-    // TODO(BC, 11/6/23): once moveToAddressableArea command exists add it back here
-    // else if (command.commandType === 'moveToAddressableArea') {
-    // ...
-    // }
-    else {
+    } else if (
+      command.commandType === 'moveToAddressableArea' &&
+      !acc.includes(command.params.addressableAreaName as AddressableAreaName)
+    ) {
+      return [...acc, command.params.addressableAreaName as AddressableAreaName]
+    } else {
       return acc
     }
   }, [])

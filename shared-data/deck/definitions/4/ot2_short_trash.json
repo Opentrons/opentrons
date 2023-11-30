@@ -201,6 +201,18 @@
         ]
       },
       {
+        "id": "12",
+        "areaType": "slot",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Slot 12",
+        "compatibleModuleTypes": []
+      },
+      {
         "id": "shortFixedTrash",
         "areaType": "fixedTrash",
         "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
@@ -375,7 +387,8 @@
         "cutout8": ["8"],
         "cutout9": ["9"],
         "cutout10": ["10"],
-        "cutout11": ["11"]
+        "cutout11": ["11"],
+        "cutout12": ["12"]
       }
     },
     {

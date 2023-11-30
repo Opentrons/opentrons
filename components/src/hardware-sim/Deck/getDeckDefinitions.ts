@@ -6,7 +6,7 @@ import type { DeckDefinition } from '@opentrons/shared-data'
 // and SD is not webpacked
 
 const deckDefinitionsContext = require.context(
-  '@opentrons/shared-data/deck/definitions/3',
+  '@opentrons/shared-data/deck/definitions/4',
   true, // traverse subdirectories
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk

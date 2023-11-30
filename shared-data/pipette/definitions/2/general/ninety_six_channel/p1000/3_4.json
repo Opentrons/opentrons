@@ -4,19 +4,46 @@
   "model": "p1000",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
-    "presses": 0.0,
-    "speed": 5.5,
-    "increment": 0.0,
-    "distance": 10.0,
-    "prep_move_distance": 9.0,
-    "prep_move_speed": 10.0
+    "pressFit": {
+      "presses": 1,
+      "increment": 0.0,
+      "speed": 10.0,
+      "distance": 13.0,
+      "currentByTipCount": {
+        "1": 0.2,
+        "2": 0.25,
+        "3": 0.3,
+        "4": 0.35,
+        "5": 0.4,
+        "6": 0.45,
+        "7": 0.5,
+        "8": 0.55,
+        "12": 0.19,
+        "16": 0.25,
+        "24": 0.38,
+        "48": 0.75
+      }
+    },
+    "camAction": {
+      "speed": 5.5,
+      "distance": 10.0,
+      "prep_move_distance": 9.0,
+      "prep_move_speed": 10.0,
+      "connectTiprackDistanceMM": 7.0,
+
+      "currentByTipCount": {
+        "96": 1.5
+      }
+    }
   },
   "dropTipConfigurations": {
-    "current": 1.5,
-    "speed": 5.5,
-    "distance": 10.8,
-    "prep_move_distance": 19.0,
-    "prep_move_speed": 10.0
+    "camAction": {
+      "current": 1.5,
+      "speed": 5.5,
+      "distance": 10.8,
+      "prep_move_distance": 19.0,
+      "prep_move_speed": 10.0
+    }
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,
@@ -44,22 +71,7 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
-    "availableConfigurations": [1, 8, 12, 96],
-    "perTipPickupCurrent": {
-      "1": 0.02,
-      "2": 0.03,
-      "3": 0.05,
-      "4": 0.06,
-      "5": 0.08,
-      "6": 0.09,
-      "7": 0.11,
-      "8": 0.13,
-      "12": 0.19,
-      "16": 0.25,
-      "24": 0.38,
-      "48": 0.75,
-      "96": 1.5
-    }
+    "availableConfigurations": [1, 8, 12, 16, 24, 48, 96]
   },
   "backCompatNames": [],
   "channels": 96,
@@ -71,7 +83,6 @@
     "current": 0.8,
     "speed": 5
   },
-  "tipPresenceCheckDistanceMM": "8.0",
-  "connectTiprackDistanceMM": "7.0",
-  "endTipActionRetractDistanceMM": "2.0"
+  "tipPresenceCheckDistanceMM": 8.0,
+  "endTipActionRetractDistanceMM": 2.0
 }

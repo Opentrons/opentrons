@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from math import pi
-from subprocess import run
+from subprocess import run, Popen
 from time import time
 from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
-
+import atexit
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -78,6 +78,15 @@ def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
     print('Stopping "opentrons-robot-server"...')
     run(["systemctl", "stop", "opentrons-robot-server"])
+    atexit.register(restart_server_ot3)
+
+
+def restart_server_ot3() -> None:
+    """Start opentrons-robot-server on the OT3."""
+    print('Starting "opentrons-robot-server"...')
+    Popen(
+        ["systemctl", "restart", "opentrons-robot-server", "&"],
+    )
 
 
 def start_server_ot3() -> None:
@@ -547,9 +556,11 @@ async def update_pick_up_current(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
-    config_model.current = current
-    pipette.pick_up_configurations = config_model
+    config_model = pipette.pick_up_configurations.press_fit
+    config_model.current_by_tip_count = {
+        k: current for k in config_model.current_by_tip_count.keys()
+    }
+    pipette.pick_up_configurations.press_fit = config_model
 
 
 async def update_pick_up_distance(
@@ -557,9 +568,9 @@ async def update_pick_up_distance(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
+    config_model = pipette.pick_up_configurations.press_fit
     config_model.distance = distance
-    pipette.pick_up_configurations = config_model
+    pipette.pick_up_configurations.press_fit = config_model
 
 
 async def move_plunger_absolute_ot3(

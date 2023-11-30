@@ -768,16 +768,16 @@ class PipetteHandlerProvider(Generic[MountType]):
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
         if presses is None or presses < 0:
-            checked_presses = instrument.pick_up_configurations.presses
+            checked_presses = instrument.pick_up_configurations.press_fit.presses
         else:
             checked_presses = presses
 
         if not increment or increment < 0:
-            check_incr = instrument.pick_up_configurations.increment
+            check_incr = instrument.pick_up_configurations.press_fit.increment
         else:
             check_incr = increment
 
-        pick_up_speed = instrument.pick_up_configurations.speed
+        pick_up_speed = instrument.pick_up_configurations.press_fit.speed
 
         def build_presses() -> Iterator[Tuple[float, float]]:
             # Press the nozzle into the tip <presses> number of times,
@@ -785,7 +785,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             for i in range(checked_presses):
                 # move nozzle down into the tip
                 press_dist = (
-                    -1.0 * instrument.pick_up_configurations.distance
+                    -1.0 * instrument.pick_up_configurations.press_fit.distance
                     + -1.0 * check_incr * i
                 )
                 # move nozzle back up
@@ -808,7 +808,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.nozzle_manager.get_tip_configuration_current()
+                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
+                                    instrument.nozzle_manager.current_configuration.tip_count
+                                ]
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),
@@ -817,7 +819,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                         for press_dist, backup_dist in build_presses()
                     ],
                     shake_off_list=self._build_pickup_shakes(instrument),
-                    retract_target=instrument.pick_up_configurations.distance
+                    retract_target=instrument.pick_up_configurations.press_fit.distance
                     + check_incr * checked_presses
                     + 2,
                 ),
@@ -837,7 +839,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                             current={
                                 Axis.by_mount(
                                     mount
-                                ): instrument.nozzle_manager.get_tip_configuration_current()
+                                ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
+                                    instrument.nozzle_manager.current_configuration.tip_count
+                                ]
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),
@@ -846,7 +850,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                         for press_dist, backup_dist in build_presses()
                     ],
                     shake_off_list=self._build_pickup_shakes(instrument),
-                    retract_target=instrument.pick_up_configurations.distance
+                    retract_target=instrument.pick_up_configurations.press_fit.distance
                     + check_incr * checked_presses
                     + 2,
                 ),
@@ -923,9 +927,13 @@ class PipetteHandlerProvider(Generic[MountType]):
     ):
         instrument = self.get_pipette(mount)
 
+        if not instrument.drop_configurations.plunger_eject:
+            raise CommandPreconditionViolated(
+                f"Pipette {instrument.name} on {mount.name} has no plunger eject configuration"
+            )
         bottom = instrument.plunger_positions.bottom
         droptip = instrument.plunger_positions.drop_tip
-        speed = instrument.drop_configurations.speed
+        speed = instrument.drop_configurations.plunger_eject.speed
         shakes: List[Tuple[top_types.Point, Optional[float]]] = []
         if Quirks.dropTipShake in instrument.config.quirks:
             diameter = instrument.current_tiprack_diameter
@@ -941,7 +949,11 @@ class PipetteHandlerProvider(Generic[MountType]):
                 bottom,
                 droptip,
                 {Axis.of_plunger(mount): instrument.plunger_motor_current.run},
-                {Axis.of_plunger(mount): instrument.drop_configurations.current},
+                {
+                    Axis.of_plunger(
+                        mount
+                    ): instrument.drop_configurations.plunger_eject.current
+                },
                 speed,
                 home_after,
                 (Axis.of_plunger(mount),),
@@ -971,7 +983,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 {
                     Axis.of_main_tool_actuator(
                         mount
-                    ): instrument.drop_configurations.current
+                    ): instrument.drop_configurations.plunger_eject.current
                 },
                 speed,
                 home_after,
