@@ -37,7 +37,7 @@ if __name__ == '__main__':
             df = pd.concat([df, df_reading])
             if bool(is_stable) == 1:
                 filename = robot + '_' + labware + '.csv'
-                df.to_csv('C:/Users/Rhyann Clarke/Documents/' + filename)
+                df.to_csv(os.path.expanduser('~/Documents') + filename)
                 break
                 
             # disconnect from serial port
