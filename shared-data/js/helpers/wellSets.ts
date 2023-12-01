@@ -52,7 +52,8 @@ export interface WellSetHelpers {
 
   canPipetteUseLabware: (
     pipetteSpec: PipetteNameSpecs,
-    labwareDef: LabwareDefinition2
+    labwareDef?: LabwareDefinition2,
+    trashName?: string
   ) => boolean
 }
 
@@ -123,24 +124,28 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
 
   const canPipetteUseLabware = (
     pipetteSpec: PipetteNameSpecs,
-    labwareDef: LabwareDefinition2
+    labwareDef?: LabwareDefinition2,
+    trashName?: string
   ): boolean => {
-    if (pipetteSpec.channels === 1) {
+    if (pipetteSpec.channels === 1 || trashName != null) {
       // assume all labware can be used by single-channel
       return true
     }
-
-    const allWellSets = getAllWellSetsForLabware(labwareDef)
-    return allWellSets.some(wellSet => {
-      const uniqueWells = uniq(wellSet)
-      // if all wells are non-null, and there are either 1 (reservoir-like)
-      // or 8 (well plate-like) unique wells in the set,
-      // then assume both 8 and 96 channel pipettes will work
-      return (
-        uniqueWells.every(well => well != null) &&
-        [1, 8].includes(uniqueWells.length)
-      )
-    })
+    if (labwareDef != null) {
+      const allWellSets = getAllWellSetsForLabware(labwareDef)
+      return allWellSets.some(wellSet => {
+        const uniqueWells = uniq(wellSet)
+        // if all wells are non-null, and there are either 1 (reservoir-like)
+        // or 8 (well plate-like) unique wells in the set,
+        // then assume both 8 and 96 channel pipettes will work
+        return (
+          uniqueWells.every(well => well != null) &&
+          [1, 8].includes(uniqueWells.length)
+        )
+      })
+    } else {
+      return false
+    }
   }
   return {
     getAllWellSetsForLabware,

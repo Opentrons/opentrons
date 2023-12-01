@@ -487,15 +487,15 @@ export interface RobotState {
       }
     }
     additionalEquipment: {
-      /** for now, the only entity in here will be the waste chute */
+      /** for the waste chute and trash bin */
       [additionalEquipmentId: string]: LocationLiquidState
     }
   }
 }
 
 export type ErrorType =
-  | 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'EQUIPMENT_DOES_NOT_EXIST'
   | 'GRIPPER_REQUIRED'
   | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'

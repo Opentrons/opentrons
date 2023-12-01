@@ -10,7 +10,8 @@ export const forAspirateInPlace = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  //   TODO(jr, 11/6/23): update state
+  //  aspirateInPlace is only used for air_gap so there are no state
+  //  updates
 }
 
 export const forDispenseInPlace = (
