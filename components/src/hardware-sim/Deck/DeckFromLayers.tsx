@@ -50,7 +50,8 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
     name: 'g',
     type: 'element',
     value: '',
-    attributes: { id: 'deckLayers' },
+    // set pointer-events: none to allow click events on descendant elements
+    attributes: { id: 'deckLayers', style: 'pointer-events:none' },
     children: layerGroupNodes,
   }
 
