@@ -184,14 +184,17 @@ jobs:
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      # replace package.json stub version number with version from tag
       - name: 'set version number'
         run: |
           npm install -g json
           VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
-      - run: cd ./components && npm publish --provenace --access public
+      - name: 'publish to npm registry'
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./components && npm publish --provenace --access public
           
 
       
