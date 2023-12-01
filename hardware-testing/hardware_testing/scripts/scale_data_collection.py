@@ -2,7 +2,7 @@ import sys, os, time, datetime
 import pandas as pd
 from serial.tools.list_ports import comports  # type: ignore[import]
 sys.path.insert(0, os.path.abspath('../'))
-from drivers.radwag import RadwagScale
+from hardware_testing.drivers import RadwagScale
 
 def find_port(vid: int, pid: int) -> str:
     """Find COM port from provided VIP:PID."""
