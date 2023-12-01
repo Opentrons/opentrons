@@ -28,6 +28,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   WRAP,
+  ProtocolDeck,
 } from '@opentrons/components'
 
 import {
@@ -38,7 +39,6 @@ import {
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import {
@@ -172,7 +172,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
             complete:
               mostRecentAnalysis != null ? (
-                <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
+                <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
               ) : (
                 <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />
               ),

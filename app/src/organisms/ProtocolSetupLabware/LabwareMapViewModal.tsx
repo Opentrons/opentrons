@@ -55,7 +55,7 @@ export function LabwareMapViewModal(
     hasExitIcon: true,
   }
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => {
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
     const { moduleDef, nestedLabwareDef, nestedLabwareId, slotName } = module
     const labwareInAdapterInMod =
       nestedLabwareId != null
@@ -111,8 +111,8 @@ export function LabwareMapViewModal(
         deckConfig={deckConfig}
         deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
         robotType={FLEX_ROBOT_TYPE}
-        labwareLocations={labwareLocations}
-        moduleLocations={moduleLocations}
+        labwareOnDeck={labwareLocations}
+        modulesOnDeck={modulesOnDeck}
       />
     </Modal>
   )

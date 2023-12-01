@@ -336,7 +336,6 @@ describe('SetupLiquidsMap', () => {
           attachedModuleMatch: null,
         },
       ])
-
     when(mockBaseDeck)
       .calledWith(
         partialComponentPropsMatcher({
@@ -344,9 +343,9 @@ describe('SetupLiquidsMap', () => {
             FLEX_ROBOT_TYPE
           ),
           robotType: FLEX_ROBOT_TYPE,
-          // ToDo (kk:11/03/2023) Update the following part later
-          labwareLocations: expect.anything(),
-          moduleLocations: expect.anything(),
+          // // ToDo (kk:11/03/2023) Update the following part later
+          labwareOnDeck: expect.anything(),
+          modulesOnDeck: expect.anything(),
         })
       )
       .mockReturnValue(<div>mock BaseDeck</div>)

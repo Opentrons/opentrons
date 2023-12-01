@@ -23,7 +23,6 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import { ProtocolDetails } from '..'
-import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
 import { ChooseRobotToRunProtocolSlideout } from '../../ChooseRobotToRunProtocolSlideout'
 
@@ -33,7 +32,6 @@ jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
-jest.mock('../../../molecules/DeckThumbnail')
 jest.mock('../../ChooseRobotToRunProtocolSlideout')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
@@ -46,9 +44,6 @@ const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
   typeof getUnreachableRobots
 >
 const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
-  typeof DeckThumbnail
->
 const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
   typeof getIsProtocolAnalysisInProgress
 >
@@ -93,7 +88,6 @@ describe('ProtocolDetails', () => {
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     mockGetScanning.mockReturnValue(false)
-    mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
     mockChooseRobotToRunProtocolSlideout.mockImplementation(
       ({ showSlideout }) =>
         showSlideout ? <div>mock Choose Robot Slideout</div> : null
@@ -144,7 +138,7 @@ describe('ProtocolDetails', () => {
     expect(getByText('fakeSrcFileName')).toBeInTheDocument()
   })
   it('renders deck view section', () => {
-    const { getByRole, getByText } = render({
+    const { getByRole } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -159,7 +153,6 @@ describe('ProtocolDetails', () => {
       },
     })
     expect(getByRole('heading', { name: 'Deck View' })).toBeInTheDocument()
-    expect(getByText('mock Deck Thumbnail')).toBeInTheDocument()
   })
   it('opens choose robot slideout when Start setup button is clicked', () => {
     const { getByRole, getByText, queryByText } = render({
