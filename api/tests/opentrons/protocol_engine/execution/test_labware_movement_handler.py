@@ -171,9 +171,7 @@ async def test_move_labware_with_gripper(
 
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
-    decoy.when(ot3_hardware_api._gripper_handler.is_ready_for_jaw_home()).then_return(
-        True
-    )
+    decoy.when(ot3_hardware_api.gripper_jaw_can_home()).then_return(True)
 
     decoy.when(
         await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
