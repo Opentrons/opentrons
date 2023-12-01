@@ -189,7 +189,7 @@ export type NozzleConfigurationStyle =
   | typeof ALL
 
 interface NozzleConfigurationParams {
-  primaryNozzle: string
+  primaryNozzle?: string
   style: NozzleConfigurationStyle
 }
 
