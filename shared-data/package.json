@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/shared-data",
   "version": "0.0.0-dev",
-  "description": "Default labware definitions for Opentrons robots",
+  "description": "Shared system definitions and utilities for Opentrons robots and software",
   "repository": {
     "type": "git",
     "url": "https://github.com/Opentrons/opentrons.git"
