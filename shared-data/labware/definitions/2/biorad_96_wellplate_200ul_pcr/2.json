@@ -1024,6 +1024,11 @@
       "x": 0,
       "y": 0,
       "z": 15.41
+    },
+    "opentrons_96_pcr_adapter": {
+      "x": 0,
+      "y": 0,
+      "z": 10.4
     }
   },
   "stackingOffsetWithModule": {
@@ -1031,6 +1036,11 @@
       "x": 0,
       "y": 0,
       "z": 10.75
+    },
+    "magneticBlockV1": {
+      "x": 0,
+      "y": 0,
+      "z": 3.54
     }
   }
 }

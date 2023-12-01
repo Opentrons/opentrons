@@ -96,6 +96,7 @@ export const COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER: Record<
   [DEEP_WELL_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_2ml_deep/2'],
   [FLAT_BOTTOM_ADAPTER_LOADNAME]: ['opentrons/nest_96_wellplate_200ul_flat/2'],
   [PCR_ADAPTER_LOADNAME]: [
+    'opentrons/biorad_96_wellplate_200ul_pcr/2',
     'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
     'opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2',
   ],
@@ -174,6 +175,12 @@ export const getAdapterLabwareIsAMatch = (
     'opentrons_flex_96_filtertiprack_1000ul',
   ]
 
+  const ninetySixWellLabwares = [
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'biorad_96_wellplate_200ul_pcr',
+  ]
+
   const deepWellPair =
     loadName === DEEP_WELL_ADAPTER_LOADNAME &&
     draggedLabwareLoadname === 'nest_96_wellplate_2ml_deep'
@@ -182,8 +189,7 @@ export const getAdapterLabwareIsAMatch = (
     draggedLabwareLoadname === 'nest_96_wellplate_200ul_flat'
   const pcrPair =
     loadName === PCR_ADAPTER_LOADNAME &&
-    (draggedLabwareLoadname === 'nest_96_wellplate_100ul_pcr_full_skirt' ||
-      draggedLabwareLoadname === 'opentrons_96_wellplate_200ul_pcr_full_skirt')
+    ninetySixWellLabwares.includes(draggedLabwareLoadname)
   const universalPair =
     loadName === UNIVERSAL_FLAT_ADAPTER_LOADNAME &&
     (draggedLabwareLoadname === 'corning_384_wellplate_112ul_flat' ||
