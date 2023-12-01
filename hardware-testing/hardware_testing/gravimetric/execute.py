@@ -18,7 +18,6 @@ from .helpers import (
     _calculate_average,
     _jog_to_find_liquid_height,
     _sense_liquid_height,
-    _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
 )
@@ -179,7 +178,6 @@ def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labwar
     labware_on_scale = ctx.load_labware(
         cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
     )
-    _apply_labware_offsets(cfg, [labware_on_scale])
     return labware_on_scale
 
 
@@ -283,9 +281,13 @@ def _run_trial(
         m_tag = _tag(m_type)
         if trial.recorder.is_simulator and not trial.blank:
             if m_type == MeasurementType.ASPIRATE:
-                trial.recorder.add_simulation_mass(trial.channel_count * trial.volume * -0.001)
+                trial.recorder.add_simulation_mass(
+                    trial.channel_count * trial.volume * -0.001
+                )
             elif m_type == MeasurementType.DISPENSE:
-                trial.recorder.add_simulation_mass(trial.channel_count * trial.volume * 0.001)
+                trial.recorder.add_simulation_mass(
+                    trial.channel_count * trial.volume * 0.001
+                )
         m_data = record_measurement_data(
             trial.ctx,
             m_tag,

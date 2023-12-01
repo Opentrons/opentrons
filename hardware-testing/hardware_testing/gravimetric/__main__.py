@@ -49,7 +49,7 @@ from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
 
 # FIXME: bump to v2.15 to utilize protocol engine
-API_LEVEL = "2.13"
+API_LEVEL = "2.15"
 
 LABWARE_OFFSETS: List[dict] = []
 
@@ -89,6 +89,19 @@ GRAVIMETRIC_CFG_INCREMENT = {
         },
     },
 }
+
+PIPETTE_MODEL_NAME = {
+    50: {
+        1: "p50_single_flex",
+        8: "p50_multi_flex",
+    },
+    1000: {
+        1: "p1000_single_flex",
+        8: "p1000_multi_flex",
+        96: "p1000_96_flex",
+    },
+}
+
 
 PHOTOMETRIC_CFG = {
     50: {
@@ -172,9 +185,11 @@ class RunArgs:
         _ctx = helpers.get_api_context(
             API_LEVEL,  # type: ignore[attr-defined]
             is_simulating=args.simulate,
-            deck_version="2",
+            pipette_left=PIPETTE_MODEL_NAME[args.pipette][args.channels],
             extra_labware=custom_defs,
         )
+        for offset in LABWARE_OFFSETS:
+            _ctx.engine_client.state.labware._add_labware_offset(offset)
         return _ctx
 
     @classmethod  # noqa: C901
