@@ -23,3 +23,10 @@ def load(
         if defn["robotType"] == robot_type:
             return cast(RobotDefinition, defn)
     raise KeyError(robot_type)
+
+
+def user_facing_robot_type(robot_type: RobotType, include_article: bool = False) -> str:
+    if robot_type == "OT-2 Standard":
+        return "an OT-2" if include_article else "OT-2"
+    elif robot_type == "OT-3 Standard":
+        return "a Flex" if include_article else "Flex"

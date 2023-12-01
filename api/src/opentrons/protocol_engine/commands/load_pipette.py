@@ -5,6 +5,7 @@ from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_to_pipette_name_type,
 )
 from opentrons_shared_data.pipette.types import PipetteGenerationType
+from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type, Tuple
@@ -98,7 +99,8 @@ class LoadPipetteImplementation(
             )
         ):
             raise InvalidSpecificationForRobotTypeError(
-                f"Cannot load a {pipette_generation.value} pipette on {robot_type.name} robot."
+                f"Cannot load a {pipette_generation.value.capitalize()} pipette on "
+                f"{user_facing_robot_type(robot_type=self._state_view.config.robot_type, include_article=True)}."
             )
 
         if params.mount == MountType.EXTENSION:
