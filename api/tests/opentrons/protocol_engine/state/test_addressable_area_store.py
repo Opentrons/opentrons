@@ -91,6 +91,7 @@ def test_initial_state_simulated(
         loaded_addressable_areas_by_name={},
         potential_cutout_fixtures_by_cutout_id={},
         deck_definition=ot3_standard_deck_def,
+        deck_configuration=[],
         use_simulated_deck_config=True,
     )
 
@@ -103,6 +104,7 @@ def test_initial_state(
     assert subject.state.potential_cutout_fixtures_by_cutout_id == {}
     assert not subject.state.use_simulated_deck_config
     assert subject.state.deck_definition == ot3_standard_deck_def
+    assert subject.state.deck_configuration == _make_deck_config()
     # Loading 9 regular slots, 1 trash, 2 Staging Area slots and 3 waste chute types
     assert len(subject.state.loaded_addressable_areas_by_name) == 15
 

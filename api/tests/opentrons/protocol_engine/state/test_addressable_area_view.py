@@ -21,6 +21,7 @@ from opentrons.protocol_engine.state.addressable_areas import (
 from opentrons.protocol_engine.types import (
     AddressableArea,
     AreaType,
+    DeckConfigurationType,
     PotentialCutoutFixture,
     Dimensions,
     DeckPoint,
@@ -45,6 +46,7 @@ def get_addressable_area_view(
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
     deck_definition: Optional[DeckDefinitionV4] = None,
+    deck_configuration: Optional[DeckConfigurationType] = None,
     use_simulated_deck_config: bool = False,
 ) -> AddressableAreaView:
     """Get a labware view test subject."""
@@ -53,6 +55,7 @@ def get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV4, {"otId": "fake"}),
+        deck_configuration=deck_configuration or [],
         use_simulated_deck_config=use_simulated_deck_config,
     )
 

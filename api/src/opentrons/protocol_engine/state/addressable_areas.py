@@ -1,6 +1,6 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
-from typing import Dict, Set, Union, List
+from typing import Dict, List, Optional, Set, Union
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
@@ -36,9 +36,30 @@ class AddressableAreaState:
     """State of all loaded addressable area resources."""
 
     loaded_addressable_areas_by_name: Dict[str, AddressableArea]
+    """The addressable areas that have been loaded so far.
+
+    When `use_simulated_deck_config` is `False`, these are the addressable areas that the
+    deck configuration provided.
+
+    When `use_simulated_deck_config` is `True`, these are the addressable areas that have been
+    referenced by the protocol so far.
+    """
+
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
+
     deck_definition: DeckDefinitionV4
+
+    deck_configuration: Optional[DeckConfigurationType]
+    """The host robot's full deck configuration.
+
+    If `use_simulated_deck_config` is `True`, this is meaningless and this value is undefined.
+    In practice it will probably be `None` or `[]`.
+
+    If `use_simulated_deck_config` is `False`, this will be non-`None`.
+    """
+
     use_simulated_deck_config: bool
+    """See `Config.use_simulated_deck_config`."""
 
 
 def _get_conflicting_addressable_areas(
@@ -115,6 +136,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                 )
             )
         self._state = AddressableAreaState(
+            deck_configuration=deck_configuration,
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
             deck_definition=deck_definition,
@@ -127,7 +149,11 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             self._handle_command(action.command)
         if isinstance(action, PlayAction):
             current_state = self._state
-            if action.deck_configuration is not None:
+            if (
+                action.deck_configuration is not None
+                and not self._state.use_simulated_deck_config
+            ):
+                self._state.deck_configuration = action.deck_configuration
                 self._state.loaded_addressable_areas_by_name = (
                     self._get_addressable_areas_from_deck_configuration(
                         deck_config=action.deck_configuration,
