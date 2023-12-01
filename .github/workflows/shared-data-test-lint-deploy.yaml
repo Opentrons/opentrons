@@ -254,5 +254,5 @@ jobs:
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          cd ./shared-data && yarn publish --provenace --access public
+          cd ./shared-data && npm publish --provenace --access public
           

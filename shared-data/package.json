@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/shared-data",
-  "version": "0.0.0-dev",
+  "version": "0.0.0-alpha.16",
   "description": "Shared system definitions and utilities for Opentrons robots and software",
   "repository": {
     "type": "git",
