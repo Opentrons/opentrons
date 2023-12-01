@@ -199,7 +199,7 @@ export function CommandText(props: Props): JSX.Element | null {
       )
     }
     case 'configureNozzleLayout': {
-      const { configuration_params, pipetteId } = command.params
+      const { configurationParams, pipetteId } = command.params
       const pipetteName = robotSideAnalysis.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
@@ -208,7 +208,7 @@ export function CommandText(props: Props): JSX.Element | null {
       return (
         <StyledText as="p" {...styleProps}>
           {t('configure_nozzle_layout', {
-            amount: configuration_params.style === 'COLUMN' ? '8' : 'all',
+            amount: configurationParams.style === 'COLUMN' ? '8' : 'all',
             pipette:
               pipetteName != null
                 ? getPipetteNameSpecs(pipetteName)?.displayName
