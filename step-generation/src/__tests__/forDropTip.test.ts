@@ -1,17 +1,123 @@
+import {
+  makeStateArgsStandard,
+  makeContext,
+  makeState,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+} from '../fixtures'
+import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
+import { InvariantContext, RobotState } from '../types'
+const forDropTip = makeImmutableStateUpdater(_forDropTip)
 describe('dropTip', () => {
-  //  NOTE(jr, 12/1/23): this state update is not in use currently for PD 8.0
-  //  since we only support dropping tip into the waste chute or trash bin
-  //  which are both addressableAreas (so the commands are moveToAddressableArea
-  //  and dropTipInPlace) We will use this again when we add return tip.
+  let invariantContext: InvariantContext
+  beforeEach(() => {
+    invariantContext = makeContext()
+  })
+
+  // TODO Ian 2019-04-19: this is a ONE-OFF fixture
+  function makeRobotState(args: {
+    singleHasTips: boolean
+    multiHasTips: boolean
+  }): RobotState {
+    const _robotState = makeState({
+      ...makeStateArgsStandard(),
+      invariantContext,
+      tiprackSetting: {
+        tiprack1Id: true,
+      },
+    })
+
+    _robotState.tipState.pipettes.p300SingleId = args.singleHasTips
+    _robotState.tipState.pipettes.p300MultiId = args.multiHasTips
+    return _robotState
+  }
+
   describe('replaceTip: single channel', () => {
-    it.todo('drop tip if there is a tip')
+    it('drop tip if there is a tip', () => {
+      const prevRobotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+      const params = {
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+      }
+      const result = forDropTip(params, invariantContext, prevRobotState)
+      expect(result).toEqual({
+        warnings: [],
+        robotState: makeRobotState({
+          singleHasTips: false,
+          multiHasTips: true,
+        }),
+      })
+    })
+    // TODO: IL 2019-11-20
     it.todo('no tip on pipette')
   })
   describe('Multi-channel dropTip', () => {
-    it.todo('drop tip when there are tips')
+    it('drop tip when there are tips', () => {
+      const prevRobotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+      const params = {
+        pipetteId: 'p300MultiId',
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+      }
+      const result = forDropTip(params, invariantContext, prevRobotState)
+      expect(result).toEqual({
+        warnings: [],
+        robotState: makeRobotState({
+          singleHasTips: true,
+          multiHasTips: false,
+        }),
+      })
+    })
   })
   describe('liquid tracking', () => {
-    it.todo('dropTip uses full volume when transfering tip to trash')
+    it('dropTip uses full volume when transfering tip to trash', () => {
+      const prevRobotState = makeRobotState({
+        singleHasTips: true,
+        multiHasTips: true,
+      })
+      const params = {
+        pipetteId: 'p300MultiId',
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+      }
+      prevRobotState.liquidState.pipettes.p300MultiId['0'] = {
+        ingred1: {
+          volume: 150,
+        },
+      }
+      const result = forDropTip(params, invariantContext, prevRobotState)
+      expect(result).toMatchObject({
+        robotState: {
+          liquidState: {
+            pipettes: {
+              p300MultiId: {
+                '0': {
+                  ingred1: {
+                    volume: 0,
+                  },
+                },
+              },
+            },
+            labware: {
+              [SOURCE_LABWARE]: {
+                A1: {
+                  ingred1: {
+                    volume: 150,
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+    })
   })
 })

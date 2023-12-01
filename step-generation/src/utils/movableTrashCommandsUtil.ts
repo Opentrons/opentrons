@@ -79,7 +79,6 @@ export const movableTrashCommandsUtil = (
   }
 
   let inPlaceCommands: CurriedCommandCreator[] = []
-
   switch (type) {
     case 'airGap': {
       inPlaceCommands =
