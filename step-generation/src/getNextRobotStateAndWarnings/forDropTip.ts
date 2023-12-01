@@ -1,31 +1,23 @@
-import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '..'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { DropTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
+//  NOTE(jr, 12/1/23): this state update is not in use currently for PD 8.0
+//  since we only support dropping tip into the waste chute or trash bin
+//  which are both addressableAreas (so the commands are moveToAddressableArea
+//  and dropTipInPlace) We will use this again when we add return tip.
 export function forDropTip(
   params: DropTipParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, wellName } = params
-  const trashId = Object.values(invariantContext.labwareEntities).find(
-    lw =>
-      lw.labwareDefURI === FLEX_TRASH_DEF_URI ||
-      lw.labwareDefURI === OT_2_TRASH_DEF_URI
-  )?.id
-
-  if (trashId == null) {
-    console.error(
-      `expected to find trash id ${trashId} in labware entities but could not`
-    )
-  }
+  const { pipetteId, wellName, labwareId } = params
   const { robotState } = robotStateAndWarnings
   dispenseUpdateLiquidState({
     invariantContext,
     prevLiquidState: robotState.liquidState,
     pipetteId,
-    labwareId: trashId ?? '',
+    labwareId,
     useFullVolume: true,
     wellName,
   })

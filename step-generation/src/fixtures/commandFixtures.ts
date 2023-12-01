@@ -1,4 +1,3 @@
-import { FIXED_TRASH_ID } from '../constants'
 import { tiprackWellNamesFlat } from './data'
 import type {
   AspDispAirgapParams,
@@ -156,14 +155,14 @@ export const makeAirGapHelper: MakeAirGapHelper<AspDispAirgapParams> = bakedPara
   },
 })
 export const blowoutHelper = (
-  labware?: string | null | undefined,
+  labware: string,
   params?: Partial<BlowoutParams>
 ): CreateCommand => ({
   commandType: 'blowout',
   key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
-    labwareId: labware || FIXED_TRASH_ID,
+    labwareId: labware,
     wellName: DEFAULT_BLOWOUT_WELL,
     wellLocation: {
       origin: 'bottom',
@@ -176,6 +175,25 @@ export const blowoutHelper = (
     ...params,
   },
 })
+export const blowoutInPlaceHelper = (): CreateCommand[] => [
+  {
+    commandType: 'moveToAddressableArea',
+    key: expect.any(String),
+    params: {
+      pipetteId: 'p300SingleId',
+      addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
+    },
+  },
+  {
+    commandType: 'blowOutInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: 'p300SingleId',
+      flowRate: 2.3,
+    },
+  },
+]
 const _defaultDispenseParams = {
   pipetteId: DEFAULT_PIPETTE,
   labwareId: DEST_LABWARE,
@@ -285,6 +303,7 @@ export const dropTipHelper = (pipette?: string): CreateCommand[] => [
     params: {
       pipetteId: pipette ?? DEFAULT_PIPETTE,
       addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
     },
   },
   {

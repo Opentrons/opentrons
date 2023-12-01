@@ -1399,19 +1399,20 @@ describe('advanced options', () => {
         // no dispense > air gap, because tip will be reused
         // blowout
         {
-          commandType: 'blowout',
+          commandType: 'moveToAddressableArea',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
+            addressableAreaName: 'movableTrashA3',
+            offset: { x: 0, y: 0, z: 0 },
+          },
+        },
+        {
+          commandType: 'blowOutInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
             flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 80.3,
-              },
-            },
           },
         },
         // next chunk from A1: remaining volume
@@ -1682,19 +1683,20 @@ describe('advanced options', () => {
           },
         },
         {
-          commandType: 'blowout',
+          commandType: 'moveToAddressableArea',
           key: expect.any(String),
           params: {
-            flowRate: 2.3,
-            labwareId: 'fixedTrash',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 80.3,
-              },
-            },
             pipetteId: 'p300SingleId',
-            wellName: 'A1',
+            addressableAreaName: 'movableTrashA3',
+            offset: { x: 0, y: 0, z: 0 },
+          },
+        },
+        {
+          commandType: 'blowOutInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            flowRate: 2.3,
           },
         },
         // use the dispense > air gap here before moving to trash
@@ -1724,15 +1726,7 @@ describe('advanced options', () => {
           },
         },
         // since we used dispense > air gap, drop the tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
+        ...dropTipHelper(),
       ])
     })
 
@@ -2390,15 +2384,7 @@ describe('advanced options', () => {
         },
         // this step is over, and we used dispense > air gap, so
         // we will dispose of the tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
+        ...dropTipHelper(),
       ])
     })
 
@@ -2419,6 +2405,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             addressableAreaName: 'movableTrashA3',
+            offset: { x: 0, y: 0, z: 0 },
           },
         },
         {
@@ -3081,15 +3068,7 @@ describe('advanced options', () => {
           },
         },
         // we used dispense > air gap, so we will dispose of the tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
+        ...dropTipHelper(),
       ])
     })
 
@@ -3110,6 +3089,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             addressableAreaName: 'movableTrashA3',
+            offset: { x: 0, y: 0, z: 0 },
           },
         },
         {
@@ -3490,6 +3470,7 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             addressableAreaName: 'movableTrashA3',
+            offset: { x: 0, y: 0, z: 0 },
           },
         },
         {
@@ -3819,15 +3800,7 @@ describe('advanced options', () => {
           },
         },
         // we used dispense > air gap, so we will dispose of the tip
-        {
-          commandType: 'dropTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'fixedTrash',
-            wellName: 'A1',
-          },
-        },
+        ...dropTipHelper(),
       ])
     })
   })

@@ -12,7 +12,6 @@ import {
   fixtureP300Multi as _fixtureP300Multi,
   fixtureP100096 as _fixtureP100096,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
@@ -24,7 +23,6 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
   FIXED_TRASH_ID,
-  OT_2_TRASH_DEF_URI,
 } from '../constants'
 import {
   DEFAULT_PIPETTE,
@@ -53,7 +51,6 @@ const fixtureP300Single = _fixtureP300Single
 const fixtureP300Multi = _fixtureP300Multi
 const fixtureP100096 = _fixtureP100096
 
-const fixtureTrash = _fixtureTrash as LabwareDefinition2
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
@@ -85,12 +82,6 @@ export function getTipColumn<T>(index: number, filled: T): Record<string, T> {
 // standard context fixtures to use across tests
 export function makeContext(): InvariantContext {
   const labwareEntities = {
-    [FIXED_TRASH_ID]: {
-      id: FIXED_TRASH_ID,
-
-      labwareDefURI: OT_2_TRASH_DEF_URI,
-      def: fixtureTrash,
-    },
     [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
 
@@ -276,9 +267,6 @@ export const makeStateArgsStandard = (): StandardMakeStateArgs => ({
     destPlateId: {
       slot: '3',
     },
-    fixedTrash: {
-      slot: '12',
-    },
   },
   moduleLocations: {},
 })
@@ -303,9 +291,6 @@ export const makeStateArgsLabwareOffDeck = (): StandardMakeStateArgs => ({
     },
     destPlateId: {
       slot: 'C2',
-    },
-    fixedTrash: {
-      slot: 'A3',
     },
   },
   moduleLocations: {},

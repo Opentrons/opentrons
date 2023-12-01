@@ -30,9 +30,6 @@ describe('snapshot tests', () => {
           tiprack5Id: {
             slot: 'tiprack5AdapterId',
           },
-          fixedTrash: {
-            slot: '12',
-          },
         },
         pipetteLocations: {
           p300SingleId: {
