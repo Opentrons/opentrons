@@ -105,7 +105,8 @@ export function InstrumentsAndModules({
     attachedPipettes?.left ?? null
   )
   const attachPipetteRequired =
-    attachedLeftPipette == null && attachedRightPipette == null
+    attachedLeftPipette?.data?.calibratedOffset?.last_modified == null &&
+    attachedRightPipette?.data?.calibratedOffset?.last_modified == null
   const updatePipetteFWRequired =
     badLeftPipette != null || badRightPipette != null
 
@@ -153,6 +154,8 @@ export function InstrumentsAndModules({
             subsystem={subsystemToUpdate}
             proceed={() => setSubsystemToUpdate(null)}
             description={t('updating_firmware')}
+            proceedDescription={t('firmware_up_to_date')}
+            isOnDevice={false}
           />
         </ModalShell>
       )}

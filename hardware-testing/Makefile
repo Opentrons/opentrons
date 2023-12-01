@@ -97,6 +97,12 @@ test-photometric-single:
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --dye-well-col-offset 3
 	-$(MAKE) remove-patches-gravimetric
 
+.PHONY: test-photometric-multi
+test-photometric-multi:
+	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 8 --tip 50
+	-$(MAKE) remove-patches-gravimetric
+
 .PHONY: test-photometric
 test-photometric:
 	-$(MAKE) apply-patches-gravimetric
@@ -129,6 +135,8 @@ test-gravimetric-96:
 .PHONY: test-gravimetric
 test-gravimetric:
 	-$(MAKE) apply-patches-gravimetric
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate
+	$(python) -m hardware_testing.gravimetric.daily_setup --simulate --calibrate
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
 	$(MAKE) test-gravimetric-96
@@ -180,6 +188,8 @@ ssh $(ssh_helper_ot3) root@$(1) \
 mount -o remount,rw / &&\
 mv /data/plot/index.html /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 mv /data/plot/index.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/plotly-2.12.1.min.js /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
+mv /data/plot/favicon.png /opt/opentrons-robot-server/hardware_testing/tools/plot &&\
 rm -rf /data/plot &&\
 cleanup || cleanup"
 endef

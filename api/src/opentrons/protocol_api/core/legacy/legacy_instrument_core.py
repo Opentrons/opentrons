@@ -17,7 +17,9 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 from opentrons.protocols.geometry import planning
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
+from ..._waste_chute import WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
 from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
@@ -101,7 +103,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                         "cause over aspiration if the previous command is a "
                         "blow_out."
                     )
-                self.prepare_for_aspirate()
+                self.prepare_to_aspirate()
             self.move_to(location=location)
         elif not in_place:
             self.move_to(location=location)
@@ -282,6 +284,13 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
+    def drop_tip_in_waste_chute(
+        self, waste_chute: WasteChute, home_after: Optional[bool]
+    ) -> None:
+        raise APIVersionError(
+            "Dropping tips in a waste chute is not supported in this API Version."
+        )
+
     def home(self) -> None:
         """Home the mount"""
         self._protocol_interface.get_hardware().home_z(
@@ -435,7 +444,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def is_ready_to_aspirate(self) -> bool:
         return self.get_hardware_state()["ready_to_aspirate"]
 
-    def prepare_for_aspirate(self) -> None:
+    def prepare_to_aspirate(self) -> None:
         self._protocol_interface.get_hardware().prepare_for_aspirate(self._mount)
 
     def get_return_height(self) -> float:
@@ -509,5 +518,14 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
                 )
 
     def configure_for_volume(self, volume: float) -> None:
+        """This will never be called because it was added in API 2.15."""
+        pass
+
+    def configure_nozzle_layout(
+        self,
+        style: NozzleLayout,
+        primary_nozzle: Optional[str],
+        front_right_nozzle: Optional[str],
+    ) -> None:
         """This will never be called because it was added in API 2.15."""
         pass

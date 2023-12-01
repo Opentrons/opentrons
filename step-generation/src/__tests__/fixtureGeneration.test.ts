@@ -18,6 +18,18 @@ describe('snapshot tests', () => {
           sourcePlateId: {
             slot: '4',
           },
+          tiprack4AdapterId: {
+            slot: '7',
+          },
+          tiprack5AdapterId: {
+            slot: '8',
+          },
+          tiprack4Id: {
+            slot: 'tiprack4AdapterId',
+          },
+          tiprack5Id: {
+            slot: 'tiprack5AdapterId',
+          },
           fixedTrash: {
             slot: '12',
           },

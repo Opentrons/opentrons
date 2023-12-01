@@ -39,6 +39,8 @@ from opentrons.hardware_control import (
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
+    should_load_fixed_trash,
+    should_load_fixed_trash_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution import execute as execute_apiv2
@@ -315,12 +317,33 @@ def execute(  # noqa: C901
     :param log_level: The level of logs to emit on the command line:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
-    :param emit_runlog: A callback for printing the runlog. If specified, this
-                        will be called whenever a command adds an entry to the
-                        runlog, which can be used for display and progress
-                        estimation. If specified, the callback should take a
-                        single argument (the name doesn't matter) which will
-                        be a dictionary (see below). Default: ``None``
+    :param emit_runlog: A callback for printing the run log. If specified, this
+        will be called whenever a command adds an entry to the
+        run log, which can be used for display and progress
+        estimation. If specified, the callback should take a
+        single argument (the name doesn't matter) which will
+        be a dictionary:
+
+        .. code-block:: python
+
+          {
+            'name': command_name,
+            'payload': {
+              'text': string_command_text,
+              # The rest of this struct is
+              # command-dependent; see
+              # opentrons.commands.commands.
+             }
+          }
+
+        .. note::
+          In older software versions, ``payload["text"]`` was a
+          `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
+          To get human-readable text, you had to do ``payload["text"].format(**payload)``.
+          Don't do that anymore. If ``payload["text"]`` happens to contain any
+          ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
+          ``KeyError``.
+
     :param custom_labware_paths: A list of directories to search for custom labware.
                                  Loads valid labware from these paths and makes them available
                                  to the protocol context. If this is ``None`` (the default), and
@@ -333,26 +356,11 @@ def execute(  # noqa: C901
                               non-recursive contents of specified directories
                               are presented by the protocol context in
                               ``ProtocolContext.bundled_data``.
-
-    The format of the runlog entries is as follows:
-
-    .. code-block:: python
-
-        {
-            'name': command_name,
-            'payload': {
-                 'text': string_command_text,
-                  # The rest of this struct is command-dependent; see
-                  # opentrons.commands.commands. Its keys match format
-                  # keys in 'text', so that
-                  # entry['payload']['text'].format(**entry['payload'])
-                  # will produce a string with information filled in
-             }
-        }
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
+    # TODO(mm, 2023-11-20): We should restore the original log settings when we're done.
 
     # TODO(mm, 2023-10-02): Switch this truthy check to `is not None`
     # to match documented behavior.
@@ -531,6 +539,7 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            load_fixed_trash=should_load_fixed_trash_for_python_protocol(api_version),
         )
     )
 
@@ -604,6 +613,7 @@ def _run_file_pe(
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(),
+            load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(
@@ -618,7 +628,10 @@ def _run_file_pe(
         try:
             # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
             # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-            result = await protocol_runner.run(protocol_source)
+            result = await protocol_runner.run(
+                deck_configuration=entrypoint_util.get_deck_configuration(),
+                protocol_source=protocol_source,
+            )
         finally:
             unsubscribe()
 
@@ -644,6 +657,8 @@ def _get_protocol_engine_config() -> Config:
         # We deliberately omit ignore_pause=True because, in the current implementation of
         # opentrons.protocol_api.core.engine, that would incorrectly make
         # ProtocolContext.is_simulating() return True.
+        use_simulated_deck_config=True,
+        # TODO the above is not correct for this and it should use the robot's actual config
     )
 
 

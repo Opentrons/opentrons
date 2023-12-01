@@ -2,10 +2,14 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
-import { WASTE_CHUTE_LOAD_NAME } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
-import { useFeatureFlag } from '../../../../../redux/config'
+import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+} from '../../../../../resources/deck_configuration/utils'
+import {
+  useIsFlex,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
@@ -14,31 +18,15 @@ import { SetupModuleAndDeck } from '../index'
 import { SetupModulesList } from '../SetupModulesList'
 import { SetupModulesMap } from '../SetupModulesMap'
 import { SetupFixtureList } from '../SetupFixtureList'
-import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
-import { LoadedFixturesBySlot } from '@opentrons/api-client'
-
-const mockLoadedFixturesBySlot: LoadedFixturesBySlot = {
-  D3: {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  },
-}
 
 jest.mock('../../../hooks')
 jest.mock('../SetupModulesList')
 jest.mock('../SetupModulesMap')
 jest.mock('../SetupFixtureList')
 jest.mock('../../../../../redux/config')
+jest.mock('../../../../../resources/deck_configuration/utils')
 
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
@@ -57,8 +45,11 @@ const mockSetupFixtureList = SetupFixtureList as jest.MockedFunction<
 const mockSetupModulesMap = SetupModulesMap as jest.MockedFunction<
   typeof SetupModulesMap
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
+const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
+  typeof getRequiredDeckConfig
+>
+const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
+  typeof getIsFixtureMismatch
 >
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'
@@ -77,7 +68,7 @@ describe('SetupModuleAndDeck', () => {
       runId: MOCK_RUN_ID,
       expandLabwarePositionCheckStep: () => jest.fn(),
       hasModules: true,
-      loadedFixturesBySlot: {},
+      commands: [],
     }
     mockSetupFixtureList.mockReturnValue(<div>Mock setup fixture list</div>)
     mockSetupModulesList.mockReturnValue(<div>Mock setup modules list</div>)
@@ -89,12 +80,12 @@ describe('SetupModuleAndDeck', () => {
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     when(mockUseModuleCalibrationStatus)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .mockReturnValue({ complete: true })
+    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(false)
+    when(mockGetRequiredDeckConfig).mockReturnValue([])
+    when(mockGetIsFixtureMismatch).mockReturnValue(false)
   })
 
   it('renders the list and map view buttons', () => {
@@ -143,11 +134,15 @@ describe('SetupModuleAndDeck', () => {
     getByText('Mock setup modules list')
   })
 
-  it('should render the SetupModulesList and SetupFixtureList component when clicking List View and ff is on', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
-    props.loadedFixturesBySlot = mockLoadedFixturesBySlot
+  it('should render the SetupModulesList and SetupFixtureList component when clicking List View for Flex', () => {
+    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(true)
+    when(mockGetRequiredDeckConfig).mockReturnValue([
+      {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: 'trashBinAdapter',
+        requiredAddressableAreas: ['movableTrashA1'],
+      },
+    ])
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'List View' })
     fireEvent.click(button)
@@ -155,10 +150,28 @@ describe('SetupModuleAndDeck', () => {
     getByText('Mock setup fixture list')
   })
 
+  it('should not render the SetupFixtureList component when there are no required fixtures', () => {
+    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(true)
+    const { getByRole, getByText, queryByText } = render(props)
+    const button = getByRole('button', { name: 'List View' })
+    fireEvent.click(button)
+    getByText('Mock setup modules list')
+    expect(queryByText('Mock setup fixture list')).toBeNull()
+  })
+
   it('should render the SetupModulesMap component when clicking Map View', () => {
     const { getByRole, getByText } = render(props)
     const button = getByRole('button', { name: 'Map View' })
     fireEvent.click(button)
     getByText('Mock setup modules map')
+  })
+
+  it('should render disabled button when deck config is not configured or there is a conflict', () => {
+    when(mockGetIsFixtureMismatch).mockReturnValue(true)
+    const { getByRole } = render(props)
+    const button = getByRole('button', {
+      name: 'Proceed to labware position check',
+    })
+    expect(button).toBeDisabled()
   })
 })

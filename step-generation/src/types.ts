@@ -112,7 +112,7 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper' | 'wasteChute' | 'stagingArea'
+    name: 'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
     id: string
     location?: string
   }
@@ -209,7 +209,7 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'consolidate'
 
   sourceWells: string[]
-  destWell: string
+  destWell: string | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -226,7 +226,7 @@ export type TransferArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'transfer'
 
   sourceWells: string[]
-  destWells: string[]
+  destWells: string[] | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -486,32 +486,40 @@ export interface RobotState {
         [well: string]: LocationLiquidState
       }
     }
+    additionalEquipment: {
+      /** for now, the only entity in here will be the waste chute */
+      [additionalEquipmentId: string]: LocationLiquidState
+    }
   }
 }
 
 export type ErrorType =
+  | 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST'
+  | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'GRIPPER_REQUIRED'
+  | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
+  | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
+  | 'HEATER_SHAKER_IS_SHAKING'
+  | 'HEATER_SHAKER_LATCH_CLOSED'
+  | 'HEATER_SHAKER_LATCH_OPEN'
+  | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
+  | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'INSUFFICIENT_TIPS'
+  | 'INVALID_SLOT'
   | 'LABWARE_DOES_NOT_EXIST'
+  | 'LABWARE_OFF_DECK'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
+  | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
+  | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'NO_TIP_ON_PIPETTE'
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'PIPETTE_VOLUME_EXCEEDED'
-  | 'TIP_VOLUME_EXCEEDED'
-  | 'MISSING_TEMPERATURE_STEP'
-  | 'THERMOCYCLER_LID_CLOSED'
-  | 'INVALID_SLOT'
-  | 'HEATER_SHAKER_LATCH_OPEN'
-  | 'HEATER_SHAKER_IS_SHAKING'
+  | 'PIPETTING_INTO_COLUMN_4'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
-  | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
-  | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
-  | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
-  | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
-  | 'HEATER_SHAKER_LATCH_CLOSED'
-  | 'LABWARE_OFF_DECK'
-  | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'THERMOCYCLER_LID_CLOSED'
+  | 'TIP_VOLUME_EXCEEDED'
 
 export interface CommandCreatorError {
   message: string
@@ -566,6 +574,3 @@ export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
 }
-
-// Copied from PD
-export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'

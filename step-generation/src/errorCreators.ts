@@ -12,6 +12,13 @@ export function insufficientTips(): CommandCreatorError {
   }
 }
 
+export function missingAdapter(): CommandCreatorError {
+  return {
+    type: 'MISSING_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips fully without an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
@@ -193,5 +200,30 @@ export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
   return {
     type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',
     message: 'The destination for dropping tip does not exist',
+  }
+}
+
+export const additionalEquipmentDoesNotExist = (args: {
+  additionalEquipment: string
+}): CommandCreatorError => {
+  return {
+    type: 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST',
+    message: `The ${args.additionalEquipment} does not exist`,
+  }
+}
+
+export const gripperRequired = (): CommandCreatorError => {
+  return {
+    type: 'GRIPPER_REQUIRED',
+    message: 'The gripper is required to fulfill this action',
+  }
+}
+
+export const pipettingIntoColumn4 = (args: {
+  typeOfStep: string
+}): CommandCreatorError => {
+  return {
+    type: 'PIPETTING_INTO_COLUMN_4',
+    message: `Cannot ${args.typeOfStep} into a column 4 slot.`,
   }
 }

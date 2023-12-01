@@ -64,6 +64,8 @@ from opentrons.protocols.types import (
 )
 from opentrons.protocols.api_support.deck_type import (
     for_simulation as deck_type_for_simulation,
+    should_load_fixed_trash,
+    should_load_fixed_trash_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -187,7 +189,7 @@ class _CommandScraper:
             #
             # TODO(mm, 2023-10-03): This is a bit too intrusive for something whose job is just to
             # "scrape." The entry point function should be responsible for setting the underlying
-            # logger's level.
+            # logger's level. Also, we should probably restore the original level when we're done.
             level = getattr(logging, self._level.upper(), logging.WARNING)
             self._logger.setLevel(level)
 
@@ -439,15 +441,23 @@ def simulate(
 
     Each dict element in the run log has the following keys:
 
-        - ``level``: The depth at which this command is nested - if this an
-                     aspirate inside a mix inside a transfer, for instance,
-                     it would be 3.
-        - ``payload``: The command, its arguments, and how to format its text.
-                       For more specific details see
-                       ``opentrons.commands``. To format a message from
-                       a payload do ``payload['text'].format(**payload)``.
+        - ``level``: The depth at which this command is nested. If this an
+          aspirate inside a mix inside a transfer, for instance, it would be 3.
+
+        - ``payload``: The command. The human-readable run log text is available at
+          ``payload["text"]``. The other keys of ``payload`` are command-dependent;
+          see ``opentrons.commands``.
+
+          .. note::
+            In older software versions, ``payload["text"]`` was a
+            `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
+            To get human-readable text, you had to do ``payload["text"].format(**payload)``.
+            Don't do that anymore. If ``payload["text"]`` happens to contain any
+            ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
+            ``KeyError``.
+
         - ``logs``: Any log messages that occurred during execution of this
-                    command, as a logging.LogRecord
+          command, as a standard Python :py:obj:`~logging.LogRecord`.
 
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
@@ -474,7 +484,7 @@ def simulate(
                            occur during protocol simulation are best associated
                            with the actions in the protocol that cause them.
                            Default: ``False``
-    :param log_level: The level of logs to capture in the runlog:
+    :param log_level: The level of logs to capture in the run log:
                       ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
                       Defaults to ``"warning"``.
     :returns: A tuple of a run log for user output, and possibly the required
@@ -784,6 +794,7 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(robot_type),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            load_fixed_trash=should_load_fixed_trash_for_python_protocol(api_version),
         )
     )
 
@@ -878,6 +889,7 @@ def _run_file_pe(
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(robot_type),
+            load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
         protocol_runner = create_protocol_runner(
@@ -888,7 +900,12 @@ def _run_file_pe(
 
         scraper = _CommandScraper(stack_logger, log_level, protocol_runner.broker)
         with scraper.scrape():
-            result = await protocol_runner.run(protocol_source)
+            result = await protocol_runner.run(
+                # deck_configuration=[] is a placeholder value, ignored because
+                # the Protocol Engine config specifies use_simulated_deck_config=True.
+                deck_configuration=[],
+                protocol_source=protocol_source,
+            )
 
         if result.state_summary.status != EngineStatus.SUCCEEDED:
             raise entrypoint_util.ProtocolEngineExecuteError(
@@ -915,6 +932,7 @@ def _get_protocol_engine_config(robot_type: RobotType) -> Config:
         use_virtual_pipettes=True,
         use_virtual_modules=True,
         use_virtual_gripper=True,
+        use_simulated_deck_config=True,
     )
 
 

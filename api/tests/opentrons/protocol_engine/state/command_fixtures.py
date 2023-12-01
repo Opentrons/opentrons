@@ -9,9 +9,12 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
     DeckPoint,
+    ModuleModel,
+    ModuleDefinition,
     MovementAxis,
     WellLocation,
     LabwareLocation,
+    DeckSlotLocation,
     LabwareMovementStrategy,
 )
 
@@ -150,6 +153,30 @@ def create_load_pipette_command(
     result = cmd.LoadPipetteResult(pipetteId=pipette_id)
 
     return cmd.LoadPipette(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_load_module_command(
+    module_id: str,
+    location: DeckSlotLocation,
+    model: ModuleModel,
+) -> cmd.LoadModule:
+    """Get a completed LoadModule command."""
+    params = cmd.LoadModuleParams(moduleId=module_id, location=location, model=model)
+    result = cmd.LoadModuleResult(
+        moduleId=module_id,
+        model=model,
+        serialNumber=None,
+        definition=ModuleDefinition.construct(),  # type: ignore[call-arg]
+    )
+
+    return cmd.LoadModule(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
@@ -463,6 +490,20 @@ def create_move_labware_command(
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime(year=2022, month=1, day=1),
+        params=params,
+        result=result,
+    )
+
+
+def create_prepare_to_aspirate_command(pipette_id: str) -> cmd.PrepareToAspirate:
+    """Get a completed PrepareToAspirate command."""
+    params = cmd.PrepareToAspirateParams(pipetteId=pipette_id)
+    result = cmd.PrepareToAspirateResult()
+    return cmd.PrepareToAspirate(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2023, month=10, day=24),
         params=params,
         result=result,
     )

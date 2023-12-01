@@ -4,21 +4,20 @@ import reduce from 'lodash/reduce'
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
-  ModuleModel,
-  PipetteName,
   Liquid,
-  LoadedPipette,
   LoadedLabware,
   LoadedModule,
-} from '@opentrons/shared-data'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
-import type {
+  LoadedPipette,
+  LoadFixtureRunTimeCommand,
   LoadLabwareRunTimeCommand,
+  LoadLiquidRunTimeCommand,
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
-  LoadLiquidRunTimeCommand,
-  LoadFixtureRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  ModuleModel,
+  PipetteName,
+  RunTimeCommand,
+  AddressableAreaName,
+} from '@opentrons/shared-data'
 
 interface PipetteNamesByMount {
   left: PipetteName | null
@@ -132,7 +131,7 @@ export function parseInitialLoadedLabwareBySlot(
   )
 }
 
-interface LoadedLabwareByAdapter {
+export interface LoadedLabwareByAdapter {
   [labwareId: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareByAdapter(
@@ -230,6 +229,7 @@ export function parseInitialLoadedModulesBySlot(
 export interface LoadedFixturesBySlot {
   [slotName: string]: LoadFixtureRunTimeCommand
 }
+// TODO(bh, 2023-11-09): remove this util, there will be no loadFixture command
 export function parseInitialLoadedFixturesByCutout(
   commands: RunTimeCommand[]
 ): LoadedFixturesBySlot {
@@ -244,6 +244,63 @@ export function parseInitialLoadedFixturesByCutout(
     (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
     {}
   )
+}
+
+export function parseAllAddressableAreas(
+  commands: RunTimeCommand[]
+): AddressableAreaName[] {
+  return commands.reduce<AddressableAreaName[]>((acc, command) => {
+    if (
+      command.commandType === 'moveLabware' &&
+      command.params.newLocation !== 'offDeck' &&
+      'slotName' in command.params.newLocation &&
+      !acc.includes(command.params.newLocation.slotName as AddressableAreaName)
+    ) {
+      return [
+        ...acc,
+        command.params.newLocation.slotName as AddressableAreaName,
+      ]
+    } else if (
+      command.commandType === 'moveLabware' &&
+      command.params.newLocation !== 'offDeck' &&
+      'addressableAreaName' in command.params.newLocation &&
+      !acc.includes(
+        command.params.newLocation.addressableAreaName as AddressableAreaName
+      )
+    ) {
+      return [
+        ...acc,
+        command.params.newLocation.addressableAreaName as AddressableAreaName,
+      ]
+    } else if (
+      (command.commandType === 'loadLabware' ||
+        command.commandType === 'loadModule') &&
+      command.params.location !== 'offDeck' &&
+      'slotName' in command.params.location &&
+      !acc.includes(command.params.location.slotName as AddressableAreaName)
+    ) {
+      return [...acc, command.params.location.slotName as AddressableAreaName]
+    } else if (
+      command.commandType === 'loadLabware' &&
+      command.params.location !== 'offDeck' &&
+      'addressableAreaName' in command.params.location &&
+      !acc.includes(
+        command.params.location.addressableAreaName as AddressableAreaName
+      )
+    ) {
+      return [
+        ...acc,
+        command.params.location.addressableAreaName as AddressableAreaName,
+      ]
+    } else if (
+      command.commandType === 'moveToAddressableArea' &&
+      !acc.includes(command.params.addressableAreaName as AddressableAreaName)
+    ) {
+      return [...acc, command.params.addressableAreaName as AddressableAreaName]
+    } else {
+      return acc
+    }
+  }, [])
 }
 
 export interface LiquidsById {

@@ -13,17 +13,26 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  instrumentsResponseLeftPipetteFixture,
+  instrumentsResponseRightPipetteFixture,
 } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  useHost,
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
   useDismissCurrentRunMutation,
   useEstopQuery,
   useDoorQuery,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
+import {
+  getPipetteModelSpecs,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+} from '@opentrons/shared-data'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 
 import { i18n } from '../../../../i18n'
 import {
@@ -79,6 +88,10 @@ import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 import { RunFailedModal } from '../RunFailedModal'
 import { DISENGAGED, NOT_PRESENT } from '../../../EmergencyStop'
+import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWithTipAttached'
+import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -101,6 +114,15 @@ jest.mock('@opentrons/components', () => {
   }
 })
 jest.mock('@opentrons/react-api-client')
+jest.mock('@opentrons/shared-data', () => ({
+  getAllPipetteNames: jest.fn(
+    jest.requireActual('@opentrons/shared-data').getAllPipetteNames
+  ),
+  getPipetteNameSpecs: jest.fn(
+    jest.requireActual('@opentrons/shared-data').getPipetteNameSpecs
+  ),
+  getPipetteModelSpecs: jest.fn(),
+}))
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
@@ -114,6 +136,10 @@ jest.mock('../../../../redux/config')
 jest.mock('../RunFailedModal')
 jest.mock('../../../../redux/robot-update/selectors')
 jest.mock('../../../../redux/robot-settings/selectors')
+jest.mock('../../../DropTipWizard/getPipettesWithTipAttached')
+jest.mock('../../../../resources/deck_configuration/utils')
+jest.mock('../../../../resources/deck_configuration/hooks')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -201,6 +227,25 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
+const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+const mockGetPipettesWithTipAttached = getPipettesWithTipAttached as jest.MockedFunction<
+  typeof getPipettesWithTipAttached
+>
+const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
+  typeof getPipetteModelSpecs
+>
+const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
+  typeof getIsFixtureMismatch
+>
+const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
+  typeof useDeckConfigurationCompatibility
+>
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -215,6 +260,7 @@ const mockSettings = {
   value: true,
   restart_required: false,
 }
+const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
 
@@ -375,6 +421,23 @@ describe('ProtocolRunHeader', () => {
     mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
     mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
     mockGetRobotSettings.mockReturnValue([mockSettings])
+    mockUseInstrumentsQuery.mockReturnValue({ data: {} } as any)
+    mockUseHost.mockReturnValue({} as any)
+    mockGetPipettesWithTipAttached.mockReturnValue(
+      Promise.resolve([
+        instrumentsResponseLeftPipetteFixture,
+        instrumentsResponseRightPipetteFixture,
+      ]) as any
+    )
+    mockGetPipetteModelSpecs.mockReturnValue('p10_single_v1' as any)
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        ...noModulesProtocol,
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+      } as any)
+    mockUseDeckConfigurationCompatibility.mockReturnValue([])
+    when(mockGetIsFixtureMismatch).mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -507,6 +570,23 @@ describe('ProtocolRunHeader', () => {
     getByText(
       'A software update is available for this robot. Update to run protocols.'
     )
+  })
+
+  it('disables the Start Run button when a fixture is not configured or conflicted', () => {
+    mockUseDeckConfigurationCompatibility.mockReturnValue([
+      {
+        cutoutId: 'cutoutA1',
+        cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        requiredAddressableAreas: ['D4'],
+        compatibleCutoutFixtureIds: [
+          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+        ],
+      },
+    ])
+    when(mockGetIsFixtureMismatch).mockReturnValue(true)
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Start run' })
+    expect(button).toBeDisabled()
   })
 
   it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {
@@ -780,7 +860,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
-  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
+  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
@@ -789,7 +869,9 @@ describe('ProtocolRunHeader', () => {
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
-    getByText('Mock HeaterShakerIsRunningModal')
+    waitFor(() => {
+      getByText('Mock HeaterShakerIsRunningModal')
+    })
   })
 
   it('does not render the confirm attachment modal when there is a heater shaker in the protocol and run is idle', () => {
@@ -922,5 +1004,69 @@ describe('ProtocolRunHeader', () => {
     expect(
       queryByText('Close the robot door before starting the run.')
     ).not.toBeInTheDocument()
+  })
+
+  it('renders the drop tip banner when the run is over and a pipette has a tip attached', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: {
+          data: {
+            ...mockIdleUnstartedRun,
+            current: true,
+            status: RUN_STATUS_SUCCEEDED,
+          },
+        },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+
+    const [{ getByText }] = render()
+    await waitFor(() => {
+      getByText('Tips may be attached.')
+    })
+  })
+
+  it('does not render the drop tip banner when the run is not over', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: {
+          data: {
+            ...mockIdleUnstartedRun,
+            current: true,
+            status: RUN_STATUS_IDLE,
+          },
+        },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
+
+    const [{ queryByText }] = render()
+    await waitFor(() => {
+      expect(queryByText('Tips may be attached.')).not.toBeInTheDocument()
+    })
+  })
+
+  it('does not show the drop tip banner when the run is not over', async () => {
+    when(mockUseRunQuery)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        data: {
+          data: {
+            ...mockIdleUnstartedRun,
+            current: false,
+            status: RUN_STATUS_SUCCEEDED,
+          },
+        },
+      } as UseQueryResult<Run>)
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+
+    const [{ queryByText }] = render()
+    await waitFor(() => {
+      expect(queryByText('Tips may be attached.')).not.toBeInTheDocument()
+    })
   })
 })

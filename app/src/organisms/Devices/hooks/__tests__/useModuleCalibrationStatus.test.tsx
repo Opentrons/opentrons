@@ -86,7 +86,7 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration complete if OT-2', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({})
 
     const { result } = renderHook(
@@ -100,7 +100,7 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration complete if no modules needed', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({})
 
     const { result } = renderHook(
@@ -114,7 +114,7 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration complete if offset date exists', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         magneticModuleId: {
           attachedModuleMatch: {
@@ -136,7 +136,7 @@ describe('useModuleCalibrationStatus hook', () => {
   it('should return calibration needed if offset date does not exist', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith('otie', '1')
+      .calledWith('1')
       .mockReturnValue({
         magneticModuleId: {
           attachedModuleMatch: {

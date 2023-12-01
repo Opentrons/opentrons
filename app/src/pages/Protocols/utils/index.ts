@@ -3,14 +3,12 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import type {
   LabwareDefinition2,
-  ModuleModel,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import type {
   LabwareLocation,
   LoadModuleRunTimeCommand,
   ModuleLocation,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  ModuleModel,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export interface LabwareSetupItem {
   definition: LabwareDefinition2

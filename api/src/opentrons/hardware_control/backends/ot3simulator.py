@@ -189,6 +189,10 @@ class OT3Simulator:
         self._present_nodes = nodes
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
         self._sim_jaw_state = GripperJawState.HOMED_READY
+        self._sim_tip_state: Dict[OT3Mount, Optional[bool]] = {
+            mount: False if self._attached_instruments[mount] else None
+            for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]
+        }
 
     async def get_serial_number(self) -> Optional[str]:
         return "simulator"
@@ -390,21 +394,6 @@ class OT3Simulator:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
         self._sim_jaw_state = GripperJawState.HOLDING
-
-    async def check_for_tip_presence(
-        self,
-        mount: OT3Mount,
-        tip_state: TipStateType,
-        expect_multiple_responses: bool = False,
-    ) -> None:
-        """Raise an error if the given state doesn't match the physical state."""
-        pass
-
-    async def get_tip_present_state(
-        self, mount: OT3Mount, expect_multiple_responses: bool = False
-    ) -> bool:
-        """Get the state of the tip ejector flag for a given mount."""
-        pass
 
     async def get_jaw_state(self) -> GripperJawState:
         """Get the state of the gripper jaw."""
@@ -747,3 +736,15 @@ class OT3Simulator:
     def estop_state_machine(self) -> EstopStateMachine:
         """Return an estop state machine locked in the "disengaged" state."""
         return self._estop_state_machine
+
+    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+        return TipStateType(self._sim_tip_state[mount])
+
+    def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
+        return self._sim_tip_state[mount]
+
+    async def update_tip_detector(self, mount: OT3Mount, sensor_count: int) -> None:
+        pass
+
+    async def teardown_tip_detector(self, mount: OT3Mount) -> None:
+        pass

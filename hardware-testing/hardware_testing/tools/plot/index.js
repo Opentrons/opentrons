@@ -1,3 +1,17 @@
+// NOTE: removed "gravimetric-" from string so buttons can be smaller
+const testNames = [
+  'rnd',
+  'daily-setup',
+  'ot3-p50-multi',
+  'ot3-p50-multi-50ul-tip-increment',
+  'ot3-p50-single',
+  'ot3-p1000-96',
+  'ot3-p1000-multi',
+  'ot3-p1000-multi-50ul-tip-increment',
+  'ot3-p1000-multi-200ul-tip-increment',
+  'ot3-p1000-multi-1000ul-tip-increment',
+  'ot3-p1000-single',
+]
 function getEmptyGravData() {
   return [
     {
@@ -104,7 +118,9 @@ function parseGravimetricCSV(CSVData, retData) {
 
 window.addEventListener('load', function (evt) {
   const _updateTimeoutMillis = 100
+  const _reloadTimeoutMillis = 1000 * 10
   let _timeout
+  let _timeoutReload
   const layout = {
     title: 'Untitled',
     uirevision: true,
@@ -112,6 +128,22 @@ window.addEventListener('load', function (evt) {
     yaxis: { autorange: true },
   }
   const name_input_div = document.getElementById('testname')
+  const button_input_div = document.getElementById('buttoncontainer')
+  const allButtons = []
+  for (let i = 0; i < testNames.length; i++) {
+    const btn = document.createElement('input')
+    btn.type = 'button'
+    btn.value = testNames[i]
+    btn.onclick = function () {
+      name_input_div.value = 'gravimetric-' + btn.value
+      _setTestNameOfServer(null)
+    }
+    btn.style.backgroundColor = 'grey'
+    btn.style.marginRight = '5px'
+    button_input_div.appendChild(btn)
+    allButtons.push(btn)
+  }
+
   const plotlyDivName = 'plotly'
 
   function _clearTimeout() {
@@ -119,12 +151,22 @@ window.addEventListener('load', function (evt) {
       clearTimeout(_timeout)
       _timeout = undefined
     }
+    if (_timeoutReload) {
+      clearTimeout(_timeoutReload)
+      _timeoutReload = undefined
+    }
   }
 
   function _onScreenSizeUpdate(evt) {
     const div = document.getElementById(plotlyDivName)
     div.style.width = window.innerWidth - 50 + 'px'
     div.style.height = window.innerHeight - 100 + 'px'
+    button_input_div.style.width = window.innerWidth - 50 + 'px'
+    if (window.innerWidth - 160 > 400) {
+      name_input_div.style.width = window.innerWidth - 160 + 'px'
+    } else {
+      name_input_div.style.width = 400 + 'px'
+    }
   }
 
   function _initializePlot() {
@@ -134,17 +176,34 @@ window.addEventListener('load', function (evt) {
   }
 
   function _onTestNameResponse() {
+    _clearTimeout()
     const responseData = JSON.parse(this.responseText)
     name_input_div.value = responseData.name
-    _clearTimeout()
-    _timeout = setTimeout(_getLatestDataFromServer, _updateTimeoutMillis)
+    let btn_val
+    for (let i = 0; i < allButtons.length; i++) {
+      btn_val = 'gravimetric-' + allButtons[i].value
+      if (btn_val === responseData.name) {
+        allButtons[i].style.backgroundColor = 'yellow'
+      } else {
+        allButtons[i].style.backgroundColor = '#bbb'
+      }
+    }
     _getLatestDataFromServer()
+  }
+
+  function _onServerError(evt) {
+    clearTimeout()
+    document.body.style.backgroundColor = 'red'
+    document.body.innerHTML = '<h1>Lost Connection (refresh)</h1>'
+    location.reload()
   }
 
   function _getLatestDataFromServer(evt) {
     _clearTimeout()
     const oReq = new XMLHttpRequest()
+    oReq.addEventListener('error', _onServerError)
     oReq.addEventListener('load', function () {
+      _clearTimeout()
       const responseData = JSON.parse(this.responseText)
       let newData = getEmptyPlotlyData()
       newData = parseGravimetricCSV(responseData.latest.csv, newData)
@@ -157,10 +216,12 @@ window.addEventListener('load', function (evt) {
     })
     oReq.open('GET', 'http://' + window.location.host + '/data/latest')
     oReq.send()
+    _timeoutReload = setTimeout(_onServerError, _reloadTimeoutMillis)
   }
 
   function _getTestNameFromServer(evt) {
     const oReq = new XMLHttpRequest()
+    oReq.addEventListener('error', _onServerError)
     oReq.addEventListener('load', _onTestNameResponse)
     oReq.open('GET', 'http://' + window.location.host + '/name')
     oReq.send()
@@ -170,6 +231,7 @@ window.addEventListener('load', function (evt) {
     _clearTimeout()
     _initializePlot()
     const oReq = new XMLHttpRequest()
+    oReq.addEventListener('error', _onServerError)
     oReq.addEventListener('load', _onTestNameResponse)
     oReq.open(
       'GET',

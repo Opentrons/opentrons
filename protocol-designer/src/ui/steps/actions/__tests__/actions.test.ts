@@ -64,6 +64,7 @@ const initialRobotState: RobotState = {
   liquidState: {
     pipettes: {},
     labware: {},
+    additionalEquipment: {},
   },
   tipState: {
     pipettes: {},
@@ -383,6 +384,7 @@ describe('steps actions', () => {
                     liquidState: {
                       labware: {},
                       pipettes: {},
+                      additionalEquipment: {},
                     },
                     modules: {},
                     pipettes: {
@@ -526,6 +528,7 @@ describe('steps actions', () => {
                     liquidState: {
                       labware: {},
                       pipettes: {},
+                      additionalEquipment: {},
                     },
                     modules: {},
                     pipettes: {

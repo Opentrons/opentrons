@@ -11,21 +11,17 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
-  Module,
-  RobotWorkSpace,
-  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
-  Fixture,
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
-  inferModuleOrientationFromXCoordinate,
   NON_CONNECTING_MODULE_TYPES,
-  STANDARD_SLOT_LOAD_NAME,
+  SINGLE_SLOT_FIXTURES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -34,19 +30,17 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   useAttachedModules,
   useRunCalibrationStatus,
 } from '../../organisms/Devices/hooks'
-import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/MultipleModulesModal'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ROBOT_MODEL_OT3, getLocalRobot } from '../../redux/discovery'
-import { useFeatureFlag } from '../../redux/config'
+import { getLocalRobot } from '../../redux/discovery'
+import { getCutoutIdForSlotName } from '../../resources/deck_configuration/utils'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -62,22 +56,19 @@ import { ModuleWizardFlows } from '../ModuleWizardFlows'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { FixtureTable } from './FixtureTable'
+import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
 
 import type { CommandData } from '@opentrons/api-client'
+import type {
+  CutoutConfig,
+  CutoutId,
+  CutoutFixtureId,
+} from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const ATTACHED_MODULE_POLL_MS = 5000
-
-const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'DECK_BASE',
-  'BARCODE_COVERS',
-  'SLOT_SCREWS',
-  'SLOT_10_EXPANSION',
-  'CALIBRATION_CUTOUTS',
-]
 
 interface RenderModuleStatusProps {
   isModuleReady: boolean
@@ -90,7 +81,7 @@ interface RenderModuleStatusProps {
     commands: ModulePrepCommandsType[],
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
-  conflictedFixture?: Fixture
+  conflictedFixture?: CutoutConfig
 }
 
 function RenderModuleStatus({
@@ -104,7 +95,6 @@ function RenderModuleStatus({
   conflictedFixture,
 }: RenderModuleStatusProps): JSX.Element {
   const { makeSnackbar } = useToaster()
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
   const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
 
   const handleCalibrate = (): void => {
@@ -136,7 +126,7 @@ function RenderModuleStatus({
       {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
     </>
   )
-  if (conflictedFixture != null && enableDeckConfig) {
+  if (conflictedFixture != null) {
     moduleStatus = (
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
         <Chip
@@ -202,7 +192,7 @@ interface RowModuleProps {
   ) => Promise<CommandData[]>
   prepCommandErrorMessage: string
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
-  conflictedFixture?: Fixture
+  conflictedFixture?: CutoutConfig
 }
 
 function RowModule({
@@ -245,7 +235,7 @@ function RowModule({
       {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          cutout={conflictedFixture.fixtureLocation}
+          cutoutId={conflictedFixture.cutoutId}
           requiredModule={module.moduleDef.model}
           isOnDevice={true}
         />
@@ -282,11 +272,7 @@ function RowModule({
           />
         </Flex>
         {isNonConnectingModule ? (
-          <Flex
-            flex="3 0 0"
-            alignItems={ALIGN_CENTER}
-            padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-          >
+          <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('n_a')}
             </StyledText>
@@ -322,6 +308,8 @@ function RowModule({
 interface ProtocolSetupModulesAndDeckProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  setCutoutId: (cutoutId: CutoutId) => void
+  setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
 /**
@@ -330,6 +318,8 @@ interface ProtocolSetupModulesAndDeckProps {
 export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
+  setCutoutId,
+  setProvidedFixtureOptions,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
@@ -353,7 +343,7 @@ export function ProtocolSetupModulesAndDeck({
   const { data: deckConfig } = useDeckConfigurationQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const attachedModules =
     useAttachedModules({
@@ -374,6 +364,8 @@ export function ProtocolSetupModulesAndDeck({
     protocolModulesInfo
   )
 
+  const hasModules = attachedProtocolModuleMatches.length > 0
+
   const {
     missingModuleIds,
     remainingAttachedModules,
@@ -381,12 +373,6 @@ export function ProtocolSetupModulesAndDeck({
 
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
-
-  const modalHeader: ModalHeaderBaseProps = {
-    title: t('map_view'),
-    hasExitIcon: true,
-  }
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <>
@@ -402,50 +388,16 @@ export function ProtocolSetupModulesAndDeck({
           />
         ) : null}
         {showDeckMapModal ? (
-          <Modal
-            header={modalHeader}
-            modalSize="large"
-            onOutsideClick={() => setShowDeckMapModal(false)}
-          >
-            <RobotWorkSpace
-              deckDef={deckDef}
-              deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-              deckFill={COLORS.light1}
-              trashSlotName="A3"
-              id="ModuleSetup_deckMap"
-              trashColor={COLORS.darkGreyEnabled}
-            >
-              {() => (
-                <>
-                  {attachedProtocolModuleMatches.map(module => (
-                    <Module
-                      key={module.moduleId}
-                      x={module.x}
-                      y={module.y}
-                      orientation={inferModuleOrientationFromXCoordinate(
-                        module.x
-                      )}
-                      def={module.moduleDef}
-                    >
-                      <ModuleInfo
-                        moduleModel={module.moduleDef.model}
-                        isAttached={module.attachedModuleMatch != null}
-                        physicalPort={
-                          module.attachedModuleMatch?.usbPort ?? null
-                        }
-                        runId={runId}
-                      />
-                    </Module>
-                  ))}
-                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
-                </>
-              )}
-            </RobotWorkSpace>
-          </Modal>
+          <ModulesAndDeckMapViewModal
+            setShowDeckMapModal={setShowDeckMapModal}
+            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+            runId={runId}
+            protocolAnalysis={mostRecentAnalysis}
+          />
         ) : null}
       </Portal>
       <ChildNavigation
-        header={enableDeckConfig ? t('modules_and_deck') : t('modules')}
+        header={t('modules_and_deck')}
         onClickBack={() => setSetupScreen('prepare to run')}
         buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
         buttonType="tertiaryLowLight"
@@ -457,6 +409,7 @@ export function ProtocolSetupModulesAndDeck({
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
         marginTop="7.75rem"
+        marginBottom={SPACING.spacing80}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
           <InlineNotification
@@ -470,52 +423,67 @@ export function ProtocolSetupModulesAndDeck({
           />
         ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-            <Flex
-              color={COLORS.darkBlack70}
-              fontSize={TYPOGRAPHY.fontSize22}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              gridGap={SPACING.spacing24}
-              lineHeight={TYPOGRAPHY.lineHeight28}
-              paddingX={SPACING.spacing24}
-            >
-              <StyledText flex="4 0 0">{t('module')}</StyledText>
-              <StyledText flex="2 0 0">{t('location')}</StyledText>
-              <StyledText flex="3 0 0"> {t('status')}</StyledText>
-            </Flex>
-            {attachedProtocolModuleMatches.map(module => {
-              // check for duplicate module model in list of modules for protocol
-              const isDuplicateModuleModel = protocolModulesInfo
-                // filter out current module
-                .filter(otherModule => otherModule.moduleId !== module.moduleId)
-                // check for existence of another module of same model
-                .some(
-                  otherModule =>
-                    otherModule.moduleDef.model === module.moduleDef.model
+          {hasModules ? (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <Flex
+                color={COLORS.darkBlack70}
+                fontSize={TYPOGRAPHY.fontSize22}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                gridGap={SPACING.spacing24}
+                lineHeight={TYPOGRAPHY.lineHeight28}
+                paddingX={SPACING.spacing24}
+              >
+                <StyledText flex="4 0 0">{t('module')}</StyledText>
+                <StyledText flex="2 0 0">{t('location')}</StyledText>
+                <StyledText flex="3 0 0"> {t('status')}</StyledText>
+              </Flex>
+              {attachedProtocolModuleMatches.map(module => {
+                // check for duplicate module model in list of modules for protocol
+                const isDuplicateModuleModel = protocolModulesInfo
+                  // filter out current module
+                  .filter(
+                    otherModule => otherModule.moduleId !== module.moduleId
+                  )
+                  // check for existence of another module of same model
+                  .some(
+                    otherModule =>
+                      otherModule.moduleDef.model === module.moduleDef.model
+                  )
+
+                const cutoutIdForSlotName = getCutoutIdForSlotName(
+                  module.slotName,
+                  deckDef
                 )
-              return (
-                <RowModule
-                  key={module.moduleId}
-                  module={module}
-                  isDuplicateModuleModel={isDuplicateModuleModel}
-                  setShowMultipleModulesModal={setShowMultipleModulesModal}
-                  calibrationStatus={calibrationStatus}
-                  chainLiveCommands={chainLiveCommands}
-                  isLoading={isCommandMutationLoading}
-                  prepCommandErrorMessage={prepCommandErrorMessage}
-                  setPrepCommandErrorMessage={setPrepCommandErrorMessage}
-                  conflictedFixture={deckConfig?.find(
-                    fixture =>
-                      fixture.fixtureLocation === module.slotName &&
-                      fixture.loadName !== STANDARD_SLOT_LOAD_NAME
-                  )}
-                />
-              )
-            })}
-          </Flex>
-          {enableDeckConfig ? (
-            <FixtureTable mostRecentAnalysis={mostRecentAnalysis} />
+
+                return (
+                  <RowModule
+                    key={module.moduleId}
+                    module={module}
+                    isDuplicateModuleModel={isDuplicateModuleModel}
+                    setShowMultipleModulesModal={setShowMultipleModulesModal}
+                    calibrationStatus={calibrationStatus}
+                    chainLiveCommands={chainLiveCommands}
+                    isLoading={isCommandMutationLoading}
+                    prepCommandErrorMessage={prepCommandErrorMessage}
+                    setPrepCommandErrorMessage={setPrepCommandErrorMessage}
+                    conflictedFixture={deckConfig?.find(
+                      fixture =>
+                        fixture.cutoutId === cutoutIdForSlotName &&
+                        fixture.cutoutFixtureId != null &&
+                        !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
+                    )}
+                  />
+                )
+              })}
+            </Flex>
           ) : null}
+          <FixtureTable
+            robotType={FLEX_ROBOT_TYPE}
+            mostRecentAnalysis={mostRecentAnalysis}
+            setSetupScreen={setSetupScreen}
+            setCutoutId={setCutoutId}
+            setProvidedFixtureOptions={setProvidedFixtureOptions}
+          />
         </Flex>
       </Flex>
       <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />

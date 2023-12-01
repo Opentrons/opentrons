@@ -2,6 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -12,7 +13,6 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { useFeatureFlag } from '../../../../../redux/config'
 import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
@@ -28,11 +28,7 @@ import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
 
-import {
-  ModuleModel,
-  ModuleType,
-  STAGING_AREA_LOAD_NAME,
-} from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../hooks')
@@ -75,9 +71,7 @@ const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
 const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
   typeof LocationConflictModal
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
+
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -146,9 +140,6 @@ describe('SetupModulesList', () => {
       .mockReturnValue({
         complete: true,
       })
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
     mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
     mockUseChainLiveCommands.mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
@@ -162,7 +153,7 @@ describe('SetupModulesList', () => {
   it('should render the list view headers', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({})
     const { getByText } = render(props)
     getByText('Module')
@@ -358,7 +349,7 @@ describe('SetupModulesList', () => {
     const dupModPort = 10
     const dupModHub = 2
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockMagneticModule.moduleId]: {
           moduleId: mockMagneticModule.moduleId,
@@ -452,10 +443,8 @@ describe('SetupModulesList', () => {
     fireEvent.click(moduleSetup)
     getByText('mockModuleSetupModal')
   })
-  it('shoulde render a magnetic block with a conflicted fixture', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(true)
+  it('should render a magnetic block with a conflicted fixture', () => {
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
       [mockMagneticBlock.id]: {
         moduleId: mockMagneticBlock.id,
@@ -471,12 +460,11 @@ describe('SetupModulesList', () => {
         nestedLabwareDef: null,
         nestedLabwareId: null,
         protocolLoadOrder: 0,
-        slotName: '1',
+        slotName: 'B3',
         attachedModuleMatch: null,
         conflictedFixture: {
-          fixtureId: 'mockId',
-          fixtureLocation: '1',
-          loadName: STAGING_AREA_LOAD_NAME,
+          cutoutId: 'cutoutB3',
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
         },
       },
     } as any)

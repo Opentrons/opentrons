@@ -14,7 +14,7 @@ from opentrons.protocol_engine.types import (
     MotorAxis,
     FlowRates,
     DeckPoint,
-    CurrentWell,
+    CurrentPipetteLocation,
     TipGeometry,
 )
 from opentrons.protocol_engine.state.pipettes import (
@@ -24,13 +24,14 @@ from opentrons.protocol_engine.state.pipettes import (
     HardwarePipette,
     StaticPipetteConfig,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
 
 
 def get_pipette_view(
     pipettes_by_id: Optional[Dict[str, LoadedPipette]] = None,
     aspirated_volume_by_id: Optional[Dict[str, Optional[float]]] = None,
-    current_well: Optional[CurrentWell] = None,
+    current_well: Optional[CurrentPipetteLocation] = None,
     current_deck_point: CurrentDeckPoint = CurrentDeckPoint(
         mount=None, deck_point=None
     ),
@@ -38,17 +39,19 @@ def get_pipette_view(
     movement_speed_by_id: Optional[Dict[str, Optional[float]]] = None,
     static_config_by_id: Optional[Dict[str, StaticPipetteConfig]] = None,
     flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
+    nozzle_layout_by_id: Optional[Dict[str, Optional[NozzleMap]]] = None,
 ) -> PipetteView:
     """Get a pipette view test subject with the specified state."""
     state = PipetteState(
         pipettes_by_id=pipettes_by_id or {},
         aspirated_volume_by_id=aspirated_volume_by_id or {},
-        current_well=current_well,
+        current_location=current_well,
         current_deck_point=current_deck_point,
         attached_tip_by_id=attached_tip_by_id or {},
         movement_speed_by_id=movement_speed_by_id or {},
         static_config_by_id=static_config_by_id or {},
         flow_rates_by_id=flow_rates_by_id or {},
+        nozzle_configuration_by_id=nozzle_layout_by_id or {},
     )
 
     return PipetteView(state=state)

@@ -46,6 +46,7 @@ from .command_fixtures import (
     create_move_labware_command,
     create_move_to_coordinates_command,
     create_move_relative_command,
+    create_prepare_to_aspirate_command,
 )
 
 
@@ -62,12 +63,13 @@ def test_sets_initial_state(subject: PipetteStore) -> None:
     assert result == PipetteState(
         pipettes_by_id={},
         aspirated_volume_by_id={},
-        current_well=None,
+        current_location=None,
         current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
         attached_tip_by_id={},
         movement_speed_by_id={},
         static_config_by_id={},
         flow_rates_by_id={},
+        nozzle_configuration_by_id={},
     )
 
 
@@ -205,7 +207,7 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
 
     assert result.aspirated_volume_by_id["pipette-id"] is None
 
-    assert result.current_well == CurrentWell(
+    assert result.current_location == CurrentWell(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="well-name",
@@ -362,7 +364,7 @@ def test_movement_commands_update_current_well(
     )
     subject.handle_action(UpdateCommandAction(private_result=None, command=command))
 
-    assert subject.state.current_well == expected_location
+    assert subject.state.current_location == expected_location
 
 
 @pytest.mark.parametrize(
@@ -449,7 +451,7 @@ def test_movement_commands_without_well_clear_current_well(
     )
     subject.handle_action(UpdateCommandAction(private_result=None, command=command))
 
-    assert subject.state.current_well is None
+    assert subject.state.current_location is None
 
 
 @pytest.mark.parametrize(
@@ -502,7 +504,7 @@ def test_heater_shaker_command_without_movement(
     )
     subject.handle_action(UpdateCommandAction(private_result=None, command=command))
 
-    assert subject.state.current_well == CurrentWell(
+    assert subject.state.current_location == CurrentWell(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="well-name",
@@ -615,7 +617,7 @@ def test_move_labware_clears_current_well(
     subject.handle_action(
         UpdateCommandAction(private_result=None, command=move_labware_command)
     )
-    assert subject.state.current_well == expected_current_well
+    assert subject.state.current_location == expected_current_well
 
 
 def test_set_movement_speed(subject: PipetteStore) -> None:
@@ -855,3 +857,40 @@ def test_homing_commands_clear_deck_point(
     assert subject.state.current_deck_point == CurrentDeckPoint(
         mount=None, deck_point=None
     )
+
+
+@pytest.mark.parametrize(
+    "previous",
+    [
+        create_blow_out_command(pipette_id="pipette-id", flow_rate=1.0),
+        create_dispense_command(pipette_id="pipette-id", volume=10, flow_rate=1.0),
+    ],
+)
+def test_prepare_to_aspirate_marks_pipette_ready(
+    subject: PipetteStore, previous: cmd.Command
+) -> None:
+    """It should mark a pipette as ready to aspirate."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P50_MULTI_FLEX,
+        mount=MountType.LEFT,
+    )
+    pick_up_tip_command = create_pick_up_tip_command(
+        pipette_id="pipette-id", tip_volume=42, tip_length=101, tip_diameter=8.0
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=load_pipette_command)
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=pick_up_tip_command)
+    )
+
+    subject.handle_action(UpdateCommandAction(private_result=None, command=previous))
+
+    prepare_to_aspirate_command = create_prepare_to_aspirate_command(
+        pipette_id="pipette-id"
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=prepare_to_aspirate_command)
+    )
+    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0.0

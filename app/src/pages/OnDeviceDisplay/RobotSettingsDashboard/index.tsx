@@ -19,7 +19,10 @@ import {
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../organisms/RobotSettingsDashboard'
-import { getRobotUpdateAvailable } from '../../../redux/robot-update'
+import {
+  getRobotUpdateAvailable,
+  getRobotUpdateInfoForRobot,
+} from '../../../redux/robot-update'
 import {
   getLocalRobot,
   getRobotApiVersion,
@@ -71,6 +74,11 @@ export function RobotSettingsDashboard(): JSX.Element {
       : null
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
+  const robotUpdateInfo = useSelector((state: State) =>
+    localRobot != null && localRobot.status !== UNREACHABLE
+      ? getRobotUpdateInfoForRobot(state, localRobot)
+      : null
+  )
 
   // ACTIVE CONNECTION INFORMATION
   const networkConnection = useNetworkConnection(robotName)
@@ -128,6 +136,7 @@ export function RobotSettingsDashboard(): JSX.Element {
           }
           isUpdateAvailable={isUpdateAvailable}
           setCurrentOption={setCurrentOption}
+          robotUpdateInfo={robotUpdateInfo}
         />
       )
     case 'NetworkSettings':

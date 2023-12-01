@@ -23,6 +23,7 @@ from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -30,7 +31,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._types import OffDeckType
+from ._types import OffDeckType, StagingSlotName
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -46,6 +47,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -358,7 +360,7 @@ class ProtocolContext(CommandPublisher):
             )
 
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, LabwareCore]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
@@ -436,6 +438,20 @@ class ProtocolContext(CommandPublisher):
             location=location,
         )
 
+    @requires_version(2, 16)
+    # TODO: Confirm official naming of "waste chute".
+    def load_waste_chute(
+        self,
+        *,
+        # TODO: Confirm official naming of "staging area slot".
+        with_staging_area_slot_d4: bool = False,
+    ) -> WasteChute:
+        if with_staging_area_slot_d4:
+            raise NotImplementedError(
+                "The waste chute staging area slot is not currently implemented."
+            )
+        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+
     @requires_version(2, 15)
     def load_adapter(
         self,
@@ -477,7 +493,7 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName]
         if isinstance(location, OffDeckType):
             load_location = location
         else:
@@ -539,7 +555,9 @@ class ProtocolContext(CommandPublisher):
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, Labware, ModuleTypes, OffDeckType],
+        new_location: Union[
+            DeckLocation, Labware, ModuleTypes, OffDeckType, WasteChute
+        ],
         use_gripper: bool = False,
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
@@ -581,10 +599,17 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[ModuleCore, LabwareCore, OffDeckType, DeckSlotName]
+        location: Union[
+            ModuleCore,
+            LabwareCore,
+            WasteChute,
+            OffDeckType,
+            DeckSlotName,
+            StagingSlotName,
+        ]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
-        elif isinstance(new_location, OffDeckType):
+        elif isinstance(new_location, (OffDeckType, WasteChute)):
             location = new_location
         else:
             location = validation.ensure_and_convert_deck_slot(
@@ -691,6 +716,8 @@ class ProtocolContext(CommandPublisher):
                 location, self._api_version, self._core.robot_type
             )
         )
+        if isinstance(deck_slot, StagingSlotName):
+            raise ValueError("Cannot load a module onto a staging slot.")
 
         module_core = self._core.load_module(
             model=requested_model,
@@ -805,13 +832,19 @@ class ProtocolContext(CommandPublisher):
                 log=logger,
             )
 
+        trash: Optional[Labware]
+        try:
+            trash = self.fixed_trash
+        except NoTrashDefinedError:
+            trash = None
+
         instrument = InstrumentContext(
             core=instrument_core,
             protocol_core=self._core,
             broker=self._broker,
             api_version=self._api_version,
             tip_racks=tip_racks,
-            trash=self.fixed_trash,
+            trash=trash,
             requested_as=instrument_name,
         )
 
@@ -968,17 +1001,23 @@ class ProtocolContext(CommandPublisher):
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        return self._core_map.get(self._core.fixed_trash)
+        fixed_trash = self._core_map.get(self._core.fixed_trash)
+        if fixed_trash is None:
+            raise NoTrashDefinedError(
+                "No trash container has been defined in this protocol."
+            )
+        return fixed_trash
 
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._core.fixed_trash
-        fixed_trash = Labware(
-            core=fixed_trash_core,
-            api_version=self._api_version,
-            protocol_core=self._core,
-            core_map=self._core_map,
-        )
-        self._core_map.add(fixed_trash_core, fixed_trash)
+        if fixed_trash_core is not None:
+            fixed_trash = Labware(
+                core=fixed_trash_core,
+                api_version=self._api_version,
+                protocol_core=self._core,
+                core_map=self._core_map,
+            )
+            self._core_map.add(fixed_trash_core, fixed_trash)
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool) -> None:

@@ -13,7 +13,6 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleDefinition,
     ModuleModel,
-    ModuleLocation,
     LabwareOffsetVector,
     DeckType,
     ModuleOffsetData,
@@ -1595,11 +1594,10 @@ def test_get_overall_height(
         ),
         (DeckSlotLocation(slotName=DeckSlotName.SLOT_2), does_not_raise()),
         (DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH), does_not_raise()),
-        (ModuleLocation(moduleId="module-id-1"), does_not_raise()),
     ],
 )
 def test_raise_if_labware_in_location(
-    location: Union[DeckSlotLocation, ModuleLocation],
+    location: DeckSlotLocation,
     expected_raise: ContextManager[Any],
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
@@ -1648,19 +1646,19 @@ def test_get_by_slot() -> None:
         },
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == LoadedModule(
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == LoadedModule(
         id="1",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         serialNumber="serial-number-1",
     )
-    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == LoadedModule(
+    assert subject.get_by_slot(DeckSlotName.SLOT_2) == LoadedModule(
         id="2",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
         model=ModuleModel.TEMPERATURE_MODULE_V2,
         serialNumber="serial-number-2",
     )
-    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
+    assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
 
 
 def test_get_by_slot_prefers_later() -> None:
@@ -1686,42 +1684,11 @@ def test_get_by_slot_prefers_later() -> None:
         },
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == LoadedModule(
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == LoadedModule(
         id="1-again",
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         serialNumber="serial-number-1-again",
-    )
-
-
-def test_get_by_slot_filter_ids() -> None:
-    """It should filter modules by ID in addition to checking the slot."""
-    subject = make_module_view(
-        slot_by_module_id={
-            "1": DeckSlotName.SLOT_1,
-            "1-again": DeckSlotName.SLOT_1,
-        },
-        hardware_by_module_id={
-            "1": HardwareModule(
-                serial_number="serial-number-1",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
-                    model=ModuleModel.TEMPERATURE_MODULE_V1
-                ),
-            ),
-            "1-again": HardwareModule(
-                serial_number="serial-number-1-again",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
-                    model=ModuleModel.TEMPERATURE_MODULE_V1
-                ),
-            ),
-        },
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == LoadedModule(
-        id="1",
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        model=ModuleModel.TEMPERATURE_MODULE_V1,
-        serialNumber="serial-number-1",
     )
 
 
@@ -1756,14 +1723,14 @@ def test_is_edge_move_unsafe(
             lazy_fixture("thermocycler_v2_def"),
             LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=4.6),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=5.6),
             ),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-                dropOffset=LabwareOffsetVector(x=0, y=0, z=0.5),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=1.0),
             ),
         ),
         (

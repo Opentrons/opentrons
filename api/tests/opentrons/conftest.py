@@ -36,7 +36,11 @@ from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import (
+    RobotModel,
+    DeckDefinitionV3,
+    DeckDefinitionV4,
+)
 from opentrons_shared_data.deck import (
     load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
@@ -53,6 +57,9 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.deck import (
+    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
+)
 from opentrons.protocol_engine import (
     create_protocol_engine_in_thread,
     Config as ProtocolEngineConfig,
@@ -248,8 +255,13 @@ def deck_definition_name(robot_model: RobotModel) -> str:
 
 
 @pytest.fixture
-def deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV4:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
+
+
+@pytest.fixture
+def legacy_deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+    return load_deck(deck_definition_name, DEFAULT_LEGACY_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
@@ -296,10 +308,15 @@ def _make_ot3_pe_ctx(
             use_virtual_pipettes=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
+            # TODO figure out if we will want to use a "real" deck config here or if we are fine with simulated
+            use_simulated_deck_config=True,
             block_on_door_open=False,
         ),
         drop_tips_after_run=False,
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+        # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
+        #   this be False
+        load_fixed_trash=True,
     ) as (
         engine,
         loop,

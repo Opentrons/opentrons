@@ -1,137 +1,165 @@
-import { v4 as uuidv4 } from 'uuid'
-
 import {
-  STAGING_AREA_LOAD_NAME,
-  STANDARD_SLOT_LOAD_NAME,
-  TRASH_BIN_LOAD_NAME,
-  WASTE_CHUTE_LOAD_NAME,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
 } from '@opentrons/shared-data'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export const STANDARD_SLOT_DECK_CONFIG_FIXTURE: DeckConfiguration = [
   {
-    fixtureLocation: 'A1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'B1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'C1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'D1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'A2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'B2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'C2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'D2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'A3',
-    loadName: TRASH_BIN_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
   },
   {
-    fixtureLocation: 'B3',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'C3',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'D3',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
   },
 ]
 
-// contains staging area and waste chute fixtures
+// contains staging area fixtures
 export const EXTENDED_DECK_CONFIG_FIXTURE: DeckConfiguration = [
   {
-    fixtureLocation: 'A1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'B1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'C1',
-    loadName: TRASH_BIN_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'D1',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'A2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'B2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'C2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'D2',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'A3',
-    loadName: STANDARD_SLOT_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutA3',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
   },
   {
-    fixtureLocation: 'B3',
-    loadName: STAGING_AREA_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutB3',
+    cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'C3',
-    loadName: STAGING_AREA_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
   },
   {
-    fixtureLocation: 'D3',
-    loadName: WASTE_CHUTE_LOAD_NAME,
-    fixtureId: uuidv4(),
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  },
+]
+
+// contains waste chute fixture
+export const WASTE_CHUTE_DECK_CONFIG_FIXTURE: DeckConfiguration = [
+  {
+    cutoutId: 'cutoutA1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutB1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutC1',
+    cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutD1',
+    cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutA2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutB2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutC2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutD2',
+    cutoutFixtureId: SINGLE_CENTER_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutA3',
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutB3',
+    cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutC3',
+    cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  },
+  {
+    cutoutId: 'cutoutD3',
+    cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   },
 ]

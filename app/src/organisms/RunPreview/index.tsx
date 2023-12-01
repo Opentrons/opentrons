@@ -24,15 +24,17 @@ import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
 import { useLastRunCommandKey } from '../Devices/hooks/useLastRunCommandKey'
 import { CommandIcon } from './CommandIcon'
+import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
 interface RunPreviewProps {
   runId: string
+  robotType: RobotType
   jumpedIndex: number | null
   makeHandleScrollToStep: (index: number) => () => void
 }
 export const RunPreviewComponent = (
-  { runId, jumpedIndex, makeHandleScrollToStep }: RunPreviewProps,
+  { runId, jumpedIndex, makeHandleScrollToStep, robotType }: RunPreviewProps,
   ref: React.ForwardedRef<ViewportListRef>
 ): JSX.Element | null => {
   const { t } = useTranslation('run_details')
@@ -133,6 +135,7 @@ export const RunPreviewComponent = (
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
+                    robotType={robotType}
                     color={contentColor}
                   />
                 </Flex>

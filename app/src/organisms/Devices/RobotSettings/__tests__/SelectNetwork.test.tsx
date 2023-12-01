@@ -17,9 +17,10 @@ import { ConnectModal } from '../ConnectNetwork/ConnectModal'
 import { ResultModal } from '../ConnectNetwork/ResultModal'
 
 import { SelectNetwork } from '../SelectNetwork'
+import { RequestState } from '../../../../redux/robot-api/types'
+import { PENDING, SUCCESS, FAILURE } from '../../../../redux/robot-api'
 
 import type { ReactWrapper } from 'enzyme'
-import { RequestState } from '../../../../redux/robot-api/types'
 
 jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../../../redux/networking/selectors')
@@ -260,7 +261,7 @@ describe('<TemporarySelectNetwork />', () => {
         expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
           ssid: mockConfigure.ssid,
-          isPending: true,
+          requestStatus: PENDING,
           error: null,
           onClose: expect.any(Function),
         })
@@ -278,7 +279,7 @@ describe('<TemporarySelectNetwork />', () => {
         expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
           ssid: mockConfigure.ssid,
-          isPending: false,
+          requestStatus: SUCCESS,
           error: null,
           onClose: expect.any(Function),
         })
@@ -307,7 +308,7 @@ describe('<TemporarySelectNetwork />', () => {
         expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
           ssid: mockConfigure.ssid,
-          isPending: false,
+          requestStatus: FAILURE,
           error: { message: 'oh no!' },
           onClose: expect.any(Function),
         })

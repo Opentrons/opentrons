@@ -5,18 +5,21 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
   LabwareLocation,
-  OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import { getModuleDisplayLocation } from './getModuleDisplayLocation'
 import { getModuleModel } from './getModuleModel'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data/'
 import type { TFunction } from 'react-i18next'
 
 export function getLabwareDisplayLocation(
   robotSideAnalysis: CompletedProtocolAnalysis,
   location: LabwareLocation,
   t: TFunction<'protocol_command_text'>,
+  robotType: RobotType,
   isOnDevice?: boolean
 ): string {
   if (location === 'offDeck') {
@@ -40,7 +43,7 @@ export function getLabwareDisplayLocation(
         : t('module_in_slot', {
             count: getOccludedSlotCountForModule(
               getModuleType(moduleModel),
-              robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
+              robotType
             ),
             module: getModuleDisplayName(moduleModel),
             slot_name: slotName,
@@ -85,7 +88,7 @@ export function getLabwareDisplayLocation(
       return t('adapter_in_mod_in_slot', {
         count: getOccludedSlotCountForModule(
           getModuleType(moduleModel),
-          robotSideAnalysis.robotType ?? OT2_STANDARD_MODEL
+          robotType
         ),
         module: getModuleDisplayName(moduleModel),
         adapter: adapterDisplayName,

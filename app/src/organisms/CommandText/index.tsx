@@ -3,13 +3,21 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { getPipetteNameSpecs, RunTimeCommand } from '@opentrons/shared-data'
+import {
+  getLabwareName,
+  getLabwareDisplayLocation,
+  getFinalLabwareLocation,
+} from './utils'
 import { StyledText } from '../../atoms/text'
 import { LoadCommandText } from './LoadCommandText'
 import { PipettingCommandText } from './PipettingCommandText'
 import { TemperatureCommandText } from './TemperatureCommandText'
 import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data/js'
+import type {
+  CompletedProtocolAnalysis,
+  RobotType,
+} from '@opentrons/shared-data/js'
 import type { StyleProps } from '@opentrons/components'
 
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
@@ -38,21 +46,27 @@ const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
 interface Props extends StyleProps {
   command: RunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
+  robotType: RobotType
 }
 export function CommandText(props: Props): JSX.Element | null {
-  const { command, robotSideAnalysis, ...styleProps } = props
+  const { command, robotSideAnalysis, robotType, ...styleProps } = props
   const { t } = useTranslation('protocol_command_text')
 
   switch (command.commandType) {
     case 'aspirate':
+    case 'aspirateInPlace':
     case 'dispense':
+    case 'dispenseInPlace':
     case 'blowout':
-    case 'moveToWell':
+    case 'blowOutInPlace':
     case 'dropTip':
+    case 'dropTipInPlace':
     case 'pickUpTip': {
       return (
         <StyledText as="p" {...styleProps}>
-          <PipettingCommandText {...{ command, robotSideAnalysis }} />
+          <PipettingCommandText
+            {...{ command, robotSideAnalysis, robotType }}
+          />
         </StyledText>
       )
     }
@@ -62,7 +76,7 @@ export function CommandText(props: Props): JSX.Element | null {
     case 'loadLiquid': {
       return (
         <StyledText as="p" {...styleProps}>
-          <LoadCommandText {...{ command, robotSideAnalysis }} />
+          <LoadCommandText {...{ command, robotSideAnalysis, robotType }} />
         </StyledText>
       )
     }
@@ -132,10 +146,37 @@ export function CommandText(props: Props): JSX.Element | null {
         </StyledText>
       )
     }
+    case 'moveToWell': {
+      const { wellName, labwareId } = command.params
+      const allPreviousCommands = robotSideAnalysis.commands.slice(
+        0,
+        robotSideAnalysis.commands.findIndex(c => c.id === command.id)
+      )
+      const labwareLocation = getFinalLabwareLocation(
+        labwareId,
+        allPreviousCommands
+      )
+      const displayLocation =
+        labwareLocation != null
+          ? getLabwareDisplayLocation(
+              robotSideAnalysis,
+              labwareLocation,
+              t,
+              robotType
+            )
+          : ''
+      return t('move_to_well', {
+        well_name: wellName,
+        labware: getLabwareName(robotSideAnalysis, labwareId),
+        labware_location: displayLocation,
+      })
+    }
     case 'moveLabware': {
       return (
         <StyledText as="p" {...styleProps}>
-          <MoveLabwareCommandText {...{ command, robotSideAnalysis }} />
+          <MoveLabwareCommandText
+            {...{ command, robotSideAnalysis, robotType }}
+          />
         </StyledText>
       )
     }
@@ -153,6 +194,54 @@ export function CommandText(props: Props): JSX.Element | null {
               pipetteName != null
                 ? getPipetteNameSpecs(pipetteName)?.displayName
                 : '',
+          })}
+        </StyledText>
+      )
+    }
+    case 'configureNozzleLayout': {
+      const { configuration_params, pipetteId } = command.params
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
+      // TODO (sb, 11/9/23): Add support for other configurations when needed
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('configure_nozzle_layout', {
+            amount: configuration_params.style === 'COLUMN' ? '8' : 'all',
+            pipette:
+              pipetteName != null
+                ? getPipetteNameSpecs(pipetteName)?.displayName
+                : '',
+          })}
+        </StyledText>
+      )
+    }
+    case 'prepareToAspirate': {
+      const { pipetteId } = command.params
+      const pipetteName = robotSideAnalysis.pipettes.find(
+        pip => pip.id === pipetteId
+      )?.pipetteName
+
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('prepare_to_aspirate', {
+            pipette:
+              pipetteName != null
+                ? getPipetteNameSpecs(pipetteName)?.displayName
+                : '',
+          })}
+        </StyledText>
+      )
+    }
+    case 'moveToAddressableArea': {
+      const { addressableAreaName, speed, minimumZHeight } = command.params
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('move_to_addressable_area', {
+            addressable_area: addressableAreaName,
+            speed: speed,
+            height: minimumZHeight,
           })}
         </StyledText>
       )

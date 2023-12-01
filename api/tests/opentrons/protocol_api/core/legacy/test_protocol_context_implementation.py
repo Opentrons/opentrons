@@ -19,6 +19,7 @@ from opentrons.hardware_control.modules.types import ModuleType, TemperatureModu
 
 from opentrons.protocols import labware as mock_labware
 from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.protocol_api._types import StagingSlotName
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
 from opentrons.protocol_api.core.labware import LabwareLoadParams
@@ -173,6 +174,20 @@ def test_load_labware_off_deck_raises(
         subject.load_labware(
             load_name="cool load name",
             location=OFF_DECK,
+            label="cool label",
+            namespace="cool namespace",
+            version=1337,
+        )
+
+
+def test_load_labware_on_staging_slot_raises(
+    subject: LegacyProtocolCore,
+) -> None:
+    """It should raise an api error when loading onto a staging slot."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="cool load name",
+            location=StagingSlotName.SLOT_B4,
             label="cool label",
             namespace="cool namespace",
             version=1337,

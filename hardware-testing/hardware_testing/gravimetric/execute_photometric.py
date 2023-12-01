@@ -319,7 +319,7 @@ def execute_trials(
     trial_count = 0
     for volume in trials.keys():
         ui.print_title(f"{volume} uL")
-        if cfg.pipette_channels == 1 and not resources.ctx.is_simulating():
+        if cfg.pipette_channels != 96 and not resources.ctx.is_simulating():
             ui.get_user_ready(
                 f"put PLATE with prepped column {cfg.photoplate_column_offset} and remove SEAL"
             )
@@ -336,7 +336,7 @@ def execute_trials(
                     resources.ctx, resources.pipette, cfg, location=next_tip_location
                 )
             _run_trial(trial)
-        if not trial.ctx.is_simulating() and trial.channel_count == 1:
+        if not trial.ctx.is_simulating() and trial.channel_count != 96:
             ui.get_user_ready("add SEAL to plate and remove from DECK")
 
 

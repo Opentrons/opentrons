@@ -7,6 +7,7 @@ type DispatchStartRobotUpdate = (
   systemFile?: string | undefined
 ) => void
 
+// Safely start a robot update.
 export function useDispatchStartRobotUpdate(): DispatchStartRobotUpdate {
   const dispatch = useDispatch<(a: Action) => void>()
 

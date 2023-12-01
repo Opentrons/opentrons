@@ -121,6 +121,28 @@ describe('move liquid step form -> command creator args', () => {
     )
   })
 
+  it('moveLiquidFormToArgs calls getOrderedWells only for aspirate when dispensing is into a waste chute', () => {
+    moveLiquidFormToArgs({
+      ...hydratedForm,
+      fields: {
+        ...hydratedForm.fields,
+        dispense_labware: {
+          id: 'destLabwareId',
+          name: 'wasteChute',
+          location: 'cutoutD3',
+        },
+      },
+    })
+
+    expect(mockGetOrderedWells).toHaveBeenCalledTimes(1)
+    expect(mockGetOrderedWells).toHaveBeenCalledWith(
+      [ASPIRATE_WELL],
+      sourceLabwareDef,
+      'l2r',
+      't2b'
+    )
+  })
+
   it('moveLiquid form with 1:1 single transfer translated to args', () => {
     const result = moveLiquidFormToArgs(hydratedForm)
 

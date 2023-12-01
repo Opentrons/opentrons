@@ -8,30 +8,36 @@ import {
 } from '@opentrons/components'
 import {
   ProtocolAnalysisOutput,
-  protocolHasLiquids,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
-import { useFeatureFlag } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+  getSimplestDeckConfigForProtocolCommands,
+} from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import {
   useIsFlex,
+  useModuleCalibrationStatus,
+  useProtocolAnalysisErrors,
   useRobot,
   useRunCalibrationStatus,
-  useModuleCalibrationStatus,
   useRunHasStarted,
-  useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
+  useUnmatchedModulesForProtocol,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 import { SetupLiquids } from '../SetupLiquids'
-import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
+import { ProtocolRunSetup } from '../ProtocolRunSetup'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
@@ -43,6 +49,8 @@ jest.mock('../EmptySetupStep')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../resources/deck_configuration/utils')
+jest.mock('../../../../resources/deck_configuration/hooks')
 
 const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
@@ -79,15 +87,25 @@ const mockSetupModuleAndDeck = SetupModuleAndDeck as jest.MockedFunction<
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
 >
-const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
-  typeof protocolHasLiquids
->
 const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
   typeof EmptySetupStep
 >
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
+const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocolCommands
 >
+const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
+  typeof getRequiredDeckConfig
+>
+const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
+  typeof useUnmatchedModulesForProtocol
+>
+const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
+  typeof useDeckConfigurationCompatibility
+>
+const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
+  typeof getIsFixtureMismatch
+>
+
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
 const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
@@ -150,9 +168,13 @@ describe('ProtocolRunSetup', () => {
     when(mockSetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
-    when(mockUseFeatureFlag)
-      .calledWith('enableDeckConfiguration')
-      .mockReturnValue(false)
+    when(mockGetSimplestDeckConfigForProtocolCommands).mockReturnValue([])
+    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
+    when(mockGetRequiredDeckConfig).mockReturnValue([])
+    when(mockUseUnmatchedModulesForProtocol)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+    when(mockGetIsFixtureMismatch).mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -246,24 +268,6 @@ describe('ProtocolRunSetup', () => {
     })
   })
 
-  describe('when liquids are in the protocol', () => {
-    it('renders correct text for liquids', () => {
-      when(mockUseMostRecentCompletedAnalysis)
-        .calledWith(RUN_ID)
-        .mockReturnValue({
-          ...noModulesProtocol,
-          liquids: [{ displayName: 'water', description: 'liquid H2O' }],
-        } as any)
-      mockProtocolHasLiquids.mockReturnValue(true)
-
-      const { getByText } = render()
-      getByText('STEP 5')
-      getByText('Liquids')
-      getByText('View liquid starting locations and volumes')
-      getByText('Mock SetupLiquids')
-    })
-  })
-
   describe('when modules are in the protocol', () => {
     beforeEach(() => {
       when(mockParseAllRequiredModuleModels).mockReturnValue([
@@ -303,7 +307,7 @@ describe('ProtocolRunSetup', () => {
 
       const { getByText } = render()
       getByText('STEP 2')
-      getByText('Modules')
+      getByText('Modules & deck')
       getByText('Calibration needed')
     })
 
@@ -312,6 +316,57 @@ describe('ProtocolRunSetup', () => {
 
       const { getAllByText } = render()
       expect(getAllByText('Calibration ready').length).toEqual(1)
+    })
+
+    it('renders action needed if robot is Flex and modules are not connected', () => {
+      when(mockUseUnmatchedModulesForProtocol)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({
+          missingModuleIds: ['temperatureModuleV1'],
+          remainingAttachedModules: [],
+        })
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: false })
+
+      const { getByText } = render()
+      getByText('STEP 2')
+      getByText('Modules & deck')
+      getByText('Action needed')
+    })
+
+    it('renders action needed if robot is Flex and deck config is not configured', () => {
+      mockUseDeckConfigurationCompatibility.mockReturnValue([
+        {
+          cutoutId: 'cutoutA1',
+          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          requiredAddressableAreas: ['D4'],
+          compatibleCutoutFixtureIds: [
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          ],
+        },
+      ])
+      when(mockGetRequiredDeckConfig).mockReturnValue([
+        {
+          cutoutId: 'cutoutA1',
+          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          requiredAddressableAreas: ['D4'],
+          compatibleCutoutFixtureIds: [
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          ],
+        },
+      ] as any)
+      when(mockGetIsFixtureMismatch).mockReturnValue(true)
+      when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
+      when(mockUseModuleCalibrationStatus)
+        .calledWith(ROBOT_NAME, RUN_ID)
+        .mockReturnValue({ complete: false })
+
+      const { getByText } = render()
+      getByText('STEP 2')
+      getByText('Modules & deck')
+      getByText('Action needed')
     })
 
     it('renders module setup and allows the user to proceed to labware setup', () => {
@@ -378,9 +433,6 @@ describe('ProtocolRunSetup', () => {
 
     it('renders correct text contents for modules and fixtures', () => {
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-      when(mockUseFeatureFlag)
-        .calledWith('enableDeckConfiguration')
-        .mockReturnValue(true)
       when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({

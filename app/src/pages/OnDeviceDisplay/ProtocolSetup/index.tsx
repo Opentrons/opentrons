@@ -12,10 +12,8 @@ import {
   Btn,
   COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_STICKY,
@@ -34,6 +32,7 @@ import {
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  getFixtureDisplayName,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
@@ -41,23 +40,28 @@ import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,
 } from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
+  useRobotType,
 } from '../../../organisms/Devices/hooks'
+import {
+  useRequiredProtocolHardwareFromAnalysis,
+  useMissingProtocolHardwareFromAnalysis,
+} from '../../Protocols/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
+import { ProtocolSetupDeckConfiguration } from '../../../organisms/ProtocolSetupDeckConfiguration'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
-  getAreInstrumentsReady,
+  getIncompleteInstrumentCount,
   getProtocolUsesGripper,
 } from '../../../organisms/ProtocolSetupInstruments/utils'
 import {
@@ -67,19 +71,20 @@ import {
 import { useToaster } from '../../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
 import { getLabwareSetupItemGroups } from '../../Protocols/utils'
-import { ROBOT_MODEL_OT3, getLocalRobot } from '../../../redux/discovery'
+import { getLocalRobot } from '../../../redux/discovery'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
-import {
-  getIsHeaterShakerAttached,
-  useFeatureFlag,
-} from '../../../redux/config'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { CloseButton, PlayButton } from './Buttons'
 
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import type { ProtocolHardware, ProtocolFixture } from '../../Protocols/hooks'
+import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
@@ -194,140 +199,11 @@ export function ProtocolSetupStep({
   )
 }
 
-const CLOSE_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.red2Pressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.red2};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.red2};
-  }
-
-  &:active {
-    background-color: ${COLORS.red2Pressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
-// TODO(ew, 05/03/2023): refactor the run buttons into a shared component
-interface CloseButtonProps {
-  onClose: () => void
-}
-
-function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.red2}
-      borderRadius="6.25rem"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      onClick={onClose}
-      aria-label="close"
-      css={CLOSE_BUTTON_STYLE}
-    >
-      <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
-    </Btn>
-  )
-}
-
-interface PlayButtonProps {
-  ready: boolean
-  onPlay?: () => void
-  disabled?: boolean
-  isDoorOpen: boolean
-}
-
-function PlayButton({
-  disabled = false,
-  onPlay,
-  ready,
-  isDoorOpen,
-}: PlayButtonProps): JSX.Element {
-  const playButtonStyle = css`
-    -webkit-tap-highlight-color: transparent;
-    &:focus {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
-      color: ${COLORS.white};
-    }
-
-    &:hover {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
-      color: ${COLORS.white};
-    }
-
-    &:focus-visible {
-      box-shadow: ${ODD_FOCUS_VISIBLE};
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.blueEnabled
-        : COLORS.darkBlack20};
-    }
-
-    &:active {
-      background-color: ${ready && !isDoorOpen
-        ? COLORS.bluePressed
-        : COLORS.darkBlack40};
-      color: ${COLORS.white};
-    }
-
-    &:disabled {
-      background-color: ${COLORS.darkBlack20};
-      color: ${COLORS.darkBlack60};
-    }
-  `
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={
-        disabled || !ready || isDoorOpen
-          ? COLORS.darkBlack20
-          : COLORS.blueEnabled
-      }
-      borderRadius="6.25rem"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      disabled={disabled}
-      onClick={onPlay}
-      aria-label="play"
-      css={playButtonStyle}
-    >
-      <Icon
-        color={
-          disabled || !ready || isDoorOpen ? COLORS.darkBlack60 : COLORS.white
-        }
-        name="play-icon"
-        size="2.5rem"
-      />
-    </Btn>
-  )
-}
-
 interface PrepareToRunProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   play: () => void
-  setupScreen: SetupScreens
 }
 
 function PrepareToRun({
@@ -335,7 +211,6 @@ function PrepareToRun({
   setSetupScreen,
   confirmAttachment,
   play,
-  setupScreen,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
@@ -365,7 +240,9 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name ??
     ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId, protocolName)
+
+  const robotType = useRobotType(robotName)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -380,10 +257,22 @@ function PrepareToRun({
       refetchInterval: FETCH_DURATION_MS,
     }) ?? []
 
+  const { requiredProtocolHardware } = useRequiredProtocolHardwareFromAnalysis(
+    mostRecentAnalysis
+  )
+
+  const requiredFixtures = requiredProtocolHardware.filter(
+    (hardware): hardware is ProtocolFixture => {
+      return hardware.hardwareType === 'fixture'
+    }
+  )
+
+  const protocolHasFixtures = requiredFixtures.length > 0
+
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo =
     mostRecentAnalysis != null
@@ -394,16 +283,17 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
-  const areInstrumentsReady =
+  const incompleteInstrumentCount: number | null =
     mostRecentAnalysis != null && attachedInstruments != null
-      ? getAreInstrumentsReady(mostRecentAnalysis, attachedInstruments)
-      : false
+      ? getIncompleteInstrumentCount(mostRecentAnalysis, attachedInstruments)
+      : null
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingCalForOdd: !areInstrumentsReady,
+    hasMissingCalForOdd:
+      incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
@@ -424,18 +314,71 @@ function PrepareToRun({
         (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
       : 0
 
-  const instrumentsDetail = t('instruments_connected', {
-    count: speccedInstrumentCount,
-  })
-  const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
+  const missingProtocolHardware = useMissingProtocolHardwareFromAnalysis(
+    robotType,
+    mostRecentAnalysis
+  )
+  const isLocationConflict = missingProtocolHardware.conflictedSlots.length > 0
+
+  const missingPipettes = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'pipette'
+  )
+
+  const missingGripper = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'gripper'
+  )
+
+  const missingModules = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'module'
+  )
+  const missingFixtures = missingProtocolHardware.missingProtocolHardware.filter(
+    (hardware): hardware is ProtocolFixture =>
+      hardware.hardwareType === 'fixture'
+  )
+
+  let instrumentsDetail
+  if (missingPipettes.length > 0 && missingGripper.length > 0) {
+    instrumentsDetail = t('missing_instruments', {
+      count: missingPipettes.length + missingGripper.length,
+    })
+  } else if (missingPipettes.length > 0) {
+    instrumentsDetail = t('missing_pipettes', { count: missingPipettes.length })
+  } else if (missingGripper.length > 0) {
+    instrumentsDetail = t('missing_gripper')
+  } else if (incompleteInstrumentCount === 0) {
+    instrumentsDetail = t('instruments_connected', {
+      count: speccedInstrumentCount,
+    })
+  } else if (
+    incompleteInstrumentCount != null &&
+    incompleteInstrumentCount > 0
+  ) {
+    instrumentsDetail = t('instrument_calibrations_missing', {
+      count: incompleteInstrumentCount,
+    })
+  } else {
+    instrumentsDetail = null
+  }
+
+  const instrumentsStatus =
+    incompleteInstrumentCount === 0 ? 'ready' : 'not ready'
+
+  const areModulesReady = !isMissingModules && moduleCalibrationStatus.complete
+
+  const isMissingFixtures = missingFixtures.length > 0
+
+  const areFixturesReady = !isMissingFixtures
 
   const modulesStatus =
-    isMissingModules || !moduleCalibrationStatus.complete
-      ? 'not ready'
-      : 'ready'
+    areModulesReady && areFixturesReady && !isLocationConflict
+      ? 'ready'
+      : 'not ready'
 
-  const isReadyToRun = areInstrumentsReady && !isMissingModules
+  // TODO: (ND: 11/6/23) check for areFixturesReady once we removed stubbed fixtures in useRequiredProtocolHardwareFromAnalysis
+  // const isReadyToRun =
+  //   incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
 
+  const isReadyToRun = incompleteInstrumentCount === 0 && areModulesReady
   const onPlay = (): void => {
     if (isDoorOpen) {
       makeSnackbar(t('shared:close_robot_door'))
@@ -468,26 +411,85 @@ function PrepareToRun({
       ? getModuleDisplayName(firstMissingModuleModel)
       : ''
 
-  // determine modules detail messages
-  const connectedModulesText =
-    protocolModulesInfo.length === 0
-      ? t('no_modules_used_in_this_protocol')
-      : t('modules_connected', {
-          count: attachedModules.length,
-        })
+  const getConnectedHardwareText = (
+    protocolModulesInfo: ProtocolModuleInfo[],
+    requiredFixtures: ProtocolHardware[]
+  ): {
+    detail: string
+    subdetail?: string
+  } => {
+    if (protocolModulesInfo.length === 0 && requiredFixtures.length === 0) {
+      return { detail: t('no_modules_used_in_this_protocol') }
+    } else if (
+      protocolModulesInfo.length > 0 &&
+      requiredFixtures.length === 0
+    ) {
+      // protocol only uses modules
+      return {
+        detail: t('modules_connected', {
+          count: protocolModulesInfo.length,
+        }),
+      }
+    } else if (
+      protocolModulesInfo.length === 0 &&
+      requiredFixtures.length > 0
+    ) {
+      // protocol only uses fixtures
+      return {
+        detail: t('fixtures_connected', {
+          count: requiredFixtures.length,
+        }),
+      }
+    } else {
+      // protocol uses fixtures and modules
+      return {
+        detail: t('fixtures_connected', {
+          count: requiredFixtures.length,
+        }),
+        subdetail: t('modules_connected', {
+          count: protocolModulesInfo.length,
+        }),
+      }
+    }
+  }
+
   const missingModulesText =
     missingModuleIds.length === 1
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
-      : t('multiple_modules_missing')
+      : t('multiple_modules_missing', { count: missingModuleIds.length })
 
-  const modulesDetail = (): string => {
-    if (isMissingModules) {
-      return missingModulesText
-    } else if (!moduleCalibrationStatus.complete) {
-      return t('calibration_required')
-    } else {
-      return connectedModulesText
-    }
+  const missingFixturesText =
+    missingFixtures.length === 1
+      ? `${t('missing')} ${getFixtureDisplayName(
+          missingFixtures[0].cutoutFixtureId
+        )}`
+      : t('multiple_fixtures_missing', { count: missingFixtures.length })
+
+  const missingMultipleHardwareTypes =
+    [missingModules, missingFixtures].filter(
+      missingHardwareArr => missingHardwareArr.length > 0
+    ).length > 1
+
+  let modulesDetail: string
+  let modulesSubDetail: string | null = null
+  if (isLocationConflict) {
+    modulesDetail = t('location_conflict')
+  } else if (missingMultipleHardwareTypes) {
+    modulesDetail = t('hardware_missing')
+  } else if (missingFixtures.length > 0) {
+    modulesDetail = missingFixturesText
+  } else if (isMissingModules) {
+    modulesDetail = missingModulesText
+  } else if (!moduleCalibrationStatus.complete) {
+    modulesDetail = t('calibration_required')
+  } else {
+    // modules and deck are ready
+    const hardwareDetail = getConnectedHardwareText(
+      protocolModulesInfo,
+      requiredFixtures
+    )
+    modulesDetail = hardwareDetail.detail
+    modulesSubDetail = hardwareDetail?.subdetail ?? null
   }
 
   // Labware information
@@ -519,8 +521,6 @@ function PrepareToRun({
   const isDoorOpen =
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
-
-  const enableDeckConfig = useFeatureFlag('enableDeckConfiguration')
 
   return (
     <>
@@ -596,10 +596,13 @@ function PrepareToRun({
             />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('modules')}
-              title={enableDeckConfig ? t('modules_and_deck') : t('modules')}
-              detail={modulesDetail()}
+              title={t('modules_and_deck')}
+              detail={modulesDetail}
+              subDetail={modulesSubDetail}
               status={modulesStatus}
-              disabled={protocolModulesInfo.length === 0}
+              disabled={
+                protocolModulesInfo.length === 0 && !protocolHasFixtures
+              }
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
@@ -665,6 +668,7 @@ export type SetupScreens =
   | 'modules'
   | 'labware'
   | 'liquids'
+  | 'deck configuration'
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -685,6 +689,10 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
   )
+  const [cutoutId, setCutoutId] = React.useState<CutoutId | null>(null)
+  const [providedFixtureOptions, setProvidedFixtureOptions] = React.useState<
+    CutoutFixtureId[]
+  >([])
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -697,7 +705,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         play={play}
-        setupScreen={setupScreen}
       />
     ),
     instruments: (
@@ -707,6 +714,8 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupModulesAndDeck
         runId={runId}
         setSetupScreen={setSetupScreen}
+        setCutoutId={setCutoutId}
+        setProvidedFixtureOptions={setProvidedFixtureOptions}
       />
     ),
     labware: (
@@ -714,6 +723,14 @@ export function ProtocolSetup(): JSX.Element {
     ),
     liquids: (
       <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
+    ),
+    'deck configuration': (
+      <ProtocolSetupDeckConfiguration
+        cutoutId={cutoutId}
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        providedFixtureOptions={providedFixtureOptions}
+      />
     ),
   }
 

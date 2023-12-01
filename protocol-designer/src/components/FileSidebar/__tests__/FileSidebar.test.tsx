@@ -16,7 +16,7 @@ import {
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
-import { FileSidebar, v7WarningContent } from '../FileSidebar'
+import { FileSidebar, v8WarningContent } from '../FileSidebar'
 
 jest.mock('../../Hints/useBlockingHint')
 jest.mock('../../../file-data/selectors')
@@ -157,6 +157,48 @@ describe('FileSidebar', () => {
     )
   })
 
+  it('warning modal is shown when export is clicked with unused staging area slot', () => {
+    const stagingArea = 'stagingAreaId'
+    props.savedStepForms = savedStepForms
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
+    props.fileData.commands = commands
+    props.additionalEquipment = {
+      [stagingArea]: {
+        name: 'stagingArea',
+        id: stagingArea,
+        location: 'cutoutA3',
+      },
+    }
+
+    const wrapper = shallow(<FileSidebar {...props} />)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
+    downloadButton.simulate('click')
+    const alertModal = wrapper.find(AlertModal)
+
+    expect(alertModal).toHaveLength(1)
+    expect(alertModal.prop('heading')).toEqual(
+      'One or more staging area slots are unused'
+    )
+  })
+
+  it('warning modal is shown when export is clicked with unused trash', () => {
+    props.savedStepForms = savedStepForms
+    const trashId = 'mockTrashId'
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
+    props.fileData.commands = commands
+    props.additionalEquipment = {
+      [trashId]: { name: 'trashBin', location: 'cutoutA3', id: trashId } as any,
+    }
+
+    const wrapper = shallow(<FileSidebar {...props} />)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
+    downloadButton.simulate('click')
+    const alertModal = wrapper.find(AlertModal)
+
+    expect(alertModal).toHaveLength(1)
+    expect(alertModal.prop('heading')).toEqual('Unused trash')
+  })
+
   it('warning modal is shown when export is clicked with unused gripper', () => {
     const gripperId = 'gripperId'
     props.modulesOnDeck = modulesOnDeck
@@ -233,8 +275,8 @@ describe('FileSidebar', () => {
     // Before save button is clicked, enabled should be false
     expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
       enabled: false,
-      hintKey: 'export_v7_protocol_7_0',
-      content: v7WarningContent,
+      hintKey: 'export_v8_protocol_7_1',
+      content: v8WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })
@@ -245,8 +287,8 @@ describe('FileSidebar', () => {
     // After save button is clicked, enabled should be true
     expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
       enabled: true,
-      hintKey: 'export_v7_protocol_7_0',
-      content: v7WarningContent,
+      hintKey: 'export_v8_protocol_7_1',
+      content: v8WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })

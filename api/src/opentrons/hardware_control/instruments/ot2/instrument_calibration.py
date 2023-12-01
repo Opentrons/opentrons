@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from opentrons.config.robot_configs import default_pipette_offset
 
-from opentrons import calibration_storage
+from opentrons.calibration_storage import ot2 as calibration_storage
 from opentrons.calibration_storage import types, helpers
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import OT3Mount

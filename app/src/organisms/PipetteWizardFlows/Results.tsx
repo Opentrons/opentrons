@@ -131,7 +131,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
             subHeader = t('gantry_empty_for_96_channel_success')
             buttonText = t('attach_pip')
           } else {
-            buttonText = t('detach_next_pip')
+            buttonText = t('detach_next_pipette')
           }
         }
       }

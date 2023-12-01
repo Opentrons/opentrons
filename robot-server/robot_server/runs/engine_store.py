@@ -14,6 +14,7 @@ from opentrons.hardware_control.types import (
     HardwareEventHandler,
 )
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
 from opentrons.protocol_runner import (
     AnyRunner,
     JsonRunner,
@@ -31,6 +32,7 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.protocols import ProtocolResource
+from opentrons.protocol_engine.types import DeckConfigurationType
 
 
 class EngineConflictError(RuntimeError):
@@ -39,6 +41,10 @@ class EngineConflictError(RuntimeError):
     The store will not create a new engine unless the "current" runner/engine
     pair is idle.
     """
+
+
+class NoRunnerEnginePairError(RuntimeError):
+    """Raised if you try to get the current engine or runner while there is none."""
 
 
 class RunnerEnginePair(NamedTuple):
@@ -90,13 +96,15 @@ class EngineStore:
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" persisted ProtocolEngine."""
-        assert self._runner_engine_pair is not None, "Engine not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> AnyRunner:
         """Get the "current" persisted ProtocolRunner."""
-        assert self._runner_engine_pair is not None, "Runner not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.runner
 
     @property
@@ -143,6 +151,7 @@ class EngineStore:
         self,
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
@@ -159,6 +168,11 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             a new set may not be created.
         """
+        if protocol is not None:
+            load_fixed_trash = should_load_fixed_trash(protocol.source.config)
+        else:
+            load_fixed_trash = False
+
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -168,6 +182,8 @@ class EngineStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            load_fixed_trash=load_fixed_trash,
+            deck_configuration=deck_configuration,
         )
         runner = create_protocol_runner(
             protocol_engine=engine,

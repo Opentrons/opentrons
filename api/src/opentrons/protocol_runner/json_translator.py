@@ -8,7 +8,10 @@ from opentrons_shared_data.protocol.models import (
     protocol_schema_v6,
     ProtocolSchemaV7,
     protocol_schema_v7,
+    ProtocolSchemaV8,
+    protocol_schema_v8,
 )
+from opentrons_shared_data import command as command_schema
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import (
@@ -163,7 +166,11 @@ def _translate_v7_pipette_command(
 
 
 def _translate_simple_command(
-    command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command]
+    command: Union[
+        protocol_schema_v6.Command,
+        protocol_schema_v7.Command,
+        protocol_schema_v8.Command,
+    ]
 ) -> pe_commands.CommandCreate:
     dict_command = command.dict(exclude_none=True)
 
@@ -208,13 +215,15 @@ class JsonTranslator:
 
     def translate_commands(
         self,
-        protocol: Union[ProtocolSchemaV7, ProtocolSchemaV6],
+        protocol: Union[ProtocolSchemaV8, ProtocolSchemaV7, ProtocolSchemaV6],
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol and translates commands->protocol engine commands."""
         if isinstance(protocol, ProtocolSchemaV6):
             return self._translate_v6_commands(protocol)
-        else:
+        elif isinstance(protocol, ProtocolSchemaV7):
             return self._translate_v7_commands(protocol)
+        else:
+            return self._translate_v8_commands(protocol)
 
     def _translate_v6_commands(
         self,
@@ -244,3 +253,18 @@ class JsonTranslator:
             translated_obj = _translate_simple_command(command)
             commands_list.append(translated_obj)
         return commands_list
+
+    def _translate_v8_commands(
+        self, protocol: ProtocolSchemaV8
+    ) -> List[pe_commands.CommandCreate]:
+        """Translate commands in json protocol schema v8, which might be of different command schemas."""
+        command_schema_ref = protocol.commandSchemaId
+        # these calls will raise if the command schema version is invalid or unknown
+        command_schema_version = command_schema.schema_version_from_ref(
+            command_schema_ref
+        )
+        command_schema_string = command_schema.load_schema_string(  # noqa: F841
+            command_schema_version
+        )
+
+        return [_translate_simple_command(command) for command in protocol.commands]
