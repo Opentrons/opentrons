@@ -2,6 +2,8 @@ from typing import Dict, Any
 from typing_extensions import Protocol
 
 from .types import ConfigType
+from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 
 class Configurable(Protocol[ConfigType]):
@@ -21,6 +23,17 @@ class Configurable(Protocol[ConfigType]):
     @property
     def config(self) -> ConfigType:
         ...
+    
+    
+    @property
+    def hardware_feature_flags(self) -> HardwareFeatureFlags:
+        ...
+
+    @hardware_feature_flags.setter
+    def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        """Replace the currently-configured hardware feature flags."""
+        ...
+
 
     @config.setter
     def config(self, config: ConfigType) -> None:

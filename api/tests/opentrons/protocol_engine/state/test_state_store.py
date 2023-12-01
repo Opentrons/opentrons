@@ -55,7 +55,11 @@ def test_has_state(subject: StateStore) -> None:
 def test_state_is_immutable(subject: StateStore) -> None:
     """It should treat the state as immutable."""
     result_1 = subject.state
-    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(
+        PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        )
+    )
     result_2 = subject.state
 
     assert result_1 is not result_2
@@ -68,7 +72,11 @@ def test_notify_on_state_change(
 ) -> None:
     """It should notify state changes when actions are handled."""
     decoy.verify(change_notifier.notify(), times=0)
-    subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
+    subject.handle_action(
+        PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        )
+    )
     decoy.verify(change_notifier.notify(), times=1)
 
 

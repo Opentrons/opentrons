@@ -24,7 +24,7 @@ from .types import (
     OFF_DECK_LOCATION,
     DeckSlotLocation,
     LabwareLocation,
-    NonStackedLocation,
+    AddressableAreaLocation,
     LabwareOffsetCreate,
     ModuleLocation,
     OnLabwareLocation,
@@ -124,18 +124,11 @@ def _standardize_labware_location(
     if isinstance(original, DeckSlotLocation):
         return _standardize_deck_slot_location(original, robot_type)
     elif (
-        isinstance(original, (ModuleLocation, OnLabwareLocation))
+        isinstance(
+            original, (ModuleLocation, OnLabwareLocation, AddressableAreaLocation)
+        )
         or original == OFF_DECK_LOCATION
     ):
-        return original
-
-
-def _standardize_adapter_location(
-    original: NonStackedLocation, robot_type: RobotType
-) -> NonStackedLocation:
-    if isinstance(original, DeckSlotLocation):
-        return _standardize_deck_slot_location(original, robot_type)
-    elif isinstance(original, ModuleLocation) or original == OFF_DECK_LOCATION:
         return original
 
 

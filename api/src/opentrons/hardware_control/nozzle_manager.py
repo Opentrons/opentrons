@@ -1,17 +1,41 @@
-from typing import Dict, List, Optional, Any, Sequence
-from typing_extensions import Final
+from typing import Dict, List, Optional, Any, Sequence, Iterator, Tuple, cast
 from dataclasses import dataclass
 from collections import OrderedDict
 from enum import Enum
+from itertools import chain
 
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.types import Point
-from opentrons_shared_data.errors import (
-    ErrorCodes,
-    GeneralError,
+from opentrons_shared_data.pipette.pipette_definition import (
+    PipetteGeometryDefinition,
+    PipetteRowDefinition,
 )
+from opentrons_shared_data.errors import ErrorCodes, GeneralError, PythonException
 
-INTERNOZZLE_SPACING = 9
+
+def _nozzle_names_by_row(rows: List[PipetteRowDefinition]) -> Iterator[str]:
+    for row in rows:
+        for nozzle in row.ordered_nozzles:
+            yield nozzle
+
+
+def _row_or_col_index_for_nozzle(
+    row_or_col: "OrderedDict[str, List[str]]", nozzle: str
+) -> int:
+    for index, row_or_col_contents in enumerate(row_or_col.values()):
+        if nozzle in row_or_col_contents:
+            return index
+    raise KeyError(nozzle)
+
+
+def _row_col_indices_for_nozzle(
+    rows: "OrderedDict[str, List[str]]",
+    cols: "OrderedDict[str, List[str]]",
+    nozzle: str,
+) -> Tuple[int, int]:
+    return _row_or_col_index_for_nozzle(rows, nozzle), _row_or_col_index_for_nozzle(
+        cols, nozzle
+    )
 
 
 class NozzleConfigurationType(Enum):
@@ -24,69 +48,93 @@ class NozzleConfigurationType(Enum):
 
     COLUMN = "COLUMN"
     ROW = "ROW"
-    QUADRANT = "QUADRANT"
     SINGLE = "SINGLE"
     FULL = "FULL"
+    SUBRECT = "SUBRECT"
 
     @classmethod
     def determine_nozzle_configuration(
         cls,
-        nozzle_difference: Point,
-        physical_nozzlemap_length: int,
-        current_nozzlemap_length: int,
+        physical_rows: "OrderedDict[str, List[str]]",
+        current_rows: "OrderedDict[str, List[str]]",
+        physical_cols: "OrderedDict[str, List[str]]",
+        current_cols: "OrderedDict[str, List[str]]",
     ) -> "NozzleConfigurationType":
         """
         Determine the nozzle configuration based on the starting and
         ending nozzle.
-
-        :param nozzle_difference: the difference between the back
-        left and front right nozzle
-        :param physical_nozzlemap_length: integer representing the
-        length of the default physical configuration of the pipette.
-        :param current_nozzlemap_length: integer representing the
-        length of the current physical configuration of the pipette.
-        :return : nozzle configuration type
         """
-        if physical_nozzlemap_length == current_nozzlemap_length:
+        if physical_rows == current_rows and physical_cols == current_cols:
             return NozzleConfigurationType.FULL
-
-        if nozzle_difference == Point(0, 0, 0):
+        if len(current_rows) == 1 and len(current_cols) == 1:
             return NozzleConfigurationType.SINGLE
-        elif nozzle_difference[0] == 0:
-            return NozzleConfigurationType.COLUMN
-        elif nozzle_difference[1] == 0:
+        if len(current_rows) == 1:
             return NozzleConfigurationType.ROW
-        else:
-            return NozzleConfigurationType.QUADRANT
+        if len(current_cols) == 1:
+            return NozzleConfigurationType.COLUMN
+        return NozzleConfigurationType.SUBRECT
 
 
 @dataclass
 class NozzleMap:
     """
-    Nozzle Map.
+    A NozzleMap instance represents a specific configuration of active nozzles on a pipette.
 
-    A data store class that can build
-    and store nozzle configurations
-    based on the physical default
-    nozzle map of the pipette and
-    the requested starting/ending tips.
+    It exposes properties of the configuration like the configuration's front-right, front-left,
+    back-left and starting nozzles as well as a map of all the nozzles active in the configuration.
+
+    Because NozzleMaps represent configurations directly, the properties of the NozzleMap may not
+    match the properties of the physical pipette. For instance, a NozzleMap for a single channel
+    configuration of an 8-channel pipette - say, A1 only - will have its front left, front right,
+    and active channels all be A1, while the physical configuration would have the front right
+    channel be H1.
     """
 
-    back_left: str
-    front_right: str
     starting_nozzle: str
+    #: The nozzle that automated operations that count nozzles should start at
+    # these are really ordered dicts but you can't say that even in quotes because pydantic needs to
+    # evaluate them to generate serdes code so please only use ordered dicts here
     map_store: Dict[str, Point]
+    #: A map of all of the nozzles active in this configuration
+    rows: Dict[str, List[str]]
+    #: A map of all the rows active in this configuration
+    columns: Dict[str, List[str]]
+    #: A map of all the columns active in this configuration
     configuration: NozzleConfigurationType
+    #: The kind of configuration this is
 
     def __str__(self) -> str:
         return f"back_left_nozzle: {self.back_left} front_right_nozzle: {self.front_right} configuration: {self.configuration}"
 
     @property
+    def back_left(self) -> str:
+        """The backest, leftest (i.e. back if it's a column, left if it's a row) nozzle of the configuration.
+
+        Note: This is the value relevant for this particular configuration, and it may not represent the back left nozzle
+        of the underlying physical pipette. For instance, the back-left nozzle of a configuration representing nozzles
+        D7 to H12 of a 96-channel pipette is D7, which is not the back-left nozzle of the physical pipette (A1).
+        """
+        return next(iter(self.rows.values()))[0]
+
+    @property
+    def front_right(self) -> str:
+        """The frontest, rightest (i.e. front if it's a column, right if it's a row) nozzle of the configuration.
+
+        Note: This is the value relevant for this configuration, not the physical pipette. See the note on back_left.
+        """
+        return next(reversed(list(self.rows.values())))[-1]
+
+    @property
     def starting_nozzle_offset(self) -> Point:
+        """The position of the starting nozzle."""
         return self.map_store[self.starting_nozzle]
 
     @property
     def xy_center_offset(self) -> Point:
+        """The position of the geometrical center of all nozzles in the configuration.
+
+        Note: This is the value relevant fro this configuration, not the physical pipette. See the note on back_left.
+        """
         difference = self.map_store[self.front_right] - self.map_store[self.back_left]
         return self.map_store[self.back_left] + Point(
             difference[0] / 2, difference[1] / 2, 0
@@ -94,103 +142,82 @@ class NozzleMap:
 
     @property
     def front_nozzle_offset(self) -> Point:
+        """The offset for the front_left nozzle."""
         # front left-most nozzle of the 96 channel in a given configuration
         # and front nozzle of the 8 channel
-        if self.starting_nozzle == self.front_right:
-            return self.map_store[self.front_right]
-        map_store_list = list(self.map_store.values())
-        starting_idx = map_store_list.index(self.map_store[self.back_left])
-        difference = self.map_store[self.back_left] - self.map_store[self.front_right]
-        y_rows_length = int(difference[1] // INTERNOZZLE_SPACING)
-        return map_store_list[starting_idx + y_rows_length]
+        front_left = next(iter(self.columns.values()))[-1]
+        return self.map_store[front_left]
 
     @property
     def tip_count(self) -> int:
+        """The total number of active nozzles in the configuration, and thus the number of tips that will be picked up."""
         return len(self.map_store)
 
     @classmethod
     def build(
         cls,
-        physical_nozzle_map: Dict[str, Point],
+        physical_nozzles: "OrderedDict[str, Point]",
+        physical_rows: "OrderedDict[str, List[str]]",
+        physical_columns: "OrderedDict[str, List[str]]",
         starting_nozzle: str,
         back_left_nozzle: str,
         front_right_nozzle: str,
-        origin_nozzle: Optional[str] = None,
     ) -> "NozzleMap":
-        difference = (
-            physical_nozzle_map[front_right_nozzle]
-            - physical_nozzle_map[back_left_nozzle]
-        )
-        x_columns_length = int(abs(difference[0] // INTERNOZZLE_SPACING)) + 1
-        y_rows_length = int(abs(difference[1] // INTERNOZZLE_SPACING)) + 1
-
-        map_store_list = list(physical_nozzle_map.items())
-
-        if origin_nozzle:
-            origin_difference = (
-                physical_nozzle_map[back_left_nozzle]
-                - physical_nozzle_map[origin_nozzle]
+        try:
+            back_left_row_index, back_left_column_index = _row_col_indices_for_nozzle(
+                physical_rows, physical_columns, back_left_nozzle
             )
-            starting_col = int(abs(origin_difference[0] // INTERNOZZLE_SPACING))
-        else:
-            starting_col = 0
+        except KeyError as e:
+            raise IncompatibleNozzleConfiguration(
+                message=f"No entry for back left nozzle {e} in pipette",
+                wrapping=[PythonException(e)],
+            ) from e
+        try:
+            (
+                front_right_row_index,
+                front_right_column_index,
+            ) = _row_col_indices_for_nozzle(
+                physical_rows, physical_columns, front_right_nozzle
+            )
+        except KeyError as e:
+            raise IncompatibleNozzleConfiguration(
+                message=f"No entry for front right nozzle {e} in pipette",
+                wrapping=[PythonException(e)],
+            ) from e
+
+        correct_rows_with_all_columns = list(physical_rows.items())[
+            back_left_row_index : front_right_row_index + 1
+        ]
+        correct_rows = [
+            (
+                row_name,
+                row_entries[back_left_column_index : front_right_column_index + 1],
+            )
+            for row_name, row_entries in correct_rows_with_all_columns
+        ]
+        rows = OrderedDict(correct_rows)
+        correct_columns_with_all_rows = list(physical_columns.items())[
+            back_left_column_index : front_right_column_index + 1
+        ]
+        correct_columns = [
+            (col_name, col_entries[back_left_row_index : front_right_row_index + 1])
+            for col_name, col_entries in correct_columns_with_all_rows
+        ]
+        columns = OrderedDict(correct_columns)
+
         map_store = OrderedDict(
-            {
-                k: v
-                for i in range(x_columns_length)
-                for k, v in map_store_list[
-                    (i + starting_col) * 8 : y_rows_length * ((i + starting_col) + 1)
-                ]
-            }
+            (nozzle, physical_nozzles[nozzle]) for nozzle in chain(*rows.values())
         )
+
         return cls(
-            back_left=back_left_nozzle,
-            front_right=front_right_nozzle,
             starting_nozzle=starting_nozzle,
             map_store=map_store,
+            rows=rows,
+            columns=columns,
             configuration=NozzleConfigurationType.determine_nozzle_configuration(
-                difference, len(physical_nozzle_map), len(map_store)
+                physical_rows, rows, physical_columns, columns
             ),
         )
-
-    @staticmethod
-    def validate_nozzle_configuration(
-        back_left_nozzle: str,
-        front_right_nozzle: str,
-        default_configuration: "NozzleMap",
-        current_configuration: Optional["NozzleMap"] = None,
-    ) -> None:
-        """
-        Validate nozzle configuration.
-        """
-        if back_left_nozzle > front_right_nozzle:
-            raise IncompatibleNozzleConfiguration(
-                message=f"Back left nozzle {back_left_nozzle} provided is not to the back or left of {front_right_nozzle}.",
-                detail={
-                    "current_nozzle_configuration": current_configuration,
-                    "requested_back_left_nozzle": back_left_nozzle,
-                    "requested_front_right_nozzle": front_right_nozzle,
-                },
-            )
-        if not default_configuration.map_store.get(back_left_nozzle):
-            raise IncompatibleNozzleConfiguration(
-                message=f"Starting nozzle {back_left_nozzle} does not exist in the nozzle map.",
-                detail={
-                    "current_nozzle_configuration": current_configuration,
-                    "requested_back_left_nozzle": back_left_nozzle,
-                    "requested_front_right_nozzle": front_right_nozzle,
-                },
-            )
-
-        if not default_configuration.map_store.get(front_right_nozzle):
-            raise IncompatibleNozzleConfiguration(
-                message=f"Ending nozzle {front_right_nozzle} does not exist in the nozzle map.",
-                detail={
-                    "current_nozzle_configuration": current_configuration,
-                    "requested_back_left_nozzle": back_left_nozzle,
-                    "requested_front_right_nozzle": front_right_nozzle,
-                },
-            )
 
 
 class IncompatibleNozzleConfiguration(GeneralError):
@@ -215,33 +242,39 @@ class NozzleConfigurationManager:
     def __init__(
         self,
         nozzle_map: NozzleMap,
-        pick_up_current_map: Dict[int, float],
     ) -> None:
         self._physical_nozzle_map = nozzle_map
         self._current_nozzle_configuration = nozzle_map
-        self._pick_up_current_map: Final[Dict[int, float]] = pick_up_current_map
 
     @classmethod
-    def build_from_nozzlemap(
-        cls,
-        nozzle_map: Dict[str, List[float]],
-        pick_up_current_map: Dict[int, float],
+    def build_from_config(
+        cls, pipette_geometry: PipetteGeometryDefinition
     ) -> "NozzleConfigurationManager":
-
-        sorted_nozzlemap = list(nozzle_map.keys())
-        sorted_nozzlemap.sort(key=lambda x: int(x[1::]))
-        nozzle_map_ordereddict: Dict[str, Point] = OrderedDict(
-            {k: Point(*nozzle_map[k]) for k in sorted_nozzlemap}
+        sorted_nozzle_map = OrderedDict(
+            (
+                (k, Point(*pipette_geometry.nozzle_map[k]))
+                for k in _nozzle_names_by_row(pipette_geometry.ordered_rows)
+            )
         )
-        first_nozzle = next(iter(list(nozzle_map_ordereddict.keys())))
-        last_nozzle = next(reversed(list(nozzle_map_ordereddict.keys())))
+        sorted_rows = OrderedDict(
+            (entry.key, entry.ordered_nozzles)
+            for entry in pipette_geometry.ordered_rows
+        )
+        sorted_cols = OrderedDict(
+            (entry.key, entry.ordered_nozzles)
+            for entry in pipette_geometry.ordered_columns
+        )
+        back_left = next(iter(sorted_rows.values()))[0]
+        front_right = next(reversed(list(sorted_rows.values())))[-1]
         starting_nozzle_config = NozzleMap.build(
-            nozzle_map_ordereddict,
-            starting_nozzle=first_nozzle,
-            back_left_nozzle=first_nozzle,
-            front_right_nozzle=last_nozzle,
+            physical_nozzles=sorted_nozzle_map,
+            physical_rows=sorted_rows,
+            physical_columns=sorted_cols,
+            starting_nozzle=back_left,
+            back_left_nozzle=back_left,
+            front_right_nozzle=front_right,
         )
-        return cls(starting_nozzle_config, pick_up_current_map)
+        return cls(starting_nozzle_config)
 
     @property
     def starting_nozzle_offset(self) -> Point:
@@ -260,29 +293,24 @@ class NozzleConfigurationManager:
         front_right_nozzle: str,
         starting_nozzle: Optional[str] = None,
     ) -> None:
-        if (
-            back_left_nozzle == self._physical_nozzle_map.back_left
-            and front_right_nozzle == self._physical_nozzle_map.front_right
-        ):
-            self._current_nozzle_configuration = self._physical_nozzle_map
-        else:
-            NozzleMap.validate_nozzle_configuration(
-                back_left_nozzle,
-                front_right_nozzle,
-                self._physical_nozzle_map,
-                self._current_nozzle_configuration,
-            )
+        self._current_nozzle_configuration = NozzleMap.build(
+            # these casts are because of pydantic in the protocol engine (see above)
+            physical_nozzles=cast(
+                "OrderedDict[str, Point]", self._physical_nozzle_map.map_store
+            ),
+            physical_rows=cast(
+                "OrderedDict[str, List[str]]", self._physical_nozzle_map.rows
+            ),
+            physical_columns=cast(
+                "OrderedDict[str, List[str]]", self._physical_nozzle_map.columns
+            ),
+            starting_nozzle=starting_nozzle or back_left_nozzle,
+            back_left_nozzle=back_left_nozzle,
+            front_right_nozzle=front_right_nozzle,
+        )
 
-            self._current_nozzle_configuration = NozzleMap.build(
-                self._physical_nozzle_map.map_store,
-                starting_nozzle=starting_nozzle or back_left_nozzle,
-                back_left_nozzle=back_left_nozzle,
-                front_right_nozzle=front_right_nozzle,
-                origin_nozzle=self._physical_nozzle_map.starting_nozzle,
-            )
-
-    def get_tip_configuration_current(self) -> float:
-        return self._pick_up_current_map[self._current_nozzle_configuration.tip_count]
+    def get_tip_count(self) -> int:
+        return self._current_nozzle_configuration.tip_count
 
     def critical_point_with_tip_length(
         self,

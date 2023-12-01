@@ -177,6 +177,14 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -404,6 +412,12 @@ __all__ = [
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
+    # move to addressable area command models
+    "MoveToAddressableArea",
+    "MoveToAddressableAreaParams",
+    "MoveToAddressableAreaCreate",
+    "MoveToAddressableAreaResult",
+    "MoveToAddressableAreaCommandType",
     # wait for resume command models
     "WaitForResume",
     "WaitForResumeParams",

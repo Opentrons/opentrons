@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
     WellLocation,
     WellOrigin,
     WellOffset,
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
@@ -31,6 +31,7 @@ from opentrons.types import Point, DeckSlotName
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -574,6 +575,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def get_blow_out_flow_rate(self, rate: float = 1.0) -> float:
         return self._blow_out_flow_rate * rate
 
+    def get_nozzle_configuration(self) -> NozzleConfigurationType:
+        return self._engine_client.state.pipettes.get_nozzle_layout_type(
+            self._pipette_id
+        )
+
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,
@@ -608,25 +614,25 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if style == NozzleLayout.COLUMN:
             configuration_model: NozzleLayoutConfigurationType = (
                 ColumnNozzleLayoutConfiguration(
-                    primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+                    primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
                 )
             )
         elif style == NozzleLayout.ROW:
             configuration_model = RowNozzleLayoutConfiguration(
-                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+                primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
         elif style == NozzleLayout.QUADRANT:
             assert front_right_nozzle is not None
             configuration_model = QuadrantNozzleLayoutConfiguration(
-                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
-                front_right_nozzle=front_right_nozzle,
+                primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
+                frontRightNozzle=front_right_nozzle,
             )
         elif style == NozzleLayout.SINGLE:
             configuration_model = SingleNozzleLayoutConfiguration(
-                primary_nozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
+                primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle)
             )
         else:
-            configuration_model = EmptyNozzleLayoutConfiguration()
+            configuration_model = AllNozzleLayoutConfiguration()
         self._engine_client.configure_nozzle_layout(
             pipette_id=self._pipette_id, configuration_params=configuration_model
         )

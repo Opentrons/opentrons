@@ -36,14 +36,14 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
   },
   [TEMPERATURE_MODULE_TYPE]: {
     [TEMPERATURE_MODULE_V1]: require('../../images/modules/tempdeck_gen1.png'),
-    [TEMPERATURE_MODULE_V2]: require('../../images/modules/tempdeck_gen2.png'),
+    [TEMPERATURE_MODULE_V2]: require('../../images/modules/temp_deck_gen_2_transparent.png'),
   },
   [THERMOCYCLER_MODULE_TYPE]: {
     [THERMOCYCLER_MODULE_V1]: require('../../images/modules/thermocycler.jpg'),
     [THERMOCYCLER_MODULE_V2]: require('../../images/modules/thermocycler_gen2.png'),
   },
   [HEATERSHAKER_MODULE_TYPE]: {
-    [HEATERSHAKER_MODULE_V1]: require('../../images/modules/heatershaker.png'),
+    [HEATERSHAKER_MODULE_V1]: require('../../images/modules/heater_shaker_module_transparent.png'),
   },
   [MAGNETIC_BLOCK_TYPE]: {
     [MAGNETIC_BLOCK_V1]: require('../../images/modules/mag_block.png'),

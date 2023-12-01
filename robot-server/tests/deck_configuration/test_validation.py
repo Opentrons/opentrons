@@ -185,6 +185,19 @@ def test_unrecognized_cutout_fixture() -> None:
     ]
     assert subject.get_configuration_errors(deck_definition, cutout_fixtures) == {
         subject.UnrecognizedCutoutFixtureError(
-            cutout_fixture_id="someUnrecognizedCutoutFixture"
+            cutout_fixture_id="someUnrecognizedCutoutFixture",
+            allowed_cutout_fixture_ids=frozenset(
+                [
+                    "singleLeftSlot",
+                    "singleCenterSlot",
+                    "singleRightSlot",
+                    "stagingAreaRightSlot",
+                    "wasteChuteRightAdapterCovered",
+                    "wasteChuteRightAdapterNoCover",
+                    "stagingAreaSlotWithWasteChuteRightAdapterCovered",
+                    "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
+                    "trashBinAdapter",
+                ]
+            ),
         )
     }

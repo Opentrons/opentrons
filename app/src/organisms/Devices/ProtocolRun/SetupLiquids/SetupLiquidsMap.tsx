@@ -15,8 +15,8 @@ import {
   LabwareRender,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
@@ -64,7 +64,7 @@ export function SetupLiquidsMap(
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     protocolAnalysis.commands ?? []
   )
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
@@ -187,7 +187,7 @@ export function SetupLiquidsMap(
                   <LabwareRender
                     definition={topLabwareDefinition}
                     wellFill={labwareHasLiquid ? wellFill : undefined}
-                    hover={labwareId === hoverLabwareId && labwareHasLiquid}
+                    highlight={labwareId === hoverLabwareId && labwareHasLiquid}
                   />
                   <LabwareInfoOverlay
                     definition={topLabwareDefinition}

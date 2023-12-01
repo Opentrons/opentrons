@@ -8,7 +8,6 @@ import uniq from 'lodash/uniq'
 import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
-import { OT_2_TRASH_DEF_URI } from '@opentrons/step-generation'
 import {
   ModuleType,
   ModuleModel,
@@ -34,10 +33,7 @@ import {
   FormPipette,
   PipetteOnDeck,
 } from '../../../step-forms'
-import {
-  FLEX_TRASH_DEF_URI,
-  INITIAL_DECK_SETUP_STEP_ID,
-} from '../../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
@@ -220,16 +216,12 @@ export function CreateFileWizard(): JSX.Element | null {
       ) {
         // defaulting trash to appropriate locations
         dispatch(
-          labwareIngredActions.createContainer({
-            labwareDefURI:
-              values.fields.robotType === FLEX_ROBOT_TYPE
-                ? FLEX_TRASH_DEF_URI
-                : OT_2_TRASH_DEF_URI,
-            slot:
-              values.fields.robotType === FLEX_ROBOT_TYPE
-                ? getTrashSlot(values)
-                : '12',
-          })
+          createDeckFixture(
+            'trashBin',
+            values.fields.robotType === FLEX_ROBOT_TYPE
+              ? getTrashSlot(values)
+              : 'cutout12'
+          )
         )
       }
 
@@ -263,9 +255,15 @@ export function CreateFileWizard(): JSX.Element | null {
       const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
-      newTiprackModels.forEach(tiprackDefURI => {
+      newTiprackModels.forEach((tiprackDefURI, index) => {
+        const ot2Slots = index === 0 ? '2' : '5'
+        const flexSlots = index === 0 ? 'C2' : 'B2'
         dispatch(
           labwareIngredActions.createContainer({
+            slot:
+              values.fields.robotType === FLEX_ROBOT_TYPE
+                ? flexSlots
+                : ot2Slots,
             labwareDefURI: tiprackDefURI,
             adapterUnderLabwareDefURI:
               values.pipettesByMount.left.pipetteName === 'p1000_96'

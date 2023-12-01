@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -12,7 +13,6 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   Link,
-  SIZE_5,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -162,7 +162,7 @@ export function DeviceDetailsDeckConfiguration({
               {t('deck_configuration_is_not_available_when_robot_is_busy')}
             </Banner>
           ) : null}
-          <Flex gridGap={SPACING.spacing40}>
+          <Flex css={DECK_CONFIG_SECTION_STYLE}>
             <Flex
               // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
               marginLeft={`-${SPACING.spacing32}`}
@@ -190,14 +190,14 @@ export function DeviceDetailsDeckConfiguration({
                 <StyledText>{t('location')}</StyledText>
                 <StyledText>{t('fixture')}</StyledText>
               </Flex>
-              {fixtureDisplayList.map(fixture => {
-                return (
+              {fixtureDisplayList.length > 0 ? (
+                fixtureDisplayList.map(fixture => (
                   <Flex
                     key={fixture.cutoutId}
                     backgroundColor={COLORS.fundamentalsBackground}
                     gridGap={SPACING.spacing60}
                     padding={SPACING.spacing8}
-                    width={SIZE_5}
+                    width="100%"
                     css={TYPOGRAPHY.labelRegular}
                   >
                     <StyledText>
@@ -207,8 +207,18 @@ export function DeviceDetailsDeckConfiguration({
                       {getFixtureDisplayName(fixture.cutoutFixtureId)}
                     </StyledText>
                   </Flex>
-                )
-              })}
+                ))
+              ) : (
+                <Flex
+                  backgroundColor={COLORS.fundamentalsBackground}
+                  gridGap={SPACING.spacing60}
+                  padding={SPACING.spacing8}
+                  width="100%"
+                  css={TYPOGRAPHY.labelRegular}
+                >
+                  <StyledText>{t('no_deck_fixtures')}</StyledText>
+                </Flex>
+              )}
             </Flex>
           </Flex>
         </Flex>
@@ -216,3 +226,13 @@ export function DeviceDetailsDeckConfiguration({
     </>
   )
 }
+
+const DECK_CONFIG_SECTION_STYLE = css`
+  flex-direction: ${DIRECTION_ROW};
+  grid-gap: ${SPACING.spacing40};
+  @media screen and (max-width: 1024px) {
+    flex-direction: ${DIRECTION_COLUMN};
+    align-items: ${ALIGN_CENTER};
+    grid-gap: ${SPACING.spacing32};
+  }
+`

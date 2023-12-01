@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  AspirateInPlaceRunTimeCommand,
   BlowoutInPlaceRunTimeCommand,
   DispenseInPlaceRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
@@ -150,6 +151,26 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )[0]
     getByText('Blowing out in place at 300 µL/sec')
+  })
+  it('renders correct text for aspirateInPlace', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          {
+            commandType: 'aspirateInPlace',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              flowRate: 300,
+              volume: 10,
+            },
+          } as AspirateInPlaceRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Aspirating 10 µL in place at 300 µL/sec')
   })
   it('renders correct text for moveToWell', () => {
     const dispenseCommand = mockRobotSideAnalysis.commands.find(
@@ -301,7 +322,7 @@ describe('CommandText', () => {
         { i18nInstance: i18n }
       )[0]
       getByText(
-        'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
+        'Picking up tip(s) from A1 of Opentrons 96 Tip Rack 300 µL in Slot 9'
       )
     }
   })

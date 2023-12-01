@@ -1,93 +1,51 @@
 import { parseAllAddressableAreas } from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getAddressableAreaFromSlotId,
-  getDeckDefFromRobotTypeV4,
+  getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
 import type {
+  CutoutConfig,
   CutoutId,
   RunTimeCommand,
-  CutoutFixtureId,
   CutoutFixture,
   AddressableAreaName,
   DeckDefinition,
+  DeckConfiguration,
+  CutoutFixtureId,
 } from '@opentrons/shared-data'
+import type { CutoutConfigAndCompatibility } from './hooks'
 
-export interface CutoutConfigProtocolSpec {
-  cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId | null
+export interface CutoutConfigProtocolSpec extends CutoutConfig {
   requiredAddressableAreas: AddressableAreaName[]
 }
 
-export const FLEX_SIMPLEST_DECK_CONFIG: CutoutConfigProtocolSpec[] = [
-  {
-    cutoutId: 'cutoutA1',
-    cutoutFixtureId: 'singleLeftSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutB1',
-    cutoutFixtureId: 'singleLeftSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutC1',
-    cutoutFixtureId: 'singleLeftSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutD1',
-    cutoutFixtureId: 'singleLeftSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutA2',
-    cutoutFixtureId: 'singleCenterSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutB2',
-    cutoutFixtureId: 'singleCenterSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutC2',
-    cutoutFixtureId: 'singleCenterSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutD2',
-    cutoutFixtureId: 'singleCenterSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutA3',
-    cutoutFixtureId: 'singleRightSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutB3',
-    cutoutFixtureId: 'singleRightSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutC3',
-    cutoutFixtureId: 'singleRightSlot',
-    requiredAddressableAreas: [],
-  },
-  {
-    cutoutId: 'cutoutD3',
-    cutoutFixtureId: 'singleRightSlot',
-    requiredAddressableAreas: [],
-  },
+export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
+  { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutC1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutD1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutA2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutB2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutC2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutD2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutA3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutB3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutC3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutD3', cutoutFixtureId: 'singleRightSlot' },
 ]
+
+export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] = FLEX_SIMPLEST_DECK_CONFIG.map(
+  config => ({ ...config, requiredAddressableAreas: [] })
+)
 
 export function getSimplestDeckConfigForProtocolCommands(
   protocolAnalysisCommands: RunTimeCommand[]
 ): CutoutConfigProtocolSpec[] {
   // TODO(BC, 2023-11-06): abstract out the robot type
-  const deckDef = getDeckDefFromRobotTypeV4(FLEX_ROBOT_TYPE)
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   const addressableAreas = parseAllAddressableAreas(protocolAnalysisCommands)
   const simplestDeckConfig = addressableAreas.reduce<
@@ -155,7 +113,7 @@ export function getSimplestDeckConfigForProtocolCommands(
       }
     }
     return acc
-  }, FLEX_SIMPLEST_DECK_CONFIG)
+  }, FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC)
 
   return simplestDeckConfig
 }
@@ -225,4 +183,61 @@ export function getSimplestFixtureForAddressableAreas(
     cutoutFixturesForCutoutId
   )
   return nextCompatibleCutoutFixtures?.[0] ?? null
+}
+
+export function getRequiredDeckConfig<T extends CutoutConfigProtocolSpec>(
+  deckConfigProtocolSpec: T[]
+): T[] {
+  const nonSingleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
+    ({ requiredAddressableAreas }) =>
+      // required AA list includes a non-single-slot AA
+      !requiredAddressableAreas.every(aa =>
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+      )
+  )
+  // fixture includes at least 1 required AA
+  const requiredDeckConfigProtocolSpec = nonSingleSlotDeckConfigCompatibility.filter(
+    fixture => fixture.requiredAddressableAreas.length > 0
+  )
+
+  return requiredDeckConfigProtocolSpec
+}
+
+export function getUnmatchedSingleSlotFixtures(
+  deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
+): CutoutConfigAndCompatibility[] {
+  const singleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
+    ({ requiredAddressableAreas }) =>
+      // required AA list includes only single-slot AA
+      requiredAddressableAreas.every(aa =>
+        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
+      )
+  )
+  // fixture includes at least 1 required AA
+  const unmatchedSingleSlotDeckConfigCompatibility = singleSlotDeckConfigCompatibility.filter(
+    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+      !isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
+  )
+
+  return unmatchedSingleSlotDeckConfigCompatibility
+}
+
+export function getIsFixtureMismatch(
+  deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
+): boolean {
+  const isFixtureMismatch = !deckConfigProtocolSpec.every(
+    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+      isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
+  )
+  return isFixtureMismatch
+}
+
+function isMatchedFixture(
+  cutoutFixtureId: CutoutFixtureId | null,
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+): boolean {
+  return (
+    cutoutFixtureId == null ||
+    compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+  )
 }

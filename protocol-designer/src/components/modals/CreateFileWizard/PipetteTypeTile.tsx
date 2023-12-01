@@ -46,7 +46,7 @@ export function FirstPipetteTypeTile(
       mount={mount}
       allowNoPipette={false}
       display96Channel={allow96Channel}
-      tileHeader={i18n.t('modal.create_file_wizard.choose_first_pipette')}
+      tileHeader={i18n.t('modal.create_file_wizard.choose_left_pipette')}
     />
   )
 }
@@ -66,7 +66,7 @@ export function SecondPipetteTypeTile(
         mount={RIGHT}
         allowNoPipette
         display96Channel={false}
-        tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')}
+        tileHeader={i18n.t('modal.create_file_wizard.choose_right_pipette')}
       />
     )
   }

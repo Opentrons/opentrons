@@ -22,10 +22,13 @@ import {
   pickUpTipHelper,
   SOURCE_LABWARE,
   AIR_GAP_META,
+  moveToAddressableAreaHelper,
+  dropTipInPlaceHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type { AspDispAirgapParams, CreateCommand } from '@opentrons/shared-data'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
+
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',
@@ -70,6 +73,7 @@ let mixinArgs: Partial<ConsolidateArgs>
 
 beforeEach(() => {
   invariantContext = makeContext()
+
   initialRobotState = getInitialRobotStateStandard(invariantContext)
   robotStatePickedUpOneTip = getRobotStatePickedUpTipStandard(invariantContext)
 
@@ -98,6 +102,10 @@ beforeEach(() => {
     blowoutLocation: null,
     dropTipLocation: FIXED_TRASH_ID,
   }
+  invariantContext = {
+    ...invariantContext,
+    additionalEquipmentEntities: {},
+  }
 })
 
 describe('consolidate single-channel', () => {
@@ -117,6 +125,43 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A1', 50),
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
+    ])
+  })
+
+  it('Minimal single-channel: A1 A2 to B1, 50uL with p300, drop in waste chute', () => {
+    const data = {
+      ...mixinArgs,
+      sourceWells: ['A1', 'A2'],
+      volume: 50,
+      changeTip: 'once',
+      dropTipLocation: 'wasteChuteId',
+      dispenseAirGapVolume: 5,
+    } as ConsolidateArgs
+
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        wasteChuteId: {
+          name: 'wasteChute',
+          id: 'wasteChuteId',
+          location: 'cutoutD3',
+        },
+      },
+    }
+
+    const result = consolidate(data, invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+      aspirateHelper('A1', 50),
+      aspirateHelper('A2', 50),
+      dispenseHelper('B1', 100),
+      airGapHelper('B1', 5, { labwareId: 'destPlateId' }),
+      moveToAddressableAreaHelper({
+        addressableAreaName: '1and8ChannelWasteChute',
+      }),
+      dropTipInPlaceHelper(),
     ])
   })
 

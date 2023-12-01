@@ -8,8 +8,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
 } from '@opentrons/shared-data'
 
 import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
@@ -42,7 +42,7 @@ export const SetupModulesMap = ({
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
 
-  const robotType = getRobotTypeFromLoadedLabware(protocolAnalysis.labware)
+  const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 

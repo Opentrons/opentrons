@@ -373,8 +373,21 @@ class SlotDoesNotExistError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class CutoutDoesNotExistError(ProtocolEngineError):
+    """Raised when referencing a cutout that does not exist."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CutoutDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class FixtureDoesNotExistError(ProtocolEngineError):
-    """Raised when referencing an addressable area (aka fixture) that does not exist."""
+    """Raised when referencing a cutout fixture that does not exist."""
 
     def __init__(
         self,
@@ -383,6 +396,58 @@ class FixtureDoesNotExistError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FixtureDoesNotExist."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class AddressableAreaDoesNotExistError(ProtocolEngineError):
+    """Raised when referencing an addressable area that does not exist."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a AddressableAreaDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class FixtureDoesNotProvideAreasError(ProtocolEngineError):
+    """Raised when a cutout fixture does not provide any addressable areas for a requested cutout."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FixtureDoesNotProvideAreasError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class AreaNotInDeckConfigurationError(ProtocolEngineError):
+    """Raised when an addressable area is referenced that is not provided by a deck configuration."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a AreaNotInDeckConfigurationError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class IncompatibleAddressableAreaError(ProtocolEngineError):
+    """Raised when two non-compatible addressable areas are referenced during analysis."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a IncompatibleAddressableAreaError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -738,6 +803,32 @@ class LocationIsOccupiedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LocationIsOccupiedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LocationNotAccessibleByPipetteError(ProtocolEngineError):
+    """Raised when attempting to move pipette to an inaccessible location."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationNotAccessibleByPipetteError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LocationIsStagingSlotError(ProtocolEngineError):
+    """Raised when referencing a labware on a staging slot when trying to get standard deck slot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationIsStagingSlotError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

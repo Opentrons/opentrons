@@ -34,6 +34,7 @@ import {
 } from './heaterShakerUpdates'
 import { forMoveLabware } from './forMoveLabware'
 import {
+  forAspirateInPlace,
   forBlowOutInPlace,
   forDispenseInPlace,
   forDropTipInPlace,
@@ -97,6 +98,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
+    case 'aspirateInPlace':
+      forAspirateInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
     case 'dropTipInPlace':
       forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
       break
@@ -111,7 +120,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
         invariantContext,
         robotStateAndWarnings
       )
-
       break
 
     case 'touchTip':

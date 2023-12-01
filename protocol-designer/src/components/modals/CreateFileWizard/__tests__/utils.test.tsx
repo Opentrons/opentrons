@@ -80,12 +80,12 @@ describe('getTrashSlot', () => {
     const result = getTrashSlot(MOCK_FORM_STATE)
     expect(result).toBe(FLEX_TRASH_DEFAULT_SLOT)
   })
-  it('should return B3 when there is a staging area in slot A3', () => {
+  it('should return cutoutB3 when there is a staging area in slot A3', () => {
     MOCK_FORM_STATE = {
       ...MOCK_FORM_STATE,
       additionalEquipment: ['stagingArea_cutoutA3'],
     }
     const result = getTrashSlot(MOCK_FORM_STATE)
-    expect(result).toBe('B3')
+    expect(result).toBe('cutoutB3')
   })
 })

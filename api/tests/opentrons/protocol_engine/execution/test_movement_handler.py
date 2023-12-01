@@ -17,6 +17,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     CurrentWell,
     MotorAxis,
+    AddressableOffsetVector,
 )
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -111,7 +112,7 @@ async def test_move_to_well(
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
-            current_well=None,
+            current_location=None,
         )
     ).then_return(
         PipetteLocationData(
@@ -225,7 +226,7 @@ async def test_move_to_well_from_starting_location(
     decoy.when(
         state_store.motion.get_pipette_location(
             pipette_id="pipette-id",
-            current_well=current_well,
+            current_location=current_well,
         )
     ).then_return(
         PipetteLocationData(
@@ -293,6 +294,99 @@ async def test_move_to_well_from_starting_location(
             is_multi_channel=False,
             destination_is_tip_rack=False,
         ),
+    )
+
+
+async def test_move_to_addressable_area(
+    decoy: Decoy,
+    state_store: StateStore,
+    thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
+    mock_gantry_mover: GantryMover,
+    subject: MovementHandler,
+) -> None:
+    """Move requests should call hardware controller with movement data."""
+    decoy.when(
+        state_store.modules.get_heater_shaker_movement_restrictors()
+    ).then_return([])
+
+    decoy.when(
+        state_store.addressable_areas.get_addressable_area_base_slot("area-name")
+    ).then_return(DeckSlotName.SLOT_1)
+
+    decoy.when(state_store.tips.get_pipette_channels("pipette-id")).then_return(1)
+
+    decoy.when(
+        state_store.motion.get_pipette_location(
+            pipette_id="pipette-id",
+            current_location=None,
+        )
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.FRONT_NOZZLE,
+        )
+    )
+
+    decoy.when(
+        await mock_gantry_mover.get_position(
+            pipette_id="pipette-id",
+        )
+    ).then_return(Point(1, 1, 1))
+
+    decoy.when(mock_gantry_mover.get_max_travel_z(pipette_id="pipette-id")).then_return(
+        42.0
+    )
+
+    decoy.when(
+        state_store.pipettes.get_movement_speed(
+            pipette_id="pipette-id", requested_speed=45.6
+        )
+    ).then_return(39339.5)
+
+    decoy.when(
+        state_store.motion.get_movement_waypoints_to_addressable_area(
+            addressable_area_name="area-name",
+            offset=AddressableOffsetVector(x=9, y=8, z=7),
+            origin=Point(1, 1, 1),
+            origin_cp=CriticalPoint.FRONT_NOZZLE,
+            max_travel_z=42.0,
+            force_direct=True,
+            minimum_z_height=12.3,
+        )
+    ).then_return(
+        [Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER), Waypoint(Point(4, 5, 6))]
+    )
+
+    decoy.when(
+        await mock_gantry_mover.move_to(
+            pipette_id="pipette-id",
+            waypoints=[
+                Waypoint(Point(1, 2, 3), CriticalPoint.XY_CENTER),
+                Waypoint(Point(4, 5, 6)),
+            ],
+            speed=39339.5,
+        ),
+    ).then_return(Point(4, 5, 6))
+
+    result = await subject.move_to_addressable_area(
+        pipette_id="pipette-id",
+        addressable_area_name="area-name",
+        offset=AddressableOffsetVector(x=9, y=8, z=7),
+        force_direct=True,
+        minimum_z_height=12.3,
+        speed=45.6,
+    )
+
+    assert result == Point(x=4, y=5, z=6)
+
+    decoy.verify(
+        heater_shaker_movement_flagger.raise_if_movement_restricted(
+            hs_movement_restrictors=[],
+            destination_slot=1,
+            is_multi_channel=False,
+            destination_is_tip_rack=False,
+        )
     )
 
 

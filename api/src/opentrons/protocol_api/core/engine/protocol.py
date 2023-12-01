@@ -20,6 +20,7 @@ from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
+    AddressableAreaLocation,
     ModuleLocation,
     OnLabwareLocation,
     ModuleModel as EngineModuleModel,
@@ -41,7 +42,7 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType, OFF_DECK
+from ..._types import OffDeckType, OFF_DECK, StagingSlotName
 from ..._liquid import Liquid
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
@@ -143,7 +144,12 @@ class ProtocolCore(
         self,
         load_name: str,
         location: Union[
-            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
         ],
         label: Optional[str],
         namespace: Optional[str],
@@ -204,7 +210,13 @@ class ProtocolCore(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
@@ -230,11 +242,11 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_labware_id=load_result.labwareId,
-            # It's important that we don't fetch these IDs from Protocol Engine, and
-            # use our own bookkeeping instead. If we fetched these IDs from Protocol
-            # Engine, it would have leaked state from Labware Position Check in the
-            # same HTTP run.
-            #
+            # TODO (spp, 2023-11-27): We've been using IDs from _labware_cores_by_id
+            #  and _module_cores_by_id instead of getting the lists directly from engine
+            #  because of the chance of engine carrying labware IDs from LPC too.
+            #  But with https://github.com/Opentrons/opentrons/pull/13943,
+            #  & LPC in maintenance runs, we can now rely on engine state for these IDs too.
             # Wrapping .keys() in list() is just to make Decoy verification easier.
             existing_labware_ids=list(self._labware_cores_by_id.keys()),
             existing_module_ids=list(self._module_cores_by_id.keys()),
@@ -255,6 +267,7 @@ class ProtocolCore(
         labware_core: LabwareCore,
         new_location: Union[
             DeckSlotName,
+            StagingSlotName,
             LabwareCore,
             ModuleCore,
             NonConnectedModuleCore,
@@ -403,8 +416,8 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_module_id=result.moduleId,
-            # It's important that we don't fetch these IDs from Protocol Engine.
-            # See comment in self.load_labware().
+            # TODO: We can now fetch these IDs from engine too.
+            #  See comment in self.load_labware().
             #
             # Wrapping .keys() in list() is just to make Decoy verification easier.
             existing_labware_ids=list(self._labware_cores_by_id.keys()),
@@ -541,7 +554,7 @@ class ProtocolCore(
 
     def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
-        return self._engine_client.state.labware.get_slot_definition(slot)
+        return self._engine_client.state.addressable_areas.get_slot_definition(slot)
 
     def _ensure_module_location(
         self, slot: DeckSlotName, module_type: ModuleType
@@ -556,9 +569,7 @@ class ProtocolCore(
     ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
-            slot_name=slot_name,
-            allowed_labware_ids=set(self._labware_cores_by_id.keys()),
-            allowed_module_ids=set(self._module_cores_by_id.keys()),
+            slot_name=slot_name
         )
 
         if isinstance(loaded_item, LoadedLabware):
@@ -595,7 +606,9 @@ class ProtocolCore(
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
-        return self._engine_client.state.labware.get_slot_center_position(slot_name)
+        return self._engine_client.state.addressable_areas.get_addressable_area_center(
+            slot_name.id
+        )
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
@@ -650,7 +663,12 @@ class ProtocolCore(
     def _convert_labware_location(
         self,
         location: Union[
-            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
         ],
     ) -> LabwareLocation:
         if isinstance(location, LabwareCore):
@@ -660,7 +678,13 @@ class ProtocolCore(
 
     @staticmethod
     def _get_non_stacked_location(
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
+        ]
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)
@@ -668,3 +692,5 @@ class ProtocolCore(
             return OFF_DECK_LOCATION
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
+        elif isinstance(location, StagingSlotName):
+            return AddressableAreaLocation(addressableAreaName=location.id)

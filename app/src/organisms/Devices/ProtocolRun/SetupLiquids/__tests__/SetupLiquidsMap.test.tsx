@@ -12,7 +12,6 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -21,8 +20,8 @@ import {
   parseLiquidsInLoadOrder,
   simpleAnalysisFileFixture,
 } from '@opentrons/api-client'
-import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { useAttachedModules } from '../../../hooks'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
@@ -74,9 +73,6 @@ const mockLabwareRender = LabwareRender as jest.MockedFunction<
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
->
-const mockGetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<
-  typeof getRobotTypeFromLoadedLabware
 >
 const mockParseInitialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter as jest.MockedFunction<
   typeof parseInitialLoadedLabwareByAdapter
@@ -131,13 +127,17 @@ const render = (props: React.ComponentProps<typeof SetupLiquidsMap>) => {
     i18nInstance: i18n,
   })
 }
+const mockProtocolAnalysis = {
+  ...simpleAnalysisFileFixture,
+  robotType: OT2_ROBOT_TYPE,
+} as any
 
 describe('SetupLiquidsMap', () => {
   let props: React.ComponentProps<typeof SetupLiquidsMap>
   beforeEach(() => {
     props = {
       runId: RUN_ID,
-      protocolAnalysis: simpleAnalysisFileFixture as any,
+      protocolAnalysis: mockProtocolAnalysis,
     }
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
@@ -161,23 +161,20 @@ describe('SetupLiquidsMap', () => {
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
     when(mockGetAttachedProtocolModuleMatches).mockReturnValue([])
     when(mockGetLabwareRenderInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot2StandardDeckDef as any)
+      .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
       .mockReturnValue({})
     when(mockGetSimplestDeckConfigForProtocolCommands)
-      .calledWith(simpleAnalysisFileFixture.commands as RunTimeCommand[])
+      .calledWith(mockProtocolAnalysis.commands as RunTimeCommand[])
       // TODO(bh, 2023-11-13): mock the cutout config protocol spec
       .mockReturnValue([])
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(simpleAnalysisFileFixture.labware as any)
-      .mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockParseLiquidsInLoadOrder)
       .calledWith(
-        simpleAnalysisFileFixture.liquids as any,
-        simpleAnalysisFileFixture.commands as any
+        mockProtocolAnalysis.liquids as any,
+        mockProtocolAnalysis.commands as any
       )
       .mockReturnValue([])
     when(mockParseInitialLoadedLabwareByAdapter)
-      .calledWith(simpleAnalysisFileFixture.commands as any)
+      .calledWith(mockProtocolAnalysis.commands as any)
       .mockReturnValue({})
     when(mockLabwareInfoOverlay)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
@@ -208,21 +205,18 @@ describe('SetupLiquidsMap', () => {
   })
 
   it('should render base deck - robot type is OT-2', () => {
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(simpleAnalysisFileFixture.labware as any)
-      .mockReturnValue(OT2_ROBOT_TYPE)
     when(mockGetDeckDefFromRobotType)
       .calledWith(OT2_ROBOT_TYPE)
       .mockReturnValue(ot2StandardDeckDef as any)
     when(mockParseLabwareInfoByLiquidId)
-      .calledWith(simpleAnalysisFileFixture.commands as any)
+      .calledWith(mockProtocolAnalysis.commands as any)
       .mockReturnValue({})
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
     when(mockGetLabwareRenderInfo).mockReturnValue({})
     when(mockGetProtocolModulesInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot2StandardDeckDef as any)
+      .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
       .mockReturnValue(mockProtocolModuleInfo)
     when(mockGetAttachedProtocolModuleMatches)
       .calledWith(
@@ -271,12 +265,23 @@ describe('SetupLiquidsMap', () => {
   })
 
   it('should render base deck - robot type is Flex', () => {
+    const mockFlexAnalysis = {
+      ...mockProtocolAnalysis,
+      robotType: FLEX_ROBOT_TYPE,
+    }
+    props = {
+      ...props,
+      protocolAnalysis: {
+        ...mockProtocolAnalysis,
+        robotType: FLEX_ROBOT_TYPE,
+      },
+    }
     when(mockGetDeckDefFromRobotType)
       .calledWith(FLEX_ROBOT_TYPE)
       .mockReturnValue(ot3StandardDeckDef as any)
 
     when(mockGetLabwareRenderInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot3StandardDeckDef as any)
+      .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue({
         [MOCK_300_UL_TIPRACK_ID]: {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -289,14 +294,14 @@ describe('SetupLiquidsMap', () => {
       })
 
     when(mockParseLabwareInfoByLiquidId)
-      .calledWith(simpleAnalysisFileFixture.commands as any)
+      .calledWith(mockFlexAnalysis.commands as any)
       .mockReturnValue({})
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
 
     when(mockGetProtocolModulesInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot3StandardDeckDef as any)
+      .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue(mockProtocolModuleInfo)
     when(mockGetAttachedProtocolModuleMatches)
       .calledWith(

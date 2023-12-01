@@ -126,7 +126,7 @@ const TEMPERATURE_MODULE_INFO = {
   slotName: 'D1',
 }
 
-const mockFixture: CutoutConfig = {
+const mockCutoutConfig: CutoutConfig = {
   cutoutId: 'cutoutD1',
   cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
 }
@@ -134,7 +134,7 @@ const mockFixture: CutoutConfig = {
 describe('useModuleRenderInfoForProtocolById hook', () => {
   beforeEach(() => {
     when(mockUseDeckConfigurationQuery).mockReturnValue({
-      data: [mockFixture],
+      data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
     when(mockUseAttachedModules)
       .calledWith()
@@ -163,26 +163,19 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       .calledWith('1')
       .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
-    const { result } = renderHook(() =>
-      useModuleRenderInfoForProtocolById('otie', '1')
-    )
+    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
     expect(result.current).toStrictEqual({})
   })
   it('should return module render info', () => {
-    const { result } = renderHook(() =>
-      useModuleRenderInfoForProtocolById('otie', '1')
-    )
+    const { result } = renderHook(() => useModuleRenderInfoForProtocolById('1'))
     expect(result.current).toStrictEqual({
       magneticModuleId: {
-        // TODO(bh, 2023-11-09): update this test once conflict logic has been updated to use getSimplestDeckConfigForProtocolCommands or similar
-        // conflictedFixture: mockFixture,
-        conflictedFixture: undefined,
+        conflictedFixture: mockCutoutConfig,
         attachedModuleMatch: mockMagneticModuleGen2,
         ...MAGNETIC_MODULE_INFO,
       },
       temperatureModuleId: {
-        // conflictedFixture: mockFixture,
-        conflictedFixture: undefined,
+        conflictedFixture: mockCutoutConfig,
         attachedModuleMatch: mockTemperatureModuleGen2,
         ...TEMPERATURE_MODULE_INFO,
       },

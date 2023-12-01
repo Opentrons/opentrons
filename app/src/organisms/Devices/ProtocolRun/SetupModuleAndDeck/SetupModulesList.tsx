@@ -71,7 +71,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId } = props
   const { t } = useTranslation('protocol_setup')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const {

@@ -7,7 +7,6 @@ import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
-  LoadedLabware,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
@@ -202,10 +201,10 @@ export const getWellsDepth = (
 
 export const getSlotHasMatingSurfaceUnitVector = (
   deckDef: DeckDefinition,
-  slotNumber: string
+  addressableAreaName: string
 ): boolean => {
   const matingSurfaceUnitVector = deckDef.locations.addressableAreas.find(
-    orderedSlot => orderedSlot.id === slotNumber
+    aa => aa.id === addressableAreaName
   )?.matingSurfaceUnitVector
 
   return Boolean(matingSurfaceUnitVector)
@@ -337,26 +336,7 @@ export const getCalibrationAdapterLoadName = (
   }
 }
 
-export const getRobotTypeFromLoadedLabware = (
-  labware: LoadedLabware[]
-): RobotType => {
-  const isProtocolForOT3 = labware.some(
-    l => l.loadName === 'opentrons_1_trash_3200ml_fixed'
-  )
-  return isProtocolForOT3 ? 'OT-3 Standard' : 'OT-2 Standard'
-}
-
 export const getDeckDefFromRobotType = (
-  robotType: RobotType
-): DeckDefinition => {
-  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard'
-    ? standardFlexDeckDef
-    : standardOt2DeckDef
-}
-
-// TODO(bh, 2023-11-09): delete this function
-export const getDeckDefFromRobotTypeV4 = (
   robotType: RobotType
 ): DeckDefinition => {
   // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063

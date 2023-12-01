@@ -5,6 +5,7 @@ import { AlertModal, SpinnerModal } from '@opentrons/components'
 import { ErrorModal } from '../../../../../molecules/modals'
 import { ResultModal } from '../ResultModal'
 import { DISCONNECT, CONNECT, JOIN_OTHER } from '../constants'
+import { PENDING, FAILURE, SUCCESS } from '../../../../../redux/robot-api'
 
 import type { ShallowWrapper } from 'enzyme'
 import type { ResultModalProps } from '../ResultModal'
@@ -31,7 +32,7 @@ describe("SelectNetwork's ResultModal", () => {
             type,
             ssid,
             error: null,
-            isPending: true,
+            requestStatus: PENDING,
             onClose: handleClose,
           }}
         />
@@ -99,7 +100,7 @@ describe("SelectNetwork's ResultModal", () => {
             type,
             ssid,
             error: null,
-            isPending: false,
+            requestStatus: SUCCESS,
             onClose: handleClose,
           }}
         />
@@ -188,7 +189,7 @@ describe("SelectNetwork's ResultModal", () => {
             type,
             ssid,
             error,
-            isPending: false,
+            requestStatus: FAILURE,
             onClose: handleClose,
           }}
         />
@@ -248,6 +249,42 @@ describe("SelectNetwork's ResultModal", () => {
       )
       expect(alert.prop('close')).toEqual(handleClose)
       expect(alert.prop('error')).toEqual(error)
+    })
+
+    it('displays an ErrorModal with appropriate failure message if the status is failure and no error message is given', () => {
+      const render: (
+        type: ResultModalProps['type'],
+        ssid?: ResultModalProps['ssid']
+      ) => ShallowWrapper<React.ComponentProps<typeof ResultModal>> = (
+        type,
+        ssid = mockSsid
+      ) => {
+        return shallow(
+          <ResultModal
+            {...{
+              type,
+              ssid,
+              error: null,
+              requestStatus: FAILURE,
+              onClose: handleClose,
+            }}
+          />
+        )
+      }
+
+      const wrapper = render(JOIN_OTHER, null)
+      const alert = wrapper.find(ErrorModal)
+
+      expect(alert).toHaveLength(1)
+      expect(alert.prop('heading')).toEqual('Unable to connect to Wi-Fi')
+      expect(alert.prop('description')).toEqual(
+        expect.stringContaining('unable to connect to Wi-Fi')
+      )
+      expect(alert.prop('close')).toEqual(handleClose)
+      expect(alert.prop('error')).toEqual({
+        message:
+          'Likely incorrect network password. Please double-check your network credentials.',
+      })
     })
   })
 })
