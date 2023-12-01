@@ -204,7 +204,7 @@ jobs:
     name: 'publish shared-data package to npm'
     runs-on: 'ubuntu-latest'
     needs: ['js-test', 'publish-switch']
-    if: needs.determine-build-type.outputs.should_publish == 'true'
+    if: needs.publish-switch.outputs.should_publish == 'true'
     steps:
       - uses: 'actions/checkout@v3'
       # https://github.com/actions/checkout/issues/290
