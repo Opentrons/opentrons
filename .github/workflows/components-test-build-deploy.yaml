@@ -175,6 +175,7 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
+          registry-url: 'https://registry.npmjs.org'
       - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
@@ -194,7 +195,7 @@ jobs:
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          cd ./components && npm publish --provenace --access public
+          cd ./components && yarn publish --provenace --access public
           
 
       
