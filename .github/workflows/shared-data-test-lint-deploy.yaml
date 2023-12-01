@@ -240,7 +240,7 @@ jobs:
       - name: 'set version number'
         run: |
           npm install -g json
-          VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/shared-data@//')
+          VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
           json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
       - name: 'publish to npm registry'
         env: 
