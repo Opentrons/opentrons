@@ -10,6 +10,8 @@
   "license": "Apache-2.0",
   "source": "js/index.ts",
   "types": "lib/js/index.d.ts",
+  "main": "lib/opentrons-shared-data.js",
+  "module": "js/index.ts",
   "flow:main": "flow-types/js/index.js.flow",
   "dependencies": {
     "ajv": "^6.12.3",

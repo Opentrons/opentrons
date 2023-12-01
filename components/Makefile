@@ -9,6 +9,9 @@ tests ?=
 cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='components/src/**/*.(js|ts|tsx)'
 test_opts ?=
 
+# outputs
+main_out := lib/index.js lib/index.js.map
+
 # standard targets
 #####################################################################
 
@@ -25,6 +28,11 @@ clean:
 .PHONY: dist
 dist:
 	yarn --cwd .. build-storybook
+
+.PHONY: lib
+lib: export NODE_ENV := production
+lib:
+	yarn webpack
 
 # development
 #####################################################################

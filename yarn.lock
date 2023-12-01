@@ -2188,9 +2188,9 @@
     "@fontsource/public-sans" "5.0.3"
     "@hot-loader/react-dom" "17.0.1"
     "@opentrons/api-client" "link:api-client"
-    "@opentrons/components" "link:components"
+    "@opentrons/components" "0.0.0-alpha.14"
     "@opentrons/react-api-client" "link:react-api-client"
-    "@opentrons/shared-data" "link:shared-data"
+    "@opentrons/shared-data" "0.0.0-alpha.14"
     "@thi.ng/paths" "1.6.5"
     "@types/uuid" "^3.4.7"
     classnames "2.2.5"
@@ -2230,6 +2230,29 @@
     styled-components "5.3.6"
     typeface-open-sans "0.0.75"
     uuid "8.3.2"
+
+"@opentrons/components@0.0.0-alpha.14":
+  version "0.0.0-alpha.14"
+  resolved "https://registry.yarnpkg.com/@opentrons/components/-/components-0.0.0-alpha.14.tgz#d4929ec9173df8ca2e013175b8a6f8210bbd5fb3"
+  integrity sha512-8MVz71rVmChVj0gEyeiLmSDdOn7QSNwgeuMUs3Y65dIoJtKGGjaDJp+9DjYEXGgjQBQQvdl2nIuc8YM5twHotw==
+  dependencies:
+    "@opentrons/shared-data" "0.0.0-alpha.14"
+    "@popperjs/core" "2.1.1"
+    "@react-spring/types" "9.6.1"
+    "@react-spring/web" "9.6.1"
+    "@types/classnames" "2.2.5"
+    "@types/lodash" "^4.14.191"
+    "@types/react" "^17.0.1"
+    "@types/react-router-dom" "^5.1.7"
+    "@types/styled-components" "^5.1.26"
+    "@types/webpack-env" "^1.16.0"
+    classnames "2.2.5"
+    interactjs "^1.10.17"
+    lodash "4.17.21"
+    react-popper "1.0.0"
+    react-remove-scroll "2.4.3"
+    react-select "5.4.0"
+    styled-components "5.3.6"
 
 "@opentrons/components@link:components":
   version "0.0.0-dev"
@@ -2273,6 +2296,16 @@
     "@opentrons/api-client" "link:api-client"
     "@opentrons/shared-data" "link:shared-data"
     react-query "^3.34.8"
+
+"@opentrons/shared-data@0.0.0-alpha.14":
+  version "0.0.0-alpha.14"
+  resolved "https://registry.yarnpkg.com/@opentrons/shared-data/-/shared-data-0.0.0-alpha.14.tgz#cb10d0f51241cdb3c9aa77ec94848be4b61bcf9b"
+  integrity sha512-w+R8J5qqV+HoTcjoGsmNhn+v/7cxQQDLKdFon/GxD+X6uNVvslCumnYeuJZrAJlv+zV6lZgq6KViHhF5V3qOIA==
+  dependencies:
+    ajv "^6.12.3"
+    html-react-parser "^1.2.8"
+    lodash "4.17.21"
+    svgson "^5.2.1"
 
 "@opentrons/shared-data@link:shared-data":
   version "0.0.0-dev"

@@ -40,6 +40,13 @@ dist-js:
 clean-js:
 	yarn shx rm -rf $(BUILD_DIR)
 
+.PHONY: lib-js
+lib-js: export NODE_ENV := production
+lib-js:
+	yarn webpack
+
+
+
 # Python targets
 
 .PHONY: setup-py
