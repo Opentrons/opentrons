@@ -12,10 +12,6 @@
     "title": "Allow all tip rack options",
     "description": "Enable selection of all tip racks for each pipette."
   },
-  "OT_PD_ENABLE_FLEX_DECK_MODIFICATION": {
-    "title": "Enable Flex deck modification",
-    "description": "Allow users to select waste chute, Flex staging, and modify trash slot"
-  },
   "OT_PD_ENABLE_MULTI_TIP": {
     "title": "Enable multi tiprack support",
     "description": "Allow users to select multiple tipracks per pipette"

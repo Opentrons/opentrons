@@ -21,8 +21,6 @@ const initialFlags: Flags = {
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
   OT_PD_ALLOW_ALL_TIPRACKS:
     process.env.OT_PD_ALLOW_ALL_TIPRACKS === '1' || false,
-  OT_PD_ENABLE_FLEX_DECK_MODIFICATION:
-    process.env.OT_PD_ENABLE_FLEX_DECK_MODIFICATION === '1' || false,
   OT_PD_ENABLE_MULTI_TIP: process.env.OT_PD_ENABLE_MULTI_TIP === '1' || false,
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type

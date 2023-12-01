@@ -79,11 +79,8 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     featureFlagSelectors.getDisableModuleRestrictions
   )
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const enableDeckModification = useSelector(
-    featureFlagSelectors.getEnableDeckModification
-  )
   const hasATrash =
-    robotType === FLEX_ROBOT_TYPE && enableDeckModification
+    robotType === FLEX_ROBOT_TYPE
       ? values.additionalEquipment.includes('wasteChute') ||
         values.additionalEquipment.includes('trashBin')
       : true
@@ -151,10 +148,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
               onSetFieldTouched={setFieldTouched}
             />
           ) : (
-            <FlexModuleFields
-              {...props}
-              enableDeckModification={enableDeckModification}
-            />
+            <FlexModuleFields {...props} />
           )}
           {robotType === OT2_ROBOT_TYPE && moduleRestrictionsDisabled !== true
             ? modCrashWarning
@@ -168,23 +162,10 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         >
           <GoBack
             onClick={() => {
-              if (!enableDeckModification || robotType === OT2_ROBOT_TYPE) {
+              if (robotType === OT2_ROBOT_TYPE) {
                 if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
                   goBack(4)
-                } else if (
-                  values.pipettesByMount.right.pipetteName === '' &&
-                  robotType === FLEX_ROBOT_TYPE
-                ) {
-                  goBack(3)
-                } else if (
-                  values.pipettesByMount.right.pipetteName === '' &&
-                  robotType === OT2_ROBOT_TYPE
-                ) {
-                  goBack(2)
-                } else if (
-                  values.pipettesByMount.right.pipetteName !== '' &&
-                  robotType === FLEX_ROBOT_TYPE
-                ) {
+                } else if (values.pipettesByMount.right.pipetteName === '') {
                   goBack(2)
                 } else {
                   goBack()
@@ -211,11 +192,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     </HandleEnter>
   )
 }
-interface FlexModuleFieldsProps extends WizardTileProps {
-  enableDeckModification: boolean
-}
-function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
-  const { values, setFieldValue, enableDeckModification } = props
+
+function FlexModuleFields(props: WizardTileProps): JSX.Element {
+  const { values, setFieldValue } = props
 
   const isFlex = values.fields.robotType === FLEX_ROBOT_TYPE
   const trashBinDisabled = getTrashBinOptionDisabled(values)
@@ -284,7 +263,7 @@ function FlexModuleFields(props: FlexModuleFieldsProps): JSX.Element {
         text="Gripper"
         showCheckbox
       />
-      {enableDeckModification && isFlex ? (
+      {isFlex ? (
         <>
           <EquipmentOption
             onClick={() => handleSetEquipmentOption('wasteChute')}

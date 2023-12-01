@@ -19,10 +19,6 @@ export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
 )
-export const getEnableDeckModification: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_FLEX_DECK_MODIFICATION ?? false
-)
 export const getEnableMultiTip: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_MULTI_TIP ?? false

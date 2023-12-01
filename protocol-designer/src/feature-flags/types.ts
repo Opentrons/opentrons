@@ -21,13 +21,13 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS',
   'OT_PD_ENABLE_OT_3',
   'OT_PD_ALLOW_96_CHANNEL',
+  'OT_PD_ENABLE_FLEX_DECK_MODIFICATION',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
   | 'PRERELEASE_MODE'
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
   | 'OT_PD_ALLOW_ALL_TIPRACKS'
-  | 'OT_PD_ENABLE_FLEX_DECK_MODIFICATION'
   | 'OT_PD_ENABLE_MULTI_TIP'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
