@@ -4,7 +4,7 @@ const path = require('path')
 const webpackMerge = require('webpack-merge')
 const { baseConfig } = require('@opentrons/webpack-config')
 
-const ENTRY_INDEX = path.join(__dirname, 'src/index.ts')
+const ENTRY_INDEX = path.join(__dirname, 'js/index.ts')
 const OUTPUT_PATH = path.join(__dirname, 'lib')
 
 module.exports = async () =>

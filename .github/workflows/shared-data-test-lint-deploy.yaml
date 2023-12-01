@@ -236,6 +236,14 @@ jobs:
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js
+      - name: 'build library'
+        run: |
+          make -C shared-data lib-js
       # replace package.json stub version number with version from tag
       - name: 'set version number'
         run: |
