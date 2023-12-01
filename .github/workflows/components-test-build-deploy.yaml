@@ -189,7 +189,7 @@ jobs:
       - name: 'set version number'
         run: |
           npm install -g json
-          VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
+          VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
       - name: 'publish to npm registry'
