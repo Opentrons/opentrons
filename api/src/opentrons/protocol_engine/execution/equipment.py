@@ -92,6 +92,7 @@ class EquipmentHandler:
     _labware_data_provider: LabwareDataProvider
     _module_data_provider: ModuleDataProvider
     _model_utils: ModelUtils
+    _virtual_pipette_data_provider: pipette_data_provider.VirtualPipetteDataProvider
 
     def __init__(
         self,
@@ -100,7 +101,10 @@ class EquipmentHandler:
         action_dispatcher: ActionDispatcher,
         labware_data_provider: Optional[LabwareDataProvider] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
-        model_utils: Optional[ModelUtils] = None
+        model_utils: Optional[ModelUtils] = None,
+        virtual_pipette_data_provider: Optional[
+            pipette_data_provider.VirtualPipetteDataProvider
+        ] = None,
     ) -> None:
         """Initialize an EquipmentHandler instance."""
         self._hardware_api = hardware_api
@@ -109,6 +113,10 @@ class EquipmentHandler:
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._model_utils = model_utils or ModelUtils()
+        self._virtual_pipette_data_provider = (
+            virtual_pipette_data_provider
+            or pipette_data_provider.VirtualPipetteDataProvider()
+        )
 
     async def load_labware(
         self,
@@ -185,6 +193,7 @@ class EquipmentHandler:
         # TODO (spp, 2023-05-10): either raise error if using MountType.EXTENSION in
         #  load pipettes command, or change the mount type used to be a restricted
         #  PipetteMountType which has only pipette mounts and not the extension mount.
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
 
         pipette_name_value = (
             pipette_name.value
@@ -194,38 +203,46 @@ class EquipmentHandler:
 
         pipette_id = pipette_id or self._model_utils.generate_id()
 
-        cache_request = {mount.to_hw_mount(): pipette_name_value}
+        if not use_virtual_pipettes:
+            cache_request = {mount.to_hw_mount(): pipette_name_value}
 
-        # TODO(mc, 2022-12-09): putting the other pipette in the cache request
-        # is only to support protocol analysis, since the hardware simulator
-        # does not cache requested virtual instruments. Remove per
-        # https://opentrons.atlassian.net/browse/RLIQ-258
-        other_mount = mount.other_mount()
-        other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
-        if other_pipette is not None:
-            cache_request[other_mount.to_hw_mount()] = (
-                other_pipette.pipetteName.value
-                if isinstance(other_pipette.pipetteName, PipetteNameType)
-                else other_pipette.pipetteName
+            # TODO(mc, 2022-12-09): putting the other pipette in the cache request
+            # is only to support protocol analysis, since the hardware simulator
+            # does not cache requested virtual instruments. Remove per
+            # https://opentrons.atlassian.net/browse/RLIQ-258
+            other_mount = mount.other_mount()
+            other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
+            if other_pipette is not None:
+                cache_request[other_mount.to_hw_mount()] = (
+                    other_pipette.pipetteName.value
+                    if isinstance(other_pipette.pipetteName, PipetteNameType)
+                    else other_pipette.pipetteName
+                )
+
+            # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
+            # behavior of protocol_context.load_instrument, and is used here as a
+            # pipette existence check
+            try:
+                await self._hardware_api.cache_instruments(cache_request)
+            except RuntimeError as e:
+                raise FailedToLoadPipetteError(str(e)) from e
+
+            pipette_dict = self._hardware_api.get_attached_instrument(
+                mount.to_hw_mount()
             )
 
-        # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
-        # behavior of protocol_context.load_instrument, and is used here as a
-        # pipette existence check
-        try:
-            await self._hardware_api.cache_instruments(cache_request)
-        except RuntimeError as e:
-            raise FailedToLoadPipetteError(str(e)) from e
+            serial_number = pipette_dict["pipette_id"]
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_dict
+            )
 
-        pipette_dict = self._hardware_api.get_attached_instrument(
-            mount.to_hw_mount()
-        )
-
-        serial_number = pipette_dict["pipette_id"]
-        static_pipette_config = pipette_data_provider.get_pipette_static_config(
-            pipette_dict
-        )
-
+        else:
+            serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
+            static_pipette_config = (
+                self._virtual_pipette_data_provider.get_virtual_pipette_static_config(
+                    pipette_name_value, pipette_id
+                )
+            )
         serial = serial_number or ""
 
         return LoadedPipetteData(
@@ -338,16 +355,27 @@ class EquipmentHandler:
         """
         use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
 
-        mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
+        if not use_virtual_pipettes:
+            mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        await self._hardware_api.configure_for_volume(mount, volume)
-        pipette_dict = self._hardware_api.get_attached_instrument(mount)
+            await self._hardware_api.configure_for_volume(mount, volume)
+            pipette_dict = self._hardware_api.get_attached_instrument(mount)
 
-        serial_number = pipette_dict["pipette_id"]
-        static_pipette_config = pipette_data_provider.get_pipette_static_config(
-            pipette_dict
-        )
+            serial_number = pipette_dict["pipette_id"]
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_dict
+            )
 
+        else:
+            model = self._state_store.pipettes.get_model_name(pipette_id)
+            self._virtual_pipette_data_provider.configure_virtual_pipette_for_volume(
+                pipette_id, volume, model
+            )
+
+            serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
+            static_pipette_config = self._virtual_pipette_data_provider.get_virtual_pipette_static_config_by_model_string(
+                model, pipette_id
+            )
 
         return LoadedConfigureForVolumeData(
             pipette_id=pipette_id,
@@ -374,17 +402,34 @@ class EquipmentHandler:
         Returns:
             A NozzleMap object or None.
         """
+        use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
 
-        mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
+        if not use_virtual_pipettes:
+            mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
 
-        await self._hardware_api.update_nozzle_configuration_for_mount(
-            mount,
-            back_left_nozzle if back_left_nozzle else primary_nozzle,
-            front_right_nozzle if front_right_nozzle else primary_nozzle,
-            primary_nozzle if back_left_nozzle else None,
-        )
-        pipette_dict = self._hardware_api.get_attached_instrument(mount)
-        nozzle_map = pipette_dict["current_nozzle_map"]
+            await self._hardware_api.update_nozzle_configuration_for_mount(
+                mount,
+                back_left_nozzle if back_left_nozzle else primary_nozzle,
+                front_right_nozzle if front_right_nozzle else primary_nozzle,
+                primary_nozzle if back_left_nozzle else None,
+            )
+            pipette_dict = self._hardware_api.get_attached_instrument(mount)
+            nozzle_map = pipette_dict["current_nozzle_map"]
+
+        else:
+            model = self._state_store.pipettes.get_model_name(pipette_id)
+            self._virtual_pipette_data_provider.configure_virtual_pipette_nozzle_layout(
+                pipette_id,
+                model,
+                back_left_nozzle if back_left_nozzle else primary_nozzle,
+                front_right_nozzle if front_right_nozzle else primary_nozzle,
+                primary_nozzle if back_left_nozzle else None,
+            )
+            nozzle_map = (
+                self._virtual_pipette_data_provider.get_nozzle_layout_for_pipette(
+                    pipette_id
+                )
+            )
 
         return nozzle_map
 
@@ -418,6 +463,9 @@ class EquipmentHandler:
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:
         """Get the hardware API for a given module."""
+        use_virtual_modules = self._state_store.config.use_virtual_modules
+        if use_virtual_modules:
+            return None
 
         attached_modules = self._hardware_api.attached_modules
         serial_number = self._state_store.modules.get_serial_number(module_id)

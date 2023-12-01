@@ -206,10 +206,81 @@ class HardwareTipHandler(TipHandler):
         )
 
 
+class VirtualTipHandler(TipHandler):
+    """Pick up and drop tips, using a virtual pipette."""
+
+    def __init__(self, state_view: StateView) -> None:
+        self._state_view = state_view
+
+    async def pick_up_tip(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+    ) -> TipGeometry:
+        """Pick up a tip at the current location using a virtual pipette.
+
+        - Fetch nominal tip geometry
+        - Check that there's no tip currently attached
+        """
+        nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+        )
+
+        self._state_view.pipettes.validate_tip_state(
+            pipette_id=pipette_id,
+            expected_has_tip=False,
+        )
+
+        return nominal_tip_geometry
+
+    async def available_for_nozzle_layout(
+        self,
+        pipette_id: str,
+        style: str,
+        primary_nozzle: Optional[str] = None,
+        front_right_nozzle: Optional[str] = None,
+    ) -> Dict[str, str]:
+        """Returns configuration for nozzle layout to pass to configure_nozzle_layout."""
+        if self._state_view.pipettes.get_attached_tip(pipette_id):
+            raise CommandPreconditionViolated(
+                message=f"Cannot configure nozzle layout of {str(self)} while it has tips attached."
+            )
+        channels = self._state_view.pipettes.get_channels(pipette_id)
+        return await _available_for_nozzle_layout(
+            channels, style, primary_nozzle, front_right_nozzle
+        )
+
+    async def drop_tip(
+        self,
+        pipette_id: str,
+        home_after: Optional[bool],
+    ) -> None:
+        """Pick up a tip at the current location using a virtual pipette.
+
+        - Check that there's no tip currently attached
+        """
+        self._state_view.pipettes.validate_tip_state(
+            pipette_id=pipette_id,
+            expected_has_tip=True,
+        )
+
+    async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
+        """Add a tip using a virtual pipette.
+
+        This should not be called when using virtual pipettes.
+        """
+        assert False, "TipHandler.add_tip should not be used with virtual pipettes"
+
+
 def create_tip_handler(
     state_view: StateView, hardware_api: HardwareControlAPI
 ) -> TipHandler:
     """Create a tip handler."""
     return (
         HardwareTipHandler(state_view=state_view, hardware_api=hardware_api)
+        if state_view.config.use_virtual_pipettes is False
+        else VirtualTipHandler(state_view=state_view)
     )

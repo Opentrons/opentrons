@@ -473,9 +473,6 @@ class OT3Simulator:
             # constructor of this class)
 
             # OR Instrument detected and no expected instrument specified
-            if found_model.find("flex") > -1:
-                found_model = found_model.replace("flex", "3.5")
-
             converted_name = pipette_load_name.convert_pipette_model(found_model)
             return {
                 "config": load_pipette_data.load_definition(
