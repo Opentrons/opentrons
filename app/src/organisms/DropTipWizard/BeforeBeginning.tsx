@@ -18,6 +18,7 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
   POSITION_ABSOLUTE,
+  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
@@ -99,10 +100,18 @@ export const BeforeBeginning = (
   } else {
     return (
       <Flex css={TILE_CONTAINER_STYLE}>
-        <Title>{t('before_you_begin_do_you_want_to_blowout')}</Title>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+        <Title
+          css={css`
+            margin: 1rem 0;
+          `}
+        >
+          {t('before_you_begin_do_you_want_to_blowout')}
+        </Title>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_AROUND}
+        >
           <Flex
-            flex="1 0 auto"
             onClick={() => {
               setFlowType('liquid_and_tips')
             }}
@@ -112,15 +121,11 @@ export const BeforeBeginning = (
                 : UNSELECTED_OPTIONS_STYLE
             }
           >
-            <Flex
-              height="100%"
-              width="100%"
-              position={POSITION_ABSOLUTE}
-              flex="1"
-            />
+            <Flex height="100%" width="100%" position={POSITION_ABSOLUTE} />
             <video
               css={css`
-                max-width: 11rem;
+                max-width: 8.96rem;
+                padding: 1rem;
               `}
               autoPlay={true}
               loop={true}
@@ -132,7 +137,6 @@ export const BeforeBeginning = (
             <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
           </Flex>
           <Flex
-            flex="1 0 auto"
             onClick={() => setFlowType('only_tips')}
             css={
               flowType === 'only_tips'
@@ -142,7 +146,8 @@ export const BeforeBeginning = (
           >
             <video
               css={css`
-                max-width: 11rem;
+                max-width: 8.96rem;
+                padding: 1rem;
               `}
               autoPlay={true}
               loop={true}
@@ -154,7 +159,11 @@ export const BeforeBeginning = (
             <StyledText as="h3">{t('no_proceed_to_drop_tip')}</StyledText>
           </Flex>
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_FLEX_END}
+          marginTop="2rem"
+        >
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
           <PrimaryButton
             disabled={isCreateLoading || flowType == null}
@@ -202,11 +211,9 @@ const UNSELECTED_OPTIONS_STYLE = css`
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
 
   &:hover {
     border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

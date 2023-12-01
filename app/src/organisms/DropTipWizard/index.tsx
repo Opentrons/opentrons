@@ -561,7 +561,7 @@ export const DropTipWizardComponent = (
           {modalContent}
         </Flex>
       ) : (
-        <LegacyModalShell width="48rem" header={wizardHeader}>
+        <LegacyModalShell width="47rem" header={wizardHeader} overflow="hidden">
           {modalContent}
         </LegacyModalShell>
       )}
