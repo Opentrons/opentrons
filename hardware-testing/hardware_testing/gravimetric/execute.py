@@ -283,9 +283,9 @@ def _run_trial(
         m_tag = _tag(m_type)
         if trial.recorder.is_simulator and not trial.blank:
             if m_type == MeasurementType.ASPIRATE:
-                trial.recorder.add_simulation_mass(trial.volume * -0.001)
+                trial.recorder.add_simulation_mass(trial.channel_count * trial.volume * -0.001)
             elif m_type == MeasurementType.DISPENSE:
-                trial.recorder.add_simulation_mass(trial.volume * 0.001)
+                trial.recorder.add_simulation_mass(trial.channel_count * trial.volume * 0.001)
         m_data = record_measurement_data(
             trial.ctx,
             m_tag,
@@ -820,8 +820,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     if (
                         dispense_cv > acceptable_cv
                         or aspirate_cv > acceptable_cv
-                        or aspirate_d > acceptable_d
-                        or dispense_d > acceptable_d
+                        or abs(aspirate_d) > acceptable_d
+                        or abs(dispense_d) > acceptable_d
                     ):
                         raise RuntimeError(
                             f"Trial with volume {volume} on channel {channel} did not pass spec"
