@@ -158,7 +158,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
     def _get_addressable_areas_from_deck_configuration(
         deck_config: DeckConfigurationType, deck_definition: DeckDefinitionV4
     ) -> Dict[str, AddressableArea]:
-        """Load all provided addressable areas with a valid deck configuration."""
+        """Return all addressable areas provided by the given deck configuration."""
         # TODO uncomment once execute is hooked up with this properly
         # assert (
         #     len(deck_config) == 12
@@ -196,11 +196,10 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             addressable_area_name = location
 
         if addressable_area_name not in self._state.loaded_addressable_areas_by_name:
-            # TODO Uncomment this out once robot server side stuff is hooked up
-            # if not self._state.use_simulated_deck_config:
-            #     raise AreaNotInDeckConfigurationError(
-            #         f"{addressable_area_name} not provided by deck configuration."
-            #     )
+            # TODO Validate that during an actual run, the deck configuration provides the requested
+            # addressable area. If it does not, MoveToAddressableArea.execute() needs to raise;
+            # this store class cannot raise because Protocol Engine stores are not allowed to.
+
             cutout_id = self._validate_addressable_area_for_simulation(
                 addressable_area_name
             )
@@ -244,6 +243,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                     set(self.state.loaded_addressable_areas_by_name),
                     self._state.deck_definition,
                 )
+                # FIXME(mm, 2023-12-01): This needs to be raised from within
+                # MoveToAddressableAreaImplementation.execute(). Protocol Engine stores are not
+                # allowed to raise.
                 raise IncompatibleAddressableAreaError(
                     f"Cannot load {addressable_area_name}, not compatible with one or more of"
                     f" the following areas: {loaded_areas_on_cutout}"

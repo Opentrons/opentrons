@@ -29,8 +29,10 @@ from opentrons.protocol_engine.types import (
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
+def patch_mock_deck_configuration_provider(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out deck_configuration_provider.py functions."""
     for name, func in inspect.getmembers(
         deck_configuration_provider, inspect.isfunction
     ):

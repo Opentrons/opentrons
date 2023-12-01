@@ -587,7 +587,6 @@ def test_get_all_labware_highest_z_with_staging_area(
     staging_z = subject.get_labware_highest_z("staging-id")
     all_z = subject.get_all_labware_highest_z()
 
-    # Should exclude the off-deck plate.
     assert all_z == staging_z
 
 
