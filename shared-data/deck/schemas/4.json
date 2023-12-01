@@ -265,7 +265,8 @@
           "id",
           "mayMountTo",
           "displayName",
-          "providesAddressableAreas"
+          "providesAddressableAreas",
+          "height"
         ],
         "properties": {
           "id": {
@@ -292,6 +293,10 @@
                 "type": "string"
               }
             }
+          },
+          "height": {
+            "description": "The vertical distance (mm) from the cutout fixture's origin to its tallest physical feature that an instrument could collide with.",
+            "type": "number"
           }
         }
       }
