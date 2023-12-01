@@ -87,6 +87,7 @@ def get_api_context(
             extra_labware=extra_labware,
             hardware_simulator=ThreadManager(_thread_manager_build_hw_api),
             robot_type="Flex",
+            use_virtual_hardware=False,
         )
     else:
         return execute.get_protocol_api(
