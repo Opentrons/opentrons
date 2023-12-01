@@ -11,8 +11,8 @@ module.exports = async () =>
   webpackMerge(baseConfig, {
     entry: { index: ENTRY_INDEX },
     output: {
+      ...baseConfig.output,
       path: OUTPUT_PATH,
-      filename: 'opentrons-shared-data.js',
       library: '@opentrons/shared-data',
       libraryTarget: 'umd'
     },

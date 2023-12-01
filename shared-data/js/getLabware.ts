@@ -1,7 +1,4 @@
-import assert from 'assert'
 import mapValues from 'lodash/mapValues'
-// TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
-import definitions from '../build/labware.json'
 
 import {
   FIXED_TRASH_RENDER_HEIGHT,
@@ -14,11 +11,6 @@ import type {
   LabwareDefinition2,
   WellDefinition,
 } from './types'
-
-assert(
-  definitions && Object.keys(definitions).length > 0,
-  'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
-)
 
 // do not list in any "available labware" UI.
 // TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?

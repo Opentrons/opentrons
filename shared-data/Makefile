@@ -3,9 +3,6 @@
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-# TODO(mc, 2018-10-25): use dist to match other projects
-BUILD_DIR := build
-
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
@@ -27,18 +24,6 @@ dist: dist-js dist-py
 clean: clean-js clean-py
 
 # JavaScript targets
-
-.PHONY: setup-js
-setup-js: dist-js
-
-.PHONY: dist-js
-dist-js:
-	@yarn shx mkdir -p $(BUILD_DIR)
-	node js/scripts/build.js $(BUILD_DIR)
-
-.PHONY: clean-js
-clean-js:
-	yarn shx rm -rf $(BUILD_DIR)
 
 .PHONY: lib-js
 lib-js: export NODE_ENV := production
