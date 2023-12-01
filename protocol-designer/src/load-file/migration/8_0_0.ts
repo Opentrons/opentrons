@@ -120,8 +120,6 @@ export const migrateFile = (
   const newFilteredSavedStepForms = migrateSavedStepForms(
     filteredSavedStepForms
   )
-  console.log('savedStepForms', filteredSavedStepForms)
-  console.log('newFilteredSavedStepForms', newFilteredSavedStepForms)
 
   const flexDeckSpec: OT3RobotMixin = {
     robot: {

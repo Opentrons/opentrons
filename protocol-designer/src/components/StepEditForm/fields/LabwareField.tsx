@@ -10,7 +10,6 @@ import type { FieldProps } from '../types'
 export const LabwareField = (props: FieldProps): JSX.Element => {
   const disposalOptions = useSelector(getDisposalOptions)
   const options = useSelector(getLabwareOptions)
-
   const allOptions =
     props.name === 'dispense_labware'
       ? [...options, ...disposalOptions]

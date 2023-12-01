@@ -85,7 +85,7 @@ export const moveLiquidFormToArgs = (
     fields.aspirate_wellOrder_second
   )
 
-  const dispenseInTrash =
+  const isDispensingIntoDisposalLocation =
     'name' in destLabware &&
     (destLabware.name === 'wasteChute' || destLabware.name === 'trashBin')
 
@@ -97,7 +97,7 @@ export const moveLiquidFormToArgs = (
     dispWells = destWellsUnordered
   }
   let destWells =
-    !dispenseInTrash && def != null
+    !isDispensingIntoDisposalLocation && def != null
       ? getOrderedWells(
           dispWells,
           def,
@@ -108,7 +108,7 @@ export const moveLiquidFormToArgs = (
 
   // 1:many with single path: spread well array of length 1 to match other well array
   // distribute 1:many can not happen into the waste chute or trash bin
-  if (destWells != null && !dispenseInTrash) {
+  if (destWells != null && !isDispensingIntoDisposalLocation) {
     if (path === 'single' && sourceWells.length !== destWells.length) {
       if (sourceWells.length === 1) {
         sourceWells = Array(destWells.length).fill(sourceWells[0])
@@ -213,7 +213,7 @@ export const moveLiquidFormToArgs = (
     'blowout location for multiDispense cannot be destination well'
   )
 
-  if (!dispenseInTrash && dispWells.length === 0) {
+  if (!isDispensingIntoDisposalLocation && dispWells.length === 0) {
     console.error('expected to have destWells.length > 0 but got none')
   }
 

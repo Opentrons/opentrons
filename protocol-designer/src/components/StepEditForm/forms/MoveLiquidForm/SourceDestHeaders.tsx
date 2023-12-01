@@ -39,15 +39,9 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
   )
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
   const trashOrLabwareId = formData[addFieldNamePrefix('labware')]
-  const isTrash =
+  const isDisposalLocation =
     additionalEquipmentEntities[trashOrLabwareId]?.name === 'wasteChute' ||
     additionalEquipmentEntities[trashOrLabwareId]?.name === 'trashBin'
-
-  React.useEffect(() => {
-    if (isTrash) {
-      propsForFields.dispense_wells.updateValue(['A1'])
-    }
-  }, [isTrash])
 
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>
@@ -55,7 +49,7 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
         <FormGroup label={labwareLabel}>
           <LabwareField {...propsForFields[addFieldNamePrefix('labware')]} />
         </FormGroup>
-        {isTrash ? null : (
+        {isDisposalLocation ? null : (
           <WellSelectionField
             {...propsForFields[addFieldNamePrefix('wells')]}
             labwareId={trashOrLabwareId}
