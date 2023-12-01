@@ -164,8 +164,6 @@ jobs:
     runs-on: 'ubuntu-latest'
     needs: ['js-unit-test', 'determine-build-type']
     if: needs.determine-build-type.outputs.type == 'publish'
-    env: 
-      VERSION_STRING: echo github.ref | sed 's/refs\/tags\/components@//'
     steps:
       - uses: 'actions/checkout@v3'
       # https://github.com/actions/checkout/issues/290
@@ -189,6 +187,7 @@ jobs:
       - name: 'set version number'
         run: |
           npm install -g json
+          VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
       - run: cd ./components && npm publish --provenace --access public
         env: 
