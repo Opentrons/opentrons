@@ -26,6 +26,7 @@ def load(
 
 
 def user_facing_robot_type(robot_type: RobotType, include_article: bool = False) -> str:
+    """Appropriately formatted robot type string for use in user-facing messages."""
     if robot_type == "OT-2 Standard":
         return "an OT-2" if include_article else "OT-2"
     elif robot_type == "OT-3 Standard":
