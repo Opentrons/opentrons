@@ -62,6 +62,30 @@ def get_addressable_area_view(
     return AddressableAreaView(state=state)
 
 
+def test_get_all_cutout_fixtures_simulated_deck_config() -> None:
+    """It should return no cutout fixtures when the deck config is simulated."""
+    subject = get_addressable_area_view(
+        deck_configuration=None,
+        use_simulated_deck_config=True,
+    )
+    assert subject.get_all_cutout_fixtures() is None
+
+
+def test_get_all_cutout_fixtures_non_simulated_deck_config() -> None:
+    """It should return the cutout fixtures from the deck config, if it's not simulated."""
+    subject = get_addressable_area_view(
+        deck_configuration=[
+            ("cutout-id-1", "cutout-fixture-id-1"),
+            ("cutout-id-2", "cutout-fixture-id-2"),
+        ],
+        use_simulated_deck_config=False,
+    )
+    assert subject.get_all_cutout_fixtures() == [
+        "cutout-fixture-id-1",
+        "cutout-fixture-id-2",
+    ]
+
+
 def test_get_loaded_addressable_area() -> None:
     """It should get the loaded addressable area."""
     addressable_area = AddressableArea(
@@ -254,6 +278,43 @@ def test_get_addressable_area_center() -> None:
 
     result = subject.get_addressable_area_center("abc")
     assert result == Point(6, 12, 3)
+
+
+def test_get_fixture_height(decoy: Decoy) -> None:
+    """It should return the height of the requested fixture."""
+    subject = get_addressable_area_view()
+    decoy.when(
+        deck_configuration_provider.get_cutout_fixture(
+            "someShortCutoutFixture", subject.state.deck_definition
+        )
+    ).then_return(
+        {
+            "height": 10,
+            # These values don't matter:
+            "id": "id",
+            "mayMountTo": [],
+            "displayName": "",
+            "providesAddressableAreas": {},
+        }
+    )
+
+    decoy.when(
+        deck_configuration_provider.get_cutout_fixture(
+            "someTallCutoutFixture", subject.state.deck_definition
+        )
+    ).then_return(
+        {
+            "height": 9000.1,
+            # These values don't matter:
+            "id": "id",
+            "mayMountTo": [],
+            "displayName": "",
+            "providesAddressableAreas": {},
+        }
+    )
+
+    assert subject.get_fixture_height("someShortCutoutFixture") == 10
+    assert subject.get_fixture_height("someTallCutoutFixture") == 9000.1
 
 
 def test_get_slot_definition() -> None:

@@ -613,24 +613,22 @@ def test_get_all_obstacle_highest_z_with_modules(
     assert result == 1337.0
 
 
-def test_get_all_obstacle_highest_z_with_addressable_area(
+def test_get_all_obstacle_highest_z_with_fixtures(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the highest Z including addressable areas."""
+    """It should get the highest Z including fixtures."""
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(module_view.get_all()).then_return([])
 
-    decoy.when(addressable_area_view.get_all()).then_return(["abc", "xyz"])
-    decoy.when(addressable_area_view.get_addressable_area_height("abc")).then_return(
-        42.0
+    decoy.when(addressable_area_view.get_all_cutout_fixtures()).then_return(
+        ["abc", "xyz"]
     )
-    decoy.when(addressable_area_view.get_addressable_area_height("xyz")).then_return(
-        1337.0
-    )
+    decoy.when(addressable_area_view.get_fixture_height("abc")).then_return(42.0)
+    decoy.when(addressable_area_view.get_fixture_height("xyz")).then_return(1337.0)
 
     result = subject.get_all_obstacle_highest_z()
 

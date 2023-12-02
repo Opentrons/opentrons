@@ -310,6 +310,21 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         """Get a list of all loaded addressable area names."""
         return list(self._state.loaded_addressable_areas_by_name)
 
+    def get_all_cutout_fixtures(self) -> Optional[List[str]]:
+        """Get the names of all fixtures present in the host robot's deck configuration.
+
+        If `use_simulated_deck_config` is `True` (see `Config`), we don't have a
+        meaningful concrete layout of fixtures, so this will return `None`.
+        """
+        if self._state.use_simulated_deck_config:
+            return None
+        else:
+            assert self._state.deck_configuration is not None
+            return [
+                cutout_fixture_id
+                for _, cutout_fixture_id in self._state.deck_configuration
+            ]
+
     def _get_loaded_addressable_area(
         self, addressable_area_name: str
     ) -> AddressableArea:
@@ -405,10 +420,12 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             z=position.z,
         )
 
-    def get_addressable_area_height(self, addressable_area_name: str) -> float:
-        """Get the z height of an addressable area."""
-        addressable_area = self.get_addressable_area(addressable_area_name)
-        return addressable_area.bounding_box.z
+    def get_fixture_height(self, cutout_fixture_name: str) -> float:
+        """Get the z height of a cutout fixture."""
+        cutout_fixture = deck_configuration_provider.get_cutout_fixture(
+            cutout_fixture_name, self._state.deck_definition
+        )
+        return cutout_fixture["height"]
 
     def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
         """Get the definition of a slot in the deck."""
