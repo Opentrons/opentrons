@@ -160,7 +160,7 @@ class MotionView:
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
         destination_cp = CriticalPoint.XY_CENTER
 
-        all_labware_highest_z = self._geometry.get_all_labware_highest_z()
+        all_labware_highest_z = self._geometry.get_all_obstacle_highest_z()
         if minimum_z_height is None:
             minimum_z_height = float("-inf")
         min_travel_z = max(all_labware_highest_z, minimum_z_height)
@@ -215,7 +215,7 @@ class MotionView:
                 Ignored if `direct` is True. If lower than the default height,
                 the default is used; this can only increase the height, not decrease it.
         """
-        all_labware_highest_z = self._geometry.get_all_labware_highest_z()
+        all_labware_highest_z = self._geometry.get_all_obstacle_highest_z()
         if additional_min_travel_z is None:
             additional_min_travel_z = float("-inf")
         min_travel_z = max(all_labware_highest_z, additional_min_travel_z)
