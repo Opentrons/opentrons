@@ -80,6 +80,23 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
+      - name: 'install udev for usb-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          yarn config set network-timeout 60000
+          yarn
       - name: 'build components'
         run: make -C components
       - name: 'upload github artifact'
@@ -124,6 +141,23 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
+      - name: 'install udev for usb-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          yarn config set network-timeout 60000
+          yarn
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -161,6 +195,23 @@ jobs:
         with:
           node-version: '16'
           registry-url: 'https://registry.npmjs.org'
+      - name: 'install udev for usb-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'setup-js'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          yarn config set network-timeout 60000
+          yarn
       - name: 'build library'
         run: |
           make -C components lib
