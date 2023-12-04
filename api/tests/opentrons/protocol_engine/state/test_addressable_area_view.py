@@ -11,7 +11,7 @@ from opentrons.types import Point, DeckSlotName
 from opentrons.protocol_engine.errors import (
     AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
-    # SlotDoesNotExistError,
+    SlotDoesNotExistError,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.protocol_engine.state.addressable_areas import (
@@ -29,7 +29,9 @@ from opentrons.protocol_engine.types import (
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+def patch_mock_deck_configuration_provider(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Mock out move_types.py functions."""
     for name, func in inspect.getmembers(
         deck_configuration_provider, inspect.isfunction
@@ -311,10 +313,15 @@ def test_get_slot_definition() -> None:
     }
 
 
-# TODO Uncomment once Robot Server deck config and tests is hooked up
-# def test_get_slot_definition_raises_with_bad_slot_name() -> None:
-#     """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-#     subject = get_addressable_area_view()
-#
-#     with pytest.raises(SlotDoesNotExistError):
-#         subject.get_slot_definition(DeckSlotName.SLOT_A1)
+def test_get_slot_definition_raises_with_bad_slot_name(decoy: Decoy) -> None:
+    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
+    subject = get_addressable_area_view()
+
+    decoy.when(
+        deck_configuration_provider.get_potential_cutout_fixtures(
+            "foo", subject.state.deck_definition
+        )
+    ).then_raise(AssertionError())
+
+    with pytest.raises(SlotDoesNotExistError):
+        subject.get_slot_definition("foo")

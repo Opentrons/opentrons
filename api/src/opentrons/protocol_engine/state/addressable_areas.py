@@ -1,6 +1,7 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
 from typing import Dict, Set, Union, List
+from functools import lru_cache
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
@@ -407,11 +408,12 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         addressable_area = self.get_addressable_area(addressable_area_name)
         return addressable_area.bounding_box.z
 
+    @lru_cache(maxsize=16)
     def get_slot_definition(self, slot_id: str) -> SlotDefV3:
         """Get the definition of a slot in the deck."""
         try:
             addressable_area = self._get_addressable_area_from_deck_data(slot_id)
-        except (AreaNotInDeckConfigurationError, IncompatibleAddressableAreaError):
+        except AssertionError:
             raise SlotDoesNotExistError(
                 f"Slot ID {slot_id} does not exist in deck {self._state.deck_definition['otId']}"
             )
