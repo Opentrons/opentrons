@@ -1,6 +1,6 @@
 """Test for Calibration Set Up Position Implementation."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Mapping
+from typing import Any, Mapping
 
 import pytest
 from decoy import Decoy
@@ -47,7 +47,7 @@ async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     maintenance_position: MaintenancePosition,
     verify_axes: Mapping[Axis, float],
 ) -> None:
@@ -112,7 +112,7 @@ async def test_calibration_move_to_location_implementation_for_gripper(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(

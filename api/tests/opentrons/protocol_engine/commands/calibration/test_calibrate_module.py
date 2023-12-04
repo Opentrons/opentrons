@@ -1,11 +1,10 @@
 """Test calibrate-module command."""
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Any
 
 import inspect
 import pytest
 from decoy import Decoy
-from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
@@ -35,7 +34,7 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 @pytest.mark.ot3_only
 async def test_calibrate_module_implementation(
-    decoy: Decoy, hardware_api: HardwareControlAPI, state_view: StateView
+    decoy: Decoy, hardware_api: Any, state_view: StateView
 ) -> None:
     """Test Calibration command execution."""
     subject = CalibrateModuleImplementation(state_view, hardware_api)
@@ -94,7 +93,7 @@ async def test_calibrate_module_implementation(
 
 @pytest.mark.ot2_only
 async def test_calibrate_module_implementation_wrong_hardware(
-    decoy: Decoy, hardware_api: HardwareControlAPI, state_view: StateView
+    decoy: Decoy, hardware_api: Any, state_view: StateView
 ) -> None:
     """Should raise an unsupported hardware error."""
     subject = CalibrateModuleImplementation(

@@ -6,10 +6,9 @@ import inspect
 import pytest
 from datetime import datetime
 from decoy import Decoy
-from typing import TYPE_CHECKING
+from typing import Any
 
 from opentrons.hardware_control import ot3_calibration
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import GripperProbe, OT3Mount
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
@@ -49,7 +48,7 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 )
 async def test_calibrate_gripper(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     _mock_ot3_calibration: None,
     params_probe: CalibrateGripperParamsJaw,
     expected_hc_probe: GripperProbe,
@@ -71,7 +70,7 @@ async def test_calibrate_gripper(
 @pytest.mark.ot3_only
 async def test_calibrate_gripper_saves_calibration(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     _mock_ot3_calibration: None,
 ) -> None:
     """It should delegate to hardware API to calibrate the gripper & save calibration."""
@@ -103,7 +102,7 @@ async def test_calibrate_gripper_saves_calibration(
 
 @pytest.mark.ot3_only
 async def test_calibrate_gripper_does_not_save_during_error(
-    decoy: Decoy, hardware_api: HardwareControlAPI
+    decoy: Decoy, hardware_api: Any
 ) -> None:
     """Data should not be saved when an error is raised."""
     subject = CalibrateGripperImplementation(hardware_api=hardware_api)
@@ -133,7 +132,7 @@ async def test_calibrate_gripper_does_not_save_during_error(
 @pytest.mark.ot2_only
 async def test_calibrate_gripper_raises_on_ot2(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
 ) -> None:
     """It should raise with a descriptive error if run on an OT-2, instead of OT-3."""
     subject = CalibrateGripperImplementation(hardware_api=hardware_api)

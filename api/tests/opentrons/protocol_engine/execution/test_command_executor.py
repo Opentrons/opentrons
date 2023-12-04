@@ -7,7 +7,7 @@ import pytest
 from decoy import Decoy, matchers
 from pydantic import BaseModel
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.errors.exceptions import (

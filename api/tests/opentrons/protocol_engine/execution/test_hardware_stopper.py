@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 from decoy import Decoy
-from typing import TYPE_CHECKING
+from typing import Any
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount
@@ -197,7 +197,7 @@ async def test_hardware_stopping_sequence_no_pipette(
 async def test_hardware_stopping_sequence_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     movement: MovementHandler,
     mock_tip_handler: TipHandler,
 ) -> None:

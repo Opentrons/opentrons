@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 from decoy import Decoy, matchers
-from typing import TYPE_CHECKING, Union, Optional
+from typing import Any, Union, Optional
 
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.hardware_control import HardwareControlAPI
@@ -93,7 +93,7 @@ def default_experimental_movement_data() -> LabwareMovementOffsetData:
 @pytest.mark.ot3_only
 @pytest.fixture
 def subject(
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     state_store: StateStore,
     equipment: EquipmentHandler,
     movement: MovementHandler,
@@ -146,7 +146,7 @@ async def test_move_labware_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     subject: LabwareMovementHandler,
     from_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
@@ -335,7 +335,7 @@ async def test_labware_movement_raises_on_ot2(
 async def test_labware_movement_skips_for_virtual_gripper(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     subject: LabwareMovementHandler,
 ) -> None:
     """It should neither raise error nor move gripper when using virtual gripper."""
@@ -360,7 +360,7 @@ async def test_labware_movement_skips_for_virtual_gripper(
 async def test_labware_movement_raises_without_gripper(
     decoy: Decoy,
     state_store: StateStore,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     subject: LabwareMovementHandler,
 ) -> None:
     """It should raise an error when attempting a gripper movement without a gripper."""

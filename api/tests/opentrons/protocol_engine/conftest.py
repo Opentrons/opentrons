@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from typing import TYPE_CHECKING, Generator, cast
+from typing import Generator
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
@@ -26,6 +26,7 @@ from opentrons.hardware_control.ot3api import OT3API
 def _ot2_hardware_api(decoy: Decoy) -> API:
     return decoy.mock(cls=API)
 
+
 def _ot3_hardware_api(decoy: Decoy) -> OT3API:
     return decoy.mock(cls=OT3API)
 
@@ -34,8 +35,9 @@ def _ot3_hardware_api(decoy: Decoy) -> OT3API:
 def hardware_api(
     request: pytest.FixtureRequest, decoy: Decoy
 ) -> Generator[HardwareControlAPI, None, None]:
+    """Yield a OT2 Hardware Controller API or a OT3 Hardware Controller API."""
     machine = request.param  # type: ignore[attr-defined]
-   
+
     if request.node.get_closest_marker("ot2_only") and machine == "ot3":
         pytest.skip("test requests only ot-2")
     if request.node.get_closest_marker("ot3_only") and machine == "ot2":

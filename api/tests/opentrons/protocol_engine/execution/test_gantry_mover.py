@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 from decoy import Decoy
-from typing import TYPE_CHECKING
+from typing import Any
 
 from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import HardwareControlAPI
@@ -330,7 +330,7 @@ async def test_ot2_home_fails_with_ot3_axes(
 @pytest.mark.ot3_only
 async def test_home_on_ot3(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     mock_state_view: StateView,
 ) -> None:
     """Test homing all OT3 axes."""
@@ -394,7 +394,7 @@ async def test_retract_axis_with_invalid_axis_for_ot2(
 @pytest.mark.ot3_only
 async def test_retract_axis_on_ot3(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    hardware_api: Any,
     mock_state_view: StateView,
 ) -> None:
     """It should call OT3 hardware API's retract axis with specified axis."""
