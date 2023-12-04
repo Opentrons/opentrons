@@ -102,7 +102,7 @@ class InstrumentContext(publisher.CommandPublisher):
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
-        self._user_specified_trash = trash
+        self._user_specified_trash = None
         self.requested_as = requested_as
 
     @property  # type: ignore
