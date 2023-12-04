@@ -10,6 +10,7 @@ import {
   ALL,
   COLUMN,
   CreateCommand,
+  OT2_ROBOT_TYPE,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import { Channels } from '@opentrons/components'
@@ -21,15 +22,6 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-<<<<<<< HEAD
-import {
-  AddressableAreaName,
-  CreateCommand,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-=======
->>>>>>> d32452f15c (begin to use correct command params)
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */

@@ -71,6 +71,9 @@ export const getInitialRobotState: (
       onlyPipettingFormSteps.length > 1
         ? onlyPipettingFormSteps[onlyPipettingFormSteps.length - 2]
         : null
+    //  NOTE: previous pipetting step nozzles is necessary
+    //  in order to know when to emit the configureNozzleLayout
+    //  command
     const prevPipettingStepNozzles =
       prevPipetteFormStep != null ? prevPipetteFormStep[1]?.nozzles : undefined
     const labware: Record<string, LabwareTemporalProperties> = mapValues(

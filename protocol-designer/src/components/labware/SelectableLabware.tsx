@@ -36,6 +36,14 @@ export interface Props {
   wellContents: ContentsByWell
 }
 
+const getChannelsFromNozleType = (nozzleType: NozzleType): 8 | 96 => {
+  if (nozzleType === '8-channel' || nozzleType === COLUMN) {
+    return 8
+  } else {
+    return 96
+  }
+}
+
 export class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
     const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
@@ -49,15 +57,7 @@ export class SelectableLabware extends React.Component<Props> {
 
     // Returns PRIMARY WELLS from the selection.
     if (this.props.nozzleType != null) {
-      let channels: 8 | 96
-      if (
-        this.props.nozzleType === '8-channel' ||
-        this.props.nozzleType === COLUMN
-      ) {
-        channels = 8
-      } else {
-        channels = 96
-      }
+      const channels = getChannelsFromNozleType(this.props.nozzleType)
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
       const primaryWells: WellGroup = reduce(
@@ -87,15 +87,7 @@ export class SelectableLabware extends React.Component<Props> {
     const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
       if (this.props.nozzleType != null) {
-        let channels: 8 | 96
-        if (
-          this.props.nozzleType === '8-channel' ||
-          this.props.nozzleType === COLUMN
-        ) {
-          channels = 8
-        } else {
-          channels = 96
-        }
+        const channels = getChannelsFromNozleType(this.props.nozzleType)
         const selectedWells = this._getWellsFromRect(rect)
         const allWellsForMulti: WellGroup = reduce(
           selectedWells,
@@ -131,15 +123,7 @@ export class SelectableLabware extends React.Component<Props> {
 
   handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
     if (this.props.nozzleType != null) {
-      let channels: 8 | 96
-      if (
-        this.props.nozzleType === '8-channel' ||
-        this.props.nozzleType === COLUMN
-      ) {
-        channels = 8
-      } else {
-        channels = 96
-      }
+      const channels = getChannelsFromNozleType(this.props.nozzleType)
       const labwareDef = this.props.labwareProps.definition
       const wellSet = getWellSetForMultichannel(
         labwareDef,
@@ -166,18 +150,13 @@ export class SelectableLabware extends React.Component<Props> {
       nozzleType,
       selectedPrimaryWells,
     } = this.props
-    let channels: 8 | 96
-    if (nozzleType === '8-channel' || nozzleType === COLUMN) {
-      channels = 8
-    } else {
-      channels = 96
-    }
     // For rendering, show all wells not just primary wells
     const allSelectedWells =
       nozzleType != null
         ? reduce<WellGroup, WellGroup>(
             selectedPrimaryWells,
             (acc, _, wellName): WellGroup => {
+              const channels = getChannelsFromNozleType(nozzleType)
               const wellSet = getWellSetForMultichannel(
                 this.props.labwareProps.definition,
                 wellName,

@@ -31,8 +31,10 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const selectedWells = ownProps.value
   const pipette =
     pipetteId && stepFormSelectors.getPipetteEntities(state)[pipetteId]
+  const is8Channel = pipette ? pipette.spec.channels === 8 : false
+
   let nozzleType: NozzleType | null = null
-  if (pipette !== null && pipette !== '' && pipette?.spec.channels === 8) {
+  if (pipette !== null && is8Channel) {
     nozzleType = '8-channel'
   } else if (nozzles === COLUMN) {
     nozzleType = COLUMN
