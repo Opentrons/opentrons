@@ -1,5 +1,6 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
+  | AspirateInPlaceRunTimeCommand
   | AspirateRunTimeCommand
   | AspirateInPlaceRunTimeCommand
   | BlowoutInPlaceRunTimeCommand

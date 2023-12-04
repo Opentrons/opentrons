@@ -43,6 +43,7 @@ import {
   InvariantContext,
   LabwareEntities,
   AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import { getStagingAreaAddressableAreas } from '../../utils'
 import type { StepFieldName } from '../../form-types'
@@ -54,11 +55,38 @@ import type {
 
 export type { StepFieldName }
 
-const getLabwareEntity = (
+interface LabwareEntityWithTouchTip extends LabwareEntity {
+  isTouchTipAllowed: boolean
+}
+
+interface AdditionalEquipmentEntityWithTouchTip
+  extends AdditionalEquipmentEntity {
+  isTouchTipAllowed: boolean
+}
+
+type LabwareOrAdditionalEquipmentEntity =
+  | LabwareEntityWithTouchTip
+  | AdditionalEquipmentEntityWithTouchTip
+
+const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
   id: string
-): LabwareEntity | null => {
-  return state.labwareEntities[id] || null
+): LabwareOrAdditionalEquipmentEntity | null => {
+  if (state.labwareEntities[id] != null) {
+    const labwareDisallowsTouchTip =
+      state.labwareEntities[id]?.def.parameters.quirks?.includes(
+        'touchTipDisabled'
+      ) ?? false
+    return {
+      ...state.labwareEntities[id],
+      isTouchTipAllowed: !labwareDisallowsTouchTip,
+    }
+  } else if (state.additionalEquipmentEntities[id] != null) {
+    return {
+      ...state.additionalEquipmentEntities[id],
+      isTouchTipAllowed: false,
+    }
+  } else return null
 }
 
 const getIsAdapterLocation = (
@@ -155,7 +183,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   aspirate_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -186,7 +214,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   dispense_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -217,7 +245,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),

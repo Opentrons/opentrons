@@ -1,7 +1,7 @@
 """Geometry state getters."""
 import enum
 from numpy import array, dot
-from typing import Optional, List, Set, Tuple, Union, cast
+from typing import Optional, List, Tuple, Union, cast, TypeVar
 
 from opentrons.types import Point, DeckSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -26,6 +26,7 @@ from ..types import (
     ModuleOffsetData,
     DeckType,
     CurrentWell,
+    CurrentPipetteLocation,
     TipGeometry,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
@@ -56,6 +57,9 @@ class _GripperMoveType(enum.Enum):
 
     PICK_UP_LABWARE = enum.auto()
     DROP_LABWARE = enum.auto()
+
+
+_LabwareLocation = TypeVar("_LabwareLocation", bound=LabwareLocation)
 
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
@@ -119,12 +123,12 @@ class GeometryView:
         self,
         pipette_id: str,
         labware_id: str,
-        location: Optional[CurrentWell],
+        location: Optional[CurrentPipetteLocation],
         minimum_z_height: Optional[float],
     ) -> float:
         """Get the minimum allowed travel height of an arc move."""
         if (
-            location is not None
+            isinstance(location, CurrentWell)
             and pipette_id == location.pipette_id
             and labware_id == location.labware_id
         ):
@@ -486,15 +490,26 @@ class GeometryView:
         return slot_name
 
     def ensure_location_not_occupied(
-        self, location: LabwareLocation
-    ) -> LabwareLocation:
-        """Ensure that the location does not already have equipment in it."""
-        if isinstance(location, AddressableAreaLocation):
+        self, location: _LabwareLocation
+    ) -> _LabwareLocation:
+        """Ensure that the location does not already have either Labware or a Module in it."""
+        # TODO (spp, 2023-11-27): Slot locations can also be addressable areas
+        #  so we will need to cross-check against items loaded in both location types.
+        #  Something like 'check if an item is in lists of both- labware on addressable areas
+        #  as well as labware on slots'. Same for modules.
+        if isinstance(
+            location,
+            (
+                DeckSlotLocation,
+                ModuleLocation,
+                OnLabwareLocation,
+                AddressableAreaLocation,
+            ),
+        ):
             self._labware.raise_if_labware_in_location(location)
-        if isinstance(location, (DeckSlotLocation, ModuleLocation)):
-            self._labware.raise_if_labware_in_location(location)
+        if isinstance(location, DeckSlotLocation):
             self._modules.raise_if_module_in_location(location)
-        return location
+        return cast(_LabwareLocation, location)
 
     def get_labware_grip_point(
         self,
@@ -562,39 +577,40 @@ class GeometryView:
         )
 
     def get_extra_waypoints(
-        self, labware_id: str, location: Optional[CurrentWell]
+        self, location: Optional[CurrentPipetteLocation], to_slot: DeckSlotName
     ) -> List[Tuple[float, float]]:
         """Get extra waypoints for movement if thermocycler needs to be dodged."""
-        if location is not None and self._modules.should_dodge_thermocycler(
-            from_slot=self.get_ancestor_slot_name(location.labware_id),
-            to_slot=self.get_ancestor_slot_name(labware_id),
-        ):
-            middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
-                self._config.robot_type
-            )
-            middle_slot_center = self._addressable_areas.get_addressable_area_center(
-                addressable_area_name=middle_slot.id,
-            )
-            return [(middle_slot_center.x, middle_slot_center.y)]
+        if location is not None:
+            if isinstance(location, CurrentWell):
+                from_slot = self.get_ancestor_slot_name(location.labware_id)
+            else:
+                from_slot = self._addressable_areas.get_addressable_area_base_slot(
+                    location.addressable_area_name
+                )
+            if self._modules.should_dodge_thermocycler(
+                from_slot=from_slot, to_slot=to_slot
+            ):
+                middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                    self._config.robot_type
+                )
+                middle_slot_center = (
+                    self._addressable_areas.get_addressable_area_center(
+                        addressable_area_name=middle_slot.id,
+                    )
+                )
+                return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_slot_item(
         self,
         slot_name: DeckSlotName,
-        allowed_labware_ids: Set[str],
-        allowed_module_ids: Set[str],
     ) -> Union[LoadedLabware, LoadedModule, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
-            allowed_ids=allowed_labware_ids,
         )
         maybe_module = self._modules.get_by_slot(
             slot_name=slot_name,
-            allowed_ids=allowed_module_ids,
         )
 
         return maybe_labware or maybe_module or None

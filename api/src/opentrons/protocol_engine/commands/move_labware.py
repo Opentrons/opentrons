@@ -25,6 +25,10 @@ if TYPE_CHECKING:
 MoveLabwareCommandType = Literal["moveLabware"]
 
 
+# Seconds to wait after droppping labware in trash chute
+_TRASH_CHUTE_DROP_DELAY = 1.0
+
+
 # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
 class MoveLabwareParams(BaseModel):
     """Input parameters for a ``moveLabware`` command."""
@@ -94,6 +98,7 @@ class MoveLabwareImplementation(
             labware_id=params.labwareId
         )
         definition_uri = current_labware.definitionUri
+        delay_after_drop: Optional[float] = None
 
         if self._state_view.labware.is_fixed_trash(params.labwareId):
             raise LabwareMovementNotAllowedError(
@@ -108,6 +113,8 @@ class MoveLabwareImplementation(
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move {current_labware.loadName} to addressable area {area_name}"
                 )
+            if fixture_validation.is_gripper_waste_chute(area_name):
+                delay_after_drop = _TRASH_CHUTE_DROP_DELAY
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
@@ -175,6 +182,7 @@ class MoveLabwareImplementation(
                 current_location=validated_current_loc,
                 new_location=validated_new_loc,
                 user_offset_data=user_offset_data,
+                delay_after_drop=delay_after_drop,
             )
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement

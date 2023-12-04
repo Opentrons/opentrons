@@ -301,6 +301,7 @@ class StateStore(StateView, ActionHandler):
             config=self._config,
             labware_view=self._labware,
             pipette_view=self._pipettes,
+            addressable_area_view=self._addressable_areas,
             geometry_view=self._geometry,
             module_view=self._modules,
         )

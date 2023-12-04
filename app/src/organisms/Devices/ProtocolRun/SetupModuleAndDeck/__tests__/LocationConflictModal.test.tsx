@@ -75,7 +75,7 @@ describe('LocationConflictModal', () => {
     getByText('Heater-Shaker Module GEN1')
     getByRole('button', { name: 'Cancel' }).click()
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Update deck' }).click()
+    getByRole('button', { name: 'Confirm removal' }).click()
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render correct info for a odd', () => {

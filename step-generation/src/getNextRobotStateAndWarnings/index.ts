@@ -120,7 +120,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
         invariantContext,
         robotStateAndWarnings
       )
-
       break
 
     case 'touchTip':

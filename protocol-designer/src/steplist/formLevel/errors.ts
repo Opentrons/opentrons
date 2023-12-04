@@ -79,6 +79,10 @@ const WELL_RATIO_MOVE_LIQUID: FormError = {
   title: 'Well selection must be 1 to many, many to 1, or N to N',
   dependentFields: ['aspirate_wells', 'dispense_wells'],
 }
+const WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE: FormError = {
+  title: 'Well selection must be many to 1, or 1 to 1',
+  dependentFields: ['aspirate_wells'],
+}
 const MAGNET_ACTION_TYPE_REQUIRED: FormError = {
   title: 'Action type must be either engage or disengage',
   dependentFields: ['magnetAction'],
@@ -128,14 +132,17 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-export type FormErrorChecker = (arg: unknown) => FormError | null
+interface HydratedFormData {
+  [key: string]: any
+}
+
+export type FormErrorChecker = (arg: HydratedFormData) => FormError | null
 // TODO: test these
 
 /*******************
  ** Error Checkers **
  ********************/
 // TODO: real HydratedFormData type
-type HydratedFormData = any
 export const incompatibleLabware = (
   fields: HydratedFormData
 ): FormError | null => {
@@ -206,11 +213,23 @@ export const pauseForTimeOrUntilTold = (
 export const wellRatioMoveLiquid = (
   fields: HydratedFormData
 ): FormError | null => {
-  const { aspirate_wells, dispense_wells } = fields
-  if (!aspirate_wells || !dispense_wells) return null
-  return getWellRatio(aspirate_wells, dispense_wells)
-    ? null
+  const { aspirate_wells, dispense_wells, dispense_labware } = fields
+  const dispenseLabware = dispense_labware?.name ?? null
+  const isDispensingIntoWasteChute =
+    dispenseLabware != null ? dispenseLabware === 'wasteChute' : false
+  if (!aspirate_wells || (!isDispensingIntoWasteChute && !dispense_wells))
+    return null
+  const wellRatioFormError = isDispensingIntoWasteChute
+    ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
+
+  return getWellRatio(
+    aspirate_wells,
+    dispense_wells,
+    isDispensingIntoWasteChute
+  )
+    ? null
+    : wellRatioFormError
 }
 export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette } = fields
@@ -338,7 +357,7 @@ export const engageHeightRangeExceeded = (
  ********************/
 type ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
-) => (arg: unknown) => FormError[]
+) => (arg: HydratedFormData) => FormError[]
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
 ) => value =>

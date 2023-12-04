@@ -106,7 +106,7 @@ export function getFixtureDisplayName(
   } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE) {
     return 'Waste chute only'
   } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE) {
-    return 'Waste chute only covered'
+    return 'Waste chute only with cover'
   } else if (
     cutoutFixtureId ===
     STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
@@ -116,7 +116,7 @@ export function getFixtureDisplayName(
     cutoutFixtureId ===
     STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
   ) {
-    return 'Waste chute with staging area slot covered'
+    return 'Waste chute with staging area slot and cover'
   } else {
     return 'Slot'
   }

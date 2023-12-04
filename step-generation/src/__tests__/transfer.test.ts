@@ -22,13 +22,14 @@ import {
   dropTipInPlaceHelper,
   moveToAddressableAreaHelper,
 } from '../fixtures'
-import { FIXED_TRASH_ID } from '..'
+import { FIXED_TRASH_ID } from '../constants'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../utils/misc'
 import { transfer } from '../commandCreators/compound/transfer'
 import type { InvariantContext, RobotState, TransferArgs } from '../types'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 const airGapHelper = makeAirGapHelper({
   wellLocation: {
@@ -184,6 +185,63 @@ test('single transfer: 1 source & 1 dest', () => {
   expect(res.commands).toEqual([
     aspirateHelper('A1', 30),
     dispenseHelper('B2', 30),
+  ])
+})
+
+test('single transfer: 1 source & 1 dest with waste chute', () => {
+  const mockWasteChuteId = 'mockWasteChuteId'
+
+  mixinArgs = {
+    ...mixinArgs,
+    destLabware: mockWasteChuteId,
+    sourceWells: ['A1'],
+    destWells: null,
+    changeTip: 'never',
+    volume: 30,
+  }
+
+  invariantContext = {
+    ...invariantContext,
+    additionalEquipmentEntities: {
+      mockWasteChuteId: {
+        name: 'wasteChute',
+        id: mockWasteChuteId,
+        location: WASTE_CHUTE_CUTOUT,
+      },
+    },
+  }
+  robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId = {
+    '0': { volume: 200 },
+  }
+  robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {
+    '0': { volume: 200 },
+  }
+
+  const result = transfer(
+    mixinArgs as TransferArgs,
+    invariantContext,
+    robotStateWithTip
+  )
+  const res = getSuccessResult(result)
+  expect(res.commands).toEqual([
+    aspirateHelper('A1', 30),
+    {
+      commandType: 'moveToAddressableArea',
+      key: expect.any(String),
+      params: {
+        addressableAreaName: '1and8ChannelWasteChute',
+        pipetteId: 'p300SingleId',
+      },
+    },
+    {
+      commandType: 'dispenseInPlace',
+      key: expect.any(String),
+      params: {
+        flowRate: 2.2,
+        pipetteId: 'p300SingleId',
+        volume: 30,
+      },
+    },
   ])
 })
 

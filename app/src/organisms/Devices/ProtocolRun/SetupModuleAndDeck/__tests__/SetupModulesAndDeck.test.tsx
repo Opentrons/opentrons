@@ -4,7 +4,10 @@ import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
-import { getRequiredDeckConfig } from '../../../../../resources/deck_configuration/utils'
+import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+} from '../../../../../resources/deck_configuration/utils'
 import {
   useIsFlex,
   useRunHasStarted,
@@ -45,6 +48,9 @@ const mockSetupModulesMap = SetupModulesMap as jest.MockedFunction<
 const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
   typeof getRequiredDeckConfig
 >
+const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
+  typeof getIsFixtureMismatch
+>
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'
 
@@ -79,6 +85,7 @@ describe('SetupModuleAndDeck', () => {
       .mockReturnValue({ complete: true })
     when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(false)
     when(mockGetRequiredDeckConfig).mockReturnValue([])
+    when(mockGetIsFixtureMismatch).mockReturnValue(false)
   })
 
   it('renders the list and map view buttons', () => {
@@ -157,5 +164,14 @@ describe('SetupModuleAndDeck', () => {
     const button = getByRole('button', { name: 'Map View' })
     fireEvent.click(button)
     getByText('Mock setup modules map')
+  })
+
+  it('should render disabled button when deck config is not configured or there is a conflict', () => {
+    when(mockGetIsFixtureMismatch).mockReturnValue(true)
+    const { getByRole } = render(props)
+    const button = getByRole('button', {
+      name: 'Proceed to labware position check',
+    })
+    expect(button).toBeDisabled()
   })
 })

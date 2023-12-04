@@ -207,8 +207,6 @@ def test_get_slot_item_empty(
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
             slot_name=DeckSlotName.SLOT_1,
-            allowed_labware_ids={"fixed-trash-123"},
-            allowed_module_ids=set(),
         )
     ).then_return(None)
 
@@ -1120,8 +1118,6 @@ def test_load_module(
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
             slot_name=slot_name,
-            allowed_labware_ids={"fixed-trash-123"},
-            allowed_module_ids={"abc123"},
         )
     ).then_return(
         LoadedModule.construct(id="abc123")  # type: ignore[call-arg]
@@ -1285,8 +1281,6 @@ def test_load_mag_block(
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
             slot_name=DeckSlotName.SLOT_1,
-            allowed_labware_ids={"fixed-trash-123"},
-            allowed_module_ids={"abc123"},
         )
     ).then_return(
         LoadedModule.construct(id="abc123")  # type: ignore[call-arg]
