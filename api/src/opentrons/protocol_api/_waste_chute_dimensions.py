@@ -14,5 +14,5 @@ SLOT_ORIGIN_TO_96_TIP_A1 = Point(14.445, 42.085, 115)
 # we can't define this as a single coordinate.
 SLOT_ORIGIN_TO_GRIPPER_JAW_CENTER = Point(64, 29, 136.5)
 
-# This includes the height of the optional lid.
-ENVELOPE_HEIGHT = 154
+# This is the same with or without the cover attached, since the cover is flush with the rim.
+ENVELOPE_HEIGHT = 125
