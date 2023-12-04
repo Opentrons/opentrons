@@ -554,7 +554,7 @@ class ProtocolCore(
 
     def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
-        return self._engine_client.state.addressable_areas.get_slot_definition(slot)
+        return self._engine_client.state.addressable_areas.get_slot_definition(slot.id)
 
     def _ensure_module_location(
         self, slot: DeckSlotName, module_type: ModuleType

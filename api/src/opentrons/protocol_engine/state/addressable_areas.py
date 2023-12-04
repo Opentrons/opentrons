@@ -23,6 +23,7 @@ from ..types import (
     DeckSlotLocation,
     AddressableAreaLocation,
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     DeckConfigurationType,
 )
@@ -37,6 +38,7 @@ class AddressableAreaState:
 
     loaded_addressable_areas_by_name: Dict[str, AddressableArea]
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
+    assumed_slots_for_deck: Set[str]
     deck_definition: DeckDefinitionV4
     use_simulated_deck_config: bool
 
@@ -114,9 +116,16 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                     deck_definition,
                 )
             )
+
+        if config.robot_type == "OT-2 Standard":
+            assumed_slots = {slot.to_ot2_equivalent().id for slot in DeckSlotName}
+        else:
+            assumed_slots = {slot.to_ot3_equivalent().id for slot in DeckSlotName}
+
         self._state = AddressableAreaState(
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
+            assumed_slots_for_deck=assumed_slots,
             deck_definition=deck_definition,
             use_simulated_deck_config=config.use_simulated_deck_config,
         )
@@ -204,6 +213,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             cutout_id = self._validate_addressable_area_for_simulation(
                 addressable_area_name
             )
+
+            self._update_assumed_slots_for_deck(cutout_id)
+
             cutout_position = deck_configuration_provider.get_cutout_position(
                 cutout_id, self._state.deck_definition
             )
@@ -232,9 +244,11 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         )
 
         if cutout_id in self._state.potential_cutout_fixtures_by_cutout_id:
+            # Get the existing potential cutout fixtures for the addressable area already loaded on this cutout
             existing_potential_fixtures = (
                 self._state.potential_cutout_fixtures_by_cutout_id[cutout_id]
             )
+            # See if there's any common cutout fixture that supplies existing addressable areas and the one being loaded
             remaining_fixtures = existing_potential_fixtures.intersection(
                 set(potential_fixtures)
             )
@@ -248,6 +262,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                     f"Cannot load {addressable_area_name}, not compatible with one or more of"
                     f" the following areas: {loaded_areas_on_cutout}"
                 )
+
             self._state.potential_cutout_fixtures_by_cutout_id[
                 cutout_id
             ] = remaining_fixtures
@@ -255,7 +270,17 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             self._state.potential_cutout_fixtures_by_cutout_id[cutout_id] = set(
                 potential_fixtures
             )
+
         return cutout_id
+
+    def _update_assumed_slots_for_deck(self, cutout_id: str) -> None:
+        """Update assumed deck slot for analysis run and remove if no longer possible in a deck configuration."""
+        deck_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
+        potential_addressable_areas: Set[str] = set()
+        for fixtures in self._state.potential_cutout_fixtures_by_cutout_id[cutout_id]:
+            potential_addressable_areas.update(fixtures.provided_addressable_areas)
+        if deck_slot.id not in potential_addressable_areas:
+            self._state.assumed_slots_for_deck.discard(deck_slot.id)
 
 
 class AddressableAreaView(HasState[AddressableAreaState]):
@@ -276,7 +301,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         if not self._state.use_simulated_deck_config:
             return self._get_loaded_addressable_area(addressable_area_name)
         else:
-            return self._get_addressable_area_for_simulation(addressable_area_name)
+            return self._get_addressable_area_from_deck_data(addressable_area_name)
 
     def get_all(self) -> List[str]:
         """Get a list of all loaded addressable area names."""
@@ -293,7 +318,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
                 f"{addressable_area_name} not provided by deck configuration."
             )
 
-    def _get_addressable_area_for_simulation(
+    def _get_addressable_area_from_deck_data(
         self, addressable_area_name: str
     ) -> AddressableArea:
         """Get an addressable area that may not have been already loaded for a simulated run.
@@ -347,7 +372,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:
         """Get the position of an addressable area."""
         # TODO This should be the regular `get_addressable_area` once Robot Server deck config and tests is hooked up
-        addressable_area = self._get_addressable_area_for_simulation(
+        addressable_area = self._get_addressable_area_from_deck_data(
             addressable_area_name
         )
         position = addressable_area.position
@@ -382,14 +407,13 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         addressable_area = self.get_addressable_area(addressable_area_name)
         return addressable_area.bounding_box.z
 
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+    def get_slot_definition(self, slot_id: str) -> SlotDefV3:
         """Get the definition of a slot in the deck."""
         try:
-            # TODO This should be the regular `get_addressable_area` once Robot Server deck config and tests is hooked up
-            addressable_area = self._get_addressable_area_for_simulation(slot.id)
+            addressable_area = self._get_addressable_area_from_deck_data(slot_id)
         except (AreaNotInDeckConfigurationError, IncompatibleAddressableAreaError):
             raise SlotDoesNotExistError(
-                f"Slot ID {slot.id} does not exist in deck {self._state.deck_definition['otId']}"
+                f"Slot ID {slot_id} does not exist in deck {self._state.deck_definition['otId']}"
             )
         position = addressable_area.position
         bounding_box = addressable_area.bounding_box
@@ -404,3 +428,28 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             "displayName": addressable_area.display_name,
             "compatibleModuleTypes": addressable_area.compatible_module_types,
         }
+
+    def get_deck_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all slot definitions either configured for robot or assumed for analysis run so far."""
+        if not self._state.use_simulated_deck_config:
+            slot_definitions = {
+                area.area_name: self.get_slot_definition(area.area_name)
+                for area in self._state.loaded_addressable_areas_by_name.values()
+                if area.area_type in {AreaType.SLOT, AreaType.STAGING_SLOT}
+            }
+        else:
+            loaded_slot_names = {
+                area.area_name
+                for area in self._state.loaded_addressable_areas_by_name.values()
+                if area.area_type in {AreaType.SLOT, AreaType.STAGING_SLOT}
+            }
+            assumed_and_loaded_slots = loaded_slot_names.union(
+                self._state.assumed_slots_for_deck
+            )
+
+            slot_definitions = {
+                slot_name: self.get_slot_definition(slot_name)
+                for slot_name in assumed_and_loaded_slots
+            }
+
+        return slot_definitions

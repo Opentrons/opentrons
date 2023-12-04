@@ -30,6 +30,7 @@ from .command_fixtures import (
     create_load_labware_command,
     create_load_module_command,
     create_move_labware_command,
+    create_move_to_addressable_area_command,
 )
 
 
@@ -91,6 +92,20 @@ def test_initial_state_simulated(
         loaded_addressable_areas_by_name={},
         potential_cutout_fixtures_by_cutout_id={},
         deck_definition=ot3_standard_deck_def,
+        assumed_slots_for_deck={
+            "A1",
+            "A2",
+            "A3",
+            "B1",
+            "B2",
+            "B3",
+            "C1",
+            "C2",
+            "C3",
+            "D1",
+            "D2",
+            "D3",
+        },
         use_simulated_deck_config=True,
     )
 
@@ -159,6 +174,12 @@ def test_initial_state(
                 strategy=LabwareMovementStrategy.USING_GRIPPER,
             ),
             "A4",
+        ),
+        (
+            create_move_to_addressable_area_command(
+                pipette_id="pipette-id", addressable_area_name="gripperWasteChute"
+            ),
+            "gripperWasteChute",
         ),
     ),
 )
@@ -282,6 +303,53 @@ def test_addressable_area_referencing_commands_load(
     """It should check that the addressable area is in the deck config."""
     subject.handle_action(UpdateCommandAction(private_result=None, command=command))
     assert expected_area in subject.state.loaded_addressable_areas_by_name
+
+
+def test_command_updates_assumed_slots(
+    simulated_subject: AddressableAreaStore,
+) -> None:
+    """It should keep or remove the deck slot associated with the cutout ID depending on addressable area loaded."""
+    move_labware_command = create_move_labware_command(
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+    simulated_subject.handle_action(
+        UpdateCommandAction(private_result=None, command=move_labware_command)
+    )
+    assert len(simulated_subject.state.assumed_slots_for_deck) == 12
+    assert "A1" in simulated_subject.state.assumed_slots_for_deck
+
+    move_labware_command = create_move_labware_command(
+        new_location=AddressableAreaLocation(addressableAreaName="gripperWasteChute"),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+    assert "D3" in simulated_subject.state.assumed_slots_for_deck
+    simulated_subject.handle_action(
+        UpdateCommandAction(private_result=None, command=move_labware_command)
+    )
+    assert len(simulated_subject.state.assumed_slots_for_deck) == 11
+    assert "D3" not in simulated_subject.state.assumed_slots_for_deck
+
+    move_to_area_command = create_move_to_addressable_area_command(
+        pipette_id="pipette-id",
+        addressable_area_name="movableTrashA3",
+    )
+    assert "A3" in simulated_subject.state.assumed_slots_for_deck
+    simulated_subject.handle_action(
+        UpdateCommandAction(private_result=None, command=move_to_area_command)
+    )
+    assert len(simulated_subject.state.assumed_slots_for_deck) == 10
+    assert "A3" not in simulated_subject.state.assumed_slots_for_deck
+
+    move_labware_command = create_move_labware_command(
+        new_location=AddressableAreaLocation(addressableAreaName="B4"),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+    simulated_subject.handle_action(
+        UpdateCommandAction(private_result=None, command=move_labware_command)
+    )
+    assert len(simulated_subject.state.assumed_slots_for_deck) == 10
+    assert "B3" in simulated_subject.state.assumed_slots_for_deck
 
 
 # TODO Uncomment this out once this check is back in

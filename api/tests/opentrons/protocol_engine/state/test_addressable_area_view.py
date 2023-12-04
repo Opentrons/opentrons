@@ -42,6 +42,7 @@ def get_addressable_area_view(
     potential_cutout_fixtures_by_cutout_id: Optional[
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
+    assumed_slots_for_deck: Optional[Set[str]] = None,
     deck_definition: Optional[DeckDefinitionV4] = None,
     use_simulated_deck_config: bool = False,
 ) -> AddressableAreaView:
@@ -51,6 +52,7 @@ def get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV4, {"otId": "fake"}),
+        assumed_slots_for_deck=assumed_slots_for_deck or set(),
         use_simulated_deck_config=use_simulated_deck_config,
     )
 
@@ -111,7 +113,11 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
             "cutoutA1": {
-                PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")
+                PotentialCutoutFixture(
+                    cutout_id="cutoutA1",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
             }
         },
         use_simulated_deck_config=True,
@@ -136,7 +142,13 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     ).then_return(
         (
             "cutoutA1",
-            {PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")},
+            {
+                PotentialCutoutFixture(
+                    cutout_id="cutoutA1",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
         )
     )
 
@@ -162,7 +174,13 @@ def test_get_addressable_area_for_simulation_raises(decoy: Decoy) -> None:
     """It should raise if the requested addressable area is incompatible with loaded ones."""
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
-            "123": {PotentialCutoutFixture(cutout_id="789", cutout_fixture_id="bleh")}
+            "123": {
+                PotentialCutoutFixture(
+                    cutout_id="789",
+                    cutout_fixture_id="bleh",
+                    provided_addressable_areas=frozenset(),
+                )
+            }
         },
         use_simulated_deck_config=True,
     )
@@ -172,7 +190,16 @@ def test_get_addressable_area_for_simulation_raises(decoy: Decoy) -> None:
             "abc", subject.state.deck_definition
         )
     ).then_return(
-        ("123", {PotentialCutoutFixture(cutout_id="123", cutout_fixture_id="blah")})
+        (
+            "123",
+            {
+                PotentialCutoutFixture(
+                    cutout_id="123",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
+        )
     )
 
     decoy.when(
@@ -269,7 +296,7 @@ def test_get_slot_definition() -> None:
         }
     )
 
-    result = subject.get_slot_definition(DeckSlotName.SLOT_6)
+    result = subject.get_slot_definition(DeckSlotName.SLOT_6.id)
 
     assert result == {
         "id": "area",

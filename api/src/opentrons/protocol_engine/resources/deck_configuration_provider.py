@@ -70,6 +70,7 @@ def get_potential_cutout_fixtures(
                     PotentialCutoutFixture(
                         cutout_id=cutout_id,
                         cutout_fixture_id=cutout_fixture["id"],
+                        provided_addressable_areas=frozenset(provided_areas),
                     )
                 )
     # This following logic is making the assumption that every addressable area can only go on one cutout, though
