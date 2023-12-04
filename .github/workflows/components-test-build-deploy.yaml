@@ -175,6 +175,7 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '16'
+          registry-url: 'https://registry.npmjs.org'
       - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
@@ -200,13 +201,8 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
-          cd ./components
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-          registry-url: 'https://registry.npmjs.org'
       - name: 'publish to npm registry'
-        run: npm publish --access public
+        run: cp ./.npmrc ./components/.npmrc && cd ./components && npm publish --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
