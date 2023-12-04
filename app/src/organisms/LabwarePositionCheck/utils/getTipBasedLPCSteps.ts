@@ -169,7 +169,6 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       modules
     ).reduce<LabwareLocationCombo[]>(
       (labwareLocationAcc, labwareLocationCombo) => {
-        // remove labware that isn't accessed by a pickup tip command
         if (labwareLocationCombo.labwareId !== currentLabware.id) {
           return labwareLocationAcc
         }
