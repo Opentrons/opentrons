@@ -253,9 +253,7 @@ jobs:
           npm install -g json
           VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
           json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
-      - name: 'cat npmrc'
-        run: cat ./.npmrc
       - name: 'publish to npm registry'
         run: |
-          cd ./shared-data && yarn publish --access public
+          cd ./components && echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.yarnrc && yarn publish --access public
           
