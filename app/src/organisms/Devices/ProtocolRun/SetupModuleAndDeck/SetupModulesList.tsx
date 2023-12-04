@@ -21,6 +21,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
@@ -35,7 +36,6 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { getCutoutIdForSlotName } from '../../../../resources/deck_configuration/utils'
 import { useChainLiveCommands } from '../../../../resources/runs/hooks'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'

@@ -183,7 +183,7 @@ export function ProtocolRunHeader({
   const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    robotProtocolAnalysis?.commands ?? []
+    robotProtocolAnalysis
   )
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 

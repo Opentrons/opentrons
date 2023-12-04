@@ -29,12 +29,12 @@ import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
 import type {
+  CutoutConfigProtocolSpec,
   LoadModuleRunTimeCommand,
   PipetteName,
   RobotType,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { CutoutConfigProtocolSpec } from '../../resources/deck_configuration/utils'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null

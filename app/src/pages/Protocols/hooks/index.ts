@@ -10,12 +10,12 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
-import { getCutoutIdForSlotName } from '../../../resources/deck_configuration/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -23,8 +23,8 @@ import type {
   CutoutId,
   ModuleModel,
   PipetteName,
+  ProtocolAnalysisOutput,
   RobotType,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -63,7 +63,7 @@ export type ProtocolHardware =
   | ProtocolFixture
 
 export const useRequiredProtocolHardwareFromAnalysis = (
-  analysis?: CompletedProtocolAnalysis | null
+  analysis: CompletedProtocolAnalysis | null
 ): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
   const {
     data: attachedModulesData,
@@ -82,7 +82,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   const { data: deckConfig = [] } = useDeckConfigurationQuery()
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    analysis?.commands ?? []
+    analysis
   )
 
   if (analysis == null || analysis?.status !== 'completed') {
@@ -195,7 +195,7 @@ export const useRequiredProtocolHardware = (
     { enabled: protocolData != null }
   )
 
-  return useRequiredProtocolHardwareFromAnalysis(analysis)
+  return useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
 }
 
 /**
@@ -234,7 +234,7 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
   requiredProtocolHardware: ProtocolHardware[],
   isLoading: boolean,
   robotType: RobotType,
-  protocolCommands: RunTimeCommand[]
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 ): {
   missingProtocolHardware: ProtocolHardware[]
   conflictedSlots: string[]
@@ -242,7 +242,7 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
 } => {
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    protocolCommands
+    protocolAnalysis
   )
 
   // determine missing or conflicted hardware
@@ -283,7 +283,7 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
 
 export const useMissingProtocolHardwareFromAnalysis = (
   robotType: RobotType,
-  analysis?: CompletedProtocolAnalysis | null
+  analysis: CompletedProtocolAnalysis | null
 ): {
   missingProtocolHardware: ProtocolHardware[]
   conflictedSlots: string[]
@@ -298,7 +298,7 @@ export const useMissingProtocolHardwareFromAnalysis = (
     requiredProtocolHardware,
     isLoading,
     robotType,
-    analysis?.commands ?? []
+    analysis ?? null
   )
 }
 
@@ -318,12 +318,12 @@ export const useMissingProtocolHardware = (
   const {
     requiredProtocolHardware,
     isLoading,
-  } = useRequiredProtocolHardwareFromAnalysis(analysis)
+  } = useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
 
   return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,
     isLoading,
     FLEX_ROBOT_TYPE,
-    analysis?.commands ?? []
+    analysis ?? null
   )
 }

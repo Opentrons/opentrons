@@ -17,6 +17,7 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
@@ -25,7 +26,6 @@ import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import { getWellFillFromLabwareId } from './utils'
 import { getLabwareRenderInfo } from '../utils/getLabwareRenderInfo'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
@@ -70,9 +70,7 @@ export function SetupLiquidsMap(
   const labwareByLiquidId = parseLabwareInfoByLiquidId(
     protocolAnalysis.commands ?? []
   )
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
   const deckLayerBlocklist = getStandardDeckViewLayerBlockList(robotType)
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)

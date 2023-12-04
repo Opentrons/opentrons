@@ -34,7 +34,7 @@ describe('FixtureTable', () => {
   let props: React.ComponentProps<typeof FixtureTable>
   beforeEach(() => {
     props = {
-      mostRecentAnalysis: [] as any,
+      mostRecentAnalysis: { commands: [], labware: [] } as any,
       robotType: FLEX_ROBOT_TYPE,
       setSetupScreen: mockSetSetupScreen,
       setCutoutId: mockSetCutoutId,
@@ -65,7 +65,7 @@ describe('FixtureTable', () => {
     props = {
       ...props,
       // TODO(bh, 2023-11-13): mock load labware etc commands
-      mostRecentAnalysis: { commands: [] } as any,
+      mostRecentAnalysis: { commands: [], labware: [] } as any,
     }
     const [{ getByText }] = render(props)
     getByText('Configured')
