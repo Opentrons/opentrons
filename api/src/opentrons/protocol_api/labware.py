@@ -72,7 +72,7 @@ class Well:
 
         - Calculating positions relative to the well. See :ref:`position-relative-labware` for details.
 
-        - Returning well measurements. see :ref:`new-labware-well-properties` for details.
+        - Returning well measurements. See :ref:`new-labware-well-properties` for details.
 
         - Specifying what liquid should be in the well at the beginning of a protocol. See :ref:`labeling-liquids` for details.
     """
@@ -362,7 +362,7 @@ class Labware:
     def uri(self) -> str:
         """A string fully identifying the labware.
 
-        :returns: The uri, ``"namespace/loadname/version"``
+        :returns: The URI, ``"namespace/loadname/version"``
         """
         return self._core.get_uri()
 
@@ -609,9 +609,9 @@ class Labware:
     @requires_version(2, 0)
     def wells(self, *args: Union[str, int]) -> List[Well]:
         """
-        Accessor function that generates a list of wells in a top  down,
-        left -> right order. This is representative of moving down `rows` and
-        across `columns` (e.g. 'A1', 'B1', 'C1'...'A2', 'B2', 'C2')
+        Accessor function that generates a list of wells in a top down,
+        left to right order. This is representative of moving down rows and
+        across columns (e.g. ``'A1'``, ``'B1'``, ``'C1'...'A2'``, ``'B2'``, ``'C2'``)
 
         With indexing one can treat it as a typical python
         list. To access well A1 for example, write ``labware.wells()[0]``.
@@ -640,7 +640,7 @@ class Labware:
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
         """
-        Accessor function used to create a look-up table of Wells by name.
+        Accessor function used to create a look-up table of wells by name.
 
         With indexing one can treat it as a typical python
         dictionary whose keys are well names. To access well A1 for example,
@@ -787,7 +787,7 @@ class Labware:
         """
         The z-coordinate of the highest single point anywhere on the labware.
 
-        This is drawn from the 'dimensions'/'zDimension' elements of the
+        This is taken from the ``zDimension`` property of the ``dimensions`` object in the
         labware definition and takes into account the calibration offset.
         """
         return self._core.highest_z
