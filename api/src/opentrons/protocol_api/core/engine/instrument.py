@@ -36,9 +36,8 @@ from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
-from ... import _waste_chute_dimensions
+from ...trash_bin import TrashBin
+from ...waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -389,19 +388,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
-    def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
-        self._engine_client.drop_tip_in_place(
-            pipette_id=self._pipette_id,
-            home_after=home_after,
-        )
-
     def drop_tip_in_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool]
     ) -> None:
-        # TODO: Can we get away with implementing this in two steps like this,
-        # or does drop_tip() need to take the waste chute location because the z-height
-        # depends on the intent of dropping tip? How would Protocol Designer want to implement
-        # this?
         self._move_to_disposal_location(
             disposal_location,
             force_direct=False,
@@ -415,58 +406,32 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         force_direct: bool,
         speed: Optional[float],
     ) -> None:
-        # NOTE: only invoked by `drop_tip_in_disposal_location`, so does not currently accommodate gripper
-
-        # map trash bin location to addressable area
-        map_trash_bin_addressable_area = {
-            'A1': 'movableTrashA1',
-            'B1': 'movableTrashB1',
-            'C1': 'movableTrashC1',
-            'D1': 'movableTrashD1',
-            'A3': 'movableTrashA3',
-            'B3': 'movableTrashB3',
-            'C3': 'movableTrashC3',
-            'D3': 'movableTrashD3',
-        }
-
-        # map pipette channel to waste chute addressable area
-        map_waste_chute_addressable_area: {
-            1: {
-                'addressableAreaName': '1and8ChannelWasteChute',
-                'offset': AddressableOffsetVector(64.0, 21.91, 144.0)
-            },
-            8: {
-                'addressableAreaName': '1and8ChannelWasteChute',
-                'offset': AddressableOffsetVector(64.0, 21.91, 144.0)
-            },
-            96: {
-                'addressableAreaName': '96ChannelWasteChute',
-                'offset': AddressableOffsetVector(14.445, 42.085, 115)
-            },
-        }
-
         # TODO (nd, 2023-11-30): give appropriate offset when finalized
         # https://opentrons.atlassian.net/browse/RSS-391
-        offset = AddressableOffsetVector(0, 0, 0)
+        offset = AddressableOffsetVector(x=0, y=0, z=0)
 
         if isinstance(disposal_location, TrashBin):
-            slot_name = disposal_location._location
-            miminum_z_height = None
-            addressable_area_name = map_trash_bin_addressable_area[slot_name]
-        else:
-            slot_name = DeckSlotName.SLOT_D3
-            miminum_z_height = _waste_chute_dimensions.ENVELOPE_HEIGHT + 5.0
+            addressable_area_name = disposal_location._addressable_area_name
+        if isinstance(disposal_location, WasteChute):
             num_channels = self.get_channels()
-            addressable_area_name = map_waste_chute_addressable_area[
-                num_channels]['addressableAreaName']
+            if num_channels == 96:
+                addressable_area_name = '1and8ChannelWasteChute'
+            else:
+                addressable_area_name = '96ChannelWasteChute'
 
         self._engine_client.move_to_addressable_area(
             pipette_id=self._pipette_id,
             addressable_area_name=addressable_area_name,
             offset=offset,
-            miminum_z_height=miminum_z_height,
             force_direct=force_direct,
-            speed=speed
+            speed=speed,
+            minimum_z_height=None
+        )
+
+    def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
+        self._engine_client.drop_tip_in_place(
+            pipette_id=self._pipette_id,
+            home_after=home_after,
         )
 
     def home(self) -> None:

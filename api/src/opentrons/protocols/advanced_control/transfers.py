@@ -13,7 +13,7 @@ from typing import (
     TYPE_CHECKING,
     TypeVar,
 )
-from opentrons.protocol_api.labware import Well
+from opentrons.protocol_api.labware import Labware, Well
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -800,9 +800,10 @@ class TransferPlan:
                 self._strategy.blow_out_strategy == BlowOutStrategy.TRASH
                 or self._strategy.disposal_volume
             ):
-                yield self._format_dict(
-                    "blow_out", [self._instr.trash_container.wells()[0]]
-                )
+                if isinstance(self._instr.trash_container, Labware):
+                    yield self._format_dict(
+                        "blow_out", [self._instr.trash_container.wells()[0]]
+                    )
         else:
             # Used by distribute
             if self._strategy.air_gap:

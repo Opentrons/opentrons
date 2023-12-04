@@ -47,8 +47,8 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
-from ._trash_bin import TrashBin
-from ._waste_chute import WasteChute
+from .trash_bin import TrashBin
+from .waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -442,13 +442,24 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 16)
     def load_trash_bin(
         self,
-        location: Optional[DeckLocation] = None
+        location: DeckLocation
     ) -> TrashBin:
-        location = validation.ensure_trash_bin_location(
+        slot_name = validation.ensure_and_convert_deck_slot(
             location,
-            self._core.robot_type
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
         )
-        trash_bin = TrashBin(location=location)
+        addressable_area_name = validation.ensure_and_convert_trash_bin_location(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        # we previously returned trash bin object from ensure_and_convert_trash_bin_location
+        # should we recycle a 
+        trash_bin = TrashBin(
+            location=slot_name,
+            addressable_area_name=addressable_area_name
+        )
         self._core.append_disposal_location(trash_bin)
         return trash_bin
 

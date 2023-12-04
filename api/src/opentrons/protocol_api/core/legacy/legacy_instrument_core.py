@@ -19,8 +19,8 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ...trash_bin import TrashBin
+from ...waste_chute import WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
 from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore

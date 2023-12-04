@@ -44,8 +44,8 @@ from opentrons.protocol_engine.errors import (
 from ... import validation
 from ..._types import OffDeckType, OFF_DECK, StagingSlotName
 from ..._liquid import Liquid
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ...trash_bin import TrashBin
+from ...waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -108,7 +108,7 @@ class ProtocolCore(
     def fixed_trash(self) -> Optional[LabwareCore]:
         """Get the fixed trash labware."""
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
+        if trash_id is not None and self._api_version < APIVersion(2, 16):
             return self._labware_cores_by_id[trash_id]
         return None
 
@@ -127,6 +127,12 @@ class ProtocolCore(
     ) -> None:
         """Append a disposal location object to the core"""
         self._disposal_locations.append(disposal_location)
+
+    def get_disposal_locations(
+        self
+    ) -> List[Union[TrashBin, WasteChute]]:
+        """Get disposal locations."""
+        return self._disposal_locations
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""

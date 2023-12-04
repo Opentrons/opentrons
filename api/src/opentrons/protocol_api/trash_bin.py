@@ -6,6 +6,8 @@ class TrashBin:
 
     def __init__(
         self,
-        location
+        location: str,
+        addressable_area_name: str
     ) -> None:
         self._location = location
+        self._addressable_area_name = addressable_area_name

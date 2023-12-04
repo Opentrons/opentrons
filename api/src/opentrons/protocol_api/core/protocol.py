@@ -19,7 +19,8 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
-from .._waste_chute import WasteChute
+from ..trash_bin import TrashBin
+from ..waste_chute import WasteChute
 from .._types import OffDeckType, StagingSlotName
 
 
@@ -55,6 +56,14 @@ class AbstractProtocol(
         definition: LabwareDefinition,
     ) -> LabwareLoadParams:
         """Add a labware definition to the set of loadable definitions."""
+        ...
+
+    @abstractmethod
+    def append_disposal_location(
+        self,
+        disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Append a disposal location object to the core"""
         ...
 
     @abstractmethod
@@ -135,6 +144,10 @@ class AbstractProtocol(
 
     @abstractmethod
     def set_rail_lights(self, on: bool) -> None:
+        ...
+
+    @abstractmethod
+    def get_disposal_locations(self) -> List[Union[TrashBin, WasteChute]]:
         ...
 
     @abstractmethod

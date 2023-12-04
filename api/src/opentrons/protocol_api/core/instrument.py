@@ -10,8 +10,8 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
-from .._trash_bin import TrashBin
-from .._waste_chute import WasteChute
+from ..trash_bin import TrashBin
+from ..waste_chute import WasteChute
 from .well import WellCoreType
 
 
@@ -141,6 +141,12 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         disposal_location: Union[TrashBin, WasteChute],
         home_after: Optional[bool]
     ) -> None:
+        """Move to and drop tip into a TrashBin or WasteChute.
+
+        Args:
+            disposal_location: The disposal location object we're dropping to.
+            home_after: Whether to home the pipette after the tip is dropped.
+        """
         ...
 
     @abstractmethod

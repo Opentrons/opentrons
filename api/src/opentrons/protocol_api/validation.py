@@ -265,25 +265,47 @@ def ensure_module_model(load_name: str) -> ModuleModel:
     return model
 
 
-def ensure_trash_bin_location(
+def ensure_and_convert_trash_bin_location(
     deck_slot: Union[int, str],
+    api_version: APIVersion,
     robot_type: RobotType
-) -> DeckSlotName:
+) -> str:
 
-    """Ensure trash bin load location is valid."""
+    """Ensure trash bin load location is valid.
+    
+    Also, convert the deck slot to a valid trash bin addressable area.
+    """
 
     if robot_type == 'OT-2 Standard':
         raise InvalidTrashBinLocationError('Cannot load trash on OT-2.')
 
-    validated_slot = ensure_and_convert_deck_slot(deck_slot)
-    slot_name_ot3 = validated_slot.to_ot3_equivalent()
-    valid_trash_bin_slots = {'A1', 'B1', 'C1', 'D1', 'A3', 'B3', 'C3', 'D3'}
+    # map trash bin location to addressable area
+    
+    map_trash_bin_addressable_area = {
+        'A1': 'movableTrashA1',
+        'B1': 'movableTrashB1',
+        'C1': 'movableTrashC1',
+        'D1': 'movableTrashD1',
+        'A3': 'movableTrashA3',
+        'B3': 'movableTrashB3',
+        'C3': 'movableTrashC3',
+        'D3': 'movableTrashD3',
+    }
+
+    slot_name_ot3 = ensure_and_convert_deck_slot(
+        deck_slot,
+        api_version,
+        robot_type
+    )
+    valid_trash_bin_slots = {
+        DeckSlotName(slot_name)
+        for slot_name in map_trash_bin_addressable_area.keys()}
     if slot_name_ot3 not in valid_trash_bin_slots:
         raise InvalidTrashBinLocationError(
             f'Invalid location for trash bin: {slot_name_ot3}.\n'
             f'Valid slots: Any slot in column 1 or 3.')
 
-    return slot_name_ot3
+    return map_trash_bin_addressable_area[slot_name_ot3]
 
 
 def ensure_hold_time_seconds(
