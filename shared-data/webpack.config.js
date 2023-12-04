@@ -13,6 +13,7 @@ module.exports = async () =>
     output: {
       ...baseConfig.output,
       path: OUTPUT_PATH,
+      filename: 'opentrons-shared-data.js',
       library: '@opentrons/shared-data',
       libraryTarget: 'umd'
     },
