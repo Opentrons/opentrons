@@ -118,7 +118,7 @@ class Plot:
         y_range = round(y_range, 3)
         y_avg = round(y_avg, 3)
         y_avg_xpos = df[x_axis].mean()
-        y_avg_text = f"Avg Force = {y_avg}N ± {y_range}N"
+        y_avg_text = f"Avg Force = {y_avg}N ± {y_range/2}N"
 
         annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=100)
 
