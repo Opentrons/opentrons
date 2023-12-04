@@ -202,9 +202,14 @@ jobs:
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
       - name: 'publish to npm registry'
+<<<<<<< Updated upstream
         run: cp ./.npmrc ./components/.npmrc && cd ./components && npm publish --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+=======
+        run: |
+          cd ./components && echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc && npm publish --access public
+>>>>>>> Stashed changes
           
 
       
