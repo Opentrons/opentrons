@@ -82,7 +82,7 @@ function getAllCheckSectionSteps(
       location,
       moduleId,
       adapterId,
-      definitionUri: definitionUri
+      definitionUri: definitionUri,
     })
   )
 }
