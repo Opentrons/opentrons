@@ -38,7 +38,7 @@ import type {
 // const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
-  setShouldDispenseLiquid: (arg: boolean) => void
+  setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
   createMaintenanceRun: UseMutateFunction<
     MaintenanceRun,
     AxiosError<any>,
