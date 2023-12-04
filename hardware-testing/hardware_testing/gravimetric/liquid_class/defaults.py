@@ -9,7 +9,7 @@ from .definition import (
 )
 
 _default_submerge_aspirate_mm = 2.5
-_default_submerge_dispense_mm = 2.5
+_default_submerge_dispense_mm = 3.0
 _default_retract_mm = 5.0
 _default_retract_discontinuity = 20
 
