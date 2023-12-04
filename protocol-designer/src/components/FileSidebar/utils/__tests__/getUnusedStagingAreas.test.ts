@@ -12,18 +12,8 @@ describe('getUnusedStagingAreas', () => {
         location: 'cutoutA3',
       },
     } as AdditionalEquipment
-    const mockCommand = ([
-      {
-        stagingArea: {
-          commandType: 'loadLabware',
-          params: { location: { slotName: 'A1' } },
-        },
-      },
-    ] as unknown) as CreateCommand[]
 
-    expect(
-      getUnusedStagingAreas(mockAdditionalEquipment, mockCommand)
-    ).toEqual(['A4'])
+    expect(getUnusedStagingAreas(mockAdditionalEquipment, [])).toEqual(['A4'])
   })
   it('returns true for multi unused staging areas', () => {
     const stagingArea = 'stagingAreaId'
