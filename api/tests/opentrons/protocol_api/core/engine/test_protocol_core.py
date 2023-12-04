@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Mount, MountType, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Mount, MountType, Point
 from opentrons.protocol_api import OFF_DECK
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleType
@@ -66,7 +66,6 @@ from opentrons.protocol_api.core.engine import (
     load_labware_params,
 )
 from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api._types import StagingSlotName
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,

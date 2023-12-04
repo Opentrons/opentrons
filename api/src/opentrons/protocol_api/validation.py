@@ -21,7 +21,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount, DeckSlotName, Location
+from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -31,7 +31,6 @@ from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
     ThermocyclerStep,
 )
-from ._types import StagingSlotName
 
 if TYPE_CHECKING:
     from .labware import Well

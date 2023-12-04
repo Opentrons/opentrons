@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.util.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -17,7 +17,7 @@ from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ..._liquid import Liquid
-from ..._types import OffDeckType, StagingSlotName
+from ..._types import OffDeckType
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams

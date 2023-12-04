@@ -10,7 +10,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -20,7 +20,7 @@ from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
 from .._waste_chute import WasteChute
-from .._types import OffDeckType, StagingSlotName
+from .._types import OffDeckType
 
 
 class AbstractProtocol(
