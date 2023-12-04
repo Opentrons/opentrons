@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple
+from typing import Generic, List, Optional, Union, Tuple, Dict
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -164,10 +164,15 @@ class AbstractProtocol(
     def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
 
-    # TODO(jbl 10-30-2023) this method may no longer need to exist post deck config work being completed
     @abstractmethod
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+    def get_slot_definition(
+        self, slot: Union[DeckSlotName, StagingSlotName]
+    ) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
+
+    @abstractmethod
+    def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get the configured or assumed slot definitions from the robot's deck."""
 
     @abstractmethod
     def get_slot_item(

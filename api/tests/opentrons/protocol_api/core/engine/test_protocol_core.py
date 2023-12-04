@@ -177,13 +177,30 @@ def test_api_version(
     assert subject.api_version == api_version
 
 
-# def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV3, subject: ProtocolCore, decoy: Decoy) -> None:
-#     """It should return a deck slot's definition."""
-#     decoy.when(subject._engine_client.state.labware.get_slot_definition(5))
-#     result = subject.get_slot_definition(DeckSlotName.SLOT_6)
-#
-#     assert result["id"] == "6"
-#     assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
+def test_get_slot_definition(
+    ot2_standard_deck_def: DeckDefinitionV4, subject: ProtocolCore, decoy: Decoy
+) -> None:
+    """It should return a deck slot's definition."""
+    expected_slot_def = cast(
+        SlotDefV3,
+        {
+            "id": "abc",
+            "position": [1, 2, 3],
+            "boundingBox": {
+                "xDimension": 4,
+                "yDimension": 5,
+                "zDimension": 6,
+            },
+            "displayName": "xyz",
+            "compatibleModuleTypes": [],
+        },
+    )
+    decoy.when(
+        subject._engine_client.state.addressable_areas.get_slot_definition(
+            DeckSlotName.SLOT_6.id
+        )
+    ).then_return(expected_slot_def)
+    assert subject.get_slot_definition(DeckSlotName.SLOT_6) == expected_slot_def
 
 
 def test_fixed_trash(subject: ProtocolCore) -> None:

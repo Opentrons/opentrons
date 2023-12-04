@@ -465,9 +465,15 @@ class LegacyProtocolCore(
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
 
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+    def get_slot_definition(
+        self, slot: Union[DeckSlotName, StagingSlotName]
+    ) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
         assert False, "get_slot_definition only supported on engine core"
+
+    def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get the configured or assumed slot definitions from the robot's deck."""
+        assert False, "get_slot_definitions only supported on engine core"
 
     def get_slot_item(
         self, slot_name: DeckSlotName
