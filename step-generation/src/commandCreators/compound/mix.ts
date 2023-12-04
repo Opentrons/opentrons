@@ -140,7 +140,7 @@ export const mix: CommandCreator<MixArgs> = (
   }
 
   if (
-    !invariantContext.labwareEntities[dropTipLocation] &&
+    !dropTipLocation ||
     !invariantContext.additionalEquipmentEntities[dropTipLocation]
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }

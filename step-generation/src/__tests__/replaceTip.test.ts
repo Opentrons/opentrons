@@ -110,7 +110,10 @@ describe('replaceTip', () => {
         initialTestRobotState
       )
       const res = getSuccessResult(result)
-      expect(res.commands).toEqual([dropTipHelper('A1'), pickUpTipHelper('B1')])
+      expect(res.commands).toEqual([
+        ...dropTipHelper(p300SingleId),
+        pickUpTipHelper('B1'),
+      ])
     })
     it('Single-channel: used all tips in first rack, move to second rack', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
@@ -240,9 +243,7 @@ describe('replaceTip', () => {
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
-        dropTipHelper('A1', {
-          pipetteId: p300MultiId,
-        }),
+        ...dropTipHelper(p300MultiId),
         pickUpTipHelper('A1', {
           pipetteId: p300MultiId,
         }),

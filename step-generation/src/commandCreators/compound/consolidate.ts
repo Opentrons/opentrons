@@ -72,7 +72,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   }
 
   if (
-    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !args.dropTipLocation ||
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
