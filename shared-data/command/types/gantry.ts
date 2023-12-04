@@ -167,9 +167,15 @@ interface RetractAxisParams {
   axis: MotorAxis
 }
 
+interface AddressableOffsetVector {
+  x: number
+  y: number
+  z: number
+}
 export interface MoveToAddressableAreaParams {
   pipetteId: string
   addressableAreaName: string
+  offset: AddressableOffsetVector
   speed?: number
   minimumZHeight?: number
   forceDirect?: boolean

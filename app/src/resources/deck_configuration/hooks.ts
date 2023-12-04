@@ -1,7 +1,7 @@
-import { parseAllAddressableAreas } from '@opentrons/api-client'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
+  getAddressableAreasInProtocol,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
@@ -27,7 +27,7 @@ export function useDeckConfigurationCompatibility(
   const deckConfig = useDeckConfigurationQuery().data ?? []
   if (robotType !== FLEX_ROBOT_TYPE) return []
   const deckDef = getDeckDefFromRobotType(robotType)
-  const allAddressableAreas = parseAllAddressableAreas(protocolCommands)
+  const allAddressableAreas = getAddressableAreasInProtocol(protocolCommands)
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
       const fixturesThatMountToCutoutId = getCutoutFixturesForCutoutId(

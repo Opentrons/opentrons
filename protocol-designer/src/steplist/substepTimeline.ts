@@ -5,6 +5,7 @@ import {
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
 import { Channels } from '@opentrons/components'
+import { getCutoutIdByAddressableArea } from '../utils'
 import type {
   CommandCreatorError,
   CommandsAndWarnings,
@@ -16,9 +17,9 @@ import {
   AddressableAreaName,
   CreateCommand,
   FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
-import { getCutoutIdByAddressableArea } from '../utils'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
@@ -129,19 +130,27 @@ export const substepTimelineSingleChannel = (
             `expected to find moveToAddressableArea command assosciated with the ${command.commandType} but could not`
           )
         }
+        const trashCutoutFixture =
+          moveToAddressableAreaCommand?.params.addressableAreaName ===
+          'fixedTrash'
+            ? 'fixedTrashSlot'
+            : 'trashBinAdapter'
+
         const cutoutFixture =
           moveToAddressableAreaCommand?.params.addressableAreaName ===
             '1and8ChannelWasteChute' ||
           moveToAddressableAreaCommand?.params.addressableAreaName ===
             '96ChannelWasteChute'
             ? 'wasteChuteRightAdapterNoCover'
-            : 'trashBinAdapter'
+            : trashCutoutFixture
 
         const cutoutId = getCutoutIdByAddressableArea(
           moveToAddressableAreaCommand?.params
             .addressableAreaName as AddressableAreaName,
           cutoutFixture,
-          FLEX_ROBOT_TYPE
+          trashCutoutFixture === 'fixedTrashSlot'
+            ? OT2_ROBOT_TYPE
+            : FLEX_ROBOT_TYPE
         )
         const additionalEquipmentId = Object.entries(
           invariantContext.additionalEquipmentEntities
@@ -272,19 +281,27 @@ export const substepTimelineMultiChannel = (
             `expected to find moveToAddressableArea command assosciated with the ${command.commandType} but could not`
           )
         }
+        const trashCutoutFixture =
+          moveToAddressableAreaCommand?.params.addressableAreaName ===
+          'fixedTrash'
+            ? 'fixedTrashSlot'
+            : 'trashBinAdapter'
+
         const cutoutFixture =
           moveToAddressableAreaCommand?.params.addressableAreaName ===
             '1and8ChannelWasteChute' ||
           moveToAddressableAreaCommand?.params.addressableAreaName ===
             '96ChannelWasteChute'
             ? 'wasteChuteRightAdapterNoCover'
-            : 'trashBinAdapter'
+            : trashCutoutFixture
 
         const cutoutId = getCutoutIdByAddressableArea(
           moveToAddressableAreaCommand?.params
             .addressableAreaName as AddressableAreaName,
           cutoutFixture,
-          FLEX_ROBOT_TYPE
+          trashCutoutFixture === 'fixedTrashSlot'
+            ? OT2_ROBOT_TYPE
+            : FLEX_ROBOT_TYPE
         )
         const additionalEquipmentId = Object.entries(
           invariantContext.additionalEquipmentEntities

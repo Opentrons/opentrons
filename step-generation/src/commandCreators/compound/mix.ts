@@ -1,4 +1,5 @@
 import flatMap from 'lodash/flatMap'
+import { LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
 import {
   repeatArray,
   blowoutUtil,
@@ -145,16 +146,16 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  const configureForVolumeCommand: CurriedCommandCreator[] =
-    invariantContext.pipetteEntities[pipette].name === 'p50_single_flex' ||
-    invariantContext.pipetteEntities[pipette].name === 'p50_multi_flex'
-      ? [
-          curryCommandCreator(configureForVolume, {
-            pipetteId: pipette,
-            volume: volume,
-          }),
-        ]
-      : []
+  const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+    invariantContext.pipetteEntities[pipette].name
+  )
+    ? [
+        curryCommandCreator(configureForVolume, {
+          pipetteId: pipette,
+          volume: volume,
+        }),
+      ]
+    : []
 
   // Command generation
   const commandCreators = flatMap(
@@ -191,6 +192,7 @@ export const mix: CommandCreator<MixArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
+        prevRobotState,
       })
       const mixCommands = mixUtil({
         pipette,

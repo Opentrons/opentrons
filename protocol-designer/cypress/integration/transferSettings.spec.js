@@ -2,55 +2,55 @@ const isMacOSX = Cypress.platform === 'darwin'
 const batchEditClickOptions = { [isMacOSX ? 'metaKey' : 'ctrlKey']: true }
 const invalidInput = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()<>?,-'
 
-// function importProtocol() {
-//   cy.fixture('../../fixtures/protocol/5/transferSettings.json').then(
-//     fileContent => {
-//       cy.get('input[type=file]').upload({
-//         fileContent: JSON.stringify(fileContent),
-//         fileName: 'fixture.json',
-//         mimeType: 'application/json',
-//         encoding: 'utf8',
-//       })
-//       cy.get('[data-test="ComputingSpinner"]').should('exist')
-//       cy.get('div')
-//         .contains(
-//           'Your protocol will be automatically updated to the latest version.'
-//         )
-//         .should('exist')
-//       cy.get('button').contains('ok', { matchCase: false }).click()
-//       // wait until computation is done before proceeding, with generous timeout
-//       cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
-//         'not.exist'
-//       )
-//     }
-//   )
-// }
+function importProtocol() {
+  cy.fixture('../../fixtures/protocol/5/transferSettings.json').then(
+    fileContent => {
+      cy.get('input[type=file]').upload({
+        fileContent: JSON.stringify(fileContent),
+        fileName: 'fixture.json',
+        mimeType: 'application/json',
+        encoding: 'utf8',
+      })
+      cy.get('[data-test="ComputingSpinner"]').should('exist')
+      cy.get('div')
+        .contains(
+          'Your protocol will be automatically updated to the latest version.'
+        )
+        .should('exist')
+      cy.get('button').contains('ok', { matchCase: false }).click()
+      // wait until computation is done before proceeding, with generous timeout
+      cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
+        'not.exist'
+      )
+    }
+  )
+}
 
-// function openDesignTab() {
-//   cy.get('button[id=NavTab_design]').click()
-//   cy.get('button').contains('ok').click()
+function openDesignTab() {
+  cy.get('button[id=NavTab_design]').click()
+  cy.get('button').contains('ok').click()
 
-//   // Verify the Design Page
-//   cy.get('#TitleBar_main > h1').contains('Multi select banner test protocol')
-//   cy.get('#TitleBar_main > h2').contains('STARTING DECK STATE')
-//   cy.get('button[id=StepCreationButton]').contains('+ Add Step')
-// }
+  // Verify the Design Page
+  cy.get('#TitleBar_main > h1').contains('Multi select banner test protocol')
+  cy.get('#TitleBar_main > h2').contains('STARTING DECK STATE')
+  cy.get('button[id=StepCreationButton]').contains('+ Add Step')
+}
 
-// function enterBatchEdit() {
-//   cy.get('[data-test="StepItem_1"]').click(batchEditClickOptions)
-//   cy.get('button').contains('exit batch edit').should('exist')
-// }
+function enterBatchEdit() {
+  cy.get('[data-test="StepItem_1"]').click(batchEditClickOptions)
+  cy.get('button').contains('exit batch edit').should('exist')
+}
 
 describe('Advanced Settings for Transfer Form', () => {
   before(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()
-    // importProtocol()
-    // openDesignTab()
+    importProtocol()
+    openDesignTab()
   })
 
-  it.skip('Verify functionality of advanced settings with different pipette and labware', () => {
-    // enterBatchEdit()
+  it('Verify functionality of advanced settings with different pipette and labware', () => {
+    enterBatchEdit()
 
     // Different Pipette disbales aspirate and dispense Flowrate and Mix settings
     // step 6 has different pipette than step 1
@@ -85,7 +85,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('exit batch edit').click()
   })
 
-  it.skip('Verify functionality of advanced settings with same pipette and labware', () => {
+  it('Verify functionality of advanced settings with same pipette and labware', () => {
     // click on step 2 in batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // deselecting on step 6 in batch edit mode
@@ -126,7 +126,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('exit batch edit').click()
   })
 
-  it.skip('verify flowrate indeterminate value', () => {
+  it('verify flowrate indeterminate value', () => {
     // click on step 2 in batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
@@ -147,7 +147,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('input[name="aspirate_flowRate"]').should('have.value', '')
   })
 
-  it.skip('verify functionality of flowrate in batch edit transfer', () => {
+  it('verify functionality of flowrate in batch edit transfer', () => {
     // Batch editing the Flowrate value
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
     cy.get('div[class*=FlowRateInput__description]').contains(
@@ -177,7 +177,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('input[name="aspirate_flowRate"]').should('have.value', 100)
   })
 
-  it.skip('verify prewet tip indeterminate value', () => {
+  it('verify prewet tip indeterminate value', () => {
     // Click on step 2, to enter batch edit and enable prewet tip
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // enable pre-wet tip
@@ -197,7 +197,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('exit batch edit').click()
   })
 
-  it.skip('verify mix settings indeterminate value', () => {
+  it('verify mix settings indeterminate value', () => {
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // Select mix settings
@@ -218,7 +218,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('exit batch edit').click()
   })
 
-  it.skip('verify mix settings batch editing in transfer form', () => {
+  it('verify mix settings batch editing in transfer form', () => {
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
@@ -242,7 +242,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('input[name="aspirate_mix_times"]').should('have.value', 2)
   })
 
-  it.skip('verify delay settings indeterminate value', () => {
+  it('verify delay settings indeterminate value', () => {
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select delay settings
@@ -264,7 +264,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('exit batch edit').click()
   })
 
-  it.skip('verify delay settings batch editing in transfer form', () => {
+  it('verify delay settings batch editing in transfer form', () => {
     // Click on step 4, to enter batch edit mode
     cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // Click on step 5 to batch edit mix settings
@@ -293,7 +293,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('input[name="aspirate_delay_seconds"]').should('have.value', 2)
   })
 
-  it.skip('verify touchTip settings indeterminate value', () => {
+  it('verify touchTip settings indeterminate value', () => {
     cy.get('[data-test="StepItem_2"]').click()
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
@@ -315,7 +315,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('button').contains('exit batch edit').click()
   })
 
-  it.skip('verify touchTip settings batch editing in transfer form', () => {
+  it('verify touchTip settings batch editing in transfer form', () => {
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
@@ -348,58 +348,57 @@ describe('Advanced Settings for Transfer Form', () => {
     )
   })
 
-  //  TODO(jr, 11/27/23): fix these when trash bin is fully wired up
-  // it('verify blowout settings indeterminate value', () => {
-  //   // Click on step 2, to enter batch edit mode
-  //   cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
-  //   // Select blowout settings
-  //   cy.get('input[name="blowout_checkbox"]').click({ force: true })
+  it('verify blowout settings indeterminate value', () => {
+    // Click on step 2, to enter batch edit mode
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
+    // Select blowout settings
+    cy.get('input[name="blowout_checkbox"]').click({ force: true })
 
-  //   // Click save button to save the changes
-  //   cy.get('button').contains('save').click()
-  //   // Click on step 4 to generate indertminate state for blowout settings.
-  //   cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
-  //   // Verify the tooltip here
-  //   cy.contains('blowout').trigger('pointerover')
-  //   cy.get('div[role="tooltip"]').should(
-  //     'contain',
-  //     'Not all selected steps are using this setting'
-  //   )
-  //   // Exit batch edit mode
-  //   cy.get('button').contains('exit batch edit').click()
-  // })
+    // Click save button to save the changes
+    cy.get('button').contains('save').click()
+    // Click on step 4 to generate indertminate state for blowout settings.
+    cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
+    // Verify the tooltip here
+    cy.contains('blowout').trigger('pointerover')
+    cy.get('div[role="tooltip"]').should(
+      'contain',
+      'Not all selected steps are using this setting'
+    )
+    // Exit batch edit mode
+    cy.get('button').contains('exit batch edit').click()
+  })
 
-  // it('verify blowout settings batch editing in transfer form', () => {
-  //   // Click on step 2, to enter batch edit mode
-  //   cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
-  //   // Click on step 3 to batch edit mix settings
-  //   cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
-  //   // Select blowout settings
-  //   cy.get('input[name="blowout_checkbox"]').click({ force: true })
-  //   // Click save button to save the changes
-  //   cy.get('button').contains('save').click()
-  //   // Exit batch edit mode
-  //   cy.get('button').contains('exit batch edit').click()
+  it('verify blowout settings batch editing in transfer form', () => {
+    // Click on step 2, to enter batch edit mode
+    cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
+    // Click on step 3 to batch edit mix settings
+    cy.get('[data-test="StepItem_3"]').click(batchEditClickOptions)
+    // Select blowout settings
+    cy.get('input[name="blowout_checkbox"]').click({ force: true })
+    // Click save button to save the changes
+    cy.get('button').contains('save').click()
+    // Exit batch edit mode
+    cy.get('button').contains('exit batch edit').click()
 
-  //   // Click on step 2 to verify that blowout has trash selected
-  //   cy.get('[data-test="StepItem_2"]').click()
-  //   cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
+    // Click on step 2 to verify that blowout has trash selected
+    cy.get('[data-test="StepItem_2"]').click()
+    cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-  //   // Verify that trash is selected
-  //   cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
-  //     const value = $input.val()
-  //     const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
-  //     expect(value).to.include(expectedSubstring)
-  //   })
-  //   // Click on step 3 to verify the batch editing
-  //   cy.get('[data-test="StepItem_3"]').click()
-  //   cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
+    // Verify that trash is selected
+    cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
+      const value = $input.val()
+      const expectedSubstring = 'trashBin'
+      expect(value).to.include(expectedSubstring)
+    })
+    // Click on step 3 to verify the batch editing
+    cy.get('[data-test="StepItem_3"]').click()
+    cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-  //   // Verify that trash is selected for the blowout option
-  //   cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
-  //     const value = $input.val()
-  //     const expectedSubstring = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
-  //     expect(value).to.include(expectedSubstring)
-  //   })
-  // })
+    // Verify that trash is selected for the blowout option
+    cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
+      const value = $input.val()
+      const expectedSubstring = 'trashBin'
+      expect(value).to.include(expectedSubstring)
+    })
+  })
 })

@@ -656,7 +656,26 @@ class LabwareView(HasState[LabwareState]):
 
     def is_fixed_trash(self, labware_id: str) -> bool:
         """Check if labware is fixed trash."""
-        return self.get_fixed_trash_id() == labware_id
+        return self.get_has_quirk(labware_id, "fixedTrash")
+
+    def raise_if_labware_inaccessible_by_pipette(self, labware_id: str) -> None:
+        """Raise an error if the specified location cannot be reached via a pipette."""
+        labware = self.get(labware_id)
+        labware_location = labware.location
+        if isinstance(labware_location, OnLabwareLocation):
+            return self.raise_if_labware_inaccessible_by_pipette(
+                labware_location.labwareId
+            )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            if fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+                raise errors.LocationNotAccessibleByPipetteError(
+                    f"Cannot move pipette to {labware.loadName},"
+                    f" labware is on staging slot {labware_location.addressableAreaName}"
+                )
+        elif labware_location == OFF_DECK_LOCATION:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
 
     def raise_if_labware_in_location(
         self,

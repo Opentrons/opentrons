@@ -3,9 +3,10 @@ import inspect
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.labware_definition import Parameters
+from opentrons_shared_data.labware.labware_definition import Parameters, Dimensions
+from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import errors, Config
 from opentrons.protocol_engine.resources import labware_validation
@@ -242,7 +243,7 @@ async def test_gripper_move_labware_implementation(
                 pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
                 dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
             ),
-            delay_after_drop=None,
+            post_drop_slide_offset=None,
         ),
     )
     assert result == MoveLabwareResult(
@@ -266,6 +267,10 @@ async def test_gripper_move_to_waste_chute_implementation(
     )
     from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     new_location = AddressableAreaLocation(addressableAreaName="gripperWasteChute")
+    labware_width = 50
+    expected_slide_offset = Point(
+        x=labware_width / 2 + GRIPPER_PADDLE_WIDTH / 2 + 8, y=0, z=0
+    )
 
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
@@ -274,11 +279,15 @@ async def test_gripper_move_to_waste_chute_implementation(
         pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
         dropOffset=None,
     )
+    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+        namespace="my-cool-namespace",
+        dimensions=Dimensions(
+            yDimension=labware_width, zDimension=labware_width, xDimension=labware_width
+        ),
+    )
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
-    ).then_return(
-        LabwareDefinition.construct(namespace="my-cool-namespace")  # type: ignore[call-arg]
-    )
+    ).then_return(labware_def)
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
         LoadedLabware(
             id="my-cool-labware-id",
@@ -306,11 +315,9 @@ async def test_gripper_move_to_waste_chute_implementation(
     decoy.when(
         state_view.geometry.ensure_valid_gripper_location(new_location)
     ).then_return(new_location)
-    decoy.when(
-        labware_validation.validate_gripper_compatible(
-            LabwareDefinition.construct(namespace="my-cool-namespace")  # type: ignore[call-arg]
-        )
-    ).then_return(True)
+    decoy.when(labware_validation.validate_gripper_compatible(labware_def)).then_return(
+        True
+    )
 
     result = await subject.execute(data)
     decoy.verify(
@@ -323,7 +330,7 @@ async def test_gripper_move_to_waste_chute_implementation(
                 pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
                 dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
             ),
-            delay_after_drop=1.0,
+            post_drop_slide_offset=expected_slide_offset,
         ),
     )
     assert result == MoveLabwareResult(

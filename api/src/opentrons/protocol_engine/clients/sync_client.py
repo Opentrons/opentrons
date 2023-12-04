@@ -326,7 +326,7 @@ class SyncClient:
         """Execute a ConfigureForVolume command."""
         request = commands.ConfigureNozzleLayoutCreate(
             params=commands.ConfigureNozzleLayoutParams(
-                pipetteId=pipette_id, configuration_params=configuration_params
+                pipetteId=pipette_id, configurationParams=configuration_params
             )
         )
         result = self._transport.execute_command(request=request)

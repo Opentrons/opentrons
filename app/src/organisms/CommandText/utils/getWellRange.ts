@@ -27,9 +27,9 @@ export function getWellRange(
         c.params?.pipetteId === pipetteId
       ) {
         // TODO(sb, 11/9/23): add support for quadrant and row configurations when needed
-        if (c.params.configuration_params.style === 'SINGLE') {
+        if (c.params.configurationParams.style === 'SINGLE') {
           usedChannels = 1
-        } else if (c.params.configuration_params.style === 'COLUMN') {
+        } else if (c.params.configurationParams.style === 'COLUMN') {
           usedChannels = 8
         }
         break

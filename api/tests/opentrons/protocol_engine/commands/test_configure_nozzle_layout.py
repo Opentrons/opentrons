@@ -291,7 +291,7 @@ NINETY_SIX_MAP = OrderedDict(
     argnames=["request_model", "expected_nozzlemap", "nozzle_params"],
     argvalues=[
         [
-            SingleNozzleLayoutConfiguration(primary_nozzle="A1"),
+            SingleNozzleLayoutConfiguration(primaryNozzle="A1"),
             NozzleMap.build(
                 physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
                 physical_rows=OrderedDict({"A": ["A1"]}),
@@ -303,7 +303,7 @@ NINETY_SIX_MAP = OrderedDict(
             {"primary_nozzle": "A1"},
         ],
         [
-            ColumnNozzleLayoutConfiguration(primary_nozzle="A1"),
+            ColumnNozzleLayoutConfiguration(primaryNozzle="A1"),
             NozzleMap.build(
                 physical_nozzles=NINETY_SIX_MAP,
                 physical_rows=NINETY_SIX_ROWS,
@@ -316,7 +316,7 @@ NINETY_SIX_MAP = OrderedDict(
         ],
         [
             QuadrantNozzleLayoutConfiguration(
-                primary_nozzle="A1", front_right_nozzle="E1"
+                primaryNozzle="A1", frontRightNozzle="E1"
             ),
             NozzleMap.build(
                 physical_nozzles=NINETY_SIX_MAP,
@@ -355,12 +355,25 @@ async def test_configure_nozzle_layout_implementation(
 
     requested_nozzle_layout = ConfigureNozzleLayoutParams(
         pipetteId="pipette-id",
-        configuration_params=request_model,
+        configurationParams=request_model,
+    )
+    primary_nozzle = (
+        None
+        if isinstance(request_model, AllNozzleLayoutConfiguration)
+        else request_model.primaryNozzle
+    )
+    front_right_nozzle = (
+        request_model.frontRightNozzle
+        if isinstance(request_model, QuadrantNozzleLayoutConfiguration)
+        else None
     )
 
     decoy.when(
         await tip_handler.available_for_nozzle_layout(
-            "pipette-id", **request_model.dict()
+            pipette_id="pipette-id",
+            style=request_model.style,
+            primary_nozzle=primary_nozzle,
+            front_right_nozzle=front_right_nozzle,
         )
     ).then_return(nozzle_params)
 

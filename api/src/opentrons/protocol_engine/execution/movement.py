@@ -73,6 +73,10 @@ class MovementHandler:
         speed: Optional[float] = None,
     ) -> Point:
         """Move to a specific well."""
+        self._state_store.labware.raise_if_labware_inaccessible_by_pipette(
+            labware_id=labware_id
+        )
+
         self._state_store.labware.raise_if_labware_has_labware_on_top(
             labware_id=labware_id
         )

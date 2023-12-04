@@ -31,6 +31,7 @@ describe('moveToAddressableArea', () => {
         params: {
           pipetteId: mockId,
           addressableAreaName: mockName,
+          offset: { x: 0, y: 0, z: 0 },
         },
       },
     ])

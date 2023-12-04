@@ -52,3 +52,11 @@ def test_replacing_instrument_tip_state(
 
     assert pip1.has_tip() is False
     assert pip2.has_tip() is False
+
+
+@pytest.mark.ot2_only
+def test_load_instrument_raises(simulating_protocol_context: ProtocolCore) -> None:
+    with pytest.raises(ValueError):
+        simulating_protocol_context.load_instrument(
+            instrument_name=PipetteNameType.P1000_SINGLE_FLEX, mount=Mount.RIGHT
+        )

@@ -38,15 +38,10 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
     getAdditionalEquipmentEntities
   )
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
-  const wasteChuteOrLabwareId = formData[addFieldNamePrefix('labware')]
-  const isWasteChute =
-    additionalEquipmentEntities[wasteChuteOrLabwareId]?.name === 'wasteChute'
-
-  React.useEffect(() => {
-    if (isWasteChute) {
-      propsForFields.dispense_wells.updateValue(['A1'])
-    }
-  }, [isWasteChute])
+  const trashOrLabwareId = formData[addFieldNamePrefix('labware')]
+  const isDisposalLocation =
+    additionalEquipmentEntities[trashOrLabwareId]?.name === 'wasteChute' ||
+    additionalEquipmentEntities[trashOrLabwareId]?.name === 'trashBin'
 
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>
@@ -54,10 +49,10 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
         <FormGroup label={labwareLabel}>
           <LabwareField {...propsForFields[addFieldNamePrefix('labware')]} />
         </FormGroup>
-        {isWasteChute ? null : (
+        {isDisposalLocation ? null : (
           <WellSelectionField
             {...propsForFields[addFieldNamePrefix('wells')]}
-            labwareId={wasteChuteOrLabwareId}
+            labwareId={trashOrLabwareId}
             pipetteId={formData.pipette}
           />
         )}

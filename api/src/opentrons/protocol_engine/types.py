@@ -748,7 +748,7 @@ class SingleNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["SINGLE"] = "SINGLE"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -758,7 +758,7 @@ class RowNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["ROW"] = "ROW"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -768,7 +768,7 @@ class ColumnNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type ROW and COLUMN."""
 
     style: Literal["COLUMN"] = "COLUMN"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -778,11 +778,11 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type QUADRANT."""
 
     style: Literal["QUADRANT"] = "QUADRANT"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
-    front_right_nozzle: str = Field(
+    frontRightNozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",

@@ -7,7 +7,10 @@ export function getDisabledFieldsMoveLiquidForm(
   const disabled: Set<string> = new Set()
   const prefixes = ['aspirate', 'dispense']
 
-  if (hydratedForm.dispense_labware?.name === 'wasteChute') {
+  if (
+    hydratedForm.dispense_labware?.name === 'wasteChute' ||
+    hydratedForm.dispense_labware?.name === 'trashBin'
+  ) {
     disabled.add('dispense_mix_checkbox')
     disabled.add('dispense_touchTip_checkbox')
     disabled.add('dispense_mmFromBottom')

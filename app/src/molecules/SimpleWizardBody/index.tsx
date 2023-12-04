@@ -56,6 +56,7 @@ const SUBHEADER_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   margin-left: 6.25rem;
   margin-right: 6.25rem;
+  margin-bottom: ${SPACING.spacing32};
   text-align: ${TYPOGRAPHY.textAlignCenter};
   height: 1.75rem;
 

@@ -160,9 +160,9 @@
         "title": "Missing 96-channel tip rack adapter",
         "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
       },
-      "ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST": {
-        "title": "The trash bin or waste chute does not exist",
-        "body": "Attempting to interact with an unknown entity."
+      "EQUIPMENT_DOES_NOT_EXIST": {
+        "title": "Attempting to interact with an unknown entity",
+        "body": "An entity you are interacting with does not exist."
       },
       "GRIPPER_REQUIRED": {
         "title": "A gripper is required to complete this action",

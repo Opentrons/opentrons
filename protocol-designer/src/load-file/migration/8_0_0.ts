@@ -62,6 +62,7 @@ export const migrateFile = (
       params: {
         addressableAreaName: trashAddressableArea,
         pipetteId: pipetteId ?? '',
+        offset: { x: 0, y: 0, z: 0 },
       },
     },
   ]
@@ -74,7 +75,6 @@ export const migrateFile = (
     }
     return acc
   }, {})
-
   const migrateSavedStepForms = (
     savedStepForms: Record<string, any>
   ): Record<string, any> => {
@@ -92,7 +92,7 @@ export const migrateFile = (
           ...stepForm,
           aspirate_labware:
             stepForm.aspirate_labware === 'fixedTrash'
-              ? trashId
+              ? null
               : stepForm.aspirate_labware,
           dispense_labware:
             stepForm.dispense_labware === 'fixedTrash'
@@ -103,8 +103,7 @@ export const migrateFile = (
       } else if (stepForm.stepType === 'mix') {
         return {
           ...stepForm,
-          labware:
-            stepForm.labware === 'fixedTrash' ? trashId : stepForm.labware,
+          labware: stepForm.labware === 'fixedTrash' ? null : stepForm.labware,
           ...sharedParams,
         }
       }

@@ -1,7 +1,7 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
-import { getWellDepth } from '@opentrons/shared-data'
+import { getWellDepth, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
@@ -356,17 +356,16 @@ export const distribute: CommandCreator<DistributeArgs> = (
             })
           : []
 
-      const configureForVolumeCommand: CurriedCommandCreator[] =
-        invariantContext.pipetteEntities[args.pipette].name ===
-          'p50_single_flex' ||
-        invariantContext.pipetteEntities[args.pipette].name === 'p50_multi_flex'
-          ? [
-              curryCommandCreator(configureForVolume, {
-                pipetteId: args.pipette,
-                volume: args.volume * destWellChunk.length + disposalVolume,
-              }),
-            ]
-          : []
+      const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+        invariantContext.pipetteEntities[args.pipette].name
+      )
+        ? [
+            curryCommandCreator(configureForVolume, {
+              pipetteId: args.pipette,
+              volume: args.volume * destWellChunk.length + disposalVolume,
+            }),
+          ]
+        : []
 
       return [
         ...tipCommands,

@@ -51,7 +51,7 @@ export const SetupModulesMap = ({
     protocolModulesInfo
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => ({
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
     moduleModel: module.moduleDef.model,
     moduleLocation: { slotName: module.slotName },
     moduleChildren: (
@@ -83,8 +83,8 @@ export const SetupModulesMap = ({
           }))}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           robotType={robotType}
-          labwareLocations={[]}
-          moduleLocations={moduleLocations}
+          labwareOnDeck={[]}
+          modulesOnDeck={modulesOnDeck}
         />
       </Box>
     </Flex>
