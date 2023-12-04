@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import inspect
 import pytest
 from decoy import Decoy
-from opentrons.hardware_control.api import API as OT2API
+from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
@@ -25,9 +25,6 @@ from opentrons.types import DeckSlotName, MountType, Point
 
 from opentrons.hardware_control import ot3_calibration as calibration
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
-
 
 @pytest.mark.ot3_only
 @pytest.fixture(autouse=True)
@@ -38,10 +35,10 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 @pytest.mark.ot3_only
 async def test_calibrate_module_implementation(
-    decoy: Decoy, ot3_hardware_api: OT3API, state_view: StateView
+    decoy: Decoy, hardware_api: HardwareControlAPI, state_view: StateView
 ) -> None:
     """Test Calibration command execution."""
-    subject = CalibrateModuleImplementation(state_view, ot3_hardware_api)
+    subject = CalibrateModuleImplementation(state_view, hardware_api)
 
     location = DeckSlotLocation(slotName=DeckSlotName("D3"))
     module_id = "module123"
@@ -75,7 +72,7 @@ async def test_calibrate_module_implementation(
     ).then_return(Point(x=3, y=2, z=1))
     decoy.when(
         await calibration.calibrate_module(
-            hcapi=ot3_hardware_api,
+            hcapi=hardware_api,
             mount=OT3Mount.LEFT,
             slot=location.slotName.id,
             module_id=module_serial,
@@ -95,13 +92,13 @@ async def test_calibrate_module_implementation(
     )
 
 
-@pytest.mark.ot3_only
+@pytest.mark.ot2_only
 async def test_calibrate_module_implementation_wrong_hardware(
-    decoy: Decoy, ot2_hardware_api: OT2API, state_view: StateView
+    decoy: Decoy, hardware_api: HardwareControlAPI, state_view: StateView
 ) -> None:
     """Should raise an unsupported hardware error."""
     subject = CalibrateModuleImplementation(
-        state_view=state_view, hardware_api=ot2_hardware_api
+        state_view=state_view, hardware_api=hardware_api
     )
 
     params = CalibrateModuleParams(

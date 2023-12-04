@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator, cast
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
@@ -18,36 +18,33 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons.protocol_engine.types import ModuleDefinition
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.api import API
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out HardwareControlAPI of unspecified robot type."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
-
-
-@pytest.fixture
-def ot2_hardware_api(decoy: Decoy) -> API:
-    """Get a mocked out OT-2 hardware API."""
+def _ot2_hardware_api(decoy: Decoy) -> API:
     return decoy.mock(cls=API)
 
+def _ot3_hardware_api(decoy: Decoy) -> OT3API:
+    return decoy.mock(cls=OT3API)
 
-@pytest.mark.ot3_only
-@pytest.fixture
-def ot3_hardware_api(decoy: Decoy) -> OT3API:
-    """Get a mocked out OT3API."""
-    try:
-        from opentrons.hardware_control.ot3api import OT3API
 
-        return decoy.mock(cls=OT3API)
-    except ImportError:
-        # TODO (tz, 9-23-22) Figure out a better way to use this fixture with OT-3 api only.
-        return None  # type: ignore[return-value]
+@pytest.fixture(params=["ot2", "ot3"])
+def hardware_api(
+    request: pytest.FixtureRequest, decoy: Decoy
+) -> Generator[HardwareControlAPI, None, None]:
+    machine = request.param  # type: ignore[attr-defined]
+   
+    if request.node.get_closest_marker("ot2_only") and machine == "ot3":
+        pytest.skip("test requests only ot-2")
+    if request.node.get_closest_marker("ot3_only") and machine == "ot2":
+        pytest.skip("test requests only ot-3")
+
+    if machine == "ot3":
+        yield _ot3_hardware_api(decoy)
+    else:
+        yield _ot2_hardware_api(decoy)
 
 
 @pytest.fixture(scope="session")

@@ -6,7 +6,7 @@ from typing import Dict, ContextManager, Optional
 from contextlib import nullcontext as does_not_raise
 
 from opentrons.types import Mount, MountType
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.state import StateView
@@ -21,12 +21,6 @@ from opentrons.protocol_engine.execution.tip_handler import (
     VirtualTipHandler,
     create_tip_handler,
 )
-
-
-@pytest.fixture
-def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
@@ -50,14 +44,14 @@ def tip_rack_definition() -> LabwareDefinition:
 async def test_create_tip_handler(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should return virtual or real tip handlers depending on config."""
     decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(False)
     assert isinstance(
         create_tip_handler(
             state_view=mock_state_view,
-            hardware_api=mock_hardware_api,
+            hardware_api=hardware_api,
         ),
         HardwareTipHandler,
     )
@@ -66,7 +60,7 @@ async def test_create_tip_handler(
     assert isinstance(
         create_tip_handler(
             state_view=mock_state_view,
-            hardware_api=mock_hardware_api,
+            hardware_api=hardware_api,
         ),
         VirtualTipHandler,
     )
@@ -75,14 +69,14 @@ async def test_create_tip_handler(
 async def test_pick_up_tip(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
     tip_rack_definition: LabwareDefinition,
 ) -> None:
     """It should use the hardware API to pick up a tip."""
     subject = HardwareTipHandler(
         state_view=mock_state_view,
-        hardware_api=mock_hardware_api,
+        hardware_api=hardware_api,
         labware_data_provider=mock_labware_data_provider,
     )
 
@@ -123,30 +117,30 @@ async def test_pick_up_tip(
     assert result == TipGeometry(length=42, diameter=5, volume=300)
 
     decoy.verify(
-        await mock_hardware_api.pick_up_tip(
+        await hardware_api.pick_up_tip(
             mount=Mount.LEFT,
             tip_length=42,
             presses=None,
             increment=None,
         ),
-        mock_hardware_api.set_current_tiprack_diameter(
+        hardware_api.set_current_tiprack_diameter(
             mount=Mount.LEFT,
             tiprack_diameter=5,
         ),
-        mock_hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
+        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
     )
 
 
 async def test_drop_tip(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should use the hardware API to drop a tip."""
     subject = HardwareTipHandler(
         state_view=mock_state_view,
-        hardware_api=mock_hardware_api,
+        hardware_api=hardware_api,
         labware_data_provider=mock_labware_data_provider,
     )
 
@@ -157,7 +151,7 @@ async def test_drop_tip(
     await subject.drop_tip(pipette_id="pipette-id", home_after=True)
 
     decoy.verify(
-        await mock_hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
+        await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
         times=1,
     )
 
@@ -165,13 +159,13 @@ async def test_drop_tip(
 async def test_add_tip(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should add a tip manually to the hardware API."""
     subject = HardwareTipHandler(
         state_view=mock_state_view,
-        hardware_api=mock_hardware_api,
+        hardware_api=hardware_api,
         labware_data_provider=mock_labware_data_provider,
     )
 
@@ -188,12 +182,12 @@ async def test_add_tip(
     await subject.add_tip(pipette_id="pipette-id", tip=tip)
 
     decoy.verify(
-        await mock_hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
-        mock_hardware_api.set_current_tiprack_diameter(
+        await hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
+        hardware_api.set_current_tiprack_diameter(
             mount=Mount.LEFT,
             tiprack_diameter=5,
         ),
-        mock_hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
+        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
     )
 
 
@@ -250,7 +244,7 @@ async def test_add_tip(
 async def test_available_nozzle_layout(
     decoy: Decoy,
     mock_state_view: StateView,
-    mock_hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_labware_data_provider: LabwareDataProvider,
     test_channels: int,
     style: str,
@@ -263,7 +257,7 @@ async def test_available_nozzle_layout(
     """The virtual and hardware pipettes should return the same data and error at the same time."""
     hw_subject = HardwareTipHandler(
         state_view=mock_state_view,
-        hardware_api=mock_hardware_api,
+        hardware_api=hardware_api,
         labware_data_provider=mock_labware_data_provider,
     )
     virtual_subject = VirtualTipHandler(state_view=mock_state_view)

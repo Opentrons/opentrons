@@ -45,12 +45,6 @@ from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonE
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out StateStore."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
-
-
-@pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mocked out StateStore."""
     return decoy.mock(cls=StateStore)

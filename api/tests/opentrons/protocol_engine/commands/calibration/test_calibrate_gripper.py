@@ -9,7 +9,7 @@ from decoy import Decoy
 from typing import TYPE_CHECKING
 
 from opentrons.hardware_control import ot3_calibration
-from opentrons.hardware_control.api import API as OT2API
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import GripperProbe, OT3Mount
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
@@ -31,10 +31,6 @@ from opentrons.protocol_engine.types import Vec3f
 
 from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
 
-if TYPE_CHECKING:
-    # Support environments without OT-3 hardware control dependencies.
-    from opentrons.hardware_control.ot3api import OT3API
-
 
 @pytest.mark.ot3_only
 @pytest.fixture(autouse=True)
@@ -53,18 +49,18 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 )
 async def test_calibrate_gripper(
     decoy: Decoy,
-    ot3_hardware_api: OT3API,
+    hardware_api: HardwareControlAPI,
     _mock_ot3_calibration: None,
     params_probe: CalibrateGripperParamsJaw,
     expected_hc_probe: GripperProbe,
 ) -> None:
     """It should delegate to the hardware API to calibrate the gripper."""
-    subject = CalibrateGripperImplementation(hardware_api=ot3_hardware_api)
+    subject = CalibrateGripperImplementation(hardware_api=hardware_api)
 
     params = CalibrateGripperParams(jaw=params_probe)
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
-            ot3_hardware_api, probe=expected_hc_probe
+            hardware_api, probe=expected_hc_probe
         )
     ).then_return(Point(1.1, 2.2, 3.3))
 
@@ -75,11 +71,11 @@ async def test_calibrate_gripper(
 @pytest.mark.ot3_only
 async def test_calibrate_gripper_saves_calibration(
     decoy: Decoy,
-    ot3_hardware_api: OT3API,
+    hardware_api: HardwareControlAPI,
     _mock_ot3_calibration: None,
 ) -> None:
     """It should delegate to hardware API to calibrate the gripper & save calibration."""
-    subject = CalibrateGripperImplementation(hardware_api=ot3_hardware_api)
+    subject = CalibrateGripperImplementation(hardware_api=hardware_api)
     params = CalibrateGripperParams(
         jaw=CalibrateGripperParamsJaw.REAR,
         otherJawOffset=Vec3f(x=4.4, y=5.5, z=6.6),
@@ -92,11 +88,11 @@ async def test_calibrate_gripper_saves_calibration(
     )
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
-            ot3_hardware_api, probe=GripperProbe.REAR
+            hardware_api, probe=GripperProbe.REAR
         )
     ).then_return(Point(1.1, 2.2, 3.3))
     decoy.when(
-        await ot3_hardware_api.save_instrument_offset(
+        await hardware_api.save_instrument_offset(
             mount=OT3Mount.GRIPPER, delta=Point(x=2.75, y=3.85, z=4.95)
         )
     ).then_return(expected_calibration_data)
@@ -107,10 +103,10 @@ async def test_calibrate_gripper_saves_calibration(
 
 @pytest.mark.ot3_only
 async def test_calibrate_gripper_does_not_save_during_error(
-    decoy: Decoy, ot3_hardware_api: OT3API
+    decoy: Decoy, hardware_api: HardwareControlAPI
 ) -> None:
     """Data should not be saved when an error is raised."""
-    subject = CalibrateGripperImplementation(hardware_api=ot3_hardware_api)
+    subject = CalibrateGripperImplementation(hardware_api=hardware_api)
 
     params = CalibrateGripperParams(
         jaw=CalibrateGripperParamsJaw.REAR,
@@ -119,7 +115,7 @@ async def test_calibrate_gripper_does_not_save_during_error(
 
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
-            ot3_hardware_api, probe=GripperProbe.REAR
+            hardware_api, probe=GripperProbe.REAR
         )
     ).then_raise(EarlyCapacitiveSenseTrigger(5.0, 3.0))
 
@@ -127,19 +123,20 @@ async def test_calibrate_gripper_does_not_save_during_error(
         await subject.execute(params)
 
     decoy.verify(
-        await ot3_hardware_api.save_instrument_offset(
+        await hardware_api.save_instrument_offset(
             mount=OT3Mount.LEFT, delta=Point(x=3, y=4, z=6)
         ),
         times=0,
     )
 
 
+@pytest.mark.ot2_only
 async def test_calibrate_gripper_raises_on_ot2(
     decoy: Decoy,
-    ot2_hardware_api: OT2API,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should raise with a descriptive error if run on an OT-2, instead of OT-3."""
-    subject = CalibrateGripperImplementation(hardware_api=ot2_hardware_api)
+    subject = CalibrateGripperImplementation(hardware_api=hardware_api)
 
     params = CalibrateGripperParams(jaw=CalibrateGripperParamsJaw.REAR)
 

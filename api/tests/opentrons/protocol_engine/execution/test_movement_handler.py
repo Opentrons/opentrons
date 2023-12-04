@@ -4,8 +4,8 @@ from decoy import Decoy
 from typing import NamedTuple
 
 from opentrons.types import MountType, Point, DeckSlotName, Mount
-from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.motion_planning import Waypoint
 
 from opentrons.protocol_engine.types import (
@@ -35,12 +35,6 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
-
-
-@pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock in the shape of a StateStore."""
     return decoy.mock(cls=StateStore)
@@ -67,7 +61,7 @@ def mock_gantry_mover(decoy: Decoy) -> GantryMover:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
     mock_gantry_mover: GantryMover,
@@ -424,7 +418,7 @@ async def test_move_relative(
     expected_delta: Point,
     distance: float,
 ) -> None:
-    """Test that move_relative triggers a relative move with the HardwareAPI."""
+    """Test that move_relative triggers a relative move with the HardwareControlAPI."""
     decoy.when(
         await mock_gantry_mover.move_relative(
             pipette_id="pipette-id",
@@ -531,7 +525,7 @@ async def test_retract_axis(
 async def test_check_valid_position(
     decoy: Decoy,
     subject: MovementHandler,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should check for an exception to determine if the position is ok."""
     decoy.when(

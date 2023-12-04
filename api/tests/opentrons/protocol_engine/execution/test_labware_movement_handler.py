@@ -45,9 +45,6 @@ from opentrons.protocol_engine.errors import (
 )
 from opentrons.protocol_engine.state import StateStore
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
-
 
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
@@ -96,7 +93,7 @@ def default_experimental_movement_data() -> LabwareMovementOffsetData:
 @pytest.mark.ot3_only
 @pytest.fixture
 def subject(
-    ot3_hardware_api: OT3API,
+    hardware_api: HardwareControlAPI,
     state_store: StateStore,
     equipment: EquipmentHandler,
     movement: MovementHandler,
@@ -106,7 +103,7 @@ def subject(
 ) -> LabwareMovementHandler:
     """Get LabwareMovementHandler for OT3, with its dependencies mocked out."""
     return LabwareMovementHandler(
-        hardware_api=ot3_hardware_api,
+        hardware_api=hardware_api,
         state_store=state_store,
         equipment=equipment,
         movement=movement,
@@ -149,13 +146,13 @@ async def test_move_labware_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
-    ot3_hardware_api: OT3API,
+    hardware_api: HardwareControlAPI,
     subject: LabwareMovementHandler,
     from_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     slide_offset: Optional[Point],
 ) -> None:
-    """It should perform a labware movement with gripper by delegating to OT3API."""
+    """It should perform a labware movement with gripper by delegating to HardwareControlAPI."""
     # TODO (spp, 2023-07-26): this test does NOT stub out movement waypoints in order to
     #  keep this as the semi-smoke test that it previously was. We should add a proper
     #  smoke test for gripper labware movement with actual labware and make this a unit test.
@@ -170,14 +167,12 @@ async def test_move_labware_with_gripper(
     )
 
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
-    decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
-    decoy.when(ot3_hardware_api._gripper_handler.is_ready_for_jaw_home()).then_return(
-        True
-    )
+    decoy.when(hardware_api.has_gripper()).then_return(True)
+    decoy.when(hardware_api._gripper_handler.is_ready_for_jaw_home()).then_return(True)
 
-    decoy.when(
-        await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
-    ).then_return(Point(x=777, y=888, z=999))
+    decoy.when(await hardware_api.gantry_position(mount=OT3Mount.GRIPPER)).then_return(
+        Point(x=777, y=888, z=999)
+    )
 
     decoy.when(
         state_store.geometry.get_final_labware_movement_offset_vectors(
@@ -241,74 +236,75 @@ async def test_move_labware_with_gripper(
 
     if slide_offset is None:
         decoy.verify(
-            await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
+            await hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
             await mock_tc_context_manager.__aenter__(),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[0]
             ),
-            await ot3_hardware_api.ungrip(),
-            await ot3_hardware_api.move_to(
+            await hardware_api.ungrip(),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[1]
             ),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[2]
             ),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[3]
             ),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[4]
             ),
-            await ot3_hardware_api.disengage_axes([Axis.Z_G]),
-            await ot3_hardware_api.ungrip(),
-            await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
-            await ot3_hardware_api.move_to(
+            await hardware_api.disengage_axes([Axis.Z_G]),
+            await hardware_api.ungrip(),
+            await hardware_api.home_z(OT3Mount.GRIPPER),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[5]
             ),
-            await ot3_hardware_api.idle_gripper(),
+            await hardware_api.idle_gripper(),
         )
     else:
         decoy.verify(
-            await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
+            await hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
             await mock_tc_context_manager.__aenter__(),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[0]
             ),
-            await ot3_hardware_api.ungrip(),
-            await ot3_hardware_api.move_to(
+            await hardware_api.ungrip(),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[1]
             ),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[2]
             ),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[3]
             ),
-            await ot3_hardware_api.grip(force_newtons=100),
-            await ot3_hardware_api.move_to(
+            await hardware_api.grip(force_newtons=100),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[4]
             ),
-            await ot3_hardware_api.disengage_axes([Axis.Z_G]),
-            await ot3_hardware_api.ungrip(),
-            await ot3_hardware_api.home_z(OT3Mount.GRIPPER),
-            await ot3_hardware_api.move_to(
+            await hardware_api.disengage_axes([Axis.Z_G]),
+            await hardware_api.ungrip(),
+            await hardware_api.home_z(OT3Mount.GRIPPER),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[5]
             ),
-            await ot3_hardware_api.ungrip(),
-            await ot3_hardware_api.move_to(
+            await hardware_api.ungrip(),
+            await hardware_api.move_to(
                 mount=gripper, abs_position=expected_waypoints[5] + slide_offset
             ),
-            await ot3_hardware_api.idle_gripper(),
+            await hardware_api.idle_gripper(),
         )
 
 
+@pytest.mark.ot2_only
 async def test_labware_movement_raises_on_ot2(
     decoy: Decoy,
     state_store: StateStore,
@@ -339,7 +335,7 @@ async def test_labware_movement_raises_on_ot2(
 async def test_labware_movement_skips_for_virtual_gripper(
     decoy: Decoy,
     state_store: StateStore,
-    ot3_hardware_api: OT3API,
+    hardware_api: HardwareControlAPI,
     subject: LabwareMovementHandler,
 ) -> None:
     """It should neither raise error nor move gripper when using virtual gripper."""
@@ -352,7 +348,7 @@ async def test_labware_movement_skips_for_virtual_gripper(
         post_drop_slide_offset=None,
     )
     decoy.verify(
-        await ot3_hardware_api.move_to(
+        await hardware_api.move_to(
             mount=matchers.Anything(), abs_position=matchers.Anything()
         ),
         times=0,
@@ -364,12 +360,12 @@ async def test_labware_movement_skips_for_virtual_gripper(
 async def test_labware_movement_raises_without_gripper(
     decoy: Decoy,
     state_store: StateStore,
-    ot3_hardware_api: OT3API,
+    hardware_api: HardwareControlAPI,
     subject: LabwareMovementHandler,
 ) -> None:
     """It should raise an error when attempting a gripper movement without a gripper."""
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
-    decoy.when(ot3_hardware_api.has_gripper()).then_return(False)
+    decoy.when(hardware_api.has_gripper()).then_return(False)
     with pytest.raises(GripperNotAttachedError):
         await subject.move_labware_with_gripper(
             labware_id="labware-id",

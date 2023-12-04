@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.execution.status_bar import StatusBarHandler
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import StatusBarState
 
 
@@ -19,7 +19,7 @@ def subject(
 async def test_set_status_bar(
     decoy: Decoy,
     subject: StatusBarHandler,
-    hardware_api: OT2HardwareControlAPI,
+    hardware_api: HardwareControlAPI,
     setting: StatusBarState,
 ) -> None:
     """The hardware controller should be called."""
@@ -44,7 +44,7 @@ async def test_set_status_bar(
 async def test_check_status_bar_should_not_be_changed(
     decoy: Decoy,
     subject: StatusBarHandler,
-    hardware_api: OT2HardwareControlAPI,
+    hardware_api: HardwareControlAPI,
     setting: StatusBarState,
     should_be_busy: bool,
 ) -> None:

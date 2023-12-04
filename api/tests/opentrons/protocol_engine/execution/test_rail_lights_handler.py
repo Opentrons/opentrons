@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def subject(
 async def test_set_rail_lights(
     decoy: Decoy,
     subject: RailLightsHandler,
-    hardware_api: OT2HardwareControlAPI,
+    hardware_api: HardwareControlAPI,
     binary: bool,
 ) -> None:
     """The hardware controller should be called."""
