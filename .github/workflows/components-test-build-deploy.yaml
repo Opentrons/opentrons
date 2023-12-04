@@ -224,7 +224,7 @@ jobs:
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
       - name: 'publish to npm registry'
-        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && cd ./components && npm publish --provenace --access public
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && cd ./components && yarn publish --provenace --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
