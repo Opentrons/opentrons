@@ -228,6 +228,7 @@ jobs:
         with:
           node-version: '16'
           registry-url: 'https://registry.npmjs.org'
+          always-auth: true
       - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
@@ -253,7 +254,7 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
           json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
       - name: 'publish to npm registry'
-        run: cd ./shared-data && npm publish --provenace --access public
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && cd ./shared-data && npm publish --provenace --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           

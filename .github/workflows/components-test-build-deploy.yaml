@@ -195,6 +195,7 @@ jobs:
         with:
           node-version: '16'
           registry-url: 'https://registry.npmjs.org'
+          always-auth: true
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -223,7 +224,7 @@ jobs:
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
       - name: 'publish to npm registry'
-        run: cd ./components && npm publish --provenace --access public
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && cd ./components && npm publish --provenace --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
