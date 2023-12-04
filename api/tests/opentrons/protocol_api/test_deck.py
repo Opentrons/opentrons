@@ -228,120 +228,91 @@ def test_delitem_raises_if_slot_has_module(
         del subject[2]
 
 
-# TODO(jbl 10-30-2023) the following commented out tests are too tightly coupled to DeckDefinitionV3 to easily port over
-#   Either refactor them when the deck class is updated/made anew or delete them later
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": "1"},
-#                     {"id": "2"},
-#                     {"id": "3"},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_slot_keys_iter(subject: Deck) -> None:
-#     """It should provide an iterable interface to deck slots."""
-#     result = list(subject)
-#
-#     assert len(subject) == 3
-#     assert result == ["1", "2", "3"]
+def test_slot_keys_iter(
+    decoy: Decoy, mock_protocol_core: ProtocolCore, subject: Deck
+) -> None:
+    """It should provide an iterable interface to deck slots."""
+    decoy.when(mock_protocol_core.get_slot_definitions()).then_return(
+        {
+            "1": {},
+            "2": {},
+            "3": {},
+        }
+    )
+
+    result = list(subject)
+
+    assert len(subject) == 3
+    assert result == ["1", "2", "3"]
 
 
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": "fee"},
-#                     {"id": "foe"},
-#                     {"id": "fum"},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_slots_property(subject: Deck) -> None:
-#     """It should provide slot definitions."""
-#     assert subject.slots == [
-#         {"id": "fee"},
-#         {"id": "foe"},
-#         {"id": "fum"},
-#     ]
+def test_slots_property(
+    decoy: Decoy, mock_protocol_core: ProtocolCore, subject: Deck
+) -> None:
+    """It should provide slot definitions."""
+    decoy.when(mock_protocol_core.get_slot_definitions()).then_return(
+        {
+            "1": {"id": "fee"},
+            "2": {"id": "foe"},
+            "3": {"id": "fum"},
+        }
+    )
+
+    assert subject.slots == [
+        {"id": "fee"},
+        {"id": "foe"},
+        {"id": "fum"},
+    ]
 
 
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": DeckSlotName.SLOT_2.id, "displayName": "foobar"},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_get_slot_definition(
-#     decoy: Decoy,
-#     mock_protocol_core: ProtocolCore,
-#     api_version: APIVersion,
-#     subject: Deck,
-# ) -> None:
-#     """It should provide slot definitions."""
-#     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
-#     decoy.when(
-#         mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
-#     ).then_return(DeckSlotName.SLOT_2)
-#
-#     assert subject.get_slot_definition(222) == {
-#         "id": DeckSlotName.SLOT_2.id,
-#         "displayName": "foobar",
-#     }
+def test_get_slot_definition(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should provide slot definitions."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
+    decoy.when(mock_protocol_core.get_slot_definition(DeckSlotName.SLOT_2)).then_return(
+        {
+            "id": DeckSlotName.SLOT_2.id,
+            "displayName": "foobar",
+        }
+    )
+
+    assert subject.get_slot_definition(222) == {
+        "id": DeckSlotName.SLOT_2.id,
+        "displayName": "foobar",
+    }
 
 
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": DeckSlotName.SLOT_3.id, "position": [1.0, 2.0, 3.0]},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_get_position_for(
-#     decoy: Decoy,
-#     mock_protocol_core: ProtocolCore,
-#     api_version: APIVersion,
-#     subject: Deck,
-# ) -> None:
-#     """It should return a `Location` for a deck slot."""
-#     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
-#     decoy.when(
-#         mock_validation.ensure_and_convert_deck_slot(333, api_version, "OT-3 Standard")
-#     ).then_return(DeckSlotName.SLOT_3)
-#     decoy.when(
-#         mock_validation.internal_slot_to_public_string(
-#             DeckSlotName.SLOT_3, "OT-3 Standard"
-#         )
-#     ).then_return("foo")
-#
-#     result = subject.position_for(333)
-#     assert result.point == Point(x=1.0, y=2.0, z=3.0)
-#     assert result.labware.is_slot is True
-#     assert str(result.labware) == "foo"
+def test_get_position_for(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should return a `Location` for a deck slot."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(333, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_3)
+    decoy.when(mock_protocol_core.get_slot_definition(DeckSlotName.SLOT_3)).then_return(
+        {"position": [1.0, 2.0, 3.0]}
+    )
+    decoy.when(
+        mock_validation.internal_slot_to_public_string(
+            DeckSlotName.SLOT_3, "OT-3 Standard"
+        )
+    ).then_return("foo")
+
+    result = subject.position_for(333)
+    assert result.point == Point(x=1.0, y=2.0, z=3.0)
+    assert result.labware.is_slot is True
+    assert str(result.labware) == "foo"
 
 
 def test_highest_z(

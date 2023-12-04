@@ -578,7 +578,7 @@ class ProtocolCore(
             raise ValueError(f"A {module_type.value} cannot be loaded into slot {slot}")
 
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
@@ -617,7 +617,7 @@ class ProtocolCore(
         except LabwareNotLoadedOnLabwareError:
             return None
 
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
         return self._engine_client.state.addressable_areas.get_addressable_area_center(
             slot_name.id
@@ -666,6 +666,9 @@ class ProtocolCore(
             return validation.internal_slot_to_public_string(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            # This will only ever be a robot accurate deck slot name or Flex staging slot name
+            return labware_location.addressableAreaName
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id[labware_location.moduleId]
         elif isinstance(labware_location, OnLabwareLocation):

@@ -7,7 +7,7 @@ from opentrons_shared_data.deck.dev_types import SlotDefV3
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.types import DeckLocation, DeckSlotName, Location, Point
+from opentrons.types import DeckLocation, DeckSlotName, StagingSlotName, Location, Point
 from opentrons_shared_data.robot.dev_types import RobotType
 
 
@@ -40,13 +40,11 @@ class CalibrationPosition:
 
 def _get_slot_name(
     slot_key: DeckLocation, api_version: APIVersion, robot_type: RobotType
-) -> DeckSlotName:
+) -> Union[DeckSlotName, StagingSlotName]:
     try:
         slot = validation.ensure_and_convert_deck_slot(
             slot_key, api_version, robot_type
         )
-        if not isinstance(slot, DeckSlotName):
-            raise ValueError("Cannot currently load staging slots from Deck.")
         return slot
     except (TypeError, ValueError) as error:
         raise KeyError(slot_key) from error
@@ -145,7 +143,10 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         slot_name = _get_slot_name(
             slot, self._api_version, self._protocol_core.robot_type
         )
-        east_slot = adjacent_slots_getters.get_east_slot(slot_name.as_int())
+        if isinstance(slot_name, DeckSlotName):
+            east_slot = adjacent_slots_getters.get_east_slot(slot_name.as_int())
+        else:
+            east_slot = None
 
         return self[east_slot] if east_slot is not None else None
 
@@ -155,7 +156,16 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         slot_name = _get_slot_name(
             slot, self._api_version, self._protocol_core.robot_type
         )
-        west_slot = adjacent_slots_getters.get_west_slot(slot_name.as_int())
+        west_slot: Optional[DeckLocation]
+        if isinstance(slot_name, DeckSlotName):
+            west_slot = adjacent_slots_getters.get_west_slot(slot_name.as_int())
+        else:
+            west_slot = {
+                StagingSlotName.SLOT_A4: "A3",
+                StagingSlotName.SLOT_B4: "B3",
+                StagingSlotName.SLOT_C4: "C3",
+                StagingSlotName.SLOT_D4: "D4",
+            }[slot_name]
 
         return self[west_slot] if west_slot is not None else None
 

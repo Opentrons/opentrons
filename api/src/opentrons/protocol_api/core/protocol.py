@@ -176,7 +176,7 @@ class AbstractProtocol(
 
     @abstractmethod
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LabwareCoreType, ModuleCoreType, None]:
         """Get the contents of a given slot, if any."""
 
@@ -193,7 +193,7 @@ class AbstractProtocol(
         """Get the labware on a given labware, if any."""
 
     @abstractmethod
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
 
     @abstractmethod

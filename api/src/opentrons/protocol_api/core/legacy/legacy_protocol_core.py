@@ -476,12 +476,12 @@ class LegacyProtocolCore(
         assert False, "get_slot_definitions only supported on engine core"
 
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LegacyLabwareCore, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
         assert False, "get_slot_item only supported on engine core"
 
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
         assert False, "get_slot_center only supported on engine core."
 

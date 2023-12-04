@@ -181,7 +181,7 @@ def ensure_and_convert_deck_slot(
 
 
 def internal_slot_to_public_string(
-    slot_name: DeckSlotName, robot_type: RobotType
+    slot_name: Union[DeckSlotName, StagingSlotName], robot_type: RobotType
 ) -> str:
     """Convert an internal `DeckSlotName` to a user-facing Python Protocol API string.
 
@@ -189,7 +189,10 @@ def internal_slot_to_public_string(
     Flexes. This probably won't change anything because the internal `DeckSlotName` should already
     match the robot's native format, but it's nice to have an explicit interface barrier.
     """
-    return slot_name.to_equivalent_for_robot_type(robot_type).id
+    if isinstance(slot_name, DeckSlotName):
+        return slot_name.to_equivalent_for_robot_type(robot_type).id
+    else:
+        return slot_name.id
 
 
 def ensure_lowercase_name(name: str) -> str:
