@@ -8,6 +8,8 @@ import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupDeckConfiguration } from '..'
 
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
@@ -16,7 +18,10 @@ const mockSetSetupScreen = jest.fn()
 const mockUpdateDeckConfiguration = jest.fn()
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
-  protocolData: [],
+  protocolData: ({
+    commands: [],
+    labware: [],
+  } as unknown) as CompletedProtocolAnalysis,
   protocolKey: 'fakeProtocolKey',
   robotType: 'OT-3 Standard' as const,
 }
@@ -50,7 +55,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
     mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith('mockRunId')
-      .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
+      .mockReturnValue(PROTOCOL_DETAILS.protocolData)
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)

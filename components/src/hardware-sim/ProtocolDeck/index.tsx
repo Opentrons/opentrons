@@ -1,12 +1,12 @@
 import * as React from 'react'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
 import { BaseDeck } from '../BaseDeck'
-import {
-  getStandardDeckViewLayerBlockList,
-  getSimplestDeckConfigForProtocolCommands,
-} from './utils'
+import { getStandardDeckViewLayerBlockList } from './utils'
 import { getLabwareOnDeck } from './utils/getLabwareOnDeck'
 import { getModulesOnDeck } from './utils/getModulesOnDeck'
 
@@ -30,9 +30,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
     return null
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
     <BaseDeck
