@@ -28,6 +28,10 @@ export function getLabwareDisplayLocation(
     return isOnDevice
       ? location.slotName
       : t('slot', { slot_name: location.slotName })
+  } else if ('addressableAreaName' in location) {
+    return isOnDevice
+      ? location.addressableAreaName
+      : t('slot', { slot_name: location.addressableAreaName })
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModel(robotSideAnalysis, location.moduleId)
     if (moduleModel == null) {
