@@ -93,6 +93,32 @@ class PipetteNotAttachedError(ProtocolEngineError):
         super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, details, wrapping)
 
 
+class InvalidLoadPipetteSpecsError(ProtocolEngineError):
+    """Raised when a loadPipette uses invalid specifications."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidLoadPipetteSpecsError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidSpecificationForRobotTypeError(ProtocolEngineError):
+    """Raised when a command provides invalid specs for the given robot type."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidSpecificationForRobotTypeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class TipNotAttachedError(ProtocolEngineError):
     """Raised when an operation's required pipette tip is not attached."""
 
