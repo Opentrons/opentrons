@@ -133,8 +133,7 @@ jobs:
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
-          yarn config set network-timeout 60000
-          yarn
+          make setup-js
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
       - name: 'Upload coverage report'
@@ -228,7 +227,6 @@ jobs:
         with:
           node-version: '16'
           registry-url: 'https://registry.npmjs.org'
-          always-auth: true
       - name: 'cache yarn cache'
         uses: actions/cache@v3
         with:
@@ -242,8 +240,7 @@ jobs:
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
-          yarn config set network-timeout 60000
-          yarn
+          make setup-js
       - name: 'build library'
         run: |
           make -C shared-data lib-js
@@ -254,7 +251,8 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
           json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
       - name: 'publish to npm registry'
-        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && cd ./shared-data && yarn publish --provenace --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./shared-data && yarn publish --provenace --access public
           
