@@ -729,7 +729,7 @@ class Labware:
         This will output ``['A1', 'B1', 'C1', 'D1'...]``.
 
         Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type. For example, 
+        can be either strings or integers, but must all be the same type. For example,
         ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but
         ``self.columns('1', 4)`` is not.
 
