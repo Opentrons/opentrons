@@ -37,7 +37,6 @@ interface SetupModuleAndDeckProps {
   robotName: string
   runId: string
   hasModules: boolean
-  // TODO: what  type is this
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 }
 

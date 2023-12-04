@@ -254,7 +254,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             if (
               labwareLocation === 'offDeck' ||
               !('slotName' in labwareLocation) ||
-              // do not render flex trash as a labware
+              // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===
                 'opentrons_1_trash_3200ml_fixed'
             ) {

@@ -129,6 +129,7 @@ const MOCK_PROTOCOL_ANALYSIS = {
       completedAt: '2022-09-07T19:47:42.786412+00:00',
     },
   ],
+  labware: [],
   liquids: [
     {
       id: '1',
