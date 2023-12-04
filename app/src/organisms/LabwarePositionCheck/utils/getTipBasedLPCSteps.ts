@@ -163,33 +163,39 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     const adapter = (labwareDef?.allowedRoles ?? []).includes('adapter')
     if (isTiprack || adapter) return acc // skip any labware that is a tiprack or adapter
 
-    const labwareLocationCombos = getLabwareLocationCombos(
+    const labwareLocations = getLabwareLocationCombos(
       commands,
       labware,
       modules
+    ).reduce<LabwareLocationCombo[]>(
+      (labwareLocationAcc, labwareLocationCombo) => {
+        // remove labware that isn't accessed by a pickup tip command
+        if (labwareLocationCombo.labwareId !== currentLabware.id) {
+          return labwareLocationAcc
+        }
+        // remove duplicate definitionUri in same location
+        const comboAlreadyExists = labwareLocationAcc.some(
+          accLocationCombo =>
+            labwareLocationCombo.definitionUri ===
+              accLocationCombo.definitionUri &&
+            isEqual(labwareLocationCombo.location, accLocationCombo.location)
+        )
+        return comboAlreadyExists
+          ? labwareLocationAcc
+          : [...labwareLocationAcc, labwareLocationCombo]
+      },
+      []
     )
+
     return [
       ...acc,
-      ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
-        (innerAcc, { location, labwareId, moduleId, adapterId }) => {
-          if (labwareId !== currentLabware.id) {
-            return innerAcc
-          }
-
-          return [
-            ...innerAcc,
-            {
-              section: SECTIONS.CHECK_LABWARE,
-              labwareId,
-              pipetteId: primaryPipetteId,
-              location,
-              moduleId,
-              adapterId,
-            },
-          ]
-        },
-        []
-      ),
+      ...labwareLocations.map(({ location, adapterId, labwareId }) => ({
+        section: SECTIONS.CHECK_LABWARE,
+        labwareId: labwareId,
+        pipetteId: primaryPipetteId,
+        location,
+        adapterId,
+      })),
     ]
   }, [])
 }
