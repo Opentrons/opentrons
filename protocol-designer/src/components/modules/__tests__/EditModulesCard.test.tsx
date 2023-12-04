@@ -28,7 +28,6 @@ import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
-import { FLEX_TRASH_DEF_URI } from '../../../constants'
 import { StagingAreasRow } from '../StagingAreasRow'
 
 jest.mock('../../../step-forms/selectors')
@@ -310,12 +309,11 @@ describe('EditModulesCard', () => {
         id: mockStagingAreaId,
         location: 'B3',
       },
-    })
-    mockGetLabwareEntities.mockReturnValue({
-      mockTrashId: {
+      mockTrash: {
+        name: 'trashBin',
         id: mockTrashId,
-        labwareDefURI: FLEX_TRASH_DEF_URI,
-      } as any,
+        location: 'cutoutA3',
+      },
     })
 
     props = {
