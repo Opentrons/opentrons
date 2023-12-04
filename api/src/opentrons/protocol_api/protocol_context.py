@@ -446,7 +446,8 @@ class ProtocolContext(CommandPublisher):
             api_version=self._api_version,
             robot_type=self._core.robot_type,
         )
-        raise ValueError("Staging areas not permitted for trash bin.")
+        if not isinstance(slot_name, DeckSlotName):
+            raise ValueError("Staging areas not permitted for trash bin.")
         addressable_area_name = validation.ensure_and_convert_trash_bin_location(
             location,
             api_version=self._api_version,
