@@ -75,13 +75,14 @@ function getAllCheckSectionSteps(
   )
 
   return labwareLocations.map(
-    ({ location, labwareId, moduleId, adapterId }) => ({
+    ({ location, labwareId, moduleId, adapterId, definitionUri }) => ({
       section: SECTIONS.CHECK_POSITIONS,
       labwareId: labwareId,
       pipetteId: getPrimaryPipetteId(pipettes),
       location,
       moduleId,
       adapterId,
+      definitionUri: definitionUri
     })
   )
 }

@@ -48,6 +48,7 @@ export const getTipBasedLPCSteps = (
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
     adapterId: lastTiprackCheckStep.adapterId,
+    definitionUri: lastTiprackCheckStep.definitionUri,
   }
   const checkLabwareSectionSteps = getCheckLabwareSectionSteps(args)
 
@@ -57,6 +58,7 @@ export const getTipBasedLPCSteps = (
     pipetteId: lastTiprackCheckStep.pipetteId,
     location: lastTiprackCheckStep.location,
     adapterId: lastTiprackCheckStep.adapterId,
+    definitionUri: lastTiprackCheckStep.definitionUri,
   }
 
   return [
@@ -134,12 +136,13 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 
     return [
       ...acc,
-      ...labwareLocations.map(({ location, adapterId }) => ({
+      ...labwareLocations.map(({ location, adapterId, definitionUri }) => ({
         section: SECTIONS.CHECK_TIP_RACKS,
         labwareId: params.labwareId,
         pipetteId: params.pipetteId,
         location,
         adapterId,
+        definitionUri: definitionUri,
       })),
     ]
   }, [])
@@ -148,53 +151,48 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
   const { labware, modules, commands, primaryPipetteId } = args
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
-  const labwareLocationCombos = getLabwareLocationCombos(
+
+  const deDupedLabwareLocationCombos = getLabwareLocationCombos(
     commands,
     labware,
     modules
-  )
-
-  return labware.reduce<CheckLabwareStep[]>((acc, currentLabware) => {
+  ).reduce<LabwareLocationCombo[]>((acc, labwareLocationCombo) => {
     const labwareDef = labwareDefinitions.find(
-      def => getLabwareDefURI(def) === currentLabware.definitionUri
+      def => getLabwareDefURI(def) === labwareLocationCombo.definitionUri
     )
-    if (currentLabware.id === FIXED_TRASH_ID) return acc
+    if (labwareLocationCombo.labwareId === FIXED_TRASH_ID) return acc
     if (labwareDef == null) {
       throw new Error(
-        `could not find labware definition within protocol with uri: ${currentLabware.definitionUri}`
+        `could not find labware definition within protocol with uri: ${labwareLocationCombo.definitionUri}`
       )
     }
     const isTiprack = getIsTiprack(labwareDef)
     const adapter = (labwareDef?.allowedRoles ?? []).includes('adapter')
     if (isTiprack || adapter) return acc // skip any labware that is a tiprack or adapter
 
-    const labwareLocations = labwareLocationCombos.reduce<
-      LabwareLocationCombo[]
-    >((labwareLocationAcc, labwareLocationCombo) => {
-      if (labwareLocationCombo.labwareId !== currentLabware.id) {
-        return labwareLocationAcc
-      }
-      // remove duplicate definitionUri in same location
-      const comboAlreadyExists = labwareLocationAcc.some(
-        accLocationCombo =>
-          labwareLocationCombo.definitionUri ===
-            accLocationCombo.definitionUri &&
-          isEqual(labwareLocationCombo.location, accLocationCombo.location)
-      )
-      return comboAlreadyExists
-        ? labwareLocationAcc
-        : [...labwareLocationAcc, labwareLocationCombo]
-    }, [])
-
-    return [
-      ...acc,
-      ...labwareLocations.map(({ location, adapterId, labwareId }) => ({
-        section: SECTIONS.CHECK_LABWARE,
-        labwareId: labwareId,
-        pipetteId: primaryPipetteId,
-        location,
-        adapterId,
-      })),
-    ]
+    const comboAlreadyExists = acc.some(
+      accLocationCombo =>
+        labwareLocationCombo.definitionUri === accLocationCombo.definitionUri &&
+        isEqual(labwareLocationCombo.location, accLocationCombo.location)
+    )
+    return comboAlreadyExists ? acc : [...acc, labwareLocationCombo]
   }, [])
+
+  return deDupedLabwareLocationCombos.reduce<CheckLabwareStep[]>(
+    (acc, { labwareId, location, moduleId, adapterId, definitionUri }) => {
+      return [
+        ...acc,
+        {
+          section: SECTIONS.CHECK_LABWARE,
+          labwareId,
+          pipetteId: primaryPipetteId,
+          location,
+          moduleId,
+          adapterId,
+          definitionUri,
+        },
+      ]
+    },
+    []
+  )
 }
