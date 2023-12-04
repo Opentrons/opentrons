@@ -253,7 +253,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           }) => {
             if (
               labwareLocation === 'offDeck' ||
-              !('slotName' in labwareLocation)
+              !('slotName' in labwareLocation) ||
+              // do not render flex trash as a labware
+              definition.parameters.loadName ===
+                'opentrons_1_trash_3200ml_fixed'
             ) {
               return null
             }

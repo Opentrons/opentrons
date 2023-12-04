@@ -27,14 +27,18 @@ import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
   hasModules: boolean
-  commands: RunTimeCommand[]
+  // TODO: what  type is this
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 }
 
 export const SetupModuleAndDeck = ({
@@ -42,7 +46,7 @@ export const SetupModuleAndDeck = ({
   robotName,
   runId,
   hasModules,
-  commands,
+  protocolAnalysis,
 }: SetupModuleAndDeckProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
@@ -58,7 +62,7 @@ export const SetupModuleAndDeck = ({
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    commands
+    protocolAnalysis
   )
 
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)

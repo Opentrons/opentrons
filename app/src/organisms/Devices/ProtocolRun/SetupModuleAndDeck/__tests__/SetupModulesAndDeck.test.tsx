@@ -68,7 +68,7 @@ describe('SetupModuleAndDeck', () => {
       runId: MOCK_RUN_ID,
       expandLabwarePositionCheckStep: () => jest.fn(),
       hasModules: true,
-      commands: [],
+      protocolAnalysis: null,
     }
     mockSetupFixtureList.mockReturnValue(<div>Mock setup fixture list</div>)
     mockSetupModulesList.mockReturnValue(<div>Mock setup modules list</div>)

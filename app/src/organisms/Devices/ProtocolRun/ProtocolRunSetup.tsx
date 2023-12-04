@@ -13,7 +13,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
@@ -21,7 +25,6 @@ import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-  getSimplestDeckConfigForProtocolCommands,
 } from '../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import {
@@ -89,7 +92,7 @@ export function ProtocolRunSetup({
   const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    protocolAnalysis?.commands ?? []
+    protocolAnalysis
   )
 
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
@@ -134,9 +137,7 @@ export function ProtocolRunSetup({
     protocolAnalysis != null && protocolAnalysis.liquids?.length > 0
   const hasModules = protocolAnalysis != null && modules.length > 0
 
-  const protocolDeckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis?.commands ?? []
-  )
+  const protocolDeckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   const requiredDeckConfig = getRequiredDeckConfig(protocolDeckConfig)
 
@@ -185,7 +186,7 @@ export function ProtocolRunSetup({
           robotName={robotName}
           runId={runId}
           hasModules={hasModules}
-          commands={protocolAnalysis?.commands ?? []}
+          protocolAnalysis={protocolAnalysis}
         />
       ),
       description: moduleDescription,

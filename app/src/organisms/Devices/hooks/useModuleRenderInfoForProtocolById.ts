@@ -1,12 +1,12 @@
 import {
   checkModuleCompatibility,
   FLEX_ROBOT_TYPE,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
-import { getCutoutIdForSlotName } from '../../../resources/deck_configuration/utils'
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from './useAttachedModules'

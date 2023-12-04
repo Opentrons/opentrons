@@ -1,19 +1,16 @@
-import {
-  FLEX_ROBOT_TYPE,
-  getAddressableAreaFromSlotId,
-  getAddressableAreasInProtocol,
-  getDeckDefFromRobotType,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '../constants'
+import { getAddressableAreaFromSlotId } from '../fixtures'
+import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 
+import type { AddressableAreaName, CutoutId } from '../../deck'
+import type { ProtocolAnalysisOutput } from '../../protocol'
 import type {
   CutoutConfig,
-  CutoutId,
-  RunTimeCommand,
   CutoutFixture,
-  AddressableAreaName,
   DeckDefinition,
   DeckConfiguration,
-} from '@opentrons/shared-data'
+  CompletedProtocolAnalysis,
+} from '../types'
 
 export interface CutoutConfigProtocolSpec extends CutoutConfig {
   requiredAddressableAreas: AddressableAreaName[]
@@ -38,15 +35,16 @@ export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[]
   config => ({ ...config, requiredAddressableAreas: [] })
 )
 
-export function getSimplestDeckConfigForProtocolCommands(
-  protocolAnalysisCommands: RunTimeCommand[]
+export function getSimplestDeckConfigForProtocol(
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 ): CutoutConfigProtocolSpec[] {
   // TODO(BC, 2023-11-06): abstract out the robot type
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const addressableAreas = getAddressableAreasInProtocol(
-    protocolAnalysisCommands
-  )
+  const addressableAreas =
+    protocolAnalysis != null
+      ? getAddressableAreasInProtocol(protocolAnalysis)
+      : []
   const simplestDeckConfig = addressableAreas.reduce<
     CutoutConfigProtocolSpec[]
   >((acc, addressableArea) => {

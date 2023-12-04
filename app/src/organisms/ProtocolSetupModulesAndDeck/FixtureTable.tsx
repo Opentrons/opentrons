@@ -17,13 +17,13 @@ import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getFixtureDisplayName,
+  getSimplestDeckConfigForProtocol,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
-import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -55,12 +55,12 @@ export function FixtureTable({
     setShowLocationConflictModal,
   ] = React.useState<boolean>(false)
 
-  const requiredFixtureDetails = getSimplestDeckConfigForProtocolCommands(
-    mostRecentAnalysis?.commands ?? []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
+    mostRecentAnalysis
   )
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    mostRecentAnalysis?.commands ?? []
+    mostRecentAnalysis
   )
 
   const nonSingleSlotDeckConfigCompatibility = deckConfigCompatibility.filter(

@@ -10,9 +10,9 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
@@ -64,9 +64,7 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
     <Flex

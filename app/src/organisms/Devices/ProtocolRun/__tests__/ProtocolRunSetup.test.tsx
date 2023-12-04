@@ -7,6 +7,7 @@ import {
   renderWithProviders,
 } from '@opentrons/components'
 import {
+  getSimplestDeckConfigForProtocol,
   ProtocolAnalysisOutput,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -18,7 +19,6 @@ import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-  getSimplestDeckConfigForProtocolCommands,
 } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
@@ -48,6 +48,7 @@ jest.mock('../SetupLiquids')
 jest.mock('../EmptySetupStep')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
+jest.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../resources/deck_configuration/utils')
 jest.mock('../../../../resources/deck_configuration/hooks')
@@ -90,8 +91,8 @@ const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
 const mockEmptySetupStep = EmptySetupStep as jest.MockedFunction<
   typeof EmptySetupStep
 >
-const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
-  typeof getSimplestDeckConfigForProtocolCommands
+const mockGetSimplestDeckConfigForProtocol = getSimplestDeckConfigForProtocol as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocol
 >
 const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
   typeof getRequiredDeckConfig
@@ -168,7 +169,7 @@ describe('ProtocolRunSetup', () => {
     when(mockSetupModuleAndDeck).mockReturnValue(<div>Mock SetupModules</div>)
     when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
     when(mockEmptySetupStep).mockReturnValue(<div>Mock EmptySetupStep</div>)
-    when(mockGetSimplestDeckConfigForProtocolCommands).mockReturnValue([])
+    when(mockGetSimplestDeckConfigForProtocol).mockReturnValue([])
     when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
     when(mockGetRequiredDeckConfig).mockReturnValue([])
     when(mockUseUnmatchedModulesForProtocol)
