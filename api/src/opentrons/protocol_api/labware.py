@@ -825,7 +825,7 @@ class Labware:
             raise APIVersionError("Labware.tip_length setter has been deprecated")
 
         # TODO(mc, 2023-02-06): this assert should be enough for mypy
-        # invvestigate if upgrading mypy allows the `cast` to be removed
+        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
         cast(LegacyLabwareCore, self._core).set_tip_length(length)
 
