@@ -1,3 +1,4 @@
-src
 dist
+js
+python
 *.tgz
