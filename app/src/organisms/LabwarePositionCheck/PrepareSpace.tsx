@@ -93,7 +93,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         >
           <BaseDeck
             robotType={robotType}
-            moduleLocations={protocolData.modules.map(mod => ({
+            modulesOnDeck={protocolData.modules.map(mod => ({
               moduleModel: mod.model,
               moduleLocation: mod.location,
               nestedLabwareDef:
@@ -107,7 +107,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                   ? { lidMotorState: 'open' }
                   : {},
             }))}
-            labwareLocations={[
+            labwareOnDeck={[
               {
                 labwareLocation: location,
                 definition: labwareDef,

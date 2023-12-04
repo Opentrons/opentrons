@@ -86,7 +86,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
 
   return (
     <RobotCoordinateSpace
-      height="400px"
+      height="455px"
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >

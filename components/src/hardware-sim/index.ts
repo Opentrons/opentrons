@@ -1,5 +1,6 @@
 export * from './BaseDeck'
 export * from './BaseDeck/__fixtures__'
+export * from './ProtocolDeck'
 export * from './Deck'
 export * from './DeckConfigurator'
 export * from './DeckSlotLocation'

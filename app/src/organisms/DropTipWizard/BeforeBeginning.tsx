@@ -18,6 +18,7 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
   POSITION_ABSOLUTE,
+  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
@@ -26,11 +27,25 @@ import { SmallButton, MediumButton } from '../../atoms/buttons'
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
 
+import type { UseMutateFunction } from 'react-query'
+import type { AxiosError } from 'axios'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
+
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
-  handleCreateAndSetup: (shouldDispenseLiquid: boolean) => void
+  setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    CreateMaintenanceRunData,
+    unknown
+  >
+  createdMaintenanceRunId: string | null
   isCreateLoading: boolean
   isOnDevice: boolean
 }
@@ -38,14 +53,27 @@ interface BeforeBeginningProps {
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const { handleCreateAndSetup, isCreateLoading, isOnDevice } = props
+  const {
+    setShouldDispenseLiquid,
+    createMaintenanceRun,
+    createdMaintenanceRunId,
+    isCreateLoading,
+    isOnDevice,
+  } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'liquid_and_tips' | 'only_tips' | null
   >(null)
+
   const handleProceed = (): void => {
-    handleCreateAndSetup(flowType === 'liquid_and_tips')
+    setShouldDispenseLiquid(flowType === 'liquid_and_tips')
   }
+
+  React.useEffect(() => {
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
+  }, [])
 
   if (isOnDevice) {
     return (
@@ -100,9 +128,13 @@ export const BeforeBeginning = (
     return (
       <Flex css={TILE_CONTAINER_STYLE}>
         <Title>{t('before_you_begin_do_you_want_to_blowout')}</Title>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_AROUND}
+          alignItems={ALIGN_CENTER}
+          marginTop={SPACING.spacing16}
+          marginBottom={SPACING.spacing32}
+        >
           <Flex
-            flex="1 0 auto"
             onClick={() => {
               setFlowType('liquid_and_tips')
             }}
@@ -112,15 +144,10 @@ export const BeforeBeginning = (
                 : UNSELECTED_OPTIONS_STYLE
             }
           >
-            <Flex
-              height="100%"
-              width="100%"
-              position={POSITION_ABSOLUTE}
-              flex="1"
-            />
+            <Flex height="100%" width="100%" position={POSITION_ABSOLUTE} />
             <video
               css={css`
-                max-width: 11rem;
+                max-width: 8.96rem;
               `}
               autoPlay={true}
               loop={true}
@@ -132,7 +159,6 @@ export const BeforeBeginning = (
             <StyledText as="h3">{t('yes_blow_out_liquid')}</StyledText>
           </Flex>
           <Flex
-            flex="1 0 auto"
             onClick={() => setFlowType('only_tips')}
             css={
               flowType === 'only_tips'
@@ -142,7 +168,7 @@ export const BeforeBeginning = (
           >
             <video
               css={css`
-                max-width: 11rem;
+                max-width: 8.96rem;
               `}
               autoPlay={true}
               loop={true}
@@ -172,7 +198,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  height: 14.5625rem;
+  height: 12.5625rem;
   width: 14.5625rem;
   cursor: pointer;
   flex-direction: ${DIRECTION_COLUMN};
@@ -202,11 +228,9 @@ const UNSELECTED_OPTIONS_STYLE = css`
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
 
   &:hover {
     border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -241,7 +265,6 @@ const TILE_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   padding: ${SPACING.spacing32};
-  height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 29.5rem;
   }

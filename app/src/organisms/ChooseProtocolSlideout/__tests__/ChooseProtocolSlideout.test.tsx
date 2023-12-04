@@ -6,14 +6,12 @@ import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
 
 jest.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 jest.mock('../../../redux/protocol-storage')
-jest.mock('../../../molecules/DeckThumbnail')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../redux/config')
 
@@ -22,9 +20,6 @@ const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
 >
 const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunction<
   typeof useCreateRunFromProtocol
->
-const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
-  typeof DeckThumbnail
 >
 const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jest.MockedFunction<
   typeof useTrackCreateProtocolRunEvent
@@ -50,7 +45,6 @@ describe('ChooseProtocolSlideout', () => {
       () => new Promise(resolve => resolve({}))
     )
     mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
-    mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
     mockUseCreateRunFromProtocol.mockReturnValue({
       createRunFromProtocolSource: mockCreateRunFromProtocol,
       reset: jest.fn(),
@@ -82,23 +76,23 @@ describe('ChooseProtocolSlideout', () => {
     expect(queryAllByText(mockConnectableRobot.name).length).toEqual(0)
   })
   it('renders an available protocol option for every stored protocol if any', () => {
-    const [{ getByText, queryByRole }] = render({
+    const [{ getByText, getByLabelText, queryByRole }] = render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    getByText('mock Deck Thumbnail')
+    getByLabelText('protocol deck map')
     getByText('fakeSrcFileName')
     expect(queryByRole('heading', { name: 'No protocols found' })).toBeNull()
   })
   it('renders an empty state if no protocol options', () => {
     mockGetStoredProtocols.mockReturnValue([])
-    const [{ getByRole, queryByText }] = render({
+    const [{ getByRole, queryByText, queryByLabelText }] = render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    expect(queryByText('mock Deck Thumbnail')).toBeNull()
+    expect(queryByLabelText('protocol deck map')).toBeNull()
     expect(queryByText('fakeSrcFileName')).toBeNull()
     expect(
       getByRole('heading', { name: 'No protocols found' })

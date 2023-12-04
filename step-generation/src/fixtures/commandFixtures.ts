@@ -330,6 +330,7 @@ export const moveToAddressableAreaHelper = (params?: {
   params: {
     pipetteId: DEFAULT_PIPETTE,
     addressableAreaName: '1and8ChannelWasteChute',
+    offset: { x: 0, y: 0, z: 0 },
     ...params,
   },
 })

@@ -36,6 +36,7 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
@@ -335,9 +336,15 @@ def _make_hardware_simulator(
         # Local import because this isn't available on OT-2s.
         from opentrons.hardware_control.ot3api import OT3API
 
-        return ThreadManager(OT3API.build_hardware_simulator)
+        return ThreadManager(
+            OT3API.build_hardware_simulator,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
+        )
     elif robot_type == "OT-2 Standard":
-        return ThreadManager(OT2API.build_hardware_simulator)
+        return ThreadManager(
+            OT2API.build_hardware_simulator,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
+        )
 
 
 @contextmanager

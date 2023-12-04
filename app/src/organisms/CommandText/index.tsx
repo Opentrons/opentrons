@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { getPipetteNameSpecs, RunTimeCommand } from '@opentrons/shared-data'
 import {
+  getAddressableAreaDisplayName,
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
@@ -199,7 +200,7 @@ export function CommandText(props: Props): JSX.Element | null {
       )
     }
     case 'configureNozzleLayout': {
-      const { configuration_params, pipetteId } = command.params
+      const { configurationParams, pipetteId } = command.params
       const pipetteName = robotSideAnalysis.pipettes.find(
         pip => pip.id === pipetteId
       )?.pipetteName
@@ -208,7 +209,7 @@ export function CommandText(props: Props): JSX.Element | null {
       return (
         <StyledText as="p" {...styleProps}>
           {t('configure_nozzle_layout', {
-            amount: configuration_params.style === 'COLUMN' ? '8' : 'all',
+            amount: configurationParams.style === 'COLUMN' ? '8' : 'all',
             pipette:
               pipetteName != null
                 ? getPipetteNameSpecs(pipetteName)?.displayName
@@ -235,13 +236,16 @@ export function CommandText(props: Props): JSX.Element | null {
       )
     }
     case 'moveToAddressableArea': {
-      const { addressableAreaName, speed, minimumZHeight } = command.params
+      const addressableAreaDisplayName = getAddressableAreaDisplayName(
+        robotSideAnalysis,
+        command.id,
+        t
+      )
+
       return (
         <StyledText as="p" {...styleProps}>
           {t('move_to_addressable_area', {
-            addressable_area: addressableAreaName,
-            speed: speed,
-            height: minimumZHeight,
+            addressable_area: addressableAreaDisplayName,
           })}
         </StyledText>
       )

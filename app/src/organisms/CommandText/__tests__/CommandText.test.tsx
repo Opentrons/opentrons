@@ -7,6 +7,7 @@ import {
   DropTipInPlaceRunTimeCommand,
   FLEX_ROBOT_TYPE,
   MoveToAddressableAreaRunTimeCommand,
+  OT2_ROBOT_TYPE,
   PrepareToAspirateRunTimeCommand,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -193,26 +194,114 @@ describe('CommandText', () => {
       getByText('Moving to well A1 of NEST 1 Well Reservoir 195 mL in Slot 5')
     }
   })
-  it('renders correct text for moveToAddressableArea', () => {
+  it('renders correct text for labware involving an addressable area slot', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'moveLabware',
+          params: {
+            strategy: 'usingGripper',
+            labwareId: mockRobotSideAnalysis.labware[2].id,
+            newLocation: { addressableAreaName: '5' },
+          },
+          id: 'def456',
+          result: { offsetId: 'fake_offset_id' },
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Moving Opentrons 96 Tip Rack 300 µL using gripper from Slot 9 to Slot 5'
+    )
+  })
+  it('renders correct text for moveToAddressableArea for Waste Chutes', () => {
     const { getByText } = renderWithProviders(
       <CommandText
         robotSideAnalysis={mockRobotSideAnalysis}
         robotType={FLEX_ROBOT_TYPE}
         command={
           {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47b',
             commandType: 'moveToAddressableArea',
             params: {
               pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
-              addressableAreaName: 'D3',
-              speed: 200,
-              minimumZHeight: 100,
+              addressableAreaName: '1and8ChannelWasteChute',
             },
           } as MoveToAddressableAreaRunTimeCommand
         }
       />,
       { i18nInstance: i18n }
     )[0]
-    getByText('Moving to D3 at 200 mm/s at 100 mm high')
+    getByText('Moving to Waste Chute')
+  })
+  it('renders correct text for moveToAddressableArea for Fixed Trash', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47c',
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'fixedTrash',
+            },
+          } as MoveToAddressableAreaRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Moving to Fixed Trash')
+  })
+  it('renders correct text for moveToAddressableArea for Trash Bins', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47d',
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'movableTrashD3',
+            },
+          } as MoveToAddressableAreaRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Moving to Trash Bin in D3')
+  })
+  it('renders correct text for moveToAddressableArea for slots', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47e',
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'D3',
+            },
+          } as MoveToAddressableAreaRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Moving to D3')
   })
   it('renders correct text for configureForVolume', () => {
     const command = {

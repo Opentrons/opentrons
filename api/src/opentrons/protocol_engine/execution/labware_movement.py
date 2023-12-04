@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
 
+from opentrons.types import Point
+
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.motion_planning import get_gripper_labware_movement_waypoints
@@ -83,6 +85,7 @@ class LabwareMovementHandler:
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
+        post_drop_slide_offset: Optional[Point],
     ) -> None:
         """Move a loaded labware from one location to another using gripper."""
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
@@ -129,12 +132,24 @@ class LabwareMovementHandler:
                 to_labware_center=to_labware_center,
                 gripper_home_z=gripper_homed_position.z,
                 offset_data=final_offsets,
+                post_drop_slide_offset=post_drop_slide_offset,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(labware_id)
 
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
+                    if waypoint_data.dropping:
+                        # This `disengage_axes` step is important in order to engage
+                        # the electronic brake on the Z axis of the gripper. The brake
+                        # has a stronger holding force on the axis than the hold current,
+                        # and prevents the axis from spuriously dropping when  e.g. the notch
+                        # on the side of a falling tiprack catches the jaw.
+                        await ot3api.disengage_axes([Axis.Z_G])
                     await ot3api.ungrip()
+                    if waypoint_data.dropping:
+                        # We lost the position estimation after disengaging the axis, so
+                        # it is necessary to home it next
+                        await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
                 await ot3api.move_to(

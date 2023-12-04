@@ -10,6 +10,7 @@ from opentrons.hardware_control import (
     HardwareControlAPI,
     dev_types as hardware_dev_types,
 )
+from opentrons.hardware_control.types import HardwareFeatureFlags
 from opentrons.system import log_control
 from opentrons_shared_data.pipette import (
     mutable_configurations,
@@ -74,6 +75,7 @@ async def post_settings(
     """Update advanced setting (feature flag)"""
     try:
         await advanced_settings.set_adv_setting(update.id, update.value)
+        hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
     except ValueError as e:
         raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)

@@ -19,6 +19,7 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaArgs> = 
       params: {
         pipetteId,
         addressableAreaName,
+        offset: { x: 0, y: 0, z: 0 },
       },
     },
   ]

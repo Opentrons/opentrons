@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     ModuleOffsetVector,
     ModuleOffsetData,
     LoadedLabware,
@@ -527,6 +528,67 @@ def test_get_all_labware_highest_z(
 
     # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
+
+
+def test_get_all_labware_highest_z_with_staging_area(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    falcon_tuberack_def: LabwareDefinition,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should get the highest Z amongst all labware including staging area."""
+    plate = LoadedLabware(
+        id="plate-id",
+        loadName="plate-load-name",
+        definitionUri="plate-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="plate-offset-id",
+    )
+    staging_lw = LoadedLabware(
+        id="staging-id",
+        loadName="staging-load-name",
+        definitionUri="staging-definition-uri",
+        location=AddressableAreaLocation(addressableAreaName="D4"),
+        offsetId="plate-offset-id",
+    )
+
+    plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    staging_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(module_view.get_all()).then_return([])
+    decoy.when(addressable_area_view.get_all()).then_return([])
+
+    decoy.when(labware_view.get_all()).then_return([plate, staging_lw])
+    decoy.when(labware_view.get("plate-id")).then_return(plate)
+    decoy.when(labware_view.get("staging-id")).then_return(staging_lw)
+
+    decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_definition("staging-id")).then_return(
+        falcon_tuberack_def  # Something tall.
+    )
+
+    decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
+        plate_offset
+    )
+    decoy.when(labware_view.get_labware_offset_vector("staging-id")).then_return(
+        staging_lw_offset
+    )
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
+    decoy.when(addressable_area_view.get_addressable_area_position("D4")).then_return(
+        Point(4, 5, 6)
+    )
+
+    staging_z = subject.get_labware_highest_z("staging-id")
+    all_z = subject.get_all_labware_highest_z()
+
+    # Should exclude the off-deck plate.
+    assert all_z == staging_z
 
 
 def test_get_all_labware_highest_z_with_modules(

@@ -22,8 +22,6 @@ import {
   pickUpTipHelper,
   SOURCE_LABWARE,
   AIR_GAP_META,
-  moveToAddressableAreaHelper,
-  dropTipInPlaceHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type { AspDispAirgapParams, CreateCommand } from '@opentrons/shared-data'
@@ -158,10 +156,6 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
       airGapHelper('B1', 5, { labwareId: 'destPlateId' }),
-      moveToAddressableAreaHelper({
-        addressableAreaName: '1and8ChannelWasteChute',
-      }),
-      dropTipInPlaceHelper(),
     ])
   })
 

@@ -4,7 +4,9 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..errors import LocationNotAccessibleByPipetteError
 from ..types import DeckPoint, AddressableOffsetVector
+from ..resources import fixture_validation
 from .pipetting_common import (
     PipetteIdMixin,
     MovementMixin,
@@ -71,6 +73,11 @@ class MoveToAddressableAreaImplementation(
         self, params: MoveToAddressableAreaParams
     ) -> MoveToAddressableAreaResult:
         """Move the requested pipette to the requested addressable area."""
+        if fixture_validation.is_staging_slot(params.addressableAreaName):
+            raise LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to staging slot {params.addressableAreaName}"
+            )
+
         x, y, z = await self._movement.move_to_addressable_area(
             pipette_id=params.pipetteId,
             addressable_area_name=params.addressableAreaName,

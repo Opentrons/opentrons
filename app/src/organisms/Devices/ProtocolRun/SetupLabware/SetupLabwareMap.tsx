@@ -65,7 +65,7 @@ export function SetupLabwareMap({
     commands
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => {
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
     const labwareInAdapterInMod =
       module.nestedLabwareId != null
         ? initialLoadedLabwareByAdapter[module.nestedLabwareId]
@@ -112,7 +112,7 @@ export function SetupLabwareMap({
 
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
 
-  const labwareLocations = map(
+  const labwareOnDeck = map(
     labwareRenderInfo,
     ({ x, y, labwareDef, displayName, slotName }, labwareId) => {
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
@@ -149,8 +149,8 @@ export function SetupLabwareMap({
             deckConfig={deckConfig}
             deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
             robotType={robotType}
-            labwareLocations={labwareLocations}
-            moduleLocations={moduleLocations}
+            labwareOnDeck={labwareOnDeck}
+            modulesOnDeck={modulesOnDeck}
           />
         </Box>
         <OffDeckLabwareList
