@@ -111,15 +111,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const { pipette } = args
 
   const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'wasteChute'
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
+    'wasteChute'
   const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'trashBin'
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
+    'trashBin'
 
   const addressableAreaNameWasteChute =
     invariantContext.pipetteEntities[args.pipette].spec.channels === 96

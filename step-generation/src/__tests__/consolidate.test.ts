@@ -97,9 +97,6 @@ beforeEach(() => {
     blowoutLocation: null,
     dropTipLocation: FIXED_TRASH_ID,
   }
-  invariantContext = {
-    ...invariantContext,
-  }
 })
 
 describe('consolidate single-channel', () => {
