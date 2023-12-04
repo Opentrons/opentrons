@@ -1,3 +1,6 @@
+from opentrons.types import DeckSlotName
+
+
 class TrashBin:
     """Represents a Flex trash bin.
 
@@ -6,7 +9,7 @@ class TrashBin:
 
     def __init__(
         self,
-        location: str,
+        location: DeckSlotName,
         addressable_area_name: str
     ) -> None:
         self._location = location

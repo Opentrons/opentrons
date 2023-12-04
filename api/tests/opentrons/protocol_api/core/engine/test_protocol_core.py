@@ -307,8 +307,6 @@ def test_load_labware(
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
             slot_name=DeckSlotName.SLOT_5,
-            allowed_labware_ids={"abc123"},
-            allowed_module_ids=set(),
         )
     ).then_return(
         LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
@@ -583,8 +581,6 @@ def test_load_adapter(
     decoy.when(
         mock_engine_client.state.geometry.get_slot_item(
             slot_name=DeckSlotName.SLOT_5,
-            allowed_labware_ids={"abc123"},
-            allowed_module_ids=set(),
         )
     ).then_return(
         LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]

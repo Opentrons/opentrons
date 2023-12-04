@@ -280,16 +280,25 @@ def ensure_and_convert_trash_bin_location(
         raise InvalidTrashBinLocationError('Cannot load trash on OT-2.')
 
     # map trash bin location to addressable area
-    
+    trash_bin_slots = [
+        DeckSlotName(slot)
+        for slot in ['A1', 'B1', 'C1', 'D1', 'A3', 'B3', 'C3', 'D3']]
+    trash_bin_addressable_areas = [
+        'movableTrashA1',
+        'movableTrashB1',
+        'movableTrashC1',
+        'movableTrashD1',
+        'movableTrashA3',
+        'movableTrashB3',
+        'movableTrashC3',
+        'movableTrashD3'
+    ]
     map_trash_bin_addressable_area = {
-        'A1': 'movableTrashA1',
-        'B1': 'movableTrashB1',
-        'C1': 'movableTrashC1',
-        'D1': 'movableTrashD1',
-        'A3': 'movableTrashA3',
-        'B3': 'movableTrashB3',
-        'C3': 'movableTrashC3',
-        'D3': 'movableTrashD3',
+        slot: addressable_area
+        for slot, addressable_area in zip(
+            trash_bin_slots,
+            trash_bin_addressable_areas
+        )
     }
 
     slot_name_ot3 = ensure_and_convert_deck_slot(
@@ -297,10 +306,9 @@ def ensure_and_convert_trash_bin_location(
         api_version,
         robot_type
     )
-    valid_trash_bin_slots = {
-        DeckSlotName(slot_name)
-        for slot_name in map_trash_bin_addressable_area.keys()}
-    if slot_name_ot3 not in valid_trash_bin_slots:
+    if not isinstance(slot_name_ot3, DeckSlotName):
+        raise ValueError('Staging areas not permitted for trash bin.')
+    if slot_name_ot3 not in trash_bin_slots:
         raise InvalidTrashBinLocationError(
             f'Invalid location for trash bin: {slot_name_ot3}.\n'
             f'Valid slots: Any slot in column 1 or 3.')

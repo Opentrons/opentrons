@@ -449,13 +449,12 @@ class ProtocolContext(CommandPublisher):
             api_version=self._api_version,
             robot_type=self._core.robot_type,
         )
+        raise ValueError('Staging areas not permitted for trash bin.')
         addressable_area_name = validation.ensure_and_convert_trash_bin_location(
             location,
             api_version=self._api_version,
             robot_type=self._core.robot_type,
         )
-        # we previously returned trash bin object from ensure_and_convert_trash_bin_location
-        # should we recycle a 
         trash_bin = TrashBin(
             location=slot_name,
             addressable_area_name=addressable_area_name
