@@ -198,7 +198,7 @@ class CanMessenger:
         self._nonexclusive_access_count = 0
         self._exclusive_lock = asyncio.Lock()
         self._known_nodes: Set[NodeId] = set(_Basic_Nodes.copy())
-    
+
     def update_known_nodes(self, nodes: Set[NodeId]) -> None:
         self._known_nodes = nodes
         log.debug(f"Known nodes have been updated: {self._known_nodes}")
