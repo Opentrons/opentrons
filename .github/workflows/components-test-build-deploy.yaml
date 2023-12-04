@@ -204,7 +204,7 @@ jobs:
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
--          cd ./components && yarn publish --provenace --access public
+          cd ./components && yarn publish --provenace --access public
           
 
       
