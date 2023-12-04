@@ -148,6 +148,11 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
   const { labware, modules, commands, primaryPipetteId } = args
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
+  const labwareLocationCombos = getLabwareLocationCombos(
+    commands,
+    labware,
+    modules
+  )
 
   return labware.reduce<CheckLabwareStep[]>((acc, currentLabware) => {
     const labwareDef = labwareDefinitions.find(
@@ -163,28 +168,23 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     const adapter = (labwareDef?.allowedRoles ?? []).includes('adapter')
     if (isTiprack || adapter) return acc // skip any labware that is a tiprack or adapter
 
-    const labwareLocations = getLabwareLocationCombos(
-      commands,
-      labware,
-      modules
-    ).reduce<LabwareLocationCombo[]>(
-      (labwareLocationAcc, labwareLocationCombo) => {
-        if (labwareLocationCombo.labwareId !== currentLabware.id) {
-          return labwareLocationAcc
-        }
-        // remove duplicate definitionUri in same location
-        const comboAlreadyExists = labwareLocationAcc.some(
-          accLocationCombo =>
-            labwareLocationCombo.definitionUri ===
-              accLocationCombo.definitionUri &&
-            isEqual(labwareLocationCombo.location, accLocationCombo.location)
-        )
-        return comboAlreadyExists
-          ? labwareLocationAcc
-          : [...labwareLocationAcc, labwareLocationCombo]
-      },
-      []
-    )
+    const labwareLocations = labwareLocationCombos.reduce<
+      LabwareLocationCombo[]
+    >((labwareLocationAcc, labwareLocationCombo) => {
+      if (labwareLocationCombo.labwareId !== currentLabware.id) {
+        return labwareLocationAcc
+      }
+      // remove duplicate definitionUri in same location
+      const comboAlreadyExists = labwareLocationAcc.some(
+        accLocationCombo =>
+          labwareLocationCombo.definitionUri ===
+            accLocationCombo.definitionUri &&
+          isEqual(labwareLocationCombo.location, accLocationCombo.location)
+      )
+      return comboAlreadyExists
+        ? labwareLocationAcc
+        : [...labwareLocationAcc, labwareLocationCombo]
+    }, [])
 
     return [
       ...acc,
