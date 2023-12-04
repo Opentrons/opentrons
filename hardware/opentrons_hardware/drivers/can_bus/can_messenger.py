@@ -200,6 +200,7 @@ class CanMessenger:
         self._known_nodes: Set[NodeId] = set(_Basic_Nodes.copy())
 
     def update_known_nodes(self, nodes: Set[NodeId]) -> None:
+        """Update present nodes."""
         self._known_nodes = nodes
         log.debug(f"Known nodes have been updated: {self._known_nodes}")
 
