@@ -266,52 +266,44 @@ def ensure_module_model(load_name: str) -> ModuleModel:
 
 
 def ensure_and_convert_trash_bin_location(
-    deck_slot: Union[int, str],
-    api_version: APIVersion,
-    robot_type: RobotType
+    deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
 ) -> str:
 
     """Ensure trash bin load location is valid.
-    
+
     Also, convert the deck slot to a valid trash bin addressable area.
     """
 
-    if robot_type == 'OT-2 Standard':
-        raise InvalidTrashBinLocationError('Cannot load trash on OT-2.')
+    if robot_type == "OT-2 Standard":
+        raise InvalidTrashBinLocationError("Cannot load trash on OT-2.")
 
     # map trash bin location to addressable area
     trash_bin_slots = [
-        DeckSlotName(slot)
-        for slot in ['A1', 'B1', 'C1', 'D1', 'A3', 'B3', 'C3', 'D3']]
+        DeckSlotName(slot) for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+    ]
     trash_bin_addressable_areas = [
-        'movableTrashA1',
-        'movableTrashB1',
-        'movableTrashC1',
-        'movableTrashD1',
-        'movableTrashA3',
-        'movableTrashB3',
-        'movableTrashC3',
-        'movableTrashD3'
+        "movableTrashA1",
+        "movableTrashB1",
+        "movableTrashC1",
+        "movableTrashD1",
+        "movableTrashA3",
+        "movableTrashB3",
+        "movableTrashC3",
+        "movableTrashD3",
     ]
     map_trash_bin_addressable_area = {
         slot: addressable_area
-        for slot, addressable_area in zip(
-            trash_bin_slots,
-            trash_bin_addressable_areas
-        )
+        for slot, addressable_area in zip(trash_bin_slots, trash_bin_addressable_areas)
     }
 
-    slot_name_ot3 = ensure_and_convert_deck_slot(
-        deck_slot,
-        api_version,
-        robot_type
-    )
+    slot_name_ot3 = ensure_and_convert_deck_slot(deck_slot, api_version, robot_type)
     if not isinstance(slot_name_ot3, DeckSlotName):
-        raise ValueError('Staging areas not permitted for trash bin.')
+        raise ValueError("Staging areas not permitted for trash bin.")
     if slot_name_ot3 not in trash_bin_slots:
         raise InvalidTrashBinLocationError(
-            f'Invalid location for trash bin: {slot_name_ot3}.\n'
-            f'Valid slots: Any slot in column 1 or 3.')
+            f"Invalid location for trash bin: {slot_name_ot3}.\n"
+            f"Valid slots: Any slot in column 1 or 3."
+        )
 
     return map_trash_bin_addressable_area[slot_name_ot3]
 

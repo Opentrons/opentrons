@@ -113,7 +113,7 @@ class ProtocolCore(
         return None
 
     def _load_fixed_trash(self) -> None:
-        if self.robot_type == 'OT-2 Standard' or self._api_version < APIVersion(2, 16):
+        if self.robot_type == "OT-2 Standard" or self._api_version < APIVersion(2, 16):
             trash_id = self._engine_client.state.labware.get_fixed_trash_id()
             if trash_id is not None:
                 self._labware_cores_by_id[trash_id] = LabwareCore(
@@ -122,15 +122,12 @@ class ProtocolCore(
                 )
 
     def append_disposal_location(
-        self,
-        disposal_location: Union[TrashBin, WasteChute]
+        self, disposal_location: Union[TrashBin, WasteChute]
     ) -> None:
         """Append a disposal location object to the core"""
         self._disposal_locations.append(disposal_location)
 
-    def get_disposal_locations(
-        self
-    ) -> List[Union[TrashBin, WasteChute]]:
+    def get_disposal_locations(self) -> List[Union[TrashBin, WasteChute]]:
         """Get disposal locations."""
         return self._disposal_locations
 

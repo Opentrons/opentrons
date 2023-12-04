@@ -954,8 +954,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 well = trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
                 self._core.drop_tip_in_disposal_location(
-                    trash_container,
-                    home_after=home_after
+                    trash_container, home_after=home_after
                 )
                 self._last_tip_picked_up_from = None
                 return self
@@ -980,10 +979,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         elif isinstance(location, (TrashBin, WasteChute)):
             # TODO: Publish to run log.
-            self._core.drop_tip_in_disposal_location(
-                location,
-                home_after=home_after
-            )
+            self._core.drop_tip_in_disposal_location(location, home_after=home_after)
             self._last_tip_picked_up_from = None
             return self
 
@@ -1467,9 +1463,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(
-        self
-    ) -> Union[labware.Labware, TrashBin, WasteChute]:
+    def trash_container(self) -> Union[labware.Labware, TrashBin, WasteChute]:
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out liquids
@@ -1497,8 +1491,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @trash_container.setter
     def trash_container(
-        self,
-        trash: Union[labware.Labware, TrashBin, WasteChute]
+        self, trash: Union[labware.Labware, TrashBin, WasteChute]
     ) -> None:
         self._user_specified_trash = trash
 

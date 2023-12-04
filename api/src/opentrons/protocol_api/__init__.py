@@ -50,7 +50,7 @@ __all__ = [
     "HeaterShakerContext",
     "MagneticBlockContext",
     "Labware",
-    "TrashBin"
+    "TrashBin",
     "WasteChute",
     "Well",
     "Liquid",

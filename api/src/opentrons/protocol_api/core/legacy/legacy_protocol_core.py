@@ -133,12 +133,11 @@ class LegacyProtocolCore(
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
     def append_disposal_location(
-        self,
-        disposal_location: Union[TrashBin, WasteChute]
+        self, disposal_location: Union[TrashBin, WasteChute]
     ) -> None:
         raise APIVersionError(
             "Disposal locations are not supported in this API Version."
-        )        
+        )
 
     def add_labware_definition(
         self,

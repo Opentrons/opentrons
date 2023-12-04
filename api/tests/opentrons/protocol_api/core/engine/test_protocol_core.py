@@ -146,6 +146,7 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 
 
 @pytest.fixture
+# APIv2.15 because we're expecting a fixed trash.
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def subject(
     decoy: Decoy,
@@ -187,6 +188,7 @@ def test_api_version(
 #     assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
 
 
+# APIv2.15 because we're expecting a fixed trash.
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_fixed_trash(subject: ProtocolCore) -> None:
     """It should have a single labware core for the fixed trash."""
@@ -1044,6 +1046,7 @@ def test_add_labware_definition(
         ),
     ],
 )
+# APIv2.15 because we're expecting a fixed trash.
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_load_module(
     decoy: Decoy,
@@ -1217,6 +1220,7 @@ def test_load_module_raises_wrong_location(
         )
 
 
+# APIv2.15 because we're expecting a fixed trash.
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_load_mag_block(
     decoy: Decoy,
@@ -1268,7 +1272,7 @@ def test_load_mag_block(
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=['fixed-trash-123'],
+            existing_labware_ids=["fixed-trash-123"],
             existing_module_ids=[],
             new_module_id="abc123",
         )

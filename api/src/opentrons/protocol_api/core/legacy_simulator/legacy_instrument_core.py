@@ -254,11 +254,8 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
-
     def drop_tip_in_disposal_location(
-        self,
-        disposal_location: Union[TrashBin, WasteChute],
-        home_after: Optional[bool]
+        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
     ) -> None:
         raise APIVersionError(
             "Dropping tips in a trash bin or waste chute is not supported in this API Version."

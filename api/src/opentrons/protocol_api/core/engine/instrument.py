@@ -23,7 +23,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import (
     PRIMARY_NOZZLE_LITERAL,
     NozzleLayoutConfigurationType,
-    AddressableOffsetVector
+    AddressableOffsetVector,
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -389,9 +389,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip_in_disposal_location(
-        self,
-        disposal_location: Union[TrashBin, WasteChute],
-        home_after: Optional[bool]
+        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
     ) -> None:
         self._move_to_disposal_location(
             disposal_location,
@@ -415,9 +413,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         if isinstance(disposal_location, WasteChute):
             num_channels = self.get_channels()
             if num_channels == 96:
-                addressable_area_name = '1and8ChannelWasteChute'
+                addressable_area_name = "1and8ChannelWasteChute"
             else:
-                addressable_area_name = '96ChannelWasteChute'
+                addressable_area_name = "96ChannelWasteChute"
 
         self._engine_client.move_to_addressable_area(
             pipette_id=self._pipette_id,
@@ -425,7 +423,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             offset=offset,
             force_direct=force_direct,
             speed=speed,
-            minimum_z_height=None
+            minimum_z_height=None,
         )
 
     def _drop_tip_in_place(self, home_after: Optional[bool]) -> None:
