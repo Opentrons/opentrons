@@ -948,8 +948,6 @@ class InstrumentContext(publisher.CommandPublisher):
         alternate_drop_location: bool = False
         if location is None:
             trash_container = self.trash_container
-            if trash_container != self._user_specified_trash and self._user_specifed_trash != None:
-                trash_container = self._user_specified_trash
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
             if isinstance(trash_container, labware.Labware):
