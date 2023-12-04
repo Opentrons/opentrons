@@ -164,6 +164,8 @@ jobs:
     runs-on: 'ubuntu-latest'
     needs: ['js-unit-test', 'determine-build-type']
     if: needs.determine-build-type.outputs.type == 'publish'
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: 'actions/checkout@v3'
       # https://github.com/actions/checkout/issues/290
@@ -201,11 +203,11 @@ jobs:
           VERSION_STRING=$(echo ${{ github.ref }} | sed 's/refs\/tags\/components@//')
           json -I -f ./components/package.json -e "this.version=\"$VERSION_STRING\""
           json -I -f ./components/package.json -e "this.dependencies['@opentrons/shared-data']=\"$VERSION_STRING\""
+      - name: 'cat npmrc'
+        run: cat ./.npmrc
       - name: 'publish to npm registry'
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          cd ./components && yarn publish --provenace --access public
+          cd ./components && yarn publish --access public
           
 
       
