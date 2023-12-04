@@ -97,7 +97,7 @@ export function DeckLocationSelect({
           addressableArea =>
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
             // special case the OT-2 trash addressable area
-            addressableArea.id === '12'
+            addressableArea.id === 'fixedTrash'
         )
         .map(slot => {
           const slotLocation = { slotName: slot.id }
