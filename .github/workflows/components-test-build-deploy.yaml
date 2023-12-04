@@ -189,7 +189,8 @@ jobs:
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
-          make setup-js
+          yarn config set network-timeout 60000
+          yarn
       - name: 'build library'
         run: |
           make -C components lib
