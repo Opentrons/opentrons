@@ -437,7 +437,7 @@ def test_get_module_labware_highest_z(
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
 
 
-def test_get_all_labware_highest_z_no_equipment(
+def test_get_all_obstacle_highest_z_no_equipment(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -449,12 +449,12 @@ def test_get_all_labware_highest_z_no_equipment(
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(addressable_area_view.get_all()).then_return([])
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 0
 
 
-def test_get_all_labware_highest_z(
+def test_get_all_obstacle_highest_z(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
@@ -524,13 +524,13 @@ def test_get_all_labware_highest_z(
 
     plate_z = subject.get_labware_highest_z("plate-id")
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
-    all_z = subject.get_all_labware_highest_z()
+    all_z = subject.get_all_obstacle_highest_z()
 
     # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
 
 
-def test_get_all_labware_highest_z_with_staging_area(
+def test_get_all_obstacle_highest_z_with_staging_area(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     falcon_tuberack_def: LabwareDefinition,
@@ -585,13 +585,12 @@ def test_get_all_labware_highest_z_with_staging_area(
     )
 
     staging_z = subject.get_labware_highest_z("staging-id")
-    all_z = subject.get_all_labware_highest_z()
+    all_z = subject.get_all_obstacle_highest_z()
 
-    # Should exclude the off-deck plate.
     assert all_z == staging_z
 
 
-def test_get_all_labware_highest_z_with_modules(
+def test_get_all_obstacle_highest_z_with_modules(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -609,31 +608,29 @@ def test_get_all_labware_highest_z_with_modules(
     decoy.when(module_view.get_overall_height("module-id-1")).then_return(42.0)
     decoy.when(module_view.get_overall_height("module-id-2")).then_return(1337.0)
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 1337.0
 
 
-def test_get_all_labware_highest_z_with_addressable_area(
+def test_get_all_obstacle_highest_z_with_fixtures(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the highest Z including addressable areas."""
+    """It should get the highest Z including fixtures."""
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(module_view.get_all()).then_return([])
 
-    decoy.when(addressable_area_view.get_all()).then_return(["abc", "xyz"])
-    decoy.when(addressable_area_view.get_addressable_area_height("abc")).then_return(
-        42.0
+    decoy.when(addressable_area_view.get_all_cutout_fixtures()).then_return(
+        ["abc", "xyz"]
     )
-    decoy.when(addressable_area_view.get_addressable_area_height("xyz")).then_return(
-        1337.0
-    )
+    decoy.when(addressable_area_view.get_fixture_height("abc")).then_return(42.0)
+    decoy.when(addressable_area_view.get_fixture_height("xyz")).then_return(1337.0)
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 1337.0
 

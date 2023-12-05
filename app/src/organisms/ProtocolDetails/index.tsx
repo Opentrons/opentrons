@@ -39,7 +39,10 @@ import {
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
-import { getGripperDisplayName } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -54,7 +57,6 @@ import {
   analyzeProtocol,
 } from '../../redux/protocol-storage'
 import { useFeatureFlag } from '../../redux/config'
-import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -230,8 +232,8 @@ export function ProtocolDetails(
       ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
       : []
 
-  const requiredFixtureDetails = getSimplestDeckConfigForProtocolCommands(
-    mostRecentAnalysis?.commands ?? []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
+    mostRecentAnalysis
   )
 
   const requiredLabwareDetails =
@@ -527,6 +529,7 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            marginBottom={SPACING.spacing16}
           >
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}

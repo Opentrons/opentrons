@@ -12,11 +12,11 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSimplestDeckConfigForProtocol,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { useAttachedModules } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
@@ -106,9 +106,7 @@ export function SetupLabwareMap({
 
   const { offDeckItems } = getLabwareSetupItemGroups(commands)
 
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
 

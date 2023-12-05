@@ -625,7 +625,7 @@ class ProtocolCore(
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
-        return self._engine_client.state.geometry.get_all_labware_highest_z()
+        return self._engine_client.state.geometry.get_all_obstacle_highest_z()
 
     def get_labware_cores(self) -> List[LabwareCore]:
         """Get all loaded labware cores."""

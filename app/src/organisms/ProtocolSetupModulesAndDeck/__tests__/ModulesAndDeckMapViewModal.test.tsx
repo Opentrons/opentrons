@@ -2,13 +2,14 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders, BaseDeck } from '@opentrons/components'
+import { getSimplestDeckConfigForProtocol } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
 jest.mock('@opentrons/api-client')
+jest.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 jest.mock('../../../redux/config')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../resources/deck_configuration/utils')
@@ -88,8 +89,8 @@ const render = (
 }
 
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
-const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
-  typeof getSimplestDeckConfigForProtocolCommands
+const mockGetSimplestDeckConfigForProtocol = getSimplestDeckConfigForProtocol as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocol
 >
 
 describe('ModulesAndDeckMapViewModal', () => {
@@ -102,7 +103,7 @@ describe('ModulesAndDeckMapViewModal', () => {
       runId: mockRunId,
       protocolAnalysis: PROTOCOL_ANALYSIS,
     }
-    when(mockGetSimplestDeckConfigForProtocolCommands).mockReturnValue(
+    when(mockGetSimplestDeckConfigForProtocol).mockReturnValue(
       // TODO(bh, 2023-11-13): mock cutout config protocol spec
       []
     )

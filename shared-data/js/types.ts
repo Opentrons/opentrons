@@ -266,6 +266,7 @@ export interface CutoutFixture {
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  height: number
 }
 
 type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'

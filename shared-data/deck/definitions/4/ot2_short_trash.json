@@ -389,7 +389,8 @@
         "cutout10": ["10"],
         "cutout11": ["11"],
         "cutout12": ["12"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "fixedTrashSlot",
@@ -397,7 +398,8 @@
       "displayName": "Fixed Trash",
       "providesAddressableAreas": {
         "cutout12": ["shortFixedTrash"]
-      }
+      },
+      "height": 58
     }
   ]
 }

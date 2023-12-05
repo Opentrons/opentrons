@@ -13,6 +13,7 @@ import {
 import {
   CompletedProtocolAnalysis,
   DeckConfiguration,
+  FLEX_SIMPLEST_DECK_CONFIG,
   LabwareDefinition2,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -21,7 +22,6 @@ import { useMissingProtocolHardware, useRequiredProtocolLabware } from '..'
 
 import type { Protocol } from '@opentrons/api-client'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { FLEX_SIMPLEST_DECK_CONFIG } from '../../../../resources/deck_configuration/utils'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')

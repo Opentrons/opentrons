@@ -84,7 +84,6 @@ describe('PipetteOverflowMenu', () => {
     props = {
       ...props,
       isPipetteCalibrated: true,
-      isRunActive: false,
     }
     const { getByRole } = render(props)
     const recalibrate = getByRole('button', {
@@ -139,5 +138,29 @@ describe('PipetteOverflowMenu', () => {
     const settings = queryByRole('button', { name: 'Pipette Settings' })
 
     expect(settings).not.toBeInTheDocument()
+  })
+
+  it('should disable certain menu items if a run is active', () => {
+    mockisFlexPipette.mockReturnValue(true)
+    props = {
+      ...props,
+      isRunActive: true,
+    }
+    const { getByRole } = render(props)
+    expect(
+      getByRole('button', {
+        name: 'Calibrate pipette',
+      })
+    ).toBeDisabled()
+    expect(
+      getByRole('button', {
+        name: 'Detach pipette',
+      })
+    ).toBeDisabled()
+    expect(
+      getByRole('button', {
+        name: 'Drop tips',
+      })
+    ).toBeDisabled()
   })
 })

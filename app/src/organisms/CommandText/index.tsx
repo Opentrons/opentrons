@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { getPipetteNameSpecs, RunTimeCommand } from '@opentrons/shared-data'
 import {
+  getAddressableAreaDisplayName,
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
@@ -235,13 +236,16 @@ export function CommandText(props: Props): JSX.Element | null {
       )
     }
     case 'moveToAddressableArea': {
-      const { addressableAreaName, speed, minimumZHeight } = command.params
+      const addressableAreaDisplayName = getAddressableAreaDisplayName(
+        robotSideAnalysis,
+        command.id,
+        t
+      )
+
       return (
         <StyledText as="p" {...styleProps}>
           {t('move_to_addressable_area', {
-            addressable_area: addressableAreaName,
-            speed: speed,
-            height: minimumZHeight,
+            addressable_area: addressableAreaDisplayName,
           })}
         </StyledText>
       )

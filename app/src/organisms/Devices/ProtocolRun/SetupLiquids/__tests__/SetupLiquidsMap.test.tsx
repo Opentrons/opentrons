@@ -12,6 +12,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSimplestDeckConfigForProtocol,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -29,7 +30,6 @@ import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckViewLayerBlockList'
 import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../../resources/deck_configuration/utils'
 import { mockProtocolModuleInfo } from '../../../../ProtocolSetupLabware/__fixtures__'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redux/modules/__fixtures__'
 
@@ -38,7 +38,6 @@ import { SetupLiquidsMap } from '../SetupLiquidsMap'
 import type {
   ModuleModel,
   ModuleType,
-  RunTimeCommand,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 
@@ -92,8 +91,8 @@ const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
 >
-const mockGetSimplestDeckConfigForProtocolCommands = getSimplestDeckConfigForProtocolCommands as jest.MockedFunction<
-  typeof getSimplestDeckConfigForProtocolCommands
+const mockGetSimplestDeckConfigForProtocol = getSimplestDeckConfigForProtocol as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocol
 >
 
 const RUN_ID = '1'
@@ -163,8 +162,8 @@ describe('SetupLiquidsMap', () => {
     when(mockGetLabwareRenderInfo)
       .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
       .mockReturnValue({})
-    when(mockGetSimplestDeckConfigForProtocolCommands)
-      .calledWith(mockProtocolAnalysis.commands as RunTimeCommand[])
+    when(mockGetSimplestDeckConfigForProtocol)
+      .calledWith(mockProtocolAnalysis)
       // TODO(bh, 2023-11-13): mock the cutout config protocol spec
       .mockReturnValue([])
     when(mockParseLiquidsInLoadOrder)

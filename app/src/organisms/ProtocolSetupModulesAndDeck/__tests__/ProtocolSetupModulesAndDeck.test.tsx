@@ -6,10 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import {
-  getDeckDefFromRobotType,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-} from '@opentrons/shared-data'
+import { WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
@@ -40,7 +37,6 @@ import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../resources/runs/hooks')
-jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
@@ -54,9 +50,6 @@ jest.mock('../FixtureTable')
 jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
 jest.mock('../ModulesAndDeckMapViewModal')
 
-const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
-  typeof getDeckDefFromRobotType
->
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
@@ -158,9 +151,6 @@ describe('ProtocolSetupModulesAndDeck', () => {
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith([], [])
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    when(mockGetDeckDefFromRobotType)
-      .calledWith('OT-3 Standard')
-      .mockReturnValue(ot3StandardDeckDef as any)
     mockSetupInstructionsModal.mockReturnValue(
       <div>mock SetupInstructionsModal</div>
     )

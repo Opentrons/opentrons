@@ -791,7 +791,6 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
-        # TODO (spp: 2023-08-30): disallow loading Flex pipettes on OT-2 by checking robotType
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
