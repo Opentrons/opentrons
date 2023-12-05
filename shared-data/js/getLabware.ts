@@ -54,15 +54,6 @@ export const PD_DO_NOT_LIST = [
   'opentrons_96_aluminumblock_nest_wellplate_100ul',
 ]
 
-export function getLabwareV1Def(
-  labwareName: string
-): LabwareDefinition1 | null | undefined {
-  const labware: LabwareDefinition1 | null | undefined =
-    // @ts-expect-error(mc, 2021-04-27): make lookup more strict or remove v1 defs entirely
-    definitions[labwareName]
-  return labware
-}
-
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)
 }

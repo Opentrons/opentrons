@@ -6,6 +6,32 @@ import {
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from './types'
 
+
+// require all definitions in the labware/definitions/1 directory
+// require.context is webpack-specific method
+const labwareSchemaV1DefsContext = require.context(
+  '@opentrons/shared-data/labware/definitions/1',
+  true, // traverse subdirectories
+  /\.json$/, // import filter
+  'sync' // load every definition into one synchronous chunk
+)
+let labwareSchemaV1Defs: Readonly<LabwareDefinition1[]> | null = null
+function getLegacyLabwareDefs(): Readonly<LabwareDefinition1[]> {
+  if (!labwareSchemaV1Defs) {
+    labwareSchemaV1Defs = labwareSchemaV1DefsContext
+      .keys()
+      .map((name: string) => labwareSchemaV1DefsContext(name))
+  }
+
+  return labwareSchemaV1Defs as Readonly<LabwareDefinition1[]>
+}
+export function getLegacyLabwareDef(
+  loadName: string | null | undefined
+): LabwareDefinition1 | null {
+  const def = getLegacyLabwareDefs().find(d => d.metadata.name === loadName)
+  return def || null
+}
+
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
 // require all definitions in the labware/definitions/2 directory
