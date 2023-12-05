@@ -5,6 +5,8 @@
   "source": "src/index.ts",
   "types": "lib/index.d.ts",
   "style": "src/index.css",
+  "main": "lib/opentrons-components.js",
+  "module": "src/index.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Opentrons/opentrons.git"
