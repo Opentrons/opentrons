@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from typing import Generator
+from typing import Generator, TYPE_CHECKING
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
@@ -20,7 +20,10 @@ from opentrons.protocol_engine.types import ModuleDefinition
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.api import API
-from opentrons.hardware_control.ot3api import OT3API
+
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 def _ot2_hardware_api(decoy: Decoy) -> API:
