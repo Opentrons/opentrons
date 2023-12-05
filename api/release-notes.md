@@ -19,7 +19,11 @@ Welcome to the v7.1.0 release of the Opentrons robot software! This release incl
 ### Improved Features
 
 - Improves aspirate, dispense, and mix behavior with volumes set to zero.
-- `opentrons_simulate` now works with all API versions.
+- The `opentrons_simulate` command-line tool now works with all Python API versions.
+
+### Known Issues
+
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with `opentrons_simulate`.
 
 ---
 
