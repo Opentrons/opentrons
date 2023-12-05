@@ -3,7 +3,6 @@
   "version": "0.0.0-dev",
   "description": "Node.js client for discovering Opentrons robots on the network",
   "main": "lib/index.js",
-  "flow:main": "flow-types/index.js.flow",
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
   "bin": {
