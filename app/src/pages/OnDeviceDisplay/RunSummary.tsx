@@ -120,6 +120,9 @@ export function RunSummary(): JSX.Element {
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
+  const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
+    false
+  )
 
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {
@@ -153,6 +156,7 @@ export function RunSummary(): JSX.Element {
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
+      setShowRunAgainSpinner(true)
       reset()
       trackEvent({
         name: 'proceedToRun',
@@ -196,6 +200,19 @@ export function RunSummary(): JSX.Element {
         console.log(`Error checking pipette tip attachement state: ${e}`)
       })
   }, [])
+
+  const RUN_AGAIN_SPINNER_TEXT = (
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="25.5rem">
+      {t('run_again')}
+      <Icon
+        name="ot-spinner"
+        aria-label="icon_ot-spinner"
+        spin={true}
+        size="2.5rem"
+        color={COLORS.white}
+      />
+    </Flex>
+  )
 
   return (
     <Btn
@@ -306,8 +323,11 @@ export function RunSummary(): JSX.Element {
               flex="1"
               iconName="play-round-corners"
               onClick={handleRunAgain}
-              buttonText={t('run_again')}
+              buttonText={
+                showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
+              }
               height="17rem"
+              css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
             />
             {!didRunSucceed ? (
               <LargeButton
@@ -399,9 +419,24 @@ const SummaryDatum = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   width: max-content;
 `
-
 const DURATION_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
+`
+
+const RUN_AGAIN_CLICKED_STYLE = css`
+  background-color: ${COLORS.bluePressed};
+  &:focus {
+    background-color: ${COLORS.bluePressed};
+  }
+  &:hover {
+    background-color: ${COLORS.bluePressed};
+  }
+  &:focus-visible {
+    background-color: ${COLORS.bluePressed};
+  }
+  &:active {
+    background-color: ${COLORS.bluePressed};
+  }
 `
