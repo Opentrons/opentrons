@@ -1,5 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Type, Union, List, Tuple
+from __future__ import annotations
+from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_api import _waste_chute_dimensions
 
@@ -17,6 +18,7 @@ from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
+
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -63,6 +65,9 @@ from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
 
+if TYPE_CHECKING:
+    from ...labware import Labware
+
 
 class ProtocolCore(
     AbstractProtocol[
@@ -92,7 +97,7 @@ class ProtocolCore(
         self._module_cores_by_id: Dict[
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
-        self._disposal_locations: List[Union[TrashBin, WasteChute]] = []
+        self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
         self._load_fixed_trash()
 
     @property
@@ -127,7 +132,7 @@ class ProtocolCore(
         """Append a disposal location object to the core"""
         self._disposal_locations.append(disposal_location)
 
-    def get_disposal_locations(self) -> List[Union[TrashBin, WasteChute]]:
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get disposal locations."""
         return self._disposal_locations
 

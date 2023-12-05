@@ -102,7 +102,10 @@ class InstrumentContext(publisher.CommandPublisher):
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
-        self._user_specified_trash = None
+        self._user_specified_trash: Union[
+            labware.Labware, TrashBin, WasteChute, None
+        ] = trash
+
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -1479,7 +1482,6 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.16
             Added support for ``TrashBin`` and ``WasteChute`` objects.
         """
-
         if self._user_specified_trash is None:
             disposal_locations = self._protocol_core.get_disposal_locations()
             if len(disposal_locations) == 0:

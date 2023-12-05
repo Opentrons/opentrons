@@ -381,8 +381,11 @@ class LegacyProtocolCore(
         """Get a mapping of mount to instrument."""
         return self._instruments
 
-    def get_disposal_locations(self) -> List[Union[TrashBin, WasteChute]]:
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get valid disposal locations."""
+        trash = self._deck_layout["12"]
+        if isinstance(trash, Labware):
+            return [trash]
         raise APIVersionError("No dynamically loadable disposal locations.")
 
     def pause(self, msg: Optional[str]) -> None:

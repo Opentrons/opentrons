@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple
+from typing import Generic, List, Optional, Union, Tuple, TYPE_CHECKING
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -22,6 +22,9 @@ from .._liquid import Liquid
 from ..trash_bin import TrashBin
 from ..waste_chute import WasteChute
 from .._types import OffDeckType, StagingSlotName
+
+if TYPE_CHECKING:
+    from ...labware import Labware
 
 
 class AbstractProtocol(
@@ -146,7 +149,7 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
-    def get_disposal_locations(self) -> List[Union[TrashBin, WasteChute]]:
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         ...
 
     @abstractmethod
