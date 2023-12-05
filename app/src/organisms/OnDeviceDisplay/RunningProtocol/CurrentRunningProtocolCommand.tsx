@@ -235,6 +235,7 @@ export function CurrentRunningProtocolCommand({
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
             robotType={robotType}
+            isOnDevice={true}
           />
         ) : null}
       </Flex>
