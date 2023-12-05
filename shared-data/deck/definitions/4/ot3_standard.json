@@ -352,15 +352,14 @@
       {
         "id": "1and8ChannelWasteChute",
         "areaType": "wasteChute",
-        "offsetFromCutoutFixture": [-13.5, 0, 0],
+        "offsetFromCutoutFixture": [64, -27, 114.5],
         "boundingBox": {
-          "xDimension": 155.0,
-          "yDimension": 86.0,
-          "zDimension": 125.0
+          "xDimension": 0,
+          "yDimension": 63,
+          "zDimension": 0
         },
         "displayName": "1/8 Channel Waste Chute",
-        "ableToDropTips": true,
-        "dropTipsOffset": [64.0, 21.91, 115.0]
+        "ableToDropTips": true
       },
       {
         "id": "96ChannelWasteChute",
