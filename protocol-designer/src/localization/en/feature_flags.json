@@ -11,17 +11,5 @@
   "OT_PD_ALLOW_ALL_TIPRACKS": {
     "title": "Allow all tip rack options",
     "description": "Enable selection of all tip racks for each pipette."
-  },
-  "OT_PD_ALLOW_96_CHANNEL": {
-    "title": "Enable 96-channel pipette",
-    "description": "Allow users to select 96-channel pipette"
-  },
-  "OT_PD_ENABLE_FLEX_DECK_MODIFICATION": {
-    "title": "Enable Flex deck modification",
-    "description": "Allow users to select waste chute, Flex staging, and modify trash slot"
-  },
-  "OT_PD_ENABLE_OFF_DECK_VIS_AND_MULTI_TIP": {
-    "title": "Enable off-deck visuals and multi tiprack support",
-    "description": "Allow users to see off-deck labware visualizations and multi tiprack support"
   }
 }
