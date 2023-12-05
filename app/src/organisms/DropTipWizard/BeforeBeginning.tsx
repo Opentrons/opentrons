@@ -17,7 +17,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   JUSTIFY_FLEX_END,
-  POSITION_ABSOLUTE,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
