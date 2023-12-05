@@ -32,8 +32,8 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
-from .trash_bin import TrashBin
-from .waste_chute import WasteChute
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
 from ._nozzle_layout import NozzleLayout
 from . import labware, validation
 

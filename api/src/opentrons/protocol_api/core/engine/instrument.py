@@ -36,8 +36,8 @@ from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
-from ...trash_bin import TrashBin
-from ...waste_chute import WasteChute
+from ..._trash_bin import TrashBin
+from ..._waste_chute import WasteChute
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
