@@ -217,6 +217,7 @@ export const mix: CommandCreator<MixArgs> = (
           curryCommandCreator(replaceTip, {
             pipette,
             dropTipLocation,
+            nozzles: data.nozzles ?? undefined,
           }),
         ]
       }

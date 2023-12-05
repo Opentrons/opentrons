@@ -101,7 +101,6 @@ export function getNextTiprack(
     }
   )
   const is96Channel = pipetteEntity.spec.channels === 96
-
   const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
     tiprackId => {
       const tipRackLocation = robotState.labware[tiprackId].slot
@@ -114,7 +113,6 @@ export function getNextTiprack(
       return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
     }
   )
-
   const firstAvailableTiprack = (is96Channel
     ? filteredSortedTipRackIdsFor96Channel
     : sortedTipracksIds
