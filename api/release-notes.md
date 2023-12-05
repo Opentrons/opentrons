@@ -5,13 +5,31 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 
+## Opentrons Robot Software Changes in 7.1.0
+
+Welcome to the v7.1.0 release of the Opentrons robot software! This release includes support for deck configuration on Opentrons Flex, partial tip pickup with the Flex 96-Channel Pipette, and other improvements.
+
+### New Features
+
+- Pick up either a column of 8 tips or all 96 tips with the Flex 96-Channel Pipette.
+- Specify the deck configuration of Flex, including the movable trash bin, waste chute, and staging area slots.
+- Use the Flex Gripper to drop labware into the waste chute, or use Flex pipettes to dispense liquid or drop tips into the waste chute.
+- Manually prepare a pipette for aspiration, when required for your application.
+
+### Improved Features
+
+- Improves aspirate, dispense, and mix behavior with volumes set to zero.
+- `opentrons_simulate` now works with all API versions.
+
+---
+
 ## Opentrons Robot Software Changes in 7.0.2
 
-The 7.0.2 hotfix release does not contain any changes to the robot software
+The 7.0.2 hotfix release does not contain any changes to the robot software.
 
 ### Known Issues
 
-JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool
+JSON protocols created or modified with Protocol Designer v6.0.0 or higher can't be simulated with the `opentrons_simulate` command-line tool.
 
 ---
 
