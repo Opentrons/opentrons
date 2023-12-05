@@ -101,6 +101,8 @@ class GeometryView:
             default=0.0,
         )
 
+        # Fixme (spp, 2023-12-04): the overall height is not the true highest z of modules
+        #  on a Flex.
         highest_module_z = max(
             (
                 self._modules.get_overall_height(module.id)
@@ -146,7 +148,10 @@ class GeometryView:
             try:
                 labware_id = self._labware.get_id_by_module(module_id=module_id)
             except LabwareNotLoadedOnModuleError:
-                return self._modules.get_overall_height(module_id=module_id)
+                deck_type = DeckType(self._labware.get_deck_definition()["otId"])
+                return self._modules.get_module_highest_z(
+                    module_id=module_id, deck_type=deck_type
+                )
             else:
                 return self.get_highest_z_of_labware_stack(labware_id)
         elif isinstance(slot_item, LoadedLabware):
@@ -408,6 +413,11 @@ class GeometryView:
         z_dim = definition.dimensions.zDimension
         height_over_labware: float = 0
         if isinstance(lw_data.location, ModuleLocation):
+            # Note: height over labware gets accounted for only if the top labware is
+            # directly on the module. So if there's a labware on an adapter on a module,
+            # then this over-module-height gets ignored. We currently do not have any modules
+            # that use an adapter and has height over labware so this doesn't cause any issues
+            # but if we add one in the future then this calculation should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
         return labware_pos.z + z_dim + height_over_labware

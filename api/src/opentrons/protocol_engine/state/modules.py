@@ -702,6 +702,38 @@ class ModuleView(HasState[ModuleState]):
         """Get the height of module parts above module labware base."""
         return self.get_dimensions(module_id).overLabwareHeight
 
+    # TODO (spp, 2023-12-05): this method is missing unit test coverage
+    def get_module_highest_z(self, module_id: str, deck_type: DeckType) -> float:
+        """Get the highest z point of the module, as placed on the robot.
+
+        The highest Z of a module, unlike the bare overall height, depends on
+        the robot it is on. We will calculate this value using the info we already have
+        about the transformation of the module's placement, based on the deck it is on.
+
+        This value is calculated as:
+        highest_z = ( nominal_robot_transformed_labware_offset_z
+                      + z_distance_between_labware_offset_point_and_overall_height
+                      + module_calibration_offset_z
+        )
+        Note: For thermocycler, the lid height is not taken into account.
+        """
+        module_height = self.get_overall_height(module_id)
+        if deck_type == DeckType.OT3_STANDARD:
+            nominal_transformed_lw_offset_z = self.get_nominal_module_offset(
+                module_id=module_id, deck_type=deck_type
+            ).z
+            z_difference_between_lw_offset_point_and_overall_height = (
+                module_height - self.get_definition(module_id).labwareOffset.z
+            )
+            calibration_offset = self.get_module_calibration_offset(module_id)
+            return (
+                nominal_transformed_lw_offset_z
+                + z_difference_between_lw_offset_point_and_overall_height
+                + (calibration_offset.moduleOffsetVector.z if calibration_offset else 0)
+            )
+        else:
+            return module_height
+
     # TODO(mc, 2022-01-19): this method is missing unit test coverage and
     # is also unused. Remove or add tests.
     def get_lid_height(self, module_id: str) -> float:
