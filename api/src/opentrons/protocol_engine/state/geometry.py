@@ -89,9 +89,8 @@ class GeometryView:
 
         return self._get_highest_z_from_labware_data(labware_data)
 
-    # TODO(mc, 2022-06-24): rename this method
-    def get_all_labware_highest_z(self) -> float:
-        """Get the highest Z-point across all labware."""
+    def get_all_obstacle_highest_z(self) -> float:
+        """Get the highest Z-point across all obstacles that the instruments need to fly over."""
         highest_labware_z = max(
             (
                 self._get_highest_z_from_labware_data(lw_data)
@@ -109,15 +108,33 @@ class GeometryView:
             default=0.0,
         )
 
-        highest_addressable_area_z = max(
-            (
-                self._addressable_areas.get_addressable_area_height(area_name)
-                for area_name in self._addressable_areas.get_all()
-            ),
-            default=0.0,
-        )
+        cutout_fixture_names = self._addressable_areas.get_all_cutout_fixtures()
+        if cutout_fixture_names is None:
+            # We're using a simulated deck config (see `Config.use_simulated_deck_config`).
+            # We only know the addressable areas referenced by the protocol, not the fixtures
+            # providing them. And there is more than one possible configuration of fixtures
+            # to provide them. So, we can't know what the highest fixture is. Default to 0.
+            #
+            # Defaulting to 0 may not be the right thing to do here.
+            # For example, suppose a protocol references an addressable area that implies a tall
+            # fixture must be on the deck, and then it uses long tips that wouldn't be able to
+            # clear the top of that fixture. We should perhaps raise an analysis error for that,
+            # but defaulting to 0 here means we won't.
+            highest_fixture_z = 0.0
+        else:
+            highest_fixture_z = max(
+                (
+                    self._addressable_areas.get_fixture_height(cutout_fixture_name)
+                    for cutout_fixture_name in cutout_fixture_names
+                ),
+                default=0.0,
+            )
 
-        return max(highest_labware_z, highest_module_z, highest_addressable_area_z)
+        return max(
+            highest_labware_z,
+            highest_module_z,
+            highest_fixture_z,
+        )
 
     def get_min_travel_z(
         self,
@@ -134,7 +151,7 @@ class GeometryView:
         ):
             min_travel_z = self.get_labware_highest_z(labware_id)
         else:
-            min_travel_z = self.get_all_labware_highest_z()
+            min_travel_z = self.get_all_obstacle_highest_z()
         if minimum_z_height:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z

@@ -479,7 +479,8 @@
         "cutoutC1": ["C1"],
         "cutoutB1": ["B1"],
         "cutoutA1": ["A1"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "singleCenterSlot",
@@ -490,7 +491,8 @@
         "cutoutC2": ["C2"],
         "cutoutB2": ["B2"],
         "cutoutA2": ["A2"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "singleRightSlot",
@@ -501,7 +503,8 @@
         "cutoutC3": ["C3"],
         "cutoutB3": ["B3"],
         "cutoutA3": ["A3"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "stagingAreaRightSlot",
@@ -512,7 +515,8 @@
         "cutoutC3": ["C3", "C4"],
         "cutoutB3": ["B3", "B4"],
         "cutoutA3": ["A3", "A4"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "trashBinAdapter",
@@ -536,7 +540,8 @@
         "cutoutC3": ["movableTrashC3"],
         "cutoutB3": ["movableTrashB3"],
         "cutoutA3": ["movableTrashA3"]
-      }
+      },
+      "height": 40
     },
     {
       "id": "wasteChuteRightAdapterCovered",
@@ -544,7 +549,8 @@
       "displayName": "Waste Chute Adapter for 1 or 8 Channel Pipettes",
       "providesAddressableAreas": {
         "cutoutD3": ["1and8ChannelWasteChute"]
-      }
+      },
+      "height": 124.5
     },
     {
       "id": "wasteChuteRightAdapterNoCover",
@@ -556,7 +562,8 @@
           "96ChannelWasteChute",
           "gripperWasteChute"
         ]
-      }
+      },
+      "height": 124.5
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterCovered",
@@ -564,7 +571,8 @@
       "displayName": "Staging Slot With Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
         "cutoutD3": ["1and8ChannelWasteChute", "D4"]
-      }
+      },
+      "height": 124.5
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
@@ -577,7 +585,8 @@
           "gripperWasteChute",
           "D4"
         ]
-      }
+      },
+      "height": 124.5
     }
   ],
   "gripperOffsets": {
