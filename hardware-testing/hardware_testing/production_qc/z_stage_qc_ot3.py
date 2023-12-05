@@ -119,7 +119,7 @@ def _record_force(mark10: Mark10) -> None:
     global thread_sensor
     global force_output
     if mark10.is_simulator():
-        force_output.append(0.0)  # to make it pass analysis
+        force_output.append(0)  # to make it pass analysis
     try:
         while thread_sensor:
             force = mark10.read_force()
@@ -138,7 +138,7 @@ def analyze_force(force_output: List) -> Tuple[bool, float, float]:
     LOG.debug(f"analyze_force: {force_output}")
 
     # Check for first 0 to ensure gauge is zeroed
-    if not force_output[0] == 0.0:
+    if not force_output[0] == 0:
         return (False, 0, 0)
 
     max_force = max(force_output)
@@ -149,7 +149,7 @@ def analyze_force(force_output: List) -> Tuple[bool, float, float]:
         return (False, 0, 0)
 
     count = 0
-    sum = 0.0
+    sum = 0
     for force in force_output:
         if force > max_force / 2:
             count += 1
@@ -246,15 +246,14 @@ async def _force_gauge(
 
             ui.print_header(f"Cycle {i+1}: Testing Current = {test_current}")
             if mark10.is_simulator():
-                mark10.set_simulation_force(test["F_MAX"])  # type: ignore[union-attr]
+                mark10.set_simulation_force(test["F_MAX"])
             TH = Thread(target=_record_force, args=(mark10,))
             thread_sensor = True
             force_output = []
             TH.start()
             try:
-                async with api._backend.motor_current(
-                    run_currents={z_ax: test_current}
-                ):
+                async with api._backend.restore_current():
+                    await api._backend.set_active_current({z_ax: test_current})
                     await api.move_to(
                         mount=mount,
                         abs_position=press_pos,
