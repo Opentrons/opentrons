@@ -21,7 +21,7 @@ import {
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { COLORS, SPACING } from '../../ui-style-constants'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type {
   DeckDefinition,
@@ -44,6 +44,7 @@ const OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST: string[] = [
   'removalHandle',
   'removableDeckOutline',
   'screwHoles',
+  'slotNumbers',
 ]
 
 export function useDeckLocationSelect(
@@ -185,15 +186,7 @@ export function DeckLocationSelect({
                   }
                 />
               )}
-              {robotType === OT2_ROBOT_TYPE ? (
-                <DeckFromLayers
-                  robotType={robotType}
-                  layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
-                />
-              ) : null}
-              {isSelected &&
-              slotPosition != null &&
-              robotType === FLEX_ROBOT_TYPE ? (
+              {isSelected && slotPosition != null ? (
                 <RobotCoordsForeignDiv
                   x={slotPosition[0]}
                   y={slotPosition[1]}
@@ -201,12 +194,14 @@ export function DeckLocationSelect({
                   height={slot.boundingBox.yDimension}
                   innerDivProps={INNER_DIV_PROPS}
                 >
-                  <Icon
-                    name="check-circle"
-                    size="1.5rem"
+                  <Text
                     color={COLORS.white}
-                  />
-                  <Text color={COLORS.white} fontSize="1.5rem">
+                    css={
+                      robotType === FLEX_ROBOT_TYPE
+                        ? TYPOGRAPHY.level4HeaderSemiBold
+                        : TYPOGRAPHY.bodyTextSemiBold
+                    }
+                  >
                     Selected
                   </Text>
                 </RobotCoordsForeignDiv>
@@ -214,6 +209,12 @@ export function DeckLocationSelect({
             </React.Fragment>
           )
         })}
+      {robotType === OT2_ROBOT_TYPE ? (
+        <DeckFromLayers
+          robotType={robotType}
+          layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
+        />
+      ) : null}
       <SlotLabels robotType={robotType} color={COLORS.darkGreyEnabled} />
     </RobotCoordinateSpace>
   )
@@ -225,4 +226,5 @@ const INNER_DIV_PROPS = {
   justifyContent: JUSTIFY_CENTER,
   height: '100%',
   gridGap: SPACING.spacing4,
+  // backgroundColor: 'black',
 }
