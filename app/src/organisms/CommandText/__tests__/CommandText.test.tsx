@@ -742,7 +742,7 @@ describe('CommandText', () => {
     )[0]
     getByText('Setting Target Temperature of Heater-Shaker to 20°C')
   })
-  it('renders correct text for thermocycler/runProfile', () => {
+  it('renders correct text for thermocycler/runProfile on Desktop', () => {
     const mockProfileSteps = [
       { holdSeconds: 10, celsius: 20 },
       { holdSeconds: 30, celsius: 40 },
@@ -772,6 +772,40 @@ describe('CommandText', () => {
     )
     getByText('temperature: 20°C, seconds: 10')
     getByText('temperature: 40°C, seconds: 30')
+  })
+  it('renders correct text for thermocycler/runProfile on ODD', () => {
+    const mockProfileSteps = [
+      { holdSeconds: 10, celsius: 20 },
+      { holdSeconds: 30, celsius: 40 },
+    ]
+    const { getByText, queryByText } = renderWithProviders(
+      <CommandText
+        command={{
+          commandType: 'thermocycler/runProfile',
+          params: { profile: mockProfileSteps, moduleId: 'abc123' },
+          id: 'def456',
+          result: {},
+          status: 'queued',
+          error: null,
+          createdAt: 'fake_timestamp',
+          startedAt: null,
+          completedAt: null,
+        }}
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={FLEX_ROBOT_TYPE}
+        isOnDevice={true}
+      />,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    getByText(
+      'Thermocycler starting 2 repetitions of cycle composed of the following steps:'
+    )
+    getByText('temperature: 20°C, seconds: 10')
+    expect(
+      queryByText('temperature: 40°C, seconds: 30')
+    ).not.toBeInTheDocument()
   })
   it('renders correct text for heaterShaker/setAndWaitForShakeSpeed', () => {
     const { getByText } = renderWithProviders(
