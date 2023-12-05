@@ -24,8 +24,8 @@ from .module_contexts import (
 )
 from ._liquid import Liquid
 from ._types import OFF_DECK
-from .trash_bin import TrashBin
-from .waste_chute import WasteChute
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
 from ._nozzle_layout import (
     COLUMN,
     ALL,

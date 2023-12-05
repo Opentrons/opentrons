@@ -47,8 +47,8 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
-from .trash_bin import TrashBin
-from .waste_chute import WasteChute
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
