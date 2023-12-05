@@ -263,8 +263,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashC1",
@@ -276,8 +275,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashB1",
@@ -289,8 +287,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashA1",
@@ -302,8 +299,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashD3",
@@ -315,8 +311,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashC3",
@@ -328,8 +323,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashB3",
@@ -341,8 +335,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashA3",
@@ -354,8 +347,7 @@
           "zDimension": 40
         },
         "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "ableToDropTips": true
       },
       {
         "id": "1and8ChannelWasteChute",
