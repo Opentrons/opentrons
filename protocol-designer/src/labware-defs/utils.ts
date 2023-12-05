@@ -2,10 +2,10 @@ import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
   PD_DO_NOT_LIST,
+  LabwareDefinition1,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from './types'
-
 
 // require all definitions in the labware/definitions/1 directory
 // require.context is webpack-specific method

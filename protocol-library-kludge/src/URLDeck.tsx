@@ -79,7 +79,8 @@ export class URLDeck extends React.Component<{}> {
             if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
             const moduleModel = modulesBySlot && modulesBySlot[slotId]
             const labware = labwareBySlot && labwareBySlot[slotId]
-            const labwareDefV2 = labware && getLatestLabwareDef(labware.labwareType)
+            const labwareDefV2 =
+              labware && getLatestLabwareDef(labware.labwareType)
             let labwareDisplayType: string | null = null
             if (labwareDefV2) {
               labwareDisplayType = labwareDefV2.metadata.displayName

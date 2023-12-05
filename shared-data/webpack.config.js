@@ -15,6 +15,6 @@ module.exports = async () =>
       path: OUTPUT_PATH,
       filename: 'opentrons-shared-data.js',
       library: '@opentrons/shared-data',
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
     },
   })

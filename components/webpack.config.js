@@ -14,6 +14,6 @@ module.exports = async () =>
       path: OUTPUT_PATH,
       filename: 'opentrons-components.js',
       library: '@opentrons/components',
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
     },
   })
