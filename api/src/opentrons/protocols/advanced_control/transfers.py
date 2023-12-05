@@ -804,6 +804,9 @@ class TransferPlan:
                     yield self._format_dict(
                         "blow_out", [self._instr.trash_container.wells()[0]]
                     )
+                else:
+                    # TODO (nd 2023/12/04) handle blowout at TrashBin or WasteChute
+                    raise NotImplementedError("Cannot blow out at this location.")
         else:
             # Used by distribute
             if self._strategy.air_gap:
