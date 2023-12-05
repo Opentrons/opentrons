@@ -32,10 +32,10 @@ class Plot:
             "annotation":None
         }
         self.create_folder()
-        self.lifetime = 7.5 # years
+        self.lifetime = [7.5, 15, 22.5, 52.5]
         self.years = self.get_years(self.lifetime)
-        self.year_color = ["green","yellow","orange"]
-        self.year_period = [0,3,3,5,5,6]
+        self.year_color = ["green", "yellow", "orange", "red"]
+        self.year_period = [0,3,3,5,5,6,6,7]
         self.probes = ["Front","Rear"]
         self.contacts = ["Air","Deck"]
         self.df_force = self.import_file(self.force)
@@ -52,7 +52,7 @@ class Plot:
             os.makedirs(path)
 
     def get_years(self, lifetime):
-        return [f"{(i+1)*lifetime} Years" for i in range(3)]
+        return [f"{i} Years" for i in lifetime]
 
     def create_plot(self):
         print("Plotting Force History...")
