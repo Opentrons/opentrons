@@ -86,23 +86,15 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const hasMoreTipracksOnDeck =
     tipracks?.totalTipracks > tipracks?.filteredTipracks
 
-  if (
-    nextTiprack == null &&
-    channels === 96 &&
-    nozzles === ALL &&
-    hasMoreTipracksOnDeck
-  ) {
+  const is96ChannelTipracksAvailable =
+    nextTiprack == null && channels === 96 && hasMoreTipracksOnDeck
+  if (nozzles === ALL && is96ChannelTipracksAvailable) {
     return {
       errors: [errorCreators.missingAdapter()],
     }
   }
 
-  if (
-    nextTiprack == null &&
-    channels === 96 &&
-    nozzles === COLUMN &&
-    hasMoreTipracksOnDeck
-  ) {
+  if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
     return {
       errors: [errorCreators.removeAdapter()],
     }

@@ -36,7 +36,9 @@ export interface Props {
   wellContents: ContentsByWell
 }
 
-const getChannelsFromNozleType = (nozzleType: NozzleType): 8 | 96 => {
+type ChannelType = 8 | 96
+
+const getChannelsFromNozleType = (nozzleType: NozzleType): ChannelType => {
   if (nozzleType === '8-channel' || nozzleType === COLUMN) {
     return 8
   } else {

@@ -3,12 +3,12 @@ import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
 } from './constants'
-import { IconName } from '@opentrons/components'
-import {
+import type { IconName } from '@opentrons/components'
+import type {
   LabwareLocation,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
-import {
+import type {
   AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,

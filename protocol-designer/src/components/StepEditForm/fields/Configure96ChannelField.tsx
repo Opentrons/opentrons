@@ -35,7 +35,7 @@ export function Configure96ChannelField(
   ]
 
   const [selectedValue, setSelectedValue] = React.useState(
-    dropdownItem || (options[0] && options[0].value)
+    dropdownItem || options[0].value
   )
   React.useEffect(() => {
     updateValue(selectedValue)
@@ -62,12 +62,12 @@ export function Configure96ChannelField(
   )
 }
 
-interface LabelProps {
+interface OptionLabelProps {
   value: string
   disabled?: boolean
 }
 
-const OptionLabel = (props: LabelProps): JSX.Element => {
+const OptionLabel = (props: OptionLabelProps): JSX.Element => {
   const { value, disabled } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',

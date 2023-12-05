@@ -82,8 +82,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
           labwareId={formData.labware}
           pipetteId={formData.pipette}
           nozzles={
-            propsForFields.nozzles != null &&
-            propsForFields.nozzles.value != null
+            propsForFields.nozzles?.value != null
               ? String(propsForFields.nozzles.value)
               : null
           }

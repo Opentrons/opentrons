@@ -125,7 +125,13 @@ const WellSelectionModalComponent = (
 export const WellSelectionModal = (
   props: WellSelectionModalProps
 ): JSX.Element | null => {
-  const { isOpen, labwareId, onCloseClick, pipetteId, nozzleType } = props
+  const {
+    isOpen,
+    labwareId,
+    onCloseClick,
+    pipetteId,
+    nozzleType = null,
+  } = props
   const wellFieldData = props.value
   // selector data
   const allWellContentsForStep = useSelector(
@@ -179,7 +185,7 @@ export const WellSelectionModal = (
         ingredNames,
         labwareDef,
         onCloseClick,
-        nozzleType: nozzleType ?? null,
+        nozzleType,
         pipetteSpec: pipette?.spec,
         selectWells,
         selectedPrimaryWells,
