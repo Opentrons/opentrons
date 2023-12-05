@@ -3,13 +3,12 @@ import styles from './URLDeck.css'
 
 import {
   RobotWorkSpace,
-  LegacyLabware,
   LabwareNameOverlay,
   LabwareRender,
   ModuleItem,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
-import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
+import { getLatestLabwareDef } from './getLabware'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
 
@@ -80,18 +79,10 @@ export class URLDeck extends React.Component<{}> {
             if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
             const moduleModel = modulesBySlot && modulesBySlot[slotId]
             const labware = labwareBySlot && labwareBySlot[slotId]
-            const labwareDefV2 =
-              labware && getLatestLabwareDef(labware.labwareType)
-            const labwareDefV1 =
-              labwareDefV2 || !labware
-                ? null
-                : getLegacyLabwareDef(labware.labwareType)
+            const labwareDefV2 = labware && getLatestLabwareDef(labware.labwareType)
             let labwareDisplayType: string | null = null
             if (labwareDefV2) {
               labwareDisplayType = labwareDefV2.metadata.displayName
-            } else if (labwareDefV1) {
-              labwareDisplayType =
-                labwareDefV1.metadata.displayName || labwareDefV1.metadata.name
             } else {
               labwareDisplayType = labware?.labwareType || null
             }
@@ -115,14 +106,7 @@ export class URLDeck extends React.Component<{}> {
                   >
                     {labwareDefV2 ? (
                       <LabwareRender definition={labwareDefV2} />
-                    ) : (
-                      <LegacyLabware
-                        /* @ts-expect-error(mc, 2021-03-18): LegacyLabware does not take x and y props */
-                        x={0}
-                        y={0}
-                        definition={labwareDefV1}
-                      />
-                    )}
+                    ) : null}
                   </g>
                 )}
                 {labware && (

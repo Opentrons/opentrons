@@ -21,7 +21,7 @@ setup: setup-py setup-js
 dist: dist-js dist-py
 
 .PHONY: clean
-clean: clean-js clean-py
+clean: clean-py
 
 # JavaScript targets
 
