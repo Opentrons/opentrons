@@ -49,7 +49,7 @@ from robot_server.subsystems.models import SubSystem
 from robot_server.subsystems.router import status_route_for, update_route_for
 
 if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
+    from opentrons.hardware_control import OT3HardwareControlAPI
 
 instruments_router = APIRouter()
 
@@ -151,7 +151,7 @@ def _bad_pipette_response(subsystem: SubSystem) -> BadPipette:
 
 
 async def _get_gripper_instrument_data(
-    hardware: "OT3API",
+    hardware: "OT3HardwareControlAPI",
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
     subsys = HWSubSystem.of_mount(OT3Mount.GRIPPER)
@@ -167,7 +167,7 @@ async def _get_gripper_instrument_data(
 
 
 async def _get_pipette_instrument_data(
-    hardware: "OT3API",
+    hardware: "OT3HardwareControlAPI",
     attached_pipettes: Dict[Mount, PipetteDict],
     mount: Mount,
 ) -> Optional[AttachedItem]:
@@ -193,7 +193,7 @@ async def _get_pipette_instrument_data(
 
 
 async def _get_instrument_data(
-    hardware: "OT3API",
+    hardware: "OT3HardwareControlAPI",
 ) -> List[AttachedItem]:
     attached_pipettes = hardware.attached_pipettes
     attached_gripper = hardware.attached_gripper
@@ -214,7 +214,7 @@ async def _get_instrument_data(
 
 
 async def _get_attached_instruments_ot3(
-    hardware: "OT3API",
+    hardware: "OT3HardwareControlAPI",
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
     await hardware.cache_instruments()

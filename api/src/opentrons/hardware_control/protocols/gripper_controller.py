@@ -2,6 +2,8 @@
 from typing import Optional
 from typing_extensions import Protocol
 
+from opentrons.hardware_control.dev_types import GripperDict
+
 
 class GripperController(Protocol):
     """A protocol specifying gripper API functions."""
@@ -28,4 +30,9 @@ class GripperController(Protocol):
         This should return False if the API believes that the gripper is
         currently holding something.
         """
+        ...
+
+    @property
+    def attached_gripper(self) -> Optional[GripperDict]:
+        """Get a dict of all attached grippers."""
         ...

@@ -17,6 +17,7 @@ from .simulatable import Simulatable
 from .identifiable import Identifiable
 from .gripper_controller import GripperController
 from .flex_calibratable import FlexCalibratable
+from .flex_instrument_configurer import FlexInstrumentConfigurer
 
 from .types import CalibrationType, MountArgType, ConfigType
 
@@ -54,6 +55,7 @@ class FlexHardwareControlInterface(
     HardwareControlInterface[CalibrationType, MountArgType, ConfigType],
     GripperController,
     FlexCalibratable,
+    FlexInstrumentConfigurer[MountArgType],
     Protocol[CalibrationType, MountArgType, ConfigType],
 ):
     """A mypy protocol for a hardware controller with Flex-specific extensions.

@@ -2262,7 +2262,7 @@ class OT3API(
             self._pipette_handler.reset_instrument(checked_mount)
 
     def get_instrument_offset(
-        self, mount: OT3Mount
+        self, mount: Union[top_types.Mount, OT3Mount]
     ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary, None]:
         """Get instrument calibration data."""
         # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
@@ -2271,11 +2271,13 @@ class OT3API(
         #  to be a part of the dict, this getter can be updated to fetch pipette offset
         #  from the dict, or just remove this getter entirely.
 
-        if mount == OT3Mount.GRIPPER:
+        ot3_mount = OT3Mount.from_mount(mount)
+
+        if ot3_mount == OT3Mount.GRIPPER:
             gripper_dict = self._gripper_handler.get_gripper_dict()
             return gripper_dict["calibration_offset"] if gripper_dict else None
         else:
-            return self._pipette_handler.get_instrument_offset(mount=mount)
+            return self._pipette_handler.get_instrument_offset(mount=ot3_mount)
 
     async def reset_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], to_default: bool = True
