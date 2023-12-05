@@ -8,9 +8,10 @@ from opentrons_shared_data.errors.exceptions import (
     CommandParameterLimitViolated,
 )
 
-from ..resources import LabwareDataProvider
+from ..resources import LabwareDataProvider, ensure_ot3_hardware
 from ..state import StateView
-from ..types import TipGeometry
+from ..types import TipGeometry, TipPresenceStatus
+from ..errors import HardwareNotSupportedError
 
 
 PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
@@ -61,6 +62,14 @@ class TipHandler(TypingProtocol):
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
+
+    async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
+        """Get tip presence status on the pipette."""
+
+    async def verify_tip_presence(
+        self, pipette_id: str, expected: TipPresenceStatus
+    ) -> None:
+        """Verify the expected tip presence status."""
 
 
 async def _available_for_nozzle_layout(
@@ -159,6 +168,7 @@ class HardwareTipHandler(TipHandler):
             presses=None,
             increment=None,
         )
+        await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
 
         self._hardware_api.set_current_tiprack_diameter(
             mount=hw_mount,
@@ -188,6 +198,7 @@ class HardwareTipHandler(TipHandler):
             kwargs = {}
 
         await self._hardware_api.drop_tip(mount=hw_mount, **kwargs)
+        await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
 
     async def add_tip(self, pipette_id: str, tip: TipGeometry) -> None:
         """Tell the Hardware API that a tip is attached."""
@@ -204,6 +215,31 @@ class HardwareTipHandler(TipHandler):
             mount=hw_mount,
             tip_volume=tip.volume,
         )
+
+    async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
+        """Get the tip presence status of the pipette."""
+        try:
+            ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+
+            hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+
+            status = await ot3api.get_tip_presence_status(hw_mount)
+            return TipPresenceStatus.from_hw_state(status)
+        except HardwareNotSupportedError:
+            # Tip presence sensing is not supported on the OT2
+            return TipPresenceStatus.UNKNOWN
+
+    async def verify_tip_presence(
+        self, pipette_id: str, expected: TipPresenceStatus
+    ) -> None:
+        """Verify the expecterd tip presence status of the pipette."""
+        try:
+            ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+            hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
+            await ot3api.verify_tip_presence(hw_mount, expected.to_hw_state())
+        except HardwareNotSupportedError:
+            # Tip presence sensing is not supported on the OT2
+            pass
 
 
 class VirtualTipHandler(TipHandler):
@@ -273,6 +309,14 @@ class VirtualTipHandler(TipHandler):
         This should not be called when using virtual pipettes.
         """
         assert False, "TipHandler.add_tip should not be used with virtual pipettes"
+
+    async def verify_tip_presence(
+        self, pipette_id: str, expected: TipPresenceStatus
+    ) -> None:
+        """Verify tip presence.
+
+        This should not be called when using virtual pipettes.
+        """
 
 
 def create_tip_handler(

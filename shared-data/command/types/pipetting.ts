@@ -13,6 +13,7 @@ export type PipettingRunTimeCommand =
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
   | TouchTipRunTimeCommand
+  | GetTipPresenceRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -27,6 +28,7 @@ export type PipettingCreateCommand =
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
   | TouchTipCreateCommand
+  | GetTipPresenceCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -152,6 +154,17 @@ export interface PrepareToAspirateRunTimeCommand
   result?: any
 }
 
+export interface GetTipPresenceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'getTipPresence'
+  params: PipetteIdentityParams
+}
+
+export interface GetTipPresenceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    GetTipPresenceCreateCommand {
+  result?: TipPresenceResult
+}
+
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -225,4 +238,9 @@ interface WellLocationParam {
 
 interface BasicLiquidHandlingResult {
   volume: number // Amount of liquid in uL handled in the operation
+}
+
+interface TipPresenceResult {
+  // ot2 should alwasy return unknown
+  status?: 'present' | 'absent' | 'unknown'
 }

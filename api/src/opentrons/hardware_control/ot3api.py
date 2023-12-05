@@ -1995,25 +1995,27 @@ class OT3API(
 
     async def get_tip_presence_status(
         self,
-        mount: OT3Mount,
+        mount: Union[top_types.Mount, OT3Mount],
     ) -> TipStateType:
         """
         Check tip presence status. If a high throughput pipette is present,
         move the tip motors down before checking the sensor status.
         """
+        real_mount = OT3Mount.from_mount(mount)
         async with contextlib.AsyncExitStack() as stack:
             if (
-                mount == OT3Mount.LEFT
+                real_mount == OT3Mount.LEFT
                 and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
             ):
                 await stack.enter_async_context(self._high_throughput_check_tip())
-            result = await self._backend.get_tip_status(mount)
+            result = await self._backend.get_tip_status(real_mount)
         return result
 
     async def verify_tip_presence(
-        self, mount: OT3Mount, expected: TipStateType
+        self, mount: Union[top_types.Mount, OT3Mount], expected: TipStateType
     ) -> None:
-        status = await self.get_tip_presence_status(mount)
+        real_mount = OT3Mount.from_mount(mount)
+        status = await self.get_tip_presence_status(real_mount)
         if status != expected:
             raise FailedTipStateCheck(expected, status.value)
 
