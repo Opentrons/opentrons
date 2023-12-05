@@ -35,7 +35,6 @@ const X_CROP_MM = 0
 const X_ADJUSTMENT_FOR_TC = '-50'
 const Y_ADJUSTMENT_FOR_TC = '214'
 
-// TODO: use components helper
 const OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
@@ -226,5 +225,4 @@ const INNER_DIV_PROPS = {
   justifyContent: JUSTIFY_CENTER,
   height: '100%',
   gridGap: SPACING.spacing4,
-  // backgroundColor: 'black',
 }
