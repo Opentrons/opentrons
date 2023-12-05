@@ -10,7 +10,7 @@ import {
   FilePipette,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV1'
-import { getLegacyLabwareDef } from '../../labware-defs/utils'
+import { getLegacyLabwareDef } from '../../labware-defs'
 import { FormPatch } from '../../steplist/actions'
 import { FormData } from '../../form-types'
 export interface PDMetadata {
