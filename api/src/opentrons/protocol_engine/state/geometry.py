@@ -413,11 +413,13 @@ class GeometryView:
         z_dim = definition.dimensions.zDimension
         height_over_labware: float = 0
         if isinstance(lw_data.location, ModuleLocation):
-            # Note: height over labware gets accounted for only if the top labware is
-            # directly on the module. So if there's a labware on an adapter on a module,
-            # then this over-module-height gets ignored. We currently do not have any modules
-            # that use an adapter and has height over labware so this doesn't cause any issues
-            # but if we add one in the future then this calculation should be updated.
+            # Note: when calculating highest z of stacked labware, height-over-labware
+            # gets accounted for only if the top labware is directly on the module.
+            # So if there's a labware on an adapter on a module, then this
+            # over-module-height gets ignored. We currently do not have any modules
+            # that use an adapter and has height over labware so this doesn't cause
+            # any issues yet. But if we add one in the future then this calculation
+            # should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
         return labware_pos.z + z_dim + height_over_labware
