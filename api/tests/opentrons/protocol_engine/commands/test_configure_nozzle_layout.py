@@ -388,5 +388,6 @@ async def test_configure_nozzle_layout_implementation(
 
     assert result == ConfigureNozzleLayoutResult()
     assert private_result == ConfigureNozzleLayoutPrivateResult(
+        pipette_id="pipette-id",
         nozzle_map=expected_nozzlemap,
     )

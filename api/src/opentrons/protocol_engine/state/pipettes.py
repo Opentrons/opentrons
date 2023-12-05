@@ -45,7 +45,6 @@ from ..commands import (
     heater_shaker,
     CommandPrivateResult,
     PrepareToAspirateResult,
-    ConfigureNozzleLayoutParams,
 )
 from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
@@ -158,9 +157,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
             self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
         elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
-            assert isinstance(command.params, ConfigureNozzleLayoutParams)
             self._state.nozzle_configuration_by_id[
-                command.params.pipetteId
+                private_result.pipette_id
             ] = private_result.nozzle_map
 
         if isinstance(command.result, LoadPipetteResult):
