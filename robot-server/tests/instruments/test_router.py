@@ -26,6 +26,7 @@ from opentrons_shared_data.gripper.gripper_definition import (
     GripperModel,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from robot_server.instruments.instrument_models import (
     Gripper,
@@ -50,7 +51,9 @@ if TYPE_CHECKING:
 @pytest.fixture
 def ot2_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mock hardware control API."""
-    return decoy.mock(cls=API)
+    mock = decoy.mock(cls=API)
+    decoy.when(mock.get_robot_type()).then_return(RobotTypeEnum.OT2)
+    return mock
 
 
 def get_sample_pipette_dict(
@@ -77,7 +80,9 @@ def ot3_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
-        return decoy.mock(cls=OT3API)
+        mock = decoy.mock(cls=OT3API)
+        decoy.when(mock.get_robot_type()).then_return(RobotTypeEnum.FLEX)
+        return mock
     except ImportError:
         return None  # type: ignore[return-value]
 
