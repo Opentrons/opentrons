@@ -24,7 +24,7 @@ from ..waste_chute import WasteChute
 from .._types import OffDeckType, StagingSlotName
 
 if TYPE_CHECKING:
-    from ...labware import Labware
+    from ..labware import Labware
 
 
 class AbstractProtocol(
