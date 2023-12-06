@@ -5,6 +5,7 @@ import pytest
 from decoy import Decoy
 from typing import Dict, Set, Optional, cast
 
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons.types import Point, DeckSlotName
 
@@ -45,9 +46,9 @@ def get_addressable_area_view(
     potential_cutout_fixtures_by_cutout_id: Optional[
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
-    assumed_slots_for_deck: Optional[Set[str]] = None,
     deck_definition: Optional[DeckDefinitionV4] = None,
     deck_configuration: Optional[DeckConfigurationType] = None,
+    robot_type: RobotType = "OT-3 Standard",
     use_simulated_deck_config: bool = False,
 ) -> AddressableAreaView:
     """Get a labware view test subject."""
@@ -57,7 +58,7 @@ def get_addressable_area_view(
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV4, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
-        assumed_slots_for_deck=assumed_slots_for_deck or set(),
+        robot_type=robot_type,
         use_simulated_deck_config=use_simulated_deck_config,
     )
 

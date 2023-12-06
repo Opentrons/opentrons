@@ -68,6 +68,8 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
         deck_locations = protocol_core.get_deck_definition()["locations"]
 
+        self._slot_definitions_by_name = self._protocol_core.get_slot_definitions()
+
         self._calibration_positions = [
             CalibrationPosition(
                 id=point["id"],
@@ -131,11 +133,11 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
     def __iter__(self) -> Iterator[str]:
         """Iterate through all deck slots."""
-        return iter(self._protocol_core.get_slot_definitions())
+        return iter(self._slot_definitions_by_name)
 
     def __len__(self) -> int:
         """Get the number of slots on the deck."""
-        return len(self._protocol_core.get_slot_definitions())
+        return len(self._slot_definitions_by_name)
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
@@ -172,7 +174,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         slot_name = _get_slot_name(
             slot, self._api_version, self._protocol_core.robot_type
         )
-        slot_definition = self._protocol_core.get_slot_definition(slot_name)
+        slot_definition = self._slot_definitions_by_name[slot_name.id]
         x, y, z = slot_definition["position"]
         normalized_slot_name = validation.internal_slot_to_public_string(
             slot_name, self._protocol_core.robot_type
@@ -185,7 +187,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         slot_name = _get_slot_name(
             slot, self._api_version, self._protocol_core.robot_type
         )
-        return self._protocol_core.get_slot_definition(slot_name)
+        return self._slot_definitions_by_name[slot_name.id]
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_center(self, slot: DeckLocation) -> Point:
@@ -205,7 +207,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     @property
     def slots(self) -> List[SlotDefV3]:
         """Get a list of all slot definitions."""
-        return list(self._protocol_core.get_slot_definitions().values())
+        return list(self._slot_definitions_by_name.values())
 
     # todo(mm, 2023-05-08): This appears internal. Remove it from this public class. Jira RSS-236.
     @property

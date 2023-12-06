@@ -1,11 +1,11 @@
 """Basic addressable area data state and store."""
 from dataclasses import dataclass
-from functools import lru_cache
 from typing import Dict, List, Optional, Set, Union
 
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, StagingSlotName
 
 from ..commands import (
     Command,
@@ -24,7 +24,6 @@ from ..types import (
     DeckSlotLocation,
     AddressableAreaLocation,
     AddressableArea,
-    AreaType,
     PotentialCutoutFixture,
     DeckConfigurationType,
 )
@@ -49,8 +48,6 @@ class AddressableAreaState:
 
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
 
-    assumed_slots_for_deck: Set[str]
-
     deck_definition: DeckDefinitionV4
 
     deck_configuration: Optional[DeckConfigurationType]
@@ -61,6 +58,8 @@ class AddressableAreaState:
 
     If `use_simulated_deck_config` is `False`, this will be non-`None`.
     """
+
+    robot_type: RobotType
 
     use_simulated_deck_config: bool
     """See `Config.use_simulated_deck_config`."""
@@ -140,17 +139,12 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                 )
             )
 
-        if config.robot_type == "OT-2 Standard":
-            assumed_slots = {slot.to_ot2_equivalent().id for slot in DeckSlotName}
-        else:
-            assumed_slots = {slot.to_ot3_equivalent().id for slot in DeckSlotName}
-
         self._state = AddressableAreaState(
             deck_configuration=deck_configuration,
             loaded_addressable_areas_by_name=loaded_addressable_areas_by_name,
             potential_cutout_fixtures_by_cutout_id={},
-            assumed_slots_for_deck=assumed_slots,
             deck_definition=deck_definition,
+            robot_type=config.robot_type,
             use_simulated_deck_config=config.use_simulated_deck_config,
         )
 
@@ -241,8 +235,6 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                 addressable_area_name
             )
 
-            self._update_assumed_slots_for_deck(cutout_id)
-
             cutout_position = deck_configuration_provider.get_cutout_position(
                 cutout_id, self._state.deck_definition
             )
@@ -302,15 +294,6 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
             )
 
         return cutout_id
-
-    def _update_assumed_slots_for_deck(self, cutout_id: str) -> None:
-        """Update assumed deck slot for analysis run and remove if no longer possible in a deck configuration."""
-        deck_slot = CUTOUT_TO_DECK_SLOT_MAP[cutout_id]
-        potential_addressable_areas: Set[str] = set()
-        for fixtures in self._state.potential_cutout_fixtures_by_cutout_id[cutout_id]:
-            potential_addressable_areas.update(fixtures.provided_addressable_areas)
-        if deck_slot.id not in potential_addressable_areas:
-            self._state.assumed_slots_for_deck.discard(deck_slot.id)
 
 
 class AddressableAreaView(HasState[AddressableAreaState]):
@@ -454,7 +437,6 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         )
         return cutout_fixture["height"]
 
-    @lru_cache(maxsize=16)
     def get_slot_definition(self, slot_id: str) -> SlotDefV3:
         """Get the definition of a slot in the deck."""
         try:
@@ -479,25 +461,10 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_deck_slot_definitions(self) -> Dict[str, SlotDefV3]:
         """Get all slot definitions either configured for robot or assumed for analysis run so far."""
-        if not self._state.use_simulated_deck_config:
-            slot_definitions = {
-                area.area_name: self.get_slot_definition(area.area_name)
-                for area in self._state.loaded_addressable_areas_by_name.values()
-                if area.area_type in {AreaType.SLOT, AreaType.STAGING_SLOT}
-            }
+        if self._state.robot_type == "OT-2 Standard":
+            slots = {slot.to_ot2_equivalent().id for slot in DeckSlotName}
         else:
-            loaded_slot_names = {
-                area.area_name
-                for area in self._state.loaded_addressable_areas_by_name.values()
-                if area.area_type in {AreaType.SLOT, AreaType.STAGING_SLOT}
-            }
-            assumed_and_loaded_slots = loaded_slot_names.union(
-                self._state.assumed_slots_for_deck
+            slots = {slot.to_ot3_equivalent().id for slot in DeckSlotName}.union(
+                slot.id for slot in StagingSlotName
             )
-
-            slot_definitions = {
-                slot_name: self.get_slot_definition(slot_name)
-                for slot_name in assumed_and_loaded_slots
-            }
-
-        return slot_definitions
+        return {slot_name: self.get_slot_definition(slot_name) for slot_name in slots}
