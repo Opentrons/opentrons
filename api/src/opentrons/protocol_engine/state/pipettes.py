@@ -637,12 +637,3 @@ class PipetteView(HasState[PipetteState]):
     def get_is_partially_configured(self, pipette_id: str) -> bool:
         """Determine if the provided pipette is partially configured."""
         return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
-
-    def get_active_channels(self, pipette_id: str) -> int:
-        """Get the number of channels being used in the given pipette's configuration."""
-        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
-        if nozzle_map_for_pipette:
-            return nozzle_map_for_pipette.tip_count
-        else:
-            # Pipette hasn't been configured for partial nozzles. All channels are active
-            return self.get_config(pipette_id).channels

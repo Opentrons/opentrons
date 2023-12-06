@@ -555,7 +555,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         return self._engine_client.state.tips.get_pipette_channels(self._pipette_id)
 
     def get_active_channels(self) -> int:
-        return self._engine_client.state.pipettes.get_active_channels(self._pipette_id)
+        return self._engine_client.state.tips.get_pipette_active_channels(
+            self._pipette_id
+        )
 
     def has_tip(self) -> bool:
         return (
