@@ -25,11 +25,15 @@ export interface ModuleRenderInfoById {
   [moduleId: string]: ModuleRenderInfoForProtocol
 }
 
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
+
 export function useModuleRenderInfoForProtocolById(
   runId: string
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const { data: deckConfig } = useDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+  })
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()
