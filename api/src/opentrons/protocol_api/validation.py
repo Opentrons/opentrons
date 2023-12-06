@@ -196,6 +196,7 @@ def internal_slot_to_public_string(
     if isinstance(slot_name, DeckSlotName):
         return slot_name.to_equivalent_for_robot_type(robot_type).id
     else:
+        # No need to convert staging slot names per robot type, since they only exist on Flex.
         return slot_name.id
 
 
