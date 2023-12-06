@@ -224,7 +224,7 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
       commandType: 'moveToAddressableArea',
       key: expect.any(String),
       params: {
-        addressableAreaName: '1and8ChannelWasteChute',
+        addressableAreaName: '1ChannelWasteChute',
         pipetteId: 'p300SingleId',
         offset: { x: 0, y: 0, z: 0 },
       },

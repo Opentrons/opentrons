@@ -3,6 +3,7 @@ import {
   CreateCommand,
   FIXED_TRASH_ID,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import type { InitialDeckSetup } from '../../../step-forms'
 
@@ -38,9 +39,9 @@ export const getUnusedTrash = (
       ? commands?.some(
           command =>
             command.commandType === 'moveToAddressableArea' &&
-            (command.params.addressableAreaName === '1and8ChannelWasteChute' ||
-              command.params.addressableAreaName === 'gripperWasteChute' ||
-              command.params.addressableAreaName === '96ChannelWasteChute')
+            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName as AddressableAreaName
+            )
         )
       : null
 

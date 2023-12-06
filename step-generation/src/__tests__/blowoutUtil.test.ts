@@ -94,7 +94,7 @@ describe('blowoutUtil', () => {
     expect(curryCommandCreatorMock).toHaveBeenCalledWith(
       moveToAddressableArea,
       {
-        addressableAreaName: '1and8ChannelWasteChute',
+        addressableAreaName: '1ChannelWasteChute',
         pipetteId: blowoutArgs.pipette,
       }
     )

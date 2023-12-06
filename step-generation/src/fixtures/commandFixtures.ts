@@ -348,7 +348,7 @@ export const moveToAddressableAreaHelper = (params?: {
   key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
-    addressableAreaName: '1and8ChannelWasteChute',
+    addressableAreaName: '1ChannelWasteChute',
     offset: { x: 0, y: 0, z: 0 },
     ...params,
   },
