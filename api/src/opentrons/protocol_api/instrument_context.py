@@ -1754,9 +1754,9 @@ class InstrumentContext(publisher.CommandPublisher):
         layout until this function is called again.
 
         .. note::
-            When picking up 8 tips with the 96-channel pipette, the tip rack *must not*
-            be placed in a tip rack adapter in the deck. If you try to perform partial
-            tip pickup on a tip rack that is in an adapter, the API will raise an error.
+            When picking up fewer than 96 tips at once, the tip rack *must not* be
+            placed in a tip rack adapter in the deck. If you try to perform partial tip
+            pickup on a tip rack that is in an adapter, the API will raise an error.
 
         :param style: The shape of the nozzle layout.
 
