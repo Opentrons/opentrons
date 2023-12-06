@@ -18,6 +18,7 @@ from opentrons.protocols import labware as labware_definition
 from ...labware import Labware
 from ..._liquid import Liquid
 from ..._types import OffDeckType, StagingSlotName
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -130,6 +131,13 @@ class LegacyProtocolCore(
     def is_simulating(self) -> bool:
         """Returns true if hardware is being simulated."""
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
+
+    def append_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        raise APIVersionError(
+            "Disposal locations are not supported in this API Version."
+        )
 
     def add_labware_definition(
         self,
@@ -372,6 +380,13 @@ class LegacyProtocolCore(
     ) -> Dict[Mount, Optional[LegacyInstrumentCore]]:
         """Get a mapping of mount to instrument."""
         return self._instruments
+
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
+        """Get valid disposal locations."""
+        trash = self._deck_layout["12"]
+        if isinstance(trash, Labware):
+            return [trash]
+        raise APIVersionError("No dynamically loadable disposal locations.")
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
