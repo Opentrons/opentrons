@@ -441,18 +441,14 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 16)
     def load_trash_bin(self, location: DeckLocation) -> TrashBin:
-        """Load a trash bin on the deck.
+        """Load a trash bin on the deck of a Flex.
 
-        If you try to load another item in a slot where you've loaded a trash bin, or
-        vice versa, the API will raise an error.
+        If you try to load a trash bin on an OT-2, the API will raise an error.
 
-        :param location: The :ref:`deck slot <deck-slots>` where the trash bin is. Valid
-            slots differ by robot type.
+        :param location: The :ref:`deck slot <deck-slots>` where the trash bin is. The
+            location can be any unoccupied slot in column 1 or 3.
 
-            - For Flex, any slot in column 1 or 3.
-            - For OT-2, slot 12 only.
-
-            If you try to load a trash bin in an invalid slot, the API will raise an error.
+            If you try to load a trash bin in column 2 or 4, the API will raise an error.
         """
         slot_name = validation.ensure_and_convert_deck_slot(
             location,
