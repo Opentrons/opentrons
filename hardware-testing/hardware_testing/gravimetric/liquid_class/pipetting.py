@@ -286,7 +286,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        pipette.air_gap(liquid_class.aspirate.trailing_air_gap, height=0)
+        if not blank:
+            pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
 
     # PHASE 1: APPROACH
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
