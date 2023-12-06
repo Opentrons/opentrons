@@ -18,7 +18,7 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
   )
 
   return (
-    <Flex height="26.9375rem" marginY={SPACING.spacing24}>
+    <Flex height="26.9375rem" paddingY={SPACING.spacing24}>
       {mostRecentAnalysis != null ? (
         <ProtocolDeck
           protocolAnalysis={mostRecentAnalysis}
