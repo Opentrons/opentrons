@@ -13,6 +13,7 @@ from opentrons.protocol_engine.errors import (
     AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
     SlotDoesNotExistError,
+    AddressableAreaDoesNotExistError,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.protocol_engine.state.addressable_areas import (
@@ -386,7 +387,7 @@ def test_get_slot_definition_raises_with_bad_slot_name(decoy: Decoy) -> None:
         deck_configuration_provider.get_potential_cutout_fixtures(
             "foo", subject.state.deck_definition
         )
-    ).then_raise(AssertionError())
+    ).then_raise(AddressableAreaDoesNotExistError())
 
     with pytest.raises(SlotDoesNotExistError):
         subject.get_slot_definition("foo")

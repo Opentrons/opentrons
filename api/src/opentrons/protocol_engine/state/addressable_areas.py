@@ -18,6 +18,7 @@ from ..errors import (
     IncompatibleAddressableAreaError,
     AreaNotInDeckConfigurationError,
     SlotDoesNotExistError,
+    AddressableAreaDoesNotExistError,
 )
 from ..resources import deck_configuration_provider
 from ..types import (
@@ -441,7 +442,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         """Get the definition of a slot in the deck."""
         try:
             addressable_area = self._get_addressable_area_from_deck_data(slot_id)
-        except AssertionError:
+        except AddressableAreaDoesNotExistError:
             raise SlotDoesNotExistError(
                 f"Slot ID {slot_id} does not exist in deck {self._state.deck_definition['otId']}"
             )

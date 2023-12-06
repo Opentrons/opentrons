@@ -237,7 +237,7 @@ def test_get_potential_cutout_fixtures_raises(
     ot3_standard_deck_def: DeckDefinitionV4,
 ) -> None:
     """It should raise if there is no fixtures that provide the requested area."""
-    with pytest.raises(AssertionError):
+    with pytest.raises(AddressableAreaDoesNotExistError):
         subject.get_potential_cutout_fixtures("theFunArea", ot3_standard_deck_def)
 
 
