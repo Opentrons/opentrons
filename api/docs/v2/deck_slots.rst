@@ -93,4 +93,26 @@ When the robot analyzes your Python protocol, it will check whether there are an
     - Physically move hardware around the deck, and update the deck configuration.
     - Alter your protocol to work with the current deck configuration, and resend the protocol to your Flex.
     
-The expected configuration is based on both explicit load commands and implicit effects of other commands in your protocol. [more TK]
+The expected configuration is based on both load methods and the effects of other methods called in your protocol.
+
+Trash Containers
+----------------
+
+You must load trash container fixtures in your protocol in order to use them.
+
+    - Use :py:meth:`.load_trash_bin` to load a movable trash bin. Call it multiple times to add more than one bin. See [ref TK] for more information on working with multiple trash bins.
+    - Use :py:meth:`.load_waste_chute` to load the waste chute in slot D3. The waste chute has multiple variants in deck configuration. The correct variant is determined by other methods in your protocol. See below.
+
+    .. note::
+        In version 2.15 of the API, Flex can only have a single trash bin in slot A3. You do not have to (and cannot) load the trash in version 2.15 protocols.
+
+        In version 2.16 of the API and later, you must load a trash container to dispose of tips or labware. If you try to perform these actions without a trash container, the API will raise an error. See :py:obj:`.InstrumentContext.trash_container`.
+
+
+Staging Area Slots
+------------------
+
+Slots A4 through D4, which are not accessible by pipettes, are always available in the API for loading and moving labware. Using a slot in column 4 as the ``location`` argument of :py:meth:`.load_labware` or the ``new_location`` argument of :py:meth:`.move_labware` will require the corresponding staging area slot in the robot's deck configuration::
+
+    [code snippet tk]
+
