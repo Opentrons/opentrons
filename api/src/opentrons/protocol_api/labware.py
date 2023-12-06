@@ -642,7 +642,7 @@ class Labware:
         """
         Accessor function used to create a look-up table of wells by name.
 
-        With indexing one can treat it as a typical python
+        With indexing one can treat it as a typical Python
         dictionary whose keys are well names. To access well A1 for example,
         write ``labware.wells_by_name()['A1']``.
 
