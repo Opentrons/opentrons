@@ -78,7 +78,7 @@ const INSTRUMENT_CARD_STYLE = css`
   }
 `
 
-const SUBSYSTEM_UPDATE_POLL_MS = 5000
+const POLL_DURATION = 5000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t, i18n } = useTranslation(['device_details', 'protocol_setup'])
@@ -123,7 +123,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     subsystem,
     {
       enabled: pollForSubsystemUpdate,
-      refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
+      refetchInterval: POLL_DURATION,
     }
   )
   // we should poll for a subsystem update from the time a bad instrument is
@@ -139,13 +139,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     ) {
       setTimeout(() => {
         setPollForSubsystemUpdate(false)
-      }, 5000)
+      }, POLL_DURATION)
     }
   }, [pipetteIsBad, subsystemUpdateData, isFlex])
 
   const settings =
     usePipetteSettingsQuery({
-      refetchInterval: 5000,
+      refetchInterval: POLL_DURATION,
       enabled: pipetteId != null,
     })?.data?.[pipetteId ?? '']?.fields ?? null
 
