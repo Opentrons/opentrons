@@ -470,13 +470,6 @@ class ProtocolContext(CommandPublisher):
         The deck plate adapter for the waste chute can only go in slot D3. If you try to
         load another item in slot D3 after loading the waste chute, or vice versa, the
         API will raise an error.
-
-        :param bool cover: Set to ``True`` when the cover is attached to the top of
-            the waste chute. The hole in the cover can fit up to eight tips in a
-            column configuration. Pipettes can dispense, blow out, or drop tips
-            through the hole in the cover. When the cover is attached, the gripper
-            can't drop labware down the chute. If you try to move labware to the
-            waste chute when ``cover=True``, the API will raise an error.
         """
         if with_staging_area_slot_d4:
             raise NotImplementedError(
