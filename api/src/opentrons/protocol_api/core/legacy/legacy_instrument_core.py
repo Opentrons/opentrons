@@ -533,4 +533,4 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def get_active_channels(self) -> int:
         """This will never be called because it was added in API 2.16."""
-        return 0
+        assert False, "get_active_channels only supported in API 2.16 & later"

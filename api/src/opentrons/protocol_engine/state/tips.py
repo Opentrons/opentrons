@@ -67,7 +67,7 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.channels_by_pipette_id[pipette_id] = config.channels
                 self._state.active_channels_by_pipette_id[pipette_id] = config.channels
             self._handle_command(action.command)
-            # TODO: add test for this
+
             if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
                 pipette_id = action.private_result.pipette_id
                 nozzle_map = action.private_result.nozzle_map
