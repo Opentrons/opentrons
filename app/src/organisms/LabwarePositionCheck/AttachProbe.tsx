@@ -78,7 +78,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     (instrument): instrument is PipetteData =>
       instrument.ok && instrument.mount === pipetteMount
   )
-  const is96Channel = attachedPipette?.data.channels === 96
 
   React.useEffect(() => {
     // move into correct position for probe attach on mount
@@ -104,36 +103,46 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setIsPending(true)
     refetch()
       .then(() => {
-        if (is96Channel || attachedPipette?.state?.tipDetected) {
-          chainRunCommands(
-            [
-              { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
-              {
-                commandType: 'retractAxis' as const,
-                params: {
-                  axis: pipetteZMotorAxis,
+        chainRunCommands(
+          [
+            {
+              commandType: 'verifyTipPresence',
+              params: { pipetteId: pipetteId, expectedState: 'present' },
+            },
+          ],
+          false
+        )
+          .then(() => {
+            chainRunCommands(
+              [
+                { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
+                {
+                  commandType: 'retractAxis' as const,
+                  params: {
+                    axis: pipetteZMotorAxis,
+                  },
                 },
-              },
-              {
-                commandType: 'retractAxis' as const,
-                params: { axis: 'x' },
-              },
-              {
-                commandType: 'retractAxis' as const,
-                params: { axis: 'y' },
-              },
-            ],
-            false
-          )
-            .then(() => proceed())
-            .catch((e: Error) => {
-              setFatalError(
-                `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
-              )
-            })
-        } else {
-          setShowUnableToDetect(true)
-        }
+                {
+                  commandType: 'retractAxis' as const,
+                  params: { axis: 'x' },
+                },
+                {
+                  commandType: 'retractAxis' as const,
+                  params: { axis: 'y' },
+                },
+              ],
+              false
+            )
+              .then(() => proceed())
+              .catch((e: Error) => {
+                setFatalError(
+                  `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
+                )
+              })
+          })
+          .catch((e: Error) => {
+            setShowUnableToDetect(true)
+          })
       })
       .catch(error => {
         setFatalError(error.message)

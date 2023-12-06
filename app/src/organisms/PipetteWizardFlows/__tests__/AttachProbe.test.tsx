@@ -40,6 +40,7 @@ describe('AttachProbe', () => {
       proceed: jest.fn(),
       chainRunCommands: jest
         .fn()
+        .mockImplementationOnce(() => Promise.resolve())
         .mockImplementationOnce(() => Promise.resolve()),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
@@ -84,6 +85,15 @@ describe('AttachProbe', () => {
     fireEvent.click(proceedBtn)
     expect(refetch).toHaveBeenCalled()
     await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
@@ -200,6 +210,15 @@ describe('AttachProbe', () => {
     getByRole('button', { name: 'Begin calibration' }).click()
     expect(refetch).toHaveBeenCalled()
     await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {

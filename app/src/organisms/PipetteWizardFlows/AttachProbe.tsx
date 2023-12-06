@@ -89,45 +89,55 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setIsPending(true)
     refetch()
       .then(() => {
-        if (is96Channel || attachedPipette?.state?.tipDetected) {
-          chainRunCommands?.(
-            [
-              {
-                commandType: 'home' as const,
-                params: {
-                  axes: axes,
+        chainRunCommands?.(
+          [
+            {
+              commandType: 'verifyTipPresence',
+              params: { pipetteId: pipetteId, expectedState: 'present' },
+            },
+          ],
+          false
+        )
+          .then(() => {
+            chainRunCommands?.(
+              [
+                {
+                  commandType: 'home' as const,
+                  params: {
+                    axes: axes,
+                  },
                 },
-              },
-              {
-                commandType: 'home' as const,
-                params: {
-                  skipIfMountPositionOk: mount,
+                {
+                  commandType: 'home' as const,
+                  params: {
+                    skipIfMountPositionOk: mount,
+                  },
                 },
-              },
-              {
-                commandType: 'calibration/calibratePipette' as const,
-                params: {
-                  mount: mount,
+                {
+                  commandType: 'calibration/calibratePipette' as const,
+                  params: {
+                    mount: mount,
+                  },
                 },
-              },
-              {
-                commandType: 'calibration/moveToMaintenancePosition' as const,
-                params: {
-                  mount: mount,
+                {
+                  commandType: 'calibration/moveToMaintenancePosition' as const,
+                  params: {
+                    mount: mount,
+                  },
                 },
-              },
-            ],
-            false
-          )
-            .then(() => {
-              proceed()
-            })
-            .catch(error => {
-              setShowErrorMessage(error.message)
-            })
-        } else {
-          setShowUnableToDetect(true)
-        }
+              ],
+              false
+            )
+              .then(() => {
+                proceed()
+              })
+              .catch(error => {
+                setShowErrorMessage(error.message)
+              })
+          })
+          .catch((e: Error) => {
+            setShowUnableToDetect(true)
+          })
       })
       .catch(error => {
         setShowErrorMessage(error.message)
