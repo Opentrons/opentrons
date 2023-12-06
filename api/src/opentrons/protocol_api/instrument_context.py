@@ -238,7 +238,10 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
-
+        if isinstance(target, (TrashBin, WasteChute)):
+            raise ValueError(
+                "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
+            )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -277,7 +280,9 @@ class InstrumentContext(publisher.CommandPublisher):
     def dispense(
         self,
         volume: Optional[float] = None,
-        location: Optional[Union[types.Location, labware.Well]] = None,
+        location: Optional[
+            Union[types.Location, labware.Well, TrashBin, WasteChute]
+        ] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
     ) -> InstrumentContext:
@@ -389,6 +394,20 @@ class InstrumentContext(publisher.CommandPublisher):
 
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
+        if isinstance(target, (TrashBin, WasteChute)):
+            # HANDLE THE MOVETOADDDRESSABLEAREA
+            self._core.dispense(
+                volume=c_vol,
+                rate=rate,
+                location=target,
+                well_core=None,
+                flow_rate=flow_rate,
+                in_place=False,
+                push_out=push_out,
+            )
+            # TODO publish this info
+            return self
+
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.dispense(
@@ -490,7 +509,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def blow_out(
-        self, location: Optional[Union[types.Location, labware.Well]] = None
+        self,
+        location: Optional[
+            Union[types.Location, labware.Well, TrashBin, WasteChute]
+        ] = None,
     ) -> InstrumentContext:
         """
         Blow an extra amount of air through a pipette's tip to clear it.
@@ -536,6 +558,14 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
+        elif isinstance(target, (TrashBin, WasteChute)):
+            # TODO handle publish info
+            self._core.blow_out(
+                location=target,
+                well_core=None,
+                in_place=False,
+            )
+            return self
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1333,7 +1363,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
@@ -1363,6 +1393,17 @@ class InstrumentContext(publisher.CommandPublisher):
                         Default is ``True``.
         """
         publish_ctx = nullcontext()
+
+        if isinstance(location, (TrashBin, WasteChute)):
+            self._core.move_to(
+                location=location,
+                well_core=None,
+                force_direct=force_direct,
+                minimum_z_height=minimum_z_height,
+                speed=speed,
+            )
+            # TODO handle publish
+            return self
 
         if publish:
             publish_ctx = publisher.publish_context(

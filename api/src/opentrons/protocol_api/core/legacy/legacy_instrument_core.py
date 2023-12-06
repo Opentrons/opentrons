@@ -113,7 +113,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def dispense(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
@@ -131,6 +131,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             in_place: Whether we should move_to location.
             push_out: The amount to push the plunger below bottom position.
         """
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
         if push_out:
             raise APIVersionError("push_out is not supported in this API version.")
         if not in_place:
@@ -140,7 +144,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def blow_out(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
     ) -> None:
@@ -151,6 +155,11 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: Unused by legacy core.
             in_place: Whether we should move_to location.
         """
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
+
         if not in_place:
             self.move_to(location=location)
         self._protocol_interface.get_hardware().blow_out(self._mount)
@@ -308,7 +317,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
 
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
@@ -327,6 +336,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             LabwareHeightError: An item on the deck is taller than
                 the computed safe travel height.
         """
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Move To Trash Bin and Waste Chute are not supported in this API Version."
+            )
         self.flag_unsafe_move(location)
 
         # prevent direct movement bugs in PAPI version >= 2.10
