@@ -25,6 +25,7 @@ def _what_protocols() -> list[(Protocol)]:
 @pytest.mark.parametrize(
     "protocol",
     _what_protocols(),
+    ids=[x.file_name for x in _what_protocols()],
 )
 def test_analyses(
     driver: WebDriver,
