@@ -575,14 +575,11 @@ class GeometryView:
         elif isinstance(location, AddressableAreaLocation):
             location_name = location.addressableAreaName
             if fixture_validation.is_gripper_waste_chute(location_name):
-                gripper_waste_chute = self._addressable_areas.get_addressable_area(
-                    location_name
-                )
-                drop_labware_location = gripper_waste_chute.drop_labware_location
-                if drop_labware_location is None:
-                    raise ValueError(
-                        f"{location_name} does not have a drop labware location associated with it"
+                drop_labware_location = (
+                    self._addressable_areas.get_addressable_area_move_to_location(
+                        location_name
                     )
+                )
                 return drop_labware_location + Point(z=grip_height_from_labware_bottom)
             # Location should have been pre-validated so this will be a deck/staging area slot
             else:

@@ -7,7 +7,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.errors import (
     FixtureDoesNotExistError,
@@ -253,8 +253,6 @@ def test_get_potential_cutout_fixtures_raises(
                     "temperatureModuleType",
                     "heaterShakerModuleType",
                 ],
-                drop_tip_location=None,
-                drop_labware_location=None,
             ),
             lazy_fixture("ot2_standard_deck_def"),
         ),
@@ -272,8 +270,6 @@ def test_get_potential_cutout_fixtures_raises(
                     "temperatureModuleType",
                     "heaterShakerModuleType",
                 ],
-                drop_tip_location=None,
-                drop_labware_location=None,
             ),
             lazy_fixture("ot2_short_trash_deck_def"),
         ),
@@ -291,8 +287,6 @@ def test_get_potential_cutout_fixtures_raises(
                     "heaterShakerModuleType",
                     "magneticBlockType",
                 ],
-                drop_tip_location=None,
-                drop_labware_location=None,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -306,8 +300,6 @@ def test_get_potential_cutout_fixtures_raises(
                 bounding_box=Dimensions(x=246.5, y=91.5, z=40),
                 position=AddressableOffsetVector(x=-16, y=-0.75, z=3),
                 compatible_module_types=[],
-                drop_tip_location=Point(x=124.25, y=47.75, z=43.0),
-                drop_labware_location=None,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -321,8 +313,6 @@ def test_get_potential_cutout_fixtures_raises(
                 bounding_box=Dimensions(x=155.0, y=86.0, z=125.0),
                 position=AddressableOffsetVector(x=-12.5, y=2, z=3),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=Point(x=65, y=31, z=139.5),
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),

@@ -9,7 +9,7 @@ from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName, Point
+from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -703,8 +703,6 @@ class AddressableArea:
     bounding_box: Dimensions
     position: AddressableOffsetVector
     compatible_module_types: List[SharedDataModuleType]
-    drop_tip_location: Optional[Point]
-    drop_labware_location: Optional[Point]
 
 
 class PostRunHardwareState(Enum):

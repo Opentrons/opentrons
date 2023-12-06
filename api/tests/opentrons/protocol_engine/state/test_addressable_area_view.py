@@ -96,8 +96,6 @@ def test_get_loaded_addressable_area() -> None:
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
         compatible_module_types=["magneticModuleType"],
-        drop_tip_location=Point(11, 22, 33),
-        drop_labware_location=None,
     )
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={"abc": addressable_area}
@@ -124,8 +122,6 @@ def test_get_addressable_area_for_simulation_already_loaded() -> None:
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
         compatible_module_types=["magneticModuleType"],
-        drop_tip_location=Point(11, 22, 33),
-        drop_labware_location=None,
     )
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={"abc": addressable_area},
@@ -154,8 +150,6 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
         compatible_module_types=["magneticModuleType"],
-        drop_tip_location=Point(11, 22, 33),
-        drop_labware_location=None,
     )
 
     decoy.when(
@@ -226,8 +220,6 @@ def test_get_addressable_area_position() -> None:
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
@@ -248,8 +240,6 @@ def test_get_addressable_area_move_to_location() -> None:
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
@@ -270,8 +260,6 @@ def test_get_addressable_area_center() -> None:
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
@@ -329,8 +317,6 @@ def test_get_slot_definition() -> None:
                 bounding_box=Dimensions(x=1, y=2, z=3),
                 position=AddressableOffsetVector(x=7, y=8, z=9),
                 compatible_module_types=["magneticModuleType"],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
