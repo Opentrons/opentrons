@@ -56,6 +56,7 @@ _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
 _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
 """The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
+_PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -815,12 +816,17 @@ class InstrumentContext(publisher.CommandPublisher):
         well: labware.Well
         tip_rack: labware.Labware
         move_to_location: Optional[types.Location] = None
+        active_channels = (
+            self.active_channels
+            if self._api_version < _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            else self.channels
+        )
 
         if location is None:
             tip_rack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
-                channels=self.active_channels,
+                channels=active_channels,
             )
 
         elif isinstance(location, labware.Well):
@@ -831,7 +837,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tip_rack, well = labware.next_available_tip(
                 starting_tip=None,
                 tip_racks=[location],
-                channels=self.active_channels,
+                channels=active_channels,
             )
 
         elif isinstance(location, types.Location):
@@ -846,7 +852,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 tip_rack, well = labware.next_available_tip(
                     starting_tip=None,
                     tip_racks=[maybe_tip_rack],
-                    channels=self.active_channels,
+                    channels=active_channels,
                 )
             else:
                 raise TypeError(
@@ -1231,6 +1237,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         blow_out = kwargs.get("blow_out")
         blow_out_strategy = None
+        active_channels = (
+            self.active_channels
+            if self._api_version < _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            else self.channels
+        )
 
         if blow_out and not blowout_location:
             if self.current_volume:
@@ -1247,7 +1258,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = labware.next_available_tip(
-                self.starting_tip, self.tip_racks, self.active_channels
+                self.starting_tip, self.tip_racks, active_channels
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
