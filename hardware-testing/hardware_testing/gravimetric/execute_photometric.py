@@ -18,7 +18,6 @@ from . import config
 from .helpers import (
     _jog_to_find_liquid_height,
     _sense_liquid_height,
-    _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
     get_list_of_wells_affected,
@@ -110,7 +109,6 @@ def _load_labware(
         photoplate = loaded_labwares[cfg.photoplate_slot]
     else:
         photoplate = ctx.load_labware(cfg.photoplate, location=cfg.photoplate_slot)
-        _apply_labware_offsets(cfg, [photoplate])
 
     if (
         cfg.reservoir_slot in loaded_labwares.keys()
@@ -119,7 +117,6 @@ def _load_labware(
         reservoir = loaded_labwares[cfg.reservoir_slot]
     else:
         reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
-        _apply_labware_offsets(cfg, [reservoir])
     return photoplate, reservoir
 
 
