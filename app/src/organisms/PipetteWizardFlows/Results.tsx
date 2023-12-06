@@ -56,6 +56,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
+    errorMessage,
     setShowErrorMessage,
     nextMount,
   } = props
@@ -296,7 +297,16 @@ export const Results = (props: ResultsProps): JSX.Element => {
     )
   }
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
-
+  if (errorMessage != null) {
+    return (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.errorEnabled}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
+    )
+  }
   return (
     <SimpleWizardBody
       iconColor={iconColor}
