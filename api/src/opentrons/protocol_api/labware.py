@@ -614,7 +614,7 @@ class Labware:
         across columns (i.e., A1, B1, C1…A2, B2, C2…)
 
         With indexing one can treat it as a typical python
-        list. To access well A1 for example, write ``labware.wells()[0]``.
+        list. For example, access well A1 with ``labware.wells()[0]``.
 
         Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
 
