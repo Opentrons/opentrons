@@ -135,7 +135,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       setPollForSubsystemUpdate(true)
     } else if (
       subsystemUpdateData != null &&
-      subsystemUpdateData.status === 'done'
+      subsystemUpdateData.updateStatus === 'done'
     ) {
       setTimeout(() => {
         setPollForSubsystemUpdate(false)
