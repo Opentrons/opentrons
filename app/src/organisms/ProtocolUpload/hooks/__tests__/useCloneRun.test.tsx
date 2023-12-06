@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   useRunQuery,
@@ -23,7 +23,7 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID: string = 'run_id'
 
 describe('useCloneRun hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
 
   beforeEach(() => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
@@ -43,7 +43,7 @@ describe('useCloneRun hook', () => {
       .mockReturnValue({ createRun: jest.fn() } as any)
 
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider

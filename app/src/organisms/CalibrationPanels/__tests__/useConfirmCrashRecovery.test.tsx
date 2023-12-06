@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { WrapperComponent, act, renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { LEFT, renderWithProviders } from '@opentrons/components'
 
@@ -15,7 +15,7 @@ import {
 import type { CalibrationPanelProps } from '../types'
 
 describe('useConfirmCrashRecovery', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: WrapperComponent<CalibrationPanelProps>
   const mockSendCommands = jest.fn()
   const mockProps = {
     cleanUpAndExit: jest.fn(),

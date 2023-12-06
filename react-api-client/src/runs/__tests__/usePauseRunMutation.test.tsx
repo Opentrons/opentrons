@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react'
 import { createRunAction, RUN_ACTION_TYPE_PAUSE } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { usePauseRunMutation } from '..'
@@ -9,6 +9,7 @@ import { usePauseRunMutation } from '..'
 import { RUN_ID_1, mockPauseRunAction } from '../__fixtures__'
 
 import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
+import type { UsePauseRunMutationOptions } from '../usePauseRunMutation'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -21,12 +22,12 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('usePauseRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UsePauseRunMutationOptions>
   const createPauseRunActionData = { actionType: RUN_ACTION_TYPE_PAUSE }
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UsePauseRunMutationOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { getRun } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useRunQuery } from '..'
@@ -19,11 +19,11 @@ const RUN_ID = '1'
 const RUN_RESPONSE = { data: { id: RUN_ID } } as Run
 
 describe('useRunQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

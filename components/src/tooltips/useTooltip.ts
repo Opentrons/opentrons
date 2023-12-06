@@ -55,7 +55,10 @@ export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
     arrowStyle: Styles.INITIAL_ARROW_STYLE,
   })
 
-  const onStateUpdate = useCallback((placement, styles) => {
+  const onStateUpdate = useCallback((placement: Placement | null, styles: {
+    popper?: CSSProperties
+    arrow?: CSSProperties
+  }) => {
     setTooltipState({
       placement,
       tooltipStyle: styles.popper ?? Styles.INITIAL_TOOLTIP_STYLE,

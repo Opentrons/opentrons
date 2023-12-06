@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
@@ -32,7 +32,7 @@ const mockDisplaySettings = {
 }
 
 describe('useIsUnboxingFlowOngoing', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
   beforeEach(() => {
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockDisplaySettings)

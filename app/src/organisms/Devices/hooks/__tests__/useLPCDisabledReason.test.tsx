@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 import { createStore } from 'redux'
@@ -51,7 +51,7 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 
 describe('useLPCDisabledReason', () => {
   const store: Store<State> = createStore(jest.fn(), {})
-  const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+  const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
     <I18nextProvider i18n={i18n}>
       <Provider store={store}>{children}</Provider>
     </I18nextProvider>

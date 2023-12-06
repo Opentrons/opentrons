@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { I18nextProvider } from 'react-i18next'
 import { getAllDefs } from '../helpers/getAllDefs'
@@ -48,7 +48,7 @@ describe('useAllLabware hook', () => {
   })
 
   it('should return object with only definition and modified date', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(() => useAllLabware('reverse', 'all'), {
@@ -62,7 +62,7 @@ describe('useAllLabware hook', () => {
     expect(labware2.definition).toBe(mockValidLabware.definition)
   })
   it('should return alphabetically sorted list', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(() => useAllLabware('alphabetical', 'all'), {
@@ -76,7 +76,7 @@ describe('useAllLabware hook', () => {
     expect(labware1.definition).toBe(mockValidLabware.definition)
   })
   it('should return no labware if not the right filter', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(() => useAllLabware('reverse', 'reservoir'), {
@@ -89,7 +89,7 @@ describe('useAllLabware hook', () => {
     expect(labware2).toBe(undefined)
   })
   it('should return labware with wellPlate filter', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(() => useAllLabware('reverse', 'wellPlate'), {
@@ -103,7 +103,7 @@ describe('useAllLabware hook', () => {
     expect(labware2.definition).toBe(mockValidLabware.definition)
   })
   it('should return custom labware with customLabware filter', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
@@ -136,7 +136,7 @@ describe('useLabwareFailure hook', () => {
     jest.restoreAllMocks()
   })
   it('should return invalid labware definition', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -154,7 +154,7 @@ describe('useLabwareFailure hook', () => {
       errorMessage: null,
     })
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -175,7 +175,7 @@ describe('useLabwareFailure hook', () => {
       errorMessage: null,
     })
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -193,7 +193,7 @@ describe('useLabwareFailure hook', () => {
       errorMessage: 'error',
     })
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>
         <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
       </Provider>
@@ -216,7 +216,7 @@ describe('useNewLabwareName hook', () => {
   })
 
   it('should return filename as a string', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(useNewLabwareName, { wrapper })

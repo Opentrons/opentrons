@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { render, fireEvent } from '@testing-library/react'
 import { act } from 'react-test-renderer'
 import { useTrackEvent } from '../../../redux/analytics'
@@ -29,7 +29,7 @@ describe('useToggleGroup', () => {
   })
 
   it('should return default selectedValue and toggle buttons', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
 
@@ -41,7 +41,7 @@ describe('useToggleGroup', () => {
     expect(result.current[0]).toBe('List View')
   })
   it('should record an analytics event for list view', async () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
 
@@ -61,7 +61,7 @@ describe('useToggleGroup', () => {
     })
   })
   it('should record an analytics event for map view', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
 

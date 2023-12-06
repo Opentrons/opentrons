@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import {
   getModules,
   mockModulesResponse,
@@ -11,6 +11,7 @@ import { useHost } from '../../api'
 import { useModulesQuery } from '..'
 
 import type { HostConfig, Response, Modules } from '@opentrons/api-client'
+import { UseModulesQueryOptions } from '../useModulesQuery'
 
 jest.mock('@opentrons/api-client/src/modules/getModules')
 jest.mock('../../api/useHost')
@@ -26,11 +27,11 @@ const MODULES_RESPONSE = {
 const V2_MODULES_RESPONSE = { data: v2MockModulesResponse }
 
 describe('useModulesQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseModulesQueryOptions>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseModulesQueryOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

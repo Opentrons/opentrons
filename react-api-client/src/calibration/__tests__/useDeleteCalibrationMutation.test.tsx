@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import {
   deleteCalibration,
   DeleteCalRequestParams,
@@ -24,7 +24,7 @@ const DELETE_CAL_DATA_RESPONSE = {
 } as EmptyResponse
 
 describe('useDeleteCalibrationMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
   const requestParams = {
     calType: 'pipetteOffset',
     mount: 'left',
@@ -33,7 +33,7 @@ describe('useDeleteCalibrationMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -49,7 +49,7 @@ describe('useDeleteCalibrationMutation hook', () => {
       .calledWith(HOST_CONFIG, requestParams)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useDeleteCalibrationMutation(),
       {
         wrapper,
@@ -57,7 +57,7 @@ describe('useDeleteCalibrationMutation hook', () => {
     )
 
     expect(result.current.data).toBeUndefined()
-    result.current.deleteCalibration(requestParams)
+    await act(() => result.current.deleteCalibration(requestParams))
     await waitFor(() => {
       return result.current.status !== 'loading'
     })
@@ -72,15 +72,16 @@ describe('useDeleteCalibrationMutation hook', () => {
         data: DELETE_CAL_DATA_RESPONSE,
       } as Response<EmptyResponse>)
 
-    const { result, waitFor } = renderHook(
+    const { result, rerender } = renderHook(
       () => useDeleteCalibrationMutation(),
       {
         wrapper,
       }
     )
-    act(() => result.current.deleteCalibration(requestParams))
-
-    await waitFor(() => result.current.data != null)
+    await act(() => result.current.deleteCalibration(requestParams))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
+    })
 
     expect(result.current.data).toEqual(DELETE_CAL_DATA_RESPONSE)
   })

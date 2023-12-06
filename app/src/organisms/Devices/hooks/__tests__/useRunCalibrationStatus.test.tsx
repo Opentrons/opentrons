@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 
@@ -26,7 +26,7 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
   typeof useRunPipetteInfoByMount
 >
-let wrapper: React.FunctionComponent<{}>
+let wrapper: React.FunctionComponent<{children: React.ReactNode}>
 
 describe('useRunCalibrationStatus hook', () => {
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
   mockTipLengthCalibration1,
@@ -19,7 +19,7 @@ const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as
 const CALIBRATIONS_FETCH_MS = 5000
 
 describe('useTipLengthCalibrations hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

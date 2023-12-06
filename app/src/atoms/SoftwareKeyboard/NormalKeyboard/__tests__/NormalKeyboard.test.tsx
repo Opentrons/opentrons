@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { NormalKeyboard } from '..'
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import {
@@ -23,7 +23,7 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
-let wrapper: React.FunctionComponent<{}>
+let wrapper: React.FunctionComponent<{children: React.ReactNode}>
 
 const mockMagneticModuleDefinition = {
   moduleId: 'someMagneticModule',

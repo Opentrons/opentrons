@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import { getEstopStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useEstopQuery } from '..'
 
 import type { HostConfig, Response, EstopStatus } from '@opentrons/api-client'
+import type { UseEstopQueryOptions } from '../useEstopQuery'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -27,11 +28,11 @@ const ESTOP_STATE_RESPONSE: EstopStatus = {
 }
 
 describe('useEstopQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseEstopQueryOptions>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseEstopQueryOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

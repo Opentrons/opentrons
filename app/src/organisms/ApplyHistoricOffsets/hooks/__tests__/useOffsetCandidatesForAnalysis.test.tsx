@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   getLabwareDisplayName,
@@ -111,7 +111,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
   })
 
   it('returns an empty array if robot ip but no analysis output', async () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <div>{children}</div>
     )
     const { result, waitFor } = renderHook(
@@ -123,7 +123,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
   })
 
   it('returns an empty array if no robot ip', async () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <div>{children}</div>
     )
     const { result, waitFor } = renderHook(
@@ -138,7 +138,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
     expect(result.current).toEqual([])
   })
   it('returns candidates for each first match with newest first', async () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <div>{children}</div>
     )
     const { result, waitFor } = renderHook(

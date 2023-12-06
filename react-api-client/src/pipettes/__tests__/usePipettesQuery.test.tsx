@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { getPipettes } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { usePipettesQuery } from '..'
 
-import type { HostConfig, Pipettes, Response } from '@opentrons/api-client'
+import type { GetPipettesParams, HostConfig, Pipettes, Response } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -35,11 +35,11 @@ const PIPETTES_RESPONSE: Pipettes = {
 } as any
 
 describe('usePipettesQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode} & GetPipettesParams>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & GetPipettesParams> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

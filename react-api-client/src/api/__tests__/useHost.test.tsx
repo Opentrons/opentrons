@@ -1,6 +1,6 @@
 // tests for the HostConfig context and hook
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import { ApiHostProvider, useHost } from '..'
 
@@ -12,7 +12,7 @@ describe('ApiHostProvider and useHost', () => {
   })
 
   it('should allow a hostname to be unset', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <ApiHostProvider hostname={null}>{children}</ApiHostProvider>
     )
     const { result } = renderHook(useHost, { wrapper })
@@ -21,7 +21,7 @@ describe('ApiHostProvider and useHost', () => {
   })
 
   it('should allow a hostname to be set', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <ApiHostProvider hostname="localhost">{children}</ApiHostProvider>
     )
     const { result } = renderHook(useHost, { wrapper })
@@ -34,7 +34,7 @@ describe('ApiHostProvider and useHost', () => {
   })
 
   it('should allow a port to be set', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <ApiHostProvider hostname="127.0.0.1" port={31950}>
         {children}
       </ApiHostProvider>
@@ -49,7 +49,7 @@ describe('ApiHostProvider and useHost', () => {
   })
 
   it('should allow a robot name to be set', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <ApiHostProvider hostname="127.0.0.1" robotName="otie">
         {children}
       </ApiHostProvider>

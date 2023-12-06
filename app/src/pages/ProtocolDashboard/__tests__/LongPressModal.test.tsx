@@ -2,7 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import { renderWithProviders, useLongPress } from '@opentrons/components'
 import { HostConfig } from '@opentrons/api-client'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { QueryClient, QueryClientProvider, UseQueryOptions } from 'react-query'
+import { renderHook } from '@testing-library/react'
 import { getSessions } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useAllSessionsQuery } from '..'
@@ -23,11 +23,11 @@ const SESSIONS_RESPONSE = {
 } as Sessions
 
 describe('useAllSessionsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseQueryOptions<Sessions, Error>>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseQueryOptions<Sessions, Error>> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

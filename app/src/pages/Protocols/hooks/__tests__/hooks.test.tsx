@@ -1,5 +1,5 @@
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import omitBy from 'lodash/omitBy'
 
@@ -173,7 +173,7 @@ describe('useRequiredProtocolLabware', () => {
 })
 
 describe('useMissingProtocolHardware', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
   beforeEach(() => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [] },

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react'
 import { createRunAction, RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { usePlayRunMutation } from '..'
@@ -9,6 +9,7 @@ import { usePlayRunMutation } from '..'
 import { RUN_ID_1, mockPlayRunAction } from '../__fixtures__'
 
 import type { HostConfig, Response, RunAction } from '@opentrons/api-client'
+import type { UsePlayRunMutationOptions } from '../usePlayRunMutation'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -21,12 +22,12 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('usePlayRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UsePlayRunMutationOptions>
   const createPlayRunActionData = { actionType: RUN_ACTION_TYPE_PLAY }
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UsePlayRunMutationOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider

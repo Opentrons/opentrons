@@ -3,7 +3,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 
 import { i18n } from '../../../../i18n'
@@ -50,7 +50,7 @@ const store: Store<any> = createStore(jest.fn(), {})
 
 // ToDo (kj:0202/2023) USB test cases will be added when USB is out
 describe('useNetworkConnection', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
 
   beforeEach(() => {
     wrapper = ({ children }) => (

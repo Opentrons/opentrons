@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { useHistoricRunDetails } from '../useHistoricRunDetails'
 import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
@@ -42,7 +42,7 @@ describe('useHistoricRunDetails', () => {
     )
 
   it('returns historical run details with newest first', async () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <div>{children}</div>
     )
     const { result, waitFor } = renderHook(useHistoricRunDetails, { wrapper })
@@ -58,7 +58,7 @@ describe('useHistoricRunDetails', () => {
           links: {},
         })
       )
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <div>{children}</div>
     )
     const { result, waitFor } = renderHook(

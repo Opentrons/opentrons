@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import { getDoorStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useDoorQuery } from '..'
 
 import type { HostConfig, Response, DoorStatus } from '@opentrons/api-client'
+import type { UseDoorQueryOptions } from '../useDoorQuery'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -23,11 +24,11 @@ const DOOR_RESPONSE: DoorStatus = {
 } as DoorStatus
 
 describe('useDoorQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseDoorQueryOptions>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseDoorQueryOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

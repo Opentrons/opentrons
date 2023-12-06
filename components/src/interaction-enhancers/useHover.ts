@@ -40,7 +40,7 @@ export function useHover(options: UseHoverOptions = {}): UseHoverResult {
   const [hovered, setHovered] = useState(false)
   const timeoutRef = useRef<number>()
 
-  const handleHoverChange = useCallback((value, delay) => {
+  const handleHoverChange = useCallback((value: boolean, delay: number | undefined) => {
     clearTimeout(timeoutRef.current)
     if (delay) {
       timeoutRef.current = setTimeout(

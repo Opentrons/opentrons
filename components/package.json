@@ -19,7 +19,8 @@
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "peerDependencies": {
     "react": "18.2.0",
-    "react-router-dom": "5.1.1"
+    "react-router-dom": "5.3.4",
+    "@types/react-router-dom": "5.3.3"
   },
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
@@ -28,7 +29,6 @@
     "@react-spring/web": "9.6.1",
     "@types/classnames": "2.2.5",
     "@types/lodash": "^4.14.191",
-    "@types/react-router-dom": "^5.1.7",
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",

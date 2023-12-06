@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
@@ -63,7 +63,7 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
         },
       ],
     } as any)
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
@@ -133,7 +133,7 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
       ],
     } as any)
 
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
