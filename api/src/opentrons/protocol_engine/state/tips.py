@@ -16,7 +16,10 @@ from ..commands import (
     DropTipResult,
     DropTipInPlaceResult,
 )
-from ..commands.configuring_common import PipetteConfigUpdateResultMixin
+from ..commands.configuring_common import (
+    PipetteConfigUpdateResultMixin,
+    PipetteNozzleLayoutResultMixin,
+)
 
 
 class TipRackWellState(Enum):
@@ -37,6 +40,7 @@ class TipState:
     column_by_labware_id: Dict[str, List[List[str]]]
     channels_by_pipette_id: Dict[str, int]
     length_by_pipette_id: Dict[str, float]
+    active_channels_by_pipette_id: Dict[str, float]
 
 
 class TipStore(HasState[TipState], HandlesActions):
@@ -51,17 +55,30 @@ class TipStore(HasState[TipState], HandlesActions):
             column_by_labware_id={},
             channels_by_pipette_id={},
             length_by_pipette_id={},
+            active_channels_by_pipette_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
             if isinstance(action.private_result, PipetteConfigUpdateResultMixin):
+                pipette_id = action.private_result.pipette_id
                 config = action.private_result.config
-                self._state.channels_by_pipette_id[
-                    action.private_result.pipette_id
-                ] = config.channels
+                self._state.channels_by_pipette_id[pipette_id] = config.channels
+                self._state.active_channels_by_pipette_id[pipette_id] = config.channels
             self._handle_command(action.command)
+            # TODO: add test for this
+            if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
+                pipette_id = action.private_result.pipette_id
+                nozzle_map = action.private_result.nozzle_map
+                if nozzle_map:
+                    self._state.active_channels_by_pipette_id[
+                        pipette_id
+                    ] = nozzle_map.tip_count
+                else:
+                    self._state.active_channels_by_pipette_id[
+                        pipette_id
+                    ] = self._state.channels_by_pipette_id[pipette_id]
 
         elif isinstance(action, ResetTipsAction):
             labware_id = action.labware_id
@@ -92,7 +109,6 @@ class TipStore(HasState[TipState], HandlesActions):
             well_name = command.params.wellName
             pipette_id = command.params.pipetteId
             length = command.result.tipLength
-
             self._set_used_tips(
                 pipette_id=pipette_id, well_name=well_name, labware_id=labware_id
             )
@@ -103,7 +119,7 @@ class TipStore(HasState[TipState], HandlesActions):
             self._state.length_by_pipette_id.pop(pipette_id, None)
 
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
-        pipette_channels = self._state.channels_by_pipette_id.get(pipette_id)
+        pipette_channels = self._state.active_channels_by_pipette_id.get(pipette_id)
         columns = self._state.column_by_labware_id.get(labware_id, [])
         wells = self._state.tips_by_labware_id.get(labware_id, {})
 
