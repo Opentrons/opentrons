@@ -2,10 +2,12 @@ import * as React from 'react'
 import ReactDOM from 'react-dom'
 import { App } from './App'
 
-const root = document.getElementById('root')
+const container = document.getElementById('root')
 
-if (!root) {
-  throw new Error('Unable to find #root')
+if (!container) {
+  throw new Error('Unable to find #root element')
 }
 
-ReactDOM.render(<App />, root)
+const root = ReactDOM.createRoot(container)
+
+root.render(<App />)

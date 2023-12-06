@@ -8,7 +8,7 @@
   "types": "lib/index.d.ts",
   "source": "src/index.ts",
   "peerDependencies": {
-    "react": "17.0.1"
+    "react": "18.2.0"
   },
   "dependencies": {
     "@opentrons/api-client": "link:../api-client",

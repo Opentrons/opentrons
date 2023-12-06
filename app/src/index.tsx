@@ -27,7 +27,11 @@ store.dispatch(uiInitialized())
 
 log.info('Rendering app UI')
 
-ReactDom.render(
+const container = document.getElementById('root')
+
+const root = ReactDom.createRoot(container)
+
+root.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <ApiClientProvider>
@@ -36,6 +40,5 @@ ReactDom.render(
         </I18nextProvider>
       </ApiClientProvider>
     </ConnectedRouter>
-  </Provider>,
-  document.getElementById('root')
+  </Provider>
 )
