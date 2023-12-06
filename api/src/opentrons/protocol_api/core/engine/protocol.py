@@ -1,5 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Type, Union, List, Tuple
+from __future__ import annotations
+from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_api import _waste_chute_dimensions
 
@@ -18,8 +19,10 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
 
+
 from opentrons.protocol_engine import (
     DeckSlotLocation,
+    AddressableAreaLocation,
     ModuleLocation,
     OnLabwareLocation,
     ModuleModel as EngineModuleModel,
@@ -41,8 +44,9 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType, OFF_DECK
+from ..._types import OffDeckType, OFF_DECK, StagingSlotName
 from ..._liquid import Liquid
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -60,6 +64,9 @@ from .module_core import (
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
+
+if TYPE_CHECKING:
+    from ...labware import Labware
 
 
 class ProtocolCore(
@@ -90,6 +97,7 @@ class ProtocolCore(
         self._module_cores_by_id: Dict[
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
+        self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
         self._load_fixed_trash()
 
     @property
@@ -105,17 +113,28 @@ class ProtocolCore(
     def fixed_trash(self) -> Optional[LabwareCore]:
         """Get the fixed trash labware."""
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
+        if trash_id is not None and self._api_version < APIVersion(2, 16):
             return self._labware_cores_by_id[trash_id]
         return None
 
     def _load_fixed_trash(self) -> None:
-        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
-            self._labware_cores_by_id[trash_id] = LabwareCore(
-                labware_id=trash_id,
-                engine_client=self._engine_client,
-            )
+        if self.robot_type == "OT-2 Standard" or self._api_version < APIVersion(2, 16):
+            trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+            if trash_id is not None:
+                self._labware_cores_by_id[trash_id] = LabwareCore(
+                    labware_id=trash_id,
+                    engine_client=self._engine_client,
+                )
+
+    def append_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Append a disposal location object to the core"""
+        self._disposal_locations.append(disposal_location)
+
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
+        """Get disposal locations."""
+        return self._disposal_locations
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
@@ -143,7 +162,12 @@ class ProtocolCore(
         self,
         load_name: str,
         location: Union[
-            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
         ],
         label: Optional[str],
         namespace: Optional[str],
@@ -204,7 +228,13 @@ class ProtocolCore(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
@@ -230,11 +260,11 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_labware_id=load_result.labwareId,
-            # It's important that we don't fetch these IDs from Protocol Engine, and
-            # use our own bookkeeping instead. If we fetched these IDs from Protocol
-            # Engine, it would have leaked state from Labware Position Check in the
-            # same HTTP run.
-            #
+            # TODO (spp, 2023-11-27): We've been using IDs from _labware_cores_by_id
+            #  and _module_cores_by_id instead of getting the lists directly from engine
+            #  because of the chance of engine carrying labware IDs from LPC too.
+            #  But with https://github.com/Opentrons/opentrons/pull/13943,
+            #  & LPC in maintenance runs, we can now rely on engine state for these IDs too.
             # Wrapping .keys() in list() is just to make Decoy verification easier.
             existing_labware_ids=list(self._labware_cores_by_id.keys()),
             existing_module_ids=list(self._module_cores_by_id.keys()),
@@ -255,6 +285,7 @@ class ProtocolCore(
         labware_core: LabwareCore,
         new_location: Union[
             DeckSlotName,
+            StagingSlotName,
             LabwareCore,
             ModuleCore,
             NonConnectedModuleCore,
@@ -403,8 +434,8 @@ class ProtocolCore(
         deck_conflict.check(
             engine_state=self._engine_client.state,
             new_module_id=result.moduleId,
-            # It's important that we don't fetch these IDs from Protocol Engine.
-            # See comment in self.load_labware().
+            # TODO: We can now fetch these IDs from engine too.
+            #  See comment in self.load_labware().
             #
             # Wrapping .keys() in list() is just to make Decoy verification easier.
             existing_labware_ids=list(self._labware_cores_by_id.keys()),
@@ -556,9 +587,7 @@ class ProtocolCore(
     ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
-            slot_name=slot_name,
-            allowed_labware_ids=set(self._labware_cores_by_id.keys()),
-            allowed_module_ids=set(self._module_cores_by_id.keys()),
+            slot_name=slot_name
         )
 
         if isinstance(loaded_item, LoadedLabware):
@@ -601,7 +630,7 @@ class ProtocolCore(
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
-        return self._engine_client.state.geometry.get_all_labware_highest_z()
+        return self._engine_client.state.geometry.get_all_obstacle_highest_z()
 
     def get_labware_cores(self) -> List[LabwareCore]:
         """Get all loaded labware cores."""
@@ -652,7 +681,12 @@ class ProtocolCore(
     def _convert_labware_location(
         self,
         location: Union[
-            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCore,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
         ],
     ) -> LabwareLocation:
         if isinstance(location, LabwareCore):
@@ -662,7 +696,13 @@ class ProtocolCore(
 
     @staticmethod
     def _get_non_stacked_location(
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCore,
+            NonConnectedModuleCore,
+            OffDeckType,
+        ]
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)
@@ -670,3 +710,5 @@ class ProtocolCore(
             return OFF_DECK_LOCATION
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
+        elif isinstance(location, StagingSlotName):
+            return AddressableAreaLocation(addressableAreaName=location.id)

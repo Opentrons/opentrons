@@ -112,7 +112,7 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper' | 'wasteChute' | 'stagingArea'
+    name: 'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
     id: string
     location?: string
   }
@@ -209,7 +209,7 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'consolidate'
 
   sourceWells: string[]
-  destWell: string
+  destWell: string | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -226,7 +226,7 @@ export type TransferArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'transfer'
 
   sourceWells: string[]
-  destWells: string[]
+  destWells: string[] | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -486,12 +486,16 @@ export interface RobotState {
         [well: string]: LocationLiquidState
       }
     }
+    additionalEquipment: {
+      /** for the waste chute and trash bin */
+      [additionalEquipmentId: string]: LocationLiquidState
+    }
   }
 }
 
 export type ErrorType =
-  | 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'EQUIPMENT_DOES_NOT_EXIST'
   | 'GRIPPER_REQUIRED'
   | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'

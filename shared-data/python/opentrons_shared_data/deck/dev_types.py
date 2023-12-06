@@ -116,6 +116,7 @@ class CutoutFixture(TypedDict):
     mayMountTo: List[str]
     displayName: str
     providesAddressableAreas: Dict[str, List[str]]
+    height: float
 
 
 Fixture = Union[

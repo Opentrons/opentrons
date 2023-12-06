@@ -41,7 +41,7 @@ export function ProtocolSetupInstruments({
       : false
   const attachedGripperMatch = usesGripper
     ? (attachedInstruments?.data ?? []).find(
-        (i): i is GripperData => i.instrumentType === 'gripper'
+        (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
       ) ?? null
     : null
 
@@ -85,7 +85,6 @@ export function ProtocolSetupInstruments({
             mount={loadedPipette.mount}
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
-            mostRecentAnalysis={mostRecentAnalysis}
             instrumentsRefetch={refetch}
           />
         )

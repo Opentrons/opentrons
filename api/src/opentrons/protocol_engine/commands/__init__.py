@@ -290,6 +290,22 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutCommandType,
 )
 
+from .get_tip_presence import (
+    GetTipPresence,
+    GetTipPresenceCreate,
+    GetTipPresenceParams,
+    GetTipPresenceResult,
+    GetTipPresenceCommandType,
+)
+
+from .verify_tip_presence import (
+    VerifyTipPresence,
+    VerifyTipPresenceCreate,
+    VerifyTipPresenceParams,
+    VerifyTipPresenceResult,
+    VerifyTipPresenceCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -505,4 +521,16 @@ __all__ = [
     "ConfigureNozzleLayoutParams",
     "ConfigureNozzleLayoutResult",
     "ConfigureNozzleLayoutCommandType",
+    # get pipette tip presence bundle
+    "GetTipPresence",
+    "GetTipPresenceCreate",
+    "GetTipPresenceParams",
+    "GetTipPresenceResult",
+    "GetTipPresenceCommandType",
+    # verify pipette tip presence bundle
+    "VerifyTipPresence",
+    "VerifyTipPresenceCreate",
+    "VerifyTipPresenceParams",
+    "VerifyTipPresenceResult",
+    "VerifyTipPresenceCommandType",
 ]

@@ -22,6 +22,7 @@ import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../ui-style-constants'
 
+import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
@@ -39,41 +40,51 @@ import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 import type { WellFill } from '../Labware'
 
+export interface LabwareOnDeck {
+  labwareLocation: LabwareLocation
+  definition: LabwareDefinition2
+  wellFill?: WellFill
+  /** user defined name for this instance of the labware */
+  displayName?: string | null
+  /** generic prop to render self-positioned children for each labware */
+  labwareChildren?: React.ReactNode
+  onLabwareClick?: () => void
+}
+
+export interface ModuleOnDeck {
+  moduleModel: ModuleModel
+  moduleLocation: ModuleLocation
+  nestedLabwareDef?: LabwareDefinition2 | null
+  nestedLabwareWellFill?: WellFill
+  /** user defined name for this instance of the nested labware */
+  nestedLabwareDisplayName?: string | null
+  innerProps?: React.ComponentProps<typeof Module>['innerProps']
+  /** generic prop to render self-positioned children for each module */
+  moduleChildren?: React.ReactNode
+  onLabwareClick?: () => void
+}
 interface BaseDeckProps {
   deckConfig: DeckConfiguration
   robotType: RobotType
-  labwareLocations?: Array<{
-    labwareLocation: LabwareLocation
-    definition: LabwareDefinition2
-    wellFill?: WellFill
-    // generic prop to render self-positioned children for each labware
-    labwareChildren?: React.ReactNode
-    onLabwareClick?: () => void
-  }>
-  moduleLocations?: Array<{
-    moduleModel: ModuleModel
-    moduleLocation: ModuleLocation
-    nestedLabwareDef?: LabwareDefinition2 | null
-    nestedLabwareWellFill?: WellFill
-    innerProps?: React.ComponentProps<typeof Module>['innerProps']
-    // generic prop to render self-positioned children for each module
-    moduleChildren?: React.ReactNode
-    onLabwareClick?: () => void
-  }>
+  labwareOnDeck?: LabwareOnDeck[]
+  modulesOnDeck?: ModuleOnDeck[]
   deckLayerBlocklist?: string[]
   showExpansion?: boolean
   lightFill?: string
   darkFill?: string
   children?: React.ReactNode
   showSlotLabels?: boolean
-  isOnDevice?: boolean
+  /** whether to make wrapping svg tag animatable via @react-spring/web, defaults to false */
+  animatedSVG?: boolean
+  /** extra props to pass to svg tag */
+  svgProps?: React.ComponentProps<typeof Svg>
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
   const {
     robotType,
-    moduleLocations = [],
-    labwareLocations = [],
+    modulesOnDeck = [],
+    labwareOnDeck = [],
     lightFill = COLORS.light1,
     darkFill = COLORS.darkGreyEnabled,
     deckLayerBlocklist = [],
@@ -81,7 +92,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     showExpansion = true,
     children,
     showSlotLabels = true,
-    isOnDevice = false,
+    animatedSVG = false,
+    svgProps = {},
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -112,6 +124,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
+      animated={animatedSVG}
+      {...svgProps}
     >
       {robotType === OT2_ROBOT_TYPE ? (
         <DeckFromLayers
@@ -121,7 +135,14 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       ) : (
         <>
           {showSlotLabels ? (
-            <SlotLabels robotType={robotType} color={darkFill} />
+            <SlotLabels
+              robotType={robotType}
+              color={darkFill}
+              show4thColumn={
+                stagingAreaFixtures.length > 0 ||
+                wasteChuteStagingAreaFixtures.length > 0
+              }
+            />
           ) : null}
           {singleSlotFixtures.map(fixture => (
             <SingleSlotFixture
@@ -183,7 +204,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
         </>
       )}
       <>
-        {moduleLocations.map(
+        {modulesOnDeck.map(
           ({
             moduleModel,
             moduleLocation,
@@ -215,7 +236,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     definition={nestedLabwareDef}
                     onLabwareClick={onLabwareClick}
                     wellFill={nestedLabwareWellFill}
-                    isOnDevice={isOnDevice}
                   />
                 ) : null}
                 {moduleChildren}
@@ -223,7 +243,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             ) : null
           }
         )}
-        {labwareLocations.map(
+        {labwareOnDeck.map(
           ({
             labwareLocation,
             definition,
@@ -233,7 +253,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           }) => {
             if (
               labwareLocation === 'offDeck' ||
-              !('slotName' in labwareLocation)
+              !('slotName' in labwareLocation) ||
+              // for legacy protocols that list fixed trash as a labware, do not render
+              definition.parameters.loadName ===
+                'opentrons_1_trash_3200ml_fixed'
             ) {
               return null
             }
@@ -253,7 +276,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   definition={definition}
                   onLabwareClick={onLabwareClick}
                   wellFill={wellFill ?? undefined}
-                  isOnDevice={isOnDevice}
                 />
                 {labwareChildren}
               </g>

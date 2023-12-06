@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple
+from typing import Generic, List, Optional, Union, Tuple, TYPE_CHECKING
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -19,8 +19,12 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
+from .._trash_bin import TrashBin
 from .._waste_chute import WasteChute
-from .._types import OffDeckType
+from .._types import OffDeckType, StagingSlotName
+
+if TYPE_CHECKING:
+    from ..labware import Labware
 
 
 class AbstractProtocol(
@@ -58,10 +62,19 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def append_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Append a disposal location object to the core"""
+        ...
+
+    @abstractmethod
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
+        location: Union[
+            DeckSlotName, StagingSlotName, LabwareCoreType, ModuleCoreType, OffDeckType
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -73,7 +86,7 @@ class AbstractProtocol(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
+        location: Union[DeckSlotName, StagingSlotName, ModuleCoreType, OffDeckType],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:
@@ -86,7 +99,12 @@ class AbstractProtocol(
         self,
         labware_core: LabwareCoreType,
         new_location: Union[
-            DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType, WasteChute
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCoreType,
+            ModuleCoreType,
+            OffDeckType,
+            WasteChute,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,
@@ -128,6 +146,10 @@ class AbstractProtocol(
 
     @abstractmethod
     def set_rail_lights(self, on: bool) -> None:
+        ...
+
+    @abstractmethod
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         ...
 
     @abstractmethod

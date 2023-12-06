@@ -24,6 +24,8 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
+from opentrons.protocol_engine.types import DeckConfigurationType
+
 
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
@@ -125,6 +127,7 @@ class MaintenanceEngineStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: Optional[DeckConfigurationType] = [],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -150,6 +153,7 @@ class MaintenanceEngineStore:
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
+            deck_configuration=deck_configuration,
         )
 
         # Using LiveRunner as the runner to allow for future refactor of maintenance runs

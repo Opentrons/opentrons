@@ -1,6 +1,8 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
+  | AspirateInPlaceRunTimeCommand
   | AspirateRunTimeCommand
+  | AspirateInPlaceRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
   | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
@@ -11,9 +13,11 @@ export type PipettingRunTimeCommand =
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
   | TouchTipRunTimeCommand
+  | GetTipPresenceRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
+  | AspirateInPlaceCreateCommand
   | BlowoutCreateCommand
   | BlowoutInPlaceCreateCommand
   | ConfigureForVolumeCreateCommand
@@ -24,6 +28,7 @@ export type PipettingCreateCommand =
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
   | TouchTipCreateCommand
+  | GetTipPresenceCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -47,6 +52,16 @@ export interface AspirateCreateCommand extends CommonCommandCreateInfo {
 export interface AspirateRunTimeCommand
   extends CommonCommandRunTimeInfo,
     AspirateCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
+
+export interface AspirateInPlaceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'aspirateInPlace'
+  params: AspirateInPlaceParams
+}
+export interface AspirateInPlaceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AspirateInPlaceCreateCommand {
   result?: BasicLiquidHandlingResult
 }
 
@@ -139,6 +154,17 @@ export interface PrepareToAspirateRunTimeCommand
   result?: any
 }
 
+export interface GetTipPresenceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'getTipPresence'
+  params: PipetteIdentityParams
+}
+
+export interface GetTipPresenceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    GetTipPresenceCreateCommand {
+  result?: TipPresenceResult
+}
+
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -174,6 +200,11 @@ export interface DispenseInPlaceParams {
   pushOut?: number
 }
 
+export interface AspirateInPlaceParams {
+  pipetteId: string
+  volume: number
+  flowRate: number // µL/s
+}
 interface FlowRateParams {
   flowRate: number // µL/s
 }
@@ -207,4 +238,9 @@ interface WellLocationParam {
 
 interface BasicLiquidHandlingResult {
   volume: number // Amount of liquid in uL handled in the operation
+}
+
+interface TipPresenceResult {
+  // ot2 should alwasy return unknown
+  status?: 'present' | 'absent' | 'unknown'
 }

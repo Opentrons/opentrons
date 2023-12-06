@@ -24,6 +24,7 @@ from ..types import (
     MotorAxis,
     Liquid,
     NozzleLayoutConfigurationType,
+    AddressableOffsetVector,
 )
 from .transports import ChildThreadTransport
 
@@ -180,6 +181,30 @@ class SyncClient:
 
         return cast(commands.MoveToWellResult, result)
 
+    def move_to_addressable_area(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
+    ) -> commands.MoveToAddressableAreaResult:
+        """Execute a MoveToAddressableArea command and return the result."""
+        request = commands.MoveToAddressableAreaCreate(
+            params=commands.MoveToAddressableAreaParams(
+                pipetteId=pipette_id,
+                addressableAreaName=addressable_area_name,
+                offset=offset,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToAddressableAreaResult, result)
+
     def move_to_coordinates(
         self,
         pipette_id: str,
@@ -301,7 +326,7 @@ class SyncClient:
         """Execute a ConfigureForVolume command."""
         request = commands.ConfigureNozzleLayoutCreate(
             params=commands.ConfigureNozzleLayoutParams(
-                pipetteId=pipette_id, configuration_params=configuration_params
+                pipetteId=pipette_id, configurationParams=configuration_params
             )
         )
         result = self._transport.execute_command(request=request)

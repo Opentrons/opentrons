@@ -225,6 +225,7 @@ export const DropTipWizardComponent = (
       ? getDropTipWizardSteps(shouldDispenseLiquid)[currentStepIndex]
       : null
   const isFinalStep = currentStepIndex === DropTipWizardSteps.length - 1
+
   const goBack = (): void => {
     setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
   }
@@ -236,6 +237,7 @@ export const DropTipWizardComponent = (
       setCurrentStepIndex(currentStepIndex + 1)
     }
   }
+
   const handleJog: Jog = (axis, dir, step) => {
     if (createdMaintenanceRunId != null) {
       createRunCommand({
@@ -259,16 +261,6 @@ export const DropTipWizardComponent = (
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCleanUpAndClose, true)
-
-  const handleCreateAndSetup = (shouldDispenseLiquid: boolean): void => {
-    createMaintenanceRun({})
-      .then(() => {
-        setShouldDispenseLiquid(shouldDispenseLiquid)
-      })
-      .catch(e =>
-        setErrorMessage(`Error setting up blowout/droptip: ${e.message}`)
-      )
-  }
 
   const retractAllAxesAndSavePosition = (): Promise<Coordinates | null> => {
     if (createdMaintenanceRunId == null)
@@ -397,7 +389,9 @@ export const DropTipWizardComponent = (
     modalContent = (
       <BeforeBeginning
         {...{
-          handleCreateAndSetup,
+          setShouldDispenseLiquid,
+          createMaintenanceRun,
+          createdMaintenanceRunId,
           isCreateLoading,
           isOnDevice,
         }}
@@ -421,6 +415,7 @@ export const DropTipWizardComponent = (
       <ChooseLocation
         robotType={robotType}
         handleProceed={proceed}
+        handleGoBack={() => setShouldDispenseLiquid(null)}
         title={
           currentStep === CHOOSE_BLOWOUT_LOCATION
             ? i18n.format(t('choose_blowout_location'), 'capitalize')
@@ -429,7 +424,7 @@ export const DropTipWizardComponent = (
         body={
           <Trans
             t={t}
-            i18nKey={i18n.format(t(bodyTextKey))}
+            i18nKey={bodyTextKey}
             components={{ block: <StyledText as="p" /> }}
           />
         }
@@ -561,7 +556,7 @@ export const DropTipWizardComponent = (
           {modalContent}
         </Flex>
       ) : (
-        <LegacyModalShell width="48rem" header={wizardHeader}>
+        <LegacyModalShell width="47rem" header={wizardHeader} overflow="hidden">
           {modalContent}
         </LegacyModalShell>
       )}

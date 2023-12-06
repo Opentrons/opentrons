@@ -17,6 +17,7 @@ import {
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
@@ -40,7 +41,6 @@ import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocalRobot } from '../../redux/discovery'
-import { getCutoutIdForSlotName } from '../../resources/deck_configuration/utils'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,
@@ -364,6 +364,8 @@ export function ProtocolSetupModulesAndDeck({
     protocolModulesInfo
   )
 
+  const hasModules = attachedProtocolModuleMatches.length > 0
+
   const {
     missingModuleIds,
     remainingAttachedModules,
@@ -421,56 +423,60 @@ export function ProtocolSetupModulesAndDeck({
           />
         ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-            <Flex
-              color={COLORS.darkBlack70}
-              fontSize={TYPOGRAPHY.fontSize22}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              gridGap={SPACING.spacing24}
-              lineHeight={TYPOGRAPHY.lineHeight28}
-              paddingX={SPACING.spacing24}
-            >
-              <StyledText flex="4 0 0">{t('module')}</StyledText>
-              <StyledText flex="2 0 0">{t('location')}</StyledText>
-              <StyledText flex="3 0 0"> {t('status')}</StyledText>
-            </Flex>
-            {attachedProtocolModuleMatches.map(module => {
-              // check for duplicate module model in list of modules for protocol
-              const isDuplicateModuleModel = protocolModulesInfo
-                // filter out current module
-                .filter(otherModule => otherModule.moduleId !== module.moduleId)
-                // check for existence of another module of same model
-                .some(
-                  otherModule =>
-                    otherModule.moduleDef.model === module.moduleDef.model
+          {hasModules ? (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <Flex
+                color={COLORS.darkBlack70}
+                fontSize={TYPOGRAPHY.fontSize22}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                gridGap={SPACING.spacing24}
+                lineHeight={TYPOGRAPHY.lineHeight28}
+                paddingX={SPACING.spacing24}
+              >
+                <StyledText flex="4 0 0">{t('module')}</StyledText>
+                <StyledText flex="2 0 0">{t('location')}</StyledText>
+                <StyledText flex="3 0 0"> {t('status')}</StyledText>
+              </Flex>
+              {attachedProtocolModuleMatches.map(module => {
+                // check for duplicate module model in list of modules for protocol
+                const isDuplicateModuleModel = protocolModulesInfo
+                  // filter out current module
+                  .filter(
+                    otherModule => otherModule.moduleId !== module.moduleId
+                  )
+                  // check for existence of another module of same model
+                  .some(
+                    otherModule =>
+                      otherModule.moduleDef.model === module.moduleDef.model
+                  )
+
+                const cutoutIdForSlotName = getCutoutIdForSlotName(
+                  module.slotName,
+                  deckDef
                 )
 
-              const cutoutIdForSlotName = getCutoutIdForSlotName(
-                module.slotName,
-                deckDef
-              )
-
-              return (
-                <RowModule
-                  key={module.moduleId}
-                  module={module}
-                  isDuplicateModuleModel={isDuplicateModuleModel}
-                  setShowMultipleModulesModal={setShowMultipleModulesModal}
-                  calibrationStatus={calibrationStatus}
-                  chainLiveCommands={chainLiveCommands}
-                  isLoading={isCommandMutationLoading}
-                  prepCommandErrorMessage={prepCommandErrorMessage}
-                  setPrepCommandErrorMessage={setPrepCommandErrorMessage}
-                  conflictedFixture={deckConfig?.find(
-                    fixture =>
-                      fixture.cutoutId === cutoutIdForSlotName &&
-                      fixture.cutoutFixtureId != null &&
-                      !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
-                  )}
-                />
-              )
-            })}
-          </Flex>
+                return (
+                  <RowModule
+                    key={module.moduleId}
+                    module={module}
+                    isDuplicateModuleModel={isDuplicateModuleModel}
+                    setShowMultipleModulesModal={setShowMultipleModulesModal}
+                    calibrationStatus={calibrationStatus}
+                    chainLiveCommands={chainLiveCommands}
+                    isLoading={isCommandMutationLoading}
+                    prepCommandErrorMessage={prepCommandErrorMessage}
+                    setPrepCommandErrorMessage={setPrepCommandErrorMessage}
+                    conflictedFixture={deckConfig?.find(
+                      fixture =>
+                        fixture.cutoutId === cutoutIdForSlotName &&
+                        fixture.cutoutFixtureId != null &&
+                        !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
+                    )}
+                  />
+                )
+              })}
+            </Flex>
+          ) : null}
           <FixtureTable
             robotType={FLEX_ROBOT_TYPE}
             mostRecentAnalysis={mostRecentAnalysis}

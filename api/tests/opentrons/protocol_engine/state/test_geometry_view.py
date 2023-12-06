@@ -19,6 +19,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
+    AddressableAreaLocation,
     ModuleOffsetVector,
     ModuleOffsetData,
     LoadedLabware,
@@ -33,6 +34,8 @@ from opentrons.protocol_engine.types import (
     OverlapOffset,
     DeckType,
     CurrentWell,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
     LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state import move_types
@@ -434,7 +437,7 @@ def test_get_module_labware_highest_z(
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
 
 
-def test_get_all_labware_highest_z_no_equipment(
+def test_get_all_obstacle_highest_z_no_equipment(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -446,12 +449,12 @@ def test_get_all_labware_highest_z_no_equipment(
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(addressable_area_view.get_all()).then_return([])
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 0
 
 
-def test_get_all_labware_highest_z(
+def test_get_all_obstacle_highest_z(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
@@ -521,13 +524,73 @@ def test_get_all_labware_highest_z(
 
     plate_z = subject.get_labware_highest_z("plate-id")
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
-    all_z = subject.get_all_labware_highest_z()
+    all_z = subject.get_all_obstacle_highest_z()
 
     # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
 
 
-def test_get_all_labware_highest_z_with_modules(
+def test_get_all_obstacle_highest_z_with_staging_area(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    falcon_tuberack_def: LabwareDefinition,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+) -> None:
+    """It should get the highest Z amongst all labware including staging area."""
+    plate = LoadedLabware(
+        id="plate-id",
+        loadName="plate-load-name",
+        definitionUri="plate-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="plate-offset-id",
+    )
+    staging_lw = LoadedLabware(
+        id="staging-id",
+        loadName="staging-load-name",
+        definitionUri="staging-definition-uri",
+        location=AddressableAreaLocation(addressableAreaName="D4"),
+        offsetId="plate-offset-id",
+    )
+
+    plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    staging_lw_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(module_view.get_all()).then_return([])
+    decoy.when(addressable_area_view.get_all()).then_return([])
+
+    decoy.when(labware_view.get_all()).then_return([plate, staging_lw])
+    decoy.when(labware_view.get("plate-id")).then_return(plate)
+    decoy.when(labware_view.get("staging-id")).then_return(staging_lw)
+
+    decoy.when(labware_view.get_definition("plate-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_definition("staging-id")).then_return(
+        falcon_tuberack_def  # Something tall.
+    )
+
+    decoy.when(labware_view.get_labware_offset_vector("plate-id")).then_return(
+        plate_offset
+    )
+    decoy.when(labware_view.get_labware_offset_vector("staging-id")).then_return(
+        staging_lw_offset
+    )
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(Point(1, 2, 3))
+    decoy.when(addressable_area_view.get_addressable_area_position("D4")).then_return(
+        Point(4, 5, 6)
+    )
+
+    staging_z = subject.get_labware_highest_z("staging-id")
+    all_z = subject.get_all_obstacle_highest_z()
+
+    assert all_z == staging_z
+
+
+def test_get_all_obstacle_highest_z_with_modules(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -545,31 +608,29 @@ def test_get_all_labware_highest_z_with_modules(
     decoy.when(module_view.get_overall_height("module-id-1")).then_return(42.0)
     decoy.when(module_view.get_overall_height("module-id-2")).then_return(1337.0)
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 1337.0
 
 
-def test_get_all_labware_highest_z_with_addressable_area(
+def test_get_all_obstacle_highest_z_with_fixtures(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the highest Z including addressable areas."""
+    """It should get the highest Z including fixtures."""
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(module_view.get_all()).then_return([])
 
-    decoy.when(addressable_area_view.get_all()).then_return(["abc", "xyz"])
-    decoy.when(addressable_area_view.get_addressable_area_height("abc")).then_return(
-        42.0
+    decoy.when(addressable_area_view.get_all_cutout_fixtures()).then_return(
+        ["abc", "xyz"]
     )
-    decoy.when(addressable_area_view.get_addressable_area_height("xyz")).then_return(
-        1337.0
-    )
+    decoy.when(addressable_area_view.get_fixture_height("abc")).then_return(42.0)
+    decoy.when(addressable_area_view.get_fixture_height("xyz")).then_return(1337.0)
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 1337.0
 
@@ -1116,15 +1177,22 @@ def test_get_tip_drop_location_with_non_tiprack(
     )
 
 
-def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
+def test_get_tip_drop_explicit_location(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    subject: GeometryView,
+    tip_rack_def: LabwareDefinition,
+) -> None:
     """It should pass the location through if origin is not WellOrigin.DROP_TIP."""
+    decoy.when(labware_view.get_definition("tip-rack-id")).then_return(tip_rack_def)
+
     input_location = DropTipWellLocation(
         origin=DropTipWellOrigin.TOP,
         offset=WellOffset(x=1, y=2, z=3),
     )
 
     result = subject.get_checked_tip_drop_location(
-        pipette_id="pipette-id", labware_id="labware-id", well_location=input_location
+        pipette_id="pipette-id", labware_id="tip-rack-id", well_location=input_location
     )
 
     assert result == WellLocation(
@@ -1183,7 +1251,7 @@ def test_ensure_location_not_occupied_raises(
         subject.ensure_location_not_occupied(location=slot_location)
 
     # Raise if module in location
-    module_location = ModuleLocation(moduleId="module-id")
+    module_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     decoy.when(labware_view.raise_if_labware_in_location(module_location)).then_return(
         None
     )
@@ -1319,8 +1387,11 @@ def test_get_labware_grip_point_for_labware_on_module(
     argnames=["location", "should_dodge", "expected_waypoints"],
     argvalues=[
         (None, True, []),
+        (None, False, []),
         (CurrentWell("pipette-id", "from-labware-id", "well-name"), False, []),
         (CurrentWell("pipette-id", "from-labware-id", "well-name"), True, [(11, 22)]),
+        (CurrentAddressableArea("pipette-id", "area-name"), False, []),
+        (CurrentAddressableArea("pipette-id", "area-name"), True, [(11, 22)]),
     ],
 )
 def test_get_extra_waypoints(
@@ -1328,7 +1399,7 @@ def test_get_extra_waypoints(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    location: Optional[CurrentWell],
+    location: Optional[CurrentPipetteLocation],
     should_dodge: bool,
     expected_waypoints: List[Tuple[float, float]],
     subject: GeometryView,
@@ -1342,14 +1413,10 @@ def test_get_extra_waypoints(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         )
     )
-    decoy.when(labware_view.get("to-labware-id")).then_return(
-        LoadedLabware(
-            id="labware2",
-            loadName="load-name2",
-            definitionUri="4567",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-        )
-    )
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("area-name")
+    ).then_return(DeckSlotName.SLOT_1)
 
     decoy.when(
         module_view.should_dodge_thermocycler(
@@ -1363,7 +1430,7 @@ def test_get_extra_waypoints(
         )
     ).then_return(Point(x=11, y=22, z=33))
 
-    extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)
+    extra_waypoints = subject.get_extra_waypoints(location, DeckSlotName.SLOT_2)
 
     assert extra_waypoints == expected_waypoints
 
@@ -1375,49 +1442,25 @@ def test_get_slot_item(
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
-    allowed_labware_ids = {"foo", "bar"}
-    allowed_module_ids = {"fizz", "buzz"}
     labware = LoadedLabware.construct(id="cool-labware")  # type: ignore[call-arg]
     module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
 
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_1, allowed_labware_ids)
-    ).then_return(None)
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_2, allowed_labware_ids)
-    ).then_return(labware)
-    decoy.when(
-        labware_view.get_by_slot(DeckSlotName.SLOT_3, allowed_labware_ids)
-    ).then_return(None)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
 
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_1, allowed_module_ids)
-    ).then_return(None)
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_2, allowed_module_ids)
-    ).then_return(None)
-    decoy.when(
-        module_view.get_by_slot(DeckSlotName.SLOT_3, allowed_module_ids)
-    ).then_return(module)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(None)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(module)
 
     assert (
         subject.get_slot_item(
-            DeckSlotName.SLOT_1, allowed_labware_ids, allowed_module_ids
+            DeckSlotName.SLOT_1,
         )
         is None
     )
-    assert (
-        subject.get_slot_item(
-            DeckSlotName.SLOT_2, allowed_labware_ids, allowed_module_ids
-        )
-        == labware
-    )
-    assert (
-        subject.get_slot_item(
-            DeckSlotName.SLOT_3, allowed_labware_ids, allowed_module_ids
-        )
-        == module
-    )
+    assert subject.get_slot_item(DeckSlotName.SLOT_2) == labware
+    assert subject.get_slot_item(DeckSlotName.SLOT_3) == module
 
 
 @pytest.mark.parametrize(

@@ -7,7 +7,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
-from opentrons.types import Point
+from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine.errors import (
     FixtureDoesNotExistError,
@@ -17,6 +17,7 @@ from opentrons.protocol_engine.errors import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
@@ -242,6 +243,8 @@ def test_get_potential_cutout_fixtures_raises(
             "1",
             AddressableArea(
                 area_name="1",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -259,6 +262,8 @@ def test_get_potential_cutout_fixtures_raises(
             "1",
             AddressableArea(
                 area_name="1",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -276,6 +281,8 @@ def test_get_potential_cutout_fixtures_raises(
             "D1",
             AddressableArea(
                 area_name="D1",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Slot D1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -293,6 +300,8 @@ def test_get_potential_cutout_fixtures_raises(
             "movableTrashB3",
             AddressableArea(
                 area_name="movableTrashB3",
+                area_type=AreaType.MOVABLE_TRASH,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Trash Bin",
                 bounding_box=Dimensions(x=246.5, y=91.5, z=40),
                 position=AddressableOffsetVector(x=-16, y=-0.75, z=3),
@@ -306,8 +315,10 @@ def test_get_potential_cutout_fixtures_raises(
             "gripperWasteChute",
             AddressableArea(
                 area_name="gripperWasteChute",
+                area_type=AreaType.WASTE_CHUTE,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Gripper Waste Chute",
-                bounding_box=Dimensions(x=155.0, y=86.0, z=154.0),
+                bounding_box=Dimensions(x=155.0, y=86.0, z=125.0),
                 position=AddressableOffsetVector(x=-12.5, y=2, z=3),
                 compatible_module_types=[],
                 drop_tip_location=None,
@@ -324,7 +335,7 @@ def test_get_addressable_area_from_name(
 ) -> None:
     """It should get the deck position for the requested cutout id."""
     addressable_area = subject.get_addressable_area_from_name(
-        addressable_area_name, DeckPoint(x=1, y=2, z=3), deck_def
+        addressable_area_name, DeckPoint(x=1, y=2, z=3), DeckSlotName.SLOT_A1, deck_def
     )
     assert addressable_area == expected_addressable_area
 
@@ -335,5 +346,8 @@ def test_get_addressable_area_from_name_raises(
     """It should raise if there is no addressable area by that name in the deck."""
     with pytest.raises(AddressableAreaDoesNotExistError):
         subject.get_addressable_area_from_name(
-            "theFunArea", DeckPoint(x=1, y=2, z=3), ot3_standard_deck_def
+            "theFunArea",
+            DeckPoint(x=1, y=2, z=3),
+            DeckSlotName.SLOT_A1,
+            ot3_standard_deck_def,
         )

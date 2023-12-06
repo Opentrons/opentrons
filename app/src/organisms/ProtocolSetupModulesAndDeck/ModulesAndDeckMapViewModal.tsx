@@ -2,11 +2,13 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseDeck } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
 import { Modal } from '../../molecules/Modal'
 import { ModuleInfo } from '../Devices/ModuleInfo'
-import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -36,11 +38,9 @@ export function ModulesAndDeckMapViewModal({
 
   if (protocolAnalysis == null) return null
 
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => ({
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
     moduleModel: module.moduleDef.model,
     moduleLocation: { slotName: module.slotName },
     moduleChildren: (
@@ -63,8 +63,8 @@ export function ModulesAndDeckMapViewModal({
         deckConfig={deckConfig}
         deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
         robotType={FLEX_ROBOT_TYPE}
-        labwareLocations={[]}
-        moduleLocations={moduleLocations}
+        labwareOnDeck={[]}
+        modulesOnDeck={modulesOnDeck}
       />
     </Modal>
   )

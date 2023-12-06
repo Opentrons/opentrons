@@ -20,6 +20,8 @@ from opentrons.protocol_engine.state.addressable_areas import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
+    AreaType,
+    DeckConfigurationType,
     PotentialCutoutFixture,
     Dimensions,
     DeckPoint,
@@ -28,8 +30,10 @@ from opentrons.protocol_engine.types import (
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
+def patch_mock_deck_configuration_provider(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out deck_configuration_provider.py functions."""
     for name, func in inspect.getmembers(
         deck_configuration_provider, inspect.isfunction
     ):
@@ -42,6 +46,7 @@ def get_addressable_area_view(
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
     deck_definition: Optional[DeckDefinitionV4] = None,
+    deck_configuration: Optional[DeckConfigurationType] = None,
     use_simulated_deck_config: bool = False,
 ) -> AddressableAreaView:
     """Get a labware view test subject."""
@@ -50,16 +55,43 @@ def get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV4, {"otId": "fake"}),
+        deck_configuration=deck_configuration or [],
         use_simulated_deck_config=use_simulated_deck_config,
     )
 
     return AddressableAreaView(state=state)
 
 
+def test_get_all_cutout_fixtures_simulated_deck_config() -> None:
+    """It should return no cutout fixtures when the deck config is simulated."""
+    subject = get_addressable_area_view(
+        deck_configuration=None,
+        use_simulated_deck_config=True,
+    )
+    assert subject.get_all_cutout_fixtures() is None
+
+
+def test_get_all_cutout_fixtures_non_simulated_deck_config() -> None:
+    """It should return the cutout fixtures from the deck config, if it's not simulated."""
+    subject = get_addressable_area_view(
+        deck_configuration=[
+            ("cutout-id-1", "cutout-fixture-id-1"),
+            ("cutout-id-2", "cutout-fixture-id-2"),
+        ],
+        use_simulated_deck_config=False,
+    )
+    assert subject.get_all_cutout_fixtures() == [
+        "cutout-fixture-id-1",
+        "cutout-fixture-id-2",
+    ]
+
+
 def test_get_loaded_addressable_area() -> None:
     """It should get the loaded addressable area."""
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_D3,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -86,6 +118,8 @@ def test_get_addressable_area_for_simulation_already_loaded() -> None:
     """It should get the addressable area for a simulation that has not been loaded yet."""
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_D3,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -105,13 +139,17 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     """It should get the addressable area for a simulation that has not been loaded yet."""
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
-            "123": {PotentialCutoutFixture(cutout_id="123", cutout_fixture_id="blah")}
+            "cutoutA1": {
+                PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")
+            }
         },
         use_simulated_deck_config=True,
     )
 
     addressable_area = AddressableArea(
         area_name="area",
+        area_type=AreaType.SLOT,
+        base_slot=DeckSlotName.SLOT_D3,
         display_name="fancy name",
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
@@ -125,18 +163,24 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
             "abc", subject.state.deck_definition
         )
     ).then_return(
-        ("123", {PotentialCutoutFixture(cutout_id="123", cutout_fixture_id="blah")})
+        (
+            "cutoutA1",
+            {PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")},
+        )
     )
 
     decoy.when(
         deck_configuration_provider.get_cutout_position(
-            "123", subject.state.deck_definition
+            "cutoutA1", subject.state.deck_definition
         )
     ).then_return(DeckPoint(x=1, y=2, z=3))
 
     decoy.when(
         deck_configuration_provider.get_addressable_area_from_name(
-            "abc", DeckPoint(x=1, y=2, z=3), subject.state.deck_definition
+            "abc",
+            DeckPoint(x=1, y=2, z=3),
+            DeckSlotName.SLOT_A1,
+            subject.state.deck_definition,
         )
     ).then_return(addressable_area)
 
@@ -176,6 +220,8 @@ def test_get_addressable_area_position() -> None:
         loaded_addressable_areas_by_name={
             "abc": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -190,12 +236,36 @@ def test_get_addressable_area_position() -> None:
     assert result == Point(1, 2, 3)
 
 
+def test_get_addressable_area_move_to_location() -> None:
+    """It should get the absolute location of an addressable area's move to location."""
+    subject = get_addressable_area_view(
+        loaded_addressable_areas_by_name={
+            "abc": AddressableArea(
+                area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
+                display_name="fancy name",
+                bounding_box=Dimensions(x=10, y=20, z=30),
+                position=AddressableOffsetVector(x=1, y=2, z=3),
+                compatible_module_types=[],
+                drop_tip_location=None,
+                drop_labware_location=None,
+            )
+        }
+    )
+
+    result = subject.get_addressable_area_move_to_location("abc")
+    assert result == Point(6, 12, 33)
+
+
 def test_get_addressable_area_center() -> None:
     """It should get the absolute location of an addressable area's center."""
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={
             "abc": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -210,12 +280,51 @@ def test_get_addressable_area_center() -> None:
     assert result == Point(6, 12, 3)
 
 
+def test_get_fixture_height(decoy: Decoy) -> None:
+    """It should return the height of the requested fixture."""
+    subject = get_addressable_area_view()
+    decoy.when(
+        deck_configuration_provider.get_cutout_fixture(
+            "someShortCutoutFixture", subject.state.deck_definition
+        )
+    ).then_return(
+        {
+            "height": 10,
+            # These values don't matter:
+            "id": "id",
+            "mayMountTo": [],
+            "displayName": "",
+            "providesAddressableAreas": {},
+        }
+    )
+
+    decoy.when(
+        deck_configuration_provider.get_cutout_fixture(
+            "someTallCutoutFixture", subject.state.deck_definition
+        )
+    ).then_return(
+        {
+            "height": 9000.1,
+            # These values don't matter:
+            "id": "id",
+            "mayMountTo": [],
+            "displayName": "",
+            "providesAddressableAreas": {},
+        }
+    )
+
+    assert subject.get_fixture_height("someShortCutoutFixture") == 10
+    assert subject.get_fixture_height("someTallCutoutFixture") == 9000.1
+
+
 def test_get_slot_definition() -> None:
     """It should return a deck slot's definition."""
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={
             "6": AddressableArea(
                 area_name="area",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_D3,
                 display_name="fancy name",
                 bounding_box=Dimensions(x=1, y=2, z=3),
                 position=AddressableOffsetVector(x=7, y=8, z=9),

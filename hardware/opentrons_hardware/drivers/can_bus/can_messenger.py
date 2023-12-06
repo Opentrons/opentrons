@@ -12,6 +12,7 @@ from typing import (
     cast,
     TypeVar,
     Type,
+    Set,
 )
 
 import logging
@@ -83,8 +84,8 @@ class AcknowledgeListener:
         self._timeout = timeout
         self._event = asyncio.Event()
         self._exclusive = exclusive
-        # todo add ability to know how many nodes will ack to a broadcast
-        # we can assume at least 3 for the gantry and head boards
+        # NOTE: 96-channel replies with the same nodes 3 times to broadcast,
+        # right now we consider the responded with the first reply we receive
         self._expected_nodes = expected_nodes
         self._expected_gripper_subnodes = (
             _Gripper_SubNodes.copy() if NodeId.gripper in expected_nodes else []
@@ -196,6 +197,12 @@ class CanMessenger:
         self._held_exclusive = False
         self._nonexclusive_access_count = 0
         self._exclusive_lock = asyncio.Lock()
+        self._known_nodes: Set[NodeId] = set(_Basic_Nodes.copy())
+
+    def update_known_nodes(self, nodes: Set[NodeId]) -> None:
+        """Update present nodes."""
+        self._known_nodes = nodes
+        log.debug(f"Known nodes have been updated: {self._known_nodes}")
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
         """Send a message."""
@@ -273,7 +280,8 @@ class CanMessenger:
         if len(expected_nodes) == 0:
             log.warning("Expected Nodes should have been specified")
             if node_id == NodeId.broadcast:
-                expected_nodes = _Basic_Nodes.copy()
+                if not expected_nodes:
+                    expected_nodes = list(self._known_nodes)
             else:
                 expected_nodes = [node_id]
 

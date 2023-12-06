@@ -1,7 +1,7 @@
 """Geometry state getters."""
 import enum
 from numpy import array, dot
-from typing import Optional, List, Set, Tuple, Union, cast
+from typing import Optional, List, Tuple, Union, cast, TypeVar
 
 from opentrons.types import Point, DeckSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -26,6 +26,7 @@ from ..types import (
     ModuleOffsetData,
     DeckType,
     CurrentWell,
+    CurrentPipetteLocation,
     TipGeometry,
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
@@ -58,6 +59,9 @@ class _GripperMoveType(enum.Enum):
     DROP_LABWARE = enum.auto()
 
 
+_LabwareLocation = TypeVar("_LabwareLocation", bound=LabwareLocation)
+
+
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
 # vs which selectors should be in LabwareView
 class GeometryView:
@@ -85,9 +89,8 @@ class GeometryView:
 
         return self._get_highest_z_from_labware_data(labware_data)
 
-    # TODO(mc, 2022-06-24): rename this method
-    def get_all_labware_highest_z(self) -> float:
-        """Get the highest Z-point across all labware."""
+    def get_all_obstacle_highest_z(self) -> float:
+        """Get the highest Z-point across all obstacles that the instruments need to fly over."""
         highest_labware_z = max(
             (
                 self._get_highest_z_from_labware_data(lw_data)
@@ -105,40 +108,61 @@ class GeometryView:
             default=0.0,
         )
 
-        highest_addressable_area_z = max(
-            (
-                self._addressable_areas.get_addressable_area_height(area_name)
-                for area_name in self._addressable_areas.get_all()
-            ),
-            default=0.0,
-        )
+        cutout_fixture_names = self._addressable_areas.get_all_cutout_fixtures()
+        if cutout_fixture_names is None:
+            # We're using a simulated deck config (see `Config.use_simulated_deck_config`).
+            # We only know the addressable areas referenced by the protocol, not the fixtures
+            # providing them. And there is more than one possible configuration of fixtures
+            # to provide them. So, we can't know what the highest fixture is. Default to 0.
+            #
+            # Defaulting to 0 may not be the right thing to do here.
+            # For example, suppose a protocol references an addressable area that implies a tall
+            # fixture must be on the deck, and then it uses long tips that wouldn't be able to
+            # clear the top of that fixture. We should perhaps raise an analysis error for that,
+            # but defaulting to 0 here means we won't.
+            highest_fixture_z = 0.0
+        else:
+            highest_fixture_z = max(
+                (
+                    self._addressable_areas.get_fixture_height(cutout_fixture_name)
+                    for cutout_fixture_name in cutout_fixture_names
+                ),
+                default=0.0,
+            )
 
-        return max(highest_labware_z, highest_module_z, highest_addressable_area_z)
+        return max(
+            highest_labware_z,
+            highest_module_z,
+            highest_fixture_z,
+        )
 
     def get_min_travel_z(
         self,
         pipette_id: str,
         labware_id: str,
-        location: Optional[CurrentWell],
+        location: Optional[CurrentPipetteLocation],
         minimum_z_height: Optional[float],
     ) -> float:
         """Get the minimum allowed travel height of an arc move."""
         if (
-            location is not None
+            isinstance(location, CurrentWell)
             and pipette_id == location.pipette_id
             and labware_id == location.labware_id
         ):
             min_travel_z = self.get_labware_highest_z(labware_id)
         else:
-            min_travel_z = self.get_all_labware_highest_z()
+            min_travel_z = self.get_all_obstacle_highest_z()
         if minimum_z_height:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z
 
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
         """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
-        slot_name = self.get_ancestor_slot_name(labware_id)
-        slot_pos = self._addressable_areas.get_addressable_area_position(slot_name.id)
+        try:
+            slot_name = self.get_ancestor_slot_name(labware_id).id
+        except errors.LocationIsStagingSlotError:
+            slot_name = self._get_staging_slot_name(labware_id)
+        slot_pos = self._addressable_areas.get_addressable_area_position(slot_name)
         labware_data = self._labware.get(labware_id)
         offset = self._get_labware_position_offset(labware_id, labware_data.location)
 
@@ -416,12 +440,20 @@ class GeometryView:
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
+        partially_configured: bool = False,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette.
 
         This makes sure that the well location has an appropriate origin & offset
         if one is not already set previously.
         """
+        if (
+            self._labware.get_definition(labware_id).parameters.isTiprack
+            and partially_configured
+        ):
+            raise errors.UnexpectedProtocolError(
+                "Cannot return tip to a tiprack while the pipette is configured for partial tip."
+            )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
                 origin=WellOrigin(well_location.origin.value),
@@ -447,6 +479,22 @@ class GeometryView:
             ),
         )
 
+    # TODO(jbl 11-30-2023) fold this function into get_ancestor_slot_name see RSS-411
+    def _get_staging_slot_name(self, labware_id: str) -> str:
+        """Get the staging slot name that the labware is on."""
+        labware_location = self._labware.get(labware_id).location
+        if isinstance(labware_location, OnLabwareLocation):
+            below_labware_id = labware_location.labwareId
+            return self._get_staging_slot_name(below_labware_id)
+        elif isinstance(
+            labware_location, AddressableAreaLocation
+        ) and fixture_validation.is_staging_slot(labware_location.addressableAreaName):
+            return labware_location.addressableAreaName
+        else:
+            raise ValueError(
+                "Cannot get staging slot name for labware not on staging slot."
+            )
+
     def get_ancestor_slot_name(self, labware_id: str) -> DeckSlotName:
         """Get the slot name of the labware or the module that the labware is on."""
         labware = self._labware.get(labware_id)
@@ -465,7 +513,7 @@ class GeometryView:
             # TODO we might want to eventually return some sort of staging slot name when we're ready to work through
             #   the linting nightmare it will create
             if fixture_validation.is_staging_slot(area_name):
-                raise ValueError(
+                raise errors.LocationIsStagingSlotError(
                     "Cannot get ancestor slot name for labware on staging slot."
                 )
             slot_name = DeckSlotName.from_primitive(area_name)
@@ -478,15 +526,26 @@ class GeometryView:
         return slot_name
 
     def ensure_location_not_occupied(
-        self, location: LabwareLocation
-    ) -> LabwareLocation:
-        """Ensure that the location does not already have equipment in it."""
-        if isinstance(location, AddressableAreaLocation):
+        self, location: _LabwareLocation
+    ) -> _LabwareLocation:
+        """Ensure that the location does not already have either Labware or a Module in it."""
+        # TODO (spp, 2023-11-27): Slot locations can also be addressable areas
+        #  so we will need to cross-check against items loaded in both location types.
+        #  Something like 'check if an item is in lists of both- labware on addressable areas
+        #  as well as labware on slots'. Same for modules.
+        if isinstance(
+            location,
+            (
+                DeckSlotLocation,
+                ModuleLocation,
+                OnLabwareLocation,
+                AddressableAreaLocation,
+            ),
+        ):
             self._labware.raise_if_labware_in_location(location)
-        if isinstance(location, (DeckSlotLocation, ModuleLocation)):
-            self._labware.raise_if_labware_in_location(location)
+        if isinstance(location, DeckSlotLocation):
             self._modules.raise_if_module_in_location(location)
-        return location
+        return cast(_LabwareLocation, location)
 
     def get_labware_grip_point(
         self,
@@ -554,39 +613,40 @@ class GeometryView:
         )
 
     def get_extra_waypoints(
-        self, labware_id: str, location: Optional[CurrentWell]
+        self, location: Optional[CurrentPipetteLocation], to_slot: DeckSlotName
     ) -> List[Tuple[float, float]]:
         """Get extra waypoints for movement if thermocycler needs to be dodged."""
-        if location is not None and self._modules.should_dodge_thermocycler(
-            from_slot=self.get_ancestor_slot_name(location.labware_id),
-            to_slot=self.get_ancestor_slot_name(labware_id),
-        ):
-            middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
-                self._config.robot_type
-            )
-            middle_slot_center = self._addressable_areas.get_addressable_area_center(
-                addressable_area_name=middle_slot.id,
-            )
-            return [(middle_slot_center.x, middle_slot_center.y)]
+        if location is not None:
+            if isinstance(location, CurrentWell):
+                from_slot = self.get_ancestor_slot_name(location.labware_id)
+            else:
+                from_slot = self._addressable_areas.get_addressable_area_base_slot(
+                    location.addressable_area_name
+                )
+            if self._modules.should_dodge_thermocycler(
+                from_slot=from_slot, to_slot=to_slot
+            ):
+                middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                    self._config.robot_type
+                )
+                middle_slot_center = (
+                    self._addressable_areas.get_addressable_area_center(
+                        addressable_area_name=middle_slot.id,
+                    )
+                )
+                return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
-    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
-    # rather than shunting this work to callers via `allowed_ids`.
-    # This has larger implications and is tied up in splitting LPC out of the protocol run
     def get_slot_item(
         self,
         slot_name: DeckSlotName,
-        allowed_labware_ids: Set[str],
-        allowed_module_ids: Set[str],
     ) -> Union[LoadedLabware, LoadedModule, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
-            allowed_ids=allowed_labware_ids,
         )
         maybe_module = self._modules.get_by_slot(
             slot_name=slot_name,
-            allowed_ids=allowed_module_ids,
         )
 
         return maybe_labware or maybe_module or None

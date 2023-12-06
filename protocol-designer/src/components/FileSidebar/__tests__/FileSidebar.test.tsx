@@ -17,7 +17,6 @@ import {
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
 import { FileSidebar, v8WarningContent } from '../FileSidebar'
-import { FLEX_TRASH_DEF_URI } from '@opentrons/step-generation'
 
 jest.mock('../../Hints/useBlockingHint')
 jest.mock('../../../file-data/selectors')
@@ -55,7 +54,6 @@ describe('FileSidebar', () => {
       savedStepForms: {},
       robotType: 'OT-2 Standard',
       additionalEquipment: {},
-      labwareOnDeck: {},
     }
 
     commands = [
@@ -185,11 +183,11 @@ describe('FileSidebar', () => {
 
   it('warning modal is shown when export is clicked with unused trash', () => {
     props.savedStepForms = savedStepForms
-    const labwareId = 'mockLabwareId'
+    const trashId = 'mockTrashId'
     // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
     props.fileData.commands = commands
-    props.labwareOnDeck = {
-      [labwareId]: { labwareDefURI: FLEX_TRASH_DEF_URI, id: labwareId } as any,
+    props.additionalEquipment = {
+      [trashId]: { name: 'trashBin', location: 'cutoutA3', id: trashId } as any,
     }
 
     const wrapper = shallow(<FileSidebar {...props} />)

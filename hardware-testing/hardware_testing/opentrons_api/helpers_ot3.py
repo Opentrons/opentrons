@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from math import pi
-from subprocess import run
+from subprocess import run, Popen
 from time import time
 from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
-
+import atexit
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
@@ -29,6 +29,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from ..data import get_git_description, csv_report
 from .types import (
@@ -77,6 +78,15 @@ def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
     print('Stopping "opentrons-robot-server"...')
     run(["systemctl", "stop", "opentrons-robot-server"])
+    atexit.register(restart_server_ot3)
+
+
+def restart_server_ot3() -> None:
+    """Start opentrons-robot-server on the OT3."""
+    print('Starting "opentrons-robot-server"...')
+    Popen(
+        ["systemctl", "restart", "opentrons-robot-server", "&"],
+    )
 
 
 def start_server_ot3() -> None:
@@ -223,7 +233,7 @@ async def build_async_ot3_hardware_api(
         except ValueError as e:
             print(e)
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
-    kwargs = {"config": config}
+    kwargs = {"config": config, "feature_flags": HardwareFeatureFlags.build_from_ff()}
     if is_simulating:
         # This Callable type annotation works around mypy complaining about slight mismatches
         # between the signatures of build_hardware_simulator() and build_hardware_controller().

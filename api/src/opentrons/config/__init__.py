@@ -184,7 +184,7 @@ CONFIG_ELEMENTS = (
         "Deck Calibration",
         Path("deck_calibration.json"),
         ConfigElementType.FILE,
-        "The file storing the deck calibration",
+        "The file storing the deck calibration. Superseded in v4 by robot_calibration_dir.",
     ),
     ConfigElement(
         "log_dir",

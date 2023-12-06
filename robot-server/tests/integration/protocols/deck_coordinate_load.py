@@ -6,7 +6,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 
 def run(context):
-    pipette = context.load_instrument("p1000_single_gen2", mount="left")
+    pipette = context.load_instrument("flex_1channel_1000", mount="left")
 
     labware = context.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", "d3")
     assert labware.parent == "D3"

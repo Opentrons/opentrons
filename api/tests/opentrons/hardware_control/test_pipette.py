@@ -393,7 +393,7 @@ def test_reload_instrument_cal_ot3(
         status=cal_types.CalibrationStatus(),
     )
     new_pip, skipped = ot3_pipette._reload_and_check_skip(
-        old_pip.config, old_pip, new_cal
+        old_pip.config, old_pip, new_cal, use_old_aspiration_functions=False
     )
 
     assert skipped

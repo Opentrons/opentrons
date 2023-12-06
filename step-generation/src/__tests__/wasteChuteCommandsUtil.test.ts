@@ -1,30 +1,40 @@
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import {
-  getInitialRobotStateStandard,
-  makeContext,
-  getSuccessResult,
-  getErrorResult,
-} from '../fixtures'
+import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import { curryCommandCreator } from '../utils'
 import { wasteChuteCommandsUtil } from '../utils/wasteChuteCommandsUtil'
-import type { InvariantContext, RobotState, PipetteEntities } from '../types'
+import type { PipetteEntities } from '../types'
+import {
+  aspirateInPlace,
+  blowOutInPlace,
+  dispenseInPlace,
+  dropTipInPlace,
+  moveToAddressableArea,
+} from '../commandCreators/atomic'
+
+jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+jest.mock('../utils/curryCommandCreator')
+
+const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<
+  typeof curryCommandCreator
+>
 
 const mockWasteChuteId = 'mockWasteChuteId'
 const mockAddressableAreaName = 'mockName'
 const mockId = 'mockId'
+
+let invariantContext = makeContext()
 const args = {
   pipetteId: mockId,
   addressableAreaName: 'mockName',
   volume: 10,
   flowRate: 10,
+  prevRobotState: getInitialRobotStateStandard(invariantContext),
 }
-const mockMoveToAddressableArea = {
-  commandType: 'moveToAddressableArea',
-  key: expect.any(String),
-  params: {
-    pipetteId: mockId,
-    addressableAreaName: mockAddressableAreaName,
-  },
+const mockMoveToAddressableAreaParams = {
+  pipetteId: mockId,
+  addressableAreaName: mockAddressableAreaName,
 }
+
 const mockPipEntities: PipetteEntities = {
   [mockId]: {
     name: 'p50_single_flex',
@@ -33,11 +43,7 @@ const mockPipEntities: PipetteEntities = {
 } as any
 
 describe('wasteChuteCommandsUtil', () => {
-  let invariantContext: InvariantContext
-  let initialRobotState: RobotState
   beforeEach(() => {
-    invariantContext = makeContext()
-    initialRobotState = getInitialRobotStateStandard(invariantContext)
     invariantContext = {
       ...invariantContext,
       pipetteEntities: mockPipEntities,
@@ -51,100 +57,65 @@ describe('wasteChuteCommandsUtil', () => {
     }
   })
   it('returns correct commands for dispensing', () => {
-    const result = wasteChuteCommandsUtil(
-      { ...args, type: 'dispense' },
-      invariantContext,
-      initialRobotState
+    wasteChuteCommandsUtil({ ...args, type: 'dispense' })
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+      moveToAddressableArea,
+      mockMoveToAddressableAreaParams
     )
-    const res = getSuccessResult(result)
-    expect(res.commands).toEqual([
-      mockMoveToAddressableArea,
-      {
-        commandType: 'dispenseInPlace',
-        key: expect.any(String),
-        params: {
-          pipetteId: mockId,
-          volume: 10,
-          flowRate: 10,
-        },
-      },
-    ])
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dispenseInPlace, {
+      pipetteId: mockId,
+      volume: 10,
+      flowRate: 10,
+    })
   })
   it('returns correct commands for blow out', () => {
-    const result = wasteChuteCommandsUtil(
-      {
-        ...args,
-        type: 'blowOut',
-      },
-      invariantContext,
-      initialRobotState
+    wasteChuteCommandsUtil({
+      ...args,
+      type: 'blowOut',
+    })
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+      moveToAddressableArea,
+      mockMoveToAddressableAreaParams
     )
-    const res = getSuccessResult(result)
-    expect(res.commands).toEqual([
-      mockMoveToAddressableArea,
-      {
-        commandType: 'blowOutInPlace',
-        key: expect.any(String),
-        params: {
-          pipetteId: mockId,
-          flowRate: 10,
-        },
-      },
-    ])
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowOutInPlace, {
+      pipetteId: mockId,
+      flowRate: 10,
+    })
   })
   it('returns correct commands for drop tip', () => {
-    initialRobotState.tipState.pipettes[mockId] = true
-    const result = wasteChuteCommandsUtil(
-      {
-        ...args,
-        type: 'dropTip',
+    wasteChuteCommandsUtil({
+      ...args,
+      type: 'dropTip',
+      prevRobotState: {
+        ...args.prevRobotState,
+        tipState: { pipettes: { [mockId]: true } } as any,
       },
-      invariantContext,
-      initialRobotState
+    })
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+      moveToAddressableArea,
+      mockMoveToAddressableAreaParams
     )
-    const res = getSuccessResult(result)
-    expect(res.commands).toEqual([
-      mockMoveToAddressableArea,
-      {
-        commandType: 'dropTipInPlace',
-        key: expect.any(String),
-        params: {
-          pipetteId: mockId,
-        },
-      },
-    ])
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dropTipInPlace, {
+      pipetteId: mockId,
+    })
   })
-  it('returns no pip attached error', () => {
-    const result = wasteChuteCommandsUtil(
-      {
-        pipetteId: 'badPip',
-        addressableAreaName: 'mockName',
-        type: 'dispense',
+  it('returns correct commands for air gap/aspirate in place', () => {
+    wasteChuteCommandsUtil({
+      ...args,
+      type: 'airGap',
+      prevRobotState: {
+        ...args.prevRobotState,
+        tipState: { pipettes: { [mockId]: true } } as any,
       },
-      invariantContext,
-      initialRobotState
+    })
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+      moveToAddressableArea,
+      mockMoveToAddressableAreaParams
     )
-    const res = getErrorResult(result)
-    expect(res.errors).toHaveLength(1)
-    expect(res.errors[0]).toMatchObject({ type: 'PIPETTE_DOES_NOT_EXIST' })
-  })
-  it('returns no waste chute attached error', () => {
-    invariantContext = {
-      ...invariantContext,
-      additionalEquipmentEntities: {},
-    }
-    const result = wasteChuteCommandsUtil(
-      {
-        ...args,
-        type: 'dispense',
-      },
-      invariantContext,
-      initialRobotState
-    )
-    const res = getErrorResult(result)
-    expect(res.errors).toHaveLength(1)
-    expect(res.errors[0]).toMatchObject({
-      type: 'ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST',
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(aspirateInPlace, {
+      pipetteId: mockId,
+      volume: 10,
+      flowRate: 10,
     })
   })
 })

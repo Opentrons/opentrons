@@ -891,19 +891,19 @@ def test_has_tip(
             NozzleLayout.COLUMN,
             "A1",
             "H1",
-            ColumnNozzleLayoutConfiguration(primary_nozzle="A1"),
+            ColumnNozzleLayoutConfiguration(primaryNozzle="A1"),
         ],
         [
             NozzleLayout.SINGLE,
             "H12",
             None,
-            SingleNozzleLayoutConfiguration(primary_nozzle="H12"),
+            SingleNozzleLayoutConfiguration(primaryNozzle="H12"),
         ],
         [
             NozzleLayout.ROW,
             "A12",
             None,
-            RowNozzleLayoutConfiguration(primary_nozzle="A12"),
+            RowNozzleLayoutConfiguration(primaryNozzle="A12"),
         ],
     ],
 )

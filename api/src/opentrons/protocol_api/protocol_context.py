@@ -31,7 +31,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._types import OffDeckType
+from ._types import OffDeckType, StagingSlotName
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -47,6 +47,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
@@ -360,7 +361,7 @@ class ProtocolContext(CommandPublisher):
             )
 
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, LabwareCore]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
@@ -439,18 +440,44 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 16)
-    # TODO: Confirm official naming of "waste chute".
+    def load_trash_bin(self, location: DeckLocation) -> TrashBin:
+        slot_name = validation.ensure_and_convert_deck_slot(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        if not isinstance(slot_name, DeckSlotName):
+            raise ValueError("Staging areas not permitted for trash bin.")
+        addressable_area_name = validation.ensure_and_convert_trash_bin_location(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        trash_bin = TrashBin(
+            location=slot_name, addressable_area_name=addressable_area_name
+        )
+        self._core.append_disposal_location(trash_bin)
+        return trash_bin
+
+    @requires_version(2, 16)
     def load_waste_chute(
         self,
         *,
-        # TODO: Confirm official naming of "staging area slot".
         with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
+        """Load the waste chute on the deck.
+
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
+        """
         if with_staging_area_slot_d4:
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."
             )
-        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        waste_chute = WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        self._core.append_disposal_location(waste_chute)
+        return waste_chute
 
     @requires_version(2, 15)
     def load_adapter(
@@ -493,7 +520,7 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName]
         if isinstance(location, OffDeckType):
             load_location = location
         else:
@@ -599,7 +626,14 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[ModuleCore, LabwareCore, WasteChute, OffDeckType, DeckSlotName]
+        location: Union[
+            ModuleCore,
+            LabwareCore,
+            WasteChute,
+            OffDeckType,
+            DeckSlotName,
+            StagingSlotName,
+        ]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
         elif isinstance(new_location, (OffDeckType, WasteChute)):
@@ -709,6 +743,8 @@ class ProtocolContext(CommandPublisher):
                 location, self._api_version, self._core.robot_type
             )
         )
+        if isinstance(deck_slot, StagingSlotName):
+            raise ValueError("Cannot load a module onto a staging slot.")
 
         module_core = self._core.load_module(
             model=requested_model,
@@ -782,7 +818,6 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
-        # TODO (spp: 2023-08-30): disallow loading Flex pipettes on OT-2 by checking robotType
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         is_96_channel = checked_instrument_name == PipetteNameType.P1000_96

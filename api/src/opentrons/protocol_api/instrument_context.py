@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import nullcontext
-from typing import Any, List, Optional, Sequence, Union, cast
+from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
@@ -32,6 +32,7 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from ._nozzle_layout import NozzleLayout
 from . import labware, validation
@@ -86,7 +87,7 @@ class InstrumentContext(publisher.CommandPublisher):
         broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
-        trash: Optional[labware.Labware],
+        trash: Optional[Union[labware.Labware, TrashBin, WasteChute]],
         requested_as: str,
     ) -> None:
         super().__init__(broker)
@@ -101,7 +102,10 @@ class InstrumentContext(publisher.CommandPublisher):
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
 
-        self._trash = trash
+        self._user_specified_trash: Union[
+            labware.Labware, TrashBin, WasteChute, None
+        ] = trash
+
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -165,9 +169,15 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`new-aspirate` for more details and examples.
 
-        :param volume: The volume to aspirate, measured in µL. If 0 or unspecified,
+        :param volume: The volume to aspirate, measured in µL. If unspecified,
                     defaults to the maximum volume for the pipette and its currently
                     attached tip.
+
+                    If ``aspirate`` is called with a volume of precisely 0, its behavior
+                    depends on the API level of the protocol. On API levels below 2.16,
+                    it will behave the same as a volume of ``None``/unspecified: aspirate
+                    until the pipette is full. On API levels at or above 2.16, no liquid
+                    will be aspirated.
         :type volume: int or float
         :param location: Tells the robot where to aspirate from. The location can be
                          a :py:class:`.Well` or a :py:class:`.Location`.
@@ -236,7 +246,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
-        c_vol = self._core.get_available_volume() if not volume else volume
+        if self.api_version >= APIVersion(2, 16):
+            c_vol = self._core.get_available_volume() if volume is None else volume
+        else:
+            c_vol = self._core.get_available_volume() if not volume else volume
         flow_rate = self._core.get_aspirate_flow_rate(rate)
 
         with publisher.publish_context(
@@ -260,7 +273,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def dispense(
         self,
         volume: Optional[float] = None,
@@ -273,9 +286,15 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`new-dispense` for more details and examples.
 
-        :param volume: The volume to dispense, measured in µL. If 0 or unspecified,
+        :param volume: The volume to dispense, measured in µL. If unspecified,
                        defaults to :py:attr:`current_volume`. If only a volume is
                        passed, the pipette will dispense from its current position.
+
+                       If ``dispense`` is called with a volume of precisely 0, its behavior
+                       depends on the API level of the protocol. On API levels below 2.16,
+                       it will behave the same as a volume of ``None``/unspecified: dispense
+                       all liquid in the pipette. On API levels at or above 2.16, no liquid
+                       will be dispensed.
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
@@ -363,7 +382,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
-        c_vol = self._core.get_current_volume() if not volume else volume
+        if self.api_version >= APIVersion(2, 16):
+            c_vol = self._core.get_current_volume() if volume is None else volume
+        else:
+            c_vol = self._core.get_current_volume() if not volume else volume
 
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
@@ -403,8 +425,14 @@ class InstrumentContext(publisher.CommandPublisher):
         See :ref:`mix` for examples.
 
         :param repetitions: Number of times to mix (default is 1).
-        :param volume: The volume to mix, measured in µL. If 0 or unspecified, defaults
+        :param volume: The volume to mix, measured in µL. If unspecified, defaults
                        to the maximum volume for the pipette and its attached tip.
+
+                       If ``mix`` is called with a volume of precisely 0, its behavior
+                       depends on the API level of the protocol. On API levels below 2.16,
+                       it will behave the same as a volume of ``None``/unspecified: mix
+                       the full working volume of the pipette. On API levels at or above 2.16,
+                       no liquid will be mixed.
         :param location: The :py:class:`.Well` or :py:class:`~.types.Location` where the
                         pipette will mix. If unspecified, the pipette will mix at its
                         current position.
@@ -433,7 +461,14 @@ class InstrumentContext(publisher.CommandPublisher):
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("mix", self.name, self.mount)
 
-        c_vol = self._core.get_available_volume() if not volume else volume
+        if self.api_version >= APIVersion(2, 16):
+            c_vol = self._core.get_available_volume() if volume is None else volume
+        else:
+            c_vol = self._core.get_available_volume() if not volume else volume
+
+        dispense_kwargs: Dict[str, Any] = {}
+        if self.api_version >= APIVersion(2, 16):
+            dispense_kwargs["push_out"] = 0.0
 
         with publisher.publish_context(
             broker=self.broker,
@@ -446,7 +481,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ):
             self.aspirate(volume, location, rate)
             while repetitions - 1 > 0:
-                self.dispense(volume, rate=rate)
+                self.dispense(volume, rate=rate, **dispense_kwargs)
                 self.aspirate(volume, rate=rate)
                 repetitions -= 1
             self.dispense(volume, rate=rate)
@@ -862,6 +897,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[
                 types.Location,
                 labware.Well,
+                TrashBin,
                 WasteChute,
             ]
         ] = None,
@@ -891,6 +927,12 @@ class InstrumentContext(publisher.CommandPublisher):
             - As a :py:class:`~.types.Location`. For example, to drop a tip from an
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
+            - As a :py:class:`.TrashBin`. This uses a default location relative to the
+              TrashBin object. For example,
+              ``pipette.drop_tip(location=trash_bin)``.
+            - As a :py:class:`.WasteChute`. This uses a default location relative to
+              the WasteChute object. For example,
+              ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
             The location to drop the tip.
@@ -908,9 +950,17 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
-            well = self.trash_container.wells()[0]
+            trash_container = self.trash_container
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
+            if isinstance(trash_container, labware.Labware):
+                well = trash_container.wells()[0]
+            else:  # implicit drop tip in disposal location, not well
+                self._core.drop_tip_in_disposal_location(
+                    trash_container, home_after=home_after
+                )
+                self._last_tip_picked_up_from = None
+                return self
 
         elif isinstance(location, labware.Well):
             well = location
@@ -930,9 +980,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
             well = maybe_well
 
-        elif isinstance(location, WasteChute):
+        elif isinstance(location, (TrashBin, WasteChute)):
             # TODO: Publish to run log.
-            self._core.drop_tip_in_waste_chute(location, home_after=home_after)
+            self._core.drop_tip_in_disposal_location(location, home_after=home_after)
             self._last_tip_picked_up_from = None
             return self
 
@@ -1416,23 +1466,36 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(self) -> labware.Labware:
+    def trash_container(self) -> Union[labware.Labware, TrashBin, WasteChute]:
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        By default, the trash container is in slot A3 on Flex and in slot 12 on OT-2.
+        On a Flex running a protocol with API version 2.16 or higher, ``trash_container`` is
+        the first ``TrashBin`` or ``WasteChute`` object loaded in the protocol.
+        On a Flex running a protocol with API version 2.15, ``trash_container`` is
+        a single-well fixed trash labware in slot D3.
+        On a an OT-2, ``trash_container`` is always a single-well fixed trash labware
+        in slot 12.
+
+        .. versionchanged:: 2.16
+            Added support for ``TrashBin`` and ``WasteChute`` objects.
         """
-        if self._trash is None:
-            raise NoTrashDefinedError(
-                "No trash container has been defined in this protocol."
-            )
-        return self._trash
+        if self._user_specified_trash is None:
+            disposal_locations = self._protocol_core.get_disposal_locations()
+            if len(disposal_locations) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            return disposal_locations[0]
+        return self._user_specified_trash
 
     @trash_container.setter
-    def trash_container(self, trash: labware.Labware) -> None:
-        self._trash = trash
+    def trash_container(
+        self, trash: Union[labware.Labware, TrashBin, WasteChute]
+    ) -> None:
+        self._user_specified_trash = trash
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1699,7 +1762,7 @@ class InstrumentContext(publisher.CommandPublisher):
         #       :param front_right: The nozzle at the front left of the layout. Only used for
         #           NozzleLayout.QUADRANT configurations.
         #       :type front_right: str or ``None``
-        if style != NozzleLayout.EMPTY:
+        if style != NozzleLayout.ALL:
             if start is None:
                 raise ValueError(
                     f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."
