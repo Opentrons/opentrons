@@ -223,6 +223,7 @@ def get_protocol_api(
     # type checking, like Jupyter Notebook.
     *,
     robot_type: Optional[_UserSpecifiedRobotType] = None,
+    use_virtual_hardware: bool = True,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -260,6 +261,7 @@ def get_protocol_api(
     :param robot_type: The type of robot to simulate: either ``"Flex"`` or ``"OT-2"``.
                        If you're running this function on a robot, the default is the type of that
                        robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
+    :param use_virtual_hardware: If true, use the protocol engines virtual hardware, if false use the lower level hardware simulator.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -317,6 +319,7 @@ def get_protocol_api(
             hardware_api=checked_hardware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
+            use_virtual_hardware=use_virtual_hardware,
         )
 
     # Intentional difference from execute.get_protocol_api():
@@ -790,6 +793,7 @@ def _create_live_context_pe(
     deck_type: str,
     extra_labware: Dict[str, "LabwareDefinitionDict"],
     bundled_data: Optional[Dict[str, bytes]],
+    use_virtual_hardware: bool = True,
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
     assert api_version >= ENGINE_CORE_API_VERSION
@@ -798,7 +802,9 @@ def _create_live_context_pe(
     pe, loop = _LIVE_PROTOCOL_ENGINE_CONTEXTS.enter_context(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api.wrapped(),
-            config=_get_protocol_engine_config(robot_type),
+            config=_get_protocol_engine_config(
+                robot_type, virtual=use_virtual_hardware
+            ),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             load_fixed_trash=should_load_fixed_trash_for_python_protocol(api_version),
@@ -895,7 +901,7 @@ def _run_file_pe(
     async def run(protocol_source: ProtocolSource) -> _SimulateResult:
         protocol_engine = await create_protocol_engine(
             hardware_api=hardware_api.wrapped(),
-            config=_get_protocol_engine_config(robot_type),
+            config=_get_protocol_engine_config(robot_type, virtual=True),
             load_fixed_trash=should_load_fixed_trash(protocol_source.config),
         )
 
@@ -930,15 +936,15 @@ def _run_file_pe(
         return asyncio.run(run(protocol_source))
 
 
-def _get_protocol_engine_config(robot_type: RobotType) -> Config:
+def _get_protocol_engine_config(robot_type: RobotType, virtual: bool) -> Config:
     """Return a Protocol Engine config to execute protocols on this device."""
     return Config(
         robot_type=robot_type,
         deck_type=DeckType(deck_type_for_simulation(robot_type)),
         ignore_pause=True,
-        use_virtual_pipettes=True,
-        use_virtual_modules=True,
-        use_virtual_gripper=True,
+        use_virtual_pipettes=virtual,
+        use_virtual_modules=virtual,
+        use_virtual_gripper=virtual,
         use_simulated_deck_config=True,
     )
 

@@ -12,6 +12,8 @@ from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from hardware_testing.opentrons_api.helpers_ot3 import start_server_ot3, stop_server_ot3
 from hardware_testing.opentrons_api.types import Point
 
+from opentrons.protocol_engine.types import LabwareOffset
+
 
 def is_running_in_app() -> bool:
     """Is running in App."""
@@ -33,7 +35,7 @@ def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
     pipette.dispense()
 
 
-def http_get_all_labware_offsets() -> List[dict]:
+def http_get_all_labware_offsets() -> List[LabwareOffset]:
     """Request (HTTP GET) from the local robot-server all runs information."""
     req = Request("http://localhost:31950/runs")
     req.add_header("Opentrons-Version", "2")
@@ -46,7 +48,18 @@ def http_get_all_labware_offsets() -> List[dict]:
 
     runs_json = json_loads(runs_response_data)
     protocols_list = runs_json["data"]
-    return [offset for p in protocols_list for offset in p["labwareOffsets"]]
+    offset_dict = [offset for p in protocols_list for offset in p["labwareOffsets"]]
+    offsets: List[LabwareOffset] = []
+    for offset_data in offset_dict:
+        new_offset = LabwareOffset(
+            id=offset_data["id"],
+            createdAt=offset_data["createdAt"],
+            definitionUri=offset_data["definitionUri"],
+            location=offset_data["location"],
+            vector=offset_data["vector"],
+        )
+        offsets.append(new_offset)
+    return offsets
 
 
 def _old_slot_to_ot3_slot(old_api_slot: str) -> str:

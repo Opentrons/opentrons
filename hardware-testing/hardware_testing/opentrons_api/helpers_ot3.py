@@ -113,7 +113,7 @@ def _create_fake_pipette_id(mount: OT3Mount, model: Optional[str]) -> Optional[s
     assert len(items) == 3
     size = "P1K" if items[0] == "p1000" else "P50"
     channels = "S" if items[1] == "single" else "M"
-    version = items[2].upper().replace(".", "")
+    version = 35  # model names don't have a version so just fake a 3.5 version
     date = datetime.now().strftime("%y%m%d")
     unique_number = 1 if mount == OT3Mount.LEFT else 2
     return f"{size}{channels}{version}{date}A0{unique_number}"

@@ -47,11 +47,12 @@ from .trial import TestResources, _change_pipettes
 from .tips import get_tips
 from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_engine.types import LabwareOffset
 
 # FIXME: bump to v2.15 to utilize protocol engine
-API_LEVEL = "2.13"
+API_LEVEL = "2.15"
 
-LABWARE_OFFSETS: List[dict] = []
+LABWARE_OFFSETS: List[LabwareOffset] = []
 
 # Keyed by pipette volume, channel count, and tip volume in that order
 GRAVIMETRIC_CFG = {
@@ -89,6 +90,19 @@ GRAVIMETRIC_CFG_INCREMENT = {
         },
     },
 }
+
+PIPETTE_MODEL_NAME = {
+    50: {
+        1: "p50_single_flex",
+        8: "p50_multi_flex",
+    },
+    1000: {
+        1: "p1000_single_flex",
+        8: "p1000_multi_flex",
+        96: "p1000_96_flex",
+    },
+}
+
 
 PHOTOMETRIC_CFG = {
     50: {
@@ -148,13 +162,12 @@ class RunArgs:
             ui.print_info(
                 "Starting opentrons-robot-server, so we can http GET labware offsets"
             )
-            offsets = workarounds.http_get_all_labware_offsets()
-            ui.print_info(f"found {len(offsets)} offsets:")
-            for offset in offsets:
-                ui.print_info(f"\t{offset['createdAt']}:")
-                ui.print_info(f"\t\t{offset['definitionUri']}")
-                ui.print_info(f"\t\t{offset['vector']}")
-                LABWARE_OFFSETS.append(offset)
+            LABWARE_OFFSETS.extend(workarounds.http_get_all_labware_offsets())
+            ui.print_info(f"found {len(LABWARE_OFFSETS)} offsets:")
+            for offset in LABWARE_OFFSETS:
+                ui.print_info(f"\t{offset.createdAt}:")
+                ui.print_info(f"\t\t{offset.definitionUri}")
+                ui.print_info(f"\t\t{offset.vector}")
         # gather the custom labware (for simulation)
         custom_defs = {}
         if args.simulate:
@@ -172,9 +185,12 @@ class RunArgs:
         _ctx = helpers.get_api_context(
             API_LEVEL,  # type: ignore[attr-defined]
             is_simulating=args.simulate,
-            deck_version="2",
+            pipette_left=PIPETTE_MODEL_NAME[args.pipette][args.channels],
             extra_labware=custom_defs,
         )
+        for offset in LABWARE_OFFSETS:
+            engine = _ctx._core._engine_client._transport._engine  # type: ignore[attr-defined]
+            engine.state_view._labware_store._add_labware_offset(offset)
         return _ctx
 
     @classmethod  # noqa: C901
@@ -387,7 +403,6 @@ def build_gravimetric_cfg(
         pipette_channels=run_args.pipette_channels,
         tip_volume=tip_volume,
         trials=run_args.trials,
-        labware_offsets=LABWARE_OFFSETS,
         labware_on_scale=run_args.protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
         slot_scale=run_args.protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
@@ -436,7 +451,6 @@ def build_photometric_cfg(
         increment=False,
         tip_volume=tip_volume,
         trials=run_args.trials,
-        labware_offsets=LABWARE_OFFSETS,
         photoplate=run_args.protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
         photoplate_slot=run_args.protocol_cfg.SLOT_PLATE,  # type: ignore[attr-defined]
         reservoir=run_args.protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
