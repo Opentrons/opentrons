@@ -4,6 +4,8 @@ import itertools
 import logging
 from typing import Collection, Dict, Optional, Tuple, overload, Union
 
+from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
+
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
@@ -25,18 +27,25 @@ from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModule
 from opentrons.types import DeckSlotName, Point
 
 
-class PartialTipMovementNotAllowedError(ValueError):
+class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
     """Error raised when trying to perform a partial tip movement to an illegal location."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            message=message,
+        )
 
 
 _log = logging.getLogger(__name__)
 
-# Arbitrary safety margin in z-direction
-Z_SAFETY_MARGIN = 10
-
+# TODO (spp, 2023-12-06): move this to a location like motion planning where we can
+#  derive these values from geometry definitions
 # Bounding box measurements
 A12_column_front_left_bound = Point(x=-1.8, y=2)
 A12_column_back_right_bound = Point(x=592, y=506.2)
+
+# Arbitrary safety margin in z-direction
+Z_SAFETY_MARGIN = 10
 
 
 @overload
@@ -287,9 +296,7 @@ def _check_deck_conflict_for_8_channel(
     pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
     tip_length = pipette_tip.length if pipette_tip else 0.0
 
-    if (
-        north_slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length
-    ):  # a safe margin magic number
+    if north_slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length:
         raise PartialTipMovementNotAllowedError(
             f"Moving to {engine_state.labware.get_load_name(labware_id)} in slot {labware_slot}"
             f" with a Single nozzle configuration will result in collision with"
