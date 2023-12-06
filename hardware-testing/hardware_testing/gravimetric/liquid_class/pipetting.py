@@ -246,13 +246,17 @@ def _pipette_with_liquid_settings(  # noqa: C901
             if i < _num_mixes - 1:
                 pipette.dispense(mix)
             else:
-                _dispense_with_added_blow_out()
+                if added_blow_out:
+                    push_out = min(
+                        liquid_class.dispense.blow_out_submerged, _get_max_blow_out_ul()
+                    )
+                pipette.dispense(dispense, push_out=push_out)
             ctx.delay(liquid_class.dispense.delay)
         # don't go all the way up to retract position, but instead just above liquid
         _retract(
             ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
         )
-        _blow_out_remaining_air()
+        pipette.blow_out()
         hw_api.prepare_for_aspirate(hw_mount)
         assert pipette.current_volume == 0
 
