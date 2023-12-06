@@ -1,4 +1,6 @@
 """Tests for pipette state accessors in the protocol_engine state store."""
+from collections import OrderedDict
+
 import pytest
 from typing import cast, Dict, List, Optional
 
@@ -6,7 +8,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
-from opentrons.types import MountType, Mount as HwMount
+from opentrons.types import MountType, Mount as HwMount, Point
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -26,6 +28,12 @@ from opentrons.protocol_engine.state.pipettes import (
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
+
+from ..pipette_fixtures import (
+    NINETY_SIX_MAP,
+    NINETY_SIX_COLS,
+    NINETY_SIX_ROWS,
+)
 
 
 def get_pipette_view(
@@ -512,3 +520,75 @@ def test_get_motor_axes(
 
     assert subject.get_z_axis("pipette-id") == expected_z_axis
     assert subject.get_plunger_axis("pipette-id") == expected_plunger_axis
+
+
+@pytest.mark.parametrize(
+    argnames=["nozzle_map", "expected_channels"],
+    argvalues=[
+        (
+            NozzleMap.build(
+                physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+                physical_rows=OrderedDict({"A": ["A1"]}),
+                physical_columns=OrderedDict({"1": ["A1"]}),
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="A1",
+            ),
+            1,
+        ),
+        (
+            NozzleMap.build(
+                physical_nozzles=NINETY_SIX_MAP,
+                physical_rows=NINETY_SIX_ROWS,
+                physical_columns=NINETY_SIX_COLS,
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="H12",
+            ),
+            96,
+        ),
+        (
+            NozzleMap.build(
+                physical_nozzles=NINETY_SIX_MAP,
+                physical_rows=NINETY_SIX_ROWS,
+                physical_columns=NINETY_SIX_COLS,
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="E1",
+            ),
+            5,
+        ),
+        (None, 9),
+    ],
+)
+def test_get_active_channels(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    nozzle_map: Optional[NozzleMap],
+    expected_channels: int,
+) -> None:
+    """It should return the correct number of active channels for the pipette."""
+    config = StaticPipetteConfig(
+        model="pipette-model",
+        display_name="display name",
+        serial_number="serial-number",
+        min_volume=1.23,
+        max_volume=4.56,
+        channels=9,
+        tip_configuration_lookup_table={4.56: supported_tip_fixture},
+        nominal_tip_overlap={},
+        home_position=10.12,
+        nozzle_offset_z=12.13,
+    )
+
+    subject = get_pipette_view(
+        pipettes_by_id={
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
+                mount=MountType.LEFT,
+                pipetteName=PipetteNameType.P300_SINGLE,
+            )
+        },
+        static_config_by_id={"pipette-id": config},
+        nozzle_layout_by_id={"pipette-id": nozzle_map},
+    )
+    assert subject.get_active_channels("pipette-id") == expected_channels

@@ -135,6 +135,10 @@ class TipView(HasState[TipState]):
         """
         self._state = state
 
+    # TODO (spp, 2023-12-05): update this logic once we support partial nozzle configurations
+    #  that require the tip tracking to move right to left or front to back;
+    #  for example when using leftmost column config of 96-channel
+    #  or backmost single nozzle configuration of an 8-channel.
     def get_next_tip(  # noqa: C901
         self, labware_id: str, num_tips: int, starting_tip_name: Optional[str]
     ) -> Optional[str]:
