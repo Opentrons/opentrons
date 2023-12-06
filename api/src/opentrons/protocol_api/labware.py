@@ -611,7 +611,7 @@ class Labware:
         """
         Accessor function that generates a list of wells in a top down,
         left to right order. This is representative of moving down rows and
-        across columns (e.g., A1, B1, C1…A2, B2, C2…)
+        across columns (i.e., A1, B1, C1 . . . A2, B2, C2 . . . ).
 
         With indexing one can treat it as a typical python
         list. For example, access well A1 with ``labware.wells()[0]``.
@@ -646,7 +646,7 @@ class Labware:
         dictionary whose keys are well names. For example, access well A1
         with ``labware.wells_by_name()['A1']``.
 
-        :return: Dictionary of well objects keyed by well name.
+        :return: Dictionary of :py:class:`.Well` objects keyed by well name.
         """
         return dict(self._wells_by_name)
 
@@ -667,12 +667,12 @@ class Labware:
         Accessor function used to navigate through a labware by row.
 
         With indexing one can treat it as a typical python nested list.
-        To access row A for example, write ``labware.rows()[0]``. This
+        For example, access row A with ``labware.rows()[0]``. This
         will output ``['A1', 'A2', 'A3', 'A4'...]``.
 
         Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
 
-        :return: A list of row lists
+        :return: A list of row lists.
         """
         if not args:
             return [
@@ -700,10 +700,10 @@ class Labware:
         Accessor function used to navigate through a labware by row name.
 
         With indexing one can treat it as a typical python dictionary.
-        To access row A for example, write ``labware.rows_by_name()['A']``.
+        For example, access row A with ``labware.rows_by_name()['A']``.
         This will output ``['A1', 'A2', 'A3', 'A4'...]``.
 
-        :return: Dictionary of Well lists keyed by row name.
+        :return: Dictionary of :py:class:`.Well` lists keyed by row name.
         """
         return {
             row_name: [self._wells_by_name[well_name] for well_name in row]
@@ -725,7 +725,7 @@ class Labware:
         Accessor function used to navigate through a labware by column.
 
         With indexing one can treat it as a typical python nested list.
-        To access row A for example, write ``labware.columns()[0]``.
+        For example, access row A with ``labware.columns()[0]``.
         This will output ``['A1', 'B1', 'C1', 'D1'...]``.
 
         Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args
@@ -761,11 +761,10 @@ class Labware:
         Accessor function used to navigate through a labware by column name.
 
         With indexing one can treat it as a typical python dictionary.
-        To access row A for example,
-        write ``labware.columns_by_name()['1']``.
+        For example, access row A with ``labware.columns_by_name()['1']``.
         This will output ``['A1', 'B1', 'C1', 'D1'...]``.
 
-        :return: Dictionary of Well lists keyed by column name.
+        :return: Dictionary of :py:class:`.Well` lists keyed by column name.
         """
         return {
             column_name: [self._wells_by_name[well_name] for well_name in column]
