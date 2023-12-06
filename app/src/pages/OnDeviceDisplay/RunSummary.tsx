@@ -64,7 +64,6 @@ import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttac
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
@@ -106,9 +105,7 @@ export function RunSummary(): JSX.Element {
     runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
   )
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  const onResetSuccess = (_createRunResponse: Run): void =>
-    history.push(`/runs/${runId}/setup`)
-  const { reset } = useRunControls(runId, onResetSuccess)
+  const { reset } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const localRobot = useSelector(getLocalRobot)
