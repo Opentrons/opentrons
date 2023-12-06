@@ -56,6 +56,7 @@ _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
 _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
 """The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
+_PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -101,11 +102,9 @@ class InstrumentContext(publisher.CommandPublisher):
             default_aspirate=_DEFAULT_ASPIRATE_CLEARANCE,
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
-
         self._user_specified_trash: Union[
             labware.Labware, TrashBin, WasteChute, None
         ] = trash
-
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -817,12 +816,17 @@ class InstrumentContext(publisher.CommandPublisher):
         well: labware.Well
         tip_rack: labware.Labware
         move_to_location: Optional[types.Location] = None
+        active_channels = (
+            self.active_channels
+            if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            else self.channels
+        )
 
         if location is None:
             tip_rack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
-                channels=self.channels,
+                channels=active_channels,
             )
 
         elif isinstance(location, labware.Well):
@@ -833,7 +837,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tip_rack, well = labware.next_available_tip(
                 starting_tip=None,
                 tip_racks=[location],
-                channels=self.channels,
+                channels=active_channels,
             )
 
         elif isinstance(location, types.Location):
@@ -848,7 +852,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 tip_rack, well = labware.next_available_tip(
                     starting_tip=None,
                     tip_racks=[maybe_tip_rack],
-                    channels=self.channels,
+                    channels=active_channels,
                 )
             else:
                 raise TypeError(
@@ -1233,6 +1237,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         blow_out = kwargs.get("blow_out")
         blow_out_strategy = None
+        active_channels = (
+            self.active_channels
+            if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            else self.channels
+        )
 
         if blow_out and not blowout_location:
             if self.current_volume:
@@ -1249,7 +1258,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = labware.next_available_tip(
-                self.starting_tip, self.tip_racks, self.channels
+                self.starting_tip, self.tip_racks, active_channels
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
@@ -1582,6 +1591,12 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._core.get_channels()
 
     @property  # type: ignore
+    @requires_version(2, 16)
+    def active_channels(self) -> int:
+        """The number of channels configured for active use using configure_nozzle_layout()."""
+        return self._core.get_active_channels()
+
+    @property  # type: ignore
     @requires_version(2, 2)
     def return_height(self) -> float:
         """The height to return a tip to its tip rack.
@@ -1729,6 +1744,7 @@ class InstrumentContext(publisher.CommandPublisher):
         style: NozzleLayout,
         start: Optional[str] = None,
         front_right: Optional[str] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
         """Configure how many tips the 96-channel pipette will pick up.
 
@@ -1777,5 +1793,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     "Cannot configure a QUADRANT layout without a front right nozzle."
                 )
         self._core.configure_nozzle_layout(
-            style, primary_nozzle=start, front_right_nozzle=front_right
+            style,
+            primary_nozzle=start,
+            front_right_nozzle=front_right,
         )
+        # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
+        self._tip_racks = tip_racks or []

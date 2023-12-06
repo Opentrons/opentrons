@@ -480,7 +480,7 @@ def test_pick_up_tip_from_labware(
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
@@ -534,7 +534,7 @@ def test_pick_up_tip_from_labware_location(
     location = Location(point=Point(1, 2, 3), labware=mock_tip_rack)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
@@ -568,7 +568,7 @@ def test_pick_up_from_associated_tip_racks(
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=mock_starting_tip,
