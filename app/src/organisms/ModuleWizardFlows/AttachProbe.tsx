@@ -68,6 +68,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   ])
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
+  const pipetteId = attachedPipette.serialNumber
 
   const attachedPipetteChannels = attachedPipette.data.channels
   let pipetteAttachProbeVideoSource, probeLocation
@@ -180,29 +181,43 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     chainRunCommands?.(
       [
         {
-          commandType: 'home' as const,
-          params: {
-            axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
-          },
-        },
-        {
-          commandType: 'calibration/calibrateModule',
-          params: {
-            moduleId: attachedModule.id,
-            labwareId: adapterId,
-            mount: attachedPipette.mount,
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: attachedPipette.mount,
-          },
+          commandType: 'verifyTipPresence',
+          params: { pipetteId: pipetteId, expectedState: 'present' },
         },
       ],
       false
     )
-      .then(() => proceed())
+      .then(() => {
+        chainRunCommands?.(
+          [
+            {
+              commandType: 'home' as const,
+              params: {
+                axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
+              },
+            },
+            {
+              commandType: 'calibration/calibrateModule',
+              params: {
+                moduleId: attachedModule.id,
+                labwareId: adapterId,
+                mount: attachedPipette.mount,
+              },
+            },
+            {
+              commandType: 'calibration/moveToMaintenancePosition' as const,
+              params: {
+                mount: attachedPipette.mount,
+              },
+            },
+          ],
+          false
+        )
+          .then(() => proceed())
+          .catch((e: Error) =>
+            setErrorMessage(`error starting module calibration: ${e.message}`)
+          )
+      })
       .catch((e: Error) =>
         setErrorMessage(`error starting module calibration: ${e.message}`)
       )
