@@ -7,6 +7,7 @@ from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
+from ..errors import LabwareNotLoadedOnLabwareError, LabwareNotLoadedOnModuleError
 from ..resources import fixture_validation
 from ..types import (
     OFF_DECK_LOCATION,
@@ -100,6 +101,8 @@ class GeometryView:
             default=0.0,
         )
 
+        # Fixme (spp, 2023-12-04): the overall height is not the true highest z of modules
+        #  on a Flex.
         highest_module_z = max(
             (
                 self._modules.get_overall_height(module.id)
@@ -135,6 +138,38 @@ class GeometryView:
             highest_module_z,
             highest_fixture_z,
         )
+
+    def get_highest_z_in_slot(self, slot: DeckSlotLocation) -> float:
+        """Get the highest Z-point of all items stacked in the given deck slot."""
+        slot_item = self.get_slot_item(slot.slotName)
+        if isinstance(slot_item, LoadedModule):
+            # get height of module + all labware on it
+            module_id = slot_item.id
+            try:
+                labware_id = self._labware.get_id_by_module(module_id=module_id)
+            except LabwareNotLoadedOnModuleError:
+                deck_type = DeckType(self._labware.get_deck_definition()["otId"])
+                return self._modules.get_module_highest_z(
+                    module_id=module_id, deck_type=deck_type
+                )
+            else:
+                return self.get_highest_z_of_labware_stack(labware_id)
+        elif isinstance(slot_item, LoadedLabware):
+            # get stacked heights of all labware in the slot
+            return self.get_highest_z_of_labware_stack(slot_item.id)
+        else:
+            return 0
+
+    def get_highest_z_of_labware_stack(self, labware_id: str) -> float:
+        """Get the highest Z-point of the topmost labware in the stack of labware on the given labware.
+
+        If there is no labware on the given labware, returns highest z of the given labware.
+        """
+        try:
+            stacked_labware_id = self._labware.get_id_by_labware(labware_id)
+        except LabwareNotLoadedOnLabwareError:
+            return self.get_labware_highest_z(labware_id)
+        return self.get_highest_z_of_labware_stack(stacked_labware_id)
 
     def get_min_travel_z(
         self,
@@ -378,6 +413,13 @@ class GeometryView:
         z_dim = definition.dimensions.zDimension
         height_over_labware: float = 0
         if isinstance(lw_data.location, ModuleLocation):
+            # Note: when calculating highest z of stacked labware, height-over-labware
+            # gets accounted for only if the top labware is directly on the module.
+            # So if there's a labware on an adapter on a module, then this
+            # over-module-height gets ignored. We currently do not have any modules
+            # that use an adapter and has height over labware so this doesn't cause
+            # any issues yet. But if we add one in the future then this calculation
+            # should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
         return labware_pos.z + z_dim + height_over_labware
