@@ -51,8 +51,12 @@ export function TrashBinConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn
-        css={TRASH_BIN_CONFIG_STYLE}
-        cursor={handleClickRemove != null ? 'pointer' : 'none'}
+        css={
+          handleClickRemove != null
+            ? TRASH_BIN_CONFIG_STYLE
+            : TRASH_BIN_CONFIG_STYLE_READ_ONLY
+        }
+        cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
             ? () => handleClickRemove(fixtureLocation)
@@ -62,7 +66,9 @@ export function TrashBinConfigFixture(
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
           {TRASH_BIN_DISPLAY_NAME}
         </Text>
-        <Icon name="remove" color={COLORS.white} size="2rem" />
+        {handleClickRemove != null ? (
+          <Icon name="remove" color={COLORS.white} size="2rem" />
+        ) : null}
       </Btn>
     </RobotCoordsForeignObject>
   )
@@ -85,6 +91,20 @@ const TRASH_BIN_CONFIG_STYLE = css`
   &:hover {
     background-color: ${COLORS.grey1};
   }
+
+  &:focus-visible {
+  }
+`
+
+const TRASH_BIN_CONFIG_STYLE_READ_ONLY = css`
+  display: ${DISPLAY_FLEX};
+  align-items: ${ALIGN_CENTER};
+  background-color: ${COLORS.grey2};
+  border-radius: ${BORDERS.borderRadiusSize1};
+  color: ${COLORS.white};
+  justify-content: ${JUSTIFY_CENTER};
+  grid-gap: ${SPACING.spacing8};
+  width: 100%;
 
   &:focus-visible {
   }
