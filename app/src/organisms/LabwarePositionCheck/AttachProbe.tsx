@@ -22,7 +22,7 @@ import type {
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset, PipetteData } from '@opentrons/api-client'
+import type { LabwareOffset } from '@opentrons/api-client'
 
 interface AttachProbeProps extends AttachProbeStep {
   protocolData: CompletedProtocolAnalysis
@@ -68,7 +68,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteMount = pipette?.mount
-  const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
+  const { refetch } = useInstrumentsQuery({
     enabled: false,
     onSettled: () => {
       setIsPending(false)

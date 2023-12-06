@@ -24,7 +24,6 @@ import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import { ProbeNotAttached } from './ProbeNotAttached'
-import type { PipetteData } from '@opentrons/api-client'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
@@ -69,7 +68,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
-  const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
+  const { refetch } = useInstrumentsQuery({
     enabled: false,
     onSettled: () => {
       setIsPending(false)
