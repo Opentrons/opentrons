@@ -83,7 +83,7 @@ export function GripperCard({
       setPollForSubsystemUpdate(true)
     } else if (
       subsystemUpdateData != null &&
-      subsystemUpdateData.updateStatus === 'done'
+      subsystemUpdateData.data.updateStatus === 'done'
     ) {
       setTimeout(() => {
         setPollForSubsystemUpdate(false)
