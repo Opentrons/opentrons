@@ -153,7 +153,8 @@
           "dispense_delay_checkbox": false,
           "dispense_delay_seconds": "1",
           "dispense_delay_mmFromBottom": null,
-          "dropTip_location": "9d61f642-8f9b-467d-b2f7-b67fb162fd26:wasteChute"
+          "dropTip_location": "9d61f642-8f9b-467d-b2f7-b67fb162fd26:wasteChute",
+          "nozzles": null
         },
         "240a2c96-3db8-4679-bdac-049306b7b9c4": {
           "id": "240a2c96-3db8-4679-bdac-049306b7b9c4",
