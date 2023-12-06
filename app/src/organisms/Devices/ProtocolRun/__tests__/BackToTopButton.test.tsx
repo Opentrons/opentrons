@@ -102,18 +102,19 @@ describe('BackToTopButton', () => {
     })
   })
 
-  it('should not disabled with modules not connected tooltip when there are missing moduleIds', () => {
+  it('should be disabled with modules not connected tooltip when there are missing moduleIds', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
         missingModuleIds: ['temperatureModuleV1'],
         remainingAttachedModules: [],
       })
-    const { getByRole } = render()
+    const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Back to top' })
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
+    getByText('Make sure all modules are connected before proceeding to run')
   })
-  it('should not be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
+  it('should be disabled with modules not connected and calibration not completed tooltip if missing cal and moduleIds', async () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -125,25 +126,32 @@ describe('BackToTopButton', () => {
       .mockReturnValue({
         complete: false,
       })
-    const { getByRole } = render()
+    const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Back to top' })
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
+    getByText(
+      'Make sure robot calibration is complete and all modules are connected before proceeding to run'
+    )
   })
-  it('should not be disabled with calibration not complete tooltip when calibration not complete', async () => {
+  it('should be disabled with calibration not complete tooltip when calibration not complete', async () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
         complete: false,
       })
-    const { getByRole } = render()
+    const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Back to top' })
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
+    getByText(
+      'Make sure robot calibration is complete before proceeding to run'
+    )
   })
-  it('should not be disabled with protocol run started tooltip when run has started', async () => {
+  it('should be disabled with protocol run started tooltip when run has started', async () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 
-    const { getByRole } = render()
+    const { getByRole, getByText } = render()
     const button = getByRole('button', { name: 'Back to top' })
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
+    getByText('Protocol run started.')
   })
 })
