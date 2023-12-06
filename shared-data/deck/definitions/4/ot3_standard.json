@@ -350,7 +350,19 @@
         "ableToDropTips": true
       },
       {
-        "id": "1and8ChannelWasteChute",
+        "id": "1ChannelWasteChute",
+        "areaType": "wasteChute",
+        "offsetFromCutoutFixture": [64, 36, 114.5],
+        "boundingBox": {
+          "xDimension": 0,
+          "yDimension": 0,
+          "zDimension": 0
+        },
+        "displayName": "1 Channel Waste Chute",
+        "ableToDropTips": true
+      },
+      {
+        "id": "8ChannelWasteChute",
         "areaType": "wasteChute",
         "offsetFromCutoutFixture": [64, -27, 114.5],
         "boundingBox": {
@@ -358,7 +370,7 @@
           "yDimension": 63,
           "zDimension": 0
         },
-        "displayName": "1/8 Channel Waste Chute",
+        "displayName": "8 Channel Waste Chute",
         "ableToDropTips": true
       },
       {
@@ -537,7 +549,7 @@
       "mayMountTo": ["cutoutD3"],
       "displayName": "Waste Chute Adapter for 1 or 8 Channel Pipettes",
       "providesAddressableAreas": {
-        "cutoutD3": ["1and8ChannelWasteChute"]
+        "cutoutD3": ["1ChannelWasteChute", "8ChannelWasteChute"]
       },
       "height": 124.5
     },
@@ -547,7 +559,8 @@
       "displayName": "Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
         "cutoutD3": [
-          "1and8ChannelWasteChute",
+          "1ChannelWasteChute",
+          "8ChannelWasteChute",
           "96ChannelWasteChute",
           "gripperWasteChute"
         ]
@@ -559,7 +572,7 @@
       "mayMountTo": ["cutoutD3"],
       "displayName": "Staging Slot With Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "cutoutD3": ["1and8ChannelWasteChute", "D4"]
+        "cutoutD3": ["1ChannelWasteChute", "8ChannelWasteChute", "D4"]
       },
       "height": 124.5
     },
@@ -569,7 +582,8 @@
       "displayName": "Staging Slot With Waste Chute Adapter and Staging Area Slot",
       "providesAddressableAreas": {
         "cutoutD3": [
-          "1and8ChannelWasteChute",
+          "1ChannelWasteChute",
+          "8ChannelWasteChute",
           "96ChannelWasteChute",
           "gripperWasteChute",
           "D4"
