@@ -611,7 +611,7 @@ class Labware:
         """
         Accessor function that generates a list of wells in a top down,
         left to right order. This is representative of moving down rows and
-        across columns (e.g. ``'A1'``, ``'B1'``, ``'C1'...'A2'``, ``'B2'``, ``'C2'``)
+        across columns (i.e., A1, B1, C1…A2, B2, C2…)
 
         With indexing one can treat it as a typical python
         list. To access well A1 for example, write ``labware.wells()[0]``.
