@@ -1772,6 +1772,7 @@ class InstrumentContext(publisher.CommandPublisher):
             *left-to-right* from a tip rack. Use ``"A12"`` to have the pipette use its
             rightmost nozzles to pick up tips *right-to-left* from a tip rack.
         :type start: str or ``None``
+        :param tip_racks: List of tip racks to use during this configuration.
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
         #
