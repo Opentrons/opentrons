@@ -1,9 +1,9 @@
 """Deck configuration resource provider."""
-from typing import List, Set, Tuple, Optional
+from typing import List, Set, Tuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, CutoutFixture
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import DeckSlotName
 
 from ..types import (
     AddressableArea,
@@ -106,27 +106,6 @@ def get_addressable_area_from_name(
                 y=addressable_area["boundingBox"]["yDimension"],
                 z=addressable_area["boundingBox"]["zDimension"],
             )
-            drop_tips_deck_offset = addressable_area.get("dropTipsOffset")
-            drop_tip_location: Optional[Point]
-            if drop_tips_deck_offset:
-                drop_tip_location = Point(
-                    x=drop_tips_deck_offset[0] + cutout_position.x,
-                    y=drop_tips_deck_offset[1] + cutout_position.y,
-                    z=drop_tips_deck_offset[2] + cutout_position.z,
-                )
-            else:
-                drop_tip_location = None
-
-            drop_labware_deck_offset = addressable_area.get("dropLabwareOffset")
-            drop_labware_location: Optional[Point]
-            if drop_labware_deck_offset:
-                drop_labware_location = Point(
-                    x=drop_labware_deck_offset[0] + cutout_position.x,
-                    y=drop_labware_deck_offset[1] + cutout_position.y,
-                    z=drop_labware_deck_offset[2] + cutout_position.z,
-                )
-            else:
-                drop_labware_location = None
 
             return AddressableArea(
                 area_name=addressable_area["id"],
@@ -138,8 +117,6 @@ def get_addressable_area_from_name(
                 compatible_module_types=addressable_area.get(
                     "compatibleModuleTypes", []
                 ),
-                drop_tip_location=drop_tip_location,
-                drop_labware_location=drop_labware_location,
             )
     raise AddressableAreaDoesNotExistError(
         f"Could not find addressable area with name {addressable_area_name}"

@@ -107,8 +107,8 @@ def test_initial_state(
     assert not subject.state.use_simulated_deck_config
     assert subject.state.deck_definition == ot3_standard_deck_def
     assert subject.state.deck_configuration == _make_deck_config()
-    # Loading 9 regular slots, 1 trash, 2 Staging Area slots and 3 waste chute types
-    assert len(subject.state.loaded_addressable_areas_by_name) == 15
+    # Loading 9 regular slots, 1 trash, 2 Staging Area slots and 4 waste chute types
+    assert len(subject.state.loaded_addressable_areas_by_name) == 16
 
 
 @pytest.mark.parametrize(
