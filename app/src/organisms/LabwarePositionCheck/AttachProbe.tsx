@@ -74,10 +74,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       setIsPending(false)
     },
   })
-  const attachedPipette = attachedInstrumentsData?.data.find(
-    (instrument): instrument is PipetteData =>
-      instrument.ok && instrument.mount === pipetteMount
-  )
 
   React.useEffect(() => {
     // move into correct position for probe attach on mount

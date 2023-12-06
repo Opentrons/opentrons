@@ -75,10 +75,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       setIsPending(false)
     },
   })
-  const attachedPipette = attachedInstrumentsData?.data.find(
-    (instrument): instrument is PipetteData =>
-      instrument.ok && instrument.mount === mount
-  )
   const deckConfig = useDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
     deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
