@@ -818,7 +818,7 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location: Optional[types.Location] = None
         active_channels = (
             self.active_channels
-            if self._api_version < _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
             else self.channels
         )
 
@@ -1239,7 +1239,7 @@ class InstrumentContext(publisher.CommandPublisher):
         blow_out_strategy = None
         active_channels = (
             self.active_channels
-            if self._api_version < _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
             else self.channels
         )
 
