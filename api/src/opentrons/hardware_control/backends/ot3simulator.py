@@ -467,7 +467,9 @@ class OT3Simulator:
                     ),
                     "id": None,
                 }
-        if found_model and expected_instr or found_model:
+        if (found_model and expected_instr or found_model) and init_instr[
+            "id"
+        ] is not None:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
@@ -476,9 +478,11 @@ class OT3Simulator:
 
             found_model_version = ""
             if found_model.find("flex") > -1:
-                 found_model = found_model.replace("_flex", "")  # type: ignore
-                 found_model_version = f"{init_instr['id'][4]}.{init_instr['id'][5]}"
-            converted_name = pipette_load_name.convert_pipette_model(found_model, found_model_version)
+                found_model = found_model.replace("_flex", "")  # type: ignore
+                found_model_version = f"{init_instr['id'][4]}.{init_instr['id'][5]}"
+            converted_name = pipette_load_name.convert_pipette_model(
+                found_model, found_model_version
+            )
             return {
                 "config": load_pipette_data.load_definition(
                     converted_name.pipette_type,
