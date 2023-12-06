@@ -379,7 +379,9 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
 
-        if self.api_version >= APIVersion(2, 11) and not isinstance(target, (TrashBin, WasteChute)):
+        if self.api_version >= APIVersion(2, 11) and not isinstance(
+            target, (TrashBin, WasteChute)
+        ):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
