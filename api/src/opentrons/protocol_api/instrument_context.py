@@ -1752,7 +1752,7 @@ class InstrumentContext(publisher.CommandPublisher):
         pipetting actions that the pipette performs. It also alters the pipette's
         behavior for picking up tips. The pipette will continue to use the specified
         layout until this function is called again.
-        
+
         .. note::
             When picking up 8 tips with the 96-channel pipette, the tip rack *must not*
             be placed in a tip rack adapter in the deck. If you try to perform partial
