@@ -48,7 +48,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def dispense(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[WellCoreType],
         volume: float,
         rate: float,
@@ -71,7 +71,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def blow_out(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[WellCoreType],
         in_place: bool,
     ) -> None:
@@ -158,7 +158,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[WellCoreType],
         force_direct: bool,
         minimum_z_height: Optional[float],
