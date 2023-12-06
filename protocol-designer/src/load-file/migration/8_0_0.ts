@@ -90,6 +90,7 @@ export const migrateFile = (
       if (stepForm.stepType === 'moveLiquid') {
         return {
           ...stepForm,
+          nozzles: null,
           aspirate_labware:
             stepForm.aspirate_labware === 'fixedTrash'
               ? null
@@ -103,6 +104,7 @@ export const migrateFile = (
       } else if (stepForm.stepType === 'mix') {
         return {
           ...stepForm,
+          nozzles: null,
           labware: stepForm.labware === 'fixedTrash' ? null : stepForm.labware,
           ...sharedParams,
         }

@@ -115,7 +115,8 @@
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
           "stepType": "moveLiquid",
           "stepName": "transfer",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "54dc3200-75c7-11ea-b42f-4b64e50f43e5": {
           "pauseAction": "untilResume",
@@ -167,7 +168,8 @@
           "id": "a4cee9a0-75dc-11ea-b42f-4b64e50f43e5",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         }
       },
       "orderedStepIds": [

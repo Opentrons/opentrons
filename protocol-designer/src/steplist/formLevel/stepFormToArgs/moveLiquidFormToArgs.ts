@@ -77,6 +77,7 @@ export const moveLiquidFormToArgs = (
     dispense_wells: destWellsUnordered,
     dropTip_location: dropTipLocation,
     path,
+    nozzles,
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
@@ -200,6 +201,7 @@ export const moveLiquidFormToArgs = (
     description: hydratedFormData.description,
     name: hydratedFormData.stepName,
     dropTipLocation,
+    nozzles,
   }
   assert(
     sourceWellsUnordered.length > 0,

@@ -54,6 +54,7 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
             {...propsForFields[addFieldNamePrefix('wells')]}
             labwareId={trashOrLabwareId}
             pipetteId={formData.pipette}
+            nozzles={String(propsForFields.nozzles.value) ?? null}
           />
         )}
       </div>

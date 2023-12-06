@@ -191,7 +191,8 @@
           "id": "f9a294f1-f42b-4cae-893a-592405349d56",
           "stepType": "moveLiquid",
           "stepName": "transfer",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "5fdb9a12-fab4-42fd-886f-40af107b15d6": {
           "times": "2",
@@ -217,7 +218,8 @@
           "id": "5fdb9a12-fab4-42fd-886f-40af107b15d6",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "3901f6f9-cecd-4d2a-8d85-40d85f9f8b4f": {
           "labware": "fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",

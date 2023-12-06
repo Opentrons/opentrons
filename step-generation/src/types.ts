@@ -14,6 +14,7 @@ import type {
   ModuleModel,
   PipetteNameSpecs,
   PipetteName,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -40,6 +41,8 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
+  nozzles?: NozzleConfigurationStyle
+  prevNozzles?: NozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -165,7 +168,7 @@ interface CommonArgs {
 
 export type SharedTransferLikeArgs = CommonArgs & {
   pipette: string // PipetteId
-
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -261,6 +264,7 @@ export type MixArgs = CommonArgs & {
   commandCreatorFnName: 'mix'
   labware: string
   pipette: string
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number
@@ -517,6 +521,8 @@ export type ErrorType =
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'PIPETTING_INTO_COLUMN_4'
+  | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
+  | 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'

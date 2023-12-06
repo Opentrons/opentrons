@@ -4,6 +4,15 @@ import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
+import {
+  AddressableAreaName,
+  FLEX_ROBOT_TYPE,
+  ALL,
+  COLUMN,
+  CreateCommand,
+  OT2_ROBOT_TYPE,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import { Channels } from '@opentrons/components'
 import { getCutoutIdByAddressableArea } from '../utils'
 import type {
@@ -13,12 +22,6 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-import {
-  AddressableAreaName,
-  CreateCommand,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
@@ -207,7 +210,8 @@ export const substepTimelineMultiChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
-  channels: Channels
+  channels: Channels,
+  nozzles: NozzleConfigurationStyle | null
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
@@ -231,10 +235,20 @@ export const substepTimelineMultiChannel = (
             ? invariantContext.labwareEntities[labwareId].def
             : null
 
+        let numChannels = channels
+        if (nozzles === ALL) {
+          numChannels = 96
+        } else if (nozzles === COLUMN) {
+          numChannels = 8
+        } else {
+          console.error(
+            'we currently do not support other 96-channel configurations'
+          )
+        }
         const wellsForTips =
-          channels &&
+          numChannels &&
           labwareDef &&
-          getWellsForTips(channels, labwareDef, wellName).wellsForTips
+          getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
 
         const wellInfo = {
           labwareId,
@@ -357,7 +371,8 @@ export const substepTimeline = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
-  channels: Channels
+  channels: Channels,
+  nozzles: NozzleConfigurationStyle | null
 ): SubstepTimelineFrame[] => {
   if (channels === 1) {
     return substepTimelineSingleChannel(
@@ -370,7 +385,8 @@ export const substepTimeline = (
       commandCreator,
       invariantContext,
       initialRobotState,
-      channels
+      channels,
+      nozzles
     )
   }
 }

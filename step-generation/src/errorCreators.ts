@@ -19,6 +19,13 @@ export function missingAdapter(): CommandCreatorError {
   }
 }
 
+export function removeAdapter(): CommandCreatorError {
+  return {
+    type: 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips partially with an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
@@ -158,6 +165,16 @@ export const tallLabwareEastWestOfHeaterShaker = (
   return {
     type: 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER',
     message: `Labware over 53 mm is ${position} of this Heater-Shaker module.`,
+  }
+}
+
+export const tallLabwareWestOf96ChannelPipetteLabware = (args: {
+  source: string
+  labware: string
+}): CommandCreatorError => {
+  return {
+    type: 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE',
+    message: `Labware to the left of the ${args.source} ${args.labware} is too tall and will collide with the 96-channel.`,
   }
 }
 
