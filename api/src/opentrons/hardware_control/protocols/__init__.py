@@ -1,5 +1,5 @@
 """Typing protocols describing a hardware controller."""
-from typing_extensions import Protocol
+from typing_extensions import Protocol, Type
 
 from .module_provider import ModuleProvider
 from .hardware_manager import HardwareManager
@@ -19,7 +19,13 @@ from .gripper_controller import GripperController
 from .flex_calibratable import FlexCalibratable
 from .flex_instrument_configurer import FlexInstrumentConfigurer
 
-from .types import CalibrationType, MountArgType, ConfigType
+from .types import (
+    CalibrationType,
+    MountArgType,
+    ConfigType,
+    OT2RobotType,
+    FlexRobotType,
+)
 
 
 class HardwareControlInterface(
@@ -31,7 +37,7 @@ class HardwareControlInterface(
     AsyncioConfigurable,
     Stoppable,
     Simulatable,
-    Identifiable,
+    Identifiable[Type[OT2RobotType]],
     Protocol[CalibrationType, MountArgType, ConfigType],
 ):
     """A mypy protocol for a hardware controller.
@@ -48,14 +54,23 @@ class HardwareControlInterface(
     however, they can satisfy protocols.
     """
 
-    ...
+    def get_robot_type(self) -> Type[OT2RobotType]:
+        return OT2RobotType
 
 
 class FlexHardwareControlInterface(
-    HardwareControlInterface[CalibrationType, MountArgType, ConfigType],
+    ModuleProvider,
+    ExecutionControllable,
+    LiquidHandler[CalibrationType, MountArgType, ConfigType],
+    ChassisAccessoryManager,
+    HardwareManager,
+    AsyncioConfigurable,
+    Stoppable,
+    Simulatable,
     GripperController,
     FlexCalibratable,
     FlexInstrumentConfigurer[MountArgType],
+    Identifiable[Type[FlexRobotType]],
     Protocol[CalibrationType, MountArgType, ConfigType],
 ):
     """A mypy protocol for a hardware controller with Flex-specific extensions.
@@ -64,7 +79,8 @@ class FlexHardwareControlInterface(
     with some additional functionality and parameterization not supported on the OT-2.
     """
 
-    ...
+    def get_robot_type(self) -> Type[FlexRobotType]:
+        return FlexRobotType
 
 
 __all__ = [

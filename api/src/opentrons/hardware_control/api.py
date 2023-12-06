@@ -28,7 +28,7 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
@@ -301,9 +301,6 @@ class API(
 
     def __repr__(self) -> str:
         return "<{} using backend {}>".format(type(self), type(self._backend))
-
-    def get_robot_type(self) -> RobotTypeEnum:
-        return RobotTypeEnum.OT2
 
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()

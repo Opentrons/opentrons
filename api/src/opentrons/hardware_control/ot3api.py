@@ -33,7 +33,7 @@ from opentrons_shared_data.pipette.dev_types import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
 )
@@ -290,9 +290,6 @@ class OT3API(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
         await self._backend.update_to_default_current_settings(gantry_load)
-
-    def get_robot_type(self) -> RobotTypeEnum:
-        return RobotTypeEnum.FLEX
 
     async def get_serial_number(self) -> Optional[str]:
         return await self._backend.get_serial_number()
