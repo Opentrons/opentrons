@@ -205,6 +205,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
+    def get_active_channels(self) -> int:
+        ...
+
+    @abstractmethod
     def has_tip(self) -> bool:
         ...
 

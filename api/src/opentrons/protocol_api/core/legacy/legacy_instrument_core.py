@@ -527,5 +527,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
     ) -> None:
-        """This will never be called because it was added in API 2.15."""
+        """This will never be called because it was added in API 2.16."""
         pass
+
+    def get_active_channels(self) -> int:
+        """This will never be called because it was added in API 2.16."""
+        return 0

@@ -142,7 +142,7 @@ class TipView(HasState[TipState]):
         wells = self._state.tips_by_labware_id.get(labware_id, {})
         columns = self._state.column_by_labware_id.get(labware_id, [])
 
-        if columns and num_tips == len(columns[0]):
+        if columns and num_tips == len(columns[0]):  # Get next tips for 8-channel
             column_head = [column[0] for column in columns]
             starting_column_index = 0
 
@@ -158,7 +158,7 @@ class TipView(HasState[TipState]):
                 if not any(wells[well] == TipRackWellState.USED for well in column):
                     return column[0]
 
-        elif num_tips == len(wells.keys()):
+        elif num_tips == len(wells.keys()):  # Get next tips for 96 channel
             if starting_tip_name and starting_tip_name != columns[0][0]:
                 return None
 
@@ -167,7 +167,7 @@ class TipView(HasState[TipState]):
             ):
                 return next(iter(wells))
 
-        else:
+        else:  # Get next tips for single channel
             if starting_tip_name is not None:
                 wells = _drop_wells_before_starting_tip(wells, starting_tip_name)
 
