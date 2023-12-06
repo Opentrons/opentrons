@@ -108,6 +108,7 @@ export const UnmountGripper = (
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
         gridGap={SPACING.spacing8}
+        paddingLeft={isOnDevice ? 0 : SPACING.spacing32}
       >
         <Btn onClick={() => setShowGripperStillDetected(false)}>
           <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
