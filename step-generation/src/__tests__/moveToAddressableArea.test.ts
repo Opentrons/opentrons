@@ -17,7 +17,7 @@ const invariantContext: any = {
 describe('moveToAddressableArea', () => {
   it('should call moveToAddressableArea with correct params', () => {
     const robotInitialState = getRobotInitialState()
-    const mockName = '1ChannellWasteChute'
+    const mockName = '1ChannelWasteChute'
     const result = moveToAddressableArea(
       { pipetteId: mockId, addressableAreaName: mockName },
       invariantContext,

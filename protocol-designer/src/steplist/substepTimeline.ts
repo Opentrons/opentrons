@@ -292,8 +292,9 @@ export const substepTimelineMultiChannel = (
             : 'trashBinAdapter'
 
         const cutoutFixture =
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '1ChannelWasteChute' ||
+          wasteChuteddressableAreaNamesPipette.includes(
+            moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
+          ) ||
           moveToAddressableAreaCommand?.params.addressableAreaName ===
             '96ChannelWasteChute'
             ? 'wasteChuteRightAdapterNoCover'
