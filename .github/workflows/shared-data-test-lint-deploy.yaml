@@ -199,10 +199,10 @@ jobs:
         - id: publish-switch
           run: |
             echo "Determining whether to publish artifacts for event ${{github.event_type}} and ref ${{github.ref}}"
-            if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/shared-data')) }}" ] ; then
+            if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/shared-data')) }}" = "true"] ; then
               echo "Publishing builds for shared-data@ tags"
               echo 'should_publish=true' >> $GITHUB_OUTPUT
-            elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" ] ; then
+            elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true"] ; then
               echo "Publishing builds for components@ tags"
               echo 'should_publish=true' >> $GITHUB_OUTPUT
             else 
