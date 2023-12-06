@@ -70,14 +70,17 @@ def get_potential_cutout_fixtures(
                     PotentialCutoutFixture(
                         cutout_id=cutout_id,
                         cutout_fixture_id=cutout_fixture["id"],
+                        provided_addressable_areas=frozenset(provided_areas),
                     )
                 )
     # This following logic is making the assumption that every addressable area can only go on one cutout, though
     # it may have multiple cutout fixtures that supply it on that cutout. If this assumption changes, some of the
     # following logic will have to be readjusted
-    assert (
-        potential_fixtures
-    ), f"No potential fixtures for addressable area {addressable_area_name}"
+    if not potential_fixtures:
+        raise AddressableAreaDoesNotExistError(
+            f"{addressable_area_name} is not provided by any cutout fixtures"
+            f" in deck definition {deck_definition['otId']}"
+        )
     cutout_id = potential_fixtures[0].cutout_id
     assert all(cutout_id == fixture.cutout_id for fixture in potential_fixtures)
     return cutout_id, set(potential_fixtures)

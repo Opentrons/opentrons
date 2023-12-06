@@ -1,11 +1,11 @@
 """Tests for opentrons.legacy.Deck."""
 import inspect
-from typing import cast
+from typing import cast, Dict
 
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
 from opentrons.protocols.api_support.types import APIVersion
@@ -37,7 +37,7 @@ def deck_definition() -> DeckDefinitionV4:
 @pytest.fixture
 def api_version() -> APIVersion:
     """Get a dummy `APIVersion` with which to configure the subject."""
-    return APIVersion(123, 456)
+    return APIVersion(1, 234)
 
 
 @pytest.fixture(autouse=True)
@@ -67,15 +67,35 @@ def mock_core_map(decoy: Decoy) -> LoadedCoreMap:
 
 
 @pytest.fixture
+def slot_definitions_by_name() -> Dict[str, SlotDefV3]:
+    """Get a dictionary of slot names to slot definitions."""
+    return {"1": {}}
+
+
+@pytest.fixture
+def staging_slot_definitions_by_name() -> Dict[str, SlotDefV3]:
+    """Get a dictionary of staging slot names to slot definitions."""
+    return {"2": {}}
+
+
+@pytest.fixture
 def subject(
     decoy: Decoy,
     deck_definition: DeckDefinitionV4,
     mock_protocol_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
     api_version: APIVersion,
+    slot_definitions_by_name: Dict[str, SlotDefV3],
+    staging_slot_definitions_by_name: Dict[str, SlotDefV3],
 ) -> Deck:
     """Get a Deck test subject with its dependencies mocked out."""
     decoy.when(mock_protocol_core.get_deck_definition()).then_return(deck_definition)
+    decoy.when(mock_protocol_core.get_slot_definitions()).then_return(
+        slot_definitions_by_name
+    )
+    decoy.when(mock_protocol_core.get_staging_slot_definitions()).then_return(
+        staging_slot_definitions_by_name
+    )
 
     return Deck(
         protocol_core=mock_protocol_core,
@@ -228,120 +248,126 @@ def test_delitem_raises_if_slot_has_module(
         del subject[2]
 
 
-# TODO(jbl 10-30-2023) the following commented out tests are too tightly coupled to DeckDefinitionV3 to easily port over
-#   Either refactor them when the deck class is updated/made anew or delete them later
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": "1"},
-#                     {"id": "2"},
-#                     {"id": "3"},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_slot_keys_iter(subject: Deck) -> None:
-#     """It should provide an iterable interface to deck slots."""
-#     result = list(subject)
-#
-#     assert len(subject) == 3
-#     assert result == ["1", "2", "3"]
+@pytest.mark.parametrize(
+    argnames=["slot_definitions_by_name", "staging_slot_definitions_by_name"],
+    argvalues=[
+        (
+            {
+                "1": {},
+                "2": {},
+                "3": {},
+            },
+            {"4": {}},
+        )
+    ],
+)
+def test_slot_keys_iter(subject: Deck) -> None:
+    """It should provide an iterable interface to deck slots."""
+    result = list(subject)
+
+    assert len(subject) == 3
+    assert result == ["1", "2", "3"]
 
 
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": "fee"},
-#                     {"id": "foe"},
-#                     {"id": "fum"},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_slots_property(subject: Deck) -> None:
-#     """It should provide slot definitions."""
-#     assert subject.slots == [
-#         {"id": "fee"},
-#         {"id": "foe"},
-#         {"id": "fum"},
-#     ]
+@pytest.mark.parametrize(
+    argnames=[
+        "slot_definitions_by_name",
+        "staging_slot_definitions_by_name",
+        "api_version",
+    ],
+    argvalues=[
+        (
+            {
+                "1": {},
+                "2": {},
+                "3": {},
+            },
+            {"4": {}},
+            APIVersion(2, 16),
+        )
+    ],
+)
+def test_slot_keys_iter_with_staging_slots(subject: Deck) -> None:
+    """It should provide an iterable interface to deck slots."""
+    result = list(subject)
+
+    assert len(subject) == 4
+    assert result == ["1", "2", "3", "4"]
 
 
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": DeckSlotName.SLOT_2.id, "displayName": "foobar"},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_get_slot_definition(
-#     decoy: Decoy,
-#     mock_protocol_core: ProtocolCore,
-#     api_version: APIVersion,
-#     subject: Deck,
-# ) -> None:
-#     """It should provide slot definitions."""
-#     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
-#     decoy.when(
-#         mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
-#     ).then_return(DeckSlotName.SLOT_2)
-#
-#     assert subject.get_slot_definition(222) == {
-#         "id": DeckSlotName.SLOT_2.id,
-#         "displayName": "foobar",
-#     }
+@pytest.mark.parametrize(
+    "slot_definitions_by_name",
+    [
+        {
+            "1": {"id": "fee"},
+            "2": {"id": "foe"},
+            "3": {"id": "fum"},
+        }
+    ],
+)
+def test_slots_property(subject: Deck) -> None:
+    """It should provide slot definitions."""
+    assert subject.slots == [
+        {"id": "fee"},
+        {"id": "foe"},
+        {"id": "fum"},
+    ]
 
 
-# @pytest.mark.parametrize(
-#     "deck_definition",
-#     [
-#         {
-#             "locations": {
-#                 "orderedSlots": [
-#                     {"id": DeckSlotName.SLOT_3.id, "position": [1.0, 2.0, 3.0]},
-#                 ],
-#                 "calibrationPoints": [],
-#             }
-#         },
-#     ],
-# )
-# def test_get_position_for(
-#     decoy: Decoy,
-#     mock_protocol_core: ProtocolCore,
-#     api_version: APIVersion,
-#     subject: Deck,
-# ) -> None:
-#     """It should return a `Location` for a deck slot."""
-#     decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
-#     decoy.when(
-#         mock_validation.ensure_and_convert_deck_slot(333, api_version, "OT-3 Standard")
-#     ).then_return(DeckSlotName.SLOT_3)
-#     decoy.when(
-#         mock_validation.internal_slot_to_public_string(
-#             DeckSlotName.SLOT_3, "OT-3 Standard"
-#         )
-#     ).then_return("foo")
-#
-#     result = subject.position_for(333)
-#     assert result.point == Point(x=1.0, y=2.0, z=3.0)
-#     assert result.labware.is_slot is True
-#     assert str(result.labware) == "foo"
+@pytest.mark.parametrize(
+    "slot_definitions_by_name",
+    [
+        {
+            "2": {
+                "id": DeckSlotName.SLOT_2.id,
+                "displayName": "foobar",
+            }
+        }
+    ],
+)
+def test_get_slot_definition(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should provide slot definitions."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(222, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_2)
+
+    assert subject.get_slot_definition(222) == {
+        "id": DeckSlotName.SLOT_2.id,
+        "displayName": "foobar",
+    }
+
+
+@pytest.mark.parametrize(
+    "slot_definitions_by_name",
+    [{"3": {"position": [1.0, 2.0, 3.0]}}],
+)
+def test_get_position_for(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: Deck,
+) -> None:
+    """It should return a `Location` for a deck slot."""
+    decoy.when(mock_protocol_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(333, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_3)
+    decoy.when(
+        mock_validation.internal_slot_to_public_string(
+            DeckSlotName.SLOT_3, "OT-3 Standard"
+        )
+    ).then_return("foo")
+
+    result = subject.position_for(333)
+    assert result.point == Point(x=1.0, y=2.0, z=3.0)
+    assert result.labware.is_slot is True
+    assert str(result.labware) == "foo"
 
 
 def test_highest_z(

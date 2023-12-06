@@ -12,6 +12,7 @@ from typing import (
     Tuple,
     NamedTuple,
     cast,
+    Union,
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
@@ -19,7 +20,7 @@ from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, StagingSlotName, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -285,7 +286,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_by_slot(
         self,
-        slot_name: DeckSlotName,
+        slot_name: Union[DeckSlotName, StagingSlotName],
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
         loaded_labware = list(self._state.labware_by_id.values())
@@ -293,7 +294,10 @@ class LabwareView(HasState[LabwareState]):
         for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)
-                and labware.location.slotName == slot_name
+                and labware.location.slotName.id == slot_name.id
+            ) or (
+                isinstance(labware.location, AddressableAreaLocation)
+                and labware.location.addressableAreaName == slot_name.id
             ):
                 return labware
 
