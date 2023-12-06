@@ -15,6 +15,7 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('moveLiquid')).toEqual({
         pipette: null,
+        nozzles: null,
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
@@ -84,6 +85,7 @@ describe('getDefaultsForStepType', () => {
         mix_touchTip_mmFromBottom: null,
         mix_touchTip_checkbox: false,
         pipette: null,
+        nozzles: null,
         volume: undefined,
         times: null,
         wells: [],

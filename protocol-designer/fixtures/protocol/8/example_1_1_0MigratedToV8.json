@@ -125,7 +125,8 @@
           "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
           "stepType": "moveLiquid",
           "stepName": "transfer things",
-          "stepDetails": "yeah notes"
+          "stepDetails": "yeah notes",
+          "nozzles": null
         },
         "18113c80-92a6-11e9-ac62-1b173f839d9e": {
           "times": 3,
@@ -151,7 +152,8 @@
           "id": "18113c80-92a6-11e9-ac62-1b173f839d9e",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "2e622080-92a6-11e9-ac62-1b173f839d9e": {
           "pauseAction": "untilTime",

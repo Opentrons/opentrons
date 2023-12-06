@@ -131,6 +131,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    case 'configureNozzleLayout':
+      break
+
     case 'touchTip':
     case 'waitForDuration':
     case 'waitForResume':

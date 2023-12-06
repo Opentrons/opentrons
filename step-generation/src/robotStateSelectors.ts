@@ -6,6 +6,9 @@ import {
   getTiprackVolume,
   THERMOCYCLER_MODULE_TYPE,
   orderWells,
+  NozzleConfigurationStyle,
+  COLUMN,
+  ALL,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -25,9 +28,10 @@ export function _getNextTip(args: {
   tiprackId: string
   invariantContext: InvariantContext
   robotState: RobotState
+  nozzles?: NozzleConfigurationStyle
 }): string | null {
   // return the well name of the next available tip for a pipette (or null)
-  const { pipetteId, tiprackId, invariantContext, robotState } = args
+  const { pipetteId, tiprackId, invariantContext, robotState, nozzles } = args
   const pipetteChannels =
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
@@ -41,13 +45,13 @@ export function _getNextTip(args: {
     return well || null
   }
 
-  if (pipetteChannels === 8) {
+  if (pipetteChannels === 8 || (pipetteChannels === 96 && nozzles === COLUMN)) {
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
     const fullColumn = tiprackColumns.find(col => col.every(hasTip))
     return fullColumn != null ? fullColumn[0] : null
   }
-  if (pipetteChannels === 96) {
+  if (pipetteChannels === 96 && nozzles === ALL) {
     const allWellsHaveTip = orderedWells.every(hasTip)
     return allWellsHaveTip ? orderedWells[0] : null
   }
@@ -55,15 +59,19 @@ export function _getNextTip(args: {
   assert(false, `Pipette ${pipetteId} has no channels/spec, cannot _getNextTip`)
   return null
 }
-type NextTiprack = {
-  tiprackId: string
-  well: string
-} | null
+interface NextTiprackInfo {
+  nextTiprack: {
+    tiprackId: string
+    well: string
+  } | null
+  tipracks: { totalTipracks: number; filteredTipracks: number }
+}
 export function getNextTiprack(
   pipetteId: string,
   invariantContext: InvariantContext,
-  robotState: RobotState
-): NextTiprack {
+  robotState: RobotState,
+  nozzles?: NozzleConfigurationStyle
+): NextTiprackInfo {
   /** Returns the next tiprack that has tips.
     Tipracks are any labwareIds that exist in tipState.tipracks.
     For 8-channel pipette, tipracks need a full column of tips.
@@ -92,34 +100,64 @@ export function getNextTiprack(
       )
     }
   )
-  const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>
+  const is96Channel = pipetteEntity.spec.channels === 96
+  const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
+    tiprackId => {
+      const tipRackLocation = robotState.labware[tiprackId].slot
+      const tiprackLocation = invariantContext.labwareEntities[tipRackLocation]
+      const has96TiprackAdapterId =
+        tiprackLocation?.def.parameters.loadName ===
+          'opentrons_flex_96_tiprack_adapter' &&
+        tiprackLocation?.def.namespace === 'opentrons'
+
+      return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
+    }
+  )
+  const firstAvailableTiprack = (is96Channel
+    ? filteredSortedTipRackIdsFor96Channel
+    : sortedTipracksIds
+  ).find(tiprackId =>
     _getNextTip({
       pipetteId,
       tiprackId,
+      nozzles,
       invariantContext,
       robotState,
     })
   )
-
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip =
     firstAvailableTiprack &&
     _getNextTip({
       pipetteId,
       tiprackId: firstAvailableTiprack,
+      nozzles,
       invariantContext,
       robotState,
     })
 
   if (firstAvailableTiprack && nextTip) {
     return {
-      tiprackId: firstAvailableTiprack,
-      well: nextTip,
+      nextTiprack: {
+        tiprackId: firstAvailableTiprack,
+        well: nextTip,
+      },
+      tipracks: {
+        totalTipracks: sortedTipracksIds.length,
+        filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+      },
     }
   }
 
-  // No available tipracks (for given pipette channels)
-  return null
+  // No available tipracks (for given pipette channels) but keep track of tiprack numbers
+  // for 96-channel and tiprack adapters
+  return {
+    nextTiprack: null,
+    tipracks: {
+      totalTipracks: sortedTipracksIds.length,
+      filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+    },
+  }
 }
 export function getPipetteWithTipMaxVol(
   pipetteId: string,

@@ -1,24 +1,26 @@
+import { ALL, COLUMN, NozzleConfigurationStyle } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
 import { COLUMN_4_SLOTS } from '../../constants'
-import { dropTip } from './dropTip'
 import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
-  getLabwareSlot,
-  reduceCommandCreators,
-  modulePipetteCollision,
-  uuid,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsTallLabwareWestOf96Channel,
+  getLabwareSlot,
+  modulePipetteCollision,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  reduceCommandCreators,
+  uuid,
   wasteChuteCommandsUtil,
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
+import { dropTip } from './dropTip'
 import type {
+  CommandCreator,
   CommandCreatorError,
   CurriedCommandCreator,
-  CommandCreator,
 } from '../../types'
 interface PickUpTipArgs {
   pipette: string
@@ -33,14 +35,6 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 ) => {
   const errors: CommandCreatorError[] = []
   const tiprackSlot = prevRobotState.labware[args.tiprack].slot
-  const pipetteName = invariantContext.pipetteEntities[args.pipette].name
-  const adapterId =
-    invariantContext.labwareEntities[tiprackSlot] != null
-      ? invariantContext.labwareEntities[tiprackSlot]
-      : null
-  if (adapterId == null && pipetteName === 'p1000_96') {
-    errors.push(errorCreators.missingAdapter())
-  }
   if (COLUMN_4_SLOTS.includes(tiprackSlot)) {
     errors.push(
       errorCreators.pipettingIntoColumn4({ typeOfStep: 'pick up tip' })
@@ -68,6 +62,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 interface ReplaceTipArgs {
   pipette: string
   dropTipLocation: string
+  nozzles?: NozzleConfigurationStyle
 }
 
 /**
@@ -80,8 +75,31 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, dropTipLocation } = args
-  const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
+  const { pipette, dropTipLocation, nozzles } = args
+  const { nextTiprack, tipracks } = getNextTiprack(
+    pipette,
+    invariantContext,
+    prevRobotState,
+    nozzles
+  )
+  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const channels = pipetteSpec?.channels
+  const hasMoreTipracksOnDeck =
+    tipracks?.totalTipracks > tipracks?.filteredTipracks
+
+  const is96ChannelTipracksAvailable =
+    nextTiprack == null && channels === 96 && hasMoreTipracksOnDeck
+  if (nozzles === ALL && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.missingAdapter()],
+    }
+  }
+
+  if (nozzles === COLUMN && is96ChannelTipracksAvailable) {
+    return {
+      errors: [errorCreators.removeAdapter()],
+    }
+  }
 
   if (nextTiprack == null) {
     // no valid next tip / tiprack, bail out
@@ -90,10 +108,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
-    (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
-    false
+    (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
 
   if (!pipetteSpec)
     return {
@@ -133,6 +149,28 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
+  if (
+    channels === 96 &&
+    nozzles === COLUMN &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      nextTiprack.tiprackId,
+      pipette
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'tiprack',
+          labware:
+            invariantContext.labwareEntities[nextTiprack.tiprackId].def.metadata
+              .displayName,
+        }),
+      ],
+    }
+  }
+
   if (
     modulePipetteCollision({
       pipette,
