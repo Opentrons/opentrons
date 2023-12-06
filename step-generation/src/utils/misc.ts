@@ -9,6 +9,9 @@ import {
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
   PipetteChannels,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -45,13 +48,13 @@ export function getWasteChuteAddressableAreaNamePip(
 ): string {
   switch (channels) {
     case 1: {
-      return '1ChannelWasteChute'
+      return ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
     }
     case 8: {
-      return '8ChannelWasteChute'
+      return EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
     }
     case 96: {
-      return '96ChannelWasteChute'
+      return NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
     }
   }
 }
