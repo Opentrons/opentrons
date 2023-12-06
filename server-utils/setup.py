@@ -51,7 +51,7 @@ KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Common utilities for various Opentrons Python servers."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    "anyio==3.3.0",
+    "anyio==3.6.1",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",
     "python-multipart==0.0.5",

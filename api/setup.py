@@ -61,7 +61,7 @@ PACKAGES = find_packages(where="src")
 INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
     "aionotify==0.2.0",
-    "anyio==3.3.0",
+    "anyio==3.6.1",
     "jsonschema==3.0.2",
     "numpy>=1.15.1,<2",
     "pydantic==1.8.2",

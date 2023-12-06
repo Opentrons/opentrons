@@ -7,8 +7,8 @@ name = "pypi"
 # atomicwrites and colorama are pytest dependencies on windows,
 # spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
-atomicwrites = { version = "==1.4.0", sys_platform = "== 'win32'" }
-colorama = { version = "==0.4.4", sys_platform = "== 'win32'" }
+atomicwrites = { version = "==1.4.0", markers="sys_platform=='win32'" }
+colorama = { version = "==0.4.4", markers="sys_platform=='win32'" }
 coverage = "==5.1"
 mypy = "==0.910"
 numpydoc = "==0.9.1"
@@ -23,7 +23,7 @@ wheel = "==0.37.0"
 typeguard = "==2.13.1"
 sphinx-substitution-extensions = "==2020.9.30.0"
 sphinxext-opengraph = "==0.8.1"
-sphinx-tabs = ">=3.4.1,<4"
+sphinx-tabs = ">=3.4.0,<4"
 mock = "~=4.0.3"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
@@ -35,7 +35,7 @@ types-mock = "==4.0.1"
 types-setuptools = "==57.0.2"
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons = { editable = true, path = "." }
-opentrons-hardware = { editable = true, path = "./../hardware", extras= ["FLEX"] }
+opentrons-hardware = { editable = true, path = "./../hardware", extras=["FLEX"] }
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
 pytest-profiling = "~=1.7.0"
