@@ -32,6 +32,7 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+from . import deck_conflict
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
@@ -141,7 +142,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     absolute_point=location.point,
                 )
             )
-
+            deck_conflict.check_safe_for_pipette_movement(
+                engine_state=self._engine_client.state,
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+            )
             self._engine_client.aspirate(
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
@@ -155,7 +162,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def dispense(
         self,
-        location: Location,
+        location: Union[Location, TrashBin, WasteChute],
         well_core: Optional[WellCore],
         volume: float,
         rate: float,
@@ -175,15 +182,20 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         """
         if well_core is None:
             if not in_place:
-                self._engine_client.move_to_coordinates(
-                    pipette_id=self._pipette_id,
-                    coordinates=DeckPoint(
-                        x=location.point.x, y=location.point.y, z=location.point.z
-                    ),
-                    minimum_z_height=None,
-                    force_direct=False,
-                    speed=None,
-                )
+                if isinstance(location, (TrashBin, WasteChute)):
+                    self._move_to_disposal_location(
+                        disposal_location=location, force_direct=False, speed=None
+                    )
+                else:
+                    self._engine_client.move_to_coordinates(
+                        pipette_id=self._pipette_id,
+                        coordinates=DeckPoint(
+                            x=location.point.x, y=location.point.y, z=location.point.z
+                        ),
+                        minimum_z_height=None,
+                        force_direct=False,
+                        speed=None,
+                    )
 
             self._engine_client.dispense_in_place(
                 pipette_id=self._pipette_id,
@@ -192,6 +204,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 push_out=push_out,
             )
         else:
+            if isinstance(location, (TrashBin, WasteChute)):
+                raise ValueError("Trash Bin and Waste Chute have no Wells.")
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
@@ -202,7 +216,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     absolute_point=location.point,
                 )
             )
-
+            deck_conflict.check_safe_for_pipette_movement(
+                engine_state=self._engine_client.state,
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+            )
             self._engine_client.dispense(
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
@@ -213,10 +233,18 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 push_out=push_out,
             )
 
-        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+        if isinstance(location, (TrashBin, WasteChute)):
+            self._protocol_core.set_last_location(location=None, mount=self.get_mount())
+        else:
+            self._protocol_core.set_last_location(
+                location=location, mount=self.get_mount()
+            )
 
     def blow_out(
-        self, location: Location, well_core: Optional[WellCore], in_place: bool
+        self,
+        location: Union[Location, TrashBin, WasteChute],
+        well_core: Optional[WellCore],
+        in_place: bool,
     ) -> None:
         """Blow liquid out of the tip.
 
@@ -228,20 +256,27 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         flow_rate = self.get_blow_out_flow_rate(1.0)
         if well_core is None:
             if not in_place:
-                self._engine_client.move_to_coordinates(
-                    pipette_id=self._pipette_id,
-                    coordinates=DeckPoint(
-                        x=location.point.x, y=location.point.y, z=location.point.z
-                    ),
-                    force_direct=False,
-                    minimum_z_height=None,
-                    speed=None,
-                )
+                if isinstance(location, (TrashBin, WasteChute)):
+                    self._move_to_disposal_location(
+                        disposal_location=location, force_direct=False, speed=None
+                    )
+                else:
+                    self._engine_client.move_to_coordinates(
+                        pipette_id=self._pipette_id,
+                        coordinates=DeckPoint(
+                            x=location.point.x, y=location.point.y, z=location.point.z
+                        ),
+                        force_direct=False,
+                        minimum_z_height=None,
+                        speed=None,
+                    )
 
             self._engine_client.blow_out_in_place(
                 pipette_id=self._pipette_id, flow_rate=flow_rate
             )
         else:
+            if isinstance(location, (TrashBin, WasteChute)):
+                raise ValueError("Trash Bin and Waste Chute have no Wells.")
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
@@ -252,7 +287,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     absolute_point=location.point,
                 )
             )
-
+            deck_conflict.check_safe_for_pipette_movement(
+                engine_state=self._engine_client.state,
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+                well_location=well_location,
+            )
             self._engine_client.blow_out(
                 pipette_id=self._pipette_id,
                 labware_id=labware_id,
@@ -263,7 +304,12 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 flow_rate=flow_rate,
             )
 
-        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
+        if isinstance(location, (TrashBin, WasteChute)):
+            self._protocol_core.set_last_location(location=None, mount=self.get_mount())
+        else:
+            self._protocol_core.set_last_location(
+                location=location, mount=self.get_mount()
+            )
 
     def touch_tip(
         self,
@@ -289,7 +335,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         well_location = WellLocation(
             origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=z_offset)
         )
-
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=self._engine_client.state,
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
         self._engine_client.touch_tip(
             pipette_id=self._pipette_id,
             labware_id=labware_id,
@@ -331,7 +383,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             absolute_point=location.point,
         )
-
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=self._engine_client.state,
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
         self._engine_client.pick_up_tip(
             pipette_id=self._pipette_id,
             labware_id=labware_id,
@@ -376,7 +434,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         else:
             well_location = DropTipWellLocation()
-
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=self._engine_client.state,
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=WellLocation(),
+        )
         self._engine_client.drop_tip(
             pipette_id=self._pipette_id,
             labware_id=labware_id,
@@ -397,6 +461,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             speed=None,
         )
         self._drop_tip_in_place(home_after=home_after)
+        self._protocol_core.set_last_location(location=None, mount=self.get_mount())
 
     def _move_to_disposal_location(
         self,
@@ -448,13 +513,15 @@ class InstrumentCore(AbstractInstrument[WellCore]):
 
     def move_to(
         self,
-        location: Location,
+        location: Union[Location, TrashBin, WasteChute],
         well_core: Optional[WellCore],
         force_direct: bool,
         minimum_z_height: Optional[float],
         speed: Optional[float],
     ) -> None:
         if well_core is not None:
+            if isinstance(location, (TrashBin, WasteChute)):
+                raise ValueError("Trash Bin and Waste Chute have no Wells.")
             labware_id = well_core.labware_id
             well_name = well_core.get_name()
             well_location = (
@@ -475,16 +542,26 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 speed=speed,
             )
         else:
-            self._engine_client.move_to_coordinates(
-                pipette_id=self._pipette_id,
-                coordinates=DeckPoint(
-                    x=location.point.x, y=location.point.y, z=location.point.z
-                ),
-                minimum_z_height=minimum_z_height,
-                force_direct=force_direct,
-                speed=speed,
+            if isinstance(location, (TrashBin, WasteChute)):
+                self._move_to_disposal_location(
+                    disposal_location=location, force_direct=force_direct, speed=speed
+                )
+            else:
+                self._engine_client.move_to_coordinates(
+                    pipette_id=self._pipette_id,
+                    coordinates=DeckPoint(
+                        x=location.point.x, y=location.point.y, z=location.point.z
+                    ),
+                    minimum_z_height=minimum_z_height,
+                    force_direct=force_direct,
+                    speed=speed,
+                )
+        if isinstance(location, (TrashBin, WasteChute)):
+            self._protocol_core.set_last_location(location=None, mount=self.get_mount())
+        else:
+            self._protocol_core.set_last_location(
+                location=location, mount=self.get_mount()
             )
-        self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def get_mount(self) -> Mount:
         """Get the mount the pipette is attached to."""

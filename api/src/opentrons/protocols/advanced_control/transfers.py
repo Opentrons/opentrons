@@ -17,6 +17,7 @@ from opentrons.protocol_api.labware import Labware, Well
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 
+
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
     from opentrons.protocols.execution.dev_types import Dictable
@@ -805,8 +806,8 @@ class TransferPlan:
                         "blow_out", [self._instr.trash_container.wells()[0]]
                     )
                 else:
-                    # TODO (nd 2023/12/04) handle blowout at TrashBin or WasteChute
-                    raise NotImplementedError("Cannot blow out at this location.")
+                    yield self._format_dict("blow_out", [self._instr.trash_container])
+
         else:
             # Used by distribute
             if self._strategy.air_gap:

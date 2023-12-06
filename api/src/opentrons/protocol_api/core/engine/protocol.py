@@ -325,23 +325,18 @@ class ProtocolCore(
             else None
         )
 
-        if isinstance(new_location, WasteChute):
-            self._move_labware_to_waste_chute(
-                labware_core, strategy, _pick_up_offset, _drop_offset
-            )
-        else:
-            to_location = self._convert_labware_location(location=new_location)
+        to_location = self._convert_labware_location(location=new_location)
 
-            # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
-            # when move_labware() support is no longer experimental.
+        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
+        # when move_labware() support is no longer experimental.
 
-            self._engine_client.move_labware(
-                labware_id=labware_core.labware_id,
-                new_location=to_location,
-                strategy=strategy,
-                pick_up_offset=_pick_up_offset,
-                drop_offset=_drop_offset,
-            )
+        self._engine_client.move_labware(
+            labware_id=labware_core.labware_id,
+            new_location=to_location,
+            strategy=strategy,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
+        )
 
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
             # Clear out last location since it is not relevant to pipetting
@@ -709,6 +704,7 @@ class ProtocolCore(
             ModuleCore,
             NonConnectedModuleCore,
             OffDeckType,
+            WasteChute,
         ],
     ) -> LabwareLocation:
         if isinstance(location, LabwareCore):
@@ -724,6 +720,7 @@ class ProtocolCore(
             ModuleCore,
             NonConnectedModuleCore,
             OffDeckType,
+            WasteChute,
         ]
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
@@ -734,3 +731,6 @@ class ProtocolCore(
             return DeckSlotLocation(slotName=location)
         elif isinstance(location, StagingSlotName):
             return AddressableAreaLocation(addressableAreaName=location.id)
+        elif isinstance(location, WasteChute):
+            # TODO(mm, 2023-12-06) This will need to determine the appropriate Waste Chute to return, but only move_labware uses this for now
+            return AddressableAreaLocation(addressableAreaName="gripperWasteChute")

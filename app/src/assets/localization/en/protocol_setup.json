@@ -42,7 +42,6 @@
   "configured": "configured",
   "confirm_heater_shaker_module_modal_description": "Before the run begins, module should have both anchors fully extended for a firm attachment. The thermal adapter should be attached to the module. ",
   "confirm_heater_shaker_module_modal_title": "Confirm Heater-Shaker Module is attached",
-  "confirm_removal": "Confirm removal",
   "connect_all_hardware": "Connect and calibrate all hardware first",
   "connect_all_mod": "Connect all modules first",
   "connection_info_not_available": "Connection info not available once run has started",

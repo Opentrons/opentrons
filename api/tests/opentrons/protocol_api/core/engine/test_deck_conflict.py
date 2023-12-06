@@ -1,18 +1,28 @@
 """Unit tests for the deck_conflict module."""
 
-from decoy import Decoy
 import pytest
-
+from typing import ContextManager, Any
+from decoy import Decoy
+from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.protocol_api.core.engine import deck_conflict
 from opentrons.protocol_engine import Config, DeckSlotLocation, ModuleModel, StateView
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, Point
 
-from opentrons.protocol_engine.types import DeckType
+from opentrons.protocol_engine.types import (
+    DeckType,
+    LoadedLabware,
+    LoadedModule,
+    WellLocation,
+    WellOrigin,
+    WellOffset,
+    TipGeometry,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -265,3 +275,201 @@ def test_maps_different_module_models(
             robot_type=mock_state_view.config.robot_type,
         )
     )
+
+
+plate = LoadedLabware(
+    id="plate-id",
+    loadName="plate-load-name",
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C1),
+    definitionUri="some-plate-uri",
+    offsetId=None,
+    displayName="Fancy Plate Name",
+)
+
+module = LoadedModule(
+    id="module-id",
+    model=ModuleModel.TEMPERATURE_MODULE_V1,
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C1),
+    serialNumber="serial-number",
+)
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [("OT-3 Standard", DeckType.OT3_STANDARD)],
+)
+@pytest.mark.parametrize(
+    ["destination_well_point", "expected_raise"],
+    [
+        (Point(x=100, y=100, z=60), does_not_raise()),
+        # Z-collisions
+        (
+            Point(x=100, y=100, z=10),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="collision with items in deck slot",
+            ),
+        ),
+        (
+            Point(x=100, y=100, z=20),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="collision with items in deck slot",
+            ),
+        ),
+        # Out-of-bounds error
+        (
+            Point(x=-10, y=100, z=60),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="outside of robot bounds",
+            ),
+        ),
+        (
+            Point(x=593, y=100, z=60),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="outside of robot bounds",
+            ),
+        ),
+        (
+            Point(x=100, y=1, z=60),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="outside of robot bounds",
+            ),
+        ),
+        (
+            Point(x=100, y=507, z=60),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="outside of robot bounds",
+            ),
+        ),
+    ],
+)
+def test_deck_conflict_raises_for_bad_partial_96_channel_move(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    destination_well_point: Point,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise errors when moving to locations with restrictions for partial tip 96-channel movement.
+
+    Test premise:
+    - we are using a pipette configured for COLUMN nozzle layout with primary nozzle A12
+    - there's a labware of height 50mm in C1
+    - we are checking for conflicts when moving to a labware in C2.
+      For each test case, we are moving to a different point in the destination labware,
+      with the same pipette and tip (tip length is 10mm)
+    """
+    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(96)
+    decoy.when(
+        mock_state_view.pipettes.get_nozzle_layout_type("pipette-id")
+    ).then_return(NozzleConfigurationType.COLUMN)
+    decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
+        "A12"
+    )
+    decoy.when(
+        mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
+    ).then_return(DeckSlotName.SLOT_C2)
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_in_slot(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
+        )
+    ).then_return(50)
+    decoy.when(
+        mock_state_view.geometry.get_well_position(
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+    ).then_return(destination_well_point)
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=10, diameter=100, volume=0)
+    )
+
+    with expected_raise:
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_state_view,
+            pipette_id="pipette-id",
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+
+
+@pytest.mark.parametrize(
+    ("robot_type", "deck_type"),
+    [("OT-3 Standard", DeckType.OT3_STANDARD)],
+)
+@pytest.mark.parametrize(
+    ["destination_well_point", "expected_raise"],
+    [
+        (Point(x=100, y=100, z=60), does_not_raise()),
+        # Z-collisions
+        (
+            Point(x=100, y=100, z=10),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="collision with items in deck slot",
+            ),
+        ),
+        (
+            Point(x=100, y=100, z=20),
+            pytest.raises(
+                deck_conflict.PartialTipMovementNotAllowedError,
+                match="collision with items in deck slot",
+            ),
+        ),
+    ],
+)
+def test_deck_conflict_raises_for_bad_partial_8_channel_move(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    destination_well_point: Point,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise errors when moving to locations with restrictions for partial tip 8-channel movement.
+
+    Test premise:
+    - we are using a pipette configured for SINGLE nozzle layout with primary nozzle H1
+    - there's a labware of height 50mm in B2
+    - we are checking for conflicts when moving to a labware in C2.
+      For each test case, we are moving to a different point in the destination labware,
+      with the same pipette and tip (tip length is 10mm)
+    """
+    decoy.when(mock_state_view.pipettes.get_channels("pipette-id")).then_return(8)
+    decoy.when(
+        mock_state_view.pipettes.get_nozzle_layout_type("pipette-id")
+    ).then_return(NozzleConfigurationType.SINGLE)
+    decoy.when(mock_state_view.pipettes.get_primary_nozzle("pipette-id")).then_return(
+        "H1"
+    )
+    decoy.when(
+        mock_state_view.geometry.get_ancestor_slot_name("destination-labware-id")
+    ).then_return(DeckSlotName.SLOT_C2)
+    decoy.when(
+        mock_state_view.geometry.get_highest_z_in_slot(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_B2)
+        )
+    ).then_return(50)
+    decoy.when(
+        mock_state_view.geometry.get_well_position(
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )
+    ).then_return(destination_well_point)
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=10, diameter=100, volume=0)
+    )
+
+    with expected_raise:
+        deck_conflict.check_safe_for_pipette_movement(
+            engine_state=mock_state_view,
+            pipette_id="pipette-id",
+            labware_id="destination-labware-id",
+            well_name="A2",
+            well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+        )

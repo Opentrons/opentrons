@@ -32,6 +32,9 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerStep,
 )
 
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
+
 if TYPE_CHECKING:
     from .labware import Well
 
@@ -407,8 +410,9 @@ class LocationTypeError(TypeError):
 
 
 def validate_location(
-    location: Union[Location, Well, None], last_location: Optional[Location]
-) -> Union[WellTarget, PointTarget]:
+    location: Union[Location, Well, TrashBin, WasteChute, None],
+    last_location: Optional[Location],
+) -> Union[WellTarget, PointTarget, TrashBin, WasteChute]:
     """Validate a given location for a liquid handling command.
 
     Args:
@@ -430,10 +434,13 @@ def validate_location(
     if target_location is None:
         raise NoLocationError()
 
-    if not isinstance(target_location, (Location, Well)):
+    if not isinstance(target_location, (Location, Well, TrashBin, WasteChute)):
         raise LocationTypeError(
-            f"location should be a Well or Location, but it is {location}"
+            f"location should be a Well, Location, TrashBin or WasteChute, but it is {location}"
         )
+
+    if isinstance(target_location, (TrashBin, WasteChute)):
+        return target_location
 
     in_place = target_location == last_location
 

@@ -123,7 +123,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def dispense(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         volume: float,
         rate: float,
@@ -131,6 +131,10 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         in_place: bool,
         push_out: Optional[float],
     ) -> None:
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Dispense in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.DISPENSE.name)
@@ -138,10 +142,14 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def blow_out(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
     ) -> None:
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Blow Out in Moveable Trash or Waste Chute are not supported in this API Version."
+            )
         if not in_place:
             self.move_to(location=location, well_core=well_core)
         self._raise_if_no_tip(HardwareAction.BLOWOUT.name)
@@ -269,13 +277,18 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
 
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore] = None,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
+        if isinstance(location, (TrashBin, WasteChute)):
+            raise APIVersionError(
+                "Move To Trash Bin and Waste Chute are not supported in this API Version."
+            )
+
         self.flag_unsafe_move(location)
 
         last_location = self._protocol_interface.get_last_location()
