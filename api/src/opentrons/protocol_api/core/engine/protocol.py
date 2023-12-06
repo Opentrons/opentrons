@@ -1,5 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Type, Union, List, Tuple
+from __future__ import annotations
+from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_api import _waste_chute_dimensions
 
@@ -17,6 +18,7 @@ from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
+
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -44,6 +46,7 @@ from opentrons.protocol_engine.errors import (
 from ... import validation
 from ..._types import OffDeckType, OFF_DECK, StagingSlotName
 from ..._liquid import Liquid
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -61,6 +64,9 @@ from .module_core import (
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
+
+if TYPE_CHECKING:
+    from ...labware import Labware
 
 
 class ProtocolCore(
@@ -91,6 +97,7 @@ class ProtocolCore(
         self._module_cores_by_id: Dict[
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
+        self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
         self._load_fixed_trash()
 
     @property
@@ -106,17 +113,28 @@ class ProtocolCore(
     def fixed_trash(self) -> Optional[LabwareCore]:
         """Get the fixed trash labware."""
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
+        if trash_id is not None and self._api_version < APIVersion(2, 16):
             return self._labware_cores_by_id[trash_id]
         return None
 
     def _load_fixed_trash(self) -> None:
-        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
-            self._labware_cores_by_id[trash_id] = LabwareCore(
-                labware_id=trash_id,
-                engine_client=self._engine_client,
-            )
+        if self.robot_type == "OT-2 Standard" or self._api_version < APIVersion(2, 16):
+            trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+            if trash_id is not None:
+                self._labware_cores_by_id[trash_id] = LabwareCore(
+                    labware_id=trash_id,
+                    engine_client=self._engine_client,
+                )
+
+    def append_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Append a disposal location object to the core"""
+        self._disposal_locations.append(disposal_location)
+
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
+        """Get disposal locations."""
+        return self._disposal_locations
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""

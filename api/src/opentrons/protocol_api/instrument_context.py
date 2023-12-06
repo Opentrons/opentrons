@@ -32,6 +32,7 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from ._nozzle_layout import NozzleLayout
 from . import labware, validation
@@ -86,7 +87,7 @@ class InstrumentContext(publisher.CommandPublisher):
         broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
-        trash: Optional[labware.Labware],
+        trash: Optional[Union[labware.Labware, TrashBin, WasteChute]],
         requested_as: str,
     ) -> None:
         super().__init__(broker)
@@ -100,7 +101,9 @@ class InstrumentContext(publisher.CommandPublisher):
             default_aspirate=_DEFAULT_ASPIRATE_CLEARANCE,
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
-        self._trash = trash
+        self._user_specified_trash: Union[
+            labware.Labware, TrashBin, WasteChute, None
+        ] = trash
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -892,6 +895,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[
                 types.Location,
                 labware.Well,
+                TrashBin,
                 WasteChute,
             ]
         ] = None,
@@ -921,6 +925,12 @@ class InstrumentContext(publisher.CommandPublisher):
             - As a :py:class:`~.types.Location`. For example, to drop a tip from an
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
+            - As a :py:class:`.TrashBin`. This uses a default location relative to the
+              TrashBin object. For example,
+              ``pipette.drop_tip(location=trash_bin)``.
+            - As a :py:class:`.WasteChute`. This uses a default location relative to
+              the WasteChute object. For example,
+              ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
             The location to drop the tip.
@@ -938,9 +948,17 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
-            well = self.trash_container.wells()[0]
+            trash_container = self.trash_container
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
+            if isinstance(trash_container, labware.Labware):
+                well = trash_container.wells()[0]
+            else:  # implicit drop tip in disposal location, not well
+                self._core.drop_tip_in_disposal_location(
+                    trash_container, home_after=home_after
+                )
+                self._last_tip_picked_up_from = None
+                return self
 
         elif isinstance(location, labware.Well):
             well = location
@@ -960,9 +978,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
             well = maybe_well
 
-        elif isinstance(location, WasteChute):
+        elif isinstance(location, (TrashBin, WasteChute)):
             # TODO: Publish to run log.
-            self._core.drop_tip_in_waste_chute(location, home_after=home_after)
+            self._core.drop_tip_in_disposal_location(location, home_after=home_after)
             self._last_tip_picked_up_from = None
             return self
 
@@ -1446,23 +1464,36 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(self) -> labware.Labware:
+    def trash_container(self) -> Union[labware.Labware, TrashBin, WasteChute]:
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        By default, the trash container is in slot A3 on Flex and in slot 12 on OT-2.
+        On a Flex running a protocol with API version 2.16 or higher, ``trash_container`` is
+        the first ``TrashBin`` or ``WasteChute`` object loaded in the protocol.
+        On a Flex running a protocol with API version 2.15, ``trash_container`` is
+        a single-well fixed trash labware in slot D3.
+        On a an OT-2, ``trash_container`` is always a single-well fixed trash labware
+        in slot 12.
+
+        .. versionchanged:: 2.16
+            Added support for ``TrashBin`` and ``WasteChute`` objects.
         """
-        if self._trash is None:
-            raise NoTrashDefinedError(
-                "No trash container has been defined in this protocol."
-            )
-        return self._trash
+        if self._user_specified_trash is None:
+            disposal_locations = self._protocol_core.get_disposal_locations()
+            if len(disposal_locations) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            return disposal_locations[0]
+        return self._user_specified_trash
 
     @trash_container.setter
-    def trash_container(self, trash: labware.Labware) -> None:
-        self._trash = trash
+    def trash_container(
+        self, trash: Union[labware.Labware, TrashBin, WasteChute]
+    ) -> None:
+        self._user_specified_trash = trash
 
     @property  # type: ignore
     @requires_version(2, 0)

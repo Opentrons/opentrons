@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -21,6 +21,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
@@ -253,10 +254,12 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
                     f"Could not return tip to {labware_core.get_display_name()}"
                 )
 
-    def drop_tip_in_waste_chute(
-        self, waste_chute: WasteChute, home_after: Optional[bool]
+    def drop_tip_in_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
     ) -> None:
-        raise APIVersionError("Waste chutes are not supported in this PAPI version.")
+        raise APIVersionError(
+            "Dropping tips in a trash bin or waste chute is not supported in this API Version."
+        )
 
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
