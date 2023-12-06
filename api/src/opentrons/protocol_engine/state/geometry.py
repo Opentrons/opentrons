@@ -3,7 +3,7 @@ import enum
 from numpy import array, dot
 from typing import Optional, List, Tuple, Union, cast, TypeVar
 
-from opentrons.types import Point, DeckSlotName, MountType
+from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
@@ -635,16 +635,20 @@ class GeometryView:
         return []
 
     def get_slot_item(
-        self,
-        slot_name: DeckSlotName,
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LoadedLabware, LoadedModule, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
         )
-        maybe_module = self._modules.get_by_slot(
-            slot_name=slot_name,
-        )
+
+        if isinstance(slot_name, DeckSlotName):
+            maybe_module = self._modules.get_by_slot(
+                slot_name=slot_name,
+            )
+        else:
+            # Modules can't be loaded on staging slots
+            maybe_module = None
 
         return maybe_labware or maybe_module or None
 

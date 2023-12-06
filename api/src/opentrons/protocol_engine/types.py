@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field, validator
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple
+from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -681,6 +681,7 @@ class PotentialCutoutFixture:
 
     cutout_id: str
     cutout_fixture_id: str
+    provided_addressable_areas: FrozenSet[str]
 
 
 class AreaType(Enum):

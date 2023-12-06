@@ -8,7 +8,7 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import Mount, DeckSlotName, StagingSlotName
 from opentrons.protocol_api import OFF_DECK
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
@@ -28,7 +28,6 @@ from opentrons.protocol_api import (
     validation as mock_validation,
     Liquid,
 )
-from opentrons.protocol_api._types import StagingSlotName
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.common import (

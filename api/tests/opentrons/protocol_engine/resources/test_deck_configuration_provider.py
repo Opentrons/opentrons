@@ -183,6 +183,7 @@ def test_get_provided_addressable_area_raises(
                 PotentialCutoutFixture(
                     cutout_id="cutout3",
                     cutout_fixture_id="singleStandardSlot",
+                    provided_addressable_areas=frozenset({"3"}),
                 )
             },
             lazy_fixture("ot2_standard_deck_def"),
@@ -194,6 +195,7 @@ def test_get_provided_addressable_area_raises(
                 PotentialCutoutFixture(
                     cutout_id="cutout3",
                     cutout_fixture_id="singleStandardSlot",
+                    provided_addressable_areas=frozenset({"3"}),
                 )
             },
             lazy_fixture("ot2_short_trash_deck_def"),
@@ -203,10 +205,14 @@ def test_get_provided_addressable_area_raises(
             "cutoutD3",
             {
                 PotentialCutoutFixture(
-                    cutout_id="cutoutD3", cutout_fixture_id="singleRightSlot"
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="singleRightSlot",
+                    provided_addressable_areas=frozenset({"D3"}),
                 ),
                 PotentialCutoutFixture(
-                    cutout_id="cutoutD3", cutout_fixture_id="stagingAreaRightSlot"
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="stagingAreaRightSlot",
+                    provided_addressable_areas=frozenset({"D3", "D4"}),
                 ),
             },
             lazy_fixture("ot3_standard_deck_def"),
@@ -231,7 +237,7 @@ def test_get_potential_cutout_fixtures_raises(
     ot3_standard_deck_def: DeckDefinitionV4,
 ) -> None:
     """It should raise if there is no fixtures that provide the requested area."""
-    with pytest.raises(AssertionError):
+    with pytest.raises(AddressableAreaDoesNotExistError):
         subject.get_potential_cutout_fixtures("theFunArea", ot3_standard_deck_def)
 
 

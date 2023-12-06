@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.util.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel, ModuleType
@@ -17,7 +17,7 @@ from opentrons.protocols import labware as labware_definition
 
 from ...labware import Labware
 from ..._liquid import Liquid
-from ..._types import OffDeckType, StagingSlotName
+from ..._types import OffDeckType
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
@@ -480,17 +480,27 @@ class LegacyProtocolCore(
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
 
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+    def get_slot_definition(
+        self, slot: Union[DeckSlotName, StagingSlotName]
+    ) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
         assert False, "get_slot_definition only supported on engine core"
 
+    def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all standard slot definitions available in the deck definition."""
+        assert False, "get_slot_definitions only supported on engine core"
+
+    def get_staging_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all staging slot definitions available in the deck definition."""
+        assert False, "get_staging_slot_definitions only supported on engine core"
+
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LegacyLabwareCore, legacy_module_core.LegacyModuleCore, None]:
         """Get the contents of a given slot, if any."""
         assert False, "get_slot_item only supported on engine core"
 
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
         assert False, "get_slot_center only supported on engine core."
 

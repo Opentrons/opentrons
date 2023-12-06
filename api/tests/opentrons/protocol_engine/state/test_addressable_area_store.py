@@ -30,6 +30,7 @@ from .command_fixtures import (
     create_load_labware_command,
     create_load_module_command,
     create_move_labware_command,
+    create_move_to_addressable_area_command,
 )
 
 
@@ -92,6 +93,7 @@ def test_initial_state_simulated(
         potential_cutout_fixtures_by_cutout_id={},
         deck_definition=ot3_standard_deck_def,
         deck_configuration=[],
+        robot_type="OT-3 Standard",
         use_simulated_deck_config=True,
     )
 
@@ -105,8 +107,8 @@ def test_initial_state(
     assert not subject.state.use_simulated_deck_config
     assert subject.state.deck_definition == ot3_standard_deck_def
     assert subject.state.deck_configuration == _make_deck_config()
-    # Loading 9 regular slots, 1 trash, 2 Staging Area slots and 3 waste chute types
-    assert len(subject.state.loaded_addressable_areas_by_name) == 15
+    # Loading 9 regular slots, 1 trash, 2 Staging Area slots and 4 waste chute types
+    assert len(subject.state.loaded_addressable_areas_by_name) == 16
 
 
 @pytest.mark.parametrize(
@@ -161,6 +163,12 @@ def test_initial_state(
                 strategy=LabwareMovementStrategy.USING_GRIPPER,
             ),
             "A4",
+        ),
+        (
+            create_move_to_addressable_area_command(
+                pipette_id="pipette-id", addressable_area_name="gripperWasteChute"
+            ),
+            "gripperWasteChute",
         ),
     ),
 )
