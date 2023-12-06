@@ -145,6 +145,8 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 
 
 @pytest.fixture
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def subject(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -202,6 +204,8 @@ def test_get_slot_definition(
     assert subject.get_slot_definition(DeckSlotName.SLOT_6) == expected_slot_def
 
 
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_fixed_trash(subject: ProtocolCore) -> None:
     """It should have a single labware core for the fixed trash."""
     result = subject.fixed_trash
@@ -307,12 +311,12 @@ def test_load_labware(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -378,12 +382,12 @@ def test_load_labware_on_staging_slot(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -459,12 +463,12 @@ def test_load_labware_on_labware(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -522,12 +526,12 @@ def test_load_labware_off_deck(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -581,12 +585,12 @@ def test_load_adapter(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -650,12 +654,12 @@ def test_load_adapter_on_staging_slot(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -832,7 +836,6 @@ def test_move_labware_off_deck(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -895,7 +898,7 @@ def test_load_labware_on_module(
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -968,7 +971,7 @@ def test_load_labware_on_non_connected_module(
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="abc123",
         )
@@ -1059,6 +1062,8 @@ def test_add_labware_definition(
         ),
     ],
 )
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_load_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1231,6 +1236,8 @@ def test_load_module_raises_wrong_location(
         )
 
 
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_load_mag_block(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1366,7 +1373,7 @@ def test_load_module_thermocycler_with_no_location(
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
             new_module_id="abc123",
         )

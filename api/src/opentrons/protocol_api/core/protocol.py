@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple, Dict
+from typing import Generic, List, Optional, Union, Tuple, Dict, TYPE_CHECKING
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -19,8 +19,12 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
+from .._trash_bin import TrashBin
 from .._waste_chute import WasteChute
 from .._types import OffDeckType
+
+if TYPE_CHECKING:
+    from ..labware import Labware
 
 
 class AbstractProtocol(
@@ -55,6 +59,13 @@ class AbstractProtocol(
         definition: LabwareDefinition,
     ) -> LabwareLoadParams:
         """Add a labware definition to the set of loadable definitions."""
+        ...
+
+    @abstractmethod
+    def append_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Append a disposal location object to the core"""
         ...
 
     @abstractmethod
@@ -135,6 +146,10 @@ class AbstractProtocol(
 
     @abstractmethod
     def set_rail_lights(self, on: bool) -> None:
+        ...
+
+    @abstractmethod
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         ...
 
     @abstractmethod
