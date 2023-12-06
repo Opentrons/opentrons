@@ -412,10 +412,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             addressable_area_name = disposal_location._addressable_area_name
         if isinstance(disposal_location, WasteChute):
             num_channels = self.get_channels()
-            if num_channels == 96:
-                addressable_area_name = "1and8ChannelWasteChute"
-            else:
-                addressable_area_name = "96ChannelWasteChute"
+            addressable_area_name = {
+                1: "1ChannelWasteChute",
+                8: "8ChannelWasteChute",
+                96: "96ChannelWasteChute",
+            }[num_channels]
 
         self._engine_client.move_to_addressable_area(
             pipette_id=self._pipette_id,
