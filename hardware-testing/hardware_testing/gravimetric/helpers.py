@@ -15,19 +15,21 @@ from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocol_api.labware import Well, Labware
+from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
+from opentrons import execute, simulate
 from opentrons.types import Point, Location
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
-from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
+from .workarounds import get_sync_hw_api
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 
@@ -79,13 +81,18 @@ def get_api_context(
             stall_detection_enable=stall_detection_enable,
         )
 
-    return protocol_api.create_protocol_context(
-        api_version=APIVersion.from_string(api_level),
-        hardware_api=ThreadManager(_thread_manager_build_hw_api),  # type: ignore[arg-type]
-        deck_type="ot3_standard",
-        extra_labware=extra_labware,
-        deck_version=2,
-    )
+    if is_simulating:
+        return simulate.get_protocol_api(
+            version=APIVersion.from_string(api_level),
+            extra_labware=extra_labware,
+            hardware_simulator=ThreadManager(_thread_manager_build_hw_api),
+            robot_type="Flex",
+            use_virtual_hardware=False,
+        )
+    else:
+        return execute.get_protocol_api(
+            version=APIVersion.from_string(api_level), extra_labware=extra_labware
+        )
 
 
 def well_is_reservoir(well: protocol_api.labware.Well) -> bool:
@@ -252,23 +259,6 @@ def _get_tip_batch(is_simulating: bool, tip: int) -> str:
         return "simulation-tip-batch"
 
 
-def _apply(labware: Labware, cfg: config.VolumetricConfig) -> None:
-    o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
-    ui.print_info(
-        f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
-        f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
-    )
-    labware.set_calibration(o)
-
-
-def _apply_labware_offsets(
-    cfg: config.VolumetricConfig,
-    labwares: List[Labware],
-) -> None:
-    for lw in labwares:
-        _apply(lw, cfg)
-
-
 def _pick_up_tip(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -364,6 +354,7 @@ def _load_pipette(
         return loaded_pipettes[pipette_mount]
 
     pipette = ctx.load_instrument(pip_name, pipette_mount)
+    loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
         f"expected {pipette_volume} uL pipette, "
         f"but got a {pipette.max_volume} uL pipette"
@@ -430,7 +421,14 @@ def _load_tipracks(
                 ui.print_info(
                     f"Removing {loaded_labwares[ls[0]].name} from slot {ls[0]}"
                 )
-                del ctx._core.get_deck()[ls[0]]  # type: ignore[attr-defined]
+                ctx._core.move_labware(
+                    loaded_labwares[ls[0]]._core,
+                    new_location=OffDeckType.OFF_DECK,
+                    use_gripper=False,
+                    pause_for_manual_move=False,
+                    pick_up_offset=None,
+                    drop_offset=None,
+                )
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
@@ -438,7 +436,6 @@ def _load_tipracks(
         ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
     ]
-    _apply_labware_offsets(cfg, tipracks)
     return tipracks
 
 
