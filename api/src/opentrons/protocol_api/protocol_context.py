@@ -463,9 +463,14 @@ class ProtocolContext(CommandPublisher):
     def load_waste_chute(
         self,
         *,
-        # TODO: Confirm official naming of "staging area slot".
         with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
+        """Load the waste chute on the deck.
+
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
+        """
         if with_staging_area_slot_d4:
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."
