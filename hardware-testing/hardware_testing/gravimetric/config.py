@@ -24,7 +24,6 @@ class VolumetricConfig:
     pipette_mount: str
     tip_volume: int
     trials: int
-    labware_offsets: List[dict]
     slots_tiprack: List[int]
     increment: bool
     return_tip: bool
