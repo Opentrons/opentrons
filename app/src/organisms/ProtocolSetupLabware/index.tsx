@@ -215,7 +215,6 @@ export function ProtocolSetupLabware({
         {showDeckMapModal ? (
           <LabwareMapViewModal
             mostRecentAnalysis={mostRecentAnalysis}
-            deckDef={deckDef}
             attachedProtocolModuleMatches={attachedProtocolModuleMatches}
             handleLabwareClick={handleLabwareClick}
             onCloseClick={() => setShowDeckMapModal(false)}

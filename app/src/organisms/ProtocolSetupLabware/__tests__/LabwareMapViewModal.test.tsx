@@ -10,7 +10,6 @@ import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { i18n } from '../../../i18n'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
@@ -20,7 +19,6 @@ import { LabwareMapViewModal } from '../LabwareMapViewModal'
 
 import type {
   CompletedProtocolAnalysis,
-  DeckDefinition,
   LabwareDefinition2,
   ModuleModel,
 } from '@opentrons/shared-data'
@@ -68,7 +66,6 @@ describe('LabwareMapViewModal', () => {
     const props = {
       handleLabwareClick: jest.fn(),
       onCloseClick: jest.fn(),
-      deckDef: (deckDefFixture as unknown) as DeckDefinition,
       mostRecentAnalysis: ({
         commands: [],
         labware: [],
@@ -85,6 +82,29 @@ describe('LabwareMapViewModal', () => {
   })
 
   it('should render a deck with modules and labware', () => {
+    const mockMostRecentAnalysis = ({
+      commands: [
+        {
+          id: 'mockId',
+          createdAt: '2023-12-06T20:52:54.901662+00:00',
+          commandType: 'loadLabware',
+          key: 'mockKey',
+          status: 'succeeded',
+          params: {
+            location: {
+              slotName: 'C1',
+            },
+            loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+            namespace: 'opentrons',
+            version: 2,
+            labwareId: '300_ul_tiprack_id',
+            displayName: 'mock',
+          },
+          results: {},
+        },
+      ],
+      labware: [],
+    } as unknown) as CompletedProtocolAnalysis
     const mockLabwareOnDeck = [
       {
         labwareLocation: { slotName: 'C1' },
@@ -127,8 +147,7 @@ describe('LabwareMapViewModal', () => {
     render({
       handleLabwareClick: jest.fn(),
       onCloseClick: jest.fn(),
-      deckDef: (deckDefFixture as unknown) as DeckDefinition,
-      mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
+      mostRecentAnalysis: mockMostRecentAnalysis,
       initialLoadedLabwareByAdapter: {},
       attachedProtocolModuleMatches: [
         {
