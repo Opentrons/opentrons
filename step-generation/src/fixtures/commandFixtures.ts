@@ -1,8 +1,9 @@
 import { tiprackWellNamesFlat } from './data'
-import type {
+import {
   AspDispAirgapParams,
   BlowoutParams,
   CreateCommand,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   TouchTipParams,
 } from '@opentrons/shared-data'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
@@ -348,7 +349,7 @@ export const moveToAddressableAreaHelper = (params?: {
   key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
-    addressableAreaName: '1and8ChannelWasteChute',
+    addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
     offset: { x: 0, y: 0, z: 0 },
     ...params,
   },

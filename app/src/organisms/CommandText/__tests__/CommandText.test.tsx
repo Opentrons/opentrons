@@ -234,7 +234,7 @@ describe('CommandText', () => {
             commandType: 'moveToAddressableArea',
             params: {
               pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
-              addressableAreaName: '1and8ChannelWasteChute',
+              addressableAreaName: '1ChannelWasteChute',
             },
           } as MoveToAddressableAreaRunTimeCommand
         }
