@@ -357,6 +357,38 @@ _ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
 _ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}
 
 
+# TODO(jbl 11-17-2023) move this away from being an Enum and make this a NewType or something similar
+class StagingSlotName(enum.Enum):
+    """Staging slot identifiers."""
+
+    SLOT_A4 = "A4"
+    SLOT_B4 = "B4"
+    SLOT_C4 = "C4"
+    SLOT_D4 = "D4"
+
+    @classmethod
+    def from_primitive(cls, value: str) -> StagingSlotName:
+        str_val = value.upper()
+        return cls(str_val)
+
+    @property
+    def id(self) -> str:
+        """This slot's unique ID, as it appears in the deck definition.
+
+        This can be used to look up slot details in the deck definition.
+
+        This is preferred over `.value` or `.__str__()` for explicitness.
+        """
+        return self.value
+
+    def __str__(self) -> str:
+        """Stringify to the unique ID.
+
+        For explicitness, prefer using `.id` instead.
+        """
+        return self.id
+
+
 class TransferTipPolicy(enum.Enum):
     ONCE = enum.auto()
     NEVER = enum.auto()

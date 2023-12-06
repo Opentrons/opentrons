@@ -5,13 +5,15 @@ import pytest
 from decoy import Decoy
 from typing import Dict, Set, Optional, cast
 
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine.errors import (
     AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
-    # SlotDoesNotExistError,
+    SlotDoesNotExistError,
+    AddressableAreaDoesNotExistError,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.protocol_engine.state.addressable_areas import (
@@ -47,6 +49,7 @@ def get_addressable_area_view(
     ] = None,
     deck_definition: Optional[DeckDefinitionV4] = None,
     deck_configuration: Optional[DeckConfigurationType] = None,
+    robot_type: RobotType = "OT-3 Standard",
     use_simulated_deck_config: bool = False,
 ) -> AddressableAreaView:
     """Get a labware view test subject."""
@@ -56,6 +59,7 @@ def get_addressable_area_view(
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV4, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
+        robot_type=robot_type,
         use_simulated_deck_config=use_simulated_deck_config,
     )
 
@@ -140,7 +144,11 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
             "cutoutA1": {
-                PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")
+                PotentialCutoutFixture(
+                    cutout_id="cutoutA1",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
             }
         },
         use_simulated_deck_config=True,
@@ -165,7 +173,13 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     ).then_return(
         (
             "cutoutA1",
-            {PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")},
+            {
+                PotentialCutoutFixture(
+                    cutout_id="cutoutA1",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
         )
     )
 
@@ -191,7 +205,13 @@ def test_get_addressable_area_for_simulation_raises(decoy: Decoy) -> None:
     """It should raise if the requested addressable area is incompatible with loaded ones."""
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
-            "123": {PotentialCutoutFixture(cutout_id="789", cutout_fixture_id="bleh")}
+            "123": {
+                PotentialCutoutFixture(
+                    cutout_id="789",
+                    cutout_fixture_id="bleh",
+                    provided_addressable_areas=frozenset(),
+                )
+            }
         },
         use_simulated_deck_config=True,
     )
@@ -201,7 +221,16 @@ def test_get_addressable_area_for_simulation_raises(decoy: Decoy) -> None:
             "abc", subject.state.deck_definition
         )
     ).then_return(
-        ("123", {PotentialCutoutFixture(cutout_id="123", cutout_fixture_id="blah")})
+        (
+            "123",
+            {
+                PotentialCutoutFixture(
+                    cutout_id="123",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
+        )
     )
 
     decoy.when(
@@ -335,7 +364,7 @@ def test_get_slot_definition() -> None:
         }
     )
 
-    result = subject.get_slot_definition(DeckSlotName.SLOT_6)
+    result = subject.get_slot_definition(DeckSlotName.SLOT_6.id)
 
     assert result == {
         "id": "area",
@@ -350,10 +379,15 @@ def test_get_slot_definition() -> None:
     }
 
 
-# TODO Uncomment once Robot Server deck config and tests is hooked up
-# def test_get_slot_definition_raises_with_bad_slot_name() -> None:
-#     """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-#     subject = get_addressable_area_view()
-#
-#     with pytest.raises(SlotDoesNotExistError):
-#         subject.get_slot_definition(DeckSlotName.SLOT_A1)
+def test_get_slot_definition_raises_with_bad_slot_name(decoy: Decoy) -> None:
+    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
+    subject = get_addressable_area_view()
+
+    decoy.when(
+        deck_configuration_provider.get_potential_cutout_fixtures(
+            "foo", subject.state.deck_definition
+        )
+    ).then_raise(AddressableAreaDoesNotExistError())
+
+    with pytest.raises(SlotDoesNotExistError):
+        subject.get_slot_definition("foo")

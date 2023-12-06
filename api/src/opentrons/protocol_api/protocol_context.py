@@ -16,7 +16,7 @@ from typing import (
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
@@ -31,7 +31,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._types import OffDeckType, StagingSlotName
+from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -463,9 +463,14 @@ class ProtocolContext(CommandPublisher):
     def load_waste_chute(
         self,
         *,
-        # TODO: Confirm official naming of "staging area slot".
         with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
+        """Load the waste chute on the deck.
+
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
+        """
         if with_staging_area_slot_d4:
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."

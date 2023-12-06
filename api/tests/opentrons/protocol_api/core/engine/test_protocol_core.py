@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Mount, MountType, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Mount, MountType, Point
 from opentrons.protocol_api import OFF_DECK
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleType
@@ -66,7 +66,6 @@ from opentrons.protocol_api.core.engine import (
     load_labware_params,
 )
 from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api._types import StagingSlotName
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
@@ -179,13 +178,30 @@ def test_api_version(
     assert subject.api_version == api_version
 
 
-# def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV3, subject: ProtocolCore, decoy: Decoy) -> None:
-#     """It should return a deck slot's definition."""
-#     decoy.when(subject._engine_client.state.labware.get_slot_definition(5))
-#     result = subject.get_slot_definition(DeckSlotName.SLOT_6)
-#
-#     assert result["id"] == "6"
-#     assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
+def test_get_slot_definition(
+    ot2_standard_deck_def: DeckDefinitionV4, subject: ProtocolCore, decoy: Decoy
+) -> None:
+    """It should return a deck slot's definition."""
+    expected_slot_def = cast(
+        SlotDefV3,
+        {
+            "id": "abc",
+            "position": [1, 2, 3],
+            "boundingBox": {
+                "xDimension": 4,
+                "yDimension": 5,
+                "zDimension": 6,
+            },
+            "displayName": "xyz",
+            "compatibleModuleTypes": [],
+        },
+    )
+    decoy.when(
+        subject._engine_client.state.addressable_areas.get_slot_definition(
+            DeckSlotName.SLOT_6.id
+        )
+    ).then_return(expected_slot_def)
+    assert subject.get_slot_definition(DeckSlotName.SLOT_6) == expected_slot_def
 
 
 # APIv2.15 because we're expecting a fixed trash.

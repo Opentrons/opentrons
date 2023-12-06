@@ -30,6 +30,7 @@ from .command_fixtures import (
     create_load_labware_command,
     create_load_module_command,
     create_move_labware_command,
+    create_move_to_addressable_area_command,
 )
 
 
@@ -92,6 +93,7 @@ def test_initial_state_simulated(
         potential_cutout_fixtures_by_cutout_id={},
         deck_definition=ot3_standard_deck_def,
         deck_configuration=[],
+        robot_type="OT-3 Standard",
         use_simulated_deck_config=True,
     )
 
@@ -161,6 +163,12 @@ def test_initial_state(
                 strategy=LabwareMovementStrategy.USING_GRIPPER,
             ),
             "A4",
+        ),
+        (
+            create_move_to_addressable_area_command(
+                pipette_id="pipette-id", addressable_area_name="gripperWasteChute"
+            ),
+            "gripperWasteChute",
         ),
     ),
 )

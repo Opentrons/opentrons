@@ -11,7 +11,14 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
+from opentrons.types import (
+    DeckSlotName,
+    Location,
+    Mount,
+    MountType,
+    Point,
+    StagingSlotName,
+)
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
@@ -44,7 +51,7 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType, OFF_DECK, StagingSlotName
+from ..._types import OffDeckType, OFF_DECK
 from ..._liquid import Liquid
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
@@ -565,9 +572,21 @@ class ProtocolCore(
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
 
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+    def get_slot_definition(
+        self, slot: Union[DeckSlotName, StagingSlotName]
+    ) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
-        return self._engine_client.state.addressable_areas.get_slot_definition(slot)
+        return self._engine_client.state.addressable_areas.get_slot_definition(slot.id)
+
+    def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all standard slot definitions available in the deck definition."""
+        return self._engine_client.state.addressable_areas.get_deck_slot_definitions()
+
+    def get_staging_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all staging slot definitions available in the deck definition."""
+        return (
+            self._engine_client.state.addressable_areas.get_staging_slot_definitions()
+        )
 
     def _ensure_module_location(
         self, slot: DeckSlotName, module_type: ModuleType
@@ -578,7 +597,7 @@ class ProtocolCore(
             raise ValueError(f"A {module_type.value} cannot be loaded into slot {slot}")
 
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
@@ -617,7 +636,7 @@ class ProtocolCore(
         except LabwareNotLoadedOnLabwareError:
             return None
 
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
         return self._engine_client.state.addressable_areas.get_addressable_area_center(
             slot_name.id
@@ -666,6 +685,9 @@ class ProtocolCore(
             return validation.internal_slot_to_public_string(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            # This will only ever be a robot accurate deck slot name or Flex staging slot name
+            return labware_location.addressableAreaName
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id[labware_location.moduleId]
         elif isinstance(labware_location, OnLabwareLocation):

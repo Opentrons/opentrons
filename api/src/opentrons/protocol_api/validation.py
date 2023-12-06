@@ -21,7 +21,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Mount, DeckSlotName, Location
+from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -31,7 +31,7 @@ from opentrons.hardware_control.modules.types import (
     MagneticBlockModel,
     ThermocyclerStep,
 )
-from ._types import StagingSlotName
+
 from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 
@@ -188,7 +188,7 @@ def ensure_and_convert_deck_slot(
 
 
 def internal_slot_to_public_string(
-    slot_name: DeckSlotName, robot_type: RobotType
+    slot_name: Union[DeckSlotName, StagingSlotName], robot_type: RobotType
 ) -> str:
     """Convert an internal `DeckSlotName` to a user-facing Python Protocol API string.
 
@@ -196,7 +196,11 @@ def internal_slot_to_public_string(
     Flexes. This probably won't change anything because the internal `DeckSlotName` should already
     match the robot's native format, but it's nice to have an explicit interface barrier.
     """
-    return slot_name.to_equivalent_for_robot_type(robot_type).id
+    if isinstance(slot_name, DeckSlotName):
+        return slot_name.to_equivalent_for_robot_type(robot_type).id
+    else:
+        # No need to convert staging slot names per robot type, since they only exist on Flex.
+        return slot_name.id
 
 
 def ensure_lowercase_name(name: str) -> str:

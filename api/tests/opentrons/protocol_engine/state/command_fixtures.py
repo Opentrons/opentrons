@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     DeckSlotLocation,
     LabwareMovementStrategy,
+    AddressableOffsetVector,
 )
 
 
@@ -361,6 +362,31 @@ def create_move_to_well_command(
     result = cmd.MoveToWellResult(position=destination)
 
     return cmd.MoveToWell(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_move_to_addressable_area_command(
+    pipette_id: str,
+    addressable_area_name: str = "area-name",
+    offset: AddressableOffsetVector = AddressableOffsetVector(x=0, y=0, z=0),
+    destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
+) -> cmd.MoveToAddressableArea:
+    """Get a completed MoveToWell command."""
+    params = cmd.MoveToAddressableAreaParams(
+        pipetteId=pipette_id,
+        addressableAreaName=addressable_area_name,
+        offset=offset,
+    )
+
+    result = cmd.MoveToAddressableAreaResult(position=destination)
+
+    return cmd.MoveToAddressableArea(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

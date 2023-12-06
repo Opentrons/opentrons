@@ -1,7 +1,7 @@
 import * as React from 'react'
 import last from 'lodash/last'
 
-import { Flex, ProtocolDeck } from '@opentrons/components'
+import { Flex, ProtocolDeck, SPACING } from '@opentrons/components'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -18,7 +18,7 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
   )
 
   return (
-    <Flex height="26.9375rem">
+    <Flex height="26.9375rem" paddingY={SPACING.spacing24}>
       {mostRecentAnalysis != null ? (
         <ProtocolDeck
           protocolAnalysis={mostRecentAnalysis}

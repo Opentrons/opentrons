@@ -461,3 +461,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         """This will never be called because it was added in API 2.15."""
         pass
+
+    def get_active_channels(self) -> int:
+        """This will never be called because it was added in API 2.16."""
+        assert False, "get_active_channels only supported in API 2.16 & later"
