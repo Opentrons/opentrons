@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Set, Union
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 
-from opentrons.types import Point, DeckSlotName, StagingSlotName
+from opentrons.types import Point, DeckSlotName
 
 from ..commands import (
     Command,
@@ -64,6 +64,24 @@ class AddressableAreaState:
 
     use_simulated_deck_config: bool
     """See `Config.use_simulated_deck_config`."""
+
+
+_OT2_ORDERED_SLOTS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+_FLEX_ORDERED_SLOTS = [
+    "D1",
+    "D2",
+    "D3",
+    "C1",
+    "C2",
+    "C3",
+    "B1",
+    "B2",
+    "B3",
+    "A1",
+    "A2",
+    "A3",
+]
+_FLEX_ORDERED_STAGING_SLOTS = ["D4", "C4", "B4", "A4"]
 
 
 def _get_conflicting_addressable_areas(
@@ -461,11 +479,19 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         }
 
     def get_deck_slot_definitions(self) -> Dict[str, SlotDefV3]:
-        """Get all slot definitions either configured for robot or assumed for analysis run so far."""
+        """Get all standard slot definitions available in the deck definition."""
         if self._state.robot_type == "OT-2 Standard":
-            slots = {slot.to_ot2_equivalent().id for slot in DeckSlotName}
+            slots = _OT2_ORDERED_SLOTS
         else:
-            slots = {slot.to_ot3_equivalent().id for slot in DeckSlotName}.union(
-                slot.id for slot in StagingSlotName
-            )
+            slots = _FLEX_ORDERED_SLOTS
         return {slot_name: self.get_slot_definition(slot_name) for slot_name in slots}
+
+    def get_staging_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all staging slot definitions available in the deck definition."""
+        if self._state.robot_type == "OT-3 Standard":
+            return {
+                slot_name: self.get_slot_definition(slot_name)
+                for slot_name in _FLEX_ORDERED_STAGING_SLOTS
+            }
+        else:
+            return {}

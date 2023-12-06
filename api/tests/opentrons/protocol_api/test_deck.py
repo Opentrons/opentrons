@@ -37,7 +37,7 @@ def deck_definition() -> DeckDefinitionV4:
 @pytest.fixture
 def api_version() -> APIVersion:
     """Get a dummy `APIVersion` with which to configure the subject."""
-    return APIVersion(123, 456)
+    return APIVersion(1, 234)
 
 
 @pytest.fixture(autouse=True)
@@ -73,6 +73,12 @@ def slot_definitions_by_name() -> Dict[str, SlotDefV3]:
 
 
 @pytest.fixture
+def staging_slot_definitions_by_name() -> Dict[str, SlotDefV3]:
+    """Get a dictionary of staging slot names to slot definitions."""
+    return {"2": {}}
+
+
+@pytest.fixture
 def subject(
     decoy: Decoy,
     deck_definition: DeckDefinitionV4,
@@ -80,11 +86,15 @@ def subject(
     mock_core_map: LoadedCoreMap,
     api_version: APIVersion,
     slot_definitions_by_name: Dict[str, SlotDefV3],
+    staging_slot_definitions_by_name: Dict[str, SlotDefV3],
 ) -> Deck:
     """Get a Deck test subject with its dependencies mocked out."""
     decoy.when(mock_protocol_core.get_deck_definition()).then_return(deck_definition)
     decoy.when(mock_protocol_core.get_slot_definitions()).then_return(
         slot_definitions_by_name
+    )
+    decoy.when(mock_protocol_core.get_staging_slot_definitions()).then_return(
+        staging_slot_definitions_by_name
     )
 
     return Deck(
@@ -239,13 +249,16 @@ def test_delitem_raises_if_slot_has_module(
 
 
 @pytest.mark.parametrize(
-    "slot_definitions_by_name",
-    [
-        {
-            "1": {},
-            "2": {},
-            "3": {},
-        }
+    argnames=["slot_definitions_by_name", "staging_slot_definitions_by_name"],
+    argvalues=[
+        (
+            {
+                "1": {},
+                "2": {},
+                "3": {},
+            },
+            {"4": {}},
+        )
     ],
 )
 def test_slot_keys_iter(subject: Deck) -> None:
@@ -254,6 +267,32 @@ def test_slot_keys_iter(subject: Deck) -> None:
 
     assert len(subject) == 3
     assert result == ["1", "2", "3"]
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "slot_definitions_by_name",
+        "staging_slot_definitions_by_name",
+        "api_version",
+    ],
+    argvalues=[
+        (
+            {
+                "1": {},
+                "2": {},
+                "3": {},
+            },
+            {"4": {}},
+            APIVersion(2, 16),
+        )
+    ],
+)
+def test_slot_keys_iter_with_staging_slots(subject: Deck) -> None:
+    """It should provide an iterable interface to deck slots."""
+    result = list(subject)
+
+    assert len(subject) == 4
+    assert result == ["1", "2", "3", "4"]
 
 
 @pytest.mark.parametrize(

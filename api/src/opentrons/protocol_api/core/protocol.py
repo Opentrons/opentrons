@@ -187,7 +187,11 @@ class AbstractProtocol(
 
     @abstractmethod
     def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
-        """Get the configured or assumed slot definitions from the robot's deck."""
+        """Get all standard slot definitions available in the deck definition."""
+
+    @abstractmethod
+    def get_staging_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all staging slot definitions available in the deck definition."""
 
     @abstractmethod
     def get_slot_item(

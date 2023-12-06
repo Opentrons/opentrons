@@ -22,6 +22,8 @@ from . import validation
 
 DeckItem = Union[Labware, ModuleContext]
 
+STAGING_SLOT_VERSION_GATE = APIVersion(2, 16)
+
 
 @dataclass(frozen=True)
 class CalibrationPosition:
@@ -69,6 +71,10 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         deck_locations = protocol_core.get_deck_definition()["locations"]
 
         self._slot_definitions_by_name = self._protocol_core.get_slot_definitions()
+        if self._api_version >= STAGING_SLOT_VERSION_GATE:
+            self._slot_definitions_by_name.update(
+                self._protocol_core.get_staging_slot_definitions()
+            )
 
         self._calibration_positions = [
             CalibrationPosition(
