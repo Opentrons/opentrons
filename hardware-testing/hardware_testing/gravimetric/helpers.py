@@ -29,7 +29,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
-from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
+from .workarounds import get_sync_hw_api
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 
