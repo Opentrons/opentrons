@@ -1311,7 +1311,7 @@ class OT3API(
         if mount != self._last_moved_mount and self._last_moved_mount:
             await self.retract(self._last_moved_mount, 10)
 
-            # disengage Axis.Q motor and engage the brake to lower power
+            # disengage Axis.Z_L motor and engage the brake to lower power
             # consumption and reduce the chance of the 96-channel pipette dropping
             if (
                 self.gantry_load == GantryLoad.HIGH_THROUGHPUT
