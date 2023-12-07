@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { parseAllRequiredModuleModels } from '@opentrons/api-client'
+import {
+  parseAllRequiredModuleModels,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -133,8 +136,16 @@ export function ProtocolRunSetup({
   })
 
   if (robot == null) return null
-  const hasLiquids =
-    protocolAnalysis != null && protocolAnalysis.liquids?.length > 0
+
+  const liquids = protocolAnalysis?.liquids ?? []
+
+  const liquidsInLoadOrder =
+    protocolAnalysis != null
+      ? parseLiquidsInLoadOrder(liquids, protocolAnalysis.commands)
+      : []
+
+  const hasLiquids = protocolAnalysis != null && liquidsInLoadOrder.length > 0
+
   const hasModules = protocolAnalysis != null && modules.length > 0
 
   const protocolDeckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
