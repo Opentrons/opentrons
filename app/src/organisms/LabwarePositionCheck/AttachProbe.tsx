@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
   getPipetteNameSpecs,
@@ -49,7 +48,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     setFatalError,
     isOnDevice,
   } = props
-  const [isPending, setIsPending] = React.useState<boolean>(false)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
     false
   )
@@ -69,12 +67,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   }
 
   const pipetteMount = pipette?.mount
-  const { refetch } = useInstrumentsQuery({
-    enabled: false,
-    onSettled: () => {
-      setIsPending(false)
-    },
-  })
 
   React.useEffect(() => {
     // move into correct position for probe attach on mount
@@ -120,22 +112,18 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         params: { axis: 'y' },
       },
     ]
-    setIsPending(true)
-    refetch()
+    chainRunCommands(verifyCommands, false)
       .then(() => {
-        chainRunCommands(verifyCommands, false)
+        chainRunCommands(homeCommands, false)
+          .then(() => proceed())
+          .catch((e: Error) => {
+            setFatalError(
+              `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
+            )
+          })
       })
       .catch((e: Error) => {
         setShowUnableToDetect(true)
-      })
-      .then(() => {
-        chainRunCommands(homeCommands, false)
-      })
-      .then(() => proceed())
-      .catch((e: Error) => {
-        setFatalError(
-          `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
-        )
       })
   }
 
@@ -149,7 +137,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         handleOnClick={handleProbeAttached}
         setShowUnableToDetect={setShowUnableToDetect}
         isOnDevice={isOnDevice}
-        isPending={isPending}
       />
     )
 

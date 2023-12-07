@@ -14,10 +14,7 @@ import {
   WASTE_CHUTE_CUTOUT,
   CreateCommand,
 } from '@opentrons/shared-data'
-import {
-  useDeckConfigurationQuery,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -62,7 +59,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
-  const [isPending, setIsPending] = React.useState<boolean>(false)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
     false
   )
@@ -73,12 +69,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
-  const { refetch } = useInstrumentsQuery({
-    enabled: false,
-    onSettled: () => {
-      setIsPending(false)
-    },
-  })
   const deckConfig = useDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
     deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
@@ -118,22 +108,18 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         },
       },
     ]
-    setIsPending(true)
-    refetch()
+    chainRunCommands?.(verifyCommands, false)
       .then(() => {
-        chainRunCommands?.(verifyCommands, false)
+        chainRunCommands?.(homeCommands, false)
+          .then(() => {
+            proceed()
+          })
+          .catch(error => {
+            setShowErrorMessage(error.message)
+          })
       })
       .catch((e: Error) => {
         setShowUnableToDetect(true)
-      })
-      .then(() => {
-        chainRunCommands?.(homeCommands, false)
-      })
-      .then(() => {
-        proceed()
-      })
-      .catch(error => {
-        setShowErrorMessage(error.message)
       })
   }
 
@@ -194,7 +180,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         handleOnClick={handleOnClick}
         setShowUnableToDetect={setShowUnableToDetect}
         isOnDevice={isOnDevice ?? false}
-        isPending={isPending}
       />
     )
 
@@ -251,7 +236,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       }
       proceedButtonText={t('begin_calibration')}
       proceed={handleOnClick}
-      proceedIsDisabled={isPending}
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />
   )

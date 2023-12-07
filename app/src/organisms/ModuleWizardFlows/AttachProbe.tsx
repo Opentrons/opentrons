@@ -22,6 +22,7 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
@@ -66,6 +67,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     'module_wizard_flows',
     'pipette_wizard_flows',
   ])
+  const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
+    false
+  )
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const pipetteId = attachedPipette.serialNumber
@@ -124,29 +128,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       module: moduleDisplayName,
     })
   }
-
-  if (isRobotMoving)
-    return (
-      <InProgressModal
-        // TODO ND: 9/6/23 use spinner until animations are made
-        alternativeSpinner={null}
-        description={
-          isExiting
-            ? t('stand_back')
-            : t('module_calibrating', {
-                moduleName: moduleDisplayName,
-              })
-        }
-      >
-        {isExiting ? undefined : (
-          <Flex marginX={isOnDevice ? '4.5rem' : '8.5625rem'}>
-            <StyledText css={IN_PROGRESS_STYLE}>
-              {moduleCalibratingDisplay}
-            </StyledText>
-          </Flex>
-        )}
-      </InProgressModal>
-    )
 
   const bodyText = (
     <>
@@ -210,24 +191,58 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     chainRunCommands?.(verifyCommands, false)
       .then(() => {
         chainRunCommands?.(homeCommands, false)
-      })
-      .then(() => {
-        proceed()
+          .then(() => {
+            proceed()
+          })
+          .catch((e: Error) => {
+            setErrorMessage(`error starting module calibration: ${e.message}`)
+          })
       })
       .catch((e: Error) => {
-        setErrorMessage(`error starting module calibration: ${e.message}`)
+        setShowUnableToDetect(true)
       })
   }
 
+  if (isRobotMoving)
+    return (
+      <InProgressModal
+        // TODO ND: 9/6/23 use spinner until animations are made
+        alternativeSpinner={null}
+        description={
+          isExiting
+            ? t('stand_back')
+            : t('module_calibrating', {
+                moduleName: moduleDisplayName,
+              })
+        }
+      >
+        {isExiting ? undefined : (
+          <Flex marginX={isOnDevice ? '4.5rem' : '8.5625rem'}>
+            <StyledText css={IN_PROGRESS_STYLE}>
+              {moduleCalibratingDisplay}
+            </StyledText>
+          </Flex>
+        )}
+      </InProgressModal>
+    )
+  else if (showUnableToDetect)
+    return (
+      <ProbeNotAttached
+        handleOnClick={handleBeginCalibration}
+        setShowUnableToDetect={setShowUnableToDetect}
+        isOnDevice={isOnDevice ?? false}
+      />
+    )
   // TODO: add calibration loading screen and error screen
-  return (
-    <GenericWizardTile
-      header={i18n.format(t('attach_probe'), 'capitalize')}
-      rightHandBody={pipetteAttachProbeVid}
-      bodyText={bodyText}
-      proceedButtonText={t('begin_calibration')}
-      proceed={handleBeginCalibration}
-      back={goBack}
-    />
-  )
+  else
+    return (
+      <GenericWizardTile
+        header={i18n.format(t('attach_probe'), 'capitalize')}
+        rightHandBody={pipetteAttachProbeVid}
+        bodyText={bodyText}
+        proceedButtonText={t('begin_calibration')}
+        proceed={handleBeginCalibration}
+        back={goBack}
+      />
+    )
 }
