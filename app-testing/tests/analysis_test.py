@@ -9,10 +9,19 @@ from syrupy.filters import props
 # pipenv run pytest -k analysis_test.py --snapshot-update
 # to test
 # set to_use to new
-# pipenv run pytest -k analysis_test.py -vv
+# pipenv run pytest -k analysis_test.py -vv -s
 
 exclude = props(
-    "id", "createdAt", "startedAt", "completedAt", "lastModified", "created", "key", "pipetteId", "labwareId"
+    "id",
+    "createdAt",
+    "startedAt",
+    "completedAt",
+    "lastModified",
+    "created",
+    "key",
+    "pipetteId",
+    "labwareId",
+    "serialNumber",
 )
 
 
@@ -42,7 +51,7 @@ def test_analysis_json(snapshot_json):
     print("\n")
     print(f"Base files: {len(base)}")
     print(f"New files: {len(new)}")
-    to_use = base  # change me for snapshot
+    to_use = new  # change me for snapshot
     files_no_exist = []
     for file in to_use:
         if file.exists():
