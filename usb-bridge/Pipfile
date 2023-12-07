@@ -27,7 +27,7 @@ coverage = "==6.2"
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = {version="==1.4.0", markers="sys_platform=='win32'"}
 colorama = {version="==0.4.4", markers="sys_platform=='win32'"}
-mypy = "==0.942"
+mypy = "==0.981"
 black = "==22.3.0"
 decoy = "~=1.10"
 mock = "~=4.0.3"

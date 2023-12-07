@@ -55,7 +55,7 @@ INSTALL_REQUIRES = [
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",
     "python-multipart==0.0.5",
-    "pydantic==1.8.2",
+    "pydantic==1.9.2",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.14.0",
     "wsproto==1.0.0",

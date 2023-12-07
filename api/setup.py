@@ -64,7 +64,7 @@ INSTALL_REQUIRES = [
     "anyio==3.6.1",
     "jsonschema==3.0.2",
     "numpy>=1.15.1,<2",
-    "pydantic==1.8.2",
+    "pydantic==1.9.2",
     "pyserial==3.5",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",

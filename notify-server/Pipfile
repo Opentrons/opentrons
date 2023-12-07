@@ -11,8 +11,6 @@ notify-server = { editable = true, path = "." }
 opentrons = { editable = true, path = "../api" }
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons-hardware = { editable = true, path = "./../hardware" }
-pydantic = "==1.8.2"
-pyzmq = "==19.*,>=19.0.2"
 typing-extensions = ">=4.0.0,<5"
 
 [dev-packages]
@@ -20,7 +18,7 @@ flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 mock = "~=4.0.3"
-mypy = "==0.942"
+mypy = "==0.981"
 pytest = "==7.1.1"
 pytest-cov = "==2.10.1"
 pytest-asyncio = "==0.16.0"

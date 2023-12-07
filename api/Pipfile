@@ -10,7 +10,7 @@ name = "pypi"
 atomicwrites = { version = "==1.4.0", markers="sys_platform=='win32'" }
 colorama = { version = "==0.4.4", markers="sys_platform=='win32'" }
 coverage = "==5.1"
-mypy = "==0.910"
+mypy = "==0.981"
 numpydoc = "==0.9.1"
 pytest = "==7.0.1"
 pytest-asyncio = "~=0.16"
