@@ -1816,23 +1816,13 @@ class InstrumentContext(publisher.CommandPublisher):
             to determine how it will move to different locations on the deck. The string
             should be of the same format used when identifying wells by name. Use
             ``"A1"`` to have the pipette use its leftmost nozzles to pick up tips
-            *left-to-right* from a tip rack. Use ``"A12"`` to have the pipette use its
-            rightmost nozzles to pick up tips *right-to-left* from a tip rack.
+            *right-to-left* from a tip rack. Use ``"A12"`` to have the pipette use its
+            rightmost nozzles to pick up tips *left-to-right* from a tip rack.
         :type start: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
-            :py:meth:`.load_instrument`. If not specified,
-            :py:obj:`.InstrumentContext.tip_racks` will be reset to ``None`` and you
-            must specify the location every time you call
-            :py:meth:`~.InstrumentContext.pick_up_tip`.
-
-            To keep the same list of tip racks when changing configurations, reference
-            the same instrument's existing ``tip_racks`` parameter::
-
-                pipette.configure_nozzle_layout(
-                    style=COLUMN,
-                    tip_racks=pipette.tip_racks
-                )
-
+            :py:meth:`.load_instrument`. If not specified, the new configuration resets
+            :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
+            every time you call :py:meth:`~.InstrumentContext.pick_up_tip`.
         :type tip_racks: List[:py:class:`.Labware`]
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
