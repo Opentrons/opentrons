@@ -186,7 +186,7 @@ export const moveLiquidFormToArgs = (
     dispenseOffsetFromBottomMm:
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+      fields.dispense_flowRate || pipetteSpec.defaultBlowOutFlowRate.value,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),

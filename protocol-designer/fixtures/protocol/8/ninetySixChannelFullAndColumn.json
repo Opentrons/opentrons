@@ -2321,7 +2321,7 @@
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
         "wellName": "A1",
         "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
-        "flowRate": 7.85
+        "flowRate": 6
       }
     },
     {
@@ -2339,7 +2339,7 @@
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "volume": 10,
-        "flowRate": 7.85
+        "flowRate": 6
       }
     },
     {
@@ -2382,7 +2382,7 @@
         "labwareId": "fe1942b1-1b75-4d3a-9c12-d23004958a12:opentrons/biorad_96_wellplate_200ul_pcr/2",
         "wellName": "A7",
         "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
-        "flowRate": 7.85
+        "flowRate": 6
       }
     },
     {
@@ -2400,7 +2400,7 @@
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "volume": 10,
-        "flowRate": 7.85
+        "flowRate": 6
       }
     },
     {
