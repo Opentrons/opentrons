@@ -2,7 +2,7 @@ import hashlib
 import logging
 import os
 import shutil
-from typing import Generator, Optional, Dict, Any
+from typing import Generator, Optional, Dict, Any, TypedDict, List
 from dataclasses import dataclass
 
 from opentrons.config import CONFIG
@@ -15,7 +15,17 @@ class ConfigureArgsError(Exception):
     pass
 
 
-EAP_CONFIG_SHAPE = {
+class EapConfigItem(TypedDict):
+    name: str
+    displayName: str
+    options: List[Dict[str, Any]]
+
+
+class EapConfigShape(TypedDict):
+    options: List[EapConfigItem]
+
+
+EAP_CONFIG_SHAPE: EapConfigShape = {
     "options": [
         {
             "name": method.qualified_name(),
@@ -186,7 +196,7 @@ def eap_check_config(eap_config: Dict[str, Any]) -> Dict[str, Any]:
 
     _eap_check_no_extra_args(eap_config, options)
 
-    for opt in options:  # type: ignore
+    for opt in options:
         # Ignoring most types to do with EAP_CONFIG_SHAPE because of issues
         # wth type inference for dict comprehensions
         _eap_check_option_ok(opt, eap_config)
