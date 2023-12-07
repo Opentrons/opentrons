@@ -16,7 +16,7 @@ from typing import (
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
@@ -31,7 +31,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._types import OffDeckType, StagingSlotName
+from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -47,6 +47,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
@@ -439,18 +440,44 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 16)
-    # TODO: Confirm official naming of "waste chute".
+    def load_trash_bin(self, location: DeckLocation) -> TrashBin:
+        slot_name = validation.ensure_and_convert_deck_slot(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        if not isinstance(slot_name, DeckSlotName):
+            raise ValueError("Staging areas not permitted for trash bin.")
+        addressable_area_name = validation.ensure_and_convert_trash_bin_location(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        trash_bin = TrashBin(
+            location=slot_name, addressable_area_name=addressable_area_name
+        )
+        self._core.append_disposal_location(trash_bin)
+        return trash_bin
+
+    @requires_version(2, 16)
     def load_waste_chute(
         self,
         *,
-        # TODO: Confirm official naming of "staging area slot".
         with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
+        """Load the waste chute on the deck.
+
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
+        """
         if with_staging_area_slot_d4:
             raise NotImplementedError(
                 "The waste chute staging area slot is not currently implemented."
             )
-        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        waste_chute = WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        self._core.append_disposal_location(waste_chute)
+        return waste_chute
 
     @requires_version(2, 15)
     def load_adapter(

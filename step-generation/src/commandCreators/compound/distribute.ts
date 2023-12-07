@@ -18,6 +18,7 @@ import {
   getDispenseAirGapLocation,
   getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
   aspirate,
@@ -166,10 +167,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
     invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
     'trashBin'
 
-  const addressableAreaNameWasteChute =
-    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
+  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol

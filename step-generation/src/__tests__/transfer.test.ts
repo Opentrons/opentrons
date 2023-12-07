@@ -1,4 +1,7 @@
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import {
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
@@ -224,7 +227,7 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
       commandType: 'moveToAddressableArea',
       key: expect.any(String),
       params: {
-        addressableAreaName: '1and8ChannelWasteChute',
+        addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
         pipetteId: 'p300SingleId',
         offset: { x: 0, y: 0, z: 0 },
       },

@@ -529,6 +529,7 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            marginBottom={SPACING.spacing16}
           >
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}

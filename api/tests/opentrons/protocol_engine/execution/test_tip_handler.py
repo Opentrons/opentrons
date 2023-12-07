@@ -7,10 +7,11 @@ from contextlib import nullcontext as does_not_raise
 
 from opentrons.types import Mount, MountType
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import TipStateType
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.types import TipGeometry
+from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
 from opentrons.protocol_engine.resources import LabwareDataProvider
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
@@ -333,3 +334,87 @@ async def test_virtual_drop_tip(decoy: Decoy, mock_state_view: StateView) -> Non
         mock_state_view.pipettes.validate_tip_state("pipette-id", True),
         times=1,
     )
+
+
+async def test_get_tip_presence_on_ot2(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    mock_labware_data_provider: LabwareDataProvider,
+) -> None:
+    """It should use the hardware API to  up a tip."""
+    subject = HardwareTipHandler(
+        state_view=mock_state_view,
+        hardware_api=mock_hardware_api,
+        labware_data_provider=mock_labware_data_provider,
+    )
+
+    result = await subject.get_tip_presence(pipette_id="pipette-id")
+    assert result == TipPresenceStatus.UNKNOWN
+
+
+@pytest.mark.parametrize("hw_tip_state", [TipStateType.ABSENT, TipStateType.PRESENT])
+async def test_get_tip_presence_on_ot3(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_labware_data_provider: LabwareDataProvider,
+    hw_tip_state: TipStateType,
+) -> None:
+    """It should use the hardware API to  up a tip."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        ot3_hardware_api = decoy.mock(cls=OT3API)
+
+        subject = HardwareTipHandler(
+            state_view=mock_state_view,
+            hardware_api=ot3_hardware_api,
+            labware_data_provider=mock_labware_data_provider,
+        )
+
+        decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+            MountType.LEFT
+        )
+        decoy.when(
+            await ot3_hardware_api.get_tip_presence_status(Mount.LEFT)
+        ).then_return(hw_tip_state)
+        result = await subject.get_tip_presence(pipette_id="pipette-id")
+        assert result == TipPresenceStatus.from_hw_state(hw_tip_state)
+
+    except ImportError:
+        pass
+
+
+@pytest.mark.parametrize(
+    "expected", [TipPresenceStatus.ABSENT, TipPresenceStatus.PRESENT]
+)
+async def test_verify_tip_presence_on_ot3(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_labware_data_provider: LabwareDataProvider,
+    expected: TipPresenceStatus,
+) -> None:
+    """It should use the hardware API to  up a tip."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        ot3_hardware_api = decoy.mock(cls=OT3API)
+
+        subject = HardwareTipHandler(
+            state_view=mock_state_view,
+            hardware_api=ot3_hardware_api,
+            labware_data_provider=mock_labware_data_provider,
+        )
+        decoy.when(mock_state_view.pipettes.get_mount("pipette-id")).then_return(
+            MountType.LEFT
+        )
+        await subject.verify_tip_presence("pipette-id", expected)
+
+        decoy.verify(
+            await ot3_hardware_api.verify_tip_presence(
+                Mount.LEFT, expected.to_hw_state()
+            )
+        )
+
+    except ImportError:
+        pass

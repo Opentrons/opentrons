@@ -637,3 +637,8 @@ class PipetteView(HasState[PipetteState]):
     def get_is_partially_configured(self, pipette_id: str) -> bool:
         """Determine if the provided pipette is partially configured."""
         return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
+
+    def get_primary_nozzle(self, pipette_id: str) -> Optional[str]:
+        """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
+        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
+        return nozzle_map.starting_nozzle if nozzle_map else None

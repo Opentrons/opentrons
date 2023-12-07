@@ -20,6 +20,7 @@ import {
   moveHelper,
   getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
   aspirate,
@@ -184,10 +185,9 @@ export const transfer: CommandCreator<TransferArgs> = (
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
 
-  const addressableAreaNameWasteChute =
-    pipetteSpec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    pipetteSpec.channels
+  )
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
   // to the action of aspiration of dispensing in a given command, they are actually values bound
