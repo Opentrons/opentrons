@@ -5,8 +5,7 @@ from datetime import datetime
 
 import pytest
 from decoy import Decoy, matchers
-from typing import TYPE_CHECKING, Union, Optional, Any, Tuple
-from contextlib import nullcontext
+from typing import TYPE_CHECKING, Union, Optional, Tuple
 
 from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.hardware_control import HardwareControlAPI
@@ -44,7 +43,6 @@ from opentrons.protocol_engine.errors import (
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
-    FailedGripperPickupError,
 )
 from opentrons.protocol_engine.state import StateStore
 
@@ -138,6 +136,8 @@ async def set_up_decoy_hardware_gripper(
         ot3_hardware_api.hardware_gripper.geometry.max_allowed_grip_error
     ).then_return(6.0)
 
+    decoy.when(ot3_hardware_api.hardware_gripper.jaw_width).then_return(89)
+
     decoy.when(
         state_store.labware.get_grip_force("my-teleporting-labware")
     ).then_return(100)
@@ -178,31 +178,21 @@ def subject(
     )
 
 
-@pytest.mark.parametrize(
-    argnames=["jaw_width", "error_context"],
-    argvalues=[
-        (89, nullcontext()),
-        (100, pytest.raises(FailedGripperPickupError)),
-        (50, pytest.raises(FailedGripperPickupError)),
-        (85, nullcontext()),
-    ],
-)
 @pytest.mark.ot3_only
-async def test_failed_gripper_pickup_error(
+async def test_check_labware_pickup(
     decoy: Decoy,
     state_store: StateStore,
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
     ot3_hardware_api: OT3API,
     subject: LabwareMovementHandler,
-    jaw_width: float,
-    error_context: Any,
     hardware_gripper_offset_data: Tuple[
         LabwareMovementOffsetData, LabwareMovementOffsetData
     ],
 ) -> None:
-    """Test that FailedGripperPickupError is raised correctly."""
-    #  This should only be triggered when the difference between the
-    #  gripper jaw and labware widths is greater than the max allowed error.
+    """Test that the gripper position check is called at the right time."""
+    #  This function should only be called when after the gripper opens,
+    #  and then closes again. This is when we expect the labware to be
+    #  in the gripper jaws.
     await set_up_decoy_hardware_gripper(decoy, ot3_hardware_api, state_store)
     assert ot3_hardware_api.hardware_gripper
 
@@ -238,16 +228,31 @@ async def test_failed_gripper_pickup_error(
         )
     ).then_return(Point(201, 202, 219.5))
 
-    decoy.when(ot3_hardware_api.hardware_gripper.jaw_width).then_return(jaw_width)
+    decoy.when(ot3_hardware_api.hardware_gripper.check_labware_pickup(85)).then_return()
 
-    with error_context:
-        await subject.move_labware_with_gripper(
-            labware_id="my-teleporting-labware",
-            current_location=starting_location,
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            user_offset_data=user_offset_data,
-            post_drop_slide_offset=Point(x=1, y=1, z=1),
-        )
+    await subject.move_labware_with_gripper(
+        labware_id="my-teleporting-labware",
+        current_location=starting_location,
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        user_offset_data=user_offset_data,
+        post_drop_slide_offset=Point(x=1, y=1, z=1),
+    )
+
+    decoy.verify(
+        await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
+        await mock_tc_context_manager.__aenter__(),
+        await ot3_hardware_api.grip(force_newtons=100),
+        await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.grip(force_newtons=100),
+        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        await ot3_hardware_api.grip(force_newtons=100),
+        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        await ot3_hardware_api.grip(force_newtons=100),
+        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        await ot3_hardware_api.disengage_axes([Axis.Z_G]),
+        await ot3_hardware_api.ungrip(),
+        await ot3_hardware_api.ungrip(),
+    )
 
 
 # TODO (spp, 2022-10-18):
@@ -324,7 +329,6 @@ async def test_move_labware_with_gripper(
             labware_location=from_location
         )
     ).then_return(mock_tc_context_manager)
-    decoy.when(ot3_hardware_api.hardware_gripper.jaw_width).then_return(89)
 
     expected_waypoints = [
         Point(100, 100, 999),  # move to above slot 1

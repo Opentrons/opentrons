@@ -22,7 +22,6 @@ from ..errors import (
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
     CannotPerformGripperAction,
-    FailedGripperPickupError,
 )
 
 from ..types import (
@@ -106,25 +105,6 @@ class LabwareMovementHandler:
                 "Cannot pick up labware when gripper is already gripping."
             )
 
-        async def check_labware_pickup() -> None:
-            # check if the gripper is at an acceptable position after attempting to
-            #  pick up labware
-            labware_width = self._state_store.labware.get_dimensions(labware_id).y
-            expected_gripper_position = labware_width
-            assert ot3api.hardware_gripper
-            current_gripper_position = ot3api.hardware_gripper.jaw_width
-            if (
-                abs(current_gripper_position - expected_gripper_position)
-                > ot3api.hardware_gripper.geometry.max_allowed_grip_error
-            ):
-                raise FailedGripperPickupError(
-                    message="Expected to grip labware, but none found.",
-                    details={
-                        "expected jaw width": expected_gripper_position,
-                        "actual jaw width": current_gripper_position,
-                    },
-                )
-
         gripper_mount = OT3Mount.GRIPPER
 
         # Retract all mounts
@@ -176,7 +156,12 @@ class LabwareMovementHandler:
                     # we only want to check position after the gripper has opened and
                     # should be holding labware
                     if gripper_opened:
-                        await check_labware_pickup()
+                        assert ot3api.hardware_gripper
+                        ot3api.hardware_gripper.check_labware_pickup(
+                            labware_width=self._state_store.labware.get_dimensions(
+                                labware_id
+                            ).y
+                        )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )

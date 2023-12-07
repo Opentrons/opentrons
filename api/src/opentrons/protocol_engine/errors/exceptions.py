@@ -79,24 +79,6 @@ class FailedToLoadPipetteError(ProtocolEngineError):
         super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, details, wrapping)
 
 
-class FailedGripperPickupError(ProtocolEngineError):
-    """Raised when the gripper expects to be holding an object, but the jaw is closed farther than expected."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a FailedGripperPickupError."""
-        super().__init__(
-            ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR,
-            message,
-            details,
-            wrapping,
-        )
-
-
 # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
 class PipetteNotAttachedError(ProtocolEngineError):
     """Raised when an operation's required pipette is not attached."""
