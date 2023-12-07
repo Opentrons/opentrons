@@ -219,7 +219,6 @@ def _run_trial(trial: PhotometricTrial) -> None:
         if (i + 1) == num_dispenses:
             if not trial.cfg.same_tip:
                 _drop_tip(trial.pipette, trial.cfg.return_tip)
-                trial.ctx._core.get_hardware().retract(OT3Mount.LEFT)
         if not trial.ctx.is_simulating() and trial.channel_count == 96:
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
@@ -348,7 +347,6 @@ def _find_liquid_height(
     volume_for_setup = max(resources.test_volumes)
     _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
     mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-    resources.ctx._core.get_hardware().retract(mnt)
     if (
         not resources.ctx.is_simulating()
         and not cfg.same_tip
@@ -408,10 +406,8 @@ def _find_liquid_height(
         raise RuntimeError(
             f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
         )
-    resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
     if not cfg.same_tip:
         resources.pipette.drop_tip(home_after=False)  # always trash setup tips
-        resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
         # NOTE: the first tip-rack should have already been replaced
         #       with new tips by the operator
 
