@@ -3704,8 +3704,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-0"
+        "model": "magneticModuleV2"
       },
       "result": {
         "definition": {
@@ -3905,8 +3904,7 @@
             }
           }
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-0"
+        "model": "magneticModuleV2"
       },
       "status": "succeeded"
     },
@@ -3914,9 +3912,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
-        "location": {
-          "moduleId": "module-0"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -5168,8 +5164,7 @@
         "location": {
           "slotName": "4"
         },
-        "model": "temperatureModuleV1",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV1"
       },
       "result": {
         "definition": {
@@ -5198,8 +5193,7 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "temperatureModuleV1",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV1"
       },
       "status": "succeeded"
     },
@@ -5207,9 +5201,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "opentrons_24_aluminumblock_generic_2ml_screwcap",
-        "location": {
-          "moduleId": "module-1"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -5557,8 +5549,7 @@
         "location": {
           "slotName": "7"
         },
-        "model": "thermocyclerModuleV1",
-        "moduleId": "module-2"
+        "model": "thermocyclerModuleV1"
       },
       "result": {
         "definition": {
@@ -5588,8 +5579,7 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "thermocyclerModuleV1",
-        "moduleId": "module-2"
+        "model": "thermocyclerModuleV1"
       },
       "status": "succeeded"
     },
@@ -5597,9 +5587,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "module-2"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -13916,23 +13904,17 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/1",
       "loadName": "nest_96_wellplate_2ml_deep",
-      "location": {
-        "moduleId": "module-0"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1",
       "loadName": "opentrons_24_aluminumblock_generic_2ml_screwcap",
-      "location": {
-        "moduleId": "module-1"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "module-2"
-      }
+      "location": {}
     }
   ],
   "liquids": [],

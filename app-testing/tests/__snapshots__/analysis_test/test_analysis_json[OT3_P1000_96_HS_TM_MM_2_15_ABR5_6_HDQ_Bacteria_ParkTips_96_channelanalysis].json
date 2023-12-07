@@ -423,8 +423,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -432,9 +431,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
-        "location": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 2
       },
@@ -3379,8 +3376,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "57a39e6f-1aaf-4d1e-b788-69efda3c2bc9"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },
@@ -3388,9 +3384,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "57a39e6f-1aaf-4d1e-b788-69efda3c2bc9"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 2
       },
@@ -4605,8 +4599,7 @@
             "ot3_standard": {}
           }
         },
-        "model": "magneticBlockV1",
-        "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
+        "model": "magneticBlockV1"
       },
       "status": "succeeded"
     },
@@ -13241,9 +13234,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -13541,8 +13532,7 @@
     {
       "commandType": "heaterShaker/setTargetTemperature",
       "params": {
-        "celsius": 55.0,
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
+        "celsius": 55.0
       },
       "result": {},
       "status": "succeeded"
@@ -15241,7 +15231,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -15260,9 +15249,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -15455,9 +15442,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": false
       },
@@ -15471,9 +15456,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -15492,9 +15475,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -15507,9 +15488,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -17342,7 +17321,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -17361,9 +17339,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -18788,7 +18764,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -18807,17 +18782,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -18831,9 +18802,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -18846,9 +18815,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -18970,9 +18937,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": false
       },
@@ -18986,9 +18951,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -19001,9 +18964,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -19199,7 +19160,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -19217,17 +19177,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -19241,9 +19197,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -19378,9 +19332,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -19393,9 +19345,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -19591,7 +19541,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -19609,17 +19558,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -19633,9 +19578,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -19770,9 +19713,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -19785,9 +19726,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -19983,7 +19922,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -20001,17 +19939,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -20025,9 +19959,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -20162,9 +20094,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -20177,9 +20107,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -21734,7 +21662,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -21753,17 +21680,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -21777,9 +21700,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -21919,9 +21840,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -21935,9 +21854,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -21950,9 +21867,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -22916,8 +22831,7 @@
     {
       "commandType": "heaterShaker/setTargetTemperature",
       "params": {
-        "celsius": 55.0,
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
+        "celsius": 55.0
       },
       "result": {},
       "status": "succeeded"
@@ -24616,7 +24530,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -24635,9 +24548,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -24830,9 +24741,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": false
       },
@@ -24846,9 +24755,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -24867,9 +24774,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -24882,9 +24787,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -26717,7 +26620,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -26736,9 +26638,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -28163,7 +28063,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -28182,17 +28081,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -28206,9 +28101,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -28221,9 +28114,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -28345,9 +28236,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": false
       },
@@ -28361,9 +28250,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -28376,9 +28263,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -28574,7 +28459,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -28592,17 +28476,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -28616,9 +28496,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -28753,9 +28631,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -28768,9 +28644,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -28966,7 +28840,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -28984,17 +28857,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -29008,9 +28877,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -29145,9 +29012,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -29160,9 +29025,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -29358,7 +29221,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -29376,17 +29238,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -29400,9 +29258,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -29537,9 +29393,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -29552,9 +29406,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -31109,7 +30961,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -31128,17 +30979,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -31152,9 +30999,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -31294,9 +31139,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -31310,9 +31153,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -31325,9 +31166,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -32291,8 +32130,7 @@
     {
       "commandType": "heaterShaker/setTargetTemperature",
       "params": {
-        "celsius": 55.0,
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
+        "celsius": 55.0
       },
       "result": {},
       "status": "succeeded"
@@ -33991,7 +33829,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -34010,9 +33847,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -34205,9 +34040,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": false
       },
@@ -34221,9 +34054,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -34242,9 +34073,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -34257,9 +34086,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -36092,7 +35919,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -36111,9 +35937,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -37538,7 +37362,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -37557,17 +37380,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -37581,9 +37400,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -37596,9 +37413,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -37720,9 +37535,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": false
       },
@@ -37736,9 +37549,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -37751,9 +37562,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -37949,7 +37758,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -37967,17 +37775,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -37991,9 +37795,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -38128,9 +37930,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -38143,9 +37943,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -38341,7 +38139,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -38359,17 +38156,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -38383,9 +38176,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -38520,9 +38311,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -38535,9 +38324,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -38733,7 +38520,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 1800.0
       },
       "result": {
@@ -38751,17 +38537,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -38775,9 +38557,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -38912,9 +38692,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -38927,9 +38705,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -40484,7 +40260,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265",
         "rpm": 2000.0
       },
       "result": {
@@ -40503,17 +40278,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -40527,9 +40298,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "f37dd3ef-399a-4a24-b2d3-c4f35395f1c8"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -40669,9 +40438,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": true
       },
@@ -40685,9 +40452,7 @@
           "y": 0.0,
           "z": 3.0
         },
-        "newLocation": {
-          "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -40700,9 +40465,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -41418,9 +41181,7 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
       "loadName": "nest_96_wellplate_2ml_deep",
-      "location": {
-        "moduleId": "2898c359-b683-4abc-9ea8-098781a06265"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
@@ -41432,9 +41193,7 @@
     {
       "definitionUri": "opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/2",
       "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "57a39e6f-1aaf-4d1e-b788-69efda3c2bc9"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",

@@ -12,8 +12,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "magneticModuleV1",
-        "moduleId": "module-0"
+        "model": "magneticModuleV1"
       },
       "result": {
         "definition": {
@@ -40,8 +39,7 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "magneticModuleV1",
-        "moduleId": "module-0"
+        "model": "magneticModuleV1"
       },
       "status": "succeeded"
     },
@@ -51,8 +49,7 @@
         "location": {
           "slotName": "4"
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-1"
+        "model": "magneticModuleV2"
       },
       "result": {
         "definition": {
@@ -252,8 +249,7 @@
             }
           }
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-1"
+        "model": "magneticModuleV2"
       },
       "status": "succeeded"
     },

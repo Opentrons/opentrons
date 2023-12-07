@@ -30,8 +30,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
+        "model": "heaterShakerModuleV1"
       },
       "result": {
         "definition": {
@@ -442,8 +441,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -1598,9 +1596,7 @@
       "params": {
         "displayName": "H/S",
         "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-        "location": {
-          "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -5718,25 +5714,19 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -6232,33 +6222,27 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setTargetTemperature",
       "params": {
-        "celsius": 80.0,
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
+        "celsius": 80.0
       },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType",
         "rpm": 400.0
       },
       "result": {
@@ -6268,33 +6252,25 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -8386,9 +8362,7 @@
       "definitionUri": "opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1",
       "displayName": "H/S",
       "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-      "location": {
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1",

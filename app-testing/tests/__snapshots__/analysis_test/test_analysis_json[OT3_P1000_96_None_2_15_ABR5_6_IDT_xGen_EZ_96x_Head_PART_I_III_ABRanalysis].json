@@ -3674,8 +3674,7 @@
             "ot3_standard": {}
           }
         },
-        "model": "magneticBlockV1",
-        "moduleId": "c3270519-e379-408a-8349-2df16163848c"
+        "model": "magneticBlockV1"
       },
       "status": "succeeded"
     },
@@ -11577,9 +11576,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "newLocation": {
-          "moduleId": "c3270519-e379-408a-8349-2df16163848c"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -12231,9 +12228,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "newLocation": {
-          "moduleId": "c3270519-e379-408a-8349-2df16163848c"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -14519,9 +14514,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "newLocation": {
-          "moduleId": "c3270519-e379-408a-8349-2df16163848c"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -16091,9 +16084,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "newLocation": {
-          "moduleId": "c3270519-e379-408a-8349-2df16163848c"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -18379,9 +18370,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "newLocation": {
-          "moduleId": "c3270519-e379-408a-8349-2df16163848c"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -18568,9 +18557,7 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "c3270519-e379-408a-8349-2df16163848c"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",

@@ -1405,8 +1405,7 @@
         "location": {
           "slotName": "7"
         },
-        "model": "thermocyclerModuleV2",
-        "moduleId": "module-0"
+        "model": "thermocyclerModuleV2"
       },
       "result": {
         "definition": {
@@ -1504,8 +1503,7 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2",
-        "moduleId": "module-0"
+        "model": "thermocyclerModuleV2"
       },
       "status": "succeeded"
     },
@@ -1513,9 +1511,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "module-0"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -2737,9 +2733,7 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "module-0"
-      }
+      "location": {}
     }
   ],
   "liquids": [],
