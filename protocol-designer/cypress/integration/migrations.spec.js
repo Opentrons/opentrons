@@ -53,6 +53,15 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'v8',
       unusedPipettes: false,
     },
+    {
+      title: '96-channel full and column schema 8 -> reimported as schema 8',
+      importFixture:
+        '../../fixtures/protocol/8/ninetySixChannelFullAndColumn.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/8/ninetySixChannelFullAndColumn.json',
+      migrationModal: null,
+      unusedPipettes: false,
+    },
     //  TODO(jr, 11/30/23): write a test fixture here for v8 migrated to v8 with deck config when the ff is removed
     // {
     //   title: 'doItAllV8 flex robot -> reimported',
@@ -159,7 +168,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
                 ).forEach(stepForm => {
                   if (stepForm.stepType === 'moveLiquid') {
                     stepForm.dropTip_location = 'trash drop tip location'
-                    if (stepForm.blowout_location.includes('trashBin')) {
+                    if (stepForm.blowout_location?.includes('trashBin')) {
                       stepForm.blowout_location = 'trash blowout location'
                     }
                   }
