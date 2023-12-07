@@ -21,8 +21,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-0"
+        "model": "magneticModuleV2"
       },
       "result": {
         "definition": {
@@ -222,8 +221,7 @@
             }
           }
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-0"
+        "model": "magneticModuleV2"
       },
       "status": "succeeded"
     },
@@ -233,8 +231,7 @@
         "location": {
           "slotName": "3"
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV2"
       },
       "result": {
         "definition": {
@@ -647,8 +644,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },
@@ -658,8 +654,7 @@
         "location": {
           "slotName": "6"
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-2"
+        "model": "temperatureModuleV2"
       },
       "result": {
         "definition": {
@@ -1072,8 +1067,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-2"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },

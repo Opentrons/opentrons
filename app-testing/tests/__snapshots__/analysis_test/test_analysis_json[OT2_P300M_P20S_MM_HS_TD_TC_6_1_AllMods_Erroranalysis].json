@@ -30,8 +30,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
+        "model": "heaterShakerModuleV1"
       },
       "result": {
         "definition": {
@@ -442,8 +441,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -453,8 +451,7 @@
         "location": {
           "slotName": "9"
         },
-        "model": "magneticModuleV1",
-        "moduleId": "8d4683d0-7a88-4b33-9363-bd3894a71f9a:magneticModuleType"
+        "model": "magneticModuleV1"
       },
       "result": {
         "definition": {
@@ -481,8 +478,7 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "magneticModuleV1",
-        "moduleId": "8d4683d0-7a88-4b33-9363-bd3894a71f9a:magneticModuleType"
+        "model": "magneticModuleV1"
       },
       "status": "succeeded"
     },
@@ -492,8 +488,7 @@
         "location": {
           "slotName": "3"
         },
-        "model": "temperatureModuleV1",
-        "moduleId": "b5df8f5c-9fc5-4d45-98c2-0ce6bd218fda:temperatureModuleType"
+        "model": "temperatureModuleV1"
       },
       "result": {
         "definition": {
@@ -522,8 +517,7 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "temperatureModuleV1",
-        "moduleId": "b5df8f5c-9fc5-4d45-98c2-0ce6bd218fda:temperatureModuleType"
+        "model": "temperatureModuleV1"
       },
       "status": "succeeded"
     },
@@ -533,8 +527,7 @@
         "location": {
           "slotName": "7"
         },
-        "model": "thermocyclerModuleV1",
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
+        "model": "thermocyclerModuleV1"
       },
       "result": {
         "definition": {
@@ -564,8 +557,7 @@
           "quirks": [],
           "slotTransforms": {}
         },
-        "model": "thermocyclerModuleV1",
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
+        "model": "thermocyclerModuleV1"
       },
       "status": "succeeded"
     },
@@ -1720,9 +1712,7 @@
       "params": {
         "displayName": "H/S",
         "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-        "location": {
-          "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -2973,9 +2963,7 @@
       "params": {
         "displayName": "Temp",
         "loadName": "opentrons_24_aluminumblock_generic_2ml_screwcap",
-        "location": {
-          "moduleId": "b5df8f5c-9fc5-4d45-98c2-0ce6bd218fda:temperatureModuleType"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -3322,9 +3310,7 @@
       "params": {
         "displayName": "Mag",
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "8d4683d0-7a88-4b33-9363-bd3894a71f9a:magneticModuleType"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -4471,9 +4457,7 @@
       "params": {
         "displayName": "Themo",
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -5882,33 +5866,25 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
-      "params": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -7090,17 +7066,14 @@
     },
     {
       "commandType": "thermocycler/closeLid",
-      "params": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
       "params": {
-        "celsius": 55.0,
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
+        "celsius": 55.0
       },
       "result": {
         "targetBlockTemperature": 55.0
@@ -7109,17 +7082,14 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
-      "params": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
       "params": {
-        "celsius": 50.0,
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
+        "celsius": 50.0
       },
       "result": {
         "targetLidTemperature": 50.0
@@ -7128,41 +7098,33 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
-      "params": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setTargetTemperature",
       "params": {
-        "celsius": 55.0,
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
+        "celsius": 55.0
       },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType",
         "rpm": 1000.0
       },
       "result": {
@@ -7172,17 +7134,14 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "magneticModule/engage",
       "params": {
-        "height": 12.0,
-        "moduleId": "8d4683d0-7a88-4b33-9363-bd3894a71f9a:magneticModuleType"
+        "height": 12.0
       },
       "result": {},
       "status": "succeeded"
@@ -7190,8 +7149,7 @@
     {
       "commandType": "temperatureModule/setTargetTemperature",
       "params": {
-        "celsius": 80.0,
-        "moduleId": "b5df8f5c-9fc5-4d45-98c2-0ce6bd218fda:temperatureModuleType"
+        "celsius": 80.0
       },
       "result": {
         "targetTemperature": 80.0
@@ -7200,9 +7158,7 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -7215,44 +7171,32 @@
         "errorType": "CannotPerformModuleAction",
         "wrappedErrors": []
       },
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "status": "failed"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "status": "failed"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      },
+      "params": {},
       "status": "failed"
     },
     {
       "commandType": "thermocycler/openLid",
-      "params": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      },
+      "params": {},
       "status": "failed"
     },
     {
       "commandType": "thermocycler/deactivateBlock",
-      "params": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      },
+      "params": {},
       "status": "failed"
     },
     {
       "commandType": "thermocycler/deactivateLid",
-      "params": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      },
+      "params": {},
       "status": "failed"
     }
   ],
@@ -7315,33 +7259,25 @@
       "definitionUri": "opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1",
       "displayName": "H/S",
       "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-      "location": {
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1",
       "displayName": "Temp",
       "loadName": "opentrons_24_aluminumblock_generic_2ml_screwcap",
-      "location": {
-        "moduleId": "b5df8f5c-9fc5-4d45-98c2-0ce6bd218fda:temperatureModuleType"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
       "displayName": "Mag",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "8d4683d0-7a88-4b33-9363-bd3894a71f9a:magneticModuleType"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
       "displayName": "Themo",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/agilent_1_reservoir_290ml/1",

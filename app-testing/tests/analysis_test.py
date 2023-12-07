@@ -22,6 +22,7 @@ exclude = props(
     "pipetteId",
     "labwareId",
     "serialNumber",
+    "moduleId",
 )
 
 

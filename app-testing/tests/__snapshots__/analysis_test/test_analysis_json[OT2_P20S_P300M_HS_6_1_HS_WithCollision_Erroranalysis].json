@@ -30,8 +30,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "b8a48baa-1ee2-448d-8680-c7126843cbe4:heaterShakerModuleType"
+        "model": "heaterShakerModuleV1"
       },
       "result": {
         "definition": {
@@ -442,8 +441,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "b8a48baa-1ee2-448d-8680-c7126843cbe4:heaterShakerModuleType"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -1598,9 +1596,7 @@
       "params": {
         "displayName": "H/S",
         "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-        "location": {
-          "moduleId": "b8a48baa-1ee2-448d-8680-c7126843cbe4:heaterShakerModuleType"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -5176,25 +5172,19 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "b8a48baa-1ee2-448d-8680-c7126843cbe4:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
-      "params": {
-        "moduleId": "b8a48baa-1ee2-448d-8680-c7126843cbe4:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "b8a48baa-1ee2-448d-8680-c7126843cbe4:heaterShakerModuleType"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     }
@@ -5250,9 +5240,7 @@
       "definitionUri": "opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1",
       "displayName": "H/S",
       "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-      "location": {
-        "moduleId": "b8a48baa-1ee2-448d-8680-c7126843cbe4:heaterShakerModuleType"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/opentrons_96_tiprack_300ul/1",

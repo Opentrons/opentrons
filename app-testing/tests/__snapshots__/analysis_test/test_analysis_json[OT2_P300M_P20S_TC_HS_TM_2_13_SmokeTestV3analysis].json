@@ -2358,8 +2358,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "module-0"
+        "model": "heaterShakerModuleV1"
       },
       "result": {
         "definition": {
@@ -2770,8 +2769,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "module-0"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -2781,8 +2779,7 @@
         "location": {
           "slotName": "9"
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV2"
       },
       "result": {
         "definition": {
@@ -3195,8 +3192,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },
@@ -3206,8 +3202,7 @@
         "location": {
           "slotName": "7"
         },
-        "model": "thermocyclerModuleV2",
-        "moduleId": "module-2"
+        "model": "thermocyclerModuleV2"
       },
       "result": {
         "definition": {
@@ -3305,8 +3300,7 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2",
-        "moduleId": "module-2"
+        "model": "thermocyclerModuleV2"
       },
       "status": "succeeded"
     },
@@ -3315,9 +3309,7 @@
       "params": {
         "displayName": "Temperature-Controlled plate",
         "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-        "location": {
-          "moduleId": "module-1"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -4474,9 +4466,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "module-0"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -5631,9 +5621,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "module-2"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -12338,23 +12326,17 @@
       "definitionUri": "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1",
       "displayName": "Temperature-Controlled plate",
       "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-      "location": {
-        "moduleId": "module-1"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1",
       "loadName": "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "module-0"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "module-2"
-      }
+      "location": {}
     },
     {
       "definitionUri": "custom_beta/cpx_4_tuberack_100ul/1",

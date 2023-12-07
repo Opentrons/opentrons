@@ -423,8 +423,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -432,9 +431,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-        "location": {
-          "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -1684,9 +1681,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -1740,8 +1735,7 @@
             "ot3_standard": {}
           }
         },
-        "model": "magneticBlockV1",
-        "moduleId": "b63bf04a-f9e8-4ee3-bf14-0dd16b9dfc84"
+        "model": "magneticBlockV1"
       },
       "status": "succeeded"
     },
@@ -2164,8 +2158,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "6fc49d36-4cf8-4745-ab37-d45afcf6b7f6"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },
@@ -2173,9 +2166,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "opentrons_96_pcr_adapter_armadillo_wellplate_200ul",
-        "location": {
-          "moduleId": "6fc49d36-4cf8-4745-ab37-d45afcf6b7f6"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -15277,7 +15268,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc",
         "rpm": 2000.0
       },
       "result": {
@@ -15296,9 +15286,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -18103,7 +18091,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc",
         "rpm": 1800.0
       },
       "result": {
@@ -18122,17 +18109,13 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "params": {
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
-      },
+      "params": {},
       "result": {
         "pipetteRetracted": false
       },
@@ -18153,9 +18136,7 @@
           "y": 0.0,
           "z": 0.5
         },
-        "newLocation": {
-          "moduleId": "b63bf04a-f9e8-4ee3-bf14-0dd16b9dfc84"
-        },
+        "newLocation": {},
         "pickUpOffset": {
           "x": 0.0,
           "y": 0.0,
@@ -18227,16 +18208,12 @@
     {
       "definitionUri": "opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1",
       "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
-      "location": {
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/opentrons_96_pcr_adapter_armadillo_wellplate_200ul/1",
       "loadName": "opentrons_96_pcr_adapter_armadillo_wellplate_200ul",
-      "location": {
-        "moduleId": "6fc49d36-4cf8-4745-ab37-d45afcf6b7f6"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",

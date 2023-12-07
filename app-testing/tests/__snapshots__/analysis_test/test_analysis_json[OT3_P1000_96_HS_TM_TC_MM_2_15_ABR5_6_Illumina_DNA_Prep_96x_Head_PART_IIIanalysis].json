@@ -432,8 +432,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "d78418dd-9dd6-46e1-8ac1-95353528f716"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -441,9 +440,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "d78418dd-9dd6-46e1-8ac1-95353528f716"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 2
       },
@@ -3168,8 +3165,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "5732eff2-0e70-4895-a9e0-3c81a27fd067"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },
@@ -3177,9 +3173,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "5732eff2-0e70-4895-a9e0-3c81a27fd067"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 2
       },
@@ -4390,8 +4384,7 @@
             "ot3_standard": {}
           }
         },
-        "model": "magneticBlockV1",
-        "moduleId": "37cd0e06-a240-4491-9044-ecf3ad9953b6"
+        "model": "magneticBlockV1"
       },
       "status": "succeeded"
     },
@@ -6993,9 +6986,7 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "d78418dd-9dd6-46e1-8ac1-95353528f716"
-      }
+      "location": {}
     },
     {
       "definitionUri": "custom_beta/opentrons_ot3_96_tiprack_200ul_rss/1",
@@ -7007,9 +6998,7 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "5732eff2-0e70-4895-a9e0-3c81a27fd067"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",

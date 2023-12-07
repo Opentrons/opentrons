@@ -2777,8 +2777,7 @@
             }
           }
         },
-        "model": "heaterShakerModuleV1",
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
+        "model": "heaterShakerModuleV1"
       },
       "status": "succeeded"
     },
@@ -3201,8 +3200,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "33591710-89d5-48ef-99cb-5f9d923af02d"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },
@@ -3310,8 +3308,7 @@
             }
           }
         },
-        "model": "thermocyclerModuleV2",
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
+        "model": "thermocyclerModuleV2"
       },
       "status": "succeeded"
     },
@@ -3319,9 +3316,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "opentrons_96_well_aluminum_block",
-        "location": {
-          "moduleId": "33591710-89d5-48ef-99cb-5f9d923af02d"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -5630,9 +5625,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "opentrons_96_pcr_adapter",
-        "location": {
-          "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -7940,9 +7933,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-        "location": {
-          "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 2
       },
@@ -10685,9 +10676,7 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "params": {
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -14521,8 +14510,7 @@
     {
       "commandType": "temperatureModule/waitForTemperature",
       "params": {
-        "celsius": 25.0,
-        "moduleId": "33591710-89d5-48ef-99cb-5f9d923af02d"
+        "celsius": 25.0
       },
       "result": {},
       "status": "succeeded"
@@ -14530,7 +14518,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a",
         "rpm": 466.0
       },
       "result": {
@@ -14549,41 +14536,33 @@
     {
       "commandType": "heaterShaker/setTargetTemperature",
       "params": {
-        "celsius": 38.0,
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
+        "celsius": 38.0
       },
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
-      "params": {
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
-      "params": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/closeLid",
-      "params": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
       "params": {
-        "celsius": 38.0,
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
+        "celsius": 38.0
       },
       "result": {
         "targetLidTemperature": 38.0
@@ -14592,9 +14571,7 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
-      "params": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -14602,8 +14579,7 @@
       "commandType": "thermocycler/setTargetBlockTemperature",
       "params": {
         "celsius": 28.0,
-        "holdTimeSeconds": 5.0,
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
+        "holdTimeSeconds": 5.0
       },
       "result": {
         "targetBlockTemperature": 28.0
@@ -14612,41 +14588,31 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
-      "params": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/deactivateBlock",
-      "params": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/deactivateLid",
-      "params": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
-      "params": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -14826,7 +14792,6 @@
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "params": {
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a",
         "rpm": 350.0
       },
       "result": {
@@ -14844,9 +14809,7 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "params": {
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
-      },
+      "params": {},
       "result": {},
       "status": "succeeded"
     },
@@ -15083,9 +15046,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_well_aluminum_block/1",
       "loadName": "opentrons_96_well_aluminum_block",
-      "location": {
-        "moduleId": "33591710-89d5-48ef-99cb-5f9d923af02d"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
@@ -15096,9 +15057,7 @@
     {
       "definitionUri": "opentrons/opentrons_96_pcr_adapter/1",
       "loadName": "opentrons_96_pcr_adapter",
-      "location": {
-        "moduleId": "d54c0f0e-c5a4-4d07-95ba-cc9defc4600a"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
@@ -15108,9 +15067,7 @@
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": {
-        "moduleId": "74a13a86-1abc-434c-a219-dbea25004057"
-      }
+      "location": {}
     },
     {
       "definitionUri": "custom_beta/cpx_4_tuberack_100ul/1",

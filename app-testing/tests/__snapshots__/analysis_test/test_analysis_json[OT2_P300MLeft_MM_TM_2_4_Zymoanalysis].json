@@ -12,8 +12,7 @@
         "location": {
           "slotName": "6"
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-0"
+        "model": "magneticModuleV2"
       },
       "result": {
         "definition": {
@@ -213,8 +212,7 @@
             }
           }
         },
-        "model": "magneticModuleV2",
-        "moduleId": "module-0"
+        "model": "magneticModuleV2"
       },
       "status": "succeeded"
     },
@@ -232,9 +230,7 @@
       "params": {
         "displayName": "deepwell plate",
         "loadName": "nest_96_wellplate_2ml_deep",
-        "location": {
-          "moduleId": "module-0"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -1486,8 +1482,7 @@
         "location": {
           "slotName": "1"
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV2"
       },
       "result": {
         "definition": {
@@ -1900,8 +1895,7 @@
             }
           }
         },
-        "model": "temperatureModuleV2",
-        "moduleId": "module-1"
+        "model": "temperatureModuleV2"
       },
       "status": "succeeded"
     },
@@ -1909,9 +1903,7 @@
       "commandType": "loadLabware",
       "params": {
         "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-        "location": {
-          "moduleId": "module-1"
-        },
+        "location": {},
         "namespace": "opentrons",
         "version": 1
       },
@@ -68309,16 +68301,12 @@
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/1",
       "displayName": "deepwell plate",
       "loadName": "nest_96_wellplate_2ml_deep",
-      "location": {
-        "moduleId": "module-0"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/opentrons_96_aluminumblock_nest_wellplate_100ul/1",
       "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
-      "location": {
-        "moduleId": "module-1"
-      }
+      "location": {}
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_195ml/1",
