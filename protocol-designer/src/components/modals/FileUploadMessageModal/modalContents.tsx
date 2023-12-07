@@ -88,7 +88,8 @@ export const toV8MigrationMessage: ModalContents = {
       </p>
       <p>
         Additionally, we have addressed a bug where blow out speeds were slower
-        than expected.
+        than expected. Your protocol will automatically update the flow rates
+        unless they were specifically initialized.
       </p>
       <p>As always, please contact us with any questions or feedback.</p>
     </div>
