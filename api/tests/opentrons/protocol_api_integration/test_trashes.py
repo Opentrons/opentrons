@@ -32,7 +32,12 @@ import pytest
                 ),
             ],
         ),
-        ("2.16", "Flex", None),
+        pytest.param(
+            "2.16",
+            "Flex",
+            None,
+            marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
+        ),
     ],
 )
 def test_fixed_trash_presence(
@@ -63,6 +68,7 @@ def test_fixed_trash_presence(
         assert instrument.trash_container is protocol.fixed_trash
 
 
+@pytest.mark.ot3_only  # Simulating a Flex protocol requires a Flex hardware API.
 def test_trash_search() -> None:
     """Test the automatic trash search for protocols without a fixed trash."""
     protocol = simulate.get_protocol_api(version="2.16", robot_type="Flex")
