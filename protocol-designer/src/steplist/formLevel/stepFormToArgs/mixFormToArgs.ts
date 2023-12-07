@@ -55,7 +55,9 @@ export const mixFormToArgs = (
     ? hydratedFormData.blowout_location
     : null
   // Blowout settings
-  const blowoutFlowRateUlSec = dispenseFlowRateUlSec
+  const blowoutFlowRateUlSec =
+    hydratedFormData.dispense_flowRate ??
+    pipette.spec.defaultBlowOutFlowRate.value
   const blowoutOffsetFromTopMm = blowoutLocation
     ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
     : 0
