@@ -41,8 +41,7 @@
           "slotTransforms": {}
         },
         "model": "magneticModuleV1",
-        "moduleId": "module-0",
-        "serialNumber": "dummySerialMD"
+        "moduleId": "module-0"
       },
       "status": "succeeded"
     },
@@ -254,8 +253,7 @@
           }
         },
         "model": "magneticModuleV2",
-        "moduleId": "module-1",
-        "serialNumber": "dummySerialMD"
+        "moduleId": "module-1"
       },
       "status": "succeeded"
     },
@@ -1564,15 +1562,13 @@
       "location": {
         "slotName": "1"
       },
-      "model": "magneticModuleV1",
-      "serialNumber": "dummySerialMD"
+      "model": "magneticModuleV1"
     },
     {
       "location": {
         "slotName": "4"
       },
-      "model": "magneticModuleV2",
-      "serialNumber": "dummySerialMD"
+      "model": "magneticModuleV2"
     }
   ],
   "pipettes": [

@@ -443,8 +443,7 @@
           }
         },
         "model": "heaterShakerModuleV1",
-        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType",
-        "serialNumber": "fake-serial-number-3bedc208-a227-4649-8080-51df60d161eb"
+        "moduleId": "1767c6cc-9e14-4f36-ac52-aee55856b939:heaterShakerModuleType"
       },
       "status": "succeeded"
     },
@@ -8449,8 +8448,7 @@
       "location": {
         "slotName": "1"
       },
-      "model": "heaterShakerModuleV1",
-      "serialNumber": "fake-serial-number-3bedc208-a227-4649-8080-51df60d161eb"
+      "model": "heaterShakerModuleV1"
     }
   ],
   "pipettes": [

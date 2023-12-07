@@ -214,8 +214,7 @@
           }
         },
         "model": "magneticModuleV2",
-        "moduleId": "module-0",
-        "serialNumber": "dummySerialMD"
+        "moduleId": "module-0"
       },
       "status": "succeeded"
     },
@@ -1902,8 +1901,7 @@
           }
         },
         "model": "temperatureModuleV2",
-        "moduleId": "module-1",
-        "serialNumber": "dummySerialTD"
+        "moduleId": "module-1"
       },
       "status": "succeeded"
     },
@@ -68406,15 +68404,13 @@
       "location": {
         "slotName": "6"
       },
-      "model": "magneticModuleV2",
-      "serialNumber": "dummySerialMD"
+      "model": "magneticModuleV2"
     },
     {
       "location": {
         "slotName": "1"
       },
-      "model": "temperatureModuleV2",
-      "serialNumber": "dummySerialTD"
+      "model": "temperatureModuleV2"
     }
   ],
   "pipettes": [

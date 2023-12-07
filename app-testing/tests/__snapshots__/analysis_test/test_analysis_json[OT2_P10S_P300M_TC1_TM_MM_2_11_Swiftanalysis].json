@@ -3906,8 +3906,7 @@
           }
         },
         "model": "magneticModuleV2",
-        "moduleId": "module-0",
-        "serialNumber": "dummySerialMD"
+        "moduleId": "module-0"
       },
       "status": "succeeded"
     },
@@ -5200,8 +5199,7 @@
           "slotTransforms": {}
         },
         "model": "temperatureModuleV1",
-        "moduleId": "module-1",
-        "serialNumber": "dummySerialTD"
+        "moduleId": "module-1"
       },
       "status": "succeeded"
     },
@@ -5591,8 +5589,7 @@
           "slotTransforms": {}
         },
         "model": "thermocyclerModuleV1",
-        "moduleId": "module-2",
-        "serialNumber": "dummySerialTC"
+        "moduleId": "module-2"
       },
       "status": "succeeded"
     },
@@ -13947,22 +13944,19 @@
       "location": {
         "slotName": "1"
       },
-      "model": "magneticModuleV2",
-      "serialNumber": "dummySerialMD"
+      "model": "magneticModuleV2"
     },
     {
       "location": {
         "slotName": "4"
       },
-      "model": "temperatureModuleV1",
-      "serialNumber": "dummySerialTD"
+      "model": "temperatureModuleV1"
     },
     {
       "location": {
         "slotName": "7"
       },
-      "model": "thermocyclerModuleV1",
-      "serialNumber": "dummySerialTC"
+      "model": "thermocyclerModuleV1"
     }
   ],
   "pipettes": [
