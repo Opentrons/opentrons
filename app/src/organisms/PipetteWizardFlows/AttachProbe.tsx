@@ -8,7 +8,12 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { LEFT, MotorAxes, WASTE_CHUTE_CUTOUT, CreateCommand } from '@opentrons/shared-data'
+import {
+  LEFT,
+  MotorAxes,
+  WASTE_CHUTE_CUTOUT,
+  CreateCommand,
+} from '@opentrons/shared-data'
 import {
   useDeckConfigurationQuery,
   useInstrumentsQuery,
@@ -81,13 +86,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
-    const verifyCommands : CreateCommand[] = [
+    const verifyCommands: CreateCommand[] = [
       {
         commandType: 'verifyTipPresence',
         params: { pipetteId: pipetteId, expectedState: 'present' },
       },
     ]
-    const homeCommands : CreateCommand[] = [
+    const homeCommands: CreateCommand[] = [
       {
         commandType: 'home' as const,
         params: {
@@ -115,11 +120,21 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     ]
     setIsPending(true)
     refetch()
-      .then(() => { chainRunCommands?.(verifyCommands, false) })
-      .catch((e: Error) => { setShowUnableToDetect(true) })
-      .then(() => { chainRunCommands?.(homeCommands, false) })
-      .then(() => { proceed() })
-      .catch(error => { setShowErrorMessage(error.message) })
+      .then(() => {
+        chainRunCommands?.(verifyCommands, false)
+      })
+      .catch((e: Error) => {
+        setShowUnableToDetect(true)
+      })
+      .then(() => {
+        chainRunCommands?.(homeCommands, false)
+      })
+      .then(() => {
+        proceed()
+      })
+      .catch(error => {
+        setShowErrorMessage(error.message)
+      })
   }
 
   let src = pipetteProbe1

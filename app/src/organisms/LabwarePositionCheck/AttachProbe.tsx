@@ -96,16 +96,14 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
-  
-
   const handleProbeAttached = (): void => {
-    const verifyCommands : CreateCommand[]= [
+    const verifyCommands: CreateCommand[] = [
       {
         commandType: 'verifyTipPresence',
         params: { pipetteId: pipetteId, expectedState: 'present' },
       },
     ]
-    const homeCommands : CreateCommand[] = [
+    const homeCommands: CreateCommand[] = [
       { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
       {
         commandType: 'retractAxis' as const,
@@ -124,9 +122,15 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     ]
     setIsPending(true)
     refetch()
-      .then(() => { chainRunCommands(verifyCommands, false) })
-      .catch((e: Error) => { setShowUnableToDetect(true) })
-      .then(() => { chainRunCommands(homeCommands, false) })
+      .then(() => {
+        chainRunCommands(verifyCommands, false)
+      })
+      .catch((e: Error) => {
+        setShowUnableToDetect(true)
+      })
+      .then(() => {
+        chainRunCommands(homeCommands, false)
+      })
       .then(() => proceed())
       .catch((e: Error) => {
         setFatalError(

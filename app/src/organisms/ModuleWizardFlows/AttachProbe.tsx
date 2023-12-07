@@ -178,13 +178,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       setErrorMessage('calibration adapter has not been loaded yet')
       return
     }
-    const verifyCommands : CreateCommand[] = [
+    const verifyCommands: CreateCommand[] = [
       {
         commandType: 'verifyTipPresence',
         params: { pipetteId: pipetteId, expectedState: 'present' },
       },
     ]
-    const homeCommands : CreateCommand[] = [
+    const homeCommands: CreateCommand[] = [
       {
         commandType: 'home' as const,
         params: {
@@ -206,10 +206,14 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         },
       },
     ]
-    
+
     chainRunCommands?.(verifyCommands, false)
-      .then(() => { chainRunCommands?.(homeCommands, false) })
-      .then(() => { proceed() })
+      .then(() => {
+        chainRunCommands?.(homeCommands, false)
+      })
+      .then(() => {
+        proceed()
+      })
       .catch((e: Error) => {
         setErrorMessage(`error starting module calibration: ${e.message}`)
       })
