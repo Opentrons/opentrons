@@ -15,14 +15,22 @@ import pytest
         ("2.13", "OT-2", protocol_api.Labware),
         ("2.14", "OT-2", protocol_api.Labware),
         ("2.15", "OT-2", protocol_api.Labware),
-        ("2.15", "Flex", protocol_api.Labware),
+        pytest.param(
+            "2.15",
+            "Flex",
+            protocol_api.Labware,
+            marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
+        ),
         pytest.param(
             "2.16",
             "OT-2",
             protocol_api.TrashBin,
-            marks=pytest.mark.xfail(
-                strict=True, reason="https://opentrons.atlassian.net/browse/RSS-417"
-            ),
+            marks=[
+                pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
+                pytest.mark.xfail(
+                    strict=True, reason="https://opentrons.atlassian.net/browse/RSS-417"
+                ),
+            ],
         ),
         ("2.16", "Flex", None),
     ],
