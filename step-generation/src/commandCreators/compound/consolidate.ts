@@ -14,6 +14,7 @@ import {
   airGapHelper,
   dispenseLocationHelper,
   moveHelper,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import { configureForVolume } from '../atomic/configureForVolume'
 import {
@@ -135,11 +136,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       null &&
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
-
-  const addressableAreaNameWasteChute =
-    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
+  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
 
   const commandCreators = flatMap(
     sourceWellChunks,

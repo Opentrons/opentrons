@@ -1,5 +1,8 @@
 import takeWhile from 'lodash/takeWhile'
-import { movableTrashCommandsUtil } from '@opentrons/step-generation'
+import {
+  getWasteChuteAddressableAreaNamePip,
+  movableTrashCommandsUtil,
+} from '@opentrons/step-generation'
 import * as StepGeneration from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import type { StepArgsAndErrorsById } from '../steplist/types'
@@ -83,10 +86,9 @@ export const generateRobotStateTimeline = (
             'trashBin'
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-        const addressableAreaName =
-          pipetteSpec.channels === 96
-            ? '96ChannelWasteChute'
-            : '1and8ChannelWasteChute'
+        const addressableAreaName = getWasteChuteAddressableAreaNamePip(
+          pipetteSpec.channels
+        )
 
         let dropTipCommands = [
           StepGeneration.curryCommandCreator(StepGeneration.dropTip, {

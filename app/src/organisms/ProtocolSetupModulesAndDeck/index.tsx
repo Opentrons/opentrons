@@ -69,6 +69,7 @@ import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const ATTACHED_MODULE_POLL_MS = 5000
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
 interface RenderModuleStatusProps {
   isModuleReady: boolean
@@ -340,7 +341,9 @@ export function ProtocolSetupModulesAndDeck({
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const { data: deckConfig } = useDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+  })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)

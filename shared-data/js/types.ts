@@ -280,8 +280,6 @@ export interface AddressableArea {
   compatibleModuleTypes: ModuleType[]
   ableToDropLabware?: boolean
   ableToDropTips?: boolean
-  dropLabwareOffset?: CoordinateTuple
-  dropTipsOffset?: CoordinateTuple
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 

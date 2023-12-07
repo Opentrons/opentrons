@@ -3,15 +3,22 @@ from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import FailedTipStateCheck
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    PythonException,
 )
 
 from ..resources import LabwareDataProvider, ensure_ot3_hardware
 from ..state import StateView
 from ..types import TipGeometry, TipPresenceStatus
-from ..errors import HardwareNotSupportedError
+from ..errors import (
+    HardwareNotSupportedError,
+    TipNotAttachedError,
+    TipAttachedError,
+    ProtocolEngineError,
+)
 
 
 PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
@@ -232,7 +239,11 @@ class HardwareTipHandler(TipHandler):
     async def verify_tip_presence(
         self, pipette_id: str, expected: TipPresenceStatus
     ) -> None:
-        """Verify the expecterd tip presence status of the pipette."""
+        """Verify the expecterd tip presence status of the pipette.
+
+        This function will raise an exception if the specified tip presence status
+        isn't matched.
+        """
         try:
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
             hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
@@ -240,6 +251,16 @@ class HardwareTipHandler(TipHandler):
         except HardwareNotSupportedError:
             # Tip presence sensing is not supported on the OT2
             pass
+        except FailedTipStateCheck as e:
+            if expected == TipPresenceStatus.ABSENT:
+                raise TipAttachedError(wrapping=[PythonException(e)])
+            elif expected == TipPresenceStatus.PRESENT:
+                raise TipNotAttachedError(wrapping=[PythonException(e)])
+            else:
+                raise ProtocolEngineError(
+                    message="Unknown tip status in tip status check",
+                    wrapping=[PythonException(e)],
+                )
 
 
 class VirtualTipHandler(TipHandler):

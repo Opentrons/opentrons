@@ -8,6 +8,10 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
+  PipetteChannels,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -38,6 +42,22 @@ export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 
 type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
+
+export function getWasteChuteAddressableAreaNamePip(
+  channels: PipetteChannels
+): string {
+  switch (channels) {
+    case 1: {
+      return ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+    }
+    case 8: {
+      return EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+    }
+    case 96: {
+      return NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+    }
+  }
+}
 
 export function getTrashOrLabware(
   labwareEntities: LabwareEntities,
@@ -244,10 +264,8 @@ export const blowoutUtil = (args: {
     prevRobotState,
   } = args
   if (!blowoutLocation) return []
-  const addressableAreaName =
-    invariantContext.pipetteEntities[pipette].spec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
+  const channels = invariantContext.pipetteEntities[pipette].spec.channels
+  const addressableAreaName = getWasteChuteAddressableAreaNamePip(channels)
 
   const trashOrLabware = getTrashOrLabware(
     invariantContext.labwareEntities,
@@ -499,16 +517,14 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
   } else if (trashOrLabware === 'wasteChute') {
     const pipetteChannels =
       invariantContext.pipetteEntities[pipetteId].spec.channels
+
     commands = wasteChuteCommandsUtil({
       type: 'dispense',
       pipetteId,
       volume,
       flowRate,
       prevRobotState,
-      addressableAreaName:
-        pipetteChannels === 96
-          ? '96ChannelWasteChute'
-          : '1and8ChannelWasteChute',
+      addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
     })
   } else {
     commands = movableTrashCommandsUtil({
@@ -561,10 +577,9 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
     commands = [
       curryCommandCreator(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName:
-          pipetteChannels === 96
-            ? '96ChannelWasteChute'
-            : '1and8ChannelWasteChute',
+        addressableAreaName: getWasteChuteAddressableAreaNamePip(
+          pipetteChannels
+        ),
       }),
     ]
   } else {
@@ -663,10 +678,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       volume,
       flowRate,
       prevRobotState,
-      addressableAreaName:
-        pipetteChannels === 96
-          ? '96ChannelWasteChute'
-          : '1and8ChannelWasteChute',
+      addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
     })
   } else {
     commands = movableTrashCommandsUtil({

@@ -1781,6 +1781,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         self._core.prepare_to_aspirate()
 
+    @requires_version(2, 16)
     def configure_nozzle_layout(
         self,
         style: NozzleLayout,
@@ -1788,37 +1789,39 @@ class InstrumentContext(publisher.CommandPublisher):
         front_right: Optional[str] = None,
         tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
-        """Configure a pipette to pick up less than the maximum tip capacity. The pipette
-        will remain in its partial state until this function is called again without any inputs. All subsequent
-        pipetting calls will execute with the new nozzle layout meaning that the pipette will perform
-        robot moves in the set nozzle layout.
+        """Configure how many tips the 96-channel pipette will pick up.
 
-        :param style: The requested nozzle layout should specify the shape that you
-        wish to configure your pipette to. Certain pipettes are restricted to a subset of `NozzleLayout`
-        types. See the note below on the different `NozzleLayout` types.
-        :type requested_nozzle_layout: `NozzleLayout.COLUMN`, `NozzleLayout.ALL` or None.
-        :param start: Signifies the nozzle that the robot will use to determine how to perform moves to different locations on the deck.
-        :type start: string or None.
-        :param front_right: Signifies the ending nozzle in your partial configuration. It is not required for NozzleLayout.COLUMN, NozzleLayout.ROW, or NozzleLayout.SINGLE
-        configurations.
-        :type front_right: string or None.
-        :type tip_racks: List of tipracks to use during this configuration
+        Changing the nozzle layout will affect gantry movement for all subsequent
+        pipetting actions that the pipette performs. It also alters the pipette's
+        behavior for picking up tips. The pipette will continue to use the specified
+        layout until this function is called again.
 
         .. note::
-            Your `start` and `front_right` strings should be formatted similarly to a well, so in the format of <LETTER><NUMBER>.
-            The pipette nozzles are mapped in the same format as a 96 well standard plate starting from the back left-most nozzle
-            to the front right-most nozzle.
+            When picking up fewer than 96 tips at once, the tip rack *must not* be
+            placed in a tip rack adapter in the deck. If you try to perform partial tip
+            pickup on a tip rack that is in an adapter, the API will raise an error.
 
-        .. code-block:: python
+        :param style: The shape of the nozzle layout.
 
-            from opentrons.protocol_api import COLUMN, ALL
+            - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
+              with respect to the deck. This corresponds to a column of wells on labware.
+            - ``ALL`` resets the pipette to use all of its nozzles. Calling ``configure_nozzle_layout`` with no arguments also resets the pipette.
 
-            # Sets a pipette to a full single column pickup using "A1" as the primary nozzle. Implicitly, "H1" is the ending nozzle.
-            instr.configure_nozzle_layout(style=COLUMN, start="A1")
-
-            # Resets the pipette configuration to default
-            instr.configure_nozzle_layout(style=ALL)
+        :type style: ``NozzleLayout`` or ``None``
+        :param start: The nozzle at the back left of the layout, which the robot uses
+            to determine how it will move to different locations on the deck. The string
+            should be of the same format used when identifying wells by name. Use
+            ``"A1"`` to have the pipette use its leftmost nozzles to pick up tips
+            *left-to-right* from a tip rack. Use ``"A12"`` to have the pipette use its
+            rightmost nozzles to pick up tips *right-to-left* from a tip rack.
+        :type start: str or ``None``
+        :param tip_racks: List of tip racks to use during this configuration.
         """
+        #       TODO: add the following back into the docstring when QUADRANT is supported
+        #
+        #       :param front_right: The nozzle at the front left of the layout. Only used for
+        #           NozzleLayout.QUADRANT configurations.
+        #       :type front_right: str or ``None``
         if style != NozzleLayout.ALL:
             if start is None:
                 raise ValueError(

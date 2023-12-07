@@ -75,7 +75,7 @@ describe('LocationConflictModal', () => {
     getByText('Heater-Shaker Module GEN1')
     getByRole('button', { name: 'Cancel' }).click()
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'Confirm removal' }).click()
+    getByRole('button', { name: 'Update deck' }).click()
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render correct info for a odd', () => {
@@ -92,7 +92,7 @@ describe('LocationConflictModal', () => {
     getByText('Trash bin')
     getByText('Cancel').click()
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByText('Confirm removal').click()
+    getByText('Update deck').click()
     expect(mockUpdate).toHaveBeenCalled()
   })
 })

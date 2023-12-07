@@ -21,6 +21,12 @@ import {
 } from '@opentrons/shared-data'
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
+const wasteChuteddressableAreaNamesPipette = [
+  '1ChannelWasteChute',
+  '8ChannelWasteChute',
+  '96ChannelWasteChute',
+]
+
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
   commands: CreateCommand[]
@@ -136,13 +142,11 @@ export const substepTimelineSingleChannel = (
             ? 'fixedTrashSlot'
             : 'trashBinAdapter'
 
-        const cutoutFixture =
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '1and8ChannelWasteChute' ||
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '96ChannelWasteChute'
-            ? 'wasteChuteRightAdapterNoCover'
-            : trashCutoutFixture
+        const cutoutFixture = wasteChuteddressableAreaNamesPipette.includes(
+          moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
+        )
+          ? 'wasteChuteRightAdapterNoCover'
+          : trashCutoutFixture
 
         const cutoutId = getCutoutIdByAddressableArea(
           moveToAddressableAreaCommand?.params
@@ -288,8 +292,9 @@ export const substepTimelineMultiChannel = (
             : 'trashBinAdapter'
 
         const cutoutFixture =
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '1and8ChannelWasteChute' ||
+          wasteChuteddressableAreaNamesPipette.includes(
+            moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
+          ) ||
           moveToAddressableAreaCommand?.params.addressableAreaName ===
             '96ChannelWasteChute'
             ? 'wasteChuteRightAdapterNoCover'
