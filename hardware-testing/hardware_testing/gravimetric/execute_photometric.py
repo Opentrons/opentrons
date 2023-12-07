@@ -346,7 +346,6 @@ def _find_liquid_height(
     setup_tip = _next_tip(resources, cfg, cfg.pipette_channels == 1)
     volume_for_setup = max(resources.test_volumes)
     _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
-    mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
     if (
         not resources.ctx.is_simulating()
         and not cfg.same_tip

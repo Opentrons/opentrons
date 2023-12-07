@@ -403,7 +403,9 @@ def _load_tipracks(
     for ls in tiprack_load_settings:
         ui.print_info(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
 
-    adapter: Optional[str] = "opentrons_flex_96_tiprack_adapter" if use_adapters else None
+    adapter: Optional[str] = (
+        "opentrons_flex_96_tiprack_adapter" if use_adapters else None
+    )
     # If running multiple tests in one run, the labware may already be loaded
     loaded_labwares = ctx.loaded_labwares
     print(f"Loaded labwares {loaded_labwares}")
@@ -429,7 +431,7 @@ def _load_tipracks(
                 if ctx.deck[ls[0]] is not None:
                     # remove the adapter from the slot too
                     ui.print_info(f"removing {ctx.deck[ls[0]]} from slot {ls[0]}")
-                    del(ctx.deck[ls[0]])
+                    del ctx.deck[ls[0]]
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
