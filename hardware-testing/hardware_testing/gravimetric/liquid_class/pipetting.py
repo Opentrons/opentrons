@@ -223,16 +223,16 @@ def _pipette_with_liquid_settings(  # noqa: C901
                 "WARNING: removing trailing air-gap from pipette, "
                 "this should only happen during blank trials"
             )
-            hw_api.dispense(hw_mount)
+            pipette.dispense(volume=pipette.current_volume)
         if mode:
             # NOTE: increment test requires the plunger's "bottom" position
             #       does not change during the entire test run
             hw_api.set_liquid_class(hw_mount, mode)
         else:
-            hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
+            pipette.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
         if clear_accuracy_function:
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
-        hw_api.prepare_for_aspirate(hw_mount)
+        pipette.prepare_for_aspirate(hw_mount)
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
@@ -257,7 +257,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
             ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
         )
         pipette.blow_out()
-        hw_api.prepare_for_aspirate(hw_mount)
+        pipette.prepare_for_aspirate(hw_mount)
         assert pipette.current_volume == 0
 
     def _aspirate_on_submerge() -> None:
