@@ -62,15 +62,13 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: null,
       unusedPipettes: false,
     },
-    //  TODO(jr, 11/30/23): write a test fixture here for v8 migrated to v8 with deck config when the ff is removed
-    // {
-    //   title: 'doItAllV8 flex robot -> reimported',
-    //   importFixture: '../../fixtures/protocol/8/doItAllV8.json',
-    //   expectedExportFixture:
-    //     '../../fixtures/protocol/8/doItAllV8.json',
-    //   migrationModal: 'noBehaviorChange',
-    //   unusedPipettes: false,
-    // },
+    {
+      title: 'doItAllV8 flex robot -> reimported, should not migrate',
+      importFixture: '../../fixtures/protocol/8/doItAllV8.json',
+      expectedExportFixture: '../../fixtures/protocol/8/doItAllV8.json',
+      migrationModal: null,
+      unusedPipettes: false,
+    },
   ]
 
   testCases.forEach(
