@@ -18,7 +18,6 @@ metadata = {
 
 
 def run(ctx):
-
     [well_plate, pipette, tips, pipette_mount] = get_values(  # noqa: F821
         "well_plate", "pipette", "tips", "pipette_mount"
     )

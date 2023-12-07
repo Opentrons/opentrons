@@ -379,7 +379,6 @@ def run(ctx):
         remove_supernatant(175, lysis_res)
 
     def wash(vol, source, waste):
-
         global whichwash  # Defines which wash the protocol is on to log on the app
         """
         if source == wash1:
@@ -441,7 +440,6 @@ def run(ctx):
         pip.flow_rate.dispense = 150
 
     def stop_reaction(vol, source):
-
         pip.pick_up_tip(tips)
         pip.aspirate(vol, source)
         pip.dispense(vol, samples_m)

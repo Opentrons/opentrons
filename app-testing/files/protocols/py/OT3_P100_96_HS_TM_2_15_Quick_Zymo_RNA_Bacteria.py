@@ -354,7 +354,6 @@ def run(ctx):
         remove_supernatant(vol + starting_vol, bind_res)
 
     def wash(vol, source):
-
         global whichwash  # Defines which wash the protocol is on to log on the app
 
         if source == wash1:
@@ -416,7 +415,6 @@ def run(ctx):
         h_s.deactivate_shaker()
 
     def stop_reaction(vol, source):
-
         pip.pick_up_tip(tips)
         pip.aspirate(vol, source)
         pip.dispense(vol, samples_m)

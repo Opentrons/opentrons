@@ -38,7 +38,6 @@ STEP_POSTPCR = 1
 
 
 def run(protocol: protocol_api.ProtocolContext):
-
     protocol.comment("THIS IS A DRY RUN") if DRYRUN == True else protocol.comment("THIS IS A REACTION RUN")
     protocol.comment("USED TIPS WILL GO IN TRASH") if TIP_TRASH == True else protocol.comment(
         "USED TIPS WILL BE RE-RACKED"
