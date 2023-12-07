@@ -84,8 +84,6 @@ describe('createFile selector', () => {
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      //  TODO(jr, 10/3/23): add additionalEquipmentEntities when the schemaV8 supports
-      //  loadAddressableArea
       {}
     )
     expectResultToMatchSchema(result)
