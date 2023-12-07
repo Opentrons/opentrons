@@ -451,9 +451,9 @@ class FailedGripperPickupError(RoboticsControlError):
     """Raised when the gripper expects to be holding an object, but the jaw is closed farther than expected."""
 
     def __init__(
-            self,
-            details: Optional[Dict[str, Any]] = None,
-            wrapping: Optional[Sequence[EnumeratedError]] = None,
+        self,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FailedGripperPickupError."""
         super().__init__(
