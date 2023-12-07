@@ -5,6 +5,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
   getPipetteNameSpecs,
+  CreateCommand,
 } from '@opentrons/shared-data'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
@@ -95,53 +96,42 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
+  
+
   const handleProbeAttached = (): void => {
+    const verifyCommands : CreateCommand[]= [
+      {
+        commandType: 'verifyTipPresence',
+        params: { pipetteId: pipetteId, expectedState: 'present' },
+      },
+    ]
+    const homeCommands : CreateCommand[] = [
+      { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
+      {
+        commandType: 'retractAxis' as const,
+        params: {
+          axis: pipetteZMotorAxis,
+        },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'x' },
+      },
+      {
+        commandType: 'retractAxis' as const,
+        params: { axis: 'y' },
+      },
+    ]
     setIsPending(true)
     refetch()
-      .then(() => {
-        chainRunCommands(
-          [
-            {
-              commandType: 'verifyTipPresence',
-              params: { pipetteId: pipetteId, expectedState: 'present' },
-            },
-          ],
-          false
+      .then(() => { chainRunCommands(verifyCommands, false) })
+      .catch((e: Error) => { setShowUnableToDetect(true) })
+      .then(() => { chainRunCommands(homeCommands, false) })
+      .then(() => proceed())
+      .catch((e: Error) => {
+        setFatalError(
+          `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
         )
-          .then(() => {
-            chainRunCommands(
-              [
-                { commandType: 'home', params: { axes: [pipetteZMotorAxis] } },
-                {
-                  commandType: 'retractAxis' as const,
-                  params: {
-                    axis: pipetteZMotorAxis,
-                  },
-                },
-                {
-                  commandType: 'retractAxis' as const,
-                  params: { axis: 'x' },
-                },
-                {
-                  commandType: 'retractAxis' as const,
-                  params: { axis: 'y' },
-                },
-              ],
-              false
-            )
-              .then(() => proceed())
-              .catch((e: Error) => {
-                setFatalError(
-                  `AttachProbe failed to move to safe location after probe attach with message: ${e.message}`
-                )
-              })
-          })
-          .catch((e: Error) => {
-            setShowUnableToDetect(true)
-          })
-      })
-      .catch(error => {
-        setFatalError(error.message)
       })
   }
 

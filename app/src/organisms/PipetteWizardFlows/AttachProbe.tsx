@@ -8,7 +8,7 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { LEFT, MotorAxes, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { LEFT, MotorAxes, WASTE_CHUTE_CUTOUT, CreateCommand } from '@opentrons/shared-data'
 import {
   useDeckConfigurationQuery,
   useInstrumentsQuery,
@@ -81,62 +81,45 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
+    const verifyCommands : CreateCommand[] = [
+      {
+        commandType: 'verifyTipPresence',
+        params: { pipetteId: pipetteId, expectedState: 'present' },
+      },
+    ]
+    const homeCommands : CreateCommand[] = [
+      {
+        commandType: 'home' as const,
+        params: {
+          axes: axes,
+        },
+      },
+      {
+        commandType: 'home' as const,
+        params: {
+          skipIfMountPositionOk: mount,
+        },
+      },
+      {
+        commandType: 'calibration/calibratePipette' as const,
+        params: {
+          mount: mount,
+        },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: mount,
+        },
+      },
+    ]
     setIsPending(true)
     refetch()
-      .then(() => {
-        chainRunCommands?.(
-          [
-            {
-              commandType: 'verifyTipPresence',
-              params: { pipetteId: pipetteId, expectedState: 'present' },
-            },
-          ],
-          false
-        )
-          .then(() => {
-            chainRunCommands?.(
-              [
-                {
-                  commandType: 'home' as const,
-                  params: {
-                    axes: axes,
-                  },
-                },
-                {
-                  commandType: 'home' as const,
-                  params: {
-                    skipIfMountPositionOk: mount,
-                  },
-                },
-                {
-                  commandType: 'calibration/calibratePipette' as const,
-                  params: {
-                    mount: mount,
-                  },
-                },
-                {
-                  commandType: 'calibration/moveToMaintenancePosition' as const,
-                  params: {
-                    mount: mount,
-                  },
-                },
-              ],
-              false
-            )
-              .then(() => {
-                proceed()
-              })
-              .catch(error => {
-                setShowErrorMessage(error.message)
-              })
-          })
-          .catch((e: Error) => {
-            setShowUnableToDetect(true)
-          })
-      })
-      .catch(error => {
-        setShowErrorMessage(error.message)
-      })
+      .then(() => { chainRunCommands?.(verifyCommands, false) })
+      .catch((e: Error) => { setShowUnableToDetect(true) })
+      .then(() => { chainRunCommands?.(homeCommands, false) })
+      .then(() => { proceed() })
+      .catch(error => { setShowErrorMessage(error.message) })
   }
 
   let src = pipetteProbe1

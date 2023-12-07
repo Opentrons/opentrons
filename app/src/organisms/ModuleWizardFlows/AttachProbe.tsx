@@ -5,7 +5,7 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { WASTE_CHUTE_CUTOUT, CreateCommand } from '@opentrons/shared-data'
 import {
   LEFT,
   THERMOCYCLER_MODULE_MODELS,
@@ -178,49 +178,41 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       setErrorMessage('calibration adapter has not been loaded yet')
       return
     }
-    chainRunCommands?.(
-      [
-        {
-          commandType: 'verifyTipPresence',
-          params: { pipetteId: pipetteId, expectedState: 'present' },
+    const verifyCommands : CreateCommand[] = [
+      {
+        commandType: 'verifyTipPresence',
+        params: { pipetteId: pipetteId, expectedState: 'present' },
+      },
+    ]
+    const homeCommands : CreateCommand[] = [
+      {
+        commandType: 'home' as const,
+        params: {
+          axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
         },
-      ],
-      false
-    )
-      .then(() => {
-        chainRunCommands?.(
-          [
-            {
-              commandType: 'home' as const,
-              params: {
-                axes: attachedPipette.mount === LEFT ? ['leftZ'] : ['rightZ'],
-              },
-            },
-            {
-              commandType: 'calibration/calibrateModule',
-              params: {
-                moduleId: attachedModule.id,
-                labwareId: adapterId,
-                mount: attachedPipette.mount,
-              },
-            },
-            {
-              commandType: 'calibration/moveToMaintenancePosition' as const,
-              params: {
-                mount: attachedPipette.mount,
-              },
-            },
-          ],
-          false
-        )
-          .then(() => proceed())
-          .catch((e: Error) =>
-            setErrorMessage(`error starting module calibration: ${e.message}`)
-          )
-      })
-      .catch((e: Error) =>
+      },
+      {
+        commandType: 'calibration/calibrateModule',
+        params: {
+          moduleId: attachedModule.id,
+          labwareId: adapterId,
+          mount: attachedPipette.mount,
+        },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: attachedPipette.mount,
+        },
+      },
+    ]
+    
+    chainRunCommands?.(verifyCommands, false)
+      .then(() => { chainRunCommands?.(homeCommands, false) })
+      .then(() => { proceed() })
+      .catch((e: Error) => {
         setErrorMessage(`error starting module calibration: ${e.message}`)
-      )
+      })
   }
 
   // TODO: add calibration loading screen and error screen
