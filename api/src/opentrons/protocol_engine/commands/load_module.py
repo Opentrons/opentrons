@@ -104,6 +104,10 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
+        self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+            params.location.slotName.id
+        )
+
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location
         )
