@@ -119,9 +119,14 @@ export function parseInitialLoadedLabwareBySlot(
     (acc, command) => {
       if (
         typeof command.params.location === 'object' &&
-        'slotName' in command.params.location
+        ('slotName' in command.params.location ||
+          'addressableAreaName' in command.params.location)
       ) {
-        return { ...acc, [command.params.location.slotName]: command }
+        const slotName =
+          'addressableAreaName' in command.params.location
+            ? command.params.location.addressableAreaName
+            : command.params.location.slotName
+        return { ...acc, [slotName]: command }
       } else {
         return acc
       }
