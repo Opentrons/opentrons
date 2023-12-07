@@ -56,7 +56,7 @@ export function WasteChuteConfigFixture(
       <Btn
         css={
           handleClickRemove != null
-            ? WASTE_CHUTE_CONFIG_STYLE
+            ? WASTE_CHUTE_CONFIG_STYLE_EDITABLE
             : WASTE_CHUTE_CONFIG_STYLE_READ_ONLY
         }
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
@@ -77,29 +77,6 @@ export function WasteChuteConfigFixture(
   )
 }
 
-const WASTE_CHUTE_CONFIG_STYLE = css`
-  display: ${DISPLAY_FLEX};
-  align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey2};
-  border-radius: ${BORDERS.borderRadiusSize1};
-  color: ${COLORS.white};
-  justify-content: ${JUSTIFY_CENTER};
-  grid-gap: ${SPACING.spacing8};
-  width: 100%;
-
-  &:active {
-    background-color: ${COLORS.darkBlack90};
-  }
-
-  &:hover {
-    background-color: ${COLORS.grey1};
-  }
-
-  &:focus-visible {
-    border: 3px solid ${COLORS.fundamentalsFocus};
-  }
-`
-
 const WASTE_CHUTE_CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
@@ -109,6 +86,18 @@ const WASTE_CHUTE_CONFIG_STYLE_READ_ONLY = css`
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing8};
   width: 100%;
+`
+
+const WASTE_CHUTE_CONFIG_STYLE_EDITABLE = css`
+  ${WASTE_CHUTE_CONFIG_STYLE_READ_ONLY}
+
+  &:active {
+    background-color: ${COLORS.darkBlack90};
+  }
+
+  &:hover {
+    background-color: ${COLORS.grey1};
+  }
 
   &:focus-visible {
     border: 3px solid ${COLORS.fundamentalsFocus};

@@ -47,7 +47,7 @@ export function StagingAreaConfigFixture(
       <Btn
         css={
           handleClickRemove != null
-            ? STAGING_AREA_CONFIG_STYLE
+            ? STAGING_AREA_CONFIG_STYLE_EDITABLE
             : STAGING_AREA_CONFIG_STYLE_READ_ONLY
         }
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
@@ -68,29 +68,6 @@ export function StagingAreaConfigFixture(
   )
 }
 
-const STAGING_AREA_CONFIG_STYLE = css`
-  display: ${DISPLAY_FLEX};
-  align-items: ${ALIGN_CENTER};
-  background-color: ${COLORS.grey2};
-  border-radius: ${BORDERS.borderRadiusSize1};
-  color: ${COLORS.white};
-  grid-gap: ${SPACING.spacing8};
-  justify-content: ${JUSTIFY_CENTER};
-  width: 100%;
-
-  &:active {
-    background-color: ${COLORS.darkBlack90};
-  }
-
-  &:hover {
-    background-color: ${COLORS.grey1};
-  }
-
-  &:focus-visible {
-    border: 3px solid ${COLORS.fundamentalsFocus};
-  }
-`
-
 const STAGING_AREA_CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
@@ -100,6 +77,18 @@ const STAGING_AREA_CONFIG_STYLE_READ_ONLY = css`
   grid-gap: ${SPACING.spacing8};
   justify-content: ${JUSTIFY_CENTER};
   width: 100%;
+`
+
+const STAGING_AREA_CONFIG_STYLE_EDITABLE = css`
+  ${STAGING_AREA_CONFIG_STYLE_READ_ONLY}
+
+  &:active {
+    background-color: ${COLORS.darkBlack90};
+  }
+
+  &:hover {
+    background-color: ${COLORS.grey1};
+  }
 
   &:focus-visible {
     border: 3px solid ${COLORS.fundamentalsFocus};
