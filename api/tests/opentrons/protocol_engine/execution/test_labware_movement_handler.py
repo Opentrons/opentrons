@@ -202,7 +202,7 @@ async def test_failed_gripper_pickup_error(
 ) -> None:
     """Test that FailedGripperPickupError is raised correctly."""
     #  This should only be triggered when the difference between the
-    #  gripper jaw labware widths is greater than the max allowed error.
+    #  gripper jaw and labware widths is greater than the max allowed error.
     await set_up_decoy_hardware_gripper(decoy, ot3_hardware_api, state_store)
     assert ot3_hardware_api.hardware_gripper
 

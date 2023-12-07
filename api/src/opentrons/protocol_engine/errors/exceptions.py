@@ -80,7 +80,7 @@ class FailedToLoadPipetteError(ProtocolEngineError):
 
 
 class FailedGripperPickupError(ProtocolEngineError):
-    """Raised when the gripper expects to pick up an object but closes the jaw farther than expected."""
+    """Raised when the gripper expects to be holding an object, but the jaw is closed farther than expected."""
 
     def __init__(
         self,

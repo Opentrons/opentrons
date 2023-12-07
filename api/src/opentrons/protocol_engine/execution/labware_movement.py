@@ -173,6 +173,8 @@ class LabwareMovementHandler:
                         await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
+                    # we only want to check position after the gripper has opened and
+                    # should be holding labware
                     if gripper_opened:
                         await check_labware_pickup()
                 await ot3api.move_to(
