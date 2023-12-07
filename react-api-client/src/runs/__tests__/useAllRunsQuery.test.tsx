@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getRuns } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useAllRunsQuery } from '..'
@@ -18,11 +18,11 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useAllRunsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode} & GetRunsParams>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & GetRunsParams>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & GetRunsParams> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & GetRunsParams> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -54,11 +54,11 @@ describe('useAllRunsQuery hook', () => {
       .calledWith(HOST_CONFIG, {})
       .mockResolvedValue({ data: mockRunsResponse } as Response<Runs>)
 
-    const { result, waitFor } = renderHook(useAllRunsQuery, { wrapper })
+    const { result } = renderHook(useAllRunsQuery, { wrapper })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(mockRunsResponse)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockRunsResponse)
+    })
   })
 
   it('should return specified pageLength of runs', async () => {
@@ -67,13 +67,13 @@ describe('useAllRunsQuery hook', () => {
       .calledWith(HOST_CONFIG, { pageLength: 20 })
       .mockResolvedValue({ data: mockRunsResponse } as Response<Runs>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useAllRunsQuery({ pageLength: 20 }),
       { wrapper }
     )
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(mockRunsResponse)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockRunsResponse)
+    })
   })
 })

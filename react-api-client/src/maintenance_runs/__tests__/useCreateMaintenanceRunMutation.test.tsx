@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createMaintenanceRun } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { mockMaintenanceRunResponse } from '../__fixtures__'
@@ -24,11 +24,11 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useCreateMaintenanceRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -69,7 +69,7 @@ describe('useCreateMaintenanceRunMutation hook', () => {
         data: mockMaintenanceRunResponse,
       } as Response<MaintenanceRun>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateMaintenanceRunMutation(),
       {
         wrapper,
@@ -79,8 +79,8 @@ describe('useCreateMaintenanceRunMutation hook', () => {
       result.current.createMaintenanceRun({ labwareOffsets: [mockOffset] })
     })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(mockMaintenanceRunResponse)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockMaintenanceRunResponse)
+    })
   })
 })

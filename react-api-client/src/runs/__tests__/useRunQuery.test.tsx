@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getRun } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useRunQuery } from '..'
@@ -59,12 +59,12 @@ describe('useRunQuery hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID)
       .mockResolvedValue({ data: RUN_RESPONSE } as Response<Run>)
 
-    const { result, waitFor } = renderHook(() => useRunQuery(RUN_ID), {
+    const { result } = renderHook(() => useRunQuery(RUN_ID), {
       wrapper,
     })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(RUN_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(RUN_RESPONSE)
+    })
   })
 })

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when } from 'jest-when'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { useHistoricRunDetails } from '../useHistoricRunDetails'
 import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
@@ -42,12 +42,13 @@ describe('useHistoricRunDetails', () => {
     )
 
   it('returns historical run details with newest first', async () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <div>{children}</div>
     )
-    const { result, waitFor } = renderHook(useHistoricRunDetails, { wrapper })
-    await waitFor(() => result.current != null)
-    expect(result.current).toEqual([MOCK_RUN_LATER, MOCK_RUN_EARLIER])
+    const { result } = renderHook(useHistoricRunDetails, { wrapper })
+    await waitFor(() => {
+      expect(result.current).toEqual([MOCK_RUN_LATER, MOCK_RUN_EARLIER])
+    })
   })
   it('returns historical run details with newest first to specific host', async () => {
     when(mockUseAllRunsQuery)
@@ -58,18 +59,19 @@ describe('useHistoricRunDetails', () => {
           links: {},
         })
       )
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <div>{children}</div>
     )
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useHistoricRunDetails({ hostname: 'fakeIp' }),
       { wrapper }
     )
-    await waitFor(() => result.current != null)
-    expect(result.current).toEqual([
-      MOCK_RUN_LATER,
-      MOCK_RUN_EARLIER,
-      MOCK_RUN_EARLIER,
-    ])
+    await waitFor(() => {
+      expect(result.current).toEqual([
+        MOCK_RUN_LATER,
+        MOCK_RUN_EARLIER,
+        MOCK_RUN_EARLIER,
+      ])
+    })
   })
 })

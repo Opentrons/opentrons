@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import {
   getModules,
   mockModulesResponse,
@@ -27,11 +27,11 @@ const MODULES_RESPONSE = {
 const V2_MODULES_RESPONSE = { data: v2MockModulesResponse }
 
 describe('useModulesQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseModulesQueryOptions>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseModulesQueryOptions>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseModulesQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseModulesQueryOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -65,11 +65,11 @@ describe('useModulesQuery hook', () => {
         data: MODULES_RESPONSE,
       } as Response<Modules>)
 
-    const { result, waitFor } = renderHook(useModulesQuery, { wrapper })
+    const { result } = renderHook(useModulesQuery, { wrapper })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(MODULES_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(MODULES_RESPONSE)
+    })
   })
   it('should return an empty array if an old version of modules returns', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
@@ -79,12 +79,13 @@ describe('useModulesQuery hook', () => {
         data: V2_MODULES_RESPONSE,
       } as Response<any>)
 
-    const { result, waitFor } = renderHook(useModulesQuery, { wrapper })
+    const { result } = renderHook(useModulesQuery, { wrapper })
 
-    await waitFor(() => result.current.data != null)
-    expect(result.current.data).toEqual({
-      data: [],
-      meta: { totalLength: 0, cursor: 0 },
+    await waitFor(() => {
+      expect(result.current.data).toEqual({
+        data: [],
+        meta: { totalLength: 0, cursor: 0 },
+      })
     })
   })
 })

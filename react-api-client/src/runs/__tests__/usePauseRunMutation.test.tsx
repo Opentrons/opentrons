@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createRunAction, RUN_ACTION_TYPE_PAUSE } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { usePauseRunMutation } from '..'
@@ -42,16 +42,15 @@ describe('usePauseRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createPauseRunActionData)
       .mockRejectedValue('uh oh')
 
-    const { result, waitFor } = renderHook(usePauseRunMutation, {
+    const { result } = renderHook(usePauseRunMutation, {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
     act(() => result.current.pauseRun(RUN_ID_1))
     await waitFor(() => {
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
-    expect(result.current.data).toBeUndefined()
   })
 
   it('should create a pause run action when calling the pauseRun callback', async () => {
@@ -60,13 +59,13 @@ describe('usePauseRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createPauseRunActionData)
       .mockResolvedValue({ data: mockPauseRunAction } as Response<RunAction>)
 
-    const { result, waitFor } = renderHook(usePauseRunMutation, {
+    const { result } = renderHook(usePauseRunMutation, {
       wrapper,
     })
     act(() => result.current.pauseRun(RUN_ID_1))
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(mockPauseRunAction)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockPauseRunAction)
+    })
   })
 })

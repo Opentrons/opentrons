@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   getLabwareDisplayName,
@@ -111,22 +111,23 @@ describe('useOffsetCandidatesForAnalysis', () => {
   })
 
   it('returns an empty array if robot ip but no analysis output', async () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <div>{children}</div>
     )
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useOffsetCandidatesForAnalysis(null, mockRobotIp),
       { wrapper }
     )
-    await waitFor(() => result.current != null)
-    expect(result.current).toEqual([])
+    await waitFor(() => {
+      expect(result.current).toEqual([])
+    })
   })
 
   it('returns an empty array if no robot ip', async () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <div>{children}</div>
     )
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useOffsetCandidatesForAnalysis(
           storedProtocolDataFixture.mostRecentAnalysis,
@@ -134,14 +135,15 @@ describe('useOffsetCandidatesForAnalysis', () => {
         ),
       { wrapper }
     )
-    await waitFor(() => result.current != null)
-    expect(result.current).toEqual([])
+    await waitFor(() => {
+      expect(result.current).toEqual([])
+    })
   })
   it('returns candidates for each first match with newest first', async () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <div>{children}</div>
     )
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useOffsetCandidatesForAnalysis(
           storedProtocolDataFixture.mostRecentAnalysis,
@@ -149,20 +151,21 @@ describe('useOffsetCandidatesForAnalysis', () => {
         ),
       { wrapper }
     )
-    await waitFor(() => result.current != null)
-    expect(result.current).toEqual([
-      {
-        ...mockFirstDupCandidate,
-        labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
-      },
-      {
-        ...mockSecondCandidate,
-        labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
-      },
-      {
-        ...mockThirdCandidate,
-        labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
-      },
-    ])
+    await waitFor(() => {
+      expect(result.current).toEqual([
+        {
+          ...mockFirstDupCandidate,
+          labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
+        },
+        {
+          ...mockSecondCandidate,
+          labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
+        },
+        {
+          ...mockThirdCandidate,
+          labwareDisplayName: getLabwareDisplayName(mockLabwareDef),
+        },
+      ])
+    })
   })
 })

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getMaintenanceRun } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useMaintenanceRunQuery } from '..'
@@ -27,11 +27,11 @@ const MAINTENANCE_RUN_RESPONSE = {
 } as MaintenanceRun
 
 describe('useMaintenanceRunQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -77,15 +77,15 @@ describe('useMaintenanceRunQuery hook', () => {
         data: MAINTENANCE_RUN_RESPONSE,
       } as Response<MaintenanceRun>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useMaintenanceRunQuery(MAINTENANCE_RUN_ID),
       {
         wrapper,
       }
     )
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(MAINTENANCE_RUN_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(MAINTENANCE_RUN_RESPONSE)
+    })
   })
 })

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 
 import { getDoorStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
@@ -24,11 +24,11 @@ const DOOR_RESPONSE: DoorStatus = {
 } as DoorStatus
 
 describe('useDoorQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseDoorQueryOptions>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseDoorQueryOptions>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseDoorQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseDoorQueryOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -62,10 +62,10 @@ describe('useDoorQuery hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: DOOR_RESPONSE } as Response<DoorStatus>)
 
-    const { result, waitFor } = renderHook(useDoorQuery, { wrapper })
+    const { result } = renderHook(useDoorQuery, { wrapper })
 
-    await waitFor(() => result.current?.data != null)
-
-    expect(result.current?.data).toEqual(DOOR_RESPONSE)
+    await waitFor(() => {
+      expect(result.current?.data).toEqual(DOOR_RESPONSE)
+    })
   })
 })

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 
 import { getEstopStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
@@ -28,11 +28,11 @@ const ESTOP_STATE_RESPONSE: EstopStatus = {
 }
 
 describe('useEstopQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseEstopQueryOptions>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseEstopQueryOptions>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseEstopQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseEstopQueryOptions> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -68,10 +68,10 @@ describe('useEstopQuery hook', () => {
         data: ESTOP_STATE_RESPONSE,
       } as Response<EstopStatus>)
 
-    const { result, waitFor } = renderHook(useEstopQuery, { wrapper })
+    const { result } = renderHook(useEstopQuery, { wrapper })
 
-    await waitFor(() => result.current?.data != null)
-
-    expect(result.current?.data).toEqual(ESTOP_STATE_RESPONSE)
+    await waitFor(() => {
+      expect(result.current?.data).toEqual(ESTOP_STATE_RESPONSE)
+    })
   })
 })

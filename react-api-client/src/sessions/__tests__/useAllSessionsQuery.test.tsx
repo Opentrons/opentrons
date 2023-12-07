@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider, UseQueryOptions } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getSessions } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useAllSessionsQuery } from '..'
@@ -23,11 +23,11 @@ const SESSIONS_RESPONSE = {
 } as Sessions
 
 describe('useAllSessionsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UseQueryOptions<Sessions, Error>>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseQueryOptions<Sessions, Error>>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UseQueryOptions<Sessions, Error>> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseQueryOptions<Sessions, Error>> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -59,10 +59,11 @@ describe('useAllSessionsQuery hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: SESSIONS_RESPONSE } as Response<Sessions>)
 
-    const { result, waitFor } = renderHook(useAllSessionsQuery, { wrapper })
+    const { result } = renderHook(useAllSessionsQuery, { wrapper })
 
-    await waitFor(() => result.current.data != null)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(SESSIONS_RESPONSE)
+    })
 
-    expect(result.current.data).toEqual(SESSIONS_RESPONSE)
   })
 })

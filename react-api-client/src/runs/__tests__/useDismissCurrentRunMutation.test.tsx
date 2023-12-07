@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { dismissCurrentRun } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useDismissCurrentRunMutation } from '..'
@@ -40,7 +40,7 @@ describe('useDismissCurrentRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1)
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useDismissCurrentRunMutation(),
       {
         wrapper,
@@ -52,8 +52,7 @@ describe('useDismissCurrentRunMutation hook', () => {
       result.current.dismissCurrentRun(RUN_ID_1)
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
 })

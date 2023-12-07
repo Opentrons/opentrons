@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createLiveCommand } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateLiveCommandMutation } from '../useCreateLiveCommandMutation'
@@ -40,7 +40,7 @@ describe('useCreateLiveCommandMutation hook', () => {
       .calledWith(HOST_CONFIG, mockAnonLoadCommand, {})
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateLiveCommandMutation(),
       {
         wrapper,
@@ -54,9 +54,8 @@ describe('useCreateLiveCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
   it('should pass waitUntilComplete and timeout through if given command', async () => {
     const waitUntilComplete = true
@@ -69,7 +68,7 @@ describe('useCreateLiveCommandMutation hook', () => {
       })
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateLiveCommandMutation(),
       {
         wrapper,
@@ -85,8 +84,7 @@ describe('useCreateLiveCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
 })

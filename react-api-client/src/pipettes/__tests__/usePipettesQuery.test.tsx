@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getPipettes } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { usePipettesQuery } from '..'
@@ -73,12 +73,12 @@ describe('usePipettesQuery hook', () => {
       .calledWith(HOST_CONFIG, { refresh: false })
       .mockResolvedValue({ data: PIPETTES_RESPONSE } as Response<Pipettes>)
 
-    const { result, waitFor } = renderHook(usePipettesQuery, {
+    const { result } = renderHook(usePipettesQuery, {
       wrapper,
     })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(PIPETTES_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(PIPETTES_RESPONSE)
+    })
   })
 })

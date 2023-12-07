@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import {
   createSession,
   CreateSessionData,
@@ -27,12 +27,12 @@ const SESSION_RESPONSE = {
 } as Session
 
 describe('useCreateSessionMutation hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let createSessionData = {} as CreateSessionData
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     createSessionData = { sessionType: SESSION_TYPE_DECK_CALIBRATION }
@@ -49,7 +49,7 @@ describe('useCreateSessionMutation hook', () => {
       .calledWith(HOST_CONFIG, createSessionData)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateSessionMutation(createSessionData),
       {
         wrapper,
@@ -59,10 +59,8 @@ describe('useCreateSessionMutation hook', () => {
     expect(result.current.data).toBeUndefined()
     result.current.createSession()
     await waitFor(() => {
-      console.log(result.current.status)
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
-    expect(result.current.data).toBeUndefined()
   })
 
   it('should create a session when calling the createSession callback', async () => {
@@ -71,7 +69,7 @@ describe('useCreateSessionMutation hook', () => {
       .calledWith(HOST_CONFIG, createSessionData)
       .mockResolvedValue({ data: SESSION_RESPONSE } as Response<Session>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateSessionMutation(createSessionData),
       {
         wrapper,
@@ -79,8 +77,8 @@ describe('useCreateSessionMutation hook', () => {
     )
     act(() => result.current.createSession())
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(SESSION_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(SESSION_RESPONSE)
+    })
   })
 })

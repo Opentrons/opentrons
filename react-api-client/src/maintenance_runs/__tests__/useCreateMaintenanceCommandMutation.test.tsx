@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createMaintenanceCommand } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateMaintenanceCommandMutation } from '..'
@@ -40,7 +40,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID, mockAnonLoadCommand, {})
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateMaintenanceCommandMutation(),
       {
         wrapper,
@@ -55,9 +55,8 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
   it('should pass waitUntilComplete and timeout through if given command', async () => {
     const waitUntilComplete = true
@@ -70,7 +69,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       })
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCreateMaintenanceCommandMutation(),
       {
         wrapper,
@@ -87,8 +86,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
 })

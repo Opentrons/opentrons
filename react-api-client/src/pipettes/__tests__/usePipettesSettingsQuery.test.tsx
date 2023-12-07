@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import {
   getPipetteSettings,
   pipetteSettingsResponseFixture,
@@ -67,12 +67,12 @@ describe('usePipetteSettingsQuery hook', () => {
         data: pipetteSettingsResponseFixture as any,
       } as Response<PipetteSettings>)
 
-    const { result, waitFor } = renderHook(usePipetteSettingsQuery, {
+    const { result } = renderHook(usePipetteSettingsQuery, {
       wrapper,
     })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(pipetteSettingsResponseFixture)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(pipetteSettingsResponseFixture)
+    })
   })
 })

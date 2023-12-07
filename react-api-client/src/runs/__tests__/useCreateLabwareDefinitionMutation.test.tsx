@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createLabwareDefinition } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
@@ -43,7 +43,7 @@ describe('useCreateLabwareDefinitionMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID, labwareDefinition)
       .mockResolvedValue({ data: 'created labware definition!' } as any)
 
-    const { result, waitFor } = renderHook(useCreateLabwareDefinitionMutation, {
+    const { result } = renderHook(useCreateLabwareDefinitionMutation, {
       wrapper,
     })
 
@@ -55,8 +55,7 @@ describe('useCreateLabwareDefinitionMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('created labware definition!')
     })
-    expect(result.current.data).toBe('created labware definition!')
   })
 })
