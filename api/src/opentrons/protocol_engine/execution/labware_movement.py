@@ -111,18 +111,18 @@ class LabwareMovementHandler:
             #  pick up labware
             labware_width = self._state_store.labware.get_dimensions(labware_id).y
             expected_gripper_position = labware_width
+            assert ot3api.hardware_gripper
             current_gripper_position = ot3api.hardware_gripper.jaw_width
             if (
                 abs(current_gripper_position - expected_gripper_position)
                 > ot3api.hardware_gripper.geometry.max_allowed_grip_error
             ):
-                breakpoint()
                 raise FailedGripperPickupError(
                     message="Expected to grip labware, but none found.",
                     details={
                         "expected jaw width": expected_gripper_position,
                         "actual jaw width": current_gripper_position,
-                    }
+                    },
                 )
 
         gripper_mount = OT3Mount.GRIPPER
