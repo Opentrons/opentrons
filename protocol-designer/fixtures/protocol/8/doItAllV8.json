@@ -3577,7 +3577,7 @@
       "key": "d18252a3-48cd-4a17-b2ba-27c504564480",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
@@ -3624,7 +3624,7 @@
       "key": "e77ae2f7-62c1-4d4d-8953-007eabd265f7",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
@@ -3671,7 +3671,7 @@
       "key": "752b7cd9-8e26-48dd-92ea-25b27d3f1148",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
@@ -3718,7 +3718,7 @@
       "key": "4e9250c8-60e5-419c-b5a2-2932f72e81a3",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
@@ -3765,7 +3765,7 @@
       "key": "8cc3f36e-29b9-4347-ab7b-6916b11761c3",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
@@ -3812,7 +3812,7 @@
       "key": "46453561-dc88-426b-9c19-d9b27a902a50",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
@@ -3859,7 +3859,7 @@
       "key": "108f9a39-3f10-474b-a86b-4dca765c3c61",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
@@ -3906,7 +3906,7 @@
       "key": "66e18af3-14c4-429a-9045-b38f7579d3dd",
       "params": {
         "pipetteId": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },
