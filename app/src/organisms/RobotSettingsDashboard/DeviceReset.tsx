@@ -73,7 +73,10 @@ export function DeviceReset({
   const availableOptions = options
     // filtering out ODD setting because this gets implicitly cleared if all settings are selected
     // filtering out boot scripts since product doesn't want this exposed to ODD users
-    .filter(({ id }) => !['onDeviceDisplay', 'bootScripts'].includes(id))
+    .filter(
+      ({ id }) =>
+        !['onDeviceDisplay', 'bootScripts', 'deckConfiguration'].includes(id)
+    )
     .sort(
       (a, b) =>
         targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
@@ -145,12 +148,15 @@ export function DeviceReset({
   React.useEffect(() => {
     if (
       isEveryOptionSelected(resetOptions) &&
-      (!resetOptions.authorizedKeys || !resetOptions.onDeviceDisplay)
+      (!resetOptions.authorizedKeys ||
+        !resetOptions.onDeviceDisplay ||
+        !resetOptions.deckConfiguration)
     ) {
       setResetOptions({
         ...resetOptions,
         authorizedKeys: true,
         onDeviceDisplay: true,
+        deckConfiguration: true,
       })
     }
   }, [resetOptions])
@@ -159,15 +165,19 @@ export function DeviceReset({
     if (
       !isEveryOptionSelected(resetOptions) &&
       resetOptions.authorizedKeys &&
-      resetOptions.onDeviceDisplay
+      resetOptions.onDeviceDisplay &&
+      resetOptions.deckConfiguration
     ) {
       setResetOptions({
         ...resetOptions,
         authorizedKeys: false,
         onDeviceDisplay: false,
+        deckConfiguration: false,
       })
     }
   }, [resetOptions])
+
+  console.log(resetOptions)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
