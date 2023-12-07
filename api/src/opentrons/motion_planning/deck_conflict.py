@@ -146,21 +146,11 @@ class _NoHeaterShakerModule(NamedTuple):
         return not isinstance(item, HeaterShakerModule)
 
 
-class _FixedTrashOnly(NamedTuple):
-    """Only fixed-trash labware is allowed in this slot."""
-
-    location: DeckSlotName
-
-    def is_allowed(self, item: DeckItem) -> bool:
-        return _is_fixed_trash(item)
-
-
 _DeckRestriction = Union[
     _NothingAllowed,
     _MaxHeight,
     _NoModule,
     _NoHeaterShakerModule,
-    _FixedTrashOnly,
 ]
 """A restriction on what is allowed in a given slot."""
 
@@ -189,11 +179,7 @@ def check(
     Raises:
         DeckConflictError: Adding this item should not be allowed.
     """
-    restrictions: List[_DeckRestriction] = [
-        _FixedTrashOnly(
-            location=DeckSlotName.FIXED_TRASH.to_equivalent_for_robot_type(robot_type)
-        )
-    ]
+    restrictions: List[_DeckRestriction] = []
     # build restrictions driven by existing items
     for location, item in existing_items.items():
         restrictions += _create_restrictions(
@@ -333,10 +319,7 @@ def _create_deck_conflict_error_message(
         new_item is not None or existing_item is not None
     ), "Conflict error expects either new_item or existing_item"
 
-    if isinstance(restriction, _FixedTrashOnly):
-        message = f"Only fixed-trash is allowed in slot {restriction.location}"
-
-    elif new_item is not None:
+    if new_item is not None:
         message = (
             f"{restriction.source_item.name_for_errors}"
             f" in slot {restriction.source_location}"
