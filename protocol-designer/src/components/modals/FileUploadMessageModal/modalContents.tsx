@@ -86,6 +86,10 @@ export const toV8MigrationMessage: ModalContents = {
         next to them in the Protocol Timeline. To resolve the error, choose
         another location for aspirating or mixing.
       </p>
+      <p>
+        Additionally, we have addressed a bug where blow out speeds were slower
+        than expected.
+      </p>
       <p>As always, please contact us with any questions or feedback.</p>
     </div>
   ),
