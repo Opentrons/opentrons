@@ -25,9 +25,6 @@ import pytest
             "2.16",
             "OT-2",
             protocol_api.TrashBin,
-            marks=pytest.mark.xfail(
-                strict=True, reason="https://opentrons.atlassian.net/browse/RSS-417"
-            ),
         ),
         pytest.param(
             "2.16",
