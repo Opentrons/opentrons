@@ -51,7 +51,7 @@ def test_analysis_json(snapshot_json):
     print("\n")
     print(f"Base files: {len(base)}")
     print(f"New files: {len(new)}")
-    to_use = new  # change me for snapshot
+    to_use = base  # change me for snapshot
     files_no_exist = []
     for file in to_use:
         if file.exists():

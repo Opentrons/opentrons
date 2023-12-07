@@ -424,8 +424,7 @@
           }
         },
         "model": "heaterShakerModuleV1",
-        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc",
-        "serialNumber": "fake-serial-number-d8009f02-ffa4-430a-8de8-fff844d007d9"
+        "moduleId": "2b7f50dc-a17c-495a-a3ac-b8e678e228dc"
       },
       "status": "succeeded"
     },
@@ -2166,8 +2165,7 @@
           }
         },
         "model": "temperatureModuleV2",
-        "moduleId": "6fc49d36-4cf8-4745-ab37-d45afcf6b7f6",
-        "serialNumber": "fake-serial-number-e7523752-030c-461b-b751-5e56ddab13f2"
+        "moduleId": "6fc49d36-4cf8-4745-ab37-d45afcf6b7f6"
       },
       "status": "succeeded"
     },
@@ -18307,8 +18305,7 @@
       "location": {
         "slotName": "D1"
       },
-      "model": "heaterShakerModuleV1",
-      "serialNumber": "fake-serial-number-d8009f02-ffa4-430a-8de8-fff844d007d9"
+      "model": "heaterShakerModuleV1"
     },
     {
       "location": {
@@ -18320,8 +18317,7 @@
       "location": {
         "slotName": "D3"
       },
-      "model": "temperatureModuleV2",
-      "serialNumber": "fake-serial-number-e7523752-030c-461b-b751-5e56ddab13f2"
+      "model": "temperatureModuleV2"
     }
   ],
   "pipettes": [

@@ -2370,8 +2370,7 @@
           "slotTransforms": {}
         },
         "model": "magneticModuleV1",
-        "moduleId": "module-0",
-        "serialNumber": "dummySerialMD"
+        "moduleId": "module-0"
       },
       "status": "succeeded"
     },
@@ -2583,8 +2582,7 @@
           }
         },
         "model": "magneticModuleV2",
-        "moduleId": "module-1",
-        "serialNumber": "dummySerialMD"
+        "moduleId": "module-1"
       },
       "status": "succeeded"
     },
@@ -3009,8 +3007,7 @@
           }
         },
         "model": "temperatureModuleV2",
-        "moduleId": "module-2",
-        "serialNumber": "dummySerialTD"
+        "moduleId": "module-2"
       },
       "status": "succeeded"
     },
@@ -3306,22 +3303,19 @@
       "location": {
         "slotName": "1"
       },
-      "model": "magneticModuleV1",
-      "serialNumber": "dummySerialMD"
+      "model": "magneticModuleV1"
     },
     {
       "location": {
         "slotName": "4"
       },
-      "model": "magneticModuleV2",
-      "serialNumber": "dummySerialMD"
+      "model": "magneticModuleV2"
     },
     {
       "location": {
         "slotName": "6"
       },
-      "model": "temperatureModuleV2",
-      "serialNumber": "dummySerialTD"
+      "model": "temperatureModuleV2"
     }
   ],
   "pipettes": [

@@ -2771,8 +2771,7 @@
           }
         },
         "model": "heaterShakerModuleV1",
-        "moduleId": "module-0",
-        "serialNumber": "dummySerialHS"
+        "moduleId": "module-0"
       },
       "status": "succeeded"
     },
@@ -3197,8 +3196,7 @@
           }
         },
         "model": "temperatureModuleV2",
-        "moduleId": "module-1",
-        "serialNumber": "dummySerialTD"
+        "moduleId": "module-1"
       },
       "status": "succeeded"
     },
@@ -3308,8 +3306,7 @@
           }
         },
         "model": "thermocyclerModuleV2",
-        "moduleId": "module-2",
-        "serialNumber": "dummySerialTC"
+        "moduleId": "module-2"
       },
       "status": "succeeded"
     },
@@ -12396,22 +12393,19 @@
       "location": {
         "slotName": "1"
       },
-      "model": "heaterShakerModuleV1",
-      "serialNumber": "dummySerialHS"
+      "model": "heaterShakerModuleV1"
     },
     {
       "location": {
         "slotName": "9"
       },
-      "model": "temperatureModuleV2",
-      "serialNumber": "dummySerialTD"
+      "model": "temperatureModuleV2"
     },
     {
       "location": {
         "slotName": "7"
       },
-      "model": "thermocyclerModuleV2",
-      "serialNumber": "dummySerialTC"
+      "model": "thermocyclerModuleV2"
     }
   ],
   "pipettes": [

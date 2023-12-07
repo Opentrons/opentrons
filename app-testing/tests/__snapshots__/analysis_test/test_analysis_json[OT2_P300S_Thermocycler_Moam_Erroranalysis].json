@@ -1505,8 +1505,7 @@
           }
         },
         "model": "thermocyclerModuleV2",
-        "moduleId": "module-0",
-        "serialNumber": "dummySerialTC"
+        "moduleId": "module-0"
       },
       "status": "succeeded"
     },
@@ -2752,8 +2751,7 @@
       "location": {
         "slotName": "7"
       },
-      "model": "thermocyclerModuleV2",
-      "serialNumber": "dummySerialTC"
+      "model": "thermocyclerModuleV2"
     }
   ],
   "pipettes": [

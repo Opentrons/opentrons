@@ -443,8 +443,7 @@
           }
         },
         "model": "heaterShakerModuleV1",
-        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType",
-        "serialNumber": "fake-serial-number-341bc451-1d36-4c9c-bbae-a3337590ff06"
+        "moduleId": "5cf778e4-1131-446b-b1b4-fcc475017fa3:heaterShakerModuleType"
       },
       "status": "succeeded"
     },
@@ -483,8 +482,7 @@
           "slotTransforms": {}
         },
         "model": "magneticModuleV1",
-        "moduleId": "8d4683d0-7a88-4b33-9363-bd3894a71f9a:magneticModuleType",
-        "serialNumber": "fake-serial-number-15959126-6841-4bb5-8e5e-73671b4de360"
+        "moduleId": "8d4683d0-7a88-4b33-9363-bd3894a71f9a:magneticModuleType"
       },
       "status": "succeeded"
     },
@@ -525,8 +523,7 @@
           "slotTransforms": {}
         },
         "model": "temperatureModuleV1",
-        "moduleId": "b5df8f5c-9fc5-4d45-98c2-0ce6bd218fda:temperatureModuleType",
-        "serialNumber": "fake-serial-number-25eff16a-27ba-4744-acc8-5a76a7600843"
+        "moduleId": "b5df8f5c-9fc5-4d45-98c2-0ce6bd218fda:temperatureModuleType"
       },
       "status": "succeeded"
     },
@@ -568,8 +565,7 @@
           "slotTransforms": {}
         },
         "model": "thermocyclerModuleV1",
-        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType",
-        "serialNumber": "fake-serial-number-68d005ca-b00a-481c-9bf3-9268e1333fe8"
+        "moduleId": "a54c246e-837a-4cde-94dd-4872b0c5c032:thermocyclerModuleType"
       },
       "status": "succeeded"
     },
@@ -7381,29 +7377,25 @@
       "location": {
         "slotName": "1"
       },
-      "model": "heaterShakerModuleV1",
-      "serialNumber": "fake-serial-number-341bc451-1d36-4c9c-bbae-a3337590ff06"
+      "model": "heaterShakerModuleV1"
     },
     {
       "location": {
         "slotName": "9"
       },
-      "model": "magneticModuleV1",
-      "serialNumber": "fake-serial-number-15959126-6841-4bb5-8e5e-73671b4de360"
+      "model": "magneticModuleV1"
     },
     {
       "location": {
         "slotName": "3"
       },
-      "model": "temperatureModuleV1",
-      "serialNumber": "fake-serial-number-25eff16a-27ba-4744-acc8-5a76a7600843"
+      "model": "temperatureModuleV1"
     },
     {
       "location": {
         "slotName": "7"
       },
-      "model": "thermocyclerModuleV1",
-      "serialNumber": "fake-serial-number-68d005ca-b00a-481c-9bf3-9268e1333fe8"
+      "model": "thermocyclerModuleV1"
     }
   ],
   "pipettes": [
