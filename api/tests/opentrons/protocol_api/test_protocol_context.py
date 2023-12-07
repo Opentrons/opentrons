@@ -79,6 +79,12 @@ def mock_deck(decoy: Decoy) -> Deck:
 
 
 @pytest.fixture
+def mock_fixed_trash(decoy: Decoy) -> Labware:
+    """Get a mock Fixed Trash."""
+    return decoy.mock(cls=Labware)
+
+
+@pytest.fixture
 def api_version() -> APIVersion:
     """The API version under test."""
     return MAX_SUPPORTED_VERSION
@@ -90,8 +96,11 @@ def subject(
     mock_core_map: LoadedCoreMap,
     mock_deck: Deck,
     api_version: APIVersion,
+    mock_fixed_trash: Labware,
+    decoy: Decoy,
 ) -> ProtocolContext:
     """Get a ProtocolContext test subject with its dependencies mocked out."""
+    decoy.when(mock_core_map.get(mock_core.fixed_trash)).then_return(mock_fixed_trash)
     return ProtocolContext(
         api_version=api_version,
         core=mock_core,

@@ -134,14 +134,14 @@ class ProtocolCore(
                 )
 
     def append_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute]
+        self, disposal_location: Union[Labware, TrashBin, WasteChute]
     ) -> None:
         """Append a disposal location object to the core"""
         self._disposal_locations.append(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get disposal locations."""
-        
+
         return self._disposal_locations
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
