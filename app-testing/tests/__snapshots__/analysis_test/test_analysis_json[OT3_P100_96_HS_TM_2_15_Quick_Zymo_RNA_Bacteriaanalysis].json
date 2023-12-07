@@ -32,7 +32,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -573,7 +573,7 @@
           ],
           "metadata": {
             "displayCategory": "aluminumBlock",
-            "displayName": "Opentrons 96 Deep Well Adapter with NEST Deep Well Plate 2 mL",
+            "displayName": "Opentrons 96 Deep Well Heater-Shaker Adapter with NEST Deep Well Plate 2 mL",
             "displayVolumeUnits": "µL",
             "tags": []
           },
@@ -1711,7 +1711,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -1767,7 +1767,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -2307,7 +2307,7 @@
           ],
           "metadata": {
             "displayCategory": "aluminumBlock",
-            "displayName": "Opentrons 96 PCR Adapter with Armadillo Well Plate 200 µl",
+            "displayName": "Opentrons 96 PCR Heater-Shaker Adapter with Armadillo Well Plate 200 µl",
             "displayVolumeUnits": "µL",
             "tags": []
           },
@@ -8413,7 +8413,7 @@
             "yDimension": 85.48,
             "zDimension": 16.0
           },
-          "gripForce": 15.0,
+          "gripForce": 9.0,
           "gripHeightFromLabwareBottom": 10.0,
           "gripperOffsets": {},
           "groups": [
@@ -18166,7 +18166,15 @@
           "errorCode": "4000",
           "errorInfo": {},
           "errorType": "ProtocolCommandFailedError",
-          "wrappedErrors": []
+          "wrappedErrors": [
+            {
+              "detail": "Cannot move labware 'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep' with gripper. If trying to move a labware on an adapter, load the adapter separately to allow gripper movement.",
+              "errorCode": "4000",
+              "errorInfo": {},
+              "errorType": "LabwareMovementNotAllowedError",
+              "wrappedErrors": []
+            }
+          ]
         }
       ]
     }

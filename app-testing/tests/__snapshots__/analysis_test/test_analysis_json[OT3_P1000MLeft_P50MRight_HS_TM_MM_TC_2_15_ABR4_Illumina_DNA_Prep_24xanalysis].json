@@ -41,7 +41,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -1615,7 +1615,7 @@
         "definition": {
           "allowedRoles": [],
           "brand": {
-            "brand": "opentrons OT-3",
+            "brand": "Opentrons",
             "brandId": []
           },
           "cornerOffsetFromSlot": {
@@ -2780,7 +2780,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -4366,7 +4366,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -5674,7 +5674,7 @@
         "definition": {
           "allowedRoles": [],
           "brand": {
-            "brand": "opentrons OT-3",
+            "brand": "Opentrons",
             "brandId": []
           },
           "cornerOffsetFromSlot": {
@@ -6828,7 +6828,7 @@
           },
           "compatibleWith": [],
           "dimensions": {
-            "bareOverallHeight": 98.0,
+            "bareOverallHeight": 108.96,
             "lidHeight": 61.7,
             "overLabwareHeight": 0.0
           },
@@ -6838,7 +6838,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 4.6
+                "z": 5.6
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -6933,7 +6933,7 @@
         "definition": {
           "allowedRoles": [],
           "brand": {
-            "brand": "opentrons OT-3",
+            "brand": "Opentrons",
             "brandId": []
           },
           "cornerOffsetFromSlot": {

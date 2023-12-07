@@ -381,7 +381,7 @@
           ],
           "metadata": {
             "displayCategory": "tipRack",
-            "displayName": "Opentrons 96 Tip Rack 300 µL",
+            "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
             "displayVolumeUnits": "µL",
             "tags": []
           },
@@ -1526,7 +1526,7 @@
           ],
           "metadata": {
             "displayCategory": "tipRack",
-            "displayName": "Opentrons 96 Tip Rack 20 µL",
+            "displayName": "Opentrons OT-2 96 Tip Rack 20 µL",
             "displayVolumeUnits": "µL",
             "tags": []
           },
@@ -2671,7 +2671,7 @@
           ],
           "metadata": {
             "displayCategory": "tipRack",
-            "displayName": "Opentrons 96 Tip Rack 20 µL",
+            "displayName": "Opentrons OT-2 96 Tip Rack 20 µL",
             "displayVolumeUnits": "µL",
             "tags": []
           },

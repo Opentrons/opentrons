@@ -187,7 +187,7 @@
           ],
           "metadata": {
             "displayCategory": "tipRack",
-            "displayName": "Opentrons 96 Tip Rack 300 µL",
+            "displayName": "Opentrons OT-2 96 Tip Rack 300 µL",
             "displayVolumeUnits": "µL",
             "tags": []
           },
@@ -1333,7 +1333,7 @@
           ],
           "metadata": {
             "displayCategory": "tipRack",
-            "displayName": "Opentrons 96 Tip Rack 20 µL",
+            "displayName": "Opentrons OT-2 96 Tip Rack 20 µL",
             "displayVolumeUnits": "µL",
             "tags": []
           },
@@ -2386,7 +2386,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -2809,7 +2809,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -3221,7 +3221,7 @@
           },
           "compatibleWith": [],
           "dimensions": {
-            "bareOverallHeight": 98.0,
+            "bareOverallHeight": 108.96,
             "lidHeight": 61.7,
             "overLabwareHeight": 0.0
           },
@@ -3231,7 +3231,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 4.6
+                "z": 5.6
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -4615,7 +4615,7 @@
           ],
           "metadata": {
             "displayCategory": "aluminumBlock",
-            "displayName": "Opentrons 96 PCR Adapter with NEST Well Plate 100 µl",
+            "displayName": "Opentrons 96 PCR Heater-Shaker Adapter with NEST Well Plate 100 µl",
             "displayVolumeUnits": "µL",
             "tags": []
           },

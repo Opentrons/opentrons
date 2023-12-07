@@ -2594,7 +2594,7 @@
         "definition": {
           "allowedRoles": [],
           "brand": {
-            "brand": "opentrons OT-3",
+            "brand": "Opentrons",
             "brandId": []
           },
           "cornerOffsetFromSlot": {
@@ -3745,7 +3745,7 @@
         "definition": {
           "allowedRoles": [],
           "brand": {
-            "brand": "opentrons OT-3",
+            "brand": "Opentrons",
             "brandId": []
           },
           "cornerOffsetFromSlot": {
@@ -4896,7 +4896,7 @@
         "definition": {
           "allowedRoles": [],
           "brand": {
-            "brand": "opentrons OT-3",
+            "brand": "Opentrons",
             "brandId": []
           },
           "cornerOffsetFromSlot": {
