@@ -165,7 +165,6 @@ class LabwareMovementHandler:
                         # and prevents the axis from spuriously dropping when  e.g. the notch
                         # on the side of a falling tiprack catches the jaw.
                         await ot3api.disengage_axes([Axis.Z_G])
-
                     await ot3api.ungrip()
                     gripper_opened = True
                     if waypoint_data.dropping:
@@ -176,7 +175,6 @@ class LabwareMovementHandler:
                     await ot3api.grip(force_newtons=labware_grip_force)
                     if gripper_opened:
                         await check_labware_pickup()
-
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )

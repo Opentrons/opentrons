@@ -1044,13 +1044,10 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        msg: Optional[str] = None,
     ) -> Dict[Axis, float]:
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        if msg:
-            print(msg)
         if refresh:
             await self.refresh_positions()
         elif not self._encoder_position:
@@ -1132,7 +1129,6 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         _expect_stalls: bool = False,
     ) -> None:
-        print("in move to")
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
         realmount = OT3Mount.from_mount(mount)
@@ -1697,7 +1693,6 @@ class OT3API(
     async def grip(
         self, force_newtons: Optional[float] = None, stay_engaged: bool = True
     ) -> None:
-        print("in grip")
         self._gripper_handler.check_ready_for_jaw_move("grip")
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
             force_newtons or self._gripper_handler.get_gripper().default_grip_force
