@@ -14,6 +14,7 @@ import {
   OT2_PIPETTES,
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
+  RIGHT,
   RobotType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
@@ -21,7 +22,6 @@ import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { FormPipettesByMount } from '../../../step-forms'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { RIGHT } from '@opentrons/shared-data/js/constants'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
 
