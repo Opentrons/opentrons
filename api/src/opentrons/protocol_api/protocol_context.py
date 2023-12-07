@@ -490,8 +490,6 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 16)
     def load_waste_chute(
         self,
-        *,
-        with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
         """Load the waste chute on the deck.
 
@@ -499,11 +497,7 @@ class ProtocolContext(CommandPublisher):
         load another item in slot D3 after loading the waste chute, or vice versa, the
         API will raise an error.
         """
-        if with_staging_area_slot_d4:
-            raise NotImplementedError(
-                "The waste chute staging area slot is not currently implemented."
-            )
-        waste_chute = WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        waste_chute = WasteChute()
         self._core.append_disposal_location(waste_chute)
         return waste_chute
 

@@ -257,6 +257,32 @@ export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChu
 export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
   'gripperWasteChute'
 
+export const ADDRESSABLE_AREA_1: '1' = '1'
+export const ADDRESSABLE_AREA_2: '2' = '2'
+export const ADDRESSABLE_AREA_3: '3' = '3'
+export const ADDRESSABLE_AREA_4: '4' = '4'
+export const ADDRESSABLE_AREA_5: '5' = '5'
+export const ADDRESSABLE_AREA_6: '6' = '6'
+export const ADDRESSABLE_AREA_7: '7' = '7'
+export const ADDRESSABLE_AREA_8: '8' = '8'
+export const ADDRESSABLE_AREA_9: '9' = '9'
+export const ADDRESSABLE_AREA_10: '10' = '10'
+export const ADDRESSABLE_AREA_11: '11' = '11'
+
+export const OT2_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
+]
+
 export const FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
