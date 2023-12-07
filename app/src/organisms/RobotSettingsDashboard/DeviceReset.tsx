@@ -177,8 +177,6 @@ export function DeviceReset({
     }
   }, [resetOptions])
 
-  console.log(resetOptions)
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       {showConfirmationModal && (
