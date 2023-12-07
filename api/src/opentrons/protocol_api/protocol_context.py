@@ -139,6 +139,13 @@ class ProtocolContext(CommandPublisher):
         }
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._load_fixed_trash()
+        if(self._api_version < APIVersion(2,16)):
+            self._core.append_disposal_location(self.fixed_trash)
+        elif(self._api_version >= APIVersion(2,16) and self.robot_type == "OT-2 Standard"):
+            fixed_trash: TrashBin(
+                location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
+            )
+            self._core.append_disposal_location(fixed_trash)
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None

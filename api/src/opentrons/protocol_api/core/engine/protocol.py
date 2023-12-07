@@ -106,13 +106,6 @@ class ProtocolCore(
         ] = {}
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
         self._load_fixed_trash()
-        if(self._api_version < APIVersion(2,16)):
-            #add to disposal locations a fixed trash labware
-        elif(self._api_version >= APIVersion(2,16) and self.robot_type == "OT-2 Standard"):
-            fixed_trash: TrashBin(
-                location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
-            )
-            self._disposal_locations.append(fixed_trash)
 
     @property
     def api_version(self) -> APIVersion:
