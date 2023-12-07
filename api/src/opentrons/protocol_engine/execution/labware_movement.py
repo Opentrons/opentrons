@@ -22,6 +22,7 @@ from ..errors import (
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
     CannotPerformGripperAction,
+    FailedGripperPickupError,
 )
 
 from ..types import (
@@ -105,6 +106,25 @@ class LabwareMovementHandler:
                 "Cannot pick up labware when gripper is already gripping."
             )
 
+        async def check_labware_pickup() -> None:
+            # check if the gripper is at an acceptable position after attempting to
+            #  pick up labware
+            labware_width = self._state_store.labware.get_dimensions(labware_id).y
+            expected_gripper_position = labware_width
+            current_gripper_position = ot3api.hardware_gripper.jaw_width
+            if (
+                abs(current_gripper_position - expected_gripper_position)
+                > ot3api.hardware_gripper.geometry.max_allowed_grip_error
+            ):
+                breakpoint()
+                raise FailedGripperPickupError(
+                    message="Expected to grip labware, but none found.",
+                    details={
+                        "expected jaw width": expected_gripper_position,
+                        "actual jaw width": current_gripper_position,
+                    }
+                )
+
         gripper_mount = OT3Mount.GRIPPER
 
         # Retract all mounts
@@ -135,7 +155,7 @@ class LabwareMovementHandler:
                 post_drop_slide_offset=post_drop_slide_offset,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(labware_id)
-
+            gripper_opened = False
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
                     if waypoint_data.dropping:
@@ -145,13 +165,18 @@ class LabwareMovementHandler:
                         # and prevents the axis from spuriously dropping when  e.g. the notch
                         # on the side of a falling tiprack catches the jaw.
                         await ot3api.disengage_axes([Axis.Z_G])
+
                     await ot3api.ungrip()
+                    gripper_opened = True
                     if waypoint_data.dropping:
                         # We lost the position estimation after disengaging the axis, so
                         # it is necessary to home it next
                         await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
+                    if gripper_opened:
+                        await check_labware_pickup()
+
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )

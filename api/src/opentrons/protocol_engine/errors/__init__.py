@@ -65,6 +65,7 @@ from .exceptions import (
     LocationIsStagingSlotError,
     InvalidAxisForRobotType,
     NotSupportedOnRobotType,
+    FailedGripperPickupError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -138,4 +139,5 @@ __all__ = [
     "NotSupportedOnRobotType",
     # error occurrence models
     "ErrorOccurrence",
+    "FailedGripperPickupError",
 ]

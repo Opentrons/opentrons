@@ -22,6 +22,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     NonStackedLocation,
     LabwareMovementOffsetData,
+    Dimensions,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -194,10 +195,24 @@ async def test_move_labware_with_gripper(
     ).then_return(Point(101, 102, 119.5))
 
     decoy.when(
+        await ot3_hardware_api.encoder_current_position_ot3(OT3Mount.GRIPPER)
+    ).then_return({Axis.G: 4.0})
+
+    decoy.when(
+        state_store.labware.get_dimensions(labware_id="my-teleporting-labware")
+    ).then_return(Dimensions(x=8, y=0, z=0))
+
+    decoy.when(ot3_hardware_api.hardware_gripper.jaw_width).then_return(92.0)
+    decoy.when(
+        ot3_hardware_api.hardware_gripper.geometry.max_allowed_grip_error
+    ).then_return(2.0)
+
+    decoy.when(
         state_store.geometry.get_labware_grip_point(
             labware_id="my-teleporting-labware", location=to_location
         )
     ).then_return(Point(201, 202, 219.5))
+
     decoy.when(
         state_store.labware.get_grip_force("my-teleporting-labware")
     ).then_return(100)
@@ -358,6 +373,15 @@ async def test_labware_movement_skips_for_virtual_gripper(
         times=0,
         ignore_extra_args=True,
     )
+
+
+# @pytest.mark.ot3_only
+# def test_failed_gripper_pickup_error(
+#     decoy: Decoy,
+#     state_store: StateStore,
+#     ot3_hardware_api: OT3API,
+#     subject: LabwareMovementHandler,
+# ) -> None:
 
 
 @pytest.mark.ot3_only
