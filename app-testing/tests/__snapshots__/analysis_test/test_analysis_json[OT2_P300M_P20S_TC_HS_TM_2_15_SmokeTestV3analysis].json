@@ -10622,7 +10622,6 @@
     {
       "commandType": "loadLiquid",
       "params": {
-        "liquidId": "540bde7d-9a29-4131-ba38-16b80e139a8e",
         "volumeByWell": {
           "A1": 4000.0
         }
@@ -10633,7 +10632,6 @@
     {
       "commandType": "loadLiquid",
       "params": {
-        "liquidId": "540bde7d-9a29-4131-ba38-16b80e139a8e",
         "volumeByWell": {
           "A2": 2000.0
         }
@@ -10644,7 +10642,6 @@
     {
       "commandType": "loadLiquid",
       "params": {
-        "liquidId": "3f81cbeb-3844-47df-b6a9-9b032a2ec8df",
         "volumeByWell": {
           "A5": 555.55555
         }
@@ -10655,7 +10652,6 @@
     {
       "commandType": "loadLiquid",
       "params": {
-        "liquidId": "540bde7d-9a29-4131-ba38-16b80e139a8e",
         "volumeByWell": {
           "A8": 900.0
         }
@@ -10666,7 +10662,6 @@
     {
       "commandType": "loadLiquid",
       "params": {
-        "liquidId": "3f81cbeb-3844-47df-b6a9-9b032a2ec8df",
         "volumeByWell": {
           "A8": 1001.11
         }
