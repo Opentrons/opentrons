@@ -4429,7 +4429,6 @@
     {
       "commandType": "loadLiquid",
       "params": {
-        "liquidId": "1",
         "volumeByWell": {
           "A1": 200.0,
           "A10": 200.0,
@@ -4535,7 +4534,6 @@
     {
       "commandType": "loadLiquid",
       "params": {
-        "liquidId": "0",
         "volumeByWell": {
           "A1": 100.0,
           "A2": 100.0,
