@@ -49,7 +49,6 @@ else:
 
 
 def run(protocol: protocol_api.ProtocolContext):
-
     global p200_tips
     global p50_tips
 
@@ -443,7 +442,6 @@ def run(protocol: protocol_api.ProtocolContext):
             washreps = 3
             washcount = 0
             for wash in range(washreps):
-
                 protocol.comment("--> Adding EEW")
                 EEWVol = 200
                 for loop, X in enumerate(column_2_list):
@@ -1007,7 +1005,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
             # Resetting TWB
             for X in range(COLUMNS):
-
                 p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))
                 p1000.dispense(200, EEW_1.bottom(z=1))
                 p1000.aspirate(200, Liquid_trash_well_2.bottom(z=1))

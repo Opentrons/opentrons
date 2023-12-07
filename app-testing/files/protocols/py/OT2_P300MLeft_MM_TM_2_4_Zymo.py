@@ -433,7 +433,6 @@ resuming."
         remove_supernatant(vol, park=park)
 
     def dnase(vol, source, mix_reps=6, park=True, resuspend=True):
-
         if resuspend and magdeck.status == "engaged":
             magdeck.disengage()
 
@@ -463,7 +462,6 @@ resuming."
         ctx.pause("Incubating for 10 minutes for DNase 1 treatment with occasional mixing.")
 
     def stop_reaction(vol, source, mix_reps=6, park=True, resuspend=True):
-
         if resuspend and magdeck.status == "engaged":
             magdeck.disengage()
 

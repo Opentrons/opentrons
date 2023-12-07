@@ -51,7 +51,6 @@ STEPS = {STEP_DILUTE, STEP_MIX, STEP_DISPENSE}
 
 
 def run(protocol: protocol_api.ProtocolContext):
-
     if DRYRUN == "YES":
         protocol.comment("THIS IS A DRY RUN")
     else:
@@ -557,7 +556,6 @@ def run(protocol: protocol_api.ProtocolContext):
                     p1000.dispense(20, qpcrplate_1[Y3].bottom(z=p1000_offset_Mag), rate=0.5)
                     p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
             if FORMAT == "384":
-
                 p1000.reset_tipracks()
                 p50.reset_tipracks()
 

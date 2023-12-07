@@ -340,7 +340,6 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("--> Repeating 3 washes")
         washreps = 3
         for wash in range(washreps):
-
             protocol.comment("--> Adding EEW")
             EEWVol = 200
             p1000.pick_up_tip()

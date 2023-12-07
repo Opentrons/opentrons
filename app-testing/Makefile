@@ -1,22 +1,22 @@
 .PHONY: black
 black:
-	pipenv run python -m black .
+	python -m pipenv run python -m black .
 
 .PHONY: black-check
 black-check:
-	pipenv run python -m black . --check
+	python -m pipenv run python -m black . --check
 
 .PHONY: ruff
 ruff:
-	pipenv run python -m ruff . --fix
+	python -m pipenv run python -m ruff . --fix --unsafe-fixes
 
 .PHONY: ruff-check
 ruff-check:
-	pipenv run python -m ruff .
+	python -m pipenv run python -m ruff .
 
 .PHONY: mypy
 mypy:
-	pipenv run python -m mypy conftest.py automation tests
+	python -m pipenv run python -m mypy conftest.py automation tests
 
 .PHONY: lint
 lint:
@@ -32,15 +32,15 @@ format:
 
 .PHONY: test-ci
 test-ci:
-	pipenv run python -m pytest -m "emulated_alpha"
+	python -m pipenv run python -m pytest -m "emulated_alpha"
 
 .PHONY: setup
 setup:
-	pipenv install
+	python -m pipenv install
 
 .PHONY: teardown
 teardown:
-	pipenv --rm
+	python -m pipenv --rm
 
 .PHONY: format-readme
 format-readme:
@@ -48,4 +48,4 @@ format-readme:
 
 .PHONY: print-protocols
 print-protocols:
-	pipenv run python print_protocols.py
+	python -m pipenv run python print_protocols.py

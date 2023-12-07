@@ -22,7 +22,6 @@ MEASUREPAUSE = "NO"
 
 
 def run(protocol: protocol_api.ProtocolContext):
-
     if DRYRUN == "YES":
         protocol.comment("THIS IS A DRY RUN")
     else:
