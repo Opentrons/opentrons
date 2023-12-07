@@ -215,7 +215,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const channels = pipetteSpec.channels
   const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
     channels
   )
