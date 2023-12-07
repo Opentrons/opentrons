@@ -26,6 +26,5 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ################
     ### FIXTURES ###
     ################
-    
-    temperature_module = ctx.load_module(TEMPERATURE_MODULE_NAME, "B4")
 
+    temperature_module = ctx.load_module(TEMPERATURE_MODULE_NAME, "B4")

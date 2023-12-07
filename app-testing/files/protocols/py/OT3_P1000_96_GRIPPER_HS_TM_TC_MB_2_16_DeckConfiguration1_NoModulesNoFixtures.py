@@ -22,8 +22,10 @@ USING_GRIPPER = True
 TIP_RACK_LOCATION_1 = "C3"
 TIP_RACK_LOCATION_2 = "D2"
 
+
 def default_well(tiprack: protocol_api.labware) -> protocol_api.labware.Well:
-    return tiprack['A1']
+    return tiprack["A1"]
+
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
 
@@ -45,29 +47,18 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### PIPETTE DEFINITION ###
     ##########################
 
-    pipette_96_channel = ctx.load_instrument('flex_96channel_1000', mount="left", tip_racks=tip_racks)
+    pipette_96_channel = ctx.load_instrument("flex_96channel_1000", mount="left", tip_racks=tip_racks)
 
     ########################
     ### LOAD SOME LIQUID ###
     ########################
 
-    water = ctx.define_liquid(
-        name="water",
-        description="High Quality H₂O",
-        display_color="#42AB2D"
-    )
+    water = ctx.define_liquid(name="water", description="High Quality H₂O", display_color="#42AB2D")
 
-    acetone = ctx.define_liquid(
-        name="acetone",
-        description="C₃H₆O",
-        display_color="#38588a"
-    )
+    acetone = ctx.define_liquid(name="acetone", description="C₃H₆O", display_color="#38588a")
 
     [
-        well.load_liquid(
-            liquid=water if i % 2 == 0 else acetone, 
-            volume=STARTING_VOL
-        )
+        well.load_liquid(liquid=water if i % 2 == 0 else acetone, volume=STARTING_VOL)
         for i, column in enumerate(pcr_plate_1.columns())
         for well in column
     ]

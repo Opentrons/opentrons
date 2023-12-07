@@ -25,6 +25,5 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ################
     ### FIXTURES ###
     ################
-    
-    trash_bin_1 = ctx.load_trash_bin("C2")
 
+    trash_bin_1 = ctx.load_trash_bin("C2")

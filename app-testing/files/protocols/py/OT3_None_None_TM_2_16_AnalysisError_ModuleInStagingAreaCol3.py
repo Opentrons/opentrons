@@ -26,7 +26,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ################
     ### FIXTURES ###
     ################
-    
+
     tip_rack_96_1 = ctx.load_labware(TIPRACK_96_NAME, "B4")
     temperature_module = ctx.load_module(TEMPERATURE_MODULE_NAME, "B3")
-

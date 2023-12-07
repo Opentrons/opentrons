@@ -26,7 +26,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ################
     ### FIXTURES ###
     ################
-    
+
     tip_rack_96 = ctx.load_labware(TIPRACK_96_NAME, "C4")  # Staging Area
     trash_bin_1 = ctx.load_trash_bin("C3")
-
