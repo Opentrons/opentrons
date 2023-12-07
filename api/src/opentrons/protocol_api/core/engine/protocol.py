@@ -49,7 +49,7 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType, OFF_DECK
+from ..._types import OffDeckType
 from ..._liquid import Liquid
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
