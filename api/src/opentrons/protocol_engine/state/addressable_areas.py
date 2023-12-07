@@ -407,7 +407,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:
         """Get the position of an addressable area."""
-        addressable_area = self.get_addressable_area(addressable_area_name)
+        addressable_area = self._get_addressable_area_from_deck_data(addressable_area_name)
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
 
