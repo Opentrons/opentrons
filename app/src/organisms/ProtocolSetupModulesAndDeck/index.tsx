@@ -83,6 +83,7 @@ interface RenderModuleStatusProps {
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
   conflictedFixture?: CutoutConfig
+  setShowLocationConflictModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 function RenderModuleStatus({
@@ -94,14 +95,15 @@ function RenderModuleStatus({
   setPrepCommandErrorMessage,
   chainLiveCommands,
   conflictedFixture,
+  setShowLocationConflictModal,
 }: RenderModuleStatusProps): JSX.Element {
   const { makeSnackbar } = useToaster()
-  const { i18n, t } = useTranslation(['protocol_setup', 'module_setup_wizard'])
+  const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
 
   const handleCalibrate = (): void => {
     if (module.attachedModuleMatch != null) {
       if (getModuleTooHot(module.attachedModuleMatch)) {
-        makeSnackbar(t('module_setup_wizard:module_too_hot'))
+        makeSnackbar(t('module_wizard_flows:module_too_hot'))
       } else {
         chainLiveCommands(
           getModulePrepCommands(module.attachedModuleMatch),
@@ -129,23 +131,26 @@ function RenderModuleStatus({
   )
   if (conflictedFixture != null) {
     moduleStatus = (
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+      <>
         <Chip
           text={t('location_conflict')}
           type="warning"
           background={false}
           iconName="connection-status"
         />
-
-        <Icon name="more" size="3rem" />
-      </Flex>
+        <SmallButton
+          buttonCategory="rounded"
+          buttonText={t('resolve')}
+          onClick={() => setShowLocationConflictModal(true)}
+        />
+      </>
     )
   } else if (
     isModuleReady &&
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
-      <>
+      <Flex onClick={() => setShowLocationConflictModal(true)}>
         <Chip
           text={t('module_connected')}
           type="success"
@@ -155,7 +160,7 @@ function RenderModuleStatus({
         {isDuplicateModuleModel ? (
           <Icon name="information" size="2rem" />
         ) : null}
-      </>
+      </Flex>
     )
   } else if (
     isModuleReady &&
@@ -258,7 +263,7 @@ function RowModule({
           isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
         }
       >
-        <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
+        <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {getModuleDisplayName(module.moduleDef.model)}
           </StyledText>
@@ -273,21 +278,16 @@ function RowModule({
           />
         </Flex>
         {isNonConnectingModule ? (
-          <Flex flex="3 0 0" alignItems={ALIGN_CENTER}>
+          <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('n_a')}
             </StyledText>
           </Flex>
         ) : (
           <Flex
-            flex="3 0 0"
+            flex="4 0 0"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            onClick={
-              conflictedFixture != null
-                ? () => setShowLocationConflictModal(true)
-                : undefined
-            }
           >
             <RenderModuleStatus
               isModuleReady={isModuleReady}
@@ -298,6 +298,7 @@ function RowModule({
               chainLiveCommands={chainLiveCommands}
               setPrepCommandErrorMessage={setPrepCommandErrorMessage}
               conflictedFixture={conflictedFixture}
+              setShowLocationConflictModal={setShowLocationConflictModal}
             />
           </Flex>
         )}
@@ -436,9 +437,9 @@ export function ProtocolSetupModulesAndDeck({
                 lineHeight={TYPOGRAPHY.lineHeight28}
                 paddingX={SPACING.spacing24}
               >
-                <StyledText flex="4 0 0">{t('module')}</StyledText>
+                <StyledText flex="3.5 0 0">{t('module')}</StyledText>
                 <StyledText flex="2 0 0">{t('location')}</StyledText>
-                <StyledText flex="3 0 0"> {t('status')}</StyledText>
+                <StyledText flex="4 0 0"> {t('status')}</StyledText>
               </Flex>
               {attachedProtocolModuleMatches.map(module => {
                 // check for duplicate module model in list of modules for protocol
