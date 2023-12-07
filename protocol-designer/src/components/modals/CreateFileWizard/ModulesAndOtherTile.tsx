@@ -163,12 +163,10 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           <GoBack
             onClick={() => {
               if (robotType === OT2_ROBOT_TYPE) {
-                if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
-                  goBack(4)
-                } else if (values.pipettesByMount.right.pipetteName === '') {
+                if (values.pipettesByMount.right.pipetteName === '') {
                   goBack(2)
                 } else {
-                  goBack()
+                  goBack(1)
                 }
               } else {
                 goBack()
