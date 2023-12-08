@@ -68,7 +68,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   ])
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
-  const pipetteId = attachedPipette.serialNumber
 
   const attachedPipetteChannels = attachedPipette.data.channels
   let pipetteAttachProbeVideoSource, probeLocation
