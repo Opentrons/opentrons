@@ -22,7 +22,6 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
@@ -67,9 +66,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     'module_wizard_flows',
     'pipette_wizard_flows',
   ])
-  const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
-    false
-  )
 
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
   const pipetteId = attachedPipette.serialNumber
@@ -159,12 +155,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       setErrorMessage('calibration adapter has not been loaded yet')
       return
     }
-    const verifyCommands: CreateCommand[] = [
-      {
-        commandType: 'verifyTipPresence',
-        params: { pipetteId: pipetteId, expectedState: 'present' },
-      },
-    ]
     const homeCommands: CreateCommand[] = [
       {
         commandType: 'home' as const,
@@ -188,18 +178,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       },
     ]
 
-    chainRunCommands?.(verifyCommands, false)
+    chainRunCommands?.(homeCommands, false)
       .then(() => {
-        chainRunCommands?.(homeCommands, false)
-          .then(() => {
-            proceed()
-          })
-          .catch((e: Error) => {
-            setErrorMessage(`error starting module calibration: ${e.message}`)
-          })
+        proceed()
       })
       .catch((e: Error) => {
-        setShowUnableToDetect(true)
+        setErrorMessage(`error starting module calibration: ${e.message}`)
       })
   }
 
@@ -224,14 +208,6 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           </Flex>
         )}
       </InProgressModal>
-    )
-  else if (showUnableToDetect)
-    return (
-      <ProbeNotAttached
-        handleOnClick={handleBeginCalibration}
-        setShowUnableToDetect={setShowUnableToDetect}
-        isOnDevice={isOnDevice ?? false}
-      />
     )
   // TODO: add calibration loading screen and error screen
   else
