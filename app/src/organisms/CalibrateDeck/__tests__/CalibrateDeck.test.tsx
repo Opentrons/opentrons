@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
@@ -26,14 +27,29 @@ const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
   typeof getDeckDefinitions
 >
 
+
 describe('CalibrateDeck', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof CalibrateDeck>>
-  ) => ReturnType<typeof renderWithProviders>
   let dispatchRequests: DispatchRequestsType
   const mockDeckCalSession: Sessions.DeckCalibrationSession = {
     id: 'fake_session_id',
     ...mockDeckCalibrationSessionAttributes,
+  }
+  const render = (props: Partial<React.ComponentProps<typeof CalibrateDeck>> = {}) => {
+    const {
+      showSpinner = false,
+      isJogging = false,
+      session = mockDeckCalSession,
+    } = props
+    return renderWithProviders<React.ComponentType<typeof CalibrateDeck>>(
+      <CalibrateDeck
+        robotName="robot-name"
+        session={session}
+        dispatchRequests={dispatchRequests}
+        showSpinner={showSpinner}
+        isJogging={isJogging}
+      />,
+      { i18nInstance: i18n }
+    )
   }
 
   const SPECS: CalibrateDeckSpec[] = [
@@ -66,33 +82,14 @@ describe('CalibrateDeck', () => {
   beforeEach(() => {
     dispatchRequests = jest.fn()
     when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
-
-    render = (props = {}) => {
-      const {
-        showSpinner = false,
-        isJogging = false,
-        session = mockDeckCalSession,
-      } = props
-      return renderWithProviders<React.ComponentType<typeof CalibrateDeck>>(
-        <CalibrateDeck
-          robotName="robot-name"
-          session={session}
-          dispatchRequests={dispatchRequests}
-          showSpinner={showSpinner}
-          isJogging={isJogging}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
   })
-
   afterEach(() => {
     resetAllWhenMocks()
   })
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      const { getByRole, queryByRole } = render({
+      render({
         session: {
           ...mockDeckCalSession,
           details: {
@@ -100,38 +97,38 @@ describe('CalibrateDeck', () => {
             currentStep: spec.currentStep,
           },
         },
-      })[0]
+      })
 
       SPECS.forEach(({ currentStep, heading }) => {
         if (currentStep === spec.currentStep) {
           expect(
-            getByRole('heading', { name: spec.heading })
+            screen.getByRole('heading', { name: spec.heading })
           ).toBeInTheDocument()
         } else {
-          expect(queryByRole('heading', { name: heading })).toBeNull()
+          expect(screen.queryByRole('heading', { name: heading })).toBeNull()
         }
       })
     })
   })
 
   it('renders confirm exit on exit click', () => {
-    const { getByRole, queryByRole } = render()[0]
-
+    render()
     expect(
-      queryByRole('heading', {
+      screen.queryByRole('heading', {
         name: 'Deck Calibration progress will be lost',
       })
     ).toBeNull()
-    getByRole('button', { name: 'Exit' }).click()
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
+    fireEvent.click(exitButton)
     expect(
-      getByRole('heading', {
+      screen.getByRole('heading', {
         name: 'Deck Calibration progress will be lost',
       })
     ).toBeInTheDocument()
   })
 
   it('does not render contents when showSpinner is true', () => {
-    const { queryByRole } = render({
+    render({
       showSpinner: true,
       session: {
         ...mockDeckCalSession,
@@ -140,8 +137,8 @@ describe('CalibrateDeck', () => {
           currentStep: 'sessionStarted',
         },
       },
-    })[0]
-    expect(queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    })
+    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {
@@ -153,8 +150,9 @@ describe('CalibrateDeck', () => {
         currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: false, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    render({ isJogging: false, session })
+    const forwardButton = screen.getByRole('button', { name: 'forward' })
+    fireEvent.click(forwardButton)
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -172,8 +170,9 @@ describe('CalibrateDeck', () => {
         currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: true, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    render({ isJogging: true, session })
+    const forwardButton = screen.getByRole('button', { name: 'forward' })
+    fireEvent.click(forwardButton)
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { act, renderHook } from '@testing-library/react'
-import { render, fireEvent } from '@testing-library/react'
+import { act, renderHook, render, fireEvent } from '@testing-library/react'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useToggleGroup } from '../useToggleGroup'
 
@@ -51,9 +50,7 @@ describe('useToggleGroup', () => {
 
     const { getByText } = render(result.current[1] as any)
     const listViewButton = getByText('List View')
-    act(() => {
-      fireEvent.click(listViewButton)
-    })
+    fireEvent.click(listViewButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'fake event',
       properties: { view: 'list' },
@@ -71,9 +68,7 @@ describe('useToggleGroup', () => {
 
     const { getByText } = render(result.current[1] as any)
     const mapViewButton = getByText('Map View')
-    act(() => {
-      fireEvent.click(mapViewButton)
-    })
+    fireEvent.click(mapViewButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'fake event',
       properties: { view: 'map' },

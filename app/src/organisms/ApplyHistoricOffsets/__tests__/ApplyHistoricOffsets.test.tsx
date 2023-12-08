@@ -8,6 +8,7 @@ import { getIsLabwareOffsetCodeSnippetsOn } from '../../../redux/config'
 import { getLabwareDefinitionsFromCommands } from '../../LabwarePositionCheck/utils/labware'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('../../../redux/config')
 jest.mock('../../LabwarePositionCheck/utils/labware')
@@ -64,46 +65,40 @@ const mockFourthCandidate: OffsetCandidate = {
 }
 
 describe('ApplyHistoricOffsets', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof ApplyHistoricOffsets>>
-  ) => ReturnType<typeof renderWithProviders>
   const mockSetShouldApplyOffsets = jest.fn()
-
-  beforeEach(() => {
-    render = props =>
-      renderWithProviders<React.ComponentProps<typeof ApplyHistoricOffsets>>(
-        <ApplyHistoricOffsets
-          offsetCandidates={[
-            mockFirstCandidate,
-            mockSecondCandidate,
-            mockThirdCandidate,
-            mockFourthCandidate,
-          ]}
-          setShouldApplyOffsets={mockSetShouldApplyOffsets}
-          shouldApplyOffsets
-          commands={[]}
-          labware={[]}
-          modules={[]}
-          {...props}
-        />,
-        { i18nInstance: i18n }
-      )
-  })
+  const render = (props?: Partial<React.ComponentProps<typeof ApplyHistoricOffsets>>) =>
+    renderWithProviders<React.ComponentProps<typeof ApplyHistoricOffsets>>(
+      <ApplyHistoricOffsets
+        offsetCandidates={[
+          mockFirstCandidate,
+          mockSecondCandidate,
+          mockThirdCandidate,
+          mockFourthCandidate,
+        ]}
+        setShouldApplyOffsets={mockSetShouldApplyOffsets}
+        shouldApplyOffsets
+        commands={[]}
+        labware={[]}
+        modules={[]}
+        {...props}
+      />,
+      { i18nInstance: i18n }
+    )
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it('renders correct copy when shouldApplyOffsets is true', () => {
-    const [{ getByText }] = render()
-    getByText('Apply labware offset data')
-    getByText('View data')
+    render()
+    screen.getByText('Apply labware offset data')
+    screen.getByText('View data')
   })
 
   it('renders correct copy when shouldApplyOffsets is false', () => {
-    const [{ getByText }] = render({ shouldApplyOffsets: false })
-    getByText('Apply labware offset data')
-    getByText('View data')
+    render({ shouldApplyOffsets: false })
+    screen.getByText('Apply labware offset data')
+    screen.getByText('View data')
   })
 
   it('renders view data modal when link clicked, with correct copy and table row for each candidate', () => {
@@ -111,59 +106,62 @@ describe('ApplyHistoricOffsets', () => {
       mockLabwareDef,
       mockAdapterDef,
     ])
-    const [{ getByText, getByRole, queryByText, getByTestId }] = render()
-    getByText('View data').click()
+    render()
+    const viewDataButton = screen.getByText('View data')
+    fireEvent.click(viewDataButton)
 
-    getByRole('heading', { name: 'Apply Stored Labware Offset Data?' })
-    getByText(
+    screen.getByRole('heading', { name: 'Apply Stored Labware Offset Data?' })
+    screen.getByText(
       'This robot has offsets for labware used in this protocol. If you apply these offsets, you can still adjust them with Labware Position Check.'
     )
     expect(
-      getByRole('link', { name: 'See how labware offsets work' })
+      screen.getByRole('link', { name: 'See how labware offsets work' })
     ).toHaveAttribute(
       'href',
       'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
     )
 
     // first candidate table row
-    getByText('Slot 1')
+    screen.getByText('Slot 1')
     // second candidate table row
-    getByText('Slot 2')
+    screen.getByText('Slot 2')
     //  4th candidate a labware on adapter on module
-    getByText(
+    screen.getByText(
       'Opentrons 96 PCR Heater-Shaker Adapter in Heater-Shaker Module GEN1 in Slot 3'
     )
     // third candidate on module table row
-    getByText('Heater-Shaker Module GEN1 in Slot 3')
-    getByTestId(
+    screen.getByText('Heater-Shaker Module GEN1 in Slot 3')
+    const closeButton = screen.getByTestId(
       'ModalHeader_icon_close_Apply Stored Labware Offset Data?'
-    ).click()
-    expect(queryByText('Apply Stored Labware Offset Data?')).toBeNull()
+    )
+    fireEvent.click(closeButton)
+    expect(screen.queryByText('Apply Stored Labware Offset Data?')).toBeNull()
   })
 
   it('renders view data modal when link clicked, with correct empty state if no candidates', () => {
-    const [{ getByText, getByRole, queryByText }] = render({
+    render({
       offsetCandidates: [],
     })
-    getByText('No offset data available')
-    getByText('Learn more').click()
+    screen.getByText('No offset data available')
+    const learnMoreBUtton = screen.getByText('Learn more')
+    fireEvent.click(learnMoreBUtton)
 
-    getByRole('heading', { name: 'What is labware offset data?' })
+    screen.getByRole('heading', { name: 'What is labware offset data?' })
 
-    getByText(
+    screen.getByText(
       'Labware offset data references previous protocol run labware locations to save you time. If all the labware in this protocol have been checked in previous runs, that data will be applied to this run.'
     )
-    getByText(
+    screen.getByText(
       'You can add new offsets with Labware Position Check in later steps.'
     )
 
     expect(
-      getByRole('link', { name: 'See how labware offsets work' })
+      screen.getByRole('link', { name: 'See how labware offsets work' })
     ).toHaveAttribute(
       'href',
       'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
     )
-    expect(queryByText('location')).toBeNull()
+    expect(screen.queryByText('location')).toBeNull()
   })
 
   it('renders tabbed offset data with snippets when config option is selected', () => {
@@ -172,10 +170,11 @@ describe('ApplyHistoricOffsets', () => {
       mockAdapterDef,
     ])
     mockGetIsLabwareOffsetCodeSnippetsOn.mockReturnValue(true)
-    const [{ getByText }] = render()
-    getByText('View data').click()
-    expect(getByText('Table View')).toBeTruthy()
-    expect(getByText('Jupyter Notebook')).toBeTruthy()
-    expect(getByText('Command Line Interface (SSH)')).toBeTruthy()
+    render()
+    const viewDataButton = screen.getByText('View data')
+    fireEvent.click(viewDataButton)
+    expect(screen.getByText('Table View')).toBeTruthy()
+    expect(screen.getByText('Jupyter Notebook')).toBeTruthy()
+    expect(screen.getByText('Command Line Interface (SSH)')).toBeTruthy()
   })
 })

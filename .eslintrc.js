@@ -9,7 +9,7 @@ module.exports = {
 
   extends: ['standard-with-typescript', 'plugin:react/recommended', 'prettier'],
 
-  plugins: ['react', 'react-hooks', 'json', 'jest'],
+  plugins: ['react', 'react-hooks', 'json', 'jest', 'testing-library'],
 
   rules: {
     camelcase: 'off',
@@ -79,7 +79,7 @@ module.exports = {
       env: {
         jest: true,
       },
-      extends: ['plugin:jest/recommended'],
+      extends: ['plugin:jest/recommended', 'plugin:testing-library/react'],
       rules: {
         'jest/expect-expect': 'off',
         'jest/no-standalone-expect': 'off',
@@ -93,6 +93,7 @@ module.exports = {
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',
         'jest/no-conditional-expect': 'warn',
+        'testing-library/prefer-screen-queries': 'warn'
       },
     },
     {
