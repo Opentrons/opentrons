@@ -72,7 +72,7 @@ describe('useDeleteCalibrationMutation hook', () => {
         data: DELETE_CAL_DATA_RESPONSE,
       } as Response<EmptyResponse>)
 
-    const { result, rerender } = renderHook(
+    const { result } = renderHook(
       () => useDeleteCalibrationMutation(),
       {
         wrapper,

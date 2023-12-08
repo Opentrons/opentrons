@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
@@ -36,24 +36,24 @@ describe('RobotSettings OpenJupyterControl', () => {
   })
 
   it('should render title, description and button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Jupyter Notebook')
-    getByText(
+    render()
+    screen.getByText('Jupyter Notebook')
+    screen.getByText(
       'Open the Jupyter Notebook running on this robot in the web browser. This is an experimental feature.'
     )
-    getByText('Learn more about using Jupyter notebook')
-    getByText('Launch Jupyter Notebook')
+    screen.getByText('Learn more about using Jupyter notebook')
+    screen.getByText('Launch Jupyter Notebook')
     expect(
-      getByRole('link', { name: 'Launch Jupyter Notebook' })
+      screen.getByRole('link', { name: 'Launch Jupyter Notebook' })
     ).toBeInTheDocument()
   })
 
   it('should render jupyter notebook link', () => {
-    const [{ getByText }] = render()
-    const link = getByText('Launch Jupyter Notebook')
-    expect(link.closest('a')).toHaveAttribute('href', mockLink)
-    expect(link.closest('a')).toHaveAttribute('target', '_blank')
-    expect(link.closest('a')).toHaveAttribute('rel', 'noopener noreferrer')
+    render()
+    const link = screen.getByRole('link', {name: 'Launch Jupyter Notebook'})
+    expect(link).toHaveAttribute('href', mockLink)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
 
   it('should send and analytics event on link click', () => {

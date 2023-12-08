@@ -79,7 +79,7 @@ module.exports = {
       env: {
         jest: true,
       },
-      extends: ['plugin:jest/recommended', 'plugin:testing-library/react'],
+      extends: ['plugin:jest/recommended'],
       rules: {
         'jest/expect-expect': 'off',
         'jest/no-standalone-expect': 'off',
@@ -92,7 +92,14 @@ module.exports = {
         // TODO(mc, 2021-01-29): fix these and remove warning overrides
         'jest/no-deprecated-functions': 'warn',
         'jest/valid-title': 'warn',
-        'jest/no-conditional-expect': 'warn',
+        'jest/no-conditional-expect': 'warn'
+      },
+    },
+    {
+      files: [ '**/__tests__/**test.tsx' ],
+      env: { jest: true },
+      extends: ['plugin:testing-library/react'],
+      rules: {
         'testing-library/prefer-screen-queries': 'warn'
       },
     },

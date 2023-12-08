@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { act, renderHook, render, fireEvent } from '@testing-library/react'
+import { renderHook, render, fireEvent } from '@testing-library/react'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useToggleGroup } from '../useToggleGroup'
 

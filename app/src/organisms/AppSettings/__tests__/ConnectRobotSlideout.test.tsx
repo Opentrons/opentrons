@@ -89,8 +89,8 @@ describe('ConnectRobotSlideout', () => {
     render(props)
     const targetLink =
       'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
-    const link = screen.getByText('Learn more about connecting a robot manually')
-    expect(link.closest('a')).toHaveAttribute('href', targetLink)
+    const link = screen.getByRole('link', {name: 'Learn more about connecting a robot manually'})
+    expect(link).toHaveAttribute('href', targetLink)
   })
 
   it('Clicking Add button without IP address/hostname should display an error message', async () => {
@@ -112,7 +112,7 @@ describe('ConnectRobotSlideout', () => {
 
     screen.getByText(newIpAddress)
     screen.getByText('Searching for 30s')
-    expect(screen.queryByText('Available')).toBeInTheDocument()
+    screen.getByText('Available')
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', async () => {
@@ -129,16 +129,16 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label', async () => {
-    const { getByRole, findByText } = render(props)
+    render(props)
     const notFoundIpAddress = '1.1.1.2'
-    const inputBox = getByRole('textbox')
-    const addButton = getByRole('button', { name: 'Add' })
+    const inputBox = screen.getByRole('textbox')
+    const addButton = screen.getByRole('button', { name: 'Add' })
     fireEvent.change(inputBox, {
       target: { value: notFoundIpAddress },
     })
     fireEvent.click(addButton)
-    findByText(notFoundIpAddress)
-    findByText('Not Found')
+    screen.getByText(notFoundIpAddress)
+    screen.getByText('Not Found')
   })
 
   it('Clicking Close button in a row should remove an IP address/hostname', async () => {

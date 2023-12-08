@@ -869,7 +869,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
-    waitFor(() => {
+    await waitFor(() => {
       getByText('Mock HeaterShakerIsRunningModal')
     })
   })
@@ -950,7 +950,7 @@ describe('ProtocolRunHeader', () => {
 
   it('renders the devices page when robot is not viewable but protocol is loaded', async () => {
     mockUseIsRobotViewable.mockReturnValue(false)
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/devices')
     })
   })

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
@@ -14,9 +15,6 @@ import {
 import type { CommandData } from '@opentrons/api-client'
 
 describe('MovePin', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof MovePin>>
-  ) => ReturnType<typeof renderWithProviders>
   let mockCreateRunCommand: jest.Mock
   let mockSetErrorMessage: jest.Mock
 
@@ -26,33 +24,36 @@ describe('MovePin', () => {
   const mockSetFrontJawOffset = jest.fn()
   const mockRunId = 'fakeRunId'
 
+
+  const render = (
+    props: Partial<React.ComponentProps<typeof MovePin>> = {}
+  ) => {
+    return renderWithProviders(
+      <MovePin
+        maintenanceRunId={mockRunId}
+        section={SECTIONS.MOVE_PIN}
+        flowType={GRIPPER_FLOW_TYPES.ATTACH}
+        proceed={mockProceed}
+        attachedGripper={instrumentsResponseFixture.data[0]}
+        chainRunCommands={mockChainRunCommands}
+        isRobotMoving={false}
+        goBack={mockGoBack}
+        movement={MOVE_PIN_TO_FRONT_JAW}
+        setFrontJawOffset={mockSetFrontJawOffset}
+        frontJawOffset={{ x: 0, y: 0, z: 0 }}
+        createRunCommand={mockCreateRunCommand}
+        errorMessage={null}
+        setErrorMessage={mockSetErrorMessage}
+        isExiting={false}
+        {...props}
+      />,
+      { i18nInstance: i18n }
+    )
+  }
   beforeEach(() => {
     mockCreateRunCommand = jest.fn(() => {
       return Promise.resolve({ data: {} } as CommandData)
     })
-    render = (props = {}) => {
-      return renderWithProviders(
-        <MovePin
-          maintenanceRunId={mockRunId}
-          section={SECTIONS.MOVE_PIN}
-          flowType={GRIPPER_FLOW_TYPES.ATTACH}
-          proceed={mockProceed}
-          attachedGripper={instrumentsResponseFixture.data[0]}
-          chainRunCommands={mockChainRunCommands}
-          isRobotMoving={false}
-          goBack={mockGoBack}
-          movement={MOVE_PIN_TO_FRONT_JAW}
-          setFrontJawOffset={mockSetFrontJawOffset}
-          frontJawOffset={{ x: 0, y: 0, z: 0 }}
-          createRunCommand={mockCreateRunCommand}
-          errorMessage={null}
-          setErrorMessage={mockSetErrorMessage}
-          isExiting={false}
-          {...props}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
   })
 
   afterEach(() => {
@@ -60,8 +61,9 @@ describe('MovePin', () => {
   })
 
   it('clicking confirm proceed calls proceed with correct callbacks', async () => {
-    const { getByRole } = render()[0]
-    await getByRole('button', { name: 'Begin calibration' }).click()
+    render()
+    const begin = screen.getByRole('button', { name: 'Begin calibration' })
+    fireEvent.click(begin)
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       maintenanceRunId: 'fakeRunId',
       command: {
@@ -98,44 +100,41 @@ describe('MovePin', () => {
   })
 
   it('clicking go back calls back on moving pin from front to rear jaw', () => {
-    const { getByLabelText } = render({
-      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
-    })[0]
-    getByLabelText('back').click()
+    render({ movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW })
+    const back = screen.getByLabelText('back')
+    fireEvent.click(back)
     expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('clicking go back calls back on removing pin from rear jaw', () => {
-    const { getByLabelText } = render({
-      movement: REMOVE_PIN_FROM_REAR_JAW,
-    })[0]
-    getByLabelText('back').click()
+    render({ movement: REMOVE_PIN_FROM_REAR_JAW })
+    const back = screen.getByLabelText('back')
+    fireEvent.click(back)
     expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('renders correct text for move pin to front jaw', () => {
-    const { getByRole, getByText } = render()[0]
-    getByText('Insert calibration pin in front jaw')
-    getByText(
+    render()
+    screen.getByText('Insert calibration pin in front jaw')
+    screen.getByText(
       'Take the calibration pin from its storage location. Magnetically attach the pin to the hole on the underside of the front gripper jaw.'
     )
-    getByRole('button', { name: 'Begin calibration' })
+    screen.getByRole('button', { name: 'Begin calibration' })
   })
 
   it('renders correct loader for move pin to front jaw', () => {
-    const { getByText } = render({ isRobotMoving: true })[0]
-    getByText('Stand back, gripper is calibrating')
+    render({ isRobotMoving: true })
+    screen.getByText('Stand back, gripper is calibrating')
   })
 
   it('renders correct text for move pin from front jaw to rear with correct callbacks', async () => {
-    const { getByRole, getByText } = render({
-      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
-    })[0]
-    getByText('Insert calibration pin in rear jaw')
-    getByText(
+    render({ movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW })
+    screen.getByText('Insert calibration pin in rear jaw')
+    screen.getByText(
       'Remove the calibration pin from the front jaw and attach it to the rear jaw.'
     )
-    await getByRole('button', { name: 'Continue calibration' }).click()
+    const continueButton = screen.getByRole('button', { name: 'Continue calibration' })
+    fireEvent.click(continueButton)
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       maintenanceRunId: 'fakeRunId',
@@ -176,39 +175,38 @@ describe('MovePin', () => {
   })
 
   it('renders correct loader for move pin from front jaw to rear', () => {
-    const { getByText } = render({
+    render({
       isRobotMoving: true,
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
-    })[0]
-    getByText('Stand back, gripper is calibrating')
+    })
+    screen.getByText('Stand back, gripper is calibrating')
   })
 
   it('renders correct text for remove pin from rear jaw', () => {
-    const { getByRole, getByText } = render({
-      movement: REMOVE_PIN_FROM_REAR_JAW,
-    })[0]
-    getByText('Remove calibration pin')
-    getByText(
+    render({ movement: REMOVE_PIN_FROM_REAR_JAW })
+    screen.getByText('Remove calibration pin')
+    screen.getByText(
       'Take the calibration pin from the rear gripper jaw and return it to its storage location.'
     )
-    getByRole('button', { name: 'Complete calibration' }).click()
+    const complete = screen.getByRole('button', { name: 'Complete calibration' })
+    fireEvent.click(complete)
     expect(mockProceed).toHaveBeenCalled()
   })
 
   it('renders correct loader for remove pin from rear jaw', () => {
-    const { getByText } = render({
+    render({
       isRobotMoving: true,
       movement: REMOVE_PIN_FROM_REAR_JAW,
-    })[0]
-    getByText('Stand back, robot is in motion')
+    })
+    screen.getByText('Stand back, robot is in motion')
   })
 
   it('renders correct loader for early exiting', () => {
-    const { getByText } = render({
+    render({
       isRobotMoving: true,
       isExiting: true,
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
-    })[0]
-    getByText('Stand back, robot is in motion')
+    })
+    screen.getByText('Stand back, robot is in motion')
   })
 })

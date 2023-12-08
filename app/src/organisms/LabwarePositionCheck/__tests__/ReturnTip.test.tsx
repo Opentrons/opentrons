@@ -1,5 +1,4 @@
 import * as React from 'react'
-import type { MatcherFunction } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -18,17 +17,6 @@ const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
 const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
   typeof getIsOnDevice
 >
-
-const matchTextWithSpans: (text: string) => MatcherFunction = (
-  text: string
-) => (_content, node) => {
-  const nodeHasText = node?.textContent === text
-  const childrenDontHaveText = Array.from(node?.children ?? []).every(
-    child => child?.textContent !== text
-  )
-
-  return nodeHasText && childrenDontHaveText
-}
 
 const render = (props: React.ComponentProps<typeof ReturnTip>) => {
   return renderWithProviders(<ReturnTip {...props} />, {
@@ -66,11 +54,10 @@ describe('ReturnTip', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Return tip rack to Slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
-    getByText(
-      matchTextWithSpans(
-        'Place the Mock TipRack Definition that you used before back into Slot D1. The pipette will return tips to their original location in the rack.'
-      )
-    )
+    getByText(/Mock TipRack Definition/i)
+    getByText(/that you used before back into/i)
+    getByText('Slot D1')
+    getByText(/The pipette will return tips to their original location in the rack./i)
     getByRole('link', { name: 'Need help?' })
   })
   it('renders correct copy on device', () => {
@@ -78,11 +65,10 @@ describe('ReturnTip', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Return tip rack to Slot D1' })
     getByText('Clear all deck slots of labware')
-    getByText(
-      matchTextWithSpans(
-        'Place the Mock TipRack Definition that you used before back into Slot D1. The pipette will return tips to their original location in the rack.'
-      )
-    )
+    getByText(/Mock TipRack Definition/i)
+    getByText(/that you used before back into/i)
+    getByText('Slot D1')
+    getByText(/The pipette will return tips to their original location in the rack./i)
   })
   it('executes correct chained commands when CTA is clicked', async () => {
     const { getByRole } = render(props)

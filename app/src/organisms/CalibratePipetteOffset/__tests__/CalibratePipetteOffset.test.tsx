@@ -136,7 +136,7 @@ describe('CalibratePipetteOffset', () => {
           currentStep: 'sessionStarted',
         },
       },
-    })[0]
+    })
     expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBeNull()
   })
 

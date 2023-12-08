@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
@@ -16,48 +17,49 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
 const mockRunId = 'fakeRunId'
 
 describe('MountGripper', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof MountGripper>>
-  ) => ReturnType<typeof renderWithProviders>
   let mockRefetch: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
   let mockSetErrorMessage: jest.Mock
 
+  const render = (
+    props: Partial<React.ComponentProps<typeof MountGripper>> = {}
+  ) => {
+    return renderWithProviders(
+      <MountGripper
+        maintenanceRunId={mockRunId}
+        flowType={GRIPPER_FLOW_TYPES.ATTACH}
+        proceed={mockProceed}
+        attachedGripper={props?.attachedGripper ?? null}
+        chainRunCommands={mockChainRunCommands}
+        isRobotMoving={false}
+        goBack={() => null}
+        errorMessage={null}
+        setErrorMessage={mockSetErrorMessage}
+        {...props}
+      />,
+      { i18nInstance: i18n }
+    )
+  }
+
   beforeEach(() => {
     mockProceed = jest.fn()
     mockChainRunCommands = jest.fn()
     mockRefetch = jest.fn(() => Promise.resolve())
-    render = (props = {}) => {
-      return renderWithProviders(
-        <MountGripper
-          maintenanceRunId={mockRunId}
-          flowType={GRIPPER_FLOW_TYPES.ATTACH}
-          proceed={mockProceed}
-          attachedGripper={props?.attachedGripper ?? null}
-          chainRunCommands={mockChainRunCommands}
-          isRobotMoving={false}
-          goBack={() => null}
-          errorMessage={null}
-          setErrorMessage={mockSetErrorMessage}
-          {...props}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('clicking confirm calls proceed if attached gripper', async () => {
+  it('clicking confirm calls proceed if attached gripper', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       refetch: mockRefetch,
       data: instrumentsResponseFixture,
     } as any)
-    const { getByRole } = render()[0]
-    await getByRole('button', { name: 'Continue' }).click()
+    render()
+    const button = screen.getByRole('button', { name: 'Continue' })
+    fireEvent.click(button)
     expect(mockProceed).toHaveBeenCalled()
   })
 
@@ -66,18 +68,20 @@ describe('MountGripper', () => {
       refetch: mockRefetch,
       data: null,
     } as any)
-    const { getByRole, getByText } = render()[0]
-    await getByRole('button', { name: 'Continue' }).click()
+    render()
+    const continueButton = screen.getByRole('button', { name: 'Continue' })
+    fireEvent.click(continueButton)
     expect(mockProceed).not.toHaveBeenCalled()
-    await getByText('Unable to detect Gripper')
-    let tryAgainButton = getByRole('button', { name: 'Try again' })
-    tryAgainButton.click()
+    screen.getByText('Unable to detect Gripper')
+    let tryAgainButton = screen.getByRole('button', { name: 'Try again' })
+    fireEvent.click(tryAgainButton)
     expect(mockProceed).not.toHaveBeenCalled()
-    tryAgainButton = getByRole('button', { name: 'Try again' })
-    tryAgainButton.click()
-    const goBackButton = await getByRole('button', { name: 'Go back' })
-    goBackButton.click()
-    await getByRole('button', { name: 'Continue' }).click()
+    tryAgainButton = screen.getByRole('button', { name: 'Try again' })
+    fireEvent.click(tryAgainButton)
+    const goBackButton = screen.getByRole('button', { name: 'Go back' })
+    fireEvent.click(goBackButton)
+    const nextContinue = screen.getByRole('button', { name: 'Continue' })
+    fireEvent.click(nextContinue)
     expect(mockProceed).not.toHaveBeenCalled()
   })
 
@@ -86,9 +90,9 @@ describe('MountGripper', () => {
       refetch: mockRefetch,
       data: null,
     } as any)
-    const { getByText } = render()[0]
-    getByText('Connect and secure Flex Gripper')
-    getByText(
+    render()
+    screen.getByText('Connect and secure Flex Gripper')
+    screen.getByText(
       'Attach the gripper to the robot by aligning the connector and pressing to ensure a secure connection. Hold the gripper in place. Tighten the top gripper screw first, and the bottom screw second. Then test that the gripper is securely attached by gently pulling it side to side.'
     )
   })

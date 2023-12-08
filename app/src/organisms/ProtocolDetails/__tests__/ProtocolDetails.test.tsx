@@ -3,7 +3,7 @@ import '@testing-library/jest-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { partialComponentPropsMatcher, renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { act, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,

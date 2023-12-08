@@ -4,7 +4,7 @@ import {
   NINETY_SIX_CHANNEL,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
@@ -53,21 +53,21 @@ describe('ChoosePipette', () => {
     jest.resetAllMocks()
   })
   it('returns the correct information, buttons work as expected', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
-    getByText('Attach Left Pipette')
-    getByText('Choose a pipette to attach')
-    getByText('1- or 8-Channel pipette')
-    getByText('96-Channel pipette')
-    getByAltText('1- or 8-Channel pipette')
-    getByAltText('96-Channel pipette')
-    const singleMountPipettes = getByText('1- or 8-Channel pipette')
-    const ninetySixPipette = getByText('96-Channel pipette')
+    render(props)
+    screen.getByText('Attach Left Pipette')
+    screen.getByText('Choose a pipette to attach')
+    screen.getByText('1- or 8-Channel pipette')
+    screen.getByText('96-Channel pipette')
+    screen.getByAltText('1- or 8-Channel pipette')
+    screen.getByAltText('96-Channel pipette')
+    const singleMountPipettes = screen.getByRole('radio', {name: '1- or 8-Channel pipette 1- or 8-Channel pipette'})
+    const ninetySixPipette = screen.getByRole('radio', {name: '96-Channel pipette 96-Channel pipette'})
 
     //  Single and 8-Channel pipettes are selected first by default
-    expect(singleMountPipettes.parentElement).toHaveStyle(
+    expect(singleMountPipettes).toHaveStyle(
       `background-color: ${COLORS.lightBlue}`
     )
-    expect(ninetySixPipette.parentElement).toHaveStyle(
+    expect(ninetySixPipette).toHaveStyle(
       `background-color: ${COLORS.white}`
     )
 
@@ -79,17 +79,17 @@ describe('ChoosePipette', () => {
     fireEvent.click(singleMountPipettes)
     expect(props.setSelectedPipette).toHaveBeenCalled()
 
-    const proceedBtn = getByRole('button', { name: 'Continue' })
+    const proceedBtn = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })
   it('returns the correct information, buttons work as expected for on device display', () => {
     mockGetIsOnDevice.mockReturnValue(true)
-    const { getByText, getByLabelText } = render(props)
-    getByText('Attach Left Pipette')
-    getByText('Choose a pipette to attach')
-    const singleMountPipettes = getByText('1- or 8-Channel pipette')
-    const ninetySixPipette = getByText('96-Channel pipette')
+    render(props)
+    screen.getByText('Attach Left Pipette')
+    screen.getByText('Choose a pipette to attach')
+    const singleMountPipettes = screen.getByText('1- or 8-Channel pipette')
+    const ninetySixPipette = screen.getByText('96-Channel pipette')
 
     //  Selecting 96-Channel called setSelectedPipette prop
     fireEvent.click(ninetySixPipette)
@@ -99,43 +99,43 @@ describe('ChoosePipette', () => {
     fireEvent.click(singleMountPipettes)
     expect(props.setSelectedPipette).toHaveBeenCalled()
 
-    const proceedBtn = getByLabelText('SmallButton_primary')
+    const proceedBtn = screen.getByLabelText('SmallButton_primary')
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders exit button and clicking on it renders the exit modal, clicking on back button works', () => {
-    const { getByText, getByLabelText } = render(props)
-    const exit = getByLabelText('Exit')
+    render(props)
+    const exit = screen.getByLabelText('Exit')
     fireEvent.click(exit)
-    getByText('Attaching Pipette progress will be lost')
-    getByText(
+    screen.getByText('Attaching Pipette progress will be lost')
+    screen.getByText(
       'Are you sure you want to exit before completing Attaching Pipette?'
     )
-    const goBack = getByText('Go back')
+    const goBack = screen.getByText('Go back')
     fireEvent.click(goBack)
-    getByText('Choose a pipette to attach')
+    screen.getByText('Choose a pipette to attach')
   })
   it('renders exit button and clicking on it renders the exit modal, clicking on exit button works', () => {
-    const { getByText, getByRole, getByLabelText } = render(props)
-    const exit = getByLabelText('Exit')
+    render(props)
+    const exit = screen.getByLabelText('Exit')
     fireEvent.click(exit)
-    getByText('Attaching Pipette progress will be lost')
-    getByText(
+    screen.getByText('Attaching Pipette progress will be lost')
+    screen.getByText(
       'Are you sure you want to exit before completing Attaching Pipette?'
     )
-    const exitButton = getByRole('button', { name: 'exit' })
+    const exitButton = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(exitButton)
     expect(props.exit).toHaveBeenCalled()
   })
   it('renders the 96 channel pipette option selected', () => {
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
-    const { getByText } = render(props)
-    const singleMountPipettes = getByText('1- or 8-Channel pipette')
-    const ninetySixPipette = getByText('96-Channel pipette')
-    expect(singleMountPipettes.parentElement).toHaveStyle(
+    render(props)
+    const singleMountPipettes = screen.getByRole('radio', {name: '1- or 8-Channel pipette 1- or 8-Channel pipette'})
+    const ninetySixPipette = screen.getByRole('radio', {name: '96-Channel pipette 96-Channel pipette'})
+    expect(singleMountPipettes).toHaveStyle(
       `background-color: ${COLORS.white}`
     )
-    expect(ninetySixPipette.parentElement).toHaveStyle(
+    expect(ninetySixPipette).toHaveStyle(
       `background-color: ${COLORS.lightBlue}`
     )
   })
@@ -146,8 +146,8 @@ describe('ChoosePipette', () => {
       right: null,
     })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
-    const { getByText } = render(props)
-    getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
+    render(props)
+    screen.getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
   })
   it('renders the correct text for the 96 channel button when there is a right pipette attached', () => {
     mockGetIsGantryEmpty.mockReturnValue(false)
@@ -156,7 +156,7 @@ describe('ChoosePipette', () => {
       right: mockAttachedPipetteInformation,
     })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
-    const { getByText } = render(props)
-    getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
+    render(props)
+    screen.getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
   })
 })

@@ -79,6 +79,8 @@ describe('TrashModal ', () => {
     getByRole('button', { name: 'save' }).click()
     await waitFor(() => {
       expect(mockDeleteDeckFixture).toHaveBeenCalledWith(mockId)
+    })
+    await waitFor(() => {
       expect(mockCreateDeckFixture).toHaveBeenCalledWith('trashBin', 'cutoutA3')
     })
   })

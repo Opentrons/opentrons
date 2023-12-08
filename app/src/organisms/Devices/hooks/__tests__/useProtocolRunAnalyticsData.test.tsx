@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { renderHook } from '@testing-library/react'
-import { waitFor } from '@testing-library/react'
+import { renderHook, waitFor  } from '@testing-library/react'
 import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'

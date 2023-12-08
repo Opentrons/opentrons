@@ -25,7 +25,7 @@ const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
 >
 
 describe('CheckCalibration', () => {
-  let dispatchRequests = jest.fn()
+  const dispatchRequests = jest.fn()
   const mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
@@ -117,8 +117,7 @@ describe('CheckCalibration', () => {
   })
 
   it('renders confirm exit on exit click', () => {
-    render()[0]
-
+    render()
     expect(
       screen.queryByRole('heading', {
         name: 'Calibration Health Check progress will be lost',

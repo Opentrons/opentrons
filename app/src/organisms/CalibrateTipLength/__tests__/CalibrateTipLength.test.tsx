@@ -28,7 +28,7 @@ const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
 
 describe('CalibrateTipLength', () => {
   const dispatchRequests = jest.fn()
-  let mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
+  const mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
     id: 'fake_session_id',
     ...mockTipLengthCalibrationSessionAttributes,
   }

@@ -105,6 +105,8 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
 
@@ -221,6 +223,8 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
     getByLabelText('back').click()

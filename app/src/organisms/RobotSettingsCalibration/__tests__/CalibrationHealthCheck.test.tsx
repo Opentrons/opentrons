@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, waitFor, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -102,16 +102,16 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('renders a title and description - Calibration Health Check section', () => {
-    const [{ getByText }] = render()
-    getByText('Calibration Health Check')
-    getByText(
+    render()
+    screen.getByText('Calibration Health Check')
+    screen.getByText(
       'Check the accuracy of key calibration points without recalibrating the robot.'
     )
   })
 
   it('renders a Check health button', () => {
-    const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Check health' })
+    render()
+    const button = screen.getByRole('button', { name: 'Check health' })
     expect(button).not.toBeDisabled()
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
@@ -121,10 +121,10 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('Health check button is disabled when a button disabled reason is provided', () => {
-    const [{ getByRole }] = render({
+    render({
       buttonDisabledReason: 'otie is unreachable',
     })
-    const button = getByRole('button', { name: 'Check health' })
+    const button = screen.getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
   })
 
@@ -133,27 +133,25 @@ describe('CalibrationHealthCheck', () => {
       ...RUN_STATUSES,
       isRunRunning: true,
     })
-    const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Check health' })
+    render()
+    const button = screen.getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
   })
 
   it('Health check button is disabled when pipette are not set', () => {
     mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
-    const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Check health' })
+    render()
+    const button = screen.getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
   })
 
   it('Health check button shows Tooltip when pipette are not set', async () => {
     mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
-    const [{ getByRole, findByText }] = render()
-    const button = getByRole('button', { name: 'Check health' })
+    render()
+    const button = screen.getByRole('button', { name: 'Check health' })
     fireEvent.mouseMove(button)
-    await waitFor(() => {
-      findByText(
-        'Fully calibrate your robot before checking calibration health'
-      )
+    await waitFor(async () => {
+      await screen.findByText('Fully calibrate your robot before checking calibration health')
     })
   })
 
@@ -166,8 +164,8 @@ describe('CalibrationHealthCheck', () => {
       ...RUN_STATUSES,
       isRunRunning: true,
     })
-    const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Check health' })
+    render()
+    const button = screen.getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
   })
 })

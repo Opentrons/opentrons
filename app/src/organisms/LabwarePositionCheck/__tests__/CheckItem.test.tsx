@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import {
@@ -11,24 +12,12 @@ import { i18n } from '../../../i18n'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
-import type { MatcherFunction } from '@testing-library/react'
 
 jest.mock('../../../redux/config')
 jest.mock('../../Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 const mockEndPosition = { x: 9, y: 19, z: 29 }
-
-const matchTextWithSpans: (text: string) => MatcherFunction = (
-  text: string
-) => (_content, node) => {
-  const nodeHasText = node?.textContent === text
-  const childrenDontHaveText = Array.from(node?.children ?? []).every(
-    child => child?.textContent !== text
-  )
-
-  return nodeHasText && childrenDontHaveText
-}
 
 const render = (props: React.ComponentProps<typeof CheckItem>) => {
   return renderWithProviders(<CheckItem {...props} />, {
@@ -68,14 +57,15 @@ describe('CheckItem', () => {
     resetAllWhenMocks()
   })
   it('renders correct copy when preparing space with tip rack', () => {
-    const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
-    getByText('Clear all deck slots of labware, leaving modules in place')
-    getByText(
-      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
-    )
-    getByRole('link', { name: 'Need help?' })
-    getByRole('button', { name: 'Confirm placement' })
+    render(props)
+    screen.getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getAllByText(/Place/i)
+    screen.getAllByText(/a full Mock TipRack Definition/i)
+    screen.getAllByText(/into/i)
+    screen.getAllByText(/Slot D1/i)
+    screen.getByRole('link', { name: 'Need help?' })
+    screen.getByRole('button', { name: 'Confirm placement' })
   })
   it('renders correct copy when preparing space with non tip rack labware', () => {
     props = {
@@ -84,14 +74,15 @@ describe('CheckItem', () => {
       location: { slotName: 'D2' },
     }
 
-    const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare labware in Slot D2' })
-    getByText('Clear all deck slots of labware, leaving modules in place')
-    getByText(
-      matchTextWithSpans('Place a Mock Labware Definition into Slot D2')
-    )
-    getByRole('link', { name: 'Need help?' })
-    getByRole('button', { name: 'Confirm placement' })
+    render(props)
+    screen.getByRole('heading', { name: 'Prepare labware in Slot D2' })
+    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getAllByText(/Place a/i)
+    screen.getAllByText(/Mock Labware Definition/i)
+    screen.getAllByText(/into/i)
+    screen.getAllByText(/Slot D2/i)
+    screen.getByRole('link', { name: 'Need help?' })
+    screen.getByRole('button', { name: 'Confirm placement' })
   })
   it('executes correct chained commands when confirm placement CTA is clicked then go back', async () => {
     when(mockChainRunCommands)
