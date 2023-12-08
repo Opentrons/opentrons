@@ -12,7 +12,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Mount, DeckSlotName, Location, Point
+from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -25,7 +25,6 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import validation as subject, Well, Labware
-from opentrons.protocol_api._types import StagingSlotName
 
 
 @pytest.mark.parametrize(

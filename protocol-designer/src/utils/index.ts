@@ -187,6 +187,7 @@ export const getCutoutIdByAddressableArea = (
     }
     return null
   }
+
   const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
 
   if (cutoutId == null) {

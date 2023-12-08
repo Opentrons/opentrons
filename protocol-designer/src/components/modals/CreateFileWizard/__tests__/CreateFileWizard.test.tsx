@@ -17,10 +17,7 @@ import {
   toggleIsGripperRequired,
   createDeckFixture,
 } from '../../../../step-forms/actions/additionalItems'
-import {
-  getAllowAllTipracks,
-  getEnableDeckModification,
-} from '../../../../feature-flags/selectors'
+import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
 import { CreateFileWizard } from '..'
 
@@ -76,9 +73,6 @@ const mockCreateModule = createModule as jest.MockedFunction<
 const mockCreateDeckFixture = createDeckFixture as jest.MockedFunction<
   typeof createDeckFixture
 >
-const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
-  typeof getEnableDeckModification
->
 const render = () => {
   return renderWithProviders(<CreateFileWizard />)[0]
 }
@@ -91,7 +85,6 @@ const ten = '10uL'
 
 describe('CreateFileWizard', () => {
   beforeEach(() => {
-    mockGetEnableDeckModification.mockReturnValue(false)
     mockGetNewProtocolModal.mockReturnValue(true)
     mockGetAllowAllTipracks.mockReturnValue(false)
     mockGetLabwareDefsByURI.mockReturnValue({
@@ -155,7 +148,6 @@ describe('CreateFileWizard', () => {
     expect(mockToggleNewProtocolModal).toHaveBeenCalled()
   })
   it('renders the wizard for a Flex with custom tiprack', () => {
-    mockGetEnableDeckModification.mockReturnValue(true)
     const Custom = 'custom'
     mockGetCustomLabwareDefsByURI.mockReturnValue({
       [Custom]: fixtureTipRack10ul,

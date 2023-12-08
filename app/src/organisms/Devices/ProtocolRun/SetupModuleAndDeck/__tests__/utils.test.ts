@@ -51,9 +51,14 @@ describe('getFixtureImage', () => {
     const result = getFixtureImage('wasteChuteRightAdapterNoCover')
     expect(result).toEqual('waste_chute.png')
   })
-  it('should render the trash binimage', () => {
+  it('should render the waste chute staging area image', () => {
+    const result = getFixtureImage(
+      'stagingAreaSlotWithWasteChuteRightAdapterCovered'
+    )
+    expect(result).toEqual('waste_chute_with_staging_area.png')
+  })
+  it('should render the trash bin image', () => {
     const result = getFixtureImage('trashBinAdapter')
     expect(result).toEqual('flex_trash_bin.png')
   })
-  //  TODO(jr, 10/17/23): add rest of the test cases when we add the assets
 })

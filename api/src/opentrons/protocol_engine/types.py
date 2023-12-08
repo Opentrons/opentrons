@@ -5,11 +5,12 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field, validator
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple
+from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName, Point
+from opentrons.types import MountType, DeckSlotName
+from opentrons.hardware_control.types import TipStateType as HwTipStateType
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -680,6 +681,7 @@ class PotentialCutoutFixture:
 
     cutout_id: str
     cutout_fixture_id: str
+    provided_addressable_areas: FrozenSet[str]
 
 
 class AreaType(Enum):
@@ -703,8 +705,6 @@ class AddressableArea:
     bounding_box: Dimensions
     position: AddressableOffsetVector
     compatible_module_types: List[SharedDataModuleType]
-    drop_tip_location: Optional[Point]
-    drop_labware_location: Optional[Point]
 
 
 class PostRunHardwareState(Enum):
@@ -799,3 +799,27 @@ NozzleLayoutConfigurationType = Union[
 
 # TODO make the below some sort of better type
 DeckConfigurationType = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id
+
+
+class TipPresenceStatus(str, Enum):
+    """Tip presence status reported by a pipette."""
+
+    PRESENT = "present"
+    ABSENT = "absent"
+    UNKNOWN = "unknown"
+
+    def to_hw_state(self) -> HwTipStateType:
+        """Convert to hardware tip state."""
+        assert self != TipPresenceStatus.UNKNOWN
+        return {
+            TipPresenceStatus.PRESENT: HwTipStateType.PRESENT,
+            TipPresenceStatus.ABSENT: HwTipStateType.ABSENT,
+        }[self]
+
+    @classmethod
+    def from_hw_state(cls, state: HwTipStateType) -> "TipPresenceStatus":
+        """Convert from hardware tip state."""
+        return {
+            HwTipStateType.PRESENT: TipPresenceStatus.PRESENT,
+            HwTipStateType.ABSENT: TipPresenceStatus.ABSENT,
+        }[state]

@@ -17,7 +17,6 @@ import {
   selectors as stepFormSelectors,
 } from '../../../step-forms'
 import { getRobotType } from '../../../file-data/selectors'
-import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { FormPipette } from '../../../step-forms/types'
 import {
   getAdditionalEquipment,
@@ -29,10 +28,8 @@ import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
 import { AdditionalItemsRow } from '../AdditionalItemsRow'
-import { FLEX_TRASH_DEF_URI } from '../../../constants'
 import { StagingAreasRow } from '../StagingAreasRow'
 
-jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
 jest.mock('../../../file-data/selectors')
 jest.mock('../../../feature-flags/selectors')
@@ -48,9 +45,6 @@ const mockGetRobotType = getRobotType as jest.MockedFunction<
 >
 const mockGetAdditionalEquipment = getAdditionalEquipment as jest.MockedFunction<
   typeof getAdditionalEquipment
->
-const mockGetEnableDeckModification = getEnableDeckModification as jest.MockedFunction<
-  typeof getEnableDeckModification
 >
 const mockGetLabwareEntities = getLabwareEntities as jest.MockedFunction<
   typeof getLabwareEntities
@@ -107,7 +101,6 @@ describe('EditModulesCard', () => {
         tiprackDefURI: null,
       },
     })
-    mockGetEnableDeckModification.mockReturnValue(false)
     mockGetLabwareEntities.mockReturnValue({})
     mockGetInitialDeckSetup.mockReturnValue({
       labware: {
@@ -274,10 +267,14 @@ describe('EditModulesCard', () => {
   it('displays gripper row with no gripper', () => {
     mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     const wrapper = render(props)
-    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(1)
-    expect(wrapper.find(AdditionalItemsRow).props().isEquipmentAdded).toEqual(
-      false
-    )
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(3)
+    expect(
+      wrapper.find(AdditionalItemsRow).filter({ name: 'gripper' }).props()
+    ).toEqual({
+      isEquipmentAdded: false,
+      name: 'gripper',
+      handleAttachment: expect.anything(),
+    })
   })
   it('displays gripper row with gripper attached', () => {
     const mockGripperId = 'gripeprId'
@@ -286,16 +283,19 @@ describe('EditModulesCard', () => {
       [mockGripperId]: { name: 'gripper', id: mockGripperId },
     })
     const wrapper = render(props)
-    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(1)
-    expect(wrapper.find(AdditionalItemsRow).props().isEquipmentAdded).toEqual(
-      true
-    )
+    expect(wrapper.find(AdditionalItemsRow)).toHaveLength(3)
+    expect(
+      wrapper.find(AdditionalItemsRow).filter({ name: 'gripper' }).props()
+    ).toEqual({
+      isEquipmentAdded: true,
+      name: 'gripper',
+      handleAttachment: expect.anything(),
+    })
   })
   it('displays gripper waste chute, staging area, and trash row with all are attached', () => {
     const mockGripperId = 'gripperId'
     const mockWasteChuteId = 'wasteChuteId'
     const mockStagingAreaId = 'stagingAreaId'
-    mockGetEnableDeckModification.mockReturnValue(true)
     mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     mockGetAdditionalEquipment.mockReturnValue({
       mockGripperId: { name: 'gripper', id: mockGripperId },
@@ -309,12 +309,11 @@ describe('EditModulesCard', () => {
         id: mockStagingAreaId,
         location: 'B3',
       },
-    })
-    mockGetLabwareEntities.mockReturnValue({
-      mockTrashId: {
+      mockTrash: {
+        name: 'trashBin',
         id: mockTrashId,
-        labwareDefURI: FLEX_TRASH_DEF_URI,
-      } as any,
+        location: 'cutoutA3',
+      },
     })
 
     props = {

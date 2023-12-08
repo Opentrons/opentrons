@@ -75,6 +75,27 @@ export const noBehaviorChangeMessage: ModalContents = {
   ),
 }
 
+export const toV8MigrationMessage: ModalContents = {
+  title: 'Your protocol was made in an older version of Protocol Designer',
+  body: (
+    <div className={styles.migration_message}>
+      <p>Your protocol will be automatically updated to the latest version.</p>
+      <p>
+        Protocol Designer no longer supports aspirate or mix actions in a trash
+        bin. If your protocol contains these actions, an error icon will appear
+        next to them in the Protocol Timeline. To resolve the error, choose
+        another location for aspirating or mixing.
+      </p>
+      <p>
+        Additionally, we have addressed a bug where blow out speeds were slower
+        than expected. Your protocol will automatically update the flow rates
+        unless they were specifically initialized.
+      </p>
+      <p>As always, please contact us with any questions or feedback.</p>
+    </div>
+  ),
+}
+
 export const toV3MigrationMessage: ModalContents = {
   title: 'Update protocol to use new labware definitions',
   okButtonText: 'update protocol',
@@ -135,6 +156,9 @@ export function getMigrationMessage(migrationsRan: string[]): ModalContents {
     )
   ) {
     return noBehaviorChangeMessage
+  }
+  if (migrationsRan.includes('8.0.0')) {
+    return toV8MigrationMessage
   }
   return genericDidMigrateMessage
 }

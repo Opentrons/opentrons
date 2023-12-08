@@ -32,6 +32,7 @@ from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from ._nozzle_layout import NozzleLayout
 from . import labware, validation
@@ -55,6 +56,7 @@ _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
 _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
 """The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
+_PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -86,7 +88,7 @@ class InstrumentContext(publisher.CommandPublisher):
         broker: LegacyBroker,
         api_version: APIVersion,
         tip_racks: List[labware.Labware],
-        trash: Optional[labware.Labware],
+        trash: Optional[Union[labware.Labware, TrashBin, WasteChute]],
         requested_as: str,
     ) -> None:
         super().__init__(broker)
@@ -100,8 +102,9 @@ class InstrumentContext(publisher.CommandPublisher):
             default_aspirate=_DEFAULT_ASPIRATE_CLEARANCE,
             default_dispense=_DEFAULT_DISPENSE_CLEARANCE,
         )
-
-        self._trash = trash
+        self._user_specified_trash: Union[
+            labware.Labware, TrashBin, WasteChute, None
+        ] = trash
         self.requested_as = requested_as
 
     @property  # type: ignore
@@ -234,7 +237,10 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
-
+        if isinstance(target, (TrashBin, WasteChute)):
+            raise ValueError(
+                "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
+            )
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
                 location=move_to_location,
@@ -273,7 +279,9 @@ class InstrumentContext(publisher.CommandPublisher):
     def dispense(
         self,
         volume: Optional[float] = None,
-        location: Optional[Union[types.Location, labware.Well]] = None,
+        location: Optional[
+            Union[types.Location, labware.Well, TrashBin, WasteChute]
+        ] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
     ) -> InstrumentContext:
@@ -371,7 +379,9 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(target, validation.PointTarget):
             move_to_location = target.location
 
-        if self.api_version >= APIVersion(2, 11):
+        if self.api_version >= APIVersion(2, 11) and not isinstance(
+            target, (TrashBin, WasteChute)
+        ):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
@@ -384,6 +394,20 @@ class InstrumentContext(publisher.CommandPublisher):
             c_vol = self._core.get_current_volume() if not volume else volume
 
         flow_rate = self._core.get_dispense_flow_rate(rate)
+
+        if isinstance(target, (TrashBin, WasteChute)):
+            # HANDLE THE MOVETOADDDRESSABLEAREA
+            self._core.dispense(
+                volume=c_vol,
+                rate=rate,
+                location=target,
+                well_core=None,
+                flow_rate=flow_rate,
+                in_place=False,
+                push_out=push_out,
+            )
+            # TODO publish this info
+            return self
 
         with publisher.publish_context(
             broker=self.broker,
@@ -486,7 +510,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def blow_out(
-        self, location: Optional[Union[types.Location, labware.Well]] = None
+        self,
+        location: Optional[
+            Union[types.Location, labware.Well, TrashBin, WasteChute]
+        ] = None,
     ) -> InstrumentContext:
         """
         Blow an extra amount of air through a pipette's tip to clear it.
@@ -532,6 +559,14 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
+        elif isinstance(target, (TrashBin, WasteChute)):
+            # TODO handle publish info
+            self._core.blow_out(
+                location=target,
+                well_core=None,
+                in_place=False,
+            )
+            return self
 
         with publisher.publish_context(
             broker=self.broker,
@@ -813,12 +848,17 @@ class InstrumentContext(publisher.CommandPublisher):
         well: labware.Well
         tip_rack: labware.Labware
         move_to_location: Optional[types.Location] = None
+        active_channels = (
+            self.active_channels
+            if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            else self.channels
+        )
 
         if location is None:
             tip_rack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
-                channels=self.channels,
+                channels=active_channels,
             )
 
         elif isinstance(location, labware.Well):
@@ -829,7 +869,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tip_rack, well = labware.next_available_tip(
                 starting_tip=None,
                 tip_racks=[location],
-                channels=self.channels,
+                channels=active_channels,
             )
 
         elif isinstance(location, types.Location):
@@ -844,7 +884,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 tip_rack, well = labware.next_available_tip(
                     starting_tip=None,
                     tip_racks=[maybe_tip_rack],
-                    channels=self.channels,
+                    channels=active_channels,
                 )
             else:
                 raise TypeError(
@@ -893,6 +933,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[
                 types.Location,
                 labware.Well,
+                TrashBin,
                 WasteChute,
             ]
         ] = None,
@@ -922,6 +963,12 @@ class InstrumentContext(publisher.CommandPublisher):
             - As a :py:class:`~.types.Location`. For example, to drop a tip from an
               unusually large height above the tip rack, you could call
               ``pipette.drop_tip(tip_rack["A1"].top(z=10))``.
+            - As a :py:class:`.TrashBin`. This uses a default location relative to the
+              TrashBin object. For example,
+              ``pipette.drop_tip(location=trash_bin)``.
+            - As a :py:class:`.WasteChute`. This uses a default location relative to
+              the WasteChute object. For example,
+              ``pipette.drop_tip(location=waste_chute)``.
 
         :param location:
             The location to drop the tip.
@@ -939,9 +986,17 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         alternate_drop_location: bool = False
         if location is None:
-            well = self.trash_container.wells()[0]
+            trash_container = self.trash_container
             if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
                 alternate_drop_location = True
+            if isinstance(trash_container, labware.Labware):
+                well = trash_container.wells()[0]
+            else:  # implicit drop tip in disposal location, not well
+                self._core.drop_tip_in_disposal_location(
+                    trash_container, home_after=home_after
+                )
+                self._last_tip_picked_up_from = None
+                return self
 
         elif isinstance(location, labware.Well):
             well = location
@@ -961,9 +1016,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
             well = maybe_well
 
-        elif isinstance(location, WasteChute):
+        elif isinstance(location, (TrashBin, WasteChute)):
             # TODO: Publish to run log.
-            self._core.drop_tip_in_waste_chute(location, home_after=home_after)
+            self._core.drop_tip_in_disposal_location(location, home_after=home_after)
             self._last_tip_picked_up_from = None
             return self
 
@@ -1214,6 +1269,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         blow_out = kwargs.get("blow_out")
         blow_out_strategy = None
+        active_channels = (
+            self.active_channels
+            if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
+            else self.channels
+        )
 
         if blow_out and not blowout_location:
             if self.current_volume:
@@ -1230,7 +1290,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = labware.next_available_tip(
-                self.starting_tip, self.tip_racks, self.channels
+                self.starting_tip, self.tip_racks, active_channels
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
@@ -1314,7 +1374,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def move_to(
         self,
-        location: types.Location,
+        location: Union[types.Location, TrashBin, WasteChute],
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
@@ -1344,6 +1404,17 @@ class InstrumentContext(publisher.CommandPublisher):
                         Default is ``True``.
         """
         publish_ctx = nullcontext()
+
+        if isinstance(location, (TrashBin, WasteChute)):
+            self._core.move_to(
+                location=location,
+                well_core=None,
+                force_direct=force_direct,
+                minimum_z_height=minimum_z_height,
+                speed=speed,
+            )
+            # TODO handle publish
+            return self
 
         if publish:
             publish_ctx = publisher.publish_context(
@@ -1447,23 +1518,36 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(self) -> labware.Labware:
+    def trash_container(self) -> Union[labware.Labware, TrashBin, WasteChute]:
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        By default, the trash container is in slot A3 on Flex and in slot 12 on OT-2.
+        On a Flex running a protocol with API version 2.16 or higher, ``trash_container`` is
+        the first ``TrashBin`` or ``WasteChute`` object loaded in the protocol.
+        On a Flex running a protocol with API version 2.15, ``trash_container`` is
+        a single-well fixed trash labware in slot D3.
+        On a an OT-2, ``trash_container`` is always a single-well fixed trash labware
+        in slot 12.
+
+        .. versionchanged:: 2.16
+            Added support for ``TrashBin`` and ``WasteChute`` objects.
         """
-        if self._trash is None:
-            raise NoTrashDefinedError(
-                "No trash container has been defined in this protocol."
-            )
-        return self._trash
+        if self._user_specified_trash is None:
+            disposal_locations = self._protocol_core.get_disposal_locations()
+            if len(disposal_locations) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            return disposal_locations[0]
+        return self._user_specified_trash
 
     @trash_container.setter
-    def trash_container(self, trash: labware.Labware) -> None:
-        self._trash = trash
+    def trash_container(
+        self, trash: Union[labware.Labware, TrashBin, WasteChute]
+    ) -> None:
+        self._user_specified_trash = trash
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1548,6 +1632,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Possible values are 1, 8, or 96."""
         return self._core.get_channels()
+
+    @property  # type: ignore
+    @requires_version(2, 16)
+    def active_channels(self) -> int:
+        """The number of channels configured for active use using configure_nozzle_layout()."""
+        return self._core.get_active_channels()
 
     @property  # type: ignore
     @requires_version(2, 2)
@@ -1696,6 +1786,7 @@ class InstrumentContext(publisher.CommandPublisher):
         style: NozzleLayout,
         start: Optional[str] = None,
         front_right: Optional[str] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
     ) -> None:
         """Configure a pipette to pick up less than the maximum tip capacity. The pipette
         will remain in its partial state until this function is called again without any inputs. All subsequent
@@ -1711,6 +1802,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :param front_right: Signifies the ending nozzle in your partial configuration. It is not required for NozzleLayout.COLUMN, NozzleLayout.ROW, or NozzleLayout.SINGLE
         configurations.
         :type front_right: string or None.
+        :type tip_racks: List of tipracks to use during this configuration
 
         .. note::
             Your `start` and `front_right` strings should be formatted similarly to a well, so in the format of <LETTER><NUMBER>.
@@ -1742,5 +1834,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     "Cannot configure a QUADRANT layout without a front right nozzle."
                 )
         self._core.configure_nozzle_layout(
-            style, primary_nozzle=start, front_right_nozzle=front_right
+            style,
+            primary_nozzle=start,
+            front_right_nozzle=front_right,
         )
+        # TODO (spp, 2023-12-05): verify that tipracks are on adapters for only full 96 channel config
+        self._tip_racks = tip_racks or []

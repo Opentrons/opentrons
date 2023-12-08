@@ -35,6 +35,7 @@ def test_api2_runfunc():
     execute_python._runfunc_ok(starargs)
 
 
+@pytest.mark.ot2_only
 @pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
 def test_execute_ok(protocol, protocol_file, ctx):
     proto = parse(protocol.text, protocol.filename)

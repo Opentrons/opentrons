@@ -1,5 +1,6 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, Type, Union, List, Tuple
+from __future__ import annotations
+from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_api import _waste_chute_dimensions
 
@@ -10,13 +11,21 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, MountType, Point
+from opentrons.types import (
+    DeckSlotName,
+    Location,
+    Mount,
+    MountType,
+    Point,
+    StagingSlotName,
+)
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.api_support.types import APIVersion
+
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
@@ -42,8 +51,9 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType, OFF_DECK, StagingSlotName
+from ..._types import OffDeckType, OFF_DECK
 from ..._liquid import Liquid
+from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -61,6 +71,9 @@ from .module_core import (
 from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
+
+if TYPE_CHECKING:
+    from ...labware import Labware
 
 
 class ProtocolCore(
@@ -91,6 +104,7 @@ class ProtocolCore(
         self._module_cores_by_id: Dict[
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
+        self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
         self._load_fixed_trash()
 
     @property
@@ -106,17 +120,28 @@ class ProtocolCore(
     def fixed_trash(self) -> Optional[LabwareCore]:
         """Get the fixed trash labware."""
         trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
+        if trash_id is not None and self._api_version < APIVersion(2, 16):
             return self._labware_cores_by_id[trash_id]
         return None
 
     def _load_fixed_trash(self) -> None:
-        trash_id = self._engine_client.state.labware.get_fixed_trash_id()
-        if trash_id is not None:
-            self._labware_cores_by_id[trash_id] = LabwareCore(
-                labware_id=trash_id,
-                engine_client=self._engine_client,
-            )
+        if self.robot_type == "OT-2 Standard" or self._api_version < APIVersion(2, 16):
+            trash_id = self._engine_client.state.labware.get_fixed_trash_id()
+            if trash_id is not None:
+                self._labware_cores_by_id[trash_id] = LabwareCore(
+                    labware_id=trash_id,
+                    engine_client=self._engine_client,
+                )
+
+    def append_disposal_location(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Append a disposal location object to the core"""
+        self._disposal_locations.append(disposal_location)
+
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
+        """Get disposal locations."""
+        return self._disposal_locations
 
     def get_max_speeds(self) -> AxisMaxSpeeds:
         """Get a control interface for maximum move speeds."""
@@ -300,23 +325,18 @@ class ProtocolCore(
             else None
         )
 
-        if isinstance(new_location, WasteChute):
-            self._move_labware_to_waste_chute(
-                labware_core, strategy, _pick_up_offset, _drop_offset
-            )
-        else:
-            to_location = self._convert_labware_location(location=new_location)
+        to_location = self._convert_labware_location(location=new_location)
 
-            # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
-            # when move_labware() support is no longer experimental.
+        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
+        # when move_labware() support is no longer experimental.
 
-            self._engine_client.move_labware(
-                labware_id=labware_core.labware_id,
-                new_location=to_location,
-                strategy=strategy,
-                pick_up_offset=_pick_up_offset,
-                drop_offset=_drop_offset,
-            )
+        self._engine_client.move_labware(
+            labware_id=labware_core.labware_id,
+            new_location=to_location,
+            strategy=strategy,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
+        )
 
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
             # Clear out last location since it is not relevant to pipetting
@@ -552,9 +572,21 @@ class ProtocolCore(
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
 
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+    def get_slot_definition(
+        self, slot: Union[DeckSlotName, StagingSlotName]
+    ) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
-        return self._engine_client.state.addressable_areas.get_slot_definition(slot)
+        return self._engine_client.state.addressable_areas.get_slot_definition(slot.id)
+
+    def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all standard slot definitions available in the deck definition."""
+        return self._engine_client.state.addressable_areas.get_deck_slot_definitions()
+
+    def get_staging_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all staging slot definitions available in the deck definition."""
+        return (
+            self._engine_client.state.addressable_areas.get_staging_slot_definitions()
+        )
 
     def _ensure_module_location(
         self, slot: DeckSlotName, module_type: ModuleType
@@ -565,7 +597,7 @@ class ProtocolCore(
             raise ValueError(f"A {module_type.value} cannot be loaded into slot {slot}")
 
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LabwareCore, ModuleCore, NonConnectedModuleCore, None]:
         """Get the contents of a given slot, if any."""
         loaded_item = self._engine_client.state.geometry.get_slot_item(
@@ -604,7 +636,7 @@ class ProtocolCore(
         except LabwareNotLoadedOnLabwareError:
             return None
 
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
         return self._engine_client.state.addressable_areas.get_addressable_area_center(
             slot_name.id
@@ -612,7 +644,7 @@ class ProtocolCore(
 
     def get_highest_z(self) -> float:
         """Get the highest Z point of all deck items."""
-        return self._engine_client.state.geometry.get_all_labware_highest_z()
+        return self._engine_client.state.geometry.get_all_obstacle_highest_z()
 
     def get_labware_cores(self) -> List[LabwareCore]:
         """Get all loaded labware cores."""
@@ -653,6 +685,9 @@ class ProtocolCore(
             return validation.internal_slot_to_public_string(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
+        elif isinstance(labware_location, AddressableAreaLocation):
+            # This will only ever be a robot accurate deck slot name or Flex staging slot name
+            return labware_location.addressableAreaName
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id[labware_location.moduleId]
         elif isinstance(labware_location, OnLabwareLocation):
@@ -669,6 +704,7 @@ class ProtocolCore(
             ModuleCore,
             NonConnectedModuleCore,
             OffDeckType,
+            WasteChute,
         ],
     ) -> LabwareLocation:
         if isinstance(location, LabwareCore):
@@ -684,6 +720,7 @@ class ProtocolCore(
             ModuleCore,
             NonConnectedModuleCore,
             OffDeckType,
+            WasteChute,
         ]
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
@@ -694,3 +731,6 @@ class ProtocolCore(
             return DeckSlotLocation(slotName=location)
         elif isinstance(location, StagingSlotName):
             return AddressableAreaLocation(addressableAreaName=location.id)
+        elif isinstance(location, WasteChute):
+            # TODO(mm, 2023-12-06) This will need to determine the appropriate Waste Chute to return, but only move_labware uses this for now
+            return AddressableAreaLocation(addressableAreaName="gripperWasteChute")

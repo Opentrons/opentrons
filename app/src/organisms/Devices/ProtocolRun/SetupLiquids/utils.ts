@@ -1,6 +1,6 @@
 import { WellGroup } from '@opentrons/components'
 
-import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type { Liquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(

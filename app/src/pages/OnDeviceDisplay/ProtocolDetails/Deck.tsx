@@ -1,13 +1,11 @@
 import * as React from 'react'
 import last from 'lodash/last'
 
-import { Flex } from '@opentrons/components'
+import { Flex, ProtocolDeck, SPACING } from '@opentrons/components'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-
-import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 
 export const Deck = (props: { protocolId: string }): JSX.Element => {
   const { data: protocolData } = useProtocolQuery(props.protocolId)
@@ -20,9 +18,12 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
   )
 
   return (
-    <Flex height="26.9375rem">
+    <Flex height="26.9375rem" paddingY={SPACING.spacing24}>
       {mostRecentAnalysis != null ? (
-        <DeckThumbnail protocolAnalysis={mostRecentAnalysis} showSlotLabels />
+        <ProtocolDeck
+          protocolAnalysis={mostRecentAnalysis}
+          baseDeckProps={{ showSlotLabels: true }}
+        />
       ) : null}
     </Flex>
   )

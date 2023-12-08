@@ -17,6 +17,7 @@ import {
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getModuleType,
@@ -40,7 +41,6 @@ import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLocalRobot } from '../../redux/discovery'
-import { getCutoutIdForSlotName } from '../../resources/deck_configuration/utils'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import {
   getModulePrepCommands,

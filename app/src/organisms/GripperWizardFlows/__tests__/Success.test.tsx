@@ -39,7 +39,7 @@ describe('Success', () => {
 
   it('clicking confirm proceed calls proceed', () => {
     const { getByRole } = render()[0]
-    getByRole('button', { name: 'exit' }).click()
+    getByRole('button', { name: 'Exit' }).click()
     expect(mockProceed).toHaveBeenCalled()
   })
 
@@ -48,7 +48,7 @@ describe('Success', () => {
       successfulAction: SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
     })[0]
     getByText('Flex Gripper successfully attached and calibrated')
-    getByRole('button', { name: 'exit' })
+    getByRole('button', { name: 'Exit' })
   })
 
   it('renders correct text for calibrated', () => {
@@ -56,7 +56,7 @@ describe('Success', () => {
       successfulAction: SUCCESSFULLY_CALIBRATED,
     })[0]
     getByText('Flex Gripper successfully calibrated')
-    getByRole('button', { name: 'exit' })
+    getByRole('button', { name: 'Exit' })
   })
 
   it('renders correct text for attached', () => {

@@ -2,7 +2,9 @@
 
 exports[`snapshot tests createEmptyLiquidState 1`] = `
 Object {
-  "additionalEquipment": Object {},
+  "additionalEquipment": Object {
+    "fixedTrash": Object {},
+  },
   "labware": Object {
     "destPlateId": Object {
       "A1": Object {},
@@ -101,9 +103,6 @@ Object {
       "H7": Object {},
       "H8": Object {},
       "H9": Object {},
-    },
-    "fixedTrash": Object {
-      "A1": Object {},
     },
     "sourcePlateId": Object {
       "A1": Object {},
@@ -841,7 +840,13 @@ Object {
 
 exports[`snapshot tests makeContext 1`] = `
 Object {
-  "additionalEquipmentEntities": Object {},
+  "additionalEquipmentEntities": Object {
+    "fixedTrash": Object {
+      "id": "fixedTrash",
+      "location": "cutoutA3",
+      "name": "trashBin",
+    },
+  },
   "config": Object {
     "OT_PD_DISABLE_MODULE_RESTRICTIONS": false,
   },
@@ -1978,74 +1983,6 @@ Object {
       },
       "id": "destPlateId",
       "labwareDefURI": "fixture/fixture_96_plate/1",
-    },
-    "fixedTrash": Object {
-      "def": Object {
-        "brand": Object {
-          "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
-        "dimensions": Object {
-          "xDimension": 172.86,
-          "yDimension": 165.86,
-          "zDimension": 82,
-        },
-        "groups": Array [
-          Object {
-            "metadata": Object {},
-            "wells": Array [
-              "A1",
-            ],
-          },
-        ],
-        "metadata": Object {
-          "displayCategory": "trash",
-          "displayName": "Tall Fixed Trash",
-          "displayVolumeUnits": "L",
-          "tags": Array [
-            "trash",
-            "opentrons",
-            "tall",
-          ],
-        },
-        "namespace": "fixture",
-        "ordering": Array [
-          Array [
-            "A1",
-          ],
-        ],
-        "parameters": Object {
-          "format": "trash",
-          "isMagneticModuleCompatible": false,
-          "isTiprack": false,
-          "loadName": "fixture_trash",
-          "quirks": Array [
-            "fixedTrash",
-            "centerMultichannelOnWells",
-            "touchTipDisabled",
-          ],
-        },
-        "schemaVersion": 2,
-        "version": 1,
-        "wells": Object {
-          "A1": Object {
-            "depth": 77,
-            "shape": "rectangular",
-            "totalLiquidVolume": 1100000,
-            "x": 82.84,
-            "xDimension": 107.11,
-            "y": 53.56,
-            "yDimension": 165.67,
-            "z": 5,
-          },
-        },
-      },
-      "id": "fixedTrash",
-      "labwareDefURI": "opentrons/opentrons_1_trash_1100ml_fixed/1",
     },
     "sourcePlateId": Object {
       "def": Object {
@@ -9162,6 +9099,11 @@ Object {
           "min": 3,
           "value": 7.85,
         },
+        "defaultBlowOutFlowRate": Object {
+          "max": 812,
+          "min": 3,
+          "value": 80,
+        },
         "defaultDispenseFlowRate": Object {
           "max": 812,
           "min": 3,
@@ -10317,6 +10259,11 @@ Object {
           "min": 0.001,
           "value": 5,
         },
+        "defaultBlowOutFlowRate": Object {
+          "max": 1000,
+          "min": 5,
+          "value": 1000,
+        },
         "defaultDispenseFlowRate": Object {
           "max": 50,
           "min": 0.001,
@@ -11465,6 +11412,11 @@ Object {
           "max": 50,
           "min": 0.001,
           "value": 5,
+        },
+        "defaultBlowOutFlowRate": Object {
+          "max": 1000,
+          "min": 5,
+          "value": 1000,
         },
         "defaultDispenseFlowRate": Object {
           "max": 50,
@@ -12615,6 +12567,11 @@ Object {
           "min": 0.001,
           "value": 150,
         },
+        "defaultBlowOutFlowRate": Object {
+          "max": 275,
+          "min": 1,
+          "value": 94,
+        },
         "defaultDispenseFlowRate": Object {
           "max": 600,
           "min": 0.001,
@@ -13758,6 +13715,11 @@ Object {
           "min": 0.001,
           "value": 150,
         },
+        "defaultBlowOutFlowRate": Object {
+          "max": 1000,
+          "min": 5,
+          "value": 1000,
+        },
         "defaultDispenseFlowRate": Object {
           "max": 600,
           "min": 0.001,
@@ -14898,9 +14860,6 @@ Object {
 exports[`snapshot tests makeState 1`] = `
 Object {
   "labware": Object {
-    "fixedTrash": Object {
-      "slot": "12",
-    },
     "sourcePlateId": Object {
       "slot": "4",
     },
@@ -14924,7 +14883,9 @@ Object {
     },
   },
   "liquidState": Object {
-    "additionalEquipment": Object {},
+    "additionalEquipment": Object {
+      "fixedTrash": Object {},
+    },
     "labware": Object {
       "destPlateId": Object {
         "A1": Object {},
@@ -15023,9 +14984,6 @@ Object {
         "H7": Object {},
         "H8": Object {},
         "H9": Object {},
-      },
-      "fixedTrash": Object {
-        "A1": Object {},
       },
       "sourcePlateId": Object {
         "A1": Object {},
