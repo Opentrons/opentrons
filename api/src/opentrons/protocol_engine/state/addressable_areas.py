@@ -416,7 +416,16 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         return addressable_area.base_slot
 
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:
-        """Get the position of an addressable area."""
+        """Get the position of an addressable area.
+
+        This does not require the addressable area to be in the deck configuration.
+        This is primarily used to support legacy fixed trash labware without
+        modifying the deck layout to remove the similar, but functionally different,
+        trashBinAdapter cutout fixture.
+
+        Besides that instance, for movement purposes, this should only be called for
+        areas that have been pre-validated, otherwise there could be the risk of collision.
+        """
         addressable_area = self._get_addressable_area_from_deck_data(
             addressable_area_name
         )
@@ -455,7 +464,10 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         return cutout_fixture["height"]
 
     def get_slot_definition(self, slot_id: str) -> SlotDefV3:
-        """Get the definition of a slot in the deck."""
+        """Get the definition of a slot in the deck.
+
+        This does not require that the slot exist in deck configuration.
+        """
         try:
             addressable_area = self._get_addressable_area_from_deck_data(slot_id)
         except AddressableAreaDoesNotExistError:
