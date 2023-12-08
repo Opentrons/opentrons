@@ -1,5 +1,9 @@
 # docker build --build-arg OPENTRONS_VERSION=v7.0.2 -t opentrons-analysis:v7.0.2 .
 # docker build --build-arg OPENTRONS_VERSION=v7.1.0-alpha.1 -t opentrons-analysis:v7.1.0-alpha.1 .
+# docker build --build-arg OPENTRONS_VERSION=v7.1.0-alpha.2 -t opentrons-analysis:v7.1.0-alpha.2 .
+# docker build --build-arg OPENTRONS_VERSION=v7.1.0-alpha.3 -t opentrons-analysis:v7.1.0-alpha.3 .
+
+# python -m pipenv run python ci-tools/generate_analyses.py
 
 import json
 import os
@@ -250,9 +254,10 @@ def main() -> None:
     # tag = "v7.0.2"
     # tag = "v7.1.0-alpha.1"
     # tag = "v7.1.0-alpha.2"
-    base_tag = "v7.0.2"
-    new_release_tag = "v7.1.0-alpha.2"
-    analyze_against_image(base_tag)
+    # tag = "v7.1.0-alpha.3"
+    # base_tag = "v7.0.2"
+    new_release_tag = "v7.1.0-alpha.3"
+    # analyze_against_image(base_tag)
     analyze_against_image(new_release_tag)
 
 
