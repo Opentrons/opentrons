@@ -104,11 +104,11 @@ export function getNextTiprack(
   const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
     tiprackId => {
       const tipRackLocation = robotState.labware[tiprackId].slot
-      const tiprackLocation = invariantContext.labwareEntities[tipRackLocation]
+      const adapterEntity = invariantContext.labwareEntities[tipRackLocation]
       const has96TiprackAdapterId =
-        tiprackLocation?.def.parameters.loadName ===
+        adapterEntity?.def.parameters.loadName ===
           'opentrons_flex_96_tiprack_adapter' &&
-        tiprackLocation?.def.namespace === 'opentrons'
+        adapterEntity?.def.namespace === 'opentrons'
 
       return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
     }

@@ -16,7 +16,6 @@ import {
   blowoutUtil,
   wasteChuteCommandsUtil,
   getDispenseAirGapLocation,
-  getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import {
@@ -447,11 +446,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ]
         : []
 
-      const nozzles = prevRobotState.pipettes[args.pipette].nozzles
-      const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
+      const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
       const configureNozzleLayoutCommand: CurriedCommandCreator[] =
         //  only emit the command if previous nozzle state is different
-        is96Channel && args.nozzles != null && nozzles !== prevNozzles
+        is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
           ? [
               curryCommandCreator(configureNozzleLayout, {
                 nozzles: args.nozzles,
@@ -459,10 +457,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
               }),
             ]
           : []
-      const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
-        args.pipette,
-        prevNozzles
-      )
 
       return [
         ...configureNozzleLayoutCommand,
@@ -484,7 +478,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ...blowoutCommands,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
-        ...configureNozzleLayoutCommandReset,
       ]
     }
   )
