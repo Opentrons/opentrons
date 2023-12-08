@@ -471,8 +471,8 @@ class AppSettings:
         tests.  The click works but has no effect.
         """
         button = self.get_enable_developer_tools_toggle()
-        actions = ActionChains(self.base.driver)  # type: ignore
-        actions.move_to_element(button).perform()  # type: ignore
+        actions = ActionChains(self.base.driver)
+        actions.move_to_element(button).perform()
         self.base.click(self.enable_developer_tools_toggle)
 
     # Elements for Feature Flag

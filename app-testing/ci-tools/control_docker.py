@@ -9,7 +9,7 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import Any, Dict, List
 
-import docker
+import docker  # type: ignore
 from rich import print
 from rich.console import Console
 from rich.panel import Panel
@@ -30,12 +30,6 @@ console = Console()
 class ProtocolType(Enum):
     PROTOCOL_DESIGNER = auto()
     PYTHON = auto()
-
-
-@dataclass
-class ProtocolPaths:
-    host_protocol_path: Path
-    container_protocol_path: Path
 
 
 @dataclass
@@ -65,15 +59,13 @@ class Protocol:
 
     @property
     def protocol_type(self) -> str:
-        return (
-            ProtocolType.PYTHON if self.host_protocol_file.suffix == ".py" else ProtocolType.PROTOCOL_DESIGNER
-        ).name.title()
+        return (ProtocolType.PYTHON if self.host_protocol_file.suffix == ".py" else ProtocolType.PROTOCOL_DESIGNER).name.title()
 
     def set_analysis_execution_time(self, analysis_execution_time: float) -> None:
         self.analysis_execution_time = analysis_execution_time
 
 
-def get_or_run_container(image_name, timeout=60):
+def get_or_run_container(image_name: str, timeout: int = 60) -> docker.models.containers.Container:
     client = docker.from_env()
     volumes = {
         str(HOST_LABWARE): {"bind": CONTAINER_LABWARE, "mode": "rw"},
@@ -108,7 +100,7 @@ def get_or_run_container(image_name, timeout=60):
     return container
 
 
-def stop_and_remove_containers(image_name):
+def stop_and_remove_containers(image_name: str) -> None:
     client = docker.from_env()
 
     # Find all containers created from the specified image
@@ -128,7 +120,7 @@ def stop_and_remove_containers(image_name):
             print(f"Error stopping/removing container {container.short_id}: {e}")
 
 
-def has_designer_application(json_file_path):
+def has_designer_application(json_file_path: Path) -> bool:
     try:
         with open(json_file_path, "r", encoding="utf-8") as file:
             data = json.load(file)
@@ -140,13 +132,13 @@ def has_designer_application(json_file_path):
 
 
 def generate_protocols(tag: str) -> List[Protocol]:
-    def host_analysis_path(protocol_file: Path, tag) -> Path:
+    def host_analysis_path(protocol_file: Path, tag: str) -> Path:
         return Path(HOST_RESULTS, f"{protocol_file.stem}_{tag}_analysis.json")
 
-    def container_analysis_path(protocol_file: Path, tag) -> Path:
+    def container_analysis_path(protocol_file: Path, tag: str) -> Path:
         return Path(CONTAINER_RESULTS, f"{protocol_file.stem}_{tag}_analysis.json")
 
-    def find_pd_protocols() -> List[Path]:
+    def find_pd_protocols() -> List[Protocol]:
         # Check if the provided path is a valid directory
         if not HOST_PROTOCOLS_ROOT.is_dir():
             raise NotADirectoryError(f"The path {HOST_PROTOCOLS_ROOT} is not a valid directory.")
@@ -158,12 +150,10 @@ def generate_protocols(tag: str) -> List[Protocol]:
         for path in filtered_json_files:
             relative_path = path.relative_to(HOST_PROTOCOLS_ROOT)
             updated_path = Path(CONTAINER_PROTOCOLS_ROOT, relative_path)
-            pd_protocols.append(
-                Protocol(path, updated_path, host_analysis_path(path, tag), container_analysis_path(path, tag), tag)
-            )
+            pd_protocols.append(Protocol(path, updated_path, host_analysis_path(path, tag), container_analysis_path(path, tag), tag))
         return pd_protocols
 
-    def find_python_protocols() -> List[Path]:
+    def find_python_protocols() -> List[Protocol]:
         # Check if the provided path is a valid directory
         if not HOST_PROTOCOLS_ROOT.is_dir():
             raise NotADirectoryError(f"The path {HOST_PROTOCOLS_ROOT} is not a valid directory.")
@@ -175,17 +165,13 @@ def generate_protocols(tag: str) -> List[Protocol]:
         for path in python_files:
             relative_path = path.relative_to(HOST_PROTOCOLS_ROOT)
             container_path = Path(CONTAINER_PROTOCOLS_ROOT, relative_path)
-            py_protocols.append(
-                Protocol(
-                    path, container_path, host_analysis_path(path, tag), container_analysis_path(path, tag), tag=tag
-                )
-            )
+            py_protocols.append(Protocol(path, container_path, host_analysis_path(path, tag), container_analysis_path(path, tag), tag=tag))
         return py_protocols
 
     return find_pd_protocols() + find_python_protocols()
 
 
-def remove_all_files_in_directory(directory):
+def remove_all_files_in_directory(directory: Path) -> None:
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
         try:
@@ -197,7 +183,7 @@ def remove_all_files_in_directory(directory):
             print(f"Failed to delete {file_path}. Reason: {e}")
 
 
-def report(protocol: Protocol):
+def report(protocol: Protocol) -> None:
     panel = Panel(
         f"[bold green]Output:[/bold green]\n{protocol.output}\n\n[bold red]Exit Code:[/bold red] {protocol.exit_code}",
         title="[bold magenta]Command Result[/bold magenta]",
@@ -205,22 +191,22 @@ def report(protocol: Protocol):
     )
     console.print(panel)
     if protocol.analysis_file_exists is True:
-        if protocol.analysis["errors"] != []:
+        if protocol.analysis is not None and protocol.analysis["errors"] != []:
             console.print(f"[bold red]Analysis has errors {protocol.protocol_file_name}[/bold red]")
-            console.print(protocol.protocol.analysis["errors"])
+            console.print(protocol.analysis["errors"])
             console.print(protocol.output)
     else:
         console.print(f"[bold red]Analysis not created for {protocol.protocol_file_name}[/bold red]")
         console.print(protocol.output)
 
 
-def container_custom_labware_paths():
+def container_custom_labware_paths() -> List[str]:
     if HOST_LABWARE.is_dir():
         return [os.path.join(CONTAINER_LABWARE, file) for file in os.listdir(HOST_LABWARE) if file.endswith(".json")]
     return []
 
 
-def analyze(protocol: Protocol, container):
+def analyze(protocol: Protocol, container: docker.models.containers.Container) -> None:
     # Run the analyze command
     command = f"python -I -m opentrons.cli analyze --json-output {protocol.container_analysis_file} {protocol.container_protocol_file} {' '.join(map(str, container_custom_labware_paths()))}"  # noqa: E501
     start_time = time.time()
@@ -231,16 +217,14 @@ def analyze(protocol: Protocol, container):
     protocol.set_analysis_execution_time(time.time() - start_time)
 
 
-def analyze_many(protocol_files, container):
+def analyze_many(protocol_files: List[Protocol], container: docker.models.containers.Container) -> None:
     for file in protocol_files:
         analyze(file, container)
-    accumulated_time = sum(
-        protocol.analysis_execution_time for protocol in protocol_files if protocol.analysis_execution_time is not None
-    )
+    accumulated_time = sum(protocol.analysis_execution_time for protocol in protocol_files if protocol.analysis_execution_time is not None)
     console.print(f"{len(protocol_files)} protocols with total analysis time of {accumulated_time:.2f} seconds.\n")
 
 
-def analyze_against_image(tag):
+def analyze_against_image(tag: str) -> List[Protocol]:
     image_name = f"{IMAGE}:{tag}"
     protocols = generate_protocols(tag)
     protocols_to_process = protocols
@@ -254,7 +238,7 @@ def analyze_against_image(tag):
     return protocols_to_process
 
 
-def main():
+def main() -> None:
     # # Create the parser
     # parser = argparse.ArgumentParser(description="Process some integers.")
     # # Add the arguments

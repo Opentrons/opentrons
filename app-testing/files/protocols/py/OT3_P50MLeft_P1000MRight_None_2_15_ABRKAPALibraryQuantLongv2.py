@@ -78,12 +78,8 @@ def run(protocol: protocol_api.ProtocolContext):
             "nest_96_wellplate_100ul_pcr_full_skirt", "10"
         )  # <--- Actually an Eppendorf 96 well, same dimensions
     if FORMAT == "384":
-        qpcrplate_1 = protocol.load_labware(
-            "corning_384_wellplate_112ul_flat", "9"
-        )  # <--- Actually an Eppendorf 96 well, same dimensions
-        qpcrplate_2 = protocol.load_labware(
-            "corning_384_wellplate_112ul_flat", "10"
-        )  # <--- Actually an Eppendorf 96 well, same dimensions
+        qpcrplate_1 = protocol.load_labware("corning_384_wellplate_112ul_flat", "9")  # <--- Actually an Eppendorf 96 well, same dimensions
+        qpcrplate_2 = protocol.load_labware("corning_384_wellplate_112ul_flat", "10")  # <--- Actually an Eppendorf 96 well, same dimensions
 
     # REAGENT PLATE
     STD_1 = reagent_plate["A1"]
@@ -137,9 +133,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("--> Dispensing Diluent Part 1 and Part 2")
         protocol.comment("==============================================")
         p1000.pick_up_tip()
-        if (
-            samplecolumns >= 1
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
             X = "A2"
             Y = "A6"
             p1000.move_to(DIL.bottom(z=p1000_offset_Res))
@@ -159,9 +153,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p1000.default_speed = 400
             p1000.move_to(DIL.top())
             p1000.blow_out()
-        if (
-            samplecolumns >= 2
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
             X = "A3"
             Y = "A7"
             p1000.move_to(DIL.bottom(z=p1000_offset_Res))
@@ -181,9 +173,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p1000.default_speed = 400
             p1000.move_to(DIL.top())
             p1000.blow_out()
-        if (
-            samplecolumns >= 3
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
             X = "A4"
             Y = "A8"
             p1000.move_to(DIL.bottom(z=p1000_offset_Res))
@@ -208,27 +198,21 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("==============================================")
         protocol.comment("--> Adding Sample to Diluent Part 1")
         protocol.comment("==============================================")
-        if (
-            samplecolumns >= 1
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
             X = INICOLUMN1
             Y = "A2"
             p50.pick_up_tip()
             p50.aspirate(2, source_plate[X].bottom(z=p50_offset_Mag), rate=0.25)
             p50.dispense(2, dilution_plate_1[Y].center(), rate=0.5)
             p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-        if (
-            samplecolumns >= 2
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
             X = INICOLUMN2
             Y = "A3"
             p50.pick_up_tip()
             p50.aspirate(2, source_plate[X].bottom(z=p50_offset_Mag), rate=0.25)
             p50.dispense(2, dilution_plate_1[Y].center(), rate=0.5)
             p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-        if (
-            samplecolumns >= 3
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
             X = INICOLUMN3
             Y = "A4"
             p50.pick_up_tip()
@@ -237,9 +221,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
 
         protocol.comment("--> Mixing")
-        if (
-            samplecolumns >= 1
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
             X = "A2"
             p1000.pick_up_tip()
             p1000.move_to(dilution_plate_1[X].bottom(z=p1000_offset_Temp))
@@ -249,9 +231,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(seconds=2)
             p1000.default_speed = 400
             p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-        if (
-            samplecolumns >= 2
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
             X = "A3"
             p1000.pick_up_tip()
             p1000.move_to(dilution_plate_1[X].bottom(z=p1000_offset_Temp))
@@ -262,9 +242,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(seconds=2)
             p1000.default_speed = 400
             p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-        if (
-            samplecolumns >= 3
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
             X = "A4"
             p1000.pick_up_tip()
             p1000.move_to(dilution_plate_1[X].bottom(z=p1000_offset_Temp))
@@ -278,27 +256,21 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment("==============================================")
         protocol.comment("--> Adding Diluted Sample to Diluent Part 2")
         protocol.comment("==============================================")
-        if (
-            samplecolumns >= 1
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
             X = "A2"
             Y = "A6"
             p50.pick_up_tip()
             p50.aspirate(5, dilution_plate_1[X].center(), rate=0.5)
             p50.dispense(5, dilution_plate_1[Y].center(), rate=0.5)
             p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-        if (
-            samplecolumns >= 2
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
             X = "A3"
             Y = "A7"
             p50.pick_up_tip()
             p50.aspirate(5, dilution_plate_1[X].center(), rate=0.5)
             p50.dispense(5, dilution_plate_1[Y].center(), rate=0.5)
             p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-        if (
-            samplecolumns >= 3
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
             X = "A4"
             Y = "A8"
             p50.pick_up_tip()
@@ -307,9 +279,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
 
         protocol.comment("--> Mixing")
-        if (
-            samplecolumns >= 1
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
             X = "A6"
             p1000.pick_up_tip()
             p1000.move_to(dilution_plate_1[X].bottom(z=p1000_offset_Temp))
@@ -319,9 +289,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(seconds=2)
             p1000.default_speed = 400
             p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-        if (
-            samplecolumns >= 2
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
             X = "A7"
             p1000.pick_up_tip()
             p1000.move_to(dilution_plate_1[X].bottom(z=p1000_offset_Temp))
@@ -331,9 +299,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(seconds=2)
             p1000.default_speed = 400
             p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-        if (
-            samplecolumns >= 3
-        ):  # -----------------------------------------------------------------------------------------
+        if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
             X = "A8"
             p1000.pick_up_tip()
             p1000.move_to(dilution_plate_1[X].bottom(z=p1000_offset_Temp))
@@ -353,21 +319,15 @@ def run(protocol: protocol_api.ProtocolContext):
             p1000.pick_up_tip()
             p1000.aspirate((qPCRVol), PCR_1.bottom(z=p1000_offset_Thermo), rate=0.25)
             p1000.dispense(qPCRVol, dilution_plate_1["A9"].bottom(z=p1000_offset_Temp), rate=0.25)
-            if (
-                samplecolumns >= 1
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
                 X = "A10"
                 p1000.aspirate((qPCRVol), PCR_1.bottom(z=p1000_offset_Thermo), rate=0.25)
                 p1000.dispense(qPCRVol, dilution_plate_1[X].bottom(z=p1000_offset_Temp), rate=0.25)
-            if (
-                samplecolumns >= 2
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
                 X = "A11"
                 p1000.aspirate((qPCRVol), PCR_1.bottom(z=p1000_offset_Thermo), rate=0.25)
                 p1000.dispense(qPCRVol, dilution_plate_1[X].bottom(z=p1000_offset_Temp), rate=0.25)
-            if (
-                samplecolumns >= 3
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
                 X = "A12"
                 p1000.aspirate((qPCRVol), PCR_1.bottom(z=p1000_offset_Thermo), rate=0.25)
                 p1000.dispense(qPCRVol, dilution_plate_1[X].bottom(z=p1000_offset_Temp), rate=0.25)
@@ -376,21 +336,15 @@ def run(protocol: protocol_api.ProtocolContext):
             p1000.pick_up_tip()
             p1000.aspirate((qPCRVol), PCR_2.bottom(z=p1000_offset_Thermo), rate=0.25)
             p1000.dispense(qPCRVol, dilution_plate_2["A9"].bottom(z=p1000_offset_Deck), rate=0.25)
-            if (
-                samplecolumns >= 1
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
                 X = "A10"
                 p1000.aspirate((qPCRVol), PCR_2.bottom(z=p1000_offset_Thermo), rate=0.25)
                 p1000.dispense(qPCRVol, dilution_plate_2[X].bottom(z=p1000_offset_Deck), rate=0.25)
-            if (
-                samplecolumns >= 2
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
                 X = "A11"
                 p1000.aspirate((qPCRVol), PCR_2.bottom(z=p1000_offset_Thermo), rate=0.25)
                 p1000.dispense(qPCRVol, dilution_plate_2[X].bottom(z=p1000_offset_Deck), rate=0.25)
-            if (
-                samplecolumns >= 3
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
                 X = "A12"
                 p1000.aspirate((qPCRVol), PCR_2.bottom(z=p1000_offset_Thermo), rate=0.25)
                 p1000.dispense(qPCRVol, dilution_plate_2[X].bottom(z=p1000_offset_Deck), rate=0.25)
@@ -421,9 +375,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment("==============================================")
             protocol.comment("--> Adding Diluted Sample to Mix")
             protocol.comment("==============================================")
-            if (
-                samplecolumns >= 1
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
                 X = "A6"
                 Y = "A10"
                 p50.pick_up_tip()
@@ -434,9 +386,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 protocol.delay(seconds=2)
                 p50.default_speed = 400
                 p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-            if (
-                samplecolumns >= 2
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
                 X = "A7"
                 Y = "A11"
                 p50.pick_up_tip()
@@ -447,9 +397,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 protocol.delay(seconds=2)
                 p50.default_speed = 400
                 p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-            if (
-                samplecolumns >= 3
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
                 X = "A8"
                 Y = "A12"
                 p50.pick_up_tip()
@@ -461,9 +409,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 p50.default_speed = 400
                 p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
 
-            if (
-                samplecolumns >= 1
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
                 X = "A6"
                 Y = "A10"
                 p50.pick_up_tip()
@@ -474,9 +420,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 protocol.delay(seconds=2)
                 p50.default_speed = 400
                 p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-            if (
-                samplecolumns >= 2
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
                 X = "A7"
                 Y = "A11"
                 p50.pick_up_tip()
@@ -487,9 +431,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 protocol.delay(seconds=2)
                 p50.default_speed = 400
                 p50.drop_tip() if DRYRUN == "NO" else p50.return_tip()
-            if (
-                samplecolumns >= 3
-            ):  # -----------------------------------------------------------------------------------------
+            if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
                 X = "A8"
                 Y = "A12"
                 p50.pick_up_tip()
@@ -516,9 +458,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 p1000.dispense(20, qpcrplate_1[Y2].bottom(z=p1000_offset_Mag), rate=0.5)
                 p1000.dispense(20, qpcrplate_1[Y3].bottom(z=p1000_offset_Mag), rate=0.5)
                 p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-                if (
-                    samplecolumns >= 1
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
                     X = "A10"
                     Y1 = "A4"
                     Y2 = "A5"
@@ -529,9 +469,7 @@ def run(protocol: protocol_api.ProtocolContext):
                     p1000.dispense(20, qpcrplate_1[Y2].bottom(z=p1000_offset_Mag), rate=0.5)
                     p1000.dispense(20, qpcrplate_1[Y3].bottom(z=p1000_offset_Mag), rate=0.5)
                     p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-                if (
-                    samplecolumns >= 2
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
                     X = "A11"
                     Y1 = "A7"
                     Y2 = "A8"
@@ -542,9 +480,7 @@ def run(protocol: protocol_api.ProtocolContext):
                     p1000.dispense(20, qpcrplate_1[Y2].bottom(z=p1000_offset_Mag), rate=0.5)
                     p1000.dispense(20, qpcrplate_1[Y3].bottom(z=p1000_offset_Mag), rate=0.5)
                     p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-                if (
-                    samplecolumns >= 3
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
                     X = "A12"
                     Y1 = "A10"
                     Y2 = "A11"
@@ -613,9 +549,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 p1000.default_speed = 400
 
                 p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-                if (
-                    samplecolumns >= 1
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
                     X = "A10"
                     Y1 = "B1"
                     Y2 = "B2"
@@ -668,9 +602,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
                     p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
 
-                if (
-                    samplecolumns >= 2
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
                     X = "A11"
                     Y1 = "A7"
                     Y2 = "A8"
@@ -723,9 +655,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
                     p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
 
-                if (
-                    samplecolumns >= 3
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
                     X = "A12"
                     Y1 = "B7"
                     Y2 = "B8"
@@ -829,9 +759,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 p1000.default_speed = 400
 
                 p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
-                if (
-                    samplecolumns >= 1
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 1:  # -----------------------------------------------------------------------------------------
                     X = "A10"
                     Y1 = "B1"
                     Y2 = "B2"
@@ -884,9 +812,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
                     p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
 
-                if (
-                    samplecolumns >= 2
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 2:  # -----------------------------------------------------------------------------------------
                     X = "A11"
                     Y1 = "A7"
                     Y2 = "A8"
@@ -939,9 +865,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
                     p1000.drop_tip() if DRYRUN == "NO" else p1000.return_tip()
 
-                if (
-                    samplecolumns >= 3
-                ):  # -----------------------------------------------------------------------------------------
+                if samplecolumns >= 3:  # -----------------------------------------------------------------------------------------
                     X = "A12"
                     Y1 = "B7"
                     Y2 = "B8"

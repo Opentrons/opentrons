@@ -172,9 +172,7 @@ def run(protocol: protocol_api.ProtocolContext):
             CurrentWell = str(data[current][1])
             DyeVol = float(data[current][2])
             if DyeVol != 0:
-                p1000.transfer(
-                    DyeVol, Dye_1.bottom(z=2), sample_plate_1.wells_by_name()[CurrentWell].top(z=1), new_tip="never"
-                )
+                p1000.transfer(DyeVol, Dye_1.bottom(z=2), sample_plate_1.wells_by_name()[CurrentWell].top(z=1), new_tip="never")
             current += 1
         p1000.return_tip()
 
@@ -203,9 +201,7 @@ def run(protocol: protocol_api.ProtocolContext):
             CurrentWell = str(data[current][1])
             DyeVol = float(data[current][2])
             if DyeVol != 0:
-                p1000.transfer(
-                    DyeVol, Dye_2.bottom(z=2), sample_plate_2.wells_by_name()[CurrentWell].top(z=1), new_tip="never"
-                )
+                p1000.transfer(DyeVol, Dye_2.bottom(z=2), sample_plate_2.wells_by_name()[CurrentWell].top(z=1), new_tip="never")
             current += 1
         p1000.return_tip()
 
@@ -234,9 +230,7 @@ def run(protocol: protocol_api.ProtocolContext):
             CurrentWell = str(data[current][1])
             DyeVol = float(data[current][2])
             if DyeVol != 0:
-                p1000.transfer(
-                    DyeVol, Dye_3.bottom(z=2), sample_plate_3.wells_by_name()[CurrentWell].top(z=1), new_tip="never"
-                )
+                p1000.transfer(DyeVol, Dye_3.bottom(z=2), sample_plate_3.wells_by_name()[CurrentWell].top(z=1), new_tip="never")
             current += 1
         p1000.return_tip()
 

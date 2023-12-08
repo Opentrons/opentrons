@@ -1,15 +1,11 @@
 import json
 from pathlib import Path
+from typing import List
 
 import pytest
 from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.filters import props
-
-# set to_use to base
-# pipenv run pytest -k analysis_test.py --snapshot-update
-# to test
-# set to_use to new
-# pipenv run pytest -k analysis_test.py -vv -s
+from syrupy.types import SerializableData
 
 exclude = props(
     "id",
@@ -23,21 +19,21 @@ exclude = props(
     "labwareId",
     "serialNumber",
     "moduleId",
-    "liquidId"
+    "liquidId",
 )
 
 
 @pytest.fixture
-def snapshot_exclude(snapshot):
+def snapshot_exclude(snapshot: SerializableData) -> SerializableData:
     return snapshot.with_defaults(exclude=exclude)
 
 
 @pytest.fixture
-def snapshot_json(snapshot_exclude):
+def snapshot_json(snapshot_exclude: SerializableData) -> SerializableData:
     return snapshot_exclude.with_defaults(extension_class=JSONSnapshotExtension)
 
 
-def get_analyses(stem_keyword):
+def get_analyses(stem_keyword: str) -> List[Path]:
     path = Path(
         Path(__file__).parent.parent,
         "analysis_results",
@@ -45,7 +41,7 @@ def get_analyses(stem_keyword):
     return [file for file in path.glob("*.json") if stem_keyword in file.stem]
 
 
-def test_analysis_json(snapshot_json):
+def test_analysis_json(snapshot_json: SerializableData) -> None:
     base_stem_keyword = "_v7.0.2_"
     alpha_stem_keyword = "_v7.1.0-alpha.2_"
     base = get_analyses(base_stem_keyword)

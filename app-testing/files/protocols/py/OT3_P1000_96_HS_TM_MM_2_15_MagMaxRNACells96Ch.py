@@ -292,9 +292,7 @@ def run(ctx):
         pip.return_tip()
 
         h_s.set_and_wait_for_shake_speed(rpm=2200)
-        ctx.delay(
-            minutes=1 if not dry_run else 0.25, msg="Please wait 1 minute while the lysis buffer mixes with the sample."
-        )
+        ctx.delay(minutes=1 if not dry_run else 0.25, msg="Please wait 1 minute while the lysis buffer mixes with the sample.")
         h_s.deactivate_shaker()
 
     def bind():
@@ -356,9 +354,7 @@ def run(ctx):
         )
 
         # Incubate for beads to bind DNA
-        ctx.delay(
-            minutes=5 if not dry_run else 0.25, msg="Please wait 5 minutes while the sample binds with the beads."
-        )
+        ctx.delay(minutes=5 if not dry_run else 0.25, msg="Please wait 5 minutes while the sample binds with the beads.")
         h_s.deactivate_shaker()
 
         # Transfer plate to magnet
@@ -414,9 +410,7 @@ def run(ctx):
         h_s.close_labware_latch()
 
         for washi in np.arange(settling_time, 0, -0.5):  # settling time timer for washes
-            ctx.delay(
-                minutes=0.5, msg="There are " + str(washi) + " minutes left in wash " + str(whichwash) + " incubation."
-            )
+            ctx.delay(minutes=0.5, msg="There are " + str(washi) + " minutes left in wash " + str(whichwash) + " incubation.")
 
         remove_supernatant(vol, lysis_res)
 

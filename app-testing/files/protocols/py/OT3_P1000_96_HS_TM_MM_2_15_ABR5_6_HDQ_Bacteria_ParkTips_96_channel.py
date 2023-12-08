@@ -430,9 +430,7 @@ def run(ctx):
                 drop_offset=grip_offset("drop", "mag-plate"),
             )
 
-            ctx.delay(
-                minutes=settling_time, msg="Please wait " + str(settling_time) + " minute(s) for beads to pellet."
-            )
+            ctx.delay(minutes=settling_time, msg="Please wait " + str(settling_time) + " minute(s) for beads to pellet.")
 
             # Remove Supernatant and move off magnet
             ctx.comment("------- Removing Supernatant -------")
