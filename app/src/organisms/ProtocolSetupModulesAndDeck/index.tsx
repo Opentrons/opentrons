@@ -150,7 +150,7 @@ function RenderModuleStatus({
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
-      <Flex onClick={() => setShowLocationConflictModal(true)}>
+      <>
         <Chip
           text={t('module_connected')}
           type="success"
@@ -160,7 +160,7 @@ function RenderModuleStatus({
         {isDuplicateModuleModel ? (
           <Icon name="information" size="2rem" />
         ) : null}
-      </Flex>
+      </>
     )
   } else if (
     isModuleReady &&
