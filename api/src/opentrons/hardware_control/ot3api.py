@@ -2002,10 +2002,6 @@ class OT3API(
         self,
         mount: Union[top_types.Mount, OT3Mount],
     ) -> TipStateType:
-        """
-        Check tip presence status. If a high throughput pipette is present,
-        move the tip motors down before checking the sensor status.
-        """
         real_mount = OT3Mount.from_mount(mount)
         async with contextlib.AsyncExitStack() as stack:
             if (
