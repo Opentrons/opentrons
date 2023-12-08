@@ -67,9 +67,7 @@ def run(ctx):
     elutionplate = tempdeck.load_labware("opentrons_96_pcr_adapter_armadillo_wellplate_200ul")
 
     # Load Reservoir Plates
-    wash2_reservoir = lysis_reservoir = ctx.load_labware(
-        deepwell_type, "2"
-    )  # deleted after use- replaced (by gripper) with wash2 res
+    wash2_reservoir = lysis_reservoir = ctx.load_labware(deepwell_type, "2")  # deleted after use- replaced (by gripper) with wash2 res
     bind_reservoir = ctx.load_labware(deepwell_type, "6")
     wash1_reservoir = ctx.load_labware(deepwell_type, "5")
     wash3_reservoir = wash4_reservoir = wash5_reservoir = ctx.load_labware(deepwell_type, "7")
@@ -331,9 +329,7 @@ def run(ctx):
         pip.return_tip()
 
         h_s.set_and_wait_for_shake_speed(rpm=1800)
-        ctx.delay(
-            minutes=20 if not dry_run else 0.25, msg="Please wait 20 minutes while the sample binds with the beads."
-        )
+        ctx.delay(minutes=20 if not dry_run else 0.25, msg="Please wait 20 minutes while the sample binds with the beads.")
         h_s.deactivate_shaker()
 
         h_s.open_labware_latch()
@@ -394,9 +390,7 @@ def run(ctx):
         h_s.close_labware_latch()
 
         for washi in np.arange(settling_time, 0, -0.5):  # settling time timer for washes
-            ctx.delay(
-                minutes=0.5, msg="There are " + str(washi) + " minutes left in wash " + str(whichwash) + " incubation."
-            )
+            ctx.delay(minutes=0.5, msg="There are " + str(washi) + " minutes left in wash " + str(whichwash) + " incubation.")
 
         remove_supernatant(vol, waste_res)
 
@@ -457,9 +451,7 @@ def run(ctx):
         h_s.set_and_wait_for_shake_speed(rpm=2000)
         if not dry_run:
             tempdeck.set_temperature(4)
-        ctx.delay(
-            minutes=3 if not dry_run else 0.25, msg="Please wait 5 minutes while the sample elutes from the beads."
-        )
+        ctx.delay(minutes=3 if not dry_run else 0.25, msg="Please wait 5 minutes while the sample elutes from the beads.")
         h_s.deactivate_shaker()
 
         h_s.open_labware_latch()

@@ -16,7 +16,7 @@ ruff-check:
 
 .PHONY: mypy
 mypy:
-	python -m pipenv run python -m mypy conftest.py automation tests
+	python -m pipenv run python -m mypy conftest.py automation tests ci-tools
 
 .PHONY: lint
 lint:

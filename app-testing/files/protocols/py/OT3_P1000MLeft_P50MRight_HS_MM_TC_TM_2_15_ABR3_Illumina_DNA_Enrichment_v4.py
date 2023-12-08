@@ -55,9 +55,7 @@ def run(protocol: protocol_api.ProtocolContext):
     if ABR_TEST == True:
         protocol.comment("THIS IS A ABR RUN WITH " + str(RUN) + " REPEATS")
     protocol.comment("THIS IS A DRY RUN") if DRYRUN == True else protocol.comment("THIS IS A REACTION RUN")
-    protocol.comment("USED TIPS WILL GO IN TRASH") if TIP_TRASH == True else protocol.comment(
-        "USED TIPS WILL BE RE-RACKED"
-    )
+    protocol.comment("USED TIPS WILL GO IN TRASH") if TIP_TRASH == True else protocol.comment("USED TIPS WILL BE RE-RACKED")
 
     # DECK SETUP AND LABWARE
     # ========== FIRST ROW ===========
@@ -103,9 +101,7 @@ def run(protocol: protocol_api.ProtocolContext):
     EPM = reagent_plate.wells_by_name()["A7"]
 
     # pipette
-    p1000 = protocol.load_instrument(
-        "flex_8channel_1000", "left", tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3]
-    )
+    p1000 = protocol.load_instrument("flex_8channel_1000", "left", tip_racks=[tiprack_200_1, tiprack_200_2, tiprack_200_3])
     p50 = protocol.load_instrument("flex_8channel_50", "right", tip_racks=[tiprack_50_1, tiprack_50_2])
 
     # tip and sample tracking
