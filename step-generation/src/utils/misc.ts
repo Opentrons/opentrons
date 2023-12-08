@@ -8,8 +8,6 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
-  COLUMN,
-  ALL,
   PipetteChannels,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -18,7 +16,6 @@ import {
 import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
 import {
   aspirate,
-  configureNozzleLayout,
   dispense,
   moveToAddressableArea,
   moveToWell,
@@ -26,10 +23,7 @@ import {
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
 import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
-import type {
-  LabwareDefinition2,
-  NozzleConfigurationStyle,
-} from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AdditionalEquipmentEntities,
@@ -699,18 +693,4 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
-}
-
-export const getConfigureNozzleLayoutCommandReset = (
-  pipetteId: string,
-  prevNozzles?: NozzleConfigurationStyle
-): CurriedCommandCreator[] => {
-  return prevNozzles === COLUMN
-    ? [
-        curryCommandCreator(configureNozzleLayout, {
-          nozzles: ALL,
-          pipetteId,
-        }),
-      ]
-    : []
 }
