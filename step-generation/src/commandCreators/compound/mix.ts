@@ -179,11 +179,10 @@ export const mix: CommandCreator<MixArgs> = (
       ],
     }
   }
-  const nozzles = prevRobotState.pipettes[pipette].nozzles
-  const prevNozzles = prevRobotState.pipettes[pipette].prevNozzles
+  const stateNozzles = prevRobotState.pipettes[pipette].nozzles
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
-    is96Channel && data.nozzles != null && nozzles !== prevNozzles
+    is96Channel && data.nozzles != null && data.nozzles !== stateNozzles
       ? [
           curryCommandCreator(configureNozzleLayout, {
             nozzles: data.nozzles,
@@ -204,7 +203,7 @@ export const mix: CommandCreator<MixArgs> = (
     : []
   const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
     pipette,
-    prevNozzles
+    stateNozzles
   )
   // Command generation
   const commandCreators = flatMap(

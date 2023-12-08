@@ -42,7 +42,6 @@ export interface LabwareTemporalProperties {
 export interface PipetteTemporalProperties {
   mount: Mount
   nozzles?: NozzleConfigurationStyle
-  prevNozzles?: NozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {

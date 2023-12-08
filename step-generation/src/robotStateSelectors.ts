@@ -36,7 +36,6 @@ export function _getNextTip(args: {
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
-
   const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
@@ -78,7 +77,6 @@ export function getNextTiprack(
     If there are no available tipracks, returns null.
   */
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
-
   if (!pipetteEntity) {
     throw new Error(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
@@ -100,23 +98,21 @@ export function getNextTiprack(
       )
     }
   )
-  const is96Channel = pipetteEntity.spec.channels === 96
-  const filteredSortedTipRackIdsFor96Channel = sortedTipracksIds.filter(
-    tiprackId => {
-      const tipRackLocation = robotState.labware[tiprackId].slot
-      const tiprackLocation = invariantContext.labwareEntities[tipRackLocation]
-      const has96TiprackAdapterId =
-        tiprackLocation?.def.parameters.loadName ===
-          'opentrons_flex_96_tiprack_adapter' &&
-        tiprackLocation?.def.namespace === 'opentrons'
 
-      return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
-    }
-  )
-  const firstAvailableTiprack = (is96Channel
-    ? filteredSortedTipRackIdsFor96Channel
-    : sortedTipracksIds
-  ).find(tiprackId =>
+  const is96Channel = pipetteEntity.spec.channels === 96
+  const filtered = sortedTipracksIds.filter(tiprackId => {
+    const tipRackLocation = robotState.labware[tiprackId].slot
+    const adapterEntity = invariantContext.labwareEntities[tipRackLocation]
+    const has96TiprackAdapterId =
+      adapterEntity?.def.parameters.loadName ===
+        'opentrons_flex_96_tiprack_adapter' &&
+      adapterEntity?.def.namespace === 'opentrons'
+
+    return nozzles === ALL ? has96TiprackAdapterId : !has96TiprackAdapterId
+  })
+  const filteredSortedTiprackIds = is96Channel ? filtered : sortedTipracksIds
+
+  const firstAvailableTiprack = filteredSortedTiprackIds.find(tiprackId =>
     _getNextTip({
       pipetteId,
       tiprackId,
@@ -144,7 +140,7 @@ export function getNextTiprack(
       },
       tipracks: {
         totalTipracks: sortedTipracksIds.length,
-        filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+        filteredTipracks: filteredSortedTiprackIds.length,
       },
     }
   }
@@ -155,7 +151,7 @@ export function getNextTiprack(
     nextTiprack: null,
     tipracks: {
       totalTipracks: sortedTipracksIds.length,
-      filteredTipracks: filteredSortedTipRackIdsFor96Channel.length,
+      filteredTipracks: filteredSortedTiprackIds.length,
     },
   }
 }
