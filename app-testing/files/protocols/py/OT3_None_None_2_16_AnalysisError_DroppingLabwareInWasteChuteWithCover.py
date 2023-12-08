@@ -27,6 +27,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### FIXTURES ###
     ################
 
-    pcr_plate_1 = ctx.load_labware(PCR_PLATE_96_NAME, "B2")
+    src_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "B2")
     waste_chute = ctx.load_waste_chute(cover=True)
-    ctx.move_labware(pcr_plate_1, waste_chute, use_gripper=True)
+    ctx.move_labware(src_pcr_plate, waste_chute, use_gripper=True)

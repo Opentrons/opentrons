@@ -48,15 +48,18 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### LABWARE ###
     ###############
 
-    pcr_plate_1 = ctx.load_labware(PCR_PLATE_96_NAME, "B2")
-    pcr_plate_2 = ctx.load_labware(PCR_PLATE_96_NAME, "C2")
+    src_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "B2")
+    dest_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "C2")
 
-    tip_rack_96_1 = ctx.load_labware(TIPRACK_96_NAME, TIP_RACK_LOCATION_1)
-    tip_rack_96_2 = ctx.load_labware(TIPRACK_96_NAME, TIP_RACK_LOCATION_2)
-    tip_rack_96_3 = ctx.load_labware(TIPRACK_96_NAME, protocol_api.OFF_DECK)
-    tip_rack_96_4 = ctx.load_labware(TIPRACK_96_NAME, protocol_api.OFF_DECK)
+    on_deck_tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, TIP_RACK_LOCATION_1, "opentrons_flex_96_tiprack_adapter")
+    tip_rack_adapter_1 = on_deck_tip_rack_1.parent
+    
+    on_deck_tip_rack_2 = ctx.load_labware(TIPRACK_96_NAME, TIP_RACK_LOCATION_2, "opentrons_flex_96_tiprack_adapter")
+    tip_rack_adapter_2 = on_deck_tip_rack_2.parent
+    off_deck_tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, protocol_api.OFF_DECK)
+    off_deck_tip_rack_2 = ctx.load_labware(TIPRACK_96_NAME, protocol_api.OFF_DECK)
 
-    tip_racks = [tip_rack_96_1, tip_rack_96_2, tip_rack_96_3, tip_rack_96_4]
+    tip_racks = [on_deck_tip_rack_1, on_deck_tip_rack_2, off_deck_tip_rack_1, off_deck_tip_rack_2]
 
     ##########################
     ### PIPETTE DEFINITION ###
@@ -74,7 +77,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     [
         well.load_liquid(liquid=water if i % 2 == 0 else acetone, volume=STARTING_VOL)
-        for i, column in enumerate(pcr_plate_1.columns())
+        for i, column in enumerate(src_pcr_plate.columns())
         for well in column
     ]
 
@@ -82,34 +85,34 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### MOVE SOME LIQUID ###
     ########################
 
-    pipette_96_channel.pick_up_tip(default_well(tip_rack_96_1))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(pcr_plate_1), default_well(pcr_plate_2), new_tip="never")
+    pipette_96_channel.pick_up_tip(default_well(on_deck_tip_rack_1))
+    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
     pipette_96_channel.return_tip()
 
-    pipette_96_channel.pick_up_tip(default_well(tip_rack_96_2))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(pcr_plate_1), default_well(pcr_plate_2), new_tip="never")
+    pipette_96_channel.pick_up_tip(default_well(on_deck_tip_rack_2))
+    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
     pipette_96_channel.return_tip()
 
-    ##################################
-    ### THROW AWAY EMPTY TIP RACKS ###
-    ##################################
+    #####################################
+    ### MOVE EMPTY TIP RACKS OFF DECK ###
+    #####################################
 
-    ctx.move_labware(tip_rack_96_1, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
-    ctx.move_labware(tip_rack_96_2, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
+    ctx.move_labware(on_deck_tip_rack_1, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
+    ctx.move_labware(on_deck_tip_rack_2, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
 
     ###############################
     ### MOVE OFF DECK TIP RACKS ###
     ###############################
 
-    ctx.move_labware(tip_rack_96_3, TIP_RACK_LOCATION_1, use_gripper=not USING_GRIPPER)
-    ctx.move_labware(tip_rack_96_4, TIP_RACK_LOCATION_2, use_gripper=not USING_GRIPPER)
+    ctx.move_labware(off_deck_tip_rack_1, tip_rack_adapter_1, use_gripper=not USING_GRIPPER)
+    ctx.move_labware(off_deck_tip_rack_2, tip_rack_adapter_2, use_gripper=not USING_GRIPPER)
 
-    pipette_96_channel.pick_up_tip(default_well(tip_rack_96_3))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(pcr_plate_1), default_well(pcr_plate_2), new_tip="never")
+    pipette_96_channel.pick_up_tip(default_well(off_deck_tip_rack_1))
+    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
     pipette_96_channel.return_tip()
 
-    pipette_96_channel.pick_up_tip(default_well(tip_rack_96_4))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(pcr_plate_1), default_well(pcr_plate_2), new_tip="never")
+    pipette_96_channel.pick_up_tip(default_well(off_deck_tip_rack_2))
+    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
     pipette_96_channel.return_tip()
 
     ############################
@@ -117,14 +120,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ############################
 
     thermocycler.open_lid()
-    ctx.move_labware(pcr_plate_2, thermocycler, use_gripper=USING_GRIPPER)
-    ctx.move_labware(pcr_plate_2, magnetic_block, use_gripper=USING_GRIPPER)
-    # ctx.move_labware(pcr_plate_2, heater_shaker_adapter, use_gripper=USING_GRIPPER)
-    ctx.move_labware(pcr_plate_2, temperature_module_adapter, use_gripper=USING_GRIPPER)
+    ctx.move_labware(dest_pcr_plate, thermocycler, use_gripper=USING_GRIPPER)
+    ctx.move_labware(dest_pcr_plate, magnetic_block, use_gripper=USING_GRIPPER)
+    # ctx.move_labware(dest_pcr_plate, heater_shaker_adapter, use_gripper=USING_GRIPPER)
+    ctx.move_labware(dest_pcr_plate, temperature_module_adapter, use_gripper=USING_GRIPPER)
 
     ##########################################
     ### MAKE THIS PROTOCOL TOTALLY USELESS ###
     ##########################################
 
-    ctx.move_labware(pcr_plate_1, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
-    ctx.move_labware(pcr_plate_2, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
+    ctx.move_labware(src_pcr_plate, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
+    ctx.move_labware(dest_pcr_plate, protocol_api.OFF_DECK, use_gripper=not USING_GRIPPER)
