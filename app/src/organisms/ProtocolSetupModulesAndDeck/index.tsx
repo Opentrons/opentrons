@@ -278,7 +278,7 @@ function RowModule({
           />
         </Flex>
         {isNonConnectingModule ? (
-          <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
+          <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {t('n_a')}
             </StyledText>
