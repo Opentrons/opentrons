@@ -5,7 +5,6 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
-  getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
@@ -201,10 +200,6 @@ export const mix: CommandCreator<MixArgs> = (
         }),
       ]
     : []
-  const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
-    pipette,
-    stateNozzles
-  )
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -263,7 +258,6 @@ export const mix: CommandCreator<MixArgs> = (
         ...mixCommands,
         ...blowoutCommand,
         ...touchTipCommands,
-        ...configureNozzleLayoutCommandReset,
       ]
     }
   )

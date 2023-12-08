@@ -18,7 +18,6 @@ import {
   airGapHelper,
   dispenseLocationHelper,
   moveHelper,
-  getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
@@ -477,10 +476,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               }),
             ]
           : []
-      const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
-        args.pipette,
-        stateNozzles
-      )
 
       return [
         ...configureNozzleLayoutCommand,
@@ -496,7 +491,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ...blowoutCommand,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
-        ...configureNozzleLayoutCommandReset,
       ]
     }
   )

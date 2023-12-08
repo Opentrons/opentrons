@@ -700,17 +700,3 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
-
-export const getConfigureNozzleLayoutCommandReset = (
-  pipetteId: string,
-  prevNozzles?: NozzleConfigurationStyle
-): CurriedCommandCreator[] => {
-  return prevNozzles === COLUMN
-    ? [
-        curryCommandCreator(configureNozzleLayout, {
-          nozzles: ALL,
-          pipetteId,
-        }),
-      ]
-    : []
-}

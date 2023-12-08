@@ -18,7 +18,6 @@ export function forPickUpTip(
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
   // pipette now has tip(s)
   tipState.pipettes[pipetteId] = true
-  console.log('nozzles in forpickuptip', nozzles)
   // remove tips from tiprack
   if (pipetteSpec.channels === 1) {
     tipState.tipracks[labwareId][wellName] = false

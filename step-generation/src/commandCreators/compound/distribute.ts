@@ -16,7 +16,6 @@ import {
   blowoutUtil,
   wasteChuteCommandsUtil,
   getDispenseAirGapLocation,
-  getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
@@ -459,10 +458,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
               }),
             ]
           : []
-      const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
-        args.pipette,
-        stateNozzles
-      )
 
       return [
         ...configureNozzleLayoutCommand,
@@ -484,7 +479,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ...blowoutCommands,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
-        ...configureNozzleLayoutCommandReset,
       ]
     }
   )
