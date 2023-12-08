@@ -38,6 +38,9 @@ from opentrons.protocol_api.core.common import (
     MagneticModuleCore,
     MagneticBlockCore,
 )
+from opentrons.protocols.api_support.deck_type import (
+    NoTrashDefinedError,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -124,7 +127,7 @@ def test_fixed_trash(
     trash = trash_captor.value
 
     decoy.when(mock_core_map.get(mock_core.fixed_trash)).then_return(trash)
-
+    decoy.when(mock_core.get_disposal_locations()).then_return([trash])
     result = subject.fixed_trash
 
     assert result is trash
@@ -161,6 +164,9 @@ def test_load_instrument(
     ).then_return(mock_instrument_core)
 
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Gandalf the Grey")
+    decoy.when(mock_core.get_disposal_locations()).then_raise(
+        NoTrashDefinedError("No trash!")
+    )
 
     result = subject.load_instrument(
         instrument_name="Gandalf", mount="shadowfax", tip_racks=mock_tip_racks
@@ -205,6 +211,9 @@ def test_load_instrument_replace(
         )
     ).then_return(mock_instrument_core)
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Ada Lovelace")
+    decoy.when(mock_core.get_disposal_locations()).then_raise(
+        NoTrashDefinedError("No trash!")
+    )
 
     pipette_1 = subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
     assert subject.loaded_instruments["right"] is pipette_1
@@ -238,6 +247,9 @@ def test_96_channel_pipette_always_loads_on_the_left_mount(
             mount=Mount.LEFT,
         )
     ).then_return(mock_instrument_core)
+    decoy.when(mock_core.get_disposal_locations()).then_raise(
+        NoTrashDefinedError("No trash!")
+    )
 
     result = subject.load_instrument(
         instrument_name="A 96 Channel Name", mount="shadowfax"
@@ -269,6 +281,10 @@ def test_96_channel_pipette_raises_if_another_pipette_attached(
     ).then_return(mock_instrument_core)
 
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("ada")
+
+    decoy.when(mock_core.get_disposal_locations()).then_raise(
+        NoTrashDefinedError("No trash!")
+    )
 
     pipette_1 = subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
     assert subject.loaded_instruments["right"] is pipette_1

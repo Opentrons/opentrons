@@ -23,7 +23,10 @@ from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
-from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
+from opentrons.protocols.api_support.deck_type import (
+    NoTrashDefinedError,
+    should_load_fixed_trash_for_python_protocol,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -148,7 +151,7 @@ class ProtocolContext(CommandPublisher):
         # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
 
         self._load_fixed_trash()
-        if self._api_version < APIVersion(2, 16):
+        if should_load_fixed_trash_for_python_protocol(self._api_version):
             self._core.append_disposal_location(self.fixed_trash)
         elif (
             self._api_version >= APIVersion(2, 16)
@@ -880,10 +883,10 @@ class ProtocolContext(CommandPublisher):
                 log=logger,
             )
 
-        trash: Optional[Labware]
+        trash: Optional[Union[Labware, TrashBin]]
         try:
             trash = self.fixed_trash
-        except NoTrashDefinedError:
+        except (NoTrashDefinedError, APIVersionError):
             trash = None
 
         instrument = InstrumentContext(
@@ -1043,17 +1046,33 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def fixed_trash(self) -> Labware:
+    def fixed_trash(self) -> Union[Labware, TrashBin]:
         """The trash fixed to slot 12 of the robot deck.
 
-        It has one well and should be accessed like labware in your protocol.
+        In API Versions prior to 2.16 it has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
+
+        In API Version 2.16 and above it returns a Trash fixture for OT-2 Protocols.
         """
+        if self._api_version >= APIVersion(2, 16):
+            if self._core.robot_type == "OT-3 Standard":
+                raise APIVersionError(
+                    "Fixed Trash is not supported on Flex protocols in API Version 2.16 and above."
+                )
+            disposal_locations = self._core.get_disposal_locations()
+            if len(disposal_locations) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            if isinstance(disposal_locations[0], TrashBin):
+                return disposal_locations[0]
+
         fixed_trash = self._core_map.get(self._core.fixed_trash)
         if fixed_trash is None:
             raise NoTrashDefinedError(
                 "No trash container has been defined in this protocol."
             )
+
         return fixed_trash
 
     def _load_fixed_trash(self) -> None:
