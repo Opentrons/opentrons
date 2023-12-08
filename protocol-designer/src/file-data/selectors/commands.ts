@@ -55,33 +55,10 @@ export const getInitialRobotState: (
   stepFormSelectors.getInvariantContext,
   getLabwareLiquidState,
   (initialDeckSetup, invariantContext, labwareLiquidState) => {
-    // const onlyPipettingFormSteps = Object.entries(savedStepForms).filter(
-    //   ([stepId, form]) =>
-    //     form.stepType === 'moveLiquid' || form.stepType === 'mix'
-    // )
-    // const lastPipetteFormStep =
-    //   onlyPipettingFormSteps.length > 0
-    //     ? onlyPipettingFormSteps[onlyPipettingFormSteps.length - 1]
-    //     : null
-    // const lastPipettingStepNozzles =
-    //   lastPipetteFormStep != null ? lastPipetteFormStep[1]?.nozzles : undefined
-
-    // const prevPipetteFormStep =
-    //   onlyPipettingFormSteps.length > 1
-    //     ? onlyPipettingFormSteps[onlyPipettingFormSteps.length - 2]
-    //     : null
-    //  NOTE: previous pipetting step nozzles is necessary
-    //  in order to know when to emit the configureNozzleLayout
-    //  command
-    // const prevPipettingStepNozzles =
-    //   prevPipetteFormStep != null ? prevPipetteFormStep[1]?.nozzles : undefined
     const pipettes: Record<string, PipetteTemporalProperties> = mapValues(
       initialDeckSetup.pipettes,
       (p: PipetteOnDeck): PipetteTemporalProperties => ({
         mount: p.mount,
-        // nozzles: p.name === 'p1000_96' ? lastPipettingStepNozzles : undefined,
-        // prevNozzles:
-        //   p.name === 'p1000_96' ? prevPipettingStepNozzles : undefined,
       })
     )
     const labware: Record<string, LabwareTemporalProperties> = mapValues(
