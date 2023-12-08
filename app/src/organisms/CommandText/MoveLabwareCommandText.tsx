@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import type {
+import {
   CompletedProtocolAnalysis,
   MoveLabwareRunTimeCommand,
   RobotType,
-} from '@opentrons/shared-data/'
+  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
 import { getLabwareName } from './utils'
 import { getLabwareDisplayLocation } from './utils/getLabwareDisplayLocation'
 import { getFinalLabwareLocation } from './utils/getFinalLabwareLocation'
@@ -32,6 +33,12 @@ export function MoveLabwareCommandText(
     robotType
   )
 
+  const location = newDisplayLocation.includes(
+    GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA
+  )
+    ? 'Waste Chute'
+    : newDisplayLocation
+
   return strategy === 'usingGripper'
     ? t('move_labware_using_gripper', {
         labware: getLabwareName(robotSideAnalysis, labwareId),
@@ -44,7 +51,7 @@ export function MoveLabwareCommandText(
                 robotType
               )
             : '',
-        new_location: newDisplayLocation,
+        new_location: location,
       })
     : t('move_labware_manually', {
         labware: getLabwareName(robotSideAnalysis, labwareId),
@@ -57,6 +64,6 @@ export function MoveLabwareCommandText(
                 robotType
               )
             : '',
-        new_location: newDisplayLocation,
+        new_location: location,
       })
 }
