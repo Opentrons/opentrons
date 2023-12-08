@@ -377,3 +377,89 @@ def test_get_slot_definition_raises_with_bad_slot_name(decoy: Decoy) -> None:
 
     with pytest.raises(SlotDoesNotExistError):
         subject.get_slot_definition("foo")
+
+
+def test_raise_if_area_not_in_deck_configuration_on_robot(decoy: Decoy) -> None:
+    """It should raise if the requested addressable area name is not loaded in state."""
+    subject = get_addressable_area_view(
+        loaded_addressable_areas_by_name={"real": decoy.mock(cls=AddressableArea)}
+    )
+
+    subject.raise_if_area_not_in_deck_configuration("real")
+
+    with pytest.raises(AreaNotInDeckConfigurationError):
+        subject.raise_if_area_not_in_deck_configuration("fake")
+
+
+def test_raise_if_area_not_in_deck_configuration_simulated_config(decoy: Decoy) -> None:
+    """It should raise if the requested addressable area name is not loaded in state."""
+    subject = get_addressable_area_view(
+        use_simulated_deck_config=True,
+        potential_cutout_fixtures_by_cutout_id={
+            "waluigi": {
+                PotentialCutoutFixture(
+                    cutout_id="fire flower",
+                    cutout_fixture_id="1up",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
+            "wario": {
+                PotentialCutoutFixture(
+                    cutout_id="mushroom",
+                    cutout_fixture_id="star",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
+        },
+    )
+
+    decoy.when(
+        deck_configuration_provider.get_potential_cutout_fixtures(
+            "mario", subject.state.deck_definition
+        )
+    ).then_return(
+        (
+            "wario",
+            {
+                PotentialCutoutFixture(
+                    cutout_id="mushroom",
+                    cutout_fixture_id="star",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
+        )
+    )
+
+    subject.raise_if_area_not_in_deck_configuration("mario")
+
+    decoy.when(
+        deck_configuration_provider.get_potential_cutout_fixtures(
+            "luigi", subject.state.deck_definition
+        )
+    ).then_return(
+        (
+            "waluigi",
+            {
+                PotentialCutoutFixture(
+                    cutout_id="mushroom",
+                    cutout_fixture_id="star",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
+        )
+    )
+
+    decoy.when(
+        deck_configuration_provider.get_provided_addressable_area_names(
+            "1up", "fire flower", subject.state.deck_definition
+        )
+    ).then_return([])
+
+    decoy.when(
+        deck_configuration_provider.get_addressable_area_display_name(
+            "luigi", subject.state.deck_definition
+        )
+    ).then_return("super luigi")
+
+    with pytest.raises(IncompatibleAddressableAreaError):
+        subject.raise_if_area_not_in_deck_configuration("luigi")

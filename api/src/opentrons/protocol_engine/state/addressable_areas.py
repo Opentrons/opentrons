@@ -84,11 +84,11 @@ _FLEX_ORDERED_SLOTS = [
 _FLEX_ORDERED_STAGING_SLOTS = ["D4", "C4", "B4", "A4"]
 
 
-def _get_conflicting_addressable_areas(
+def _get_conflicting_addressable_areas_error_string(
     potential_cutout_fixtures: Set[PotentialCutoutFixture],
-    loaded_addressable_areas: Set[str],
+    loaded_addressable_areas: Dict[str, AddressableArea],
     deck_definition: DeckDefinitionV4,
-) -> Set[str]:
+) -> str:
     loaded_areas_on_cutout = set()
     for fixture in potential_cutout_fixtures:
         loaded_areas_on_cutout.update(
@@ -99,7 +99,10 @@ def _get_conflicting_addressable_areas(
             )
         )
     loaded_areas_on_cutout.intersection_update(loaded_addressable_areas)
-    return loaded_areas_on_cutout
+    display_names = {
+        loaded_addressable_areas[area].display_name for area in loaded_areas_on_cutout
+    }
+    return ", ".join(display_names)
 
 
 # This is a temporary shim while Protocol Engine's conflict-checking code
@@ -354,14 +357,21 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             if not self._state.potential_cutout_fixtures_by_cutout_id[
                 cutout_id
             ].intersection(potential_fixtures):
-                loaded_areas_on_cutout = _get_conflicting_addressable_areas(
-                    self._state.potential_cutout_fixtures_by_cutout_id[cutout_id],
-                    set(self._state.loaded_addressable_areas_by_name),
-                    self.state.deck_definition,
+                loaded_areas_on_cutout = (
+                    _get_conflicting_addressable_areas_error_string(
+                        self._state.potential_cutout_fixtures_by_cutout_id[cutout_id],
+                        self._state.loaded_addressable_areas_by_name,
+                        self.state.deck_definition,
+                    )
+                )
+                area_display_name = (
+                    deck_configuration_provider.get_addressable_area_display_name(
+                        area_name, self.state.deck_definition
+                    )
                 )
                 raise IncompatibleAddressableAreaError(
-                    f"Cannot load {area_name}, not compatible with one or more of"
-                    f" the following areas: {loaded_areas_on_cutout}"
+                    f"Cannot use {area_display_name}, not compatible with one or more of"
+                    f" the following fixtures: {loaded_areas_on_cutout}"
                 )
 
     def _get_addressable_area_from_deck_data(
@@ -407,7 +417,9 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_addressable_area_position(self, addressable_area_name: str) -> Point:
         """Get the position of an addressable area."""
-        addressable_area = self._get_addressable_area_from_deck_data(addressable_area_name)
+        addressable_area = self._get_addressable_area_from_deck_data(
+            addressable_area_name
+        )
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
 
