@@ -528,6 +528,13 @@ class GripperJawStatePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class GripperJawHoldoffPayload(EmptyPayload):
+    """A respones carrying info about the jaw holdoff value of a gripper."""
+
+    ticks: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
