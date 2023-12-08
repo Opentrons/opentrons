@@ -15,6 +15,8 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
+
 export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
   compatibleCutoutFixtureIds: CutoutFixtureId[]
 }
@@ -22,7 +24,9 @@ export function useDeckConfigurationCompatibility(
   robotType: RobotType,
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 ): CutoutConfigAndCompatibility[] {
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig =
+    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
+      .data ?? []
   if (robotType !== FLEX_ROBOT_TYPE) return []
   const deckDef = getDeckDefFromRobotType(robotType)
   const allAddressableAreas =

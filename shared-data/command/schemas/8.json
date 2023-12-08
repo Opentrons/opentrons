@@ -2205,6 +2205,12 @@
           "title": "Positionid",
           "description": "An optional ID to assign to this command instance. Auto-assigned if not defined.",
           "type": "string"
+        },
+        "failOnNotHomed": {
+          "title": "Failonnothomed",
+          "default": true,
+          "descrption": "Require all axes to be homed before saving position.",
+          "type": "boolean"
         }
       },
       "required": ["pipetteId"]

@@ -269,7 +269,12 @@ export interface CutoutFixture {
   height: number
 }
 
-type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'
+type AreaType =
+  | 'slot'
+  | 'movableTrash'
+  | 'wasteChute'
+  | 'fixedTrash'
+  | 'stagingSlot'
 
 export interface AddressableArea {
   id: AddressableAreaName

@@ -2,8 +2,6 @@
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
-from opentrons.protocol_api import _waste_chute_dimensions
-
 from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -51,7 +49,7 @@ from opentrons.protocol_engine.errors import (
 )
 
 from ... import validation
-from ..._types import OffDeckType, OFF_DECK
+from ..._types import OffDeckType
 from ..._liquid import Liquid
 from ..._trash_bin import TrashBin
 from ..._waste_chute import WasteChute
@@ -342,50 +340,6 @@ class ProtocolCore(
             # Clear out last location since it is not relevant to pipetting
             # and we only use last location for in-place pipetting commands
             self.set_last_location(location=None, mount=Mount.EXTENSION)
-
-    def _move_labware_to_waste_chute(
-        self,
-        labware_core: LabwareCore,
-        strategy: LabwareMovementStrategy,
-        pick_up_offset: Optional[LabwareOffsetVector],
-        drop_offset: Optional[LabwareOffsetVector],
-    ) -> None:
-        slot = DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
-        slot_width = 128
-        slot_height = 86
-        drop_offset_from_slot = (
-            _waste_chute_dimensions.SLOT_ORIGIN_TO_GRIPPER_JAW_CENTER
-            - Point(x=slot_width / 2, y=slot_height / 2)
-        )
-        if drop_offset is not None:
-            drop_offset_from_slot += Point(
-                x=drop_offset.x, y=drop_offset.y, z=drop_offset.z
-            )
-
-        # To get the physical movement to happen, move the labware "into the slot" with a giant
-        # offset to dunk it in the waste chute.
-        self._engine_client.move_labware(
-            labware_id=labware_core.labware_id,
-            new_location=slot,
-            strategy=strategy,
-            pick_up_offset=pick_up_offset,
-            drop_offset=LabwareOffsetVector(
-                x=drop_offset_from_slot.x,
-                y=drop_offset_from_slot.y,
-                z=drop_offset_from_slot.z,
-            ),
-        )
-
-        # To get the logical movement to be correct, move the labware off-deck.
-        # Otherwise, leaving the labware "in the slot" would mean you couldn't call this function
-        # again for other labware.
-        self._engine_client.move_labware(
-            labware_id=labware_core.labware_id,
-            new_location=self._convert_labware_location(OFF_DECK),
-            strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
-            pick_up_offset=None,
-            drop_offset=None,
-        )
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel

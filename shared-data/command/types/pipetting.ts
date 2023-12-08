@@ -14,6 +14,7 @@ export type PipettingRunTimeCommand =
   | PrepareToAspirateRunTimeCommand
   | TouchTipRunTimeCommand
   | GetTipPresenceRunTimeCommand
+  | VerifyTipPresenceRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -29,6 +30,7 @@ export type PipettingCreateCommand =
   | PrepareToAspirateCreateCommand
   | TouchTipCreateCommand
   | GetTipPresenceCreateCommand
+  | VerifyTipPresenceCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -165,6 +167,18 @@ export interface GetTipPresenceRunTimeCommand
   result?: TipPresenceResult
 }
 
+export interface VerifyTipPresenceCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'verifyTipPresence'
+  params: VerifyTipPresenceParams
+}
+
+export interface VerifyTipPresenceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    VerifyTipPresenceCreateCommand {
+  result?: any
+}
+
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -234,6 +248,10 @@ interface WellLocationParam {
       z?: number
     }
   }
+}
+
+interface VerifyTipPresenceParams extends PipetteIdentityParams {
+  expectedState?: 'present' | 'absent'
 }
 
 interface BasicLiquidHandlingResult {
