@@ -16,6 +16,7 @@ from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
+    from ..state import StateView
 
 MoveToAddressableAreaCommandType = Literal["moveToAddressableArea"]
 
@@ -66,13 +67,20 @@ class MoveToAddressableAreaImplementation(
 ):
     """Move to addressable area command implementation."""
 
-    def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
+    def __init__(
+        self, movement: MovementHandler, state_view: StateView, **kwargs: object
+    ) -> None:
         self._movement = movement
+        self._state_view = state_view
 
     async def execute(
         self, params: MoveToAddressableAreaParams
     ) -> MoveToAddressableAreaResult:
         """Move the requested pipette to the requested addressable area."""
+        self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+            params.addressableAreaName
+        )
+
         if fixture_validation.is_staging_slot(params.addressableAreaName):
             raise LocationNotAccessibleByPipetteError(
                 f"Cannot move pipette to staging slot {params.addressableAreaName}"

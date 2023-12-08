@@ -157,7 +157,7 @@
                 "$ref": "#/definitions/boundingBox"
               },
               "displayName": {
-                "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Movable Trash\"",
+                "description": "A human-readable nickname for this area e.g. \"Slot A1\" or \"Trash Bin in A1\"",
                 "type": "string"
               },
               "compatibleModuleTypes": {
