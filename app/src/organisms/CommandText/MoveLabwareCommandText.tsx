@@ -1,14 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import {
-  CompletedProtocolAnalysis,
-  MoveLabwareRunTimeCommand,
-  RobotType,
-  GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
-} from '@opentrons/shared-data'
+import { GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 import { getLabwareName } from './utils'
 import { getLabwareDisplayLocation } from './utils/getLabwareDisplayLocation'
 import { getFinalLabwareLocation } from './utils/getFinalLabwareLocation'
-
+import type {
+  CompletedProtocolAnalysis,
+  MoveLabwareRunTimeCommand,
+  RobotType,
+} from '@opentrons/shared-data'
 interface MoveLabwareCommandTextProps {
   command: MoveLabwareRunTimeCommand
   robotSideAnalysis: CompletedProtocolAnalysis
