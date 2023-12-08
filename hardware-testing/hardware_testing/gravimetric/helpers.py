@@ -209,21 +209,30 @@ def _check_if_software_supports_high_volumes() -> bool:
     modified_b = "return True" in src_b
     return modified_a and modified_b
 
-def _override_set_current_volume(self, new_volume: float) -> None:
+
+def _override_set_current_volume(self, new_volume: float) -> None:  # noqa: ANN001
     assert new_volume >= 0
     # assert new_volume <= self.working_volume
     self._current_volume = new_volume
 
-def _override_add_current_volume(self, volume_incr: float) -> None:
+
+def _override_add_current_volume(self, volume_incr: float) -> None:  # noqa: ANN001
     self._current_volume += volume_incr
 
-def _override_ok_to_add_volume(self, volume_incr: float) -> bool:
+
+def _override_ok_to_add_volume(self, volume_incr: float) -> bool:  # noqa: ANN001
     return True
 
+
 def _override_software_supports_high_volumes() -> None:
-    Pipette.set_current_volume = _override_set_current_volume
-    Pipette.ok_to_add_volume = _override_ok_to_add_volume
-    add_current_volume = _override_ok_to_add_volume
+    # yea so ok this is pretty ugly but this is super helpful for us
+    # with this we don't need to apply patches, and can run the testing scripts
+    # without pushing modified code to the robot
+
+    Pipette.set_current_volume = _override_set_current_volume  # type: ignore[assignment]
+    Pipette.ok_to_add_volume = _override_ok_to_add_volume  # type: ignore[assignment]
+    Pipette.add_current_volume = _override_add_current_volume  # type: ignore[assignment]
+
 
 def _get_channel_offset(cfg: config.VolumetricConfig, channel: int) -> Point:
     assert (
