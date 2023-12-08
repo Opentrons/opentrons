@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
@@ -58,53 +58,44 @@ describe('ChooseProtocolSlideout', () => {
   })
 
   it('renders slideout if showSlideout true', () => {
-    const [{ queryAllByText }] = render({
+    render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    expect(queryAllByText('Choose Protocol to Run')).not.toBeFalsy()
-    expect(queryAllByText(mockConnectableRobot.name)).not.toBeFalsy()
-  })
-  it('does not render slideout if showSlideout false', () => {
-    const [{ queryAllByText }] = render({
-      robot: mockConnectableRobot,
-      onCloseClick: jest.fn(),
-      showSlideout: true,
-    })
-    expect(queryAllByText('Choose Protocol to Run').length).toEqual(0)
-    expect(queryAllByText(mockConnectableRobot.name).length).toEqual(0)
+    screen.getByText(/choose protocol to run/i)
+    screen.getByText(/opentrons-robot-name/i)
   })
   it('renders an available protocol option for every stored protocol if any', () => {
-    const [{ getByText, getByLabelText, queryByRole }] = render({
+    render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    getByLabelText('protocol deck map')
-    getByText('fakeSrcFileName')
-    expect(queryByRole('heading', { name: 'No protocols found' })).toBeNull()
+    screen.getByLabelText('protocol deck map')
+    screen.getByText('fakeSrcFileName')
+    expect(screen.queryByRole('heading', { name: 'No protocols found' })).toBeNull()
   })
   it('renders an empty state if no protocol options', () => {
     mockGetStoredProtocols.mockReturnValue([])
-    const [{ getByRole, queryByText, queryByLabelText }] = render({
+    render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    expect(queryByLabelText('protocol deck map')).toBeNull()
-    expect(queryByText('fakeSrcFileName')).toBeNull()
+    expect(screen.queryByLabelText('protocol deck map')).toBeNull()
+    expect(screen.queryByText('fakeSrcFileName')).toBeNull()
     expect(
-      getByRole('heading', { name: 'No protocols found' })
+      screen.getByRole('heading', { name: 'No protocols found' })
     ).toBeInTheDocument()
   })
   it('calls createRunFromProtocolSource if CTA clicked', () => {
-    const [{ getByRole }] = render({
+    render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
     fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
       files: [expect.any(File)],
@@ -120,19 +111,19 @@ describe('ChooseProtocolSlideout', () => {
       reset: jest.fn(),
       runCreationErrorCode: 500,
     })
-    const [{ getByRole, getByText }] = render({
+    render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
-    proceedButton.click()
+    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
-    expect(getByText('run creation error')).toBeInTheDocument()
+    expect(screen.getByText('run creation error')).toBeInTheDocument()
   })
 
   it('renders error state when run creation error code is 409', () => {
@@ -143,20 +134,20 @@ describe('ChooseProtocolSlideout', () => {
       reset: jest.fn(),
       runCreationErrorCode: 409,
     })
-    const [{ getByRole, getByText }] = render({
+    render({
       robot: mockConnectableRobot,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
-    proceedButton.click()
+    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
-    getByText('This robot is busy and can’t run this protocol right now.')
-    const link = getByRole('link', { name: 'Go to Robot' })
+    screen.getByText('This robot is busy and can’t run this protocol right now.')
+    const link = screen.getByRole('link', { name: 'Go to Robot' })
     fireEvent.click(link)
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
   })

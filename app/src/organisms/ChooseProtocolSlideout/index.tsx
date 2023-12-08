@@ -67,9 +67,9 @@ export function ChooseProtocolSlideoutComponent(
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
-          const srcFilePath = selectedProtocol.srcFileNames[index]
-          return new File([srcFileBuffer], path.basename(srcFilePath))
-        })
+        const srcFilePath = selectedProtocol.srcFileNames[index]
+        return new File([srcFileBuffer], path.basename(srcFilePath))
+      })
       : []
 
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
@@ -101,10 +101,10 @@ export function ChooseProtocolSlideoutComponent(
     { hostname: robot.ip },
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        }))
+        vector,
+        location,
+        definitionUri,
+      }))
       : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
@@ -205,11 +205,8 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
           selectedProtocol != null &&
           storedProtocol.protocolKey === selectedProtocol.protocolKey
         return (
-          <>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              key={storedProtocol.protocolKey}
-            >
+          <React.Fragment key={storedProtocol.protocolKey} >
+            <Flex flexDirection={DIRECTION_COLUMN} >
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
@@ -282,7 +279,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 )}
               </StyledText>
             ) : null}
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>

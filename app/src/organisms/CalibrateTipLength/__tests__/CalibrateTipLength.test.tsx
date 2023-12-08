@@ -10,6 +10,7 @@ import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessio
 
 import { CalibrateTipLength } from '../index'
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
@@ -26,13 +27,31 @@ const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
 >
 
 describe('CalibrateTipLength', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof CalibrateTipLength>>
-  ) => ReturnType<typeof renderWithProviders>
-  let dispatchRequests: jest.MockedFunction<() => {}>
+  const dispatchRequests = jest.fn()
   let mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
     id: 'fake_session_id',
     ...mockTipLengthCalibrationSessionAttributes,
+  }
+  const render = (
+    props: Partial<React.ComponentProps<typeof CalibrateTipLength>> = {}
+  ) => {
+    const {
+      showSpinner = false,
+      isJogging = false,
+      session = mockTipLengthSession,
+    } = props
+    return renderWithProviders<
+      React.ComponentType<typeof CalibrateTipLength>
+    >(
+      <CalibrateTipLength
+        robotName="robot-name"
+        session={session}
+        dispatchRequests={dispatchRequests}
+        showSpinner={showSpinner}
+        isJogging={isJogging}
+      />,
+      { i18nInstance: i18n }
+    )
   }
 
   const SPECS: CalibrateTipLengthSpec[] = [
@@ -55,42 +74,17 @@ describe('CalibrateTipLength', () => {
   ]
 
   beforeEach(() => {
-    dispatchRequests = jest.fn()
     when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
-
-    mockTipLengthSession = {
-      id: 'fake_session_id',
-      ...mockTipLengthCalibrationSessionAttributes,
-    }
-
-    render = (props = {}) => {
-      const {
-        showSpinner = false,
-        isJogging = false,
-        session = mockTipLengthSession,
-      } = props
-      return renderWithProviders<
-        React.ComponentType<typeof CalibrateTipLength>
-      >(
-        <CalibrateTipLength
-          robotName="robot-name"
-          session={session}
-          dispatchRequests={dispatchRequests}
-          showSpinner={showSpinner}
-          isJogging={isJogging}
-        />,
-        { i18nInstance: i18n }
-      )
-    }
   })
 
   afterEach(() => {
     resetAllWhenMocks()
+    jest.resetAllMocks()
   })
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      const { getByRole, queryByRole } = render({
+      render({
         session: {
           ...mockTipLengthSession,
           details: {
@@ -98,38 +92,38 @@ describe('CalibrateTipLength', () => {
             currentStep: spec.currentStep,
           },
         },
-      })[0]
+      })
 
       SPECS.forEach(({ currentStep, heading }) => {
         if (currentStep === spec.currentStep) {
           expect(
-            getByRole('heading', { name: spec.heading })
+            screen.getByRole('heading', { name: spec.heading })
           ).toBeInTheDocument()
         } else {
-          expect(queryByRole('heading', { name: heading })).toBeNull()
+          expect(screen.queryByRole('heading', { name: heading })).toBeNull()
         }
       })
     })
   })
 
   it('renders confirm exit on exit click', () => {
-    const { getByRole, queryByRole } = render()[0]
-
+    render()
     expect(
-      queryByRole('heading', {
+      screen.queryByRole('heading', {
         name: 'Tip Length Calibration progress will be lost',
       })
     ).toBeNull()
-    getByRole('button', { name: 'Exit' }).click()
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
+    fireEvent.click(exitButton)
     expect(
-      getByRole('heading', {
+      screen.getByRole('heading', {
         name: 'Tip Length Calibration progress will be lost',
       })
     ).toBeInTheDocument()
   })
 
   it('does not render contents when showSpinner is true', () => {
-    const { queryByRole } = render({
+    render({
       showSpinner: true,
       session: {
         ...mockTipLengthSession,
@@ -138,8 +132,8 @@ describe('CalibrateTipLength', () => {
           currentStep: 'sessionStarted',
         },
       },
-    })[0]
-    expect(queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    })
+    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {
@@ -152,7 +146,8 @@ describe('CalibrateTipLength', () => {
       },
     }
     const { getByRole } = render({ isJogging: false, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    const forwardButton = getByRole('button', { name: 'forward' })
+    fireEvent.click(forwardButton)
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -170,8 +165,9 @@ describe('CalibrateTipLength', () => {
         currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
-    const { getByRole } = render({ isJogging: true, session })[0]
-    getByRole('button', { name: 'forward' }).click()
+    render({ isJogging: true, session })
+    const forwardButton = screen.getByRole('button', { name: 'forward' })
+    fireEvent.click(forwardButton)
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
