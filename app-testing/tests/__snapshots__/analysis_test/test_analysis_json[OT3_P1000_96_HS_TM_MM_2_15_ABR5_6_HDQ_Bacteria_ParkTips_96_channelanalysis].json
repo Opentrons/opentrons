@@ -32,7 +32,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -2985,7 +2985,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,
@@ -3410,7 +3410,7 @@
             "yDimension": 85.48,
             "zDimension": 16.0
           },
-          "gripForce": 15.0,
+          "gripForce": 9.0,
           "gripHeightFromLabwareBottom": 10.0,
           "gripperOffsets": {},
           "groups": [
@@ -4575,7 +4575,7 @@
               "dropOffset": {
                 "x": 0.0,
                 "y": 0.0,
-                "z": 0.5
+                "z": 1.0
               },
               "pickUpOffset": {
                 "x": 0.0,

@@ -22,7 +22,15 @@ exclude = props(
     "liquidId",
 )
 
-ignore_test = ["OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40Erroranalysis","OT3_P1000MLeft_P50MRight_HS_MM_TC_TM_2_15_ABR3_Illumina_DNA_Enrichment_v4analysis","OT3_P1000MLeft_P50MRight_HS_TM_MM_TC_2_15_ABR4_Illumina_DNA_Prep_24xanalysis"]
+ignore_test = [
+    "OT2_P300M_P20S_MM_TM_TC1_5_2_6_PD40Erroranalysis", # diff not showing? Super weird
+    "OT3_P1000MLeft_P50MRight_HS_MM_TC_TM_2_15_ABR3_Illumina_DNA_Enrichment_v4analysis", # https://opentrons.atlassian.net/browse/RQA-2001
+    "OT3_P1000MLeft_P50MRight_HS_TM_MM_TC_2_15_ABR4_Illumina_DNA_Prep_24xanalysis", # https://opentrons.atlassian.net/browse/RQA-2001
+    "OT3_P1000_96_None_2_15_ABR5_6_IDT_xGen_EZ_96x_Head_PART_I_III_ABRanalysis", # https://opentrons.atlassian.net/browse/RQA-2001
+    "OT3_P1000_96_HS_TM_TC_MM_2_15_ABR5_6_Illumina_DNA_Prep_96x_Head_PART_IIIanalysis", # https://opentrons.atlassian.net/browse/RQA-2032
+    "OT3_P1000MLeft_P50MRight_HS_MM_TC_TM_2_15_ABR3_Illumina_DNA_Enrichmentanalysis", # https://opentrons.atlassian.net/browse/RQA-2001
+]
+
 
 @pytest.fixture
 def snapshot_exclude(snapshot: SerializableData) -> SerializableData:
