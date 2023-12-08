@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .error_wrapper {
   padding-top: 1rem;

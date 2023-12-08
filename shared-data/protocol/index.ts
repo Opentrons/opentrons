@@ -8,6 +8,14 @@ import type {
   ProtocolFile as ProtocolFileV8,
   ProtocolStructure as ProtocolStructureV8,
 } from './types/schemaV8'
+import protocolSchemaV1 from './schemas/1.json'
+import protocolSchemaV2 from './schemas/2.json'
+import protocolSchemaV3 from './schemas/3.json'
+import protocolSchemaV4 from './schemas/4.json'
+import protocolSchemaV5 from './schemas/5.json'
+import protocolSchemaV6 from './schemas/6.json'
+import protocolSchemaV7 from './schemas/7.json'
+import protocolSchemaV8 from './schemas/8.json'
 
 export type {
   ProtocolFileV1,
@@ -30,3 +38,14 @@ export type JsonProtocolFile =
   | Readonly<ProtocolFileV8<{}>>
 
 export * from './types/schemaV8'
+
+export {
+  protocolSchemaV1,
+  protocolSchemaV2,
+  protocolSchemaV3,
+  protocolSchemaV4,
+  protocolSchemaV5,
+  protocolSchemaV6,
+  protocolSchemaV7,
+  protocolSchemaV8,
+}

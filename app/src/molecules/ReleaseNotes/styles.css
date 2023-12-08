@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .release_notes {
   width: 100%;

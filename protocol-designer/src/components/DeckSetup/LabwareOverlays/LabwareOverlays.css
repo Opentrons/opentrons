@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .labware_controls {
   height: 100%;

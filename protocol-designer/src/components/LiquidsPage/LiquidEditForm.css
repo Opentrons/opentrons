@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .form_card {
   margin: 1rem;

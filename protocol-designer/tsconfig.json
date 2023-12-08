@@ -20,5 +20,5 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["typings", "src"]
+  "include": ["typings", "src", "vite.config.ts"]
 }

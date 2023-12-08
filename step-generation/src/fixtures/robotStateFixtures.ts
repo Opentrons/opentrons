@@ -4,20 +4,19 @@ import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
-import {
   fixtureP10Single as _fixtureP10Single,
   fixtureP10Multi as _fixtureP10Multi,
   fixtureP300Single as _fixtureP300Single,
   fixtureP300Multi as _fixtureP300Multi,
   fixtureP100096 as _fixtureP100096,
-} from '@opentrons/shared-data/pipette/fixtures/name'
-import _fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
-import _fixtureTiprackAdapter from '@opentrons/shared-data/labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
+  fixture96Plate as _fixture96Plate,
+  fixture12Trough as _fixture12Trough,
+  fixtureTiprack10ul as _fixtureTiprack10ul,
+  fixtureTiprack300ul as _fixtureTiprack300ul,
+  fixtureTiprack1000ul as _fixtureTiprack1000ul,
+  fixtureTiprackAdapter as _fixtureTiprackAdapter,
+} from '@opentrons/shared-data'
+
 import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,

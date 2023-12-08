@@ -1,9 +1,7 @@
 import * as React from 'react'
 import parseHtml from 'html-react-parser'
 import { stringify } from 'svgson'
-
-import ot2DeckDefV3 from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ot2StandardDeckV3, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import type { INode } from 'svgson'
 import type { RobotType } from '@opentrons/shared-data'
@@ -42,7 +40,7 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
 
   // get layers from OT-2 deck definition v3
   const layerGroupNodes = filterLayerGroupNodes(
-    ot2DeckDefV3.layers,
+    ot2StandardDeckV3.layers,
     layerBlocklist
   )
 

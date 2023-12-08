@@ -87,3 +87,5 @@ export const getIncompatiblePipetteNames = (
     return []
   }
 }
+
+export * from '../pipette/fixtures/name'

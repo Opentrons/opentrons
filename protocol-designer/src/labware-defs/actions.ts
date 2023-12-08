@@ -4,12 +4,12 @@ import isEqual from 'lodash/isEqual'
 import flatten from 'lodash/flatten'
 import values from 'lodash/values'
 import uniqBy from 'lodash/uniqBy'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import {
   getLabwareDefURI,
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
   LabwareDefinition2,
+  protocolSchemaV2
 } from '@opentrons/shared-data'
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
@@ -55,7 +55,7 @@ const ajv = new Ajv({
   allErrors: true,
   jsonPointers: true,
 })
-const validate = ajv.compile(labwareSchema)
+const validate = ajv.compile(protocolSchemaV2)
 
 const _labwareDefsMatchingLoadName = (
   labwareDefs: LabwareDefinition2[],

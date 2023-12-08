@@ -1,5 +1,5 @@
 /* branded website navbar styles */
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 @import '../../styles/breakpoints.css';
 @import '../../styles/shadows.css';
 @import '../../styles/spacing.css';

@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .advanced_settings_panel {
   background-color: #f6f6f6; /* TODO Ian 2019-03-15 add to colors.css? */

@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .info_wrapper {
   @apply --font-body-2-dark;

@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .alert_modal_padding {
   padding: 4rem 1rem;

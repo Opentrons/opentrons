@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 
 .select_field.error {
   & :global(.ot_select__control) {

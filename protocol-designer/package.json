@@ -8,6 +8,7 @@
     "email": "engineering@opentrons.com"
   },
   "name": "protocol-designer",
+  "type": "module",
   "productName": "Opentrons Protocol Designer BETA",
   "private": true,
   "version": "0.0.0-dev",
@@ -20,12 +21,15 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@hot-loader/react-dom": "17.0.1",
+    "@vitejs/plugin-react": "^4.2.1",
     "@opentrons/components": "link:../components",
     "@opentrons/step-generation": "link:../step-generation",
     "@opentrons/shared-data": "link:../shared-data",
     "@types/redux-actions": "2.6.1",
     "@types/ua-parser-js": "0.7.36",
     "@types/uuid": "8.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
     "ajv": "6.12.3",
     "classnames": "2.2.5",
     "cookie": "0.3.1",
@@ -50,6 +54,9 @@
     "reselect": "4.0.0",
     "ua-parser-js": "^0.7.23",
     "uuid": "3.3.2",
-    "yup": "0.26.6"
+    "vite": "5.0.5",
+    "yup": "0.26.6",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4"
   }
 }

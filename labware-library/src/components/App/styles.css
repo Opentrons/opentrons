@@ -1,5 +1,5 @@
 /* app styles */
-@import '@opentrons/components';
+@import '@opentrons/components/styles';
 @import '../../styles/breakpoints.css';
 @import '../../styles/spacing.css';
 

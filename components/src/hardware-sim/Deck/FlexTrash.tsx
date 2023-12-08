@@ -3,15 +3,13 @@ import * as React from 'react'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  opentrons1Trash3200mlFixedV1 as trashDef,
 } from '@opentrons/shared-data'
-
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
-
-import trashDef from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 
 import type { RobotType } from '@opentrons/shared-data'
 

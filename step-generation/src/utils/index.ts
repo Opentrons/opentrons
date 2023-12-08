@@ -4,7 +4,6 @@ import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './reduceCommandCreators'
 import { modulePipetteCollision } from './modulePipetteCollision'
 import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
-import { isValidSlot } from './isValidSlot'
 import { getLabwareSlot } from './getLabwareSlot'
 
 export {
@@ -13,7 +12,6 @@ export {
   reduceCommandCreators,
   modulePipetteCollision,
   thermocyclerPipetteCollision,
-  isValidSlot,
   getLabwareSlot,
 }
 export * from './commandCreatorArgsGetters'
