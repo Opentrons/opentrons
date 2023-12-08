@@ -26,7 +26,7 @@ LABWARE_MOVEMENT_DECK_SLOT_2 = "B3"
 LABWARE_MOVEMENT_STAGING_AREA_SLOT_3 = "C3"
 LABWARE_MOVEMENT_STAGING_AREA_SLOT_4 = "A4"
 
-TIP_RACK_LOCATION_1 = "C3"  
+TIP_RACK_LOCATION_1 = "C3"
 TIP_RACK_LOCATION_2 = "D2"
 
 
@@ -129,12 +129,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Module -> Deck
     # Module -> Other Module
 
-    module_to_module_iterations = [
-        (modules[i], modules[j])
-        for i in range(modules)
-        for j in range(modules)
-        if i != j
-    ]
+    module_to_module_iterations = [(modules[i], modules[j]) for i in range(modules) for j in range(modules) if i != j]
 
-    for starting_loc, ending_loc in module_to_module_iterations:
-        ctx.
+    # for starting_loc, ending_loc in module_to_module_iterations:
+    #     ctx.

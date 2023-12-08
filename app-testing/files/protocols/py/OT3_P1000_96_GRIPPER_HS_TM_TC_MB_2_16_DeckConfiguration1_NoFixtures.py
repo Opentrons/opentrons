@@ -53,7 +53,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     on_deck_tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, TIP_RACK_LOCATION_1, "opentrons_flex_96_tiprack_adapter")
     tip_rack_adapter_1 = on_deck_tip_rack_1.parent
-    
+
     on_deck_tip_rack_2 = ctx.load_labware(TIPRACK_96_NAME, TIP_RACK_LOCATION_2, "opentrons_flex_96_tiprack_adapter")
     tip_rack_adapter_2 = on_deck_tip_rack_2.parent
     off_deck_tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, protocol_api.OFF_DECK)
@@ -86,11 +86,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ########################
 
     pipette_96_channel.pick_up_tip(default_well(on_deck_tip_rack_1))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.return_tip()
 
     pipette_96_channel.pick_up_tip(default_well(on_deck_tip_rack_2))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.return_tip()
 
     #####################################
@@ -108,11 +112,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_labware(off_deck_tip_rack_2, tip_rack_adapter_2, use_gripper=not USING_GRIPPER)
 
     pipette_96_channel.pick_up_tip(default_well(off_deck_tip_rack_1))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.return_tip()
 
     pipette_96_channel.pick_up_tip(default_well(off_deck_tip_rack_2))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.return_tip()
 
     ############################

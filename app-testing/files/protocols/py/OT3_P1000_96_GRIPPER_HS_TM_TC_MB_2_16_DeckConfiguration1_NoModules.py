@@ -89,11 +89,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ########################
 
     pipette_96_channel.pick_up_tip(default_well(on_deck_tip_rack_1))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.drop_tip(waste_chute)
 
     pipette_96_channel.pick_up_tip(default_well(on_deck_tip_rack_2))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.drop_tip(trash_bin_1)
 
     ##################################
@@ -115,11 +119,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     #############################
 
     pipette_96_channel.pick_up_tip(default_well(staging_area_tip_rack_1))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.drop_tip(waste_chute)
 
     pipette_96_channel.pick_up_tip(default_well(staging_area_tip_rack_2))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.drop_tip(trash_bin_2)
 
     ##################################
@@ -137,11 +145,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_labware(off_deck_tip_rack_2, tip_rack_adapter_2, use_gripper=not USING_GRIPPER)
 
     pipette_96_channel.pick_up_tip(default_well(off_deck_tip_rack_1))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.drop_tip(waste_chute)
 
     pipette_96_channel.pick_up_tip(default_well(off_deck_tip_rack_2))
-    pipette_96_channel.transfer(TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never")
+    pipette_96_channel.transfer(
+        TRANSFER_VOL, default_well(src_pcr_plate), default_well(dest_pcr_plate), new_tip="never"
+    )
     pipette_96_channel.drop_tip(waste_chute)
 
     ##########################################
