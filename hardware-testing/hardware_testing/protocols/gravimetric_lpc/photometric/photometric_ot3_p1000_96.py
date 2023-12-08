@@ -22,16 +22,13 @@ def run(ctx: ProtocolContext) -> None:
     reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
     plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
     pipette = ctx.load_instrument("flex_96channel_1000", "left")
-    adapters = [ctx.load_adapter(
-        "opentrons_flex_96_tiprack_adapter",
-        slot)
+    adapters = [
+        ctx.load_adapter("opentrons_flex_96_tiprack_adapter", slot)
         for slot in SLOTS_TIPRACK[50]
     ]
     for tip_size in SLOTS_TIPRACK.keys():
         tipracks = [
-            adapter.load_labware(
-                f"opentrons_flex_96_tiprack_{tip_size}uL"
-            )
+            adapter.load_labware(f"opentrons_flex_96_tiprack_{tip_size}uL")
             for adapter in adapters
         ]
         for rack in tipracks:
@@ -46,4 +43,3 @@ def run(ctx: ProtocolContext) -> None:
                 new_location=OffDeckType.OFF_DECK,
                 use_gripper=False,
             )
-

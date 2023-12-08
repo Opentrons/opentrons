@@ -20,16 +20,13 @@ def run(ctx: ProtocolContext) -> None:
 
     scale_labware = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
     pipette = ctx.load_instrument("flex_96channel_1000", "left")
-    adapters = [ctx.load_adapter(
-        "opentrons_flex_96_tiprack_adapter",
-        slot)
+    adapters = [
+        ctx.load_adapter("opentrons_flex_96_tiprack_adapter", slot)
         for slot in SLOTS_TIPRACK[50]
     ]
     for tip_size in SLOTS_TIPRACK.keys():
         tipracks = [
-            adapter.load_labware(
-                f"opentrons_flex_96_tiprack_{tip_size}uL"
-            )
+            adapter.load_labware(f"opentrons_flex_96_tiprack_{tip_size}uL")
             for adapter in adapters
         ]
         for rack in tipracks:
