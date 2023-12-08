@@ -18,6 +18,10 @@ PHOTOPLATE_LABWARE = "corning_96_wellplate_360ul_flat"
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
+
+    reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
+    plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
+    pipette = ctx.load_instrument("flex_96channel_1000", "left")
     for tip_size in SLOTS_TIPRACK.keys():
         tipracks = [
             # FIXME: use official tip-racks once available
@@ -30,11 +34,8 @@ def run(ctx: ProtocolContext) -> None:
             for slot in slots
             if size == tip_size
         ]
-        reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
-        plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
-        pipette = ctx.load_instrument("flex_96channel_1000", "left")
         for rack in tipracks:
-            pipette.pick_up_tip(rack["A1"])
+            pipette.pick_up_tip(rack)
             pipette.aspirate(10, reservoir["A1"].top())
             pipette.dispense(10, plate["A1"].top())
             pipette.drop_tip(home_after=False)
