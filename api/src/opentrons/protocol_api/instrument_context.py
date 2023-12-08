@@ -1815,8 +1815,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :type style: ``NozzleLayout`` or ``None``
         :param start: The nozzle at the back left of the layout, which the robot uses
             to determine how it will move to different locations on the deck. The string
-            should be of the same format used when identifying wells by name. 
-            Required unless setting ``style=ALL``. 
+            should be of the same format used when identifying wells by name.
+            Required unless setting ``style=ALL``.
 
             .. note::
                 When using the ``COLUMN`` layout, the only fully supported value is
