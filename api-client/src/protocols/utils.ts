@@ -117,11 +117,14 @@ export function parseInitialLoadedLabwareBySlot(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
     (acc, command) => {
-      if (
-        typeof command.params.location === 'object' &&
-        'slotName' in command.params.location
-      ) {
-        return { ...acc, [command.params.location.slotName]: command }
+      if (typeof command.params.location === 'object') {
+        let slot: string
+        if ('slotName' in command.params.location) {
+          slot = command.params.location.slotName
+        } else if ('addressableAreaName' in command.params.location) {
+          slot = command.params.location.addressableAreaName
+        } else return acc
+        return { ...acc, [slot]: command }
       } else {
         return acc
       }
