@@ -275,8 +275,6 @@ export const transfer: CommandCreator<TransferArgs> = (
               isInitialSubtransfer || destinationWell !== prevDestWell
           }
           const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
-          console.log('args.nozzles', args.nozzles)
-          console.log('state nozzles', stateNozzles)
           const configureNozzleLayoutCommand: CurriedCommandCreator[] =
             //  only emit the command if previous nozzle state is different
             is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
