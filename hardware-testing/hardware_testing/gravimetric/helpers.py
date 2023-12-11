@@ -477,6 +477,10 @@ def _load_tipracks(
                     pick_up_offset=None,
                     drop_offset=None,
                 )
+                if ctx.deck[ls[0]] is not None:
+                    # remove the adapter from the slot too
+                    ui.print_info(f"removing {ctx.deck[ls[0]]} from slot {ls[0]}")
+                    del ctx.deck[ls[0]]
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
