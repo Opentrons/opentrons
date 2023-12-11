@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { parseAllRequiredModuleModels } from '@opentrons/api-client'
+import {
+  parseAllRequiredModuleModels,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/api-client'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
@@ -76,6 +79,9 @@ const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFu
 const mockParseAllRequiredModuleModels = parseAllRequiredModuleModels as jest.MockedFunction<
   typeof parseAllRequiredModuleModels
 >
+const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
+  typeof parseLiquidsInLoadOrder
+>
 const mockSetupLabware = SetupLabware as jest.MockedFunction<
   typeof SetupLabware
 >
@@ -142,6 +148,7 @@ describe('ProtocolRunSetup', () => {
         ...MOCK_ROTOCOL_LIQUID_KEY,
       } as unknown) as ProtocolAnalysisOutput)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
+    when(mockParseLiquidsInLoadOrder).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
       .mockReturnValue(mockConnectedRobot)
