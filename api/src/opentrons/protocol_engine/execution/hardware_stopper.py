@@ -1,6 +1,6 @@
 """Post-protocol hardware stopper."""
 import logging
-from typing import Optional
+from typing import Optional, List
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
@@ -14,7 +14,9 @@ from .movement import MovementHandler
 from .gantry_mover import HardwareGantryMover
 from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
-from opentrons.types import Mount
+
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
+from opentrons.protocol_engine.types import AddressableOffsetVector
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +51,7 @@ class HardwareStopper:
             state_view=state_store,
         )
 
-    async def _drop_tip(self) -> None:
+    async def _drop_tip(self, disposal_addressable_areas: List[str]) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
@@ -73,11 +75,21 @@ class HardwareStopper:
             try:
                 await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
                 # TODO: Add ability to drop tip onto custom trash as well.
-                await self._movement_handler.move_to_well(
+                # if API is 2.15 and below aka is should_have_fixed_trash
+
+                addressable_area_name = disposal_addressable_areas[0]
+                if any("fixedTrash" in s for s in disposal_addressable_areas):
+                    addressable_area_name = "fixedTrash"
+
+                await self._movement_handler.move_to_addressable_area(
                     pipette_id=pipette_id,
-                    labware_id=FIXED_TRASH_ID,
-                    well_name="A1",
+                    addressable_area_name=addressable_area_name,
+                    offset=AddressableOffsetVector(x=0, y=0, z=0),
+                    force_direct=False,
+                    speed=None,
+                    minimum_z_height=None,
                 )
+
                 await self._tip_handler.drop_tip(
                     pipette_id=pipette_id,
                     home_after=False,
@@ -104,32 +116,43 @@ class HardwareStopper:
         drop_tips_after_run: bool = False,
     ) -> None:
         """Stop and reset the HardwareAPI, homing and dropping tips independently if specified."""
-        if drop_tips_after_run:
-            await self._drop_tip()
-
         home_after_stop = post_run_hardware_state in (
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,
         )
-        # if home_after_stop:
-        #     if None in self._state_store.pipettes.get_all_attached_tips():
-        #         await self._hardware_api.stop(home_after=home_after_stop)
-        #     else:
-        #         instrs = self._hardware_api.get_attached_instruments()
-        #         if instrs.get(Mount.EXTENSION) is not None:
-        #             await self._movement_handler.home(
-        #                 axes=[MotorAxis.EXTENSION_Z, MotorAxis.EXTENSION_JAW]
-        #             )
 
-        #         await self._movement_handler.home(
-        #             axes=[
-        #                 MotorAxis.X,
-        #                 MotorAxis.Y,
-        #                 MotorAxis.LEFT_Z,
-        #                 MotorAxis.RIGHT_Z,
-        #             ]
-        #         )
+        if drop_tips_after_run:
+            disposal_addressable_areas = (
+                self._state_store.addressable_areas.get_disposal_addressable_areas()
+            )
+            if len(disposal_addressable_areas) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            await self._drop_tip(disposal_addressable_areas)
+            await self._hardware_api.stop(home_after=home_after_stop)
 
-        # else:
+        elif home_after_stop:
+            if len(self._state_store.pipettes.get_all_attached_tips()) == 0:
+                await self._hardware_api.stop(home_after=home_after_stop)
+            else:
+                try:
+                    ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+                    if (
+                        not self._state_store.config.use_virtual_gripper
+                        and ot3api.has_gripper()
+                    ):
+                        await ot3api.home_z(mount=OT3Mount.GRIPPER)
+                except HardwareNotSupportedError:
+                    pass
 
-        await self._hardware_api.stop(home_after=home_after_stop)
+                await self._movement_handler.home(
+                    axes=[
+                        MotorAxis.X,
+                        MotorAxis.Y,
+                        MotorAxis.LEFT_Z,
+                        MotorAxis.RIGHT_Z,
+                    ]
+                )
+        else:
+            await self._hardware_api.stop(home_after=home_after_stop)
