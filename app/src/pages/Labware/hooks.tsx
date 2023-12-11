@@ -37,7 +37,6 @@ export function useAllLabware(
       : null
   )
   const sortLabware = (a: LabwareDefAndDate, b: LabwareDefAndDate): number => {
-    console.log(a.definition.metadata.displayName)
     if (
       a.definition.metadata.displayName.toUpperCase() <
       b.definition.metadata.displayName.toUpperCase()
