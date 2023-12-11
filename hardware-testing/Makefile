@@ -79,36 +79,36 @@ sdist:
 
 .PHONY: test
 test:
-	-$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts)
-	-$(MAKE) remove-patches-gravimetric
+#	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-cov
 test-cov:
-	-$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
-	-$(MAKE) remove-patches-gravimetric
+#	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-photometric-single
 test-photometric-single:
-	-$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) apply-patches-gravimetric
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --photoplate-col-offset 3
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 1 --tip 50 --dye-well-col-offset 3
-	-$(MAKE) remove-patches-gravimetric
+#	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-photometric-multi
 test-photometric-multi:
-	-$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) apply-patches-gravimetric
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 50 --channels 8 --tip 50
-	-$(MAKE) remove-patches-gravimetric
+#	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-photometric
 test-photometric:
-	-$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) apply-patches-gravimetric
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
-	-$(MAKE) remove-patches-gravimetric
+#	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
@@ -134,14 +134,14 @@ test-gravimetric-96:
 
 .PHONY: test-gravimetric
 test-gravimetric:
-	-$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) apply-patches-gravimetric
 	$(python) -m hardware_testing.gravimetric.daily_setup --simulate
 	$(python) -m hardware_testing.gravimetric.daily_setup --simulate --calibrate
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
 	$(MAKE) test-gravimetric-96
 	$(MAKE) test-photometric
-	-$(MAKE) remove-patches-gravimetric
+#	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -172,11 +172,11 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: lint
 lint:
-	-$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) apply-patches-gravimetric
 	$(python) -m mypy hardware_testing tests
 	$(python) -m black --check hardware_testing tests setup.py
 	$(python) -m flake8 hardware_testing tests setup.py
-	-$(MAKE) remove-patches-gravimetric
+#	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: format
 format:
@@ -297,10 +297,11 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
-	$(MAKE) apply-patches-gravimetric
-	-$(MAKE) sync-sw-ot3
+#	$(MAKE) apply-patches-gravimetric
+#	-$(MAKE) sync-sw-ot3
+	$(MAKE) push-ot3
 	scp $(ssh_helper_ot3) -r hardware_testing/labware root@$(host):/data/labware/v2/custom_definitions/custom_beta/
-	$(MAKE) remove-patches-gravimetric
+#   $(MAKE) remove-patches-gravimetric
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
