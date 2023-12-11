@@ -38,7 +38,9 @@ describe('useSubsystemUpdateQuery hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -78,12 +80,9 @@ describe('useSubsystemUpdateQuery hook', () => {
         data: SUBSYSTEM_UPDATE_RESPONSE,
       } as Response<SubsystemUpdateProgressData>)
 
-    const { result } = renderHook(
-      () => useSubsystemUpdateQuery(UPDATE_ID),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useSubsystemUpdateQuery(UPDATE_ID), {
+      wrapper,
+    })
 
     await waitFor(() => {
       expect(result.current.data).toEqual(SUBSYSTEM_UPDATE_RESPONSE)

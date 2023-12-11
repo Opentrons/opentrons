@@ -21,11 +21,13 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useDismissCurrentRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -40,12 +42,9 @@ describe('useDismissCurrentRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1)
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result } = renderHook(
-      () => useDismissCurrentRunMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDismissCurrentRunMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     act(() => {

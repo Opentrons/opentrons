@@ -19,11 +19,13 @@ const RUN_ID = '1'
 const RUN_RESPONSE = { data: { id: RUN_ID } } as Run
 
 describe('useRunQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

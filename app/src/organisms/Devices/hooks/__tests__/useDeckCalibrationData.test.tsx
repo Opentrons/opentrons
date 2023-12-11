@@ -40,7 +40,7 @@ const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useDeckCalibrationData hook', () => {
   let dispatchApiRequest: DispatchApiRequestType
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
     const queryClient = new QueryClient()

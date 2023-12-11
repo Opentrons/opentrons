@@ -63,7 +63,7 @@ const mockCurrentOffsets: LabwareOffset[] = [
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('useLaunchLPC hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let mockCreateMaintenanceRun: jest.Mock
   let mockCreateLabwareDefinition: jest.Mock
   let mockDeleteMaintenanceRun: jest.Mock

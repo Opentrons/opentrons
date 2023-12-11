@@ -1,7 +1,10 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { partialComponentPropsMatcher, renderWithProviders } from '@opentrons/components'
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { waitFor } from '@testing-library/react'
 import { i18n } from '../../../i18n'
@@ -27,7 +30,6 @@ import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/select
 import { ChooseRobotToRunProtocolSlideout } from '../../ChooseRobotToRunProtocolSlideout'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-
 
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/custom-labware/selectors')

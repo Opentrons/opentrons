@@ -27,9 +27,9 @@ describe('useToggleGroup', () => {
   })
 
   it('should return default selectedValue and toggle buttons', () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
 
     const { result } = renderHook(
       () => useToggleGroup('List View', 'Map View'),
@@ -39,9 +39,9 @@ describe('useToggleGroup', () => {
     expect(result.current[0]).toBe('List View')
   })
   it('should record an analytics event for list view', async () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
 
     const { result } = renderHook(
       () => useToggleGroup('List View', 'Map View', 'fake event'),
@@ -57,9 +57,9 @@ describe('useToggleGroup', () => {
     })
   })
   it('should record an analytics event for map view', () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
 
     const { result } = renderHook(
       () => useToggleGroup('List View', 'Map View', 'fake event'),

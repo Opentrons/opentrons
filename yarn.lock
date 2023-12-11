@@ -3411,6 +3411,11 @@
     "@testing-library/dom" "^8.5.0"
     "@types/react-dom" "^18.0.0"
 
+"@testing-library/user-event@14.5.1":
+  version "14.5.1"
+  resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.5.1.tgz#27337d72046d5236b32fd977edee3f74c71d332f"
+  integrity sha512-UCcUKrUYGj7ClomOo2SpNVvx4/fkd/2BbIHDCle8A0ax+P3bU7yJwDBDrS6ZwdTMARWTGODX1hEsCcO+7beJjg==
+
 "@thi.ng/checks@^1.5.13":
   version "1.5.14"
   resolved "https://registry.yarnpkg.com/@thi.ng/checks/-/checks-1.5.14.tgz#d90b40a5549d3149e62302da30c09f5784814a38"

@@ -27,11 +27,15 @@ const MODULES_RESPONSE = {
 const V2_MODULES_RESPONSE = { data: v2MockModulesResponse }
 
 describe('useModulesQuery hook', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseModulesQueryOptions>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UseModulesQueryOptions
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseModulesQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UseModulesQueryOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

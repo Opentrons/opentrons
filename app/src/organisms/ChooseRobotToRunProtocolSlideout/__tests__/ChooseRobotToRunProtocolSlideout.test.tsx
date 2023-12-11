@@ -223,15 +223,17 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
     expect(proceedButton).not.toBeDisabled()
     const otherRobot = screen.getByText('otherRobot')
-    otherRobot.click() // unselect default robot
+    fireEvent.click(otherRobot) // unselect default robot
     expect(proceedButton).not.toBeDisabled()
     const mockRobot = screen.getByText('opentrons-robot-name')
-    mockRobot.click()
+    fireEvent.click(mockRobot)
     expect(proceedButton).not.toBeDisabled()
-    proceedButton.click()
+    fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
@@ -251,13 +253,15 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
     expect(proceedButton).toBeDisabled()
     screen.getByText(
       'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
     const linkToRobotDetails = screen.getByText('Go to Robot')
-    linkToRobotDetails.click()
+    fireEvent.click(linkToRobotDetails)
   })
 
   it('renders error state when there is a run creation error', () => {
@@ -273,8 +277,10 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
-    proceedButton.click()
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
+    fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
@@ -296,14 +302,18 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
-    proceedButton.click()
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
+    fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
-    screen.getByText('This robot is busy and can’t run this protocol right now.')
+    screen.getByText(
+      'This robot is busy and can’t run this protocol right now.'
+    )
     const link = screen.getByRole('link', { name: 'Go to Robot' })
     fireEvent.click(link)
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
@@ -343,8 +353,10 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       ]
     )
     expect(screen.getByRole('checkbox')).toBeChecked()
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
-    proceedButton.click()
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
+    fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
@@ -380,7 +392,9 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     fireEvent.click(otherRobot) // unselect default robot
 
     expect(screen.getByRole('checkbox')).toBeChecked()
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
     fireEvent.click(proceedButton)
     expect(mockUseCreateRunFromProtocol).nthCalledWith(
       2,

@@ -25,12 +25,16 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('usePlayMaintenanceRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UsePlayMaintenanceRunMutationOptions>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UsePlayMaintenanceRunMutationOptions
+  >
   const createPlayRunActionData = { actionType: RUN_ACTION_TYPE_PLAY }
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UsePlayMaintenanceRunMutationOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UsePlayMaintenanceRunMutationOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider

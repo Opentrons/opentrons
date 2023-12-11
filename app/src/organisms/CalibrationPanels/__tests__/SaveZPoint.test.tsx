@@ -40,7 +40,6 @@ describe('SaveZPoint', () => {
       />,
       { i18nInstance: i18n }
     )
-
   }
 
   afterEach(() => {

@@ -45,7 +45,9 @@ describe('useAllCurrentSubsystemUpdateQuery', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -85,12 +87,9 @@ describe('useAllCurrentSubsystemUpdateQuery', () => {
         data: CURRENT_SUBSYSTEM_UPDATES_RESPONSE,
       } as Response<CurrentSubsystemUpdates>)
 
-    const { result } = renderHook(
-      () => useCurrentAllSubsystemUpdatesQuery(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCurrentAllSubsystemUpdatesQuery(), {
+      wrapper,
+    })
 
     await waitFor(() => {
       expect(result.current.data).toEqual(CURRENT_SUBSYSTEM_UPDATES_RESPONSE)

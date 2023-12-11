@@ -27,14 +27,15 @@ const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
   typeof getDeckDefinitions
 >
 
-
 describe('CalibrateDeck', () => {
   let dispatchRequests: DispatchRequestsType
   const mockDeckCalSession: Sessions.DeckCalibrationSession = {
     id: 'fake_session_id',
     ...mockDeckCalibrationSessionAttributes,
   }
-  const render = (props: Partial<React.ComponentProps<typeof CalibrateDeck>> = {}) => {
+  const render = (
+    props: Partial<React.ComponentProps<typeof CalibrateDeck>> = {}
+  ) => {
     const {
       showSpinner = false,
       isJogging = false,
@@ -138,7 +139,9 @@ describe('CalibrateDeck', () => {
         },
       },
     })
-    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    expect(
+      screen.queryByRole('heading', { name: 'Before you begin' })
+    ).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {

@@ -21,11 +21,13 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useCreateLiveCommandMutation hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -40,12 +42,9 @@ describe('useCreateLiveCommandMutation hook', () => {
       .calledWith(HOST_CONFIG, mockAnonLoadCommand, {})
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result } = renderHook(
-      () => useCreateLiveCommandMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCreateLiveCommandMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     act(() => {
@@ -68,12 +67,9 @@ describe('useCreateLiveCommandMutation hook', () => {
       })
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result } = renderHook(
-      () => useCreateLiveCommandMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCreateLiveCommandMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     act(() => {

@@ -36,7 +36,7 @@ const PROTOCOL_PROPERTIES = { protocolType: 'python' } as ProtocolAnalyticsData
 
 let mockTrackEvent: jest.Mock
 let mockGetProtocolRunAnalyticsData: jest.Mock
-let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(jest.fn(), {})
 
 describe('useTrackCreateProtocolRunEvent hook', () => {

@@ -61,7 +61,9 @@ describe('Introduction', () => {
     const button = screen.getByRole('button', { name: 'Change tip rack' })
     fireEvent.click(button)
     screen.getByText('mock choose tip rack')
-    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBe(null)
+    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBe(
+      null
+    )
   })
   it('clicking proceed loads alternate tiprack if load labware supported for session', () => {
     render({
@@ -76,7 +78,7 @@ describe('Introduction', () => {
     })
   })
   it('clicking proceed loads default if load labware is not supported for session', () => {
-    render({sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION})
+    render({ sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION })
     const startButton = screen.getByRole('button', { name: 'Get started' })
     fireEvent.click(startButton)
     expect(mockSendCommands).toHaveBeenCalledWith({
@@ -89,7 +91,9 @@ describe('Introduction', () => {
       calInvalidationHandler: mockCalInvalidationHandler,
     })
     screen.getByText('Recalibrating the deck clears pipette offset data')
-    screen.getByText('Pipette offsets for both mounts will have to be recalibrated.')
+    screen.getByText(
+      'Pipette offsets for both mounts will have to be recalibrated.'
+    )
   })
   it('displays the InvalidationWarning when necessary - Tip Length session', () => {
     render({

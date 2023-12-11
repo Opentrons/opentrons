@@ -26,7 +26,9 @@ describe('useDeleteProtocolMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -42,12 +44,9 @@ describe('useDeleteProtocolMutation hook', () => {
       .calledWith(HOST_CONFIG, protocolId)
       .mockRejectedValue('oh no')
 
-    const { result } = renderHook(
-      () => useDeleteProtocolMutation(protocolId),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     result.current.deleteProtocol()
@@ -64,12 +63,9 @@ describe('useDeleteProtocolMutation hook', () => {
         data: DELETE_PROTOCOL_RESPONSE,
       } as Response<EmptyResponse>)
 
-    const { result } = renderHook(
-      () => useDeleteProtocolMutation(protocolId),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
+      wrapper,
+    })
     act(() => result.current.deleteProtocol())
 
     await waitFor(() => {

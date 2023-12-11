@@ -22,7 +22,7 @@ const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
 >
 
 describe('useAttachedPipettes hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     mockGetPipetteModelSpecs.mockReturnValue({
       name: 'mockName',

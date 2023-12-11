@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { MediumButton } from '../MediumButton'
@@ -17,10 +18,10 @@ describe('MediumButton', () => {
     }
   })
   it('renders the default button and it works as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Medium button').click()
+    render(props)
+    fireEvent.click(screen.getByText('Medium button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(getByRole('button')).toHaveStyle(
+    expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.blueEnabled}`
     )
   })
@@ -29,16 +30,16 @@ describe('MediumButton', () => {
       ...props,
       buttonType: 'alert',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
   })
   it('renders the secondary button', () => {
     props = {
       ...props,
       buttonType: 'secondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
@@ -47,32 +48,32 @@ describe('MediumButton', () => {
       ...props,
       buttonType: 'alertSecondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
   })
   it('renders the tertiary high button', () => {
     props = {
       ...props,
       buttonType: 'tertiaryHigh',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.white}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`background-color: ${COLORS.white}`)
   })
   it('renders the tertiary low light button', () => {
     props = {
       ...props,
       buttonType: 'tertiaryLowLight',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.white}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`background-color: ${COLORS.white}`)
   })
   it('renders the button as disabled', () => {
     props = {
       ...props,
       disabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
   it('renders custom icon in the button', () => {
     props = {
@@ -87,8 +88,8 @@ describe('MediumButton', () => {
       ...props,
       buttonCategory: 'rounded',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize5}`
     )
   })

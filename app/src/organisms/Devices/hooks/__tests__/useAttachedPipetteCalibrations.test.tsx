@@ -50,7 +50,7 @@ const PIPETTE_CALIBRATIONS = {
 }
 
 describe('useAttachedPipetteCalibrations hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

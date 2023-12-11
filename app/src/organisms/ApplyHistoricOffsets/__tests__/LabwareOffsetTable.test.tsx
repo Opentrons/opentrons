@@ -66,7 +66,6 @@ const render = () =>
     { i18nInstance: i18n }
   )
 
-
 describe('LabwareOffsetTable', () => {
   afterEach(() => {
     jest.resetAllMocks()

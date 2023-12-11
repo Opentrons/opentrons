@@ -112,7 +112,9 @@ describe('DownloadUpdateModal', () => {
     render(props)
     expect(screen.getByText('Installing update...')).toBeInTheDocument()
     expect(
-      screen.getByText("This could take up to 15 minutes. Don't turn off the robot.")
+      screen.getByText(
+        "This could take up to 15 minutes. Don't turn off the robot."
+      )
     ).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
@@ -128,7 +130,9 @@ describe('DownloadUpdateModal', () => {
       screen.getByText('Install complete, robot restarting...')
     ).toBeInTheDocument()
     expect(
-      screen.getByText("This could take up to 15 minutes. Don't turn off the robot.")
+      screen.getByText(
+        "This could take up to 15 minutes. Don't turn off the robot."
+      )
     ).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
@@ -142,7 +146,9 @@ describe('DownloadUpdateModal', () => {
 
     const exitButton = screen.getByText('exit')
 
-    expect(screen.getByText('Robot software successfully updated')).toBeInTheDocument()
+    expect(
+      screen.getByText('Robot software successfully updated')
+    ).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
     expect(mockCreateLiveCommand).toBeCalledTimes(1)
     fireEvent.click(exitButton)

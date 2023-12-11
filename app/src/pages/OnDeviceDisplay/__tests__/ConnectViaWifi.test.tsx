@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -62,23 +63,23 @@ describe('ConnectViaWifi', () => {
   })
 
   it('should render step meter 2/5 (width:40%)', () => {
-    const [{ getByTestId }] = render()
-    getByTestId('StepMeter_StepMeterContainer')
-    const bar = getByTestId('StepMeter_StepMeterBar')
+    render()
+    screen.getByTestId('StepMeter_StepMeterContainer')
+    const bar = screen.getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 33.33333333333333%')
   })
 
   it('should render Searching for networks', () => {
-    const [{ getByText }] = render()
-    getByText('Searching for networks...')
+    render()
+    screen.getByText('Searching for networks...')
   })
 
   it('should render DisplayWifiList', () => {
     mockUseWifiList.mockReturnValue(mockWifiList)
-    const [{ getByText }] = render()
-    getByText('foo')
-    getByText('bar')
-    getByText('baz')
+    render()
+    screen.getByText('foo')
+    screen.getByText('bar')
+    screen.getByText('baz')
   })
 
   it('should render SelectAuthenticationType', () => {
@@ -87,9 +88,9 @@ describe('ConnectViaWifi', () => {
       wifi: initialMockWifi,
       ethernet: null,
     })
-    const [{ getByRole, getByText }] = render()
-    getByRole('button', { name: 'foo' }).click()
-    getByText('WPA2 Personal')
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'foo' }))
+    screen.getByText('WPA2 Personal')
   })
 
   it('should render SetWifiCred', () => {
@@ -98,10 +99,10 @@ describe('ConnectViaWifi', () => {
       wifi: initialMockWifi,
       ethernet: null,
     })
-    const [{ getByRole, getByText }] = render()
-    getByRole('button', { name: 'foo' }).click()
-    getByText('Continue').click()
-    getByText('Enter password')
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'foo' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Enter password')
   })
 
   it('should render ConnectingNetwork', () => {
@@ -113,10 +114,10 @@ describe('ConnectViaWifi', () => {
     mockGetRequestById.mockReturnValue({
       status: RobotApi.PENDING,
     })
-    const [{ getByRole, getByText }] = render()
-    getByRole('button', { name: 'foo' }).click()
-    getByText('Continue').click()
-    getByText('Connect').click()
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'foo' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Connect').click()
   })
 
   /* 
@@ -131,11 +132,11 @@ describe('ConnectViaWifi', () => {
       status: RobotApi.SUCCESS,
       response: {} as any,
     })
-    const [{ getByRole, getByText }] = render()
-    getByRole('button', { name: 'foo' }).click()
-    getByText('Continue').click()
-    getByText('Connect').click()
-    getByText('Successfully connected to foo!')
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'foo' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Connect').click()
+    screen.getByText('Successfully connected to foo!')
   })
 
   it('should render FailedToConnect', () => {
@@ -149,11 +150,11 @@ describe('ConnectViaWifi', () => {
       response: {} as any,
       error: { message: 'mock error' },
     })
-    const [{ getByRole, getByText }] = render()
-    getByRole('button', { name: 'foo' }).click()
-    getByText('Continue').click()
-    getByText('Connect').click()
-    getByText('Oops! Incorrect password for foo')
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'foo' }))
+    fireEvent.click(screen.getByText('Continue'))
+    screen.getByText('Connect').click()
+    screen.getByText('Oops! Incorrect password for foo')
   })
   */
 })

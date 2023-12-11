@@ -56,7 +56,7 @@ const mockTipLengthCalLauncher = jest.fn()
 const mockDeckCalLauncher = jest.fn()
 
 describe('useCalibrationTaskList hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let store: Store<State>
   const mockDeleteCalibration = jest.fn()
 

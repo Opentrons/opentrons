@@ -42,9 +42,9 @@ describe('useHistoricRunDetails', () => {
     )
 
   it('returns historical run details with newest first', async () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
-      <div>{children}</div>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <div>{children}</div>
     const { result } = renderHook(useHistoricRunDetails, { wrapper })
     await waitFor(() => {
       expect(result.current).toEqual([MOCK_RUN_LATER, MOCK_RUN_EARLIER])
@@ -59,9 +59,9 @@ describe('useHistoricRunDetails', () => {
           links: {},
         })
       )
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
-      <div>{children}</div>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <div>{children}</div>
     const { result } = renderHook(
       () => useHistoricRunDetails({ hostname: 'fakeIp' }),
       { wrapper }

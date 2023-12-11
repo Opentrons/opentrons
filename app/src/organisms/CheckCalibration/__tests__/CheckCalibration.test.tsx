@@ -143,7 +143,9 @@ describe('CheckCalibration', () => {
         },
       },
     })
-    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    expect(
+      screen.queryByRole('heading', { name: 'Before you begin' })
+    ).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {

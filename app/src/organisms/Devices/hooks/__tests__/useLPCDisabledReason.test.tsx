@@ -51,7 +51,9 @@ const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnaly
 
 describe('useLPCDisabledReason', () => {
   const store: Store<State> = createStore(jest.fn(), {})
-  const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+  const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+    children,
+  }) => (
     <I18nextProvider i18n={i18n}>
       <Provider store={store}>{children}</Provider>
     </I18nextProvider>

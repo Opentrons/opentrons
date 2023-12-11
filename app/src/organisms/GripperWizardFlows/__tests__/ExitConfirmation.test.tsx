@@ -44,15 +44,19 @@ describe('ExitConfirmation', () => {
   })
 
   it('renders correct text for attach flow', () => {
-    render({ flowType: GRIPPER_FLOW_TYPES.ATTACH, })
+    render({ flowType: GRIPPER_FLOW_TYPES.ATTACH })
     screen.getByText('Attach Gripper progress will be lost')
-    screen.getByText('Are you sure you want to exit before completing Attach Gripper?')
+    screen.getByText(
+      'Are you sure you want to exit before completing Attach Gripper?'
+    )
   })
 
   it('renders correct text for detach flow', () => {
     render({ flowType: GRIPPER_FLOW_TYPES.DETACH })
     screen.getByText('Detach Gripper progress will be lost')
-    screen.getByText('Are you sure you want to exit before completing Detach Gripper?')
+    screen.getByText(
+      'Are you sure you want to exit before completing Detach Gripper?'
+    )
   })
 
   it('renders correct text for recalibrate flow', () => {

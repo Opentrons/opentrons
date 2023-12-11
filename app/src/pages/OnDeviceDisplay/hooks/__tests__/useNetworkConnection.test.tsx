@@ -50,7 +50,7 @@ const store: Store<any> = createStore(jest.fn(), {})
 
 // ToDo (kj:0202/2023) USB test cases will be added when USB is out
 describe('useNetworkConnection', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     wrapper = ({ children }) => (

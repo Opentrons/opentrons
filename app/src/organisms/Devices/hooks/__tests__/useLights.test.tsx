@@ -23,7 +23,7 @@ const mockUseSetLightsMutation = useSetLightsMutation as jest.MockedFunction<
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useLights hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let setLights: jest.Mock
 
   beforeEach(() => {

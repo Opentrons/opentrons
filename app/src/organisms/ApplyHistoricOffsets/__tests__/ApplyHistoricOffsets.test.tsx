@@ -66,7 +66,9 @@ const mockFourthCandidate: OffsetCandidate = {
 
 describe('ApplyHistoricOffsets', () => {
   const mockSetShouldApplyOffsets = jest.fn()
-  const render = (props?: Partial<React.ComponentProps<typeof ApplyHistoricOffsets>>) =>
+  const render = (
+    props?: Partial<React.ComponentProps<typeof ApplyHistoricOffsets>>
+  ) =>
     renderWithProviders<React.ComponentProps<typeof ApplyHistoricOffsets>>(
       <ApplyHistoricOffsets
         offsetCandidates={[

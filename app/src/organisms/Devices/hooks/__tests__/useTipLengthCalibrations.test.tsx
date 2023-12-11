@@ -19,7 +19,7 @@ const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as
 const CALIBRATIONS_FETCH_MS = 5000
 
 describe('useTipLengthCalibrations hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

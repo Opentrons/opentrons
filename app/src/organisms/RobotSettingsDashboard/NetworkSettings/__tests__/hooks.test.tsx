@@ -32,7 +32,7 @@ const mockDisplaySettings = {
 }
 
 describe('useIsUnboxingFlowOngoing', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
     mockGetOnDeviceDisplaySettings.mockReturnValue(mockDisplaySettings)

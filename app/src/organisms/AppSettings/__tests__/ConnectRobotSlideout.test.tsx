@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -89,7 +90,9 @@ describe('ConnectRobotSlideout', () => {
     render(props)
     const targetLink =
       'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
-    const link = screen.getByRole('link', {name: 'Learn more about connecting a robot manually'})
+    const link = screen.getByRole('link', {
+      name: 'Learn more about connecting a robot manually',
+    })
     expect(link).toHaveAttribute('href', targetLink)
   })
 
@@ -98,7 +101,9 @@ describe('ConnectRobotSlideout', () => {
     const addButton = screen.getByRole('button', { name: 'Add' })
     expect(addButton).toBeEnabled()
     fireEvent.click(addButton)
-    const errorMessage = await screen.findByText('Enter an IP Address or Hostname')
+    const errorMessage = await screen.findByText(
+      'Enter an IP Address or Hostname'
+    )
     expect(errorMessage).toBeInTheDocument()
   })
 
@@ -129,15 +134,16 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label', async () => {
+    mockGetConfig.mockReturnValue({ discovery: { candidates: ['1.1.1.2'] } } as any)
+    mockGetViewableRobots.mockReturnValue([] as any[])
     render(props)
+    const user = userEvent.setup()
     const notFoundIpAddress = '1.1.1.2'
-    const inputBox = screen.getByRole('textbox')
-    const addButton = screen.getByRole('button', { name: 'Add' })
-    fireEvent.change(inputBox, {
-      target: { value: notFoundIpAddress },
-    })
-    fireEvent.click(addButton)
-    screen.getByText(notFoundIpAddress)
+    await user.type(screen.getByRole('textbox'), notFoundIpAddress)
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await waitFor(() =>
+      expect(screen.getByText(notFoundIpAddress))
+    )
     screen.getByText('Not Found')
   })
 

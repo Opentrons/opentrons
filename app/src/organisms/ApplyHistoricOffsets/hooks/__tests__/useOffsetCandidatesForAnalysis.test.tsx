@@ -111,9 +111,9 @@ describe('useOffsetCandidatesForAnalysis', () => {
   })
 
   it('returns an empty array if robot ip but no analysis output', async () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
-      <div>{children}</div>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <div>{children}</div>
     const { result } = renderHook(
       () => useOffsetCandidatesForAnalysis(null, mockRobotIp),
       { wrapper }
@@ -124,9 +124,9 @@ describe('useOffsetCandidatesForAnalysis', () => {
   })
 
   it('returns an empty array if no robot ip', async () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
-      <div>{children}</div>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <div>{children}</div>
     const { result } = renderHook(
       () =>
         useOffsetCandidatesForAnalysis(
@@ -140,9 +140,9 @@ describe('useOffsetCandidatesForAnalysis', () => {
     })
   })
   it('returns candidates for each first match with newest first', async () => {
-    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
-      <div>{children}</div>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <div>{children}</div>
     const { result } = renderHook(
       () =>
         useOffsetCandidatesForAnalysis(

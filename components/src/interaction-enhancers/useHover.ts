@@ -40,20 +40,23 @@ export function useHover(options: UseHoverOptions = {}): UseHoverResult {
   const [hovered, setHovered] = useState(false)
   const timeoutRef = useRef<number>()
 
-  const handleHoverChange = useCallback((value: boolean, delay: number | undefined) => {
-    clearTimeout(timeoutRef.current)
-    if (delay) {
-      timeoutRef.current = setTimeout(
-        // TODO(mc, 2021-03-08): use window.setTimeout or a separate const
-        // for the handler to tell TS that we're using DOM setTimeout, not Node.js
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval
-        (() => setHovered(value)) as TimerHandler,
-        delay
-      )
-    } else {
-      setHovered(value)
-    }
-  }, [])
+  const handleHoverChange = useCallback(
+    (value: boolean, delay: number | undefined) => {
+      clearTimeout(timeoutRef.current)
+      if (delay) {
+        timeoutRef.current = setTimeout(
+          // TODO(mc, 2021-03-08): use window.setTimeout or a separate const
+          // for the handler to tell TS that we're using DOM setTimeout, not Node.js
+          // eslint-disable-next-line @typescript-eslint/no-implied-eval
+          (() => setHovered(value)) as TimerHandler,
+          delay
+        )
+      } else {
+        setHovered(value)
+      }
+    },
+    []
+  )
 
   const handlers = useMemo(
     () => ({

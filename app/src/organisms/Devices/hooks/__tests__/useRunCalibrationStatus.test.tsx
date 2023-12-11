@@ -26,7 +26,7 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
   typeof useRunPipetteInfoByMount
 >
-let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
 describe('useRunCalibrationStatus hook', () => {
   beforeEach(() => {

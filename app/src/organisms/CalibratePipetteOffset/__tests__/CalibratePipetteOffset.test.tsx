@@ -78,8 +78,6 @@ describe('CalibratePipetteOffset', () => {
       id: 'fake_session_id',
       ...mockPipetteOffsetCalibrationSessionAttributes,
     }
-
-
   })
 
   afterEach(() => {
@@ -137,7 +135,9 @@ describe('CalibratePipetteOffset', () => {
         },
       },
     })
-    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    expect(
+      screen.queryByRole('heading', { name: 'Before you begin' })
+    ).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {

@@ -22,12 +22,16 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('usePauseRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UsePauseRunMutationOptions>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UsePauseRunMutationOptions
+  >
   const createPauseRunActionData = { actionType: RUN_ACTION_TYPE_PAUSE }
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UsePauseRunMutationOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UsePauseRunMutationOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider

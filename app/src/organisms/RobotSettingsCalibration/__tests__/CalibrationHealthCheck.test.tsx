@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { fireEvent, waitFor, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -146,12 +147,13 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('Health check button shows Tooltip when pipette are not set', async () => {
+    const user = userEvent.setup()
     mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     render()
     const button = screen.getByRole('button', { name: 'Check health' })
-    fireEvent.mouseMove(button)
-    await waitFor(async () => {
-      await screen.findByText('Fully calibrate your robot before checking calibration health')
+    user.hover(button)
+    await waitFor(() => {
+      expect(screen.getByText('Fully calibrate your robot before checking calibration health')).toBeInTheDocument()
     })
   })
 

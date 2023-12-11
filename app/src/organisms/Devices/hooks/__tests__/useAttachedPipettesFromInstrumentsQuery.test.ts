@@ -13,7 +13,7 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
 describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   it('returns attached pipettes', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: {

@@ -24,7 +24,9 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -40,12 +42,9 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
       .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID)
       .mockRejectedValue('oh no')
 
-    const { result } = renderHook(
-      () => useDeleteMaintenanceRunMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID)
@@ -60,12 +59,9 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
       .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID)
       .mockResolvedValue({ data: { data: null } } as Response<EmptyResponse>)
 
-    const { result } = renderHook(
-      () => useDeleteMaintenanceRunMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
+      wrapper,
+    })
     act(() => result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID))
 
     await waitFor(() => {

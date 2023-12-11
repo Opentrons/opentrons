@@ -3,7 +3,10 @@ import { useQuery } from 'react-query'
 import { useHost } from '../api'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 
-export type UseLightsQueryOptions<TError = Error> =  UseQueryOptions<Lights, TError>
+export type UseLightsQueryOptions<TError = Error> = UseQueryOptions<
+  Lights,
+  TError
+>
 
 export function useLightsQuery<TError = Error>(
   options: UseLightsQueryOptions<TError> = {}

@@ -168,7 +168,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         marginBottom={SPACING.spacing24}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
-        <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">
+        <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button" aria-label="copy">
           <Flex overflowWrap="anywhere">
             <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
               {apiName}
@@ -178,6 +178,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
             </Box>
           </Flex>
           {showToolTip && (
+
             <Tooltip width="3.25rem" tooltipProps={tooltipProps}>
               {t('copied')}
             </Tooltip>

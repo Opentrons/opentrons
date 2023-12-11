@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
@@ -67,29 +67,29 @@ describe('NameRobot', () => {
   })
 
   it('should render text, button and keyboard', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Name your robot')
-    getByText('Don’t worry, you can always change this in your settings.')
-    getByText('Enter up to 17 characters (letters and numbers only)')
-    getByRole('textbox')
-    getByText('Confirm')
+    render()
+    screen.getByText('Name your robot')
+    screen.getByText('Don’t worry, you can always change this in your settings.')
+    screen.getByText('Enter up to 17 characters (letters and numbers only)')
+    screen.getByRole('textbox')
+    screen.getByText('Confirm')
     // keyboard
-    getByRole('button', { name: 'a' })
+    screen.getByRole('button', { name: 'a' })
   })
 
   it('should display a letter when typing a letter', () => {
-    const [{ getByRole }] = render()
-    const input = getByRole('textbox')
-    getByRole('button', { name: 'a' }).click()
-    getByRole('button', { name: 'b' }).click()
-    getByRole('button', { name: 'c' }).click()
+    render()
+    const input = screen.getByRole('textbox')
+    fireEvent.click(screen.getByRole('button', { name: 'a' }))
+    fireEvent.click(screen.getByRole('button', { name: 'b' }))
+    fireEvent.click(screen.getByRole('button', { name: 'c' }))
     expect(input).toHaveValue('abc')
   })
 
   it('should show an error message when tapping confirm without typing anything', async () => {
-    const [{ findByText, getByLabelText }] = render()
-    getByLabelText('SmallButton_primary').click()
-    const error = await findByText(
+    render()
+    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    const error = await screen.findByText(
       'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
@@ -98,13 +98,13 @@ describe('NameRobot', () => {
   })
 
   it('should show an error message when typing an existing name - connectable robot', async () => {
-    const [{ getByRole, findByText, getByLabelText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'connectableOtie' },
     })
-    getByLabelText('SmallButton_primary').click()
-    const error = await findByText(
+    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    const error = await screen.findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
     await waitFor(() => {
@@ -113,13 +113,13 @@ describe('NameRobot', () => {
   })
 
   it('should show an error message when typing an existing name - reachable robot', async () => {
-    const [{ getByRole, findByText, getByLabelText }] = render()
-    const input = getByRole('textbox')
+    render()
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, {
       target: { value: 'reachableOtie' },
     })
-    getByLabelText('SmallButton_primary').click()
-    const error = await findByText(
+    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    const error = await screen.findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
     await waitFor(() => {
@@ -128,29 +128,29 @@ describe('NameRobot', () => {
   })
 
   it('should call a mock function when tapping the confirm button', () => {
-    const [{ getByRole, getByLabelText }] = render()
-    getByRole('button', { name: 'a' }).click()
-    getByRole('button', { name: 'b' }).click()
-    getByRole('button', { name: 'c' }).click()
-    getByLabelText('SmallButton_primary').click()
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'a' }))
+    fireEvent.click(screen.getByRole('button', { name: 'b' }))
+    fireEvent.click(screen.getByRole('button', { name: 'c' }))
+    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
     expect(mockTrackEvent).toHaveBeenCalled()
   })
 
   it('should render text and button when coming from robot settings', () => {
     mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
-    const [{ getByText, queryByText }] = render()
-    getByText('Rename robot')
+    render()
+    screen.getByText('Rename robot')
     expect(
-      queryByText('Don’t worry, you can always change this in your settings.')
+      screen.queryByText('Don’t worry, you can always change this in your settings.')
     ).not.toBeInTheDocument()
-    getByText('Enter up to 17 characters (letters and numbers only)')
-    getByText('Confirm')
+    screen.getByText('Enter up to 17 characters (letters and numbers only)')
+    screen.getByText('Confirm')
   })
 
   it('should call a mock function when tapping back button', () => {
     mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
-    const [{ getByTestId }] = render()
-    getByTestId('name_back_button').click()
+    render()
+    screen.getByTestId('name_back_button').click()
     expect(mockPush).toHaveBeenCalledWith('/robot-settings')
   })
 })

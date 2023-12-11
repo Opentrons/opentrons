@@ -42,9 +42,9 @@ describe('useProtocolMetadata', () => {
   })
 
   it('should return author, lastUpdated, method, description, and robot type', () => {
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useProtocolMetadata, { wrapper })
     const {
       author,

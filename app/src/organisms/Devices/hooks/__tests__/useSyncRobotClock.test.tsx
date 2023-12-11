@@ -13,7 +13,7 @@ jest.mock('../../../../redux/discovery')
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useSyncRobotClock hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     store.dispatch = jest.fn()
     const queryClient = new QueryClient()

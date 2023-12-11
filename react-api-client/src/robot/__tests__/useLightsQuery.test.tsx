@@ -21,11 +21,15 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const LIGHTS_RESPONSE: Lights = { on: true } as Lights
 
 describe('useLights hook', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseLightsQueryOptions>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UseLightsQueryOptions
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseLightsQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UseLightsQueryOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

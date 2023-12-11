@@ -23,7 +23,7 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
-let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
 const mockMagneticModuleDefinition = {
   moduleId: 'someMagneticModule',

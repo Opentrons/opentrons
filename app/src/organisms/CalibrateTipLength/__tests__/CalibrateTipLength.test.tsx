@@ -40,9 +40,7 @@ describe('CalibrateTipLength', () => {
       isJogging = false,
       session = mockTipLengthSession,
     } = props
-    return renderWithProviders<
-      React.ComponentType<typeof CalibrateTipLength>
-    >(
+    return renderWithProviders<React.ComponentType<typeof CalibrateTipLength>>(
       <CalibrateTipLength
         robotName="robot-name"
         session={session}
@@ -133,7 +131,9 @@ describe('CalibrateTipLength', () => {
         },
       },
     })
-    expect(screen.queryByRole('heading', { name: 'Before you begin' })).toBeNull()
+    expect(
+      screen.queryByRole('heading', { name: 'Before you begin' })
+    ).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {

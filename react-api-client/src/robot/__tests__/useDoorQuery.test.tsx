@@ -24,11 +24,15 @@ const DOOR_RESPONSE: DoorStatus = {
 } as DoorStatus
 
 describe('useDoorQuery hook', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseDoorQueryOptions>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UseDoorQueryOptions
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseDoorQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UseDoorQueryOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

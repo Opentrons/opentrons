@@ -26,7 +26,7 @@ const mockUseCalibrationStatusQuery = useCalibrationStatusQuery as jest.MockedFu
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useDeckCalibrationStatus hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

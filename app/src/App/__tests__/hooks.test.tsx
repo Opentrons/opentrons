@@ -12,7 +12,7 @@ import type { Store } from 'redux'
 import type { State } from '../../redux/types'
 
 describe('useSoftwareUpdatePoll', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let store: Store<State>
   beforeEach(() => {
     jest.useFakeTimers()

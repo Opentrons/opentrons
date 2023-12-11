@@ -66,7 +66,9 @@ describe('PickUpTip', () => {
     render(props)
     screen.getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
     screen.getByText('Place modules on deck')
-    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getByText(
+      'Clear all deck slots of labware, leaving modules in place'
+    )
     screen.getByText('a full Mock TipRack Definition')
     screen.getByText('Slot D1')
     screen.getByRole('button', { name: 'Confirm placement' })
@@ -84,7 +86,9 @@ describe('PickUpTip', () => {
   it('renders correct copy when preparing space on desktop if protocol has no modules', () => {
     render(props)
     screen.getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
-    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getByText(
+      'Clear all deck slots of labware, leaving modules in place'
+    )
     screen.getByText('a full Mock TipRack Definition')
     screen.getByText('Slot D1')
     screen.getByRole('button', { name: 'Confirm placement' })
@@ -109,7 +113,9 @@ describe('PickUpTip', () => {
         },
       ],
     })
-    screen.getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
+    screen.getByRole('heading', {
+      name: 'Pick up tip from tip rack in Slot D1',
+    })
     screen.getByText(
       "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
     )
@@ -128,7 +134,9 @@ describe('PickUpTip', () => {
         },
       ],
     })
-    screen.getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
+    screen.getByRole('heading', {
+      name: 'Pick up tip from tip rack in Slot D1',
+    })
     screen.getByText(
       nestedTextMatcher(
         "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
@@ -295,7 +303,9 @@ describe('PickUpTip', () => {
         ],
         false
       )
-      screen.getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
+      screen.getByRole('heading', {
+        name: 'Did pipette pick up tip successfully?',
+      })
     })
     const tryAgain = screen.getByRole('button', { name: 'Try again' })
     fireEvent.click(tryAgain)
@@ -445,7 +455,9 @@ describe('PickUpTip', () => {
         ],
         false
       )
-      screen.getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
+      screen.getByRole('heading', {
+        name: 'Did pipette pick up tip successfully?',
+      })
     })
     const yesButton = screen.getByRole('button', { name: 'Yes' })
     fireEvent.click(yesButton)

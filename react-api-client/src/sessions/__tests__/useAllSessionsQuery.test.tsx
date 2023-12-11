@@ -23,11 +23,15 @@ const SESSIONS_RESPONSE = {
 } as Sessions
 
 describe('useAllSessionsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseQueryOptions<Sessions, Error>>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UseQueryOptions<Sessions, Error>
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseQueryOptions<Sessions, Error>> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UseQueryOptions<Sessions, Error>
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -64,6 +68,5 @@ describe('useAllSessionsQuery hook', () => {
     await waitFor(() => {
       expect(result.current.data).toEqual(SESSIONS_RESPONSE)
     })
-
   })
 })

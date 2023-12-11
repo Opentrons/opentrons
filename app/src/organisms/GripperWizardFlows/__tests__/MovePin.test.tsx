@@ -24,7 +24,6 @@ describe('MovePin', () => {
   const mockSetFrontJawOffset = jest.fn()
   const mockRunId = 'fakeRunId'
 
-
   const render = (
     props: Partial<React.ComponentProps<typeof MovePin>> = {}
   ) => {
@@ -133,7 +132,9 @@ describe('MovePin', () => {
     screen.getByText(
       'Remove the calibration pin from the front jaw and attach it to the rear jaw.'
     )
-    const continueButton = screen.getByRole('button', { name: 'Continue calibration' })
+    const continueButton = screen.getByRole('button', {
+      name: 'Continue calibration',
+    })
     fireEvent.click(continueButton)
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
@@ -188,7 +189,9 @@ describe('MovePin', () => {
     screen.getByText(
       'Take the calibration pin from the rear gripper jaw and return it to its storage location.'
     )
-    const complete = screen.getByRole('button', { name: 'Complete calibration' })
+    const complete = screen.getByRole('button', {
+      name: 'Complete calibration',
+    })
     fireEvent.click(complete)
     expect(mockProceed).toHaveBeenCalled()
   })

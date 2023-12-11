@@ -32,7 +32,9 @@ describe('useCreateSessionMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     createSessionData = { sessionType: SESSION_TYPE_DECK_CALIBRATION }

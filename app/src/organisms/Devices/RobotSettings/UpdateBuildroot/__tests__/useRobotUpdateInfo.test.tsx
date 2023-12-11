@@ -24,7 +24,7 @@ const mockGetRobotUpdateDownloadProgress = getRobotUpdateDownloadProgress as jes
 
 describe('useRobotUpdateInfo', () => {
   let store: Store<State>
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   const MOCK_ROBOT_NAME = 'testRobot'
   const mockRobotUpdateSession: RobotUpdateSession | null = {

@@ -33,7 +33,9 @@ describe('useProtocolQuery hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -71,12 +73,9 @@ describe('useProtocolQuery hook', () => {
       .calledWith(HOST_CONFIG, PROTOCOL_ID)
       .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
 
-    const { result } = renderHook(
-      () => useProtocolQuery(PROTOCOL_ID),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useProtocolQuery(PROTOCOL_ID), {
+      wrapper,
+    })
 
     await waitFor(() => {
       expect(result.current.data).toEqual(PROTOCOL_RESPONSE)

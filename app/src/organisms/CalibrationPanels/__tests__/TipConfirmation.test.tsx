@@ -42,7 +42,9 @@ describe('TipConfirmation', () => {
 
   it('renders correct heading', () => {
     render()
-    screen.getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
+    screen.getByRole('heading', {
+      name: 'Did pipette pick up tip successfully?',
+    })
   })
   it('clicking invalidate tip send invalidate tip command', () => {
     render()

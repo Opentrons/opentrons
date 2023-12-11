@@ -28,11 +28,15 @@ const ESTOP_STATE_RESPONSE: EstopStatus = {
 }
 
 describe('useEstopQuery hook', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & UseEstopQueryOptions>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UseEstopQueryOptions
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & UseEstopQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UseEstopQueryOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

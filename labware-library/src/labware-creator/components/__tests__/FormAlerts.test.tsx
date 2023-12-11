@@ -38,7 +38,8 @@ describe('FormAlerts', () => {
     }
 
     render(<FormAlerts {...props} />)
-    screen.getByText('some warning')
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent('some warning')
   })
   it('should render an incompatible labware error when the labware is not compatible with labware creator', () => {
     when(getIsHiddenMock)
@@ -59,7 +60,8 @@ describe('FormAlerts', () => {
     }
 
     render(<FormAlerts {...props} />)
-    screen.getByText(
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is not compatible with the Labware Creator. Please fill out this form to request a custom labware definition.'
     )
   })
@@ -82,7 +84,8 @@ describe('FormAlerts', () => {
     }
 
     render(<FormAlerts {...props} />)
-    screen.getByText(
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'If your tip does not fit when placed by hand then it is not a good candidate for this pipette on the OT-2.'
     )
   })
@@ -105,7 +108,8 @@ describe('FormAlerts', () => {
     }
 
     render(<FormAlerts {...props} />)
-    screen.getByText(
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is too small to fit in a slot properly. Please fill out this form to request an adapter.'
     )
   })
@@ -128,7 +132,8 @@ describe('FormAlerts', () => {
     }
 
     render(<FormAlerts {...props} />)
-    screen.getByText(
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
     )
   })

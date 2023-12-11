@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import {
@@ -59,7 +59,9 @@ describe('CheckItem', () => {
   it('renders correct copy when preparing space with tip rack', () => {
     render(props)
     screen.getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
-    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getByText(
+      'Clear all deck slots of labware, leaving modules in place'
+    )
     screen.getAllByText(/Place/i)
     screen.getAllByText(/a full Mock TipRack Definition/i)
     screen.getAllByText(/into/i)
@@ -76,7 +78,9 @@ describe('CheckItem', () => {
 
     render(props)
     screen.getByRole('heading', { name: 'Prepare labware in Slot D2' })
-    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getByText(
+      'Clear all deck slots of labware, leaving modules in place'
+    )
     screen.getAllByText(/Place a/i)
     screen.getAllByText(/Mock Labware Definition/i)
     screen.getAllByText(/into/i)
@@ -122,7 +126,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -200,7 +204,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -275,7 +279,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -375,7 +379,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -431,7 +435,7 @@ describe('CheckItem', () => {
       ],
     }
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Go back' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Go back' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
@@ -516,7 +520,7 @@ describe('CheckItem', () => {
       ],
     }
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm position' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm position' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
@@ -601,7 +605,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       2,
@@ -732,7 +736,7 @@ describe('CheckItem', () => {
       )
 
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm position' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm position' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
@@ -857,7 +861,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [

@@ -74,7 +74,9 @@ describe('ChooseProtocolSlideout', () => {
     })
     screen.getByLabelText('protocol deck map')
     screen.getByText('fakeSrcFileName')
-    expect(screen.queryByRole('heading', { name: 'No protocols found' })).toBeNull()
+    expect(
+      screen.queryByRole('heading', { name: 'No protocols found' })
+    ).toBeNull()
   })
   it('renders an empty state if no protocol options', () => {
     mockGetStoredProtocols.mockReturnValue([])
@@ -95,7 +97,9 @@ describe('ChooseProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
     fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
       files: [expect.any(File)],
@@ -116,7 +120,9 @@ describe('ChooseProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
     fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
       files: [expect.any(File)],
@@ -139,14 +145,18 @@ describe('ChooseProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const proceedButton = screen.getByRole('button', { name: 'Proceed to setup' })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
     fireEvent.click(proceedButton)
     expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
-    screen.getByText('This robot is busy and can’t run this protocol right now.')
+    screen.getByText(
+      'This robot is busy and can’t run this protocol right now.'
+    )
     const link = screen.getByRole('link', { name: 'Go to Robot' })
     fireEvent.click(link)
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')

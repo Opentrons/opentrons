@@ -64,7 +64,7 @@ const PROTOCOL_ID = 'the_protocol_id'
 const PROTOCOL_KEY = 'the_protocol_key'
 
 describe('useStoredProtocolAnalysis hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

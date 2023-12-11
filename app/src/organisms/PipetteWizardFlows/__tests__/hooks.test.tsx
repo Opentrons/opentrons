@@ -22,7 +22,7 @@ const BASE_PROPS_FOR_RUN_SETUP = {
 }
 
 describe('usePipetteFlowWizardHeaderText', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>{children}</I18nextProvider>

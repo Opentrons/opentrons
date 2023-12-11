@@ -14,7 +14,7 @@ const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
 >
 
 describe('useAttachedModules hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   afterEach(() => {
     resetAllWhenMocks()
     jest.resetAllMocks()

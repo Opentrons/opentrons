@@ -173,7 +173,7 @@ describe('useRequiredProtocolLabware', () => {
 })
 
 describe('useMissingProtocolHardware', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [] },

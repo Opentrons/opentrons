@@ -27,11 +27,15 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('usePipetteSettingsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode} & UsePipetteSettingsQueryOptions>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UsePipetteSettingsQueryOptions
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode} & UsePipetteSettingsQueryOptions> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UsePipetteSettingsQueryOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 

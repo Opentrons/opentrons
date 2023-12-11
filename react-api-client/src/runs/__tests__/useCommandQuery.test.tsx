@@ -27,7 +27,9 @@ describe('useCommandQuery hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -65,12 +67,9 @@ describe('useCommandQuery hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID, COMMAND_ID)
       .mockResolvedValue({ data: COMMAND_RESPONSE } as Response<CommandDetail>)
 
-    const { result } = renderHook(
-      () => useCommandQuery(RUN_ID, COMMAND_ID),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCommandQuery(RUN_ID, COMMAND_ID), {
+      wrapper,
+    })
 
     await waitFor(() => {
       expect(result.current.data).toEqual(COMMAND_RESPONSE)

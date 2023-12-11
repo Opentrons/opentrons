@@ -57,7 +57,9 @@ describe('ReturnTip', () => {
     getByText(/Mock TipRack Definition/i)
     getByText(/that you used before back into/i)
     getByText('Slot D1')
-    getByText(/The pipette will return tips to their original location in the rack./i)
+    getByText(
+      /The pipette will return tips to their original location in the rack./i
+    )
     getByRole('link', { name: 'Need help?' })
   })
   it('renders correct copy on device', () => {
@@ -68,7 +70,9 @@ describe('ReturnTip', () => {
     getByText(/Mock TipRack Definition/i)
     getByText(/that you used before back into/i)
     getByText('Slot D1')
-    getByText(/The pipette will return tips to their original location in the rack./i)
+    getByText(
+      /The pipette will return tips to their original location in the rack./i
+    )
   })
   it('executes correct chained commands when CTA is clicked', async () => {
     const { getByRole } = render(props)

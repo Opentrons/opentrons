@@ -48,7 +48,7 @@ const ATTACHED_PIPETTES = {
   right: { id: '2', model: 'testModelRight' },
 }
 
-let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(jest.fn(), {})
 
 describe('useProtocolAnalysisErrors hook', () => {

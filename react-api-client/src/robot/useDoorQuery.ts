@@ -5,7 +5,10 @@ import { useHost } from '../api'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type { DoorStatus } from '@opentrons/api-client'
 
-export type UseDoorQueryOptions<TError = Error> =  UseQueryOptions<DoorStatus, TError>
+export type UseDoorQueryOptions<TError = Error> = UseQueryOptions<
+  DoorStatus,
+  TError
+>
 
 export function useDoorQuery<TError = Error>(
   options: UseDoorQueryOptions<TError> = {}

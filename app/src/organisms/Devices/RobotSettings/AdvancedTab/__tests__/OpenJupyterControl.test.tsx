@@ -50,7 +50,7 @@ describe('RobotSettings OpenJupyterControl', () => {
 
   it('should render jupyter notebook link', () => {
     render()
-    const link = screen.getByRole('link', {name: 'Launch Jupyter Notebook'})
+    const link = screen.getByRole('link', { name: 'Launch Jupyter Notebook' })
     expect(link).toHaveAttribute('href', mockLink)
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')

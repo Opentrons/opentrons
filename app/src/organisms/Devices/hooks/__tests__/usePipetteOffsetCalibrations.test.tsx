@@ -19,7 +19,7 @@ const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrations
 const CALIBRATION_DATA_POLL_MS = 5000
 
 describe('usePipetteOffsetCalibrations hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

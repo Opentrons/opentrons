@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -84,30 +85,29 @@ describe('ProtocolSetupLabware', () => {
   })
 
   it('renders the Labware Setup page', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Labware')
-    getByText('Labware name')
-    getByText('Location')
-    getByRole('button', { name: 'Map View' })
+    render()
+    screen.getByText('Labware')
+    screen.getByText('Labware name')
+    screen.getByText('Location')
+    screen.getByRole('button', { name: 'Map View' })
   })
 
   it('correctly navigates with the nav button', () => {
-    const [{ getAllByRole }] = render()
-    getAllByRole('button')[0].click()
+    render()
+    screen.getAllByRole('button')[0].click()
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
 
   it('should launch and close the deck map', () => {
-    const [{ getByRole, getByText, getByLabelText }] = render()
-
-    getByRole('button', { name: 'Map View' }).click()
-    getByLabelText('closeIcon').click()
-    getByText('Labware')
+    render()
+    screen.getByRole('button', { name: 'Map View' }).click()
+    screen.getByLabelText('closeIcon').click()
+    screen.getByText('Labware')
   })
 
   it('sends a latch-close command when the labware latch is open and the button is clicked', () => {
-    const [{ getByText }] = render()
-    getByText('Labware Latch').click()
+    render()
+    fireEvent.click(screen.getByText('Labware Latch'))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/closeLabwareLatch',
@@ -124,8 +124,8 @@ describe('ProtocolSetupLabware', () => {
       ...mockUseModulesQueryClosed,
       refetch: mockRefetch,
     } as any)
-    const [{ getByText }] = render()
-    getByText('Labware Latch').click()
+    render()
+    fireEvent.click(screen.getByText('Labware Latch'))
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/openLabwareLatch',
@@ -140,21 +140,21 @@ describe('ProtocolSetupLabware', () => {
   it('shows opening transition states of the labware latch button', () => {
     mockUseModulesQuery.mockReturnValue(mockUseModulesQueryOpening as any)
 
-    const [{ getByText }] = render()
-    getByText('Opening...')
+    render()
+    screen.getByText('Opening...')
   })
 
   it('shows closing transition state of the labware latch button', () => {
     mockUseModulesQuery.mockReturnValue(mockUseModulesQueryClosing as any)
 
-    const [{ getByText }] = render()
-    getByText('Closing...')
+    render()
+    screen.getByText('Closing...')
   })
 
   it('defaults to open when latch status is unknown', () => {
     mockUseModulesQuery.mockReturnValue(mockUseModulesQueryUnknown as any)
 
-    const [{ getByText }] = render()
-    getByText('Open')
+    render()
+    screen.getByText('Open')
   })
 })

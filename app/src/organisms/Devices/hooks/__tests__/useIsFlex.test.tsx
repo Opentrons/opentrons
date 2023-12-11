@@ -18,7 +18,7 @@ const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useIsFlex hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (

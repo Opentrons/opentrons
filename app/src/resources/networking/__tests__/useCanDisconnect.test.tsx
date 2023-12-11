@@ -24,9 +24,9 @@ const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const store: Store<State> = createStore(state => state, {})
 
-const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
-  <Provider store={store}>{children}</Provider>
-)
+const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+  children,
+}) => <Provider store={store}>{children}</Provider>
 
 const mockWifiNetwork: WifiNetwork = {
   ssid: 'linksys',

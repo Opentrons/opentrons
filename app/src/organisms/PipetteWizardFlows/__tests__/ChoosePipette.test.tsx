@@ -60,16 +60,18 @@ describe('ChoosePipette', () => {
     screen.getByText('96-Channel pipette')
     screen.getByAltText('1- or 8-Channel pipette')
     screen.getByAltText('96-Channel pipette')
-    const singleMountPipettes = screen.getByRole('radio', {name: '1- or 8-Channel pipette 1- or 8-Channel pipette'})
-    const ninetySixPipette = screen.getByRole('radio', {name: '96-Channel pipette 96-Channel pipette'})
+    const singleMountPipettes = screen.getByRole('radio', {
+      name: '1- or 8-Channel pipette 1- or 8-Channel pipette',
+    })
+    const ninetySixPipette = screen.getByRole('radio', {
+      name: '96-Channel pipette 96-Channel pipette',
+    })
 
     //  Single and 8-Channel pipettes are selected first by default
     expect(singleMountPipettes).toHaveStyle(
       `background-color: ${COLORS.lightBlue}`
     )
-    expect(ninetySixPipette).toHaveStyle(
-      `background-color: ${COLORS.white}`
-    )
+    expect(ninetySixPipette).toHaveStyle(`background-color: ${COLORS.white}`)
 
     //  Selecting 96-Channel called setSelectedPipette prop
     fireEvent.click(ninetySixPipette)
@@ -130,11 +132,13 @@ describe('ChoosePipette', () => {
   it('renders the 96 channel pipette option selected', () => {
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     render(props)
-    const singleMountPipettes = screen.getByRole('radio', {name: '1- or 8-Channel pipette 1- or 8-Channel pipette'})
-    const ninetySixPipette = screen.getByRole('radio', {name: '96-Channel pipette 96-Channel pipette'})
-    expect(singleMountPipettes).toHaveStyle(
-      `background-color: ${COLORS.white}`
-    )
+    const singleMountPipettes = screen.getByRole('radio', {
+      name: '1- or 8-Channel pipette 1- or 8-Channel pipette',
+    })
+    const ninetySixPipette = screen.getByRole('radio', {
+      name: '96-Channel pipette 96-Channel pipette',
+    })
+    expect(singleMountPipettes).toHaveStyle(`background-color: ${COLORS.white}`)
     expect(ninetySixPipette).toHaveStyle(
       `background-color: ${COLORS.lightBlue}`
     )
@@ -147,7 +151,9 @@ describe('ChoosePipette', () => {
     })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     render(props)
-    screen.getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
+    screen.getByText(
+      'Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette'
+    )
   })
   it('renders the correct text for the 96 channel button when there is a right pipette attached', () => {
     mockGetIsGantryEmpty.mockReturnValue(false)
@@ -157,6 +163,8 @@ describe('ChoosePipette', () => {
     })
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     render(props)
-    screen.getByText('Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette')
+    screen.getByText(
+      'Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette'
+    )
   })
 })

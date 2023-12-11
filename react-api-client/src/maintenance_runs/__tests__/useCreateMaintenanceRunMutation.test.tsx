@@ -28,7 +28,9 @@ describe('useCreateMaintenanceRunMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -69,12 +71,9 @@ describe('useCreateMaintenanceRunMutation hook', () => {
         data: mockMaintenanceRunResponse,
       } as Response<MaintenanceRun>)
 
-    const { result } = renderHook(
-      () => useCreateMaintenanceRunMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
+      wrapper,
+    })
     act(() => {
       result.current.createMaintenanceRun({ labwareOffsets: [mockOffset] })
     })

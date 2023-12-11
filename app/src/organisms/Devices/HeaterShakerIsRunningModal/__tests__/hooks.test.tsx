@@ -63,9 +63,9 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
         },
       ],
     } as any)
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(
       () => useHeaterShakerModuleIdsFromRun(RUN_ID_1),
       { wrapper }
@@ -133,9 +133,9 @@ describe('useHeaterShakerModuleIdsFromRun', () => {
       ],
     } as any)
 
-    const wrapper: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(
       () => useHeaterShakerModuleIdsFromRun(RUN_ID_1),
       { wrapper }

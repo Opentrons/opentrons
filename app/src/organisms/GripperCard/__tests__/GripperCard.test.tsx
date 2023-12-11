@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
@@ -60,18 +60,18 @@ describe('GripperCard', () => {
   })
 
   it('renders correct info when gripper is attached', () => {
-    const { getByText, getByRole } = render(props)
-    const image = getByRole('img', { name: 'Flex Gripper' })
+    render(props)
+    const image = screen.getByRole('img', { name: 'Flex Gripper' })
     expect(image.getAttribute('src')).toEqual('flex_gripper.png')
-    getByText('extension mount')
-    getByText('Flex Gripper')
-    const overflowButton = getByRole('button', {
+    screen.getByText('extension mount')
+    screen.getByText('Flex Gripper')
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
     fireEvent.click(overflowButton)
-    getByText('Recalibrate gripper')
-    getByText('Detach gripper')
-    getByText('About gripper')
+    screen.getByText('Recalibrate gripper')
+    screen.getByText('Detach gripper')
+    screen.getByText('About gripper')
   })
   it('renders recalibrate banner when no calibration data is present', () => {
     props = props = {
@@ -91,38 +91,38 @@ describe('GripperCard', () => {
       isRunActive: false,
     }
 
-    const { getByText } = render(props)
-    getByText('Calibration needed.')
+    render(props)
+    screen.getByText('Calibration needed.')
   })
   it('opens the about gripper slideout when button is pressed', () => {
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    overflowButton.click()
-    const aboutGripperButton = getByText('About gripper')
-    aboutGripperButton.click()
-    getByText('about gripper')
+    fireEvent.click(overflowButton)
+    const aboutGripperButton = screen.getByText('About gripper')
+    fireEvent.click(aboutGripperButton)
+    screen.getByText('about gripper')
   })
   it('renders wizard flow when recalibrate button is pressed', () => {
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    overflowButton.click()
-    const recalibrateGripperButton = getByText('Recalibrate gripper')
+    fireEvent.click(overflowButton)
+    const recalibrateGripperButton = screen.getByText('Recalibrate gripper')
     recalibrateGripperButton.click()
-    getByText('wizard flow launched')
+    screen.getByText('wizard flow launched')
   })
   it('renders wizard flow when detach button is pressed', () => {
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /InstrumentCard_overflowMenu/i,
     })
-    overflowButton.click()
-    const detachGripperButton = getByText('Detach gripper')
+    fireEvent.click(overflowButton)
+    const detachGripperButton = screen.getByText('Detach gripper')
     detachGripperButton.click()
-    getByText('wizard flow launched')
+    screen.getByText('wizard flow launched')
   })
   it('renders wizard flow when attach button is pressed', () => {
     props = {
@@ -131,14 +131,14 @@ describe('GripperCard', () => {
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
     }
-    const { getByText, getByRole } = render(props)
-    const overflowButton = getByRole('button', {
+    render(props)
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    overflowButton.click()
-    const attachGripperButton = getByText('Attach gripper')
+    fireEvent.click(overflowButton)
+    const attachGripperButton = screen.getByText('Attach gripper')
     attachGripperButton.click()
-    getByText('wizard flow launched')
+    screen.getByText('wizard flow launched')
   })
   it('renders firmware update needed state if gripper is bad', () => {
     props = {
@@ -149,11 +149,11 @@ describe('GripperCard', () => {
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
     }
-    const { getByText } = render(props)
-    getByText('Extension mount')
-    getByText('Instrument attached')
-    getByText('Firmware update available.')
-    getByText('Update now').click()
+    render(props)
+    screen.getByText('Extension mount')
+    screen.getByText('Instrument attached')
+    screen.getByText('Firmware update available.')
+    screen.getByText('Update now').click()
     expect(props.setSubsystemToUpdate).toHaveBeenCalledWith('gripper')
   })
   it('renders firmware update in progress state if gripper is bad and update in progress', () => {
@@ -168,9 +168,9 @@ describe('GripperCard', () => {
       setSubsystemToUpdate: jest.fn(),
       isRunActive: false,
     }
-    const { getByText } = render(props)
-    getByText('Extension mount')
-    getByText('Instrument attached')
-    getByText('Firmware update in progress...')
+    render(props)
+    screen.getByText('Extension mount')
+    screen.getByText('Instrument attached')
+    screen.getByText('Firmware update in progress...')
   })
 })

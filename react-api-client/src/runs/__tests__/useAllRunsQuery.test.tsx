@@ -7,7 +7,12 @@ import { useHost } from '../../api'
 import { useAllRunsQuery } from '..'
 import { mockRunsResponse } from '../__fixtures__'
 
-import type { GetRunsParams, HostConfig, Response, Runs } from '@opentrons/api-client'
+import type {
+  GetRunsParams,
+  HostConfig,
+  Response,
+  Runs,
+} from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -18,11 +23,15 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useAllRunsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode } & GetRunsParams>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & GetRunsParams
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode } & GetRunsParams> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & GetRunsParams
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -67,10 +76,9 @@ describe('useAllRunsQuery hook', () => {
       .calledWith(HOST_CONFIG, { pageLength: 20 })
       .mockResolvedValue({ data: mockRunsResponse } as Response<Runs>)
 
-    const { result } = renderHook(
-      () => useAllRunsQuery({ pageLength: 20 }),
-      { wrapper }
-    )
+    const { result } = renderHook(() => useAllRunsQuery({ pageLength: 20 }), {
+      wrapper,
+    })
 
     await waitFor(() => {
       expect(result.current.data).toEqual(mockRunsResponse)

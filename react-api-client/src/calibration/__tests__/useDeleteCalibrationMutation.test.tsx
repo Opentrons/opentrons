@@ -24,7 +24,7 @@ const DELETE_CAL_DATA_RESPONSE = {
 } as EmptyResponse
 
 describe('useDeleteCalibrationMutation hook', () => {
-  let wrapper: React.FunctionComponent<{children: React.ReactNode}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   const requestParams = {
     calType: 'pipetteOffset',
     mount: 'left',
@@ -33,7 +33,9 @@ describe('useDeleteCalibrationMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{children: React.ReactNode}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -49,12 +51,9 @@ describe('useDeleteCalibrationMutation hook', () => {
       .calledWith(HOST_CONFIG, requestParams)
       .mockRejectedValue('oh no')
 
-    const { result } = renderHook(
-      () => useDeleteCalibrationMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteCalibrationMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     await act(() => result.current.deleteCalibration(requestParams))
@@ -72,12 +71,9 @@ describe('useDeleteCalibrationMutation hook', () => {
         data: DELETE_CAL_DATA_RESPONSE,
       } as Response<EmptyResponse>)
 
-    const { result } = renderHook(
-      () => useDeleteCalibrationMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteCalibrationMutation(), {
+      wrapper,
+    })
     await act(() => result.current.deleteCalibration(requestParams))
     await waitFor(() => {
       expect(result.current.data).not.toBeNull()
