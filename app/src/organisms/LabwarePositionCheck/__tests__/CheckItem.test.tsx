@@ -126,7 +126,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -204,7 +204,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -279,7 +279,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -379,7 +379,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -435,7 +435,7 @@ describe('CheckItem', () => {
       ],
     }
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Go back' }))
+    fireEvent.click(getByRole('button', { name: 'Go back' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
@@ -520,7 +520,7 @@ describe('CheckItem', () => {
       ],
     }
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Confirm position' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm position' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
@@ -605,7 +605,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       2,
@@ -736,7 +736,7 @@ describe('CheckItem', () => {
       )
 
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Confirm position' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm position' }))
 
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
@@ -861,7 +861,7 @@ describe('CheckItem', () => {
         ])
       )
     const { getByRole } = render(props)
-    await fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
+    fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [

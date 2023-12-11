@@ -50,7 +50,7 @@ describe('RobotTypeTile', () => {
     fireEvent.click(ot2)
     expect(props.setFieldValue).toHaveBeenCalled()
     expect(ot2).toHaveStyle(`background-color: ${COLORS.white}`)
-    screen.getByRole('button', { name: 'Next' fireEvent.click(}))
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(props.proceed).toHaveBeenCalled()
   })
 })

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import userEvent from '@testing-library/user-event'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -16,7 +15,6 @@ import { WellDimensions } from '../WellDimensions'
 import { WellSpacing } from '../WellSpacing'
 
 import { LabwareDetails } from '..'
-import { act } from 'react-dom/test-utils'
 
 jest.mock('../../../pages/Labware/hooks')
 jest.mock('../../LabwareCard/CustomLabwareOverflowMenu')
