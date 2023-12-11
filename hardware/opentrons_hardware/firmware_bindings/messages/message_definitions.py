@@ -641,7 +641,11 @@ class GripperJawStateResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class SetGripperJawHoldoffRequest(EmptyPayloadMessage):  # noqa: D101
+class SetGripperJawHoldoffRequest(BaseMessage):  # noqa: D101
+    payload: payloads.GripperJawHoldoffPayload
+    payload_type: Type[
+        payloads.GripperJawHoldoffPayload
+    ] = payloads.GripperJawHoldoffPayload
     message_id: Literal[
         MessageId.set_gripper_jaw_holdoff_request
     ] = MessageId.set_gripper_jaw_holdoff_request
