@@ -236,7 +236,7 @@ export function FixtureListItem({
                 }
               >
                 <StyledText as="label" cursor="pointer">
-                  {t('update_deck')}
+                  {t('resolve')}
                 </StyledText>
               </TertiaryButton>
             ) : null}
