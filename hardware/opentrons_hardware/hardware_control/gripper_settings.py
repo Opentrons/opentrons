@@ -131,7 +131,7 @@ async def get_jaw_holdoff_ms(can_messenger: CanMessenger) -> int:
         """Listener for receiving messages back."""
         async for response, _ in reader:
             if isinstance(response, GripperJawHoldoffResponse):
-                return int(response.payload.ticks / brushed_motor_interrupts_per_sec * 1000)
+                return int(response.payload.ticks.value / brushed_motor_interrupts_per_sec * 1000)
         raise StopAsyncIteration
 
     with WaitableCallback(can_messenger, _filter) as reader:
