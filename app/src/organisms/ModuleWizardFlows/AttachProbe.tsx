@@ -131,8 +131,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         i18nKey={'pipette_wizard_flows:install_probe'}
         values={{ location: probeLocation }}
         components={{
-          strong: <strong />,
-          block: <StyledText css={BODY_STYLE} />,
+          bold: <strong />,
         }}
       />
       {wasteChuteConflict && (
