@@ -238,25 +238,6 @@ def _override_ok_to_add_volume(self, volume_incr: float) -> bool:  # noqa: ANN00
     return True
 
 
-def _override_validate_asp_vol(
-    state_view: StateView,
-    pipette_id: str,
-    aspirate_volume: float,
-    command_note_adder: CommandNoteAdder,
-) -> float:
-    return aspirate_volume
-
-
-def _override_check_safe_for_pipette_movement(
-    engine_state: StateView,
-    pipette_id: str,
-    labware_id: str,
-    well_name: str,
-    well_location: Union[WellLocation, DropTipWellLocation],
-) -> None:
-    pass
-
-
 def _override_software_supports_high_volumes() -> None:
     # yea so ok this is pretty ugly but this is super helpful for us
     # with this we don't need to apply patches, and can run the testing scripts
@@ -265,7 +246,6 @@ def _override_software_supports_high_volumes() -> None:
     Pipette.set_current_volume = _override_set_current_volume  # type: ignore[assignment]
     Pipette.ok_to_add_volume = _override_ok_to_add_volume  # type: ignore[assignment]
     Pipette.add_current_volume = _override_add_current_volume  # type: ignore[assignment]
-    PE_pipetting._validate_aspirate_volume = _override_validate_asp_vol  # type: ignore[assignment]
 
 
 def _get_channel_offset(cfg: config.VolumetricConfig, channel: int) -> Point:
