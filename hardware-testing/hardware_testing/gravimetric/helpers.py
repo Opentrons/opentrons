@@ -388,8 +388,6 @@ def _load_pipette(
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
         pipette.configure_nozzle_layout(NozzleLayout.SINGLE, "A1")
-    else:
-        pipette.configure_nozzle_layout(NozzleLayout.ALL)
     return pipette
 
 
