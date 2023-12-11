@@ -414,23 +414,22 @@ def _load_tipracks(
     cfg: config.VolumetricConfig,
     use_adapters: bool = False,
 ) -> List[Labware]:
-    adp_str = "_adp" if use_adapters else ""
     tiprack_load_settings: List[Tuple[int, str]] = [
         (
             slot,
-            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul{adp_str}",
+            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul",
         )
         for slot in cfg.slots_tiprack
     ]
     for ls in tiprack_load_settings:
         ui.print_info(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
-    if use_adapters:
-        tiprack_namespace = "custom_beta"
-    else:
-        tiprack_namespace = "opentrons"
 
+    adapter: Optional[str] = (
+        "opentrons_flex_96_tiprack_adapter" if use_adapters else None
+    )
     # If running multiple tests in one run, the labware may already be loaded
     loaded_labwares = ctx.loaded_labwares
+    print(f"Loaded labwares {loaded_labwares}")
     pre_loaded_tips: List[Labware] = []
     for ls in tiprack_load_settings:
         if ls[0] in loaded_labwares.keys():
@@ -450,11 +449,15 @@ def _load_tipracks(
                     pick_up_offset=None,
                     drop_offset=None,
                 )
+                if ctx.deck[ls[0]] is not None:
+                    # remove the adapter from the slot too
+                    ui.print_info(f"removing {ctx.deck[ls[0]]} from slot {ls[0]}")
+                    del ctx.deck[ls[0]]
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
     tipracks = [
-        ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
+        ctx.load_labware(ls[1], location=ls[0], adapter=adapter)
         for ls in tiprack_load_settings
     ]
     return tipracks
