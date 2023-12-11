@@ -100,7 +100,7 @@ export function FixtureTable({
           if (!isCurrentFixtureCompatible) {
             const isConflictingFixtureConfigured =
               cutoutFixtureId != null &&
-              !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+              SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
             chipLabel = (
               <>
                 <Chip

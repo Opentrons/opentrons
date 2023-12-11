@@ -12,7 +12,10 @@ import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
@@ -52,15 +55,26 @@ export function ProtocolSetupDeckConfiguration({
   ] = React.useState<boolean>(false)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const { data: deckConfig = [] } = useDeckConfigurationQuery()
 
   const simplestDeckConfig = getSimplestDeckConfigForProtocol(
     mostRecentAnalysis
   ).map(({ cutoutId, cutoutFixtureId }) => ({ cutoutId, cutoutFixtureId }))
 
+  const targetDeckConfig = simplestDeckConfig.find(
+    deck => deck.cutoutId === cutoutId
+  )
+
+  const mergedDeckConfig = deckConfig.map(config =>
+    targetDeckConfig != null && config.cutoutId === targetDeckConfig.cutoutId
+      ? targetDeckConfig
+      : config
+  )
+
   const [
     currentDeckConfig,
     setCurrentDeckConfig,
-  ] = React.useState<DeckConfiguration>(simplestDeckConfig)
+  ] = React.useState<DeckConfiguration>(mergedDeckConfig)
 
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const handleClickConfirm = (): void => {
@@ -94,13 +108,14 @@ export function ProtocolSetupDeckConfiguration({
           onClickButton={handleClickConfirm}
         />
         <Flex
-          marginTop="7.75rem"
+          marginTop="4rem"
           paddingX={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
         >
           <BaseDeck
-            deckConfig={simplestDeckConfig}
+            deckConfig={currentDeckConfig}
             robotType={FLEX_ROBOT_TYPE}
+            height="455px"
           />
         </Flex>
       </Flex>

@@ -748,7 +748,7 @@ export function ProtocolSetup(): JSX.Element {
         padding={
           setupScreen === 'prepare to run'
             ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
-            : `${SPACING.spacing32} ${SPACING.spacing40}`
+            : `${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`
         }
       >
         {setupComponentByScreen[setupScreen]}

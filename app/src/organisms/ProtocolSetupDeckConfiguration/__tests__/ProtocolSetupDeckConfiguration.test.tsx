@@ -2,13 +2,22 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders, BaseDeck } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
+import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupDeckConfiguration } from '..'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type {
+  CompletedProtocolAnalysis,
+  CutoutConfig,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 jest.mock('@opentrons/react-api-client')
@@ -26,6 +35,11 @@ const PROTOCOL_DETAILS = {
   robotType: 'OT-3 Standard' as const,
 }
 
+const mockCutoutConfig: CutoutConfig = {
+  cutoutId: 'cutoutD1',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
+
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -33,6 +47,9 @@ const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutatio
   typeof useUpdateDeckConfigurationMutation
 >
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
 
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupDeckConfiguration>
@@ -59,6 +76,9 @@ describe('ProtocolSetupDeckConfiguration', () => {
     mockUseUpdateDeckConfigurationMutation.mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+    mockUseDeckConfigurationQuery.mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
   afterEach(() => {
