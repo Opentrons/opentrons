@@ -19,13 +19,14 @@ import type { Subsystem } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface UpdateNeededModalProps {
-  setShowUpdateModal: React.Dispatch<React.SetStateAction<boolean>>
+  onClose: () => void
+  shouldExit: boolean
   subsystem: Subsystem
   setInitiatedSubsystemUpdate: (subsystem: Subsystem | null) => void
 }
 
 export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
-  const { setShowUpdateModal, subsystem, setInitiatedSubsystemUpdate } = props
+  const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
   const [updateId, setUpdateId] = React.useState('')
   const {
@@ -102,10 +103,11 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
       <UpdateResultsModal
         instrument={instrument}
         isSuccess={updateError === undefined}
-        closeModal={() => {
+        onClose={() => {
           refetchInstruments().catch(error => console.error(error))
-          setShowUpdateModal(false)
+          onClose()
         }}
+        shouldExit={shouldExit}
       />
     )
   }

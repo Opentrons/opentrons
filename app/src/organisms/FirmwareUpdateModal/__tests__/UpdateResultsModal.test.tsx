@@ -14,7 +14,8 @@ describe('UpdateResultsModal', () => {
   beforeEach(() => {
     props = {
       isSuccess: true,
-      closeModal: jest.fn(),
+      shouldExit: true,
+      onClose: jest.fn(),
       instrument: {
         ok: true,
         subsystem: 'gripper',
@@ -30,12 +31,13 @@ describe('UpdateResultsModal', () => {
   it('calls close modal when the close button is pressed', () => {
     const { getByText } = render(props)
     getByText('Close').click()
-    expect(props.closeModal).toHaveBeenCalled()
+    expect(props.onClose).toHaveBeenCalled()
   })
   it('renders correct text for a failed instrument update', () => {
     props = {
       isSuccess: false,
-      closeModal: jest.fn(),
+      shouldExit: true,
+      onClose: jest.fn(),
       instrument: {
         ok: false,
       } as any,

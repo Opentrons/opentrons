@@ -20,14 +20,15 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean
-  closeModal: () => void
+  shouldExit: boolean
+  onClose: () => void
   instrument?: InstrumentData
 }
 
 export function UpdateResultsModal(
   props: UpdateResultsModalProps
 ): JSX.Element {
-  const { isSuccess, closeModal, instrument } = props
+  const { isSuccess, shouldExit, onClose, instrument } = props
   const { i18n, t } = useTranslation(['firmware_update', 'shared'])
 
   const updateFailedHeader: ModalHeaderBaseProps = {
@@ -45,8 +46,12 @@ export function UpdateResultsModal(
               {t('download_logs')}
             </StyledText>
             <SmallButton
-              onClick={() => closeModal()}
-              buttonText={i18n.format(t('shared:close'), 'capitalize')}
+              onClick={onClose}
+              buttonText={
+                shouldExit
+                  ? i18n.format(t('shared:close'), 'capitalize')
+                  : t('shared:next')
+              }
               width="100%"
             />
           </Flex>
@@ -99,8 +104,12 @@ export function UpdateResultsModal(
               </StyledText>
             </Flex>
             <SmallButton
-              onClick={() => closeModal()}
-              buttonText={i18n.format(t('shared:close'), 'capitalize')}
+              onClick={onClose}
+              buttonText={
+                shouldExit
+                  ? i18n.format(t('shared:close'), 'capitalize')
+                  : t('shared:next')
+              }
               width="100%"
             />
           </Flex>

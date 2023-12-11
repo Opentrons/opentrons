@@ -46,8 +46,9 @@ describe('UpdateNeededModal', () => {
   const updateSubsystem = jest.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
-      setShowUpdateModal: jest.fn(),
+      onClose: jest.fn(),
       subsystem: 'pipette_left',
+      shouldExit: true,
       setInitiatedSubsystemUpdate: jest.fn(),
     }
     mockUseInstrumentQuery.mockReturnValue({

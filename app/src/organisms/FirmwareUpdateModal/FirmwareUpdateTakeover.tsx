@@ -10,7 +10,7 @@ import { Portal } from '../../App/portal'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
-import type { Subsystem } from '@opentrons/api-client'
+import type { Subsystem, InstrumentData } from '@opentrons/api-client'
 
 const POLL_INTERVAL_MS = 5000
 
@@ -27,9 +27,23 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   const instrumentsData = useInstrumentsQuery({
     refetchInterval: POLL_INTERVAL_MS,
   }).data?.data
-  const subsystemUpdateInstrument = instrumentsData?.find(
-    instrument => instrument.ok === false
-  )
+
+  const instrumentsToUpdate = [] as InstrumentData[]
+  instrumentsData?.forEach(instrument => {
+    if (
+      !instrument.ok &&
+      instrumentsToUpdate.find(
+        (i): i is InstrumentData => i.subsystem === instrument.subsystem
+      ) == null
+    ) {
+      instrumentsToUpdate.push(instrument)
+    }
+  })
+  const [indexToUpdate, setIndexToUpdate] = React.useState(0)
+  const subsystemToUpdate =
+    instrumentsToUpdate.length > indexToUpdate
+      ? instrumentsToUpdate[indexToUpdate]?.subsystem
+      : null
 
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
@@ -53,7 +67,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
 
   React.useEffect(() => {
     if (
-      subsystemUpdateInstrument != null &&
+      subsystemToUpdate != null &&
       maintenanceRunData == null &&
       !isUnboxingFlowOngoing &&
       externalSubsystemUpdate == null
@@ -61,22 +75,27 @@ export function FirmwareUpdateTakeover(): JSX.Element {
       setShowUpdateNeededModal(true)
     }
   }, [
-    subsystemUpdateInstrument,
+    subsystemToUpdate,
     maintenanceRunData,
     isUnboxingFlowOngoing,
     externalSubsystemUpdate,
   ])
-  const memoizedSubsystem = React.useMemo(
-    () => subsystemUpdateInstrument?.subsystem,
-    []
-  )
 
   return (
     <>
-      {memoizedSubsystem != null && showUpdateNeededModal ? (
+      {subsystemToUpdate != null && showUpdateNeededModal ? (
         <UpdateNeededModal
-          subsystem={memoizedSubsystem}
-          setShowUpdateModal={setShowUpdateNeededModal}
+          subsystem={subsystemToUpdate}
+          onClose={() => {
+            // if no more instruments need updating, close the modal
+            // otherwise start over with next instrument
+            if (instrumentsToUpdate.length <= indexToUpdate) {
+              setShowUpdateNeededModal(false)
+            } else {
+              setIndexToUpdate(indexToUpdate + 1)
+            }
+          }}
+          shouldExit={instrumentsToUpdate.length <= indexToUpdate}
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
       ) : null}
