@@ -471,7 +471,6 @@ def _connect_to_fixture(test_config: TestConfig) -> PressureFixtureBase:
     fixture = connect_to_fixture(
         test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
     )
-    fixture.connect()
     return fixture
 
 
