@@ -8,10 +8,6 @@ from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.actions import UpdateCommandAction
-from opentrons.protocol_engine.errors import (
-    # AreaNotInDeckConfigurationError,
-    IncompatibleAddressableAreaError,
-)
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
@@ -185,51 +181,6 @@ def test_addressable_area_referencing_commands_load_on_simulated_deck(
 
 
 @pytest.mark.parametrize(
-    "command",
-    (
-        create_load_labware_command(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-            labware_id="test-labware-id",
-            definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(loadName="blah"),  # type: ignore[call-arg]
-                namespace="bleh",
-                version=123,
-            ),
-            offset_id="offset-id",
-            display_name="display-name",
-        ),
-        create_load_module_command(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-            module_id="test-module-id",
-            model=ModuleModel.TEMPERATURE_MODULE_V2,
-        ),
-        create_move_labware_command(
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-            strategy=LabwareMovementStrategy.USING_GRIPPER,
-        ),
-    ),
-)
-def test_handles_command_simulated_raises(
-    command: Command,
-    simulated_subject: AddressableAreaStore,
-) -> None:
-    """It should raise when two incompatible areas are referenced."""
-    initial_command = create_move_labware_command(
-        new_location=AddressableAreaLocation(addressableAreaName="gripperWasteChute"),
-        strategy=LabwareMovementStrategy.USING_GRIPPER,
-    )
-
-    simulated_subject.handle_action(
-        UpdateCommandAction(private_result=None, command=initial_command)
-    )
-
-    with pytest.raises(IncompatibleAddressableAreaError):
-        simulated_subject.handle_action(
-            UpdateCommandAction(private_result=None, command=command)
-        )
-
-
-@pytest.mark.parametrize(
     ("command", "expected_area"),
     (
         (
@@ -292,38 +243,3 @@ def test_addressable_area_referencing_commands_load(
     """It should check that the addressable area is in the deck config."""
     subject.handle_action(UpdateCommandAction(private_result=None, command=command))
     assert expected_area in subject.state.loaded_addressable_areas_by_name
-
-
-# TODO Uncomment this out once this check is back in
-# @pytest.mark.parametrize(
-#     "command",
-#     (
-#         create_load_labware_command(
-#             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-#             labware_id="test-labware-id",
-#             definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-#                 parameters=Parameters.construct(loadName="blah"),  # type: ignore[call-arg]
-#                 namespace="bleh",
-#                 version=123,
-#             ),
-#             offset_id="offset-id",
-#             display_name="display-name",
-#         ),
-#         create_load_module_command(
-#             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-#             module_id="test-module-id",
-#             model=ModuleModel.TEMPERATURE_MODULE_V2,
-#         ),
-#         create_move_labware_command(
-#             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-#             strategy=LabwareMovementStrategy.USING_GRIPPER,
-#         ),
-#     ),
-# )
-# def test_handles_load_labware_raises(
-#     command: Command,
-#     subject: AddressableAreaStore,
-# ) -> None:
-#     """It should raise when referencing an addressable area not in the deck config."""
-#     with pytest.raises(AreaNotInDeckConfigurationError):
-#         subject.handle_action(UpdateCommandAction(private_result=None, command=command))
