@@ -174,9 +174,6 @@ class RunArgs:
             labware_dir = Path(__file__).parent.parent / "labware"
             custom_def_uris = [
                 "radwag_pipette_calibration_vial",
-                "opentrons_flex_96_tiprack_50ul_adp",
-                "opentrons_flex_96_tiprack_200ul_adp",
-                "opentrons_flex_96_tiprack_1000ul_adp",
             ]
             for def_uri in custom_def_uris:
                 with open(labware_dir / def_uri / "1.json", "r") as f:
