@@ -144,7 +144,7 @@ export function ProtocolRunSetup({
       ? parseLiquidsInLoadOrder(liquids, protocolAnalysis.commands)
       : []
 
-  const hasLiquids = protocolAnalysis != null && liquidsInLoadOrder.length > 0
+  const hasLiquids = liquidsInLoadOrder.length > 0
 
   const hasModules = protocolAnalysis != null && modules.length > 0
 
