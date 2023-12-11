@@ -93,12 +93,14 @@ export function FixtureListItem({
   cutoutId,
   cutoutFixtureId,
   compatibleCutoutFixtureIds,
+  missingLabwareDisplayName,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
   const isCurrentFixtureCompatible =
     cutoutFixtureId != null &&
     compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+  const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
   const isConflictingFixtureConfigured =
     cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
   let statusLabel
@@ -153,6 +155,7 @@ export function FixtureListItem({
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutId}
+          missingLabwareDisplayName={missingLabwareDisplayName}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
         />
       ) : null}
@@ -180,7 +183,8 @@ export function FixtureListItem({
                 width="60px"
                 height="54px"
                 src={
-                  isCurrentFixtureCompatible
+                  // show the current fixture for a missing single slot
+                  isCurrentFixtureCompatible || isRequiredSingleSlotMissing
                     ? getFixtureImage(cutoutFixtureId)
                     : getFixtureImage(compatibleCutoutFixtureIds?.[0])
                 }
@@ -191,7 +195,7 @@ export function FixtureListItem({
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}
               >
-                {isCurrentFixtureCompatible
+                {isCurrentFixtureCompatible || isRequiredSingleSlotMissing
                   ? getFixtureDisplayName(cutoutFixtureId)
                   : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
               </StyledText>

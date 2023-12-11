@@ -13,11 +13,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  getSimplestDeckConfigForProtocol,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
@@ -137,11 +133,12 @@ export function ProtocolRunSetup({
     protocolAnalysis != null && protocolAnalysis.liquids?.length > 0
   const hasModules = protocolAnalysis != null && modules.length > 0
 
-  const protocolDeckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
+  // need config compatibility (including check for single slot conflicts)
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
+  )
 
-  const requiredDeckConfig = getRequiredDeckConfig(protocolDeckConfig)
-
-  const hasFixtures = requiredDeckConfig.length > 0
+  const hasFixtures = requiredDeckConfigCompatibility.length > 0
 
   let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
     count: modules.length,
