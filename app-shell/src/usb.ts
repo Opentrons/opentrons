@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig, AxiosError } from 'axios'
 import FormData from 'form-data'
 import fs from 'fs'
 import path from 'path'
@@ -34,19 +34,17 @@ let usbFetchInterval: NodeJS.Timeout
 export function getSerialPortHttpAgent(): SerialPortHttpAgent | undefined {
   return usbHttpAgent
 }
-
 export function createSerialPortHttpAgent(path: string): void {
   const serialPortHttpAgent = new SerialPortHttpAgent({
     maxFreeSockets: 1,
     maxSockets: 1,
     maxTotalSockets: 1,
     keepAlive: true,
-    keepAliveMsecs: 10000,
+    keepAliveMsecs: Infinity,
     path,
     logger: usbLog,
     timeout: 100000,
   })
-
   usbHttpAgent = serialPortHttpAgent
 }
 
@@ -63,12 +61,10 @@ function isUsbDeviceOt3(device: UsbDevice): boolean {
     device.vendorId === parseInt(DEFAULT_VENDOR_ID, 16)
   )
 }
-
 async function usbListener(
   _event: IpcMainInvokeEvent,
   config: AxiosRequestConfig
 ): Promise<unknown> {
-  try {
     // TODO(bh, 2023-05-03): remove mutation
     let { data } = config
     let formHeaders = {}
@@ -94,21 +90,21 @@ async function usbListener(
     }
 
     const usbHttpAgent = getSerialPortHttpAgent()
-
-    const response = await axios.request({
-      httpAgent: usbHttpAgent,
-      ...config,
-      data,
-      headers: { ...config.headers, ...formHeaders },
-    })
-    return {
-      data: response.data,
-      status: response.status,
-      statusText: response.statusText,
-    }
+    try {
+      const response = await axios.request({
+        httpAgent: usbHttpAgent,
+        ...config,
+        data,
+        headers: { ...config.headers, ...formHeaders },
+      })
+      return {
+        error: false,
+        data: response.data,
+        status: response.status,
+        statusText: response.statusText,
+      }
   } catch (e) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    usbLog.debug(`usbListener error ${e?.message ?? 'unknown'}`)
+    console.log(`axios request error ${e?.message ?? 'unknown'}`)
   }
 }
 
