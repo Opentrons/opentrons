@@ -111,7 +111,7 @@ describe('GripperCard', () => {
     })
     fireEvent.click(overflowButton)
     const recalibrateGripperButton = screen.getByText('Recalibrate gripper')
-    recalibrateGripperButton.click()
+    fireEvent.click(recalibrateGripperButton)
     screen.getByText('wizard flow launched')
   })
   it('renders wizard flow when detach button is pressed', () => {
@@ -121,7 +121,7 @@ describe('GripperCard', () => {
     })
     fireEvent.click(overflowButton)
     const detachGripperButton = screen.getByText('Detach gripper')
-    detachGripperButton.click()
+    fireEvent.click(detachGripperButton)
     screen.getByText('wizard flow launched')
   })
   it('renders wizard flow when attach button is pressed', () => {
@@ -137,7 +137,7 @@ describe('GripperCard', () => {
     })
     fireEvent.click(overflowButton)
     const attachGripperButton = screen.getByText('Attach gripper')
-    attachGripperButton.click()
+    fireEvent.click(attachGripperButton)
     screen.getByText('wizard flow launched')
   })
   it('renders firmware update needed state if gripper is bad', () => {
@@ -153,7 +153,7 @@ describe('GripperCard', () => {
     screen.getByText('Extension mount')
     screen.getByText('Instrument attached')
     screen.getByText('Firmware update available.')
-    screen.getByText('Update now').click()
+    fireEvent.click(screen.getByText('Update now'))
     expect(props.setSubsystemToUpdate).toHaveBeenCalledWith('gripper')
   })
   it('renders firmware update in progress state if gripper is bad and update in progress', () => {

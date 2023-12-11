@@ -1,5 +1,6 @@
 import * as React from 'react'
 import i18n from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { FlexSlotMap } from '../FlexSlotMap'
@@ -25,21 +26,21 @@ describe('StagingAreasRow', () => {
     mockFlexSlotMap.mockReturnValue(<div>mock slot map</div>)
   })
   it('renders no staging areas', () => {
-    const { getByRole, getByText } = render(props)
-    getByText('Staging Area Slots')
-    getByRole('button', { name: 'add' }).click()
+    render(props)
+    screen.getByText('Staging Area Slots')
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
   })
   it('renders a staging area', () => {
     props = {
       ...props,
       stagingAreas: [{ name: 'stagingArea', location: 'B3', id: 'mockId' }],
     }
-    const { getByRole, getByText } = render(props)
-    getByText('mock slot map')
-    getByText('Position:')
-    getByText('B3')
-    getByRole('button', { name: 'remove' }).click()
+    render(props)
+    screen.getByText('mock slot map')
+    screen.getByText('Position:')
+    screen.getByText('B3')
+    fireEvent.click(screen.getByRole('button', { name: 'remove' }))
     expect(props.handleAttachment).toHaveBeenCalled()
-    getByRole('button', { name: 'edit' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'edit' }))
   })
 })

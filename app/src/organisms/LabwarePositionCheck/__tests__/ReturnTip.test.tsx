@@ -7,6 +7,7 @@ import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis } from '../__fixtures__'
 import { useProtocolMetadata } from '../../Devices/hooks'
 import { getIsOnDevice } from '../../../redux/config'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('../../Devices/hooks')
 jest.mock('../../../redux/config')
@@ -51,32 +52,32 @@ describe('ReturnTip', () => {
     jest.restoreAllMocks()
   })
   it('renders correct copy on desktop', () => {
-    const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Return tip rack to Slot D1' })
-    getByText('Clear all deck slots of labware, leaving modules in place')
-    getByText(/Mock TipRack Definition/i)
-    getByText(/that you used before back into/i)
-    getByText('Slot D1')
-    getByText(
+    render(props)
+    screen.getByRole('heading', { name: 'Return tip rack to Slot D1' })
+    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getByText(/Mock TipRack Definition/i)
+    screen.getByText(/that you used before back into/i)
+    screen.getByText('Slot D1')
+    screen.getByText(
       /The pipette will return tips to their original location in the rack./i
     )
-    getByRole('link', { name: 'Need help?' })
+    screen.getByRole('link', { name: 'Need help?' })
   })
   it('renders correct copy on device', () => {
     mockGetIsOnDevice.mockReturnValue(true)
-    const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Return tip rack to Slot D1' })
-    getByText('Clear all deck slots of labware')
-    getByText(/Mock TipRack Definition/i)
-    getByText(/that you used before back into/i)
-    getByText('Slot D1')
-    getByText(
+    render(props)
+    screen.getByRole('heading', { name: 'Return tip rack to Slot D1' })
+    screen.getByText('Clear all deck slots of labware')
+    screen.getByText(/Mock TipRack Definition/i)
+    screen.getByText(/that you used before back into/i)
+    screen.getByText('Slot D1')
+    screen.getByText(
       /The pipette will return tips to their original location in the rack./i
     )
   })
   it('executes correct chained commands when CTA is clicked', async () => {
-    const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -125,8 +126,8 @@ describe('ReturnTip', () => {
       ...props,
       tipPickUpOffset: { x: 10, y: 11, z: 12 },
     }
-    const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
@@ -195,8 +196,8 @@ describe('ReturnTip', () => {
         ],
       },
     }
-    const { getByRole } = render(props)
-    await getByRole('button', { name: 'Confirm placement' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
     await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [

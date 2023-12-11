@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { InProgressModal } from '../../../molecules/InProgressModal/InProgressModal'
@@ -45,24 +45,24 @@ describe('BeforeBeginning', () => {
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information for attach flow', async () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Before you begin')
-    getByText(
+    render(props)
+    screen.getByText('Before you begin')
+    screen.getByText(
       'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
     )
-    getByText(
+    screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )
-    getByText('You will need:')
-    // getByText('mock need help link')
-    getByText('Calibration Pin')
-    getByText('2.5 mm Hex Screwdriver')
-    getByText(
+    screen.getByText('You will need:')
+    // screen.getByText('mock need help link')
+    screen.getByText('Calibration Pin')
+    screen.getByText('2.5 mm Hex Screwdriver')
+    screen.getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
-    getByText('Flex Gripper')
+    screen.getByText('Flex Gripper')
 
-    getByRole('button', { name: 'Move gantry to front' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Move gantry to front' }))
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {
@@ -82,19 +82,19 @@ describe('BeforeBeginning', () => {
   })
   it('returns the correct information for detach flow', async () => {
     props = { ...props, flowType: GRIPPER_FLOW_TYPES.DETACH }
-    const { getByText, getByRole } = render(props)
-    getByText('Before you begin')
-    getByText(
+    render(props)
+    screen.getByText('Before you begin')
+    screen.getByText(
       'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
     )
-    getByText('You will need:')
-    getByText('2.5 mm Hex Screwdriver')
-    getByText(
+    screen.getByText('You will need:')
+    screen.getByText('2.5 mm Hex Screwdriver')
+    screen.getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
-    // getByText('mock need help link')
+    // screen.getByText('mock need help link')
 
-    getByRole('button', { name: 'Move gantry to front' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Move gantry to front' }))
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         { commandType: 'home', params: {} },
@@ -111,20 +111,20 @@ describe('BeforeBeginning', () => {
   })
   it('returns the correct information for recalibrate flow', async () => {
     props = { ...props, flowType: GRIPPER_FLOW_TYPES.RECALIBRATE }
-    const { getByText, getByRole } = render(props)
-    getByText('Before you begin')
-    getByText(
+    render(props)
+    screen.getByText('Before you begin')
+    screen.getByText(
       'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
     )
-    getByText(
+    screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )
-    getByText('You will need:')
-    getByText('Calibration Pin')
-    getByText('Flex Gripper')
-    // getByText('mock need help link')
+    screen.getByText('You will need:')
+    screen.getByText('Calibration Pin')
+    screen.getByText('Flex Gripper')
+    // screen.getByText('mock need help link')
 
-    getByRole('button', { name: 'Move gantry to front' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Move gantry to front' }))
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {
@@ -147,7 +147,7 @@ describe('BeforeBeginning', () => {
       ...props,
       isRobotMoving: true,
     }
-    const { getByText } = render(props)
-    getByText('mock in progress')
+    render(props)
+    screen.getByText('mock in progress')
   })
 })
