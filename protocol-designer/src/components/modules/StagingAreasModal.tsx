@@ -15,6 +15,7 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_END,
   DeckConfigurator,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
   CutoutId,
@@ -120,11 +121,12 @@ const StagingAreasModalComponent = (
 
   return (
     <Form>
-      <Box paddingX={SPACING.spacing32}>
+      <Flex height="20rem" flexDirection={DIRECTION_COLUMN}>
         <Flex
           justifyContent={JUSTIFY_END}
           alignItems={ALIGN_CENTER}
-          height="3.125rem"
+          height="4rem"
+          paddingX={SPACING.spacing32}
         >
           <Box>
             {hasConflictedSlot ? (
@@ -138,19 +140,12 @@ const StagingAreasModalComponent = (
             ) : null}
           </Box>
         </Flex>
-
-        <Flex
-          height="20rem"
-          marginTop="-2.5rem"
-          justifyContent={JUSTIFY_CENTER}
-        >
-          <DeckConfigurator
-            deckConfig={updatedSlots}
-            handleClickAdd={handleClickAdd}
-            handleClickRemove={handleClickRemove}
-          />
-        </Flex>
-      </Box>
+        <DeckConfigurator
+          deckConfig={updatedSlots}
+          handleClickAdd={handleClickAdd}
+          handleClickRemove={handleClickRemove}
+        />
+      </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_FLEX_END}
