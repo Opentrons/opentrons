@@ -1,15 +1,18 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
-import { getWellDepth } from '@opentrons/shared-data'
+import { getWellDepth, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
   reduceCommandCreators,
   blowoutUtil,
+  wasteChuteCommandsUtil,
   getDispenseAirGapLocation,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
   aspirate,
@@ -71,7 +74,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   }
 
   if (
-    !invariantContext.labwareEntities[args.dropTipLocation] &&
+    !args.dropTipLocation ||
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
@@ -107,6 +110,18 @@ export const distribute: CommandCreator<DistributeArgs> = (
     (maxVolume - disposalVolume) / args.volume
   )
   const { pipette } = args
+
+  const isWasteChute =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
+    'wasteChute'
+  const isTrashBin =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
+    'trashBin'
+
+  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
@@ -283,16 +298,33 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 : []),
             ]
           : []
+
+      let dropTipCommand = [
+        curryCommandCreator(dropTip, {
+          pipette: args.pipette,
+          dropTipLocation: args.dropTipLocation,
+        }),
+      ]
+      if (isWasteChute) {
+        dropTipCommand = wasteChuteCommandsUtil({
+          type: 'dropTip',
+          pipetteId: args.pipette,
+          prevRobotState,
+          addressableAreaName: addressableAreaNameWasteChute,
+        })
+      }
+      if (isTrashBin) {
+        dropTipCommand = movableTrashCommandsUtil({
+          type: 'dropTip',
+          pipetteId: args.pipette,
+          prevRobotState,
+          invariantContext,
+        })
+      }
+
       // if using dispense > air gap, drop or change the tip at the end
       const dropTipAfterDispenseAirGap =
-        airGapAfterDispenseCommands.length > 0
-          ? [
-              curryCommandCreator(dropTip, {
-                pipette: args.pipette,
-                dropTipLocation: args.dropTipLocation,
-              }),
-            ]
-          : []
+        airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
       const blowoutCommands = disposalVolume
         ? blowoutUtil({
             pipette: pipette,
@@ -356,17 +388,16 @@ export const distribute: CommandCreator<DistributeArgs> = (
             })
           : []
 
-      const configureForVolumeCommand: CurriedCommandCreator[] =
-        invariantContext.pipetteEntities[args.pipette].name ===
-          'p50_single_flex' ||
-        invariantContext.pipetteEntities[args.pipette].name === 'p50_multi_flex'
-          ? [
-              curryCommandCreator(configureForVolume, {
-                pipetteId: args.pipette,
-                volume: args.volume * destWellChunk.length + disposalVolume,
-              }),
-            ]
-          : []
+      const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+        invariantContext.pipetteEntities[args.pipette].name
+      )
+        ? [
+            curryCommandCreator(configureForVolume, {
+              pipetteId: args.pipette,
+              volume: args.volume * destWellChunk.length + disposalVolume,
+            }),
+          ]
+        : []
 
       return [
         ...tipCommands,

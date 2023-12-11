@@ -112,6 +112,7 @@ from .types import (
     EstopAttachLocation,
     EstopStateNotification,
     EstopState,
+    HardwareFeatureFlags,
     FailedTipStateCheck,
 )
 from .errors import (
@@ -220,6 +221,7 @@ class OT3API(
         backend: Union[OT3Simulator, OT3Controller],
         loop: asyncio.AbstractEventLoop,
         config: OT3Config,
+        feature_flags: HardwareFeatureFlags,
     ) -> None:
         """Initialize an API instance.
 
@@ -235,6 +237,7 @@ class OT3API(
         def estop_cb(event: HardwareEvent) -> None:
             self._update_estop_state(event)
 
+        self._feature_flags = feature_flags
         backend.estop_state_machine.add_listener(estop_cb)
 
         self._callbacks: Set[HardwareEventHandler] = set()
@@ -378,18 +381,31 @@ class OT3API(
         use_usb_bus: bool = False,
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
+        if feature_flags is None:
+            # If no feature flag set is defined, we will use the default values
+            feature_flags = HardwareFeatureFlags()
         if not isinstance(config, OT3Config):
             checked_config = robot_configs.load_ot3()
         else:
             checked_config = config
         backend = await OT3Controller.build(
-            checked_config, use_usb_bus, check_updates=update_firmware
+            checked_config,
+            use_usb_bus,
+            check_updates=update_firmware,
+            feature_flags=feature_flags,
         )
 
-        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(
+            backend,
+            loop=checked_loop,
+            config=checked_config,
+            feature_flags=feature_flags,
+        )
+
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -416,12 +432,15 @@ class OT3API(
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> "OT3API":
         """Build a simulating hardware controller.
 
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
         """
+        if feature_flags is None:
+            feature_flags = HardwareFeatureFlags()
 
         checked_modules = attached_modules or []
 
@@ -438,8 +457,14 @@ class OT3API(
             checked_config,
             checked_loop,
             strict_attached_instruments,
+            feature_flags,
         )
-        api_instance = cls(backend, loop=checked_loop, config=checked_config)
+        api_instance = cls(
+            backend,
+            loop=checked_loop,
+            config=checked_config,
+            feature_flags=feature_flags,
+        )
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -600,6 +625,7 @@ class OT3API(
             req_instr,
             pip_id,
             pip_offset_cal,
+            self._feature_flags.use_old_aspiration_functions,
         )
         self._pipette_handler.hardware_instruments[mount] = p
         # TODO (lc 12-5-2022) Properly support backwards compatibility
@@ -879,10 +905,11 @@ class OT3API(
             GantryLoad.HIGH_THROUGHPUT
         ][OT3AxisKind.Q]
 
+        max_distance = self._backend.axis_bounds[Axis.Q][1]
         # if position is not known, move toward limit switch at a constant velocity
-        if not any(self._backend.gear_motor_position):
+        if len(self._backend.gear_motor_position.keys()) == 0:
             await self._backend.home_tip_motors(
-                distance=self._backend.axis_bounds[Axis.Q][1],
+                distance=max_distance,
                 velocity=homing_velocity,
             )
             return
@@ -891,7 +918,13 @@ class OT3API(
             Axis.P_L
         ]
 
-        if current_pos_float > self._config.safe_home_distance:
+        # We filter out a distance more than `max_distance` because, if the tip motor was stopped during
+        # a slow-home motion, the position may be stuck at an enormous large value.
+        if (
+            current_pos_float > self._config.safe_home_distance
+            and current_pos_float < max_distance
+        ):
+
             fast_home_moves = self._build_moves(
                 {Axis.Q: current_pos_float}, {Axis.Q: self._config.safe_home_distance}
             )
@@ -905,7 +938,9 @@ class OT3API(
 
         # move until the limit switch is triggered, with no acceleration
         await self._backend.home_tip_motors(
-            distance=(current_pos_float + self._config.safe_home_distance),
+            distance=min(
+                current_pos_float + self._config.safe_home_distance, max_distance
+            ),
             velocity=homing_velocity,
         )
 
@@ -1397,9 +1432,9 @@ class OT3API(
         self, axis: Axis
     ) -> Tuple[OT3AxisMap[float], OT3AxisMap[float]]:
         origin = await self._backend.update_position()
-        target_pos = {ax: pos for ax, pos in origin.items()}
-        target_pos.update({axis: self._backend.home_position()[axis]})
-        return origin, target_pos
+        origin_pos = {axis: origin[axis]}
+        target_pos = {axis: self._backend.home_position()[axis]}
+        return origin_pos, target_pos
 
     @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:
@@ -1612,6 +1647,15 @@ class OT3API(
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration."""
         self._config = replace(self._config, **kwargs)
+
+    @property
+    def hardware_feature_flags(self) -> HardwareFeatureFlags:
+        return self._feature_flags
+
+    @hardware_feature_flags.setter
+    def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        self._feature_flags = feature_flags
+        self._backend.update_feature_flags(self._feature_flags)
 
     @ExecutionManagerProvider.wait_for_running
     async def _grip(self, duty_cycle: float, stay_engaged: bool = True) -> None:
@@ -1960,25 +2004,28 @@ class OT3API(
 
     async def get_tip_presence_status(
         self,
-        mount: OT3Mount,
+        mount: Union[top_types.Mount, OT3Mount],
     ) -> TipStateType:
         """
         Check tip presence status. If a high throughput pipette is present,
         move the tip motors down before checking the sensor status.
         """
-        async with contextlib.AsyncExitStack() as stack:
-            if (
-                mount == OT3Mount.LEFT
-                and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-            ):
-                await stack.enter_async_context(self._high_throughput_check_tip())
-            result = await self._backend.get_tip_status(mount)
-        return result
+        async with self._motion_lock:
+            real_mount = OT3Mount.from_mount(mount)
+            async with contextlib.AsyncExitStack() as stack:
+                if (
+                    real_mount == OT3Mount.LEFT
+                    and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+                ):
+                    await stack.enter_async_context(self._high_throughput_check_tip())
+                result = await self._backend.get_tip_status(real_mount)
+            return result
 
     async def verify_tip_presence(
-        self, mount: OT3Mount, expected: TipStateType
+        self, mount: Union[top_types.Mount, OT3Mount], expected: TipStateType
     ) -> None:
-        status = await self.get_tip_presence_status(mount)
+        real_mount = OT3Mount.from_mount(mount)
+        status = await self.get_tip_presence_status(real_mount)
         if status != expected:
             raise FailedTipStateCheck(expected, status.value)
 
@@ -2049,7 +2096,9 @@ class OT3API(
             and instrument.nozzle_manager.current_configuration.configuration
             == NozzleConfigurationType.FULL
         ):
-            spec = self._pipette_handler.plan_ht_pick_up_tip()
+            spec = self._pipette_handler.plan_ht_pick_up_tip(
+                instrument.nozzle_manager.current_configuration.tip_count
+            )
             if spec.z_distance_to_tiprack:
                 await self.move_rel(
                     realmount, top_types.Point(z=spec.z_distance_to_tiprack)
@@ -2057,7 +2106,10 @@ class OT3API(
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
             spec = self._pipette_handler.plan_lt_pick_up_tip(
-                realmount, presses, increment
+                realmount,
+                instrument.nozzle_manager.current_configuration.tip_count,
+                presses,
+                increment,
             )
             await self._force_pick_up_tip(realmount, spec)
 

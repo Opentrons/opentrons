@@ -11,6 +11,7 @@ import {
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
 } from '../../utils'
+import { COLUMN_4_SLOTS } from '../../constants'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { MoveToWellParams as v5MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV5'
 import type { MoveToWellParams as v6MoveToWellParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
@@ -56,6 +57,12 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     )
   } else if (prevRobotState.labware[labware].slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
+  }
+
+  if (COLUMN_4_SLOTS.includes(slotName)) {
+    errors.push(
+      errorCreators.pipettingIntoColumn4({ typeOfStep: 'move to well' })
+    )
   }
 
   if (

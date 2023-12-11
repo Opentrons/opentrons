@@ -156,6 +156,7 @@ interface MoveRelativeParams {
 interface SavePositionParams {
   pipetteId: string // pipette to use in measurement
   positionId?: string // position ID, auto-assigned if left blank
+  failOnNotHomed?: boolean // Defaults to true if blank. Require every possible axis to be homed to save.
 }
 
 interface HomeParams {
@@ -167,9 +168,15 @@ interface RetractAxisParams {
   axis: MotorAxis
 }
 
+interface AddressableOffsetVector {
+  x: number
+  y: number
+  z: number
+}
 export interface MoveToAddressableAreaParams {
   pipetteId: string
   addressableAreaName: string
+  offset: AddressableOffsetVector
   speed?: number
   minimumZHeight?: number
   forceDirect?: boolean

@@ -30,12 +30,12 @@ describe('UploadInput', () => {
   it('renders correct contents for empty state', () => {
     const { getByRole } = render()
 
-    expect(getByRole('button', { name: 'Choose File' })).toBeTruthy()
+    expect(getByRole('button', { name: 'Upload' })).toBeTruthy()
   })
 
   it('opens file select on button click', () => {
     const { getByRole, getByTestId } = render()
-    const button = getByRole('button', { name: 'Choose File' })
+    const button = getByRole('button', { name: 'Upload' })
     const input = getByTestId('file_input')
     input.click = jest.fn()
     fireEvent.click(button)

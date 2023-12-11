@@ -4,7 +4,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { OUTER_SLOTS_FLEX } from '../../../modules'
 import { isModuleWithCollisionIssue } from '../../modules'
 import {
   FLEX_SUPPORTED_MODULE_MODELS,
@@ -15,7 +14,7 @@ import type { ModuleType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
 import type { FormState } from './types'
 
-export const FLEX_TRASH_DEFAULT_SLOT = 'A3'
+export const FLEX_TRASH_DEFAULT_SLOT = 'cutoutA3'
 const ALL_STAGING_AREAS = 4
 
 export const getLastCheckedEquipment = (values: FormState): string | null => {
@@ -80,13 +79,50 @@ export const getTrashBinOptionDisabled = (values: FormState): boolean => {
   return allStagingAreasInUse && allModulesInSideSlotsOnDeck
 }
 
-export const getTrashSlot = (values: FormState): string => {
-  const stagingAreaLocations = values.additionalEquipment
-    .filter(equipment => equipment.includes('stagingArea'))
-    .map(stagingArea => stagingArea.split('_')[1])
+export const MOVABLE_TRASH_CUTOUTS = [
+  {
+    value: 'cutoutA1',
+    slot: 'A1',
+  },
+  {
+    value: 'cutoutA3',
+    slot: 'A3',
+  },
+  {
+    value: 'cutoutB1',
+    slot: 'B1',
+  },
+  {
+    value: 'cutoutB3',
+    slot: 'B3',
+  },
+  {
+    value: 'cutoutC1',
+    slot: 'C1',
+  },
+  {
+    value: 'cutoutC3',
+    slot: 'C3',
+  },
+  {
+    value: 'cutoutD1',
+    slot: 'D1',
+  },
+  {
+    value: 'cutoutD3',
+    slot: 'D3',
+  },
+]
 
-  //   return default trash slot A3 if staging area is not on slot
-  if (!stagingAreaLocations.includes(FLEX_TRASH_DEFAULT_SLOT)) {
+export const getTrashSlot = (values: FormState): string => {
+  const stagingAreas = values.additionalEquipment.filter(equipment =>
+    equipment.includes('stagingArea')
+  )
+  //  TODO(Jr, 11/16/23): refactor additionalEquipment to store cutouts
+  //  so the split isn't needed
+  const cutouts = stagingAreas.map(cutout => cutout.split('_')[1])
+
+  if (!cutouts.includes(FLEX_TRASH_DEFAULT_SLOT)) {
     return FLEX_TRASH_DEFAULT_SLOT
   }
 
@@ -103,11 +139,9 @@ export const getTrashSlot = (values: FormState): string => {
     },
     []
   )
-
-  const unoccupiedSlot = OUTER_SLOTS_FLEX.find(
-    slot =>
-      !stagingAreaLocations.includes(slot.value) &&
-      !moduleSlots.includes(slot.value)
+  const unoccupiedSlot = MOVABLE_TRASH_CUTOUTS.find(
+    cutout =>
+      !cutouts.includes(cutout.value) && !moduleSlots.includes(cutout.slot)
   )
   if (unoccupiedSlot == null) {
     console.error(

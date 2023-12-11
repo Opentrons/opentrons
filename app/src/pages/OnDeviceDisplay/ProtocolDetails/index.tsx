@@ -173,7 +173,7 @@ const ProtocolSectionTabs = ({
   setCurrentOption,
 }: ProtocolSectionTabsProps): JSX.Element => {
   return (
-    <Flex gridGap={SPACING.spacing8} marginX={SPACING.spacing16}>
+    <Flex gridGap={SPACING.spacing8}>
       {protocolSectionTabOptions.map(option => {
         return (
           <TabbedButton
@@ -270,7 +270,7 @@ const ProtocolSectionContent = ({
   }
   return (
     <Flex
-      margin={SPACING.spacing16}
+      marginTop={SPACING.spacing32}
       justifyContent={currentOption === 'Deck' ? JUSTIFY_CENTER : undefined}
     >
       {protocolSection}
@@ -453,8 +453,8 @@ export function ProtocolDetails(): JSX.Element | null {
       ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        paddingX={SPACING.spacing32}
-        paddingBottom={SPACING.spacing32}
+        paddingX={SPACING.spacing40}
+        paddingBottom={SPACING.spacing40}
       >
         {showMaxPinsAlert && (
           <SmallModalChildren
@@ -495,7 +495,6 @@ export function ProtocolDetails(): JSX.Element | null {
               // Skeleton is large. Better UX not to scroll to see buttons while loading.
               !isProtocolFetching ? SPACING.spacing60 : SPACING.spacing24
             }
-            marginX={SPACING.spacing16}
           >
             <MediumButton
               buttonText={
@@ -506,14 +505,14 @@ export function ProtocolDetails(): JSX.Element | null {
               buttonType="secondary"
               iconName="pin"
               onClick={handlePinClick}
-              width="29.25rem"
+              width="100%"
             />
             <MediumButton
               buttonText={t('protocol_info:delete_protocol')}
               buttonType="alertSecondary"
               iconName="trash"
               onClick={() => setShowConfirmationDeleteProtocol(true)}
-              width="29.25rem"
+              width="100%"
             />
           </Flex>
         </Flex>

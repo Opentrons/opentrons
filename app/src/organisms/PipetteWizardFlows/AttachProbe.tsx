@@ -3,20 +3,20 @@ import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
-  Btn,
-  PrimaryButton,
   TYPOGRAPHY,
   COLORS,
   SPACING,
   RESPONSIVENESS,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
 } from '@opentrons/components'
-import { LEFT, MotorAxes } from '@opentrons/shared-data'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { SmallButton } from '../../atoms/buttons'
+import {
+  LEFT,
+  MotorAxes,
+  WASTE_CHUTE_CUTOUT,
+  CreateCommand,
+} from '@opentrons/shared-data'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -25,7 +25,7 @@ import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Prob
 import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
-import type { PipetteData } from '@opentrons/api-client'
+import { ProbeNotAttached } from './ProbeNotAttached'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
@@ -40,32 +40,6 @@ const IN_PROGRESS_STYLE = css`
     font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
     margin-top: ${SPACING.spacing4};
-  }
-`
-
-const ALIGN_BUTTONS = css`
-  align-items: ${ALIGN_FLEX_END};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    align-items: ${ALIGN_CENTER};
-  }
-`
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
-  padding-left: ${SPACING.spacing32};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
-    &:hover {
-      opacity: 100%;
-    }
   }
 `
 
@@ -85,11 +59,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
-  const [isPending, setIsPending] = React.useState<boolean>(false)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState<boolean>(
     false
   )
-  const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
 
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const displayName = attachedPipettes[mount]?.displayName
@@ -97,64 +69,57 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
   const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
-  const { refetch, data: attachedInstrumentsData } = useInstrumentsQuery({
-    enabled: false,
-    onSettled: () => {
-      setIsPending(false)
-    },
-  })
-  const attachedPipette = attachedInstrumentsData?.data.find(
-    (instrument): instrument is PipetteData =>
-      instrument.ok && instrument.mount === mount
-  )
+  const deckConfig = useDeckConfigurationQuery().data
+  const isWasteChuteOnDeck =
+    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
+    false
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
-    setIsPending(true)
-    refetch()
+    const verifyCommands: CreateCommand[] = [
+      {
+        commandType: 'verifyTipPresence',
+        params: { pipetteId: pipetteId, expectedState: 'present' },
+      },
+    ]
+    const homeCommands: CreateCommand[] = [
+      {
+        commandType: 'home' as const,
+        params: {
+          axes: axes,
+        },
+      },
+      {
+        commandType: 'home' as const,
+        params: {
+          skipIfMountPositionOk: mount,
+        },
+      },
+      {
+        commandType: 'calibration/calibratePipette' as const,
+        params: {
+          mount: mount,
+        },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition' as const,
+        params: {
+          mount: mount,
+        },
+      },
+    ]
+    chainRunCommands?.(verifyCommands, false)
       .then(() => {
-        if (attachedPipette?.state?.tipDetected) {
-          chainRunCommands?.(
-            [
-              {
-                commandType: 'home' as const,
-                params: {
-                  axes: axes,
-                },
-              },
-              {
-                commandType: 'home' as const,
-                params: {
-                  skipIfMountPositionOk: mount,
-                },
-              },
-              {
-                commandType: 'calibration/calibratePipette' as const,
-                params: {
-                  mount: mount,
-                },
-              },
-              {
-                commandType: 'calibration/moveToMaintenancePosition' as const,
-                params: {
-                  mount: mount,
-                },
-              },
-            ],
-            false
-          )
-            .then(() => {
-              proceed()
-            })
-            .catch(error => {
-              setShowErrorMessage(error.message)
-            })
-        } else {
-          setShowUnableToDetect(true)
-        }
+        chainRunCommands?.(homeCommands, false)
+          .then(() => {
+            proceed()
+          })
+          .catch(error => {
+            setShowErrorMessage(error.message)
+          })
       })
-      .catch(error => {
-        setShowErrorMessage(error.message)
+      .catch((e: Error) => {
+        setShowUnableToDetect(true)
       })
   }
 
@@ -211,41 +176,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     )
   else if (showUnableToDetect)
     return (
-      <SimpleWizardBody
-        header={t('unable_to_detect_probe')}
-        subHeader={
-          numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
-        }
-        iconColor={COLORS.errorEnabled}
-        isSuccess={false}
-      >
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          css={ALIGN_BUTTONS}
-          gridGap={SPACING.spacing8}
-        >
-          <Btn onClick={() => setShowUnableToDetect(false)}>
-            <StyledText css={GO_BACK_BUTTON_STYLE}>
-              {t('shared:go_back')}
-            </StyledText>
-          </Btn>
-          {isOnDevice ? (
-            <SmallButton
-              buttonText={t('try_again')}
-              disabled={isPending}
-              onClick={() => {
-                setNumberOfTryAgains(numberOfTryAgains + 1)
-                handleOnClick()
-              }}
-            />
-          ) : (
-            <PrimaryButton disabled={isPending} onClick={handleOnClick}>
-              {t('try_again')}
-            </PrimaryButton>
-          )}
-        </Flex>
-      </SimpleWizardBody>
+      <ProbeNotAttached
+        handleOnClick={handleOnClick}
+        setShowUnableToDetect={setShowUnableToDetect}
+        isOnDevice={isOnDevice ?? false}
+      />
     )
 
   return errorMessage != null ? (
@@ -275,20 +210,32 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
-        <StyledText css={BODY_STYLE}>
-          <Trans
-            t={t}
-            i18nKey={'install_probe'}
-            values={{ location: probeLocation }}
-            components={{
-              bold: <strong />,
-            }}
-          />
-        </StyledText>
+        <>
+          <StyledText css={BODY_STYLE}>
+            <Trans
+              t={t}
+              i18nKey={'install_probe'}
+              values={{ location: probeLocation }}
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </StyledText>
+          {is96Channel && (
+            <Banner
+              type={isWasteChuteOnDeck ? 'error' : 'warning'}
+              size={isOnDevice ? '1.5rem' : '1rem'}
+              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+            >
+              {isWasteChuteOnDeck
+                ? t('waste_chute_error')
+                : t('waste_chute_warning')}
+            </Banner>
+          )}
+        </>
       }
       proceedButtonText={t('begin_calibration')}
       proceed={handleOnClick}
-      proceedIsDisabled={isPending}
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />
   )

@@ -3,12 +3,11 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import {
   renderWithProviders,
-  componentPropsMatcher,
   partialComponentPropsMatcher,
   LabwareRender,
   Module,
 } from '@opentrons/components'
-import { getModuleDef2 } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE, getModuleDef2 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import { i18n } from '../../../../../i18n'
@@ -111,7 +110,7 @@ describe('SetupLabwareMap', () => {
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
       .calledWith(
-        componentPropsMatcher({
+        partialComponentPropsMatcher({
           definition: fixture_tiprack_300_ul,
         })
       )
@@ -160,6 +159,7 @@ describe('SetupLabwareMap', () => {
       protocolAnalysis: ({
         commands: [],
         labware: [],
+        robotType: OT2_ROBOT_TYPE,
       } as unknown) as CompletedProtocolAnalysis,
     })
 
@@ -237,6 +237,7 @@ describe('SetupLabwareMap', () => {
       protocolAnalysis: ({
         commands: [],
         labware: [],
+        robotType: OT2_ROBOT_TYPE,
       } as unknown) as CompletedProtocolAnalysis,
     })
 

@@ -1,7 +1,7 @@
 import json
 import os
 
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Union, Optional, List
 from typing_extensions import Literal
 from functools import lru_cache
 
@@ -152,7 +152,41 @@ def _change_to_camel_case(c: str) -> str:
     return f"{config_name[0]}" + "".join(s.capitalize() for s in config_name[1::])
 
 
-def update_pipette_configuration(  # noqa: C901
+def _edit_non_quirk_with_lc_override(
+    mutable_config_key: str,
+    new_mutable_value: Any,
+    base_dict: Dict[str, Any],
+    liquid_class: Optional[LiquidClasses],
+) -> None:
+    def _do_edit_non_quirk(
+        new_value: Any, existing: Dict[Any, Any], keypath: List[Any]
+    ) -> None:
+        thiskey: Any = keypath[0]
+        if thiskey in [lc.name for lc in LiquidClasses]:
+            if liquid_class:
+                thiskey = liquid_class
+            else:
+                thiskey = LiquidClasses[thiskey]
+        if len(keypath) > 1:
+            restkeys = keypath[1:]
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    _do_edit_non_quirk(new_value, existing[key], restkeys)
+            else:
+                _do_edit_non_quirk(new_value, existing[thiskey], restkeys)
+        else:
+            # This was the last key
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    existing[key] = new_value
+            else:
+                existing[thiskey] = new_value
+
+    new_names = _MAP_KEY_TO_V2[mutable_config_key]
+    _do_edit_non_quirk(new_mutable_value, base_dict, new_names)
+
+
+def update_pipette_configuration(
     base_configurations: PipetteConfigurations,
     v1_configuration_changes: Dict[str, Any],
     liquid_class: Optional[LiquidClasses] = None,
@@ -169,40 +203,11 @@ def update_pipette_configuration(  # noqa: C901
         lookup_key = _change_to_camel_case(c)
         if c == "quirks" and isinstance(v, dict):
             quirks_list.extend([b.name for b in v.values() if b.value])
-        elif liquid_class:
-            if lookup_key == "tipLength":
-                new_names = _MAP_KEY_TO_V2[lookup_key]
-                top_name = new_names["top_level_name"]
-                nested_name = new_names["nested_name"]
-                # This is only a concern for OT-2 configs and I think we can
-                # be less smart about handling multiple tip types by updating
-                # all tips.
-                for k in dict_of_base_model["liquid_properties"][liquid_class][
-                    new_names["top_level_name"]
-                ].keys():
-                    dict_of_base_model["liquid_properties"][liquid_class][top_name][k][
-                        nested_name
-                    ] = v
-            else:
-                dict_of_base_model["liquid_properties"][liquid_class].pop(lookup_key)
-                dict_of_base_model["liquid_properties"][liquid_class][lookup_key] = v
         else:
-            try:
-                dict_of_base_model.pop(lookup_key)
-                dict_of_base_model[lookup_key] = v
-            except KeyError:
-                # The name is not the same format as previous so
-                # we need to look it up from the V2 key map
-                new_names = _MAP_KEY_TO_V2[lookup_key]
-                top_name = new_names["top_level_name"]
-                nested_name = new_names["nested_name"]
-                if new_names.get("liquid_class"):
-                    # isinstances are needed for type checking.
-                    liquid_class = LiquidClasses[new_names["liquid_class"]]
-                    dict_of_base_model[top_name][liquid_class][nested_name] = v
-                else:
-                    # isinstances are needed for type checking.
-                    dict_of_base_model[top_name][nested_name] = v
+            _edit_non_quirk_with_lc_override(
+                lookup_key, v, dict_of_base_model, liquid_class
+            )
+
     dict_of_base_model["quirks"] = list(
         set(dict_of_base_model["quirks"]) - set(quirks_list)
     )

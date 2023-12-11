@@ -30,6 +30,7 @@ import {
   RoundTab,
   TYPOGRAPHY,
   PrimaryButton,
+  ProtocolDeck,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -37,17 +38,15 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
-  parseInitialLoadedFixturesByCutout,
 } from '@opentrons/api-client'
 import {
-  WASTE_CHUTE_LOAD_NAME,
   getGripperDisplayName,
+  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
@@ -72,11 +71,7 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 
-import type {
-  JsonConfig,
-  LoadFixtureRunTimeCommand,
-  PythonConfig,
-} from '@opentrons/shared-data'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State, Dispatch } from '../../redux/types'
 
@@ -237,29 +232,9 @@ export function ProtocolDetails(
       ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
       : []
 
-  // TODO: IMMEDIATELY remove stubbed fixture as soon as PE supports loadFixture
-  const STUBBED_LOAD_FIXTURE: LoadFixtureRunTimeCommand = {
-    id: 'stubbed_load_fixture',
-    commandType: 'loadFixture',
-    params: {
-      fixtureId: 'stubbedFixtureId',
-      loadName: WASTE_CHUTE_LOAD_NAME,
-      location: { cutout: 'D3' },
-    },
-    createdAt: 'fakeTimestamp',
-    startedAt: 'fakeTimestamp',
-    completedAt: 'fakeTimestamp',
-    status: 'succeeded',
-  }
-  const requiredFixtureDetails =
-    mostRecentAnalysis?.commands != null
-      ? [
-          ...map(
-            parseInitialLoadedFixturesByCutout(mostRecentAnalysis.commands)
-          ),
-          STUBBED_LOAD_FIXTURE,
-        ]
-      : []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
+    mostRecentAnalysis
+  )
 
   const requiredLabwareDetails =
     mostRecentAnalysis != null
@@ -349,7 +324,7 @@ export function ProtocolDetails(
     ) : null,
   }
 
-  const deckThumbnail = <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
+  const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
     missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
@@ -357,7 +332,7 @@ export function ProtocolDetails(
     error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
     complete: (
       <Box size="14rem" height="auto">
-        {deckThumbnail}
+        {deckMap}
       </Box>
     ),
   }
@@ -389,7 +364,7 @@ export function ProtocolDetails(
             title={t('deck_view')}
             onClose={() => setShowDeckViewModal(false)}
           >
-            {deckThumbnail}
+            {deckMap}
           </LegacyModal>
         ) : null}
       </Portal>
@@ -554,6 +529,7 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            marginBottom={SPACING.spacing16}
           >
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}

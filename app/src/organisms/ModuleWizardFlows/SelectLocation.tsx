@@ -66,7 +66,7 @@ export const SelectLocation = (
           deckDef={deckDef}
           selectedLocation={{ slotName }}
           setSelectedLocation={loc => setSlotName(loc.slotName)}
-          disabledLocations={deckDef.locations.orderedSlots.reduce<
+          disabledLocations={deckDef.locations.addressableAreas.reduce<
             ModuleLocation[]
           >((acc, slot) => {
             if (availableSlotNames.some(slotName => slotName === slot.id))

@@ -160,9 +160,13 @@
         "title": "Missing 96-channel tip rack adapter",
         "body": "The tip rack must be placed in an adapter when picking up 96 tips simultaneously."
       },
-      "ADDITIONAL_EQUIPMENT_DOES_NOT_EXIST": {
-        "title": "{{additionalEquipment}} does not exist",
-        "body": "Attempting to interact with an unknown entity."
+      "EQUIPMENT_DOES_NOT_EXIST": {
+        "title": "Attempting to interact with an unknown entity",
+        "body": "An entity you are interacting with does not exist."
+      },
+      "GRIPPER_REQUIRED": {
+        "title": "A gripper is required to complete this action",
+        "body": "Attempting to move a labware without a gripper into the waste chute. Please add a gripper to this step."
       }
     },
     "warning": {
@@ -193,7 +197,7 @@
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
-      "body": "Slot {{selectedSlot}} is occupied. Clear the slot to continue."
+      "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue."
     },
     "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
       "title": "Cannot place module",

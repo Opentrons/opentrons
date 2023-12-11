@@ -6,14 +6,13 @@ import {
   renderWithProviders,
   partialComponentPropsMatcher,
   LabwareRender,
-  EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
 
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
-  getRobotTypeFromLoadedLabware,
+  getSimplestDeckConfigForProtocol,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -22,8 +21,8 @@ import {
   parseLiquidsInLoadOrder,
   simpleAnalysisFileFixture,
 } from '@opentrons/api-client'
-import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { useAttachedModules } from '../../../hooks'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
@@ -31,7 +30,6 @@ import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../utils/getStandardDeckViewLayerBlockList'
 import { getAttachedProtocolModuleMatches } from '../../../../ProtocolSetupModulesAndDeck/utils'
 import { getProtocolModulesInfo } from '../../utils/getProtocolModulesInfo'
-import { getDeckConfigFromProtocolCommands } from '../../../../../resources/deck_configuration/utils'
 import { mockProtocolModuleInfo } from '../../../../ProtocolSetupLabware/__fixtures__'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../../../redux/modules/__fixtures__'
 
@@ -40,7 +38,6 @@ import { SetupLiquidsMap } from '../SetupLiquidsMap'
 import type {
   ModuleModel,
   ModuleType,
-  RunTimeCommand,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 
@@ -76,9 +73,6 @@ const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
 >
-const mockGetRobotTypeFromLoadedLabware = getRobotTypeFromLoadedLabware as jest.MockedFunction<
-  typeof getRobotTypeFromLoadedLabware
->
 const mockParseInitialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter as jest.MockedFunction<
   typeof parseInitialLoadedLabwareByAdapter
 >
@@ -97,8 +91,8 @@ const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
 >
-const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
-  typeof getDeckConfigFromProtocolCommands
+const mockGetSimplestDeckConfigForProtocol = getSimplestDeckConfigForProtocol as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocol
 >
 
 const RUN_ID = '1'
@@ -132,13 +126,17 @@ const render = (props: React.ComponentProps<typeof SetupLiquidsMap>) => {
     i18nInstance: i18n,
   })
 }
+const mockProtocolAnalysis = {
+  ...simpleAnalysisFileFixture,
+  robotType: OT2_ROBOT_TYPE,
+} as any
 
 describe('SetupLiquidsMap', () => {
   let props: React.ComponentProps<typeof SetupLiquidsMap>
   beforeEach(() => {
     props = {
       runId: RUN_ID,
-      protocolAnalysis: simpleAnalysisFileFixture as any,
+      protocolAnalysis: mockProtocolAnalysis,
     }
     when(mockLabwareRender)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
@@ -162,22 +160,20 @@ describe('SetupLiquidsMap', () => {
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
     when(mockGetAttachedProtocolModuleMatches).mockReturnValue([])
     when(mockGetLabwareRenderInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot2StandardDeckDef as any)
+      .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
       .mockReturnValue({})
-    when(mockGetDeckConfigFromProtocolCommands)
-      .calledWith(simpleAnalysisFileFixture.commands as RunTimeCommand[])
-      .mockReturnValue(EXTENDED_DECK_CONFIG_FIXTURE)
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(simpleAnalysisFileFixture.labware as any)
-      .mockReturnValue(FLEX_ROBOT_TYPE)
+    when(mockGetSimplestDeckConfigForProtocol)
+      .calledWith(mockProtocolAnalysis)
+      // TODO(bh, 2023-11-13): mock the cutout config protocol spec
+      .mockReturnValue([])
     when(mockParseLiquidsInLoadOrder)
       .calledWith(
-        simpleAnalysisFileFixture.liquids as any,
-        simpleAnalysisFileFixture.commands as any
+        mockProtocolAnalysis.liquids as any,
+        mockProtocolAnalysis.commands as any
       )
       .mockReturnValue([])
     when(mockParseInitialLoadedLabwareByAdapter)
-      .calledWith(simpleAnalysisFileFixture.commands as any)
+      .calledWith(mockProtocolAnalysis.commands as any)
       .mockReturnValue({})
     when(mockLabwareInfoOverlay)
       .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
@@ -208,21 +204,18 @@ describe('SetupLiquidsMap', () => {
   })
 
   it('should render base deck - robot type is OT-2', () => {
-    when(mockGetRobotTypeFromLoadedLabware)
-      .calledWith(simpleAnalysisFileFixture.labware as any)
-      .mockReturnValue(OT2_ROBOT_TYPE)
     when(mockGetDeckDefFromRobotType)
       .calledWith(OT2_ROBOT_TYPE)
       .mockReturnValue(ot2StandardDeckDef as any)
     when(mockParseLabwareInfoByLiquidId)
-      .calledWith(simpleAnalysisFileFixture.commands as any)
+      .calledWith(mockProtocolAnalysis.commands as any)
       .mockReturnValue({})
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
     when(mockGetLabwareRenderInfo).mockReturnValue({})
     when(mockGetProtocolModulesInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot2StandardDeckDef as any)
+      .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
       .mockReturnValue(mockProtocolModuleInfo)
     when(mockGetAttachedProtocolModuleMatches)
       .calledWith(
@@ -271,12 +264,23 @@ describe('SetupLiquidsMap', () => {
   })
 
   it('should render base deck - robot type is Flex', () => {
+    const mockFlexAnalysis = {
+      ...mockProtocolAnalysis,
+      robotType: FLEX_ROBOT_TYPE,
+    }
+    props = {
+      ...props,
+      protocolAnalysis: {
+        ...mockProtocolAnalysis,
+        robotType: FLEX_ROBOT_TYPE,
+      },
+    }
     when(mockGetDeckDefFromRobotType)
       .calledWith(FLEX_ROBOT_TYPE)
       .mockReturnValue(ot3StandardDeckDef as any)
 
     when(mockGetLabwareRenderInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot3StandardDeckDef as any)
+      .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue({
         [MOCK_300_UL_TIPRACK_ID]: {
           labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -289,14 +293,14 @@ describe('SetupLiquidsMap', () => {
       })
 
     when(mockParseLabwareInfoByLiquidId)
-      .calledWith(simpleAnalysisFileFixture.commands as any)
+      .calledWith(mockFlexAnalysis.commands as any)
       .mockReturnValue({})
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
 
     when(mockGetProtocolModulesInfo)
-      .calledWith(simpleAnalysisFileFixture as any, ot3StandardDeckDef as any)
+      .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue(mockProtocolModuleInfo)
     when(mockGetAttachedProtocolModuleMatches)
       .calledWith(
@@ -331,18 +335,16 @@ describe('SetupLiquidsMap', () => {
           attachedModuleMatch: null,
         },
       ])
-
     when(mockBaseDeck)
       .calledWith(
         partialComponentPropsMatcher({
-          deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(
             FLEX_ROBOT_TYPE
           ),
           robotType: FLEX_ROBOT_TYPE,
-          // ToDo (kk:11/03/2023) Update the following part later
-          labwareLocations: expect.anything(),
-          moduleLocations: expect.anything(),
+          // // ToDo (kk:11/03/2023) Update the following part later
+          labwareOnDeck: expect.anything(),
+          modulesOnDeck: expect.anything(),
         })
       )
       .mockReturnValue(<div>mock BaseDeck</div>)

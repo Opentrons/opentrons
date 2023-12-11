@@ -99,7 +99,7 @@ class HardwareGantryMover(GantryMover):
         """
         pipette_location = self._state_view.motion.get_pipette_location(
             pipette_id=pipette_id,
-            current_well=current_well,
+            current_location=current_well,
         )
         try:
             return await self._hardware_api.gantry_position(

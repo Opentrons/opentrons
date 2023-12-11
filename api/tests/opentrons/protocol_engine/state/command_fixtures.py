@@ -9,10 +9,14 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
     DeckPoint,
+    ModuleModel,
+    ModuleDefinition,
     MovementAxis,
     WellLocation,
     LabwareLocation,
+    DeckSlotLocation,
     LabwareMovementStrategy,
+    AddressableOffsetVector,
 )
 
 
@@ -150,6 +154,30 @@ def create_load_pipette_command(
     result = cmd.LoadPipetteResult(pipetteId=pipette_id)
 
     return cmd.LoadPipette(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_load_module_command(
+    module_id: str,
+    location: DeckSlotLocation,
+    model: ModuleModel,
+) -> cmd.LoadModule:
+    """Get a completed LoadModule command."""
+    params = cmd.LoadModuleParams(moduleId=module_id, location=location, model=model)
+    result = cmd.LoadModuleResult(
+        moduleId=module_id,
+        model=model,
+        serialNumber=None,
+        definition=ModuleDefinition.construct(),  # type: ignore[call-arg]
+    )
+
+    return cmd.LoadModule(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
@@ -334,6 +362,31 @@ def create_move_to_well_command(
     result = cmd.MoveToWellResult(position=destination)
 
     return cmd.MoveToWell(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_move_to_addressable_area_command(
+    pipette_id: str,
+    addressable_area_name: str = "area-name",
+    offset: AddressableOffsetVector = AddressableOffsetVector(x=0, y=0, z=0),
+    destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
+) -> cmd.MoveToAddressableArea:
+    """Get a completed MoveToWell command."""
+    params = cmd.MoveToAddressableAreaParams(
+        pipetteId=pipette_id,
+        addressableAreaName=addressable_area_name,
+        offset=offset,
+    )
+
+    result = cmd.MoveToAddressableAreaResult(position=destination)
+
+    return cmd.MoveToAddressableArea(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

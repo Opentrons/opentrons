@@ -100,7 +100,7 @@ export const PipetteOverflowMenu = (
             <MenuItem onClick={() => handleAboutSlideout()}>
               {t('about_pipette')}
             </MenuItem>
-            <MenuItem onClick={() => handleDropTip()}>
+            <MenuItem onClick={() => handleDropTip()} disabled={isRunActive}>
               {i18n.format(t('drop_tips'), 'capitalize')}
             </MenuItem>
             <Divider marginY="0" />

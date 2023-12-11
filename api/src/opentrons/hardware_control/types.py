@@ -5,6 +5,7 @@ from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.types import PipetteChannelType
+from opentrons.config import feature_flags
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -604,6 +605,42 @@ class TipStateType(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+@dataclass
+class HardwareFeatureFlags:
+    """
+    Hardware configuration options that can be passed to API instances.
+    Some options may not be relevant to every robot.
+
+    These generally map to the feature flag options in the opentrons.config
+    module.
+    """
+
+    use_old_aspiration_functions: bool = (
+        False  # To support pipette backwards compatability
+    )
+    tip_presence_detection_enabled: bool = True
+    require_estop: bool = True
+    stall_detection_enabled: bool = True
+    overpressure_detection_enabled: bool = True
+
+    @classmethod
+    def build_from_ff(cls) -> "HardwareFeatureFlags":
+        """Build from the feature flags configuration file on disc.
+
+        Note that, if this class is built from the default constructor, the values
+        of all of the flags are just the default values instead of the values in the
+        feature_flags file or environment variables. Use this constructor to ensure
+        the right values are pulled in.
+        """
+        return HardwareFeatureFlags(
+            use_old_aspiration_functions=feature_flags.use_old_aspiration_functions(),
+            tip_presence_detection_enabled=feature_flags.tip_presence_detection_enabled(),
+            require_estop=feature_flags.require_estop(),
+            stall_detection_enabled=feature_flags.stall_detection_enabled(),
+            overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),
+        )
 
 
 class EarlyLiquidSenseTrigger(RuntimeError):

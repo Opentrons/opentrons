@@ -5,11 +5,12 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
 from pydantic import BaseModel, Field, validator
-from typing import Optional, Union, List, Dict, Any, NamedTuple
+from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
+from opentrons.hardware_control.types import TipStateType as HwTipStateType
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -18,6 +19,7 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
+from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 
 
 class EngineStatus(str, Enum):
@@ -54,6 +56,19 @@ class DeckSlotLocation(BaseModel):
     )
 
 
+class AddressableAreaLocation(BaseModel):
+    """The location of something place in an addressable area. This is a superset of deck slots."""
+
+    addressableAreaName: str = Field(
+        ...,
+        description=(
+            "The name of the addressable area that you want to use."
+            " Valid values are the `id`s of `addressableArea`s in the"
+            " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
+        ),
+    )
+
+
 class ModuleLocation(BaseModel):
     """The location of something placed atop a hardware module."""
 
@@ -76,13 +91,21 @@ _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
 LabwareLocation = Union[
-    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    _OffDeckLocationType,
+    AddressableAreaLocation,
 ]
 """Union of all locations where it's legal to keep a labware."""
 
-OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
+OnDeckLabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+]
 
-NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+NonStackedLocation = Union[
+    DeckSlotLocation, AddressableAreaLocation, ModuleLocation, _OffDeckLocationType
+]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
@@ -197,6 +220,17 @@ class CurrentWell:
     pipette_id: str
     labware_id: str
     well_name: str
+
+
+@dataclass(frozen=True)
+class CurrentAddressableArea:
+    """The latest addressable area the robot has accessed."""
+
+    pipette_id: str
+    addressable_area_name: str
+
+
+CurrentPipetteLocation = Union[CurrentWell, CurrentAddressableArea]
 
 
 @dataclass(frozen=True)
@@ -388,6 +422,10 @@ class ModuleOffsetData:
 
 class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
+
+
+class AddressableOffsetVector(Vec3f):
+    """Offset, in deck coordinates, from nominal to actual position of an addressable area."""
 
 
 class LabwareMovementOffsetData(BaseModel):
@@ -637,6 +675,38 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
+@dataclass(frozen=True)
+class PotentialCutoutFixture:
+    """Cutout and cutout fixture id associated with a potential cutout fixture that can be on the deck."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+    provided_addressable_areas: FrozenSet[str]
+
+
+class AreaType(Enum):
+    """The type of addressable area."""
+
+    SLOT = "slot"
+    STAGING_SLOT = "stagingSlot"
+    MOVABLE_TRASH = "movableTrash"
+    FIXED_TRASH = "fixedTrash"
+    WASTE_CHUTE = "wasteChute"
+
+
+@dataclass(frozen=True)
+class AddressableArea:
+    """Addressable area that has been loaded."""
+
+    area_name: str
+    area_type: AreaType
+    base_slot: DeckSlotName
+    display_name: str
+    bounding_box: Dimensions
+    position: AddressableOffsetVector
+    compatible_module_types: List[SharedDataModuleType]
+
+
 class PostRunHardwareState(Enum):
     """State of robot gantry & motors after a stop is performed and the hardware API is reset.
 
@@ -668,17 +738,17 @@ NOZZLE_NAME_REGEX = "[A-Z][0-100]"
 PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 
-class EmptyNozzleLayoutConfiguration(BaseModel):
-    """Empty basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
+class AllNozzleLayoutConfiguration(BaseModel):
+    """All basemodel to represent a reset to the nozzle configuration. Sending no parameters resets to default."""
 
-    style: Literal["EMPTY"] = "EMPTY"
+    style: Literal["ALL"] = "ALL"
 
 
 class SingleNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["SINGLE"] = "SINGLE"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -688,7 +758,7 @@ class RowNozzleLayoutConfiguration(BaseModel):
     """Minimum information required for a new nozzle configuration."""
 
     style: Literal["ROW"] = "ROW"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -698,7 +768,7 @@ class ColumnNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type ROW and COLUMN."""
 
     style: Literal["COLUMN"] = "COLUMN"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
@@ -708,11 +778,11 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     """Information required for nozzle configurations of type QUADRANT."""
 
     style: Literal["QUADRANT"] = "QUADRANT"
-    primary_nozzle: PRIMARY_NOZZLE_LITERAL = Field(
+    primaryNozzle: PRIMARY_NOZZLE_LITERAL = Field(
         ...,
         description="The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
     )
-    front_right_nozzle: str = Field(
+    frontRightNozzle: str = Field(
         ...,
         regex=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
@@ -720,9 +790,36 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
 
 
 NozzleLayoutConfigurationType = Union[
-    EmptyNozzleLayoutConfiguration,
+    AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     RowNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
 ]
+
+# TODO make the below some sort of better type
+DeckConfigurationType = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id
+
+
+class TipPresenceStatus(str, Enum):
+    """Tip presence status reported by a pipette."""
+
+    PRESENT = "present"
+    ABSENT = "absent"
+    UNKNOWN = "unknown"
+
+    def to_hw_state(self) -> HwTipStateType:
+        """Convert to hardware tip state."""
+        assert self != TipPresenceStatus.UNKNOWN
+        return {
+            TipPresenceStatus.PRESENT: HwTipStateType.PRESENT,
+            TipPresenceStatus.ABSENT: HwTipStateType.ABSENT,
+        }[self]
+
+    @classmethod
+    def from_hw_state(cls, state: HwTipStateType) -> "TipPresenceStatus":
+        """Convert from hardware tip state."""
+        return {
+            HwTipStateType.PRESENT: TipPresenceStatus.PRESENT,
+            HwTipStateType.ABSENT: TipPresenceStatus.ABSENT,
+        }[state]

@@ -2,10 +2,13 @@ import * as React from 'react'
 import map from 'lodash/map'
 import { useTranslation } from 'react-i18next'
 import { BaseDeck } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, THERMOCYCLER_MODULE_V1 } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+  THERMOCYCLER_MODULE_V1,
+} from '@opentrons/shared-data'
 
 import { Modal } from '../../molecules/Modal'
-import { getDeckConfigFromProtocolCommands } from '../../resources/deck_configuration/utils'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
@@ -42,9 +45,7 @@ export function LabwareMapViewModal(
     mostRecentAnalysis,
   } = props
   const { t } = useTranslation('protocol_setup')
-  const deckConfig = getDeckConfigFromProtocolCommands(
-    mostRecentAnalysis?.commands ?? []
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(mostRecentAnalysis)
   const labwareRenderInfo =
     mostRecentAnalysis != null
       ? getLabwareRenderInfo(mostRecentAnalysis, deckDef)
@@ -55,7 +56,7 @@ export function LabwareMapViewModal(
     hasExitIcon: true,
   }
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => {
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
     const { moduleDef, nestedLabwareDef, nestedLabwareId, slotName } = module
     const labwareInAdapterInMod =
       nestedLabwareId != null
@@ -111,8 +112,8 @@ export function LabwareMapViewModal(
         deckConfig={deckConfig}
         deckLayerBlocklist={getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE)}
         robotType={FLEX_ROBOT_TYPE}
-        labwareLocations={labwareLocations}
-        moduleLocations={moduleLocations}
+        labwareOnDeck={labwareLocations}
+        modulesOnDeck={modulesOnDeck}
       />
     </Modal>
   )

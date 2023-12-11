@@ -4,14 +4,28 @@
   "model": "p50",
   "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
-    "presses": 1,
-    "speed": 10,
-    "increment": 0.0,
-    "distance": 13.0
+    "pressFit": {
+      "presses": 1,
+      "speed": 10,
+      "increment": 0.0,
+      "distance": 13.0,
+      "currentByTipCount": {
+        "1": 0.2,
+        "2": 0.14,
+        "3": 0.2,
+        "4": 0.28,
+        "5": 0.34,
+        "6": 0.41,
+        "7": 0.48,
+        "8": 0.55
+      }
+    }
   },
   "dropTipConfigurations": {
-    "current": 1.0,
-    "speed": 10
+    "plungerEject": {
+      "current": 1.0,
+      "speed": 10
+    }
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,
@@ -45,17 +59,7 @@
   },
   "partialTipConfigurations": {
     "partialTipSupported": true,
-    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8],
-    "perTipPickupCurrent": {
-      "1": 0.2,
-      "2": 0.14,
-      "3": 0.2,
-      "4": 0.28,
-      "5": 0.34,
-      "6": 0.41,
-      "7": 0.48,
-      "8": 0.55
-    }
+    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
   },
   "backCompatNames": [],
   "channels": 8,
@@ -66,6 +70,5 @@
   "plungerHomingConfigurations": {
     "current": 1.0,
     "speed": 30
-  },
-  "tipPresenceCheckDistanceMM": "0.0"
+  }
 }

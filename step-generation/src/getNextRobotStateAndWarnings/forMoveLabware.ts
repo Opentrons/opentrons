@@ -18,6 +18,8 @@ export function forMoveLabware(
     newLocationString = newLocation.slotName
   } else if ('labwareId' in newLocation) {
     newLocationString = newLocation.labwareId
+  } else if ('addressableAreaName' in newLocation) {
+    newLocationString = newLocation.addressableAreaName
   }
 
   robotState.labware[labwareId].slot = newLocationString

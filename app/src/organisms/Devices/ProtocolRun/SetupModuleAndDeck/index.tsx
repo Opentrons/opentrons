@@ -8,33 +8,44 @@ import {
   useHoverTooltip,
   PrimaryButton,
 } from '@opentrons/components'
+
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
+import {
+  getIsFixtureMismatch,
+  getRequiredDeckConfig,
+  // getUnmatchedSingleSlotFixtures,
+} from '../../../../resources/deck_configuration/utils'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import {
-  useIsFlex,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
+  useRobotType,
 } from '../../hooks'
 import { SetupModulesMap } from './SetupModulesMap'
 import { SetupModulesList } from './SetupModulesList'
 import { SetupFixtureList } from './SetupFixtureList'
-import type { LoadedFixturesBySlot } from '@opentrons/api-client'
+
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 
 interface SetupModuleAndDeckProps {
   expandLabwarePositionCheckStep: () => void
   robotName: string
   runId: string
-  loadedFixturesBySlot: LoadedFixturesBySlot
   hasModules: boolean
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 }
 
 export const SetupModuleAndDeck = ({
   expandLabwarePositionCheckStep,
   robotName,
   runId,
-  loadedFixturesBySlot,
   hasModules,
+  protocolAnalysis,
 }: SetupModuleAndDeckProps): JSX.Element => {
   const { t } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
@@ -42,12 +53,28 @@ export const SetupModuleAndDeck = ({
     t('map_view')
   )
 
-  const isFlex = useIsFlex(robotName)
+  const robotType = useRobotType(robotName)
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const runHasStarted = useRunHasStarted(runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    protocolAnalysis
+  )
+
+  const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
+
+  // TODO(bh, 2023-11-28): there is an unimplemented scenario where unmatched single slot fixtures need to be updated
+  // will need to additionally filter out module conflict unmatched fixtures, as these are represented in SetupModulesList
+  // const unmatchedSingleSlotFixtures = getUnmatchedSingleSlotFixtures(
+  //   deckConfigCompatibility
+  // )
+
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
+  )
 
   return (
     <>
@@ -58,8 +85,10 @@ export const SetupModuleAndDeck = ({
             {hasModules ? (
               <SetupModulesList robotName={robotName} runId={runId} />
             ) : null}
-            {Object.keys(loadedFixturesBySlot).length > 0 && isFlex ? (
-              <SetupFixtureList loadedFixturesBySlot={loadedFixturesBySlot} />
+            {requiredDeckConfigCompatibility.length > 0 ? (
+              <SetupFixtureList
+                deckConfigCompatibility={requiredDeckConfigCompatibility}
+              />
             ) : null}
           </>
         ) : (
@@ -70,6 +99,7 @@ export const SetupModuleAndDeck = ({
         <PrimaryButton
           disabled={
             missingModuleIds.length > 0 ||
+            isFixtureMismatch ||
             runHasStarted ||
             !moduleCalibrationStatus.complete
           }

@@ -1,50 +1,38 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import {
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-
 import { Icon } from '../../icons'
-import { Btn, Flex, Text } from '../../primitives'
+import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import {
+  WASTE_CHUTE_DISPLAY_NAME,
+  FIXTURE_HEIGHT,
+  STAGING_AREA_FIXTURE_WIDTH,
+  SINGLE_SLOT_FIXTURE_WIDTH,
+} from './constants'
 
-import type { Cutout } from '@opentrons/shared-data'
-
-// TODO: replace stubs with JSON definitions when available
-const wasteChuteDef = {
-  schemaVersion: 1,
-  version: 1,
-  namespace: 'opentrons',
-  metadata: {
-    displayName: 'Waste chute',
-  },
-  parameters: {
-    loadName: 'trash_chute',
-  },
-  boundingBox: {
-    xDimension: 286.5,
-    yDimension: 106.0,
-    zDimension: 0,
-  },
-}
+import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
 
 interface WasteChuteConfigFixtureProps {
+  deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
+  hasStagingAreas?: boolean
 }
 
 export function WasteChuteConfigFixture(
   props: WasteChuteConfigFixtureProps
 ): JSX.Element {
-  const { handleClickRemove, fixtureLocation } = props
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const {
+    deckDefinition,
+    handleClickRemove,
+    fixtureLocation,
+    hasStagingAreas = false,
+  } = props
 
-  // TODO: migrate to fixture location for v4
-  const wasteChuteSlot = deckDef.locations.orderedSlots.find(
+  const wasteChuteSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === fixtureLocation
   )
   const [xSlotPosition = 0, ySlotPosition = 0] = wasteChuteSlot?.position ?? []
@@ -54,36 +42,43 @@ export function WasteChuteConfigFixture(
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = wasteChuteDef.boundingBox
-
   return (
     <RobotCoordsForeignObject
-      width={xDimension}
-      height={yDimension}
+      width={
+        hasStagingAreas ? STAGING_AREA_FIXTURE_WIDTH : SINGLE_SLOT_FIXTURE_WIDTH
+      }
+      height={FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex css={WASTE_CHUTE_CONFIG_STYLE}>
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>
-          {wasteChuteDef.metadata.displayName}
+      <Btn
+        css={
+          handleClickRemove != null
+            ? WASTE_CHUTE_CONFIG_STYLE_EDITABLE
+            : WASTE_CHUTE_CONFIG_STYLE_READ_ONLY
+        }
+        cursor={handleClickRemove != null ? 'pointer' : 'default'}
+        onClick={
+          handleClickRemove != null
+            ? () => handleClickRemove(fixtureLocation)
+            : () => {}
+        }
+      >
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
+          {WASTE_CHUTE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
-          <Btn
-            display={DISPLAY_FLEX}
-            justifyContent={JUSTIFY_CENTER}
-            onClick={() => handleClickRemove(fixtureLocation)}
-          >
-            <Icon name="remove" color={COLORS.white} height="2.25rem" />
-          </Btn>
+          <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
-      </Flex>
+      </Btn>
     </RobotCoordsForeignObject>
   )
 }
 
-const WASTE_CHUTE_CONFIG_STYLE = css`
+const WASTE_CHUTE_CONFIG_STYLE_READ_ONLY = css`
+  display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.grey2};
   border-radius: ${BORDERS.borderRadiusSize1};
@@ -91,6 +86,10 @@ const WASTE_CHUTE_CONFIG_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing8};
   width: 100%;
+`
+
+const WASTE_CHUTE_CONFIG_STYLE_EDITABLE = css`
+  ${WASTE_CHUTE_CONFIG_STYLE_READ_ONLY}
 
   &:active {
     background-color: ${COLORS.darkBlack90};

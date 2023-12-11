@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { i18n } from '../../../../localization'
+import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 
 import {
   BlowoutLocationField,
@@ -14,13 +16,11 @@ import { MixFields } from '../../fields/MixFields'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
-  getTouchTipNotSupportedLabware,
 } from '../../utils'
 import styles from '../../StepEditForm.css'
 
 import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { LabwareDefByDefURI } from '../../../../labware-defs'
 import type { FieldPropsByName } from '../../types'
 
 interface SourceDestFieldsProps {
@@ -28,7 +28,6 @@ interface SourceDestFieldsProps {
   prefix: 'aspirate' | 'dispense'
   propsForFields: FieldPropsByName
   formData: FormData
-  allLabware: LabwareDefByDefURI
 }
 
 const makeAddFieldNamePrefix = (prefix: string) => (
@@ -36,7 +35,22 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 ): StepFieldName => `${prefix}_${fieldName}`
 
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
-  const { className, formData, prefix, propsForFields, allLabware } = props
+  const { className, formData, prefix, propsForFields } = props
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
+  const isWasteChuteSelected =
+    propsForFields.dispense_labware?.value != null
+      ? additionalEquipmentEntities[
+          String(propsForFields.dispense_labware.value)
+        ]?.name === 'wasteChute'
+      : false
+  const isTrashBinSelected =
+    propsForFields.dispense_labware?.value != null
+      ? additionalEquipmentEntities[
+          String(propsForFields.dispense_labware.value)
+        ]?.name === 'trashBin'
+      : false
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const getDelayFields = (): JSX.Element => (
@@ -54,6 +68,9 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
       }
     />
   )
+
+  const hideWellOrderField =
+    prefix === 'dispense' && (isWasteChuteSelected || isTrashBinSelected)
 
   const getMixFields = (): JSX.Element => (
     <MixFields
@@ -83,25 +100,27 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             ]
           }
         />
-        <WellOrderField
-          prefix={prefix}
-          label={i18n.t('form.step_edit_form.field.well_order.label')}
-          updateFirstWellOrder={
-            propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
-          }
-          updateSecondWellOrder={
-            propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
-          }
-          firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
-          secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
-          firstName={addFieldNamePrefix('wellOrder_first')}
-          secondName={addFieldNamePrefix('wellOrder_second')}
-        />
+        {hideWellOrderField ? null : (
+          <WellOrderField
+            prefix={prefix}
+            label={i18n.t('form.step_edit_form.field.well_order.label')}
+            updateFirstWellOrder={
+              propsForFields[addFieldNamePrefix('wellOrder_first')].updateValue
+            }
+            updateSecondWellOrder={
+              propsForFields[addFieldNamePrefix('wellOrder_second')].updateValue
+            }
+            firstValue={formData[addFieldNamePrefix('wellOrder_first')]}
+            secondValue={formData[addFieldNamePrefix('wellOrder_second')]}
+            firstName={addFieldNamePrefix('wellOrder_first')}
+            secondName={addFieldNamePrefix('wellOrder_second')}
+          />
+        )}
       </div>
 
       <div className={styles.checkbox_column}>
         {prefix === 'aspirate' && (
-          <React.Fragment>
+          <>
             <CheckboxRowField
               {...propsForFields.preWetTip}
               label={i18n.t('form.step_edit_form.field.preWetTip.label')}
@@ -109,40 +128,19 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             />
             {getMixFields()}
             {getDelayFields()}
-          </React.Fragment>
+          </>
         )}
         {prefix === 'dispense' && (
-          <React.Fragment>
+          <>
             {getDelayFields()}
             {getMixFields()}
-          </React.Fragment>
+          </>
         )}
 
         <CheckboxRowField
           {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
-          tooltipContent={
-            getTouchTipNotSupportedLabware(
-              allLabware,
-              formData[
-                getLabwareFieldForPositioningField(
-                  addFieldNamePrefix('touchTip_mmFromBottom')
-                )
-              ]
-            )
-              ? i18n.t('tooltip.step_fields.touchTip.disabled')
-              : propsForFields[addFieldNamePrefix('touchTip_checkbox')]
-                  .tooltipContent
-          }
           label={i18n.t('form.step_edit_form.field.touchTip.label')}
           className={styles.small_field}
-          disabled={getTouchTipNotSupportedLabware(
-            allLabware,
-            formData[
-              getLabwareFieldForPositioningField(
-                addFieldNamePrefix('touchTip_mmFromBottom')
-              )
-            ]
-          )}
         >
           <TipPositionField
             {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}

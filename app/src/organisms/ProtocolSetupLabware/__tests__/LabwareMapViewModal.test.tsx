@@ -6,11 +6,13 @@ import {
   BaseDeck,
   EXTENDED_DECK_CONFIG_FIXTURE,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { i18n } from '../../../i18n'
-import { getDeckConfigFromProtocolCommands } from '../../../resources/deck_configuration/utils'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 import { mockProtocolModuleInfo } from '../__fixtures__'
@@ -26,14 +28,15 @@ import type {
 jest.mock('../../Devices/ProtocolRun/utils/getLabwareRenderInfo')
 jest.mock('@opentrons/components/src/hardware-sim/Labware/LabwareRender')
 jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
+jest.mock('@opentrons/shared-data/js/helpers/getSimplestFlexDeckConfig')
 jest.mock('../../../resources/deck_configuration/utils')
 jest.mock('../../../redux/config')
 
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
   typeof getLabwareRenderInfo
 >
-const mockGetDeckConfigFromProtocolCommands = getDeckConfigFromProtocolCommands as jest.MockedFunction<
-  typeof getDeckConfigFromProtocolCommands
+const mockGetSimplestDeckConfigForProtocol = getSimplestDeckConfigForProtocol as jest.MockedFunction<
+  typeof getSimplestDeckConfigForProtocol
 >
 
 const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
@@ -53,7 +56,7 @@ const render = (props: React.ComponentProps<typeof LabwareMapViewModal>) => {
 describe('LabwareMapViewModal', () => {
   beforeEach(() => {
     mockGetLabwareRenderInfo.mockReturnValue({})
-    mockGetDeckConfigFromProtocolCommands.mockReturnValue([])
+    mockGetSimplestDeckConfigForProtocol.mockReturnValue([])
   })
 
   afterEach(() => {
@@ -82,7 +85,7 @@ describe('LabwareMapViewModal', () => {
   })
 
   it('should render a deck with modules and labware', () => {
-    const mockLabwareLocations = [
+    const mockLabwareOnDeck = [
       {
         labwareLocation: { slotName: 'C1' },
         definition: fixture_tiprack_300_ul as LabwareDefinition2,
@@ -91,7 +94,7 @@ describe('LabwareMapViewModal', () => {
         labwareChildren: null,
       },
     ]
-    const mockModuleLocations = [
+    const mockModulesOnDeck = [
       {
         moduleModel: 'heaterShakerModuleV1' as ModuleModel,
         moduleLocation: { slotName: 'B1' },
@@ -107,8 +110,8 @@ describe('LabwareMapViewModal', () => {
         robotType: FLEX_ROBOT_TYPE,
         deckLayerBlocklist: getStandardDeckViewLayerBlockList(FLEX_ROBOT_TYPE),
         deckConfig: EXTENDED_DECK_CONFIG_FIXTURE,
-        labwareLocations: mockLabwareLocations,
-        moduleLocations: mockModuleLocations,
+        labwareOnDeck: mockLabwareOnDeck,
+        modulesOnDeck: mockModulesOnDeck,
       })
       .mockReturnValue(<div>mock base deck</div>)
     mockGetLabwareRenderInfo.mockReturnValue({

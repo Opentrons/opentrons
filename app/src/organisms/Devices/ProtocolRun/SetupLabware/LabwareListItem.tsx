@@ -93,10 +93,18 @@ export function LabwareListItem(
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
   const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
-  let slotInfo: string | null =
-    initialLocation !== 'offDeck' && 'slotName' in initialLocation
-      ? initialLocation.slotName
-      : null
+
+  let slotInfo: string | null = null
+
+  if (initialLocation !== 'offDeck' && 'slotName' in initialLocation) {
+    slotInfo = initialLocation.slotName
+  } else if (
+    initialLocation !== 'offDeck' &&
+    'addressableAreaName' in initialLocation
+  ) {
+    slotInfo = initialLocation.addressableAreaName
+  }
+
   let moduleDisplayName: string | null = null
   let extraAttentionText: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false

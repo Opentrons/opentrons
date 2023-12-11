@@ -241,6 +241,7 @@ export function RunningProtocolCommandList({
                       robotSideAnalysis={robotSideAnalysis}
                       robotType={robotType}
                       css={COMMAND_ROW_STYLE}
+                      isOnDevice={true}
                     />
                   </Flex>
                 </Flex>

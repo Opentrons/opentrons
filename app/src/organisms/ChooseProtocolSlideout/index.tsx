@@ -21,6 +21,7 @@ import {
   Icon,
   PrimaryButton,
   COLORS,
+  ProtocolDeck,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -30,13 +31,11 @@ import { appShellRequestor } from '../../redux/shell/remote'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -163,7 +162,6 @@ export function ChooseProtocolSlideoutComponent(
           }}
           robotName={robot.name}
           {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
-          protocolAnalysis={selectedProtocol?.mostRecentAnalysis}
         />
       ) : null}
     </Slideout>
@@ -182,7 +180,6 @@ interface StoredProtocolListProps {
   runCreationError: string | null
   runCreationErrorCode: number | null
   robotName: string
-  protocolAnalysis?: ProtocolAnalysisOutput | null
 }
 
 function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
@@ -192,7 +189,6 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
     runCreationError,
     runCreationErrorCode,
     robotName,
-    protocolAnalysis,
   } = props
   const { t } = useTranslation(['device_details', 'shared'])
   const storedProtocols = useSelector((state: State) =>
@@ -227,8 +223,10 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     height="4.25rem"
                     width="4.75rem"
                   >
-                    {protocolAnalysis != null ? (
-                      <DeckThumbnail protocolAnalysis={protocolAnalysis} />
+                    {storedProtocol.mostRecentAnalysis != null ? (
+                      <ProtocolDeck
+                        protocolAnalysis={storedProtocol.mostRecentAnalysis}
+                      />
                     ) : null}
                   </Box>
                   <StyledText

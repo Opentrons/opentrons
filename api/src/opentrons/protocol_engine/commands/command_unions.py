@@ -154,6 +154,14 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
+from .move_to_addressable_area import (
+    MoveToAddressableArea,
+    MoveToAddressableAreaParams,
+    MoveToAddressableAreaCreate,
+    MoveToAddressableAreaResult,
+    MoveToAddressableAreaCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -252,6 +260,22 @@ from .configure_nozzle_layout import (
     ConfigureNozzleLayoutPrivateResult,
 )
 
+from .verify_tip_presence import (
+    VerifyTipPresence,
+    VerifyTipPresenceCreate,
+    VerifyTipPresenceParams,
+    VerifyTipPresenceResult,
+    VerifyTipPresenceCommandType,
+)
+
+from .get_tip_presence import (
+    GetTipPresence,
+    GetTipPresenceCreate,
+    GetTipPresenceParams,
+    GetTipPresenceResult,
+    GetTipPresenceCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -275,6 +299,7 @@ Command = Union[
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
+    MoveToAddressableArea,
     PrepareToAspirate,
     WaitForResume,
     WaitForDuration,
@@ -283,6 +308,8 @@ Command = Union[
     SetRailLights,
     TouchTip,
     SetStatusBar,
+    VerifyTipPresence,
+    GetTipPresence,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -333,6 +360,7 @@ CommandParams = Union[
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
+    MoveToAddressableAreaParams,
     PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
@@ -341,6 +369,8 @@ CommandParams = Union[
     SetRailLightsParams,
     TouchTipParams,
     SetStatusBarParams,
+    VerifyTipPresenceParams,
+    GetTipPresenceParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -392,6 +422,7 @@ CommandType = Union[
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
+    MoveToAddressableAreaCommandType,
     PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
@@ -400,6 +431,8 @@ CommandType = Union[
     SetRailLightsCommandType,
     TouchTipCommandType,
     SetStatusBarCommandType,
+    VerifyTipPresenceCommandType,
+    GetTipPresenceCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -450,6 +483,7 @@ CommandCreate = Union[
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
+    MoveToAddressableAreaCreate,
     PrepareToAspirateCreate,
     WaitForResumeCreate,
     WaitForDurationCreate,
@@ -458,6 +492,8 @@ CommandCreate = Union[
     SetRailLightsCreate,
     TouchTipCreate,
     SetStatusBarCreate,
+    VerifyTipPresenceCreate,
+    GetTipPresenceCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -508,6 +544,7 @@ CommandResult = Union[
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
+    MoveToAddressableAreaResult,
     PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,
@@ -516,6 +553,8 @@ CommandResult = Union[
     SetRailLightsResult,
     TouchTipResult,
     SetStatusBarResult,
+    VerifyTipPresenceResult,
+    GetTipPresenceResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,

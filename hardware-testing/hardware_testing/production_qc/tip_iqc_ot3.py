@@ -1,13 +1,13 @@
 """Tip IQC OT3."""
 from asyncio import run, sleep
-from typing import List, Union, Optional
+from typing import List, Optional
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.drivers import list_ports_and_select
 from hardware_testing.drivers.pressure_fixture import (
-    PressureFixture,
+    PressureFixtureBase,
     SimPressureFixture,
+    connect_to_fixture,
 )
 
 from hardware_testing.data.csv_report import CSVReport, CSVSection, CSVLine
@@ -44,18 +44,14 @@ async def _find_position(api: OT3API, mount: OT3Mount, nominal: Point) -> Point:
         return await api.gantry_position(mount)
 
 
-def _connect_to_fixture(simulate: bool) -> PressureFixture:
-    if not simulate:
-        _port = list_ports_and_select("pressure-fixture")
-        fixture = PressureFixture.create(port=_port, slot_side="left")
-    else:
-        fixture = SimPressureFixture()  # type: ignore[assignment]
+def _connect_to_fixture(simulate: bool) -> PressureFixtureBase:
+    fixture = connect_to_fixture(simulate)  # type: ignore[assignment]
     fixture.connect()
     return fixture
 
 
 async def _read_pressure_data(
-    fixture: Union[PressureFixture, SimPressureFixture],
+    fixture: PressureFixtureBase,
     num_samples: int,
     interval: float = DEFAULT_PRESSURE_FIXTURE_READ_INTERVAL_SECONDS,
 ) -> List[float]:
@@ -73,7 +69,7 @@ async def _read_and_store_pressure_data(
     report: CSVReport,
     tip: str,
     section: str,
-    fixture: Union[PressureFixture, SimPressureFixture],
+    fixture: PressureFixtureBase,
 ) -> None:
     num_samples = TEST_SECTIONS[section.lower()]
     data_hover = await _read_pressure_data(fixture, num_samples)

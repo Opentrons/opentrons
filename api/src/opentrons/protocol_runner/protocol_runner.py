@@ -35,7 +35,7 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
-from ..protocol_engine.types import PostRunHardwareState
+from ..protocol_engine.types import PostRunHardwareState, DeckConfigurationType
 
 
 class RunResult(NamedTuple):
@@ -82,9 +82,9 @@ class AbstractRunner(ABC):
         """
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    def play(self) -> None:
+    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._protocol_engine.play()
+        self._protocol_engine.play(deck_configuration=deck_configuration)
 
     def pause(self) -> None:
         """Pause the run."""
@@ -104,6 +104,7 @@ class AbstractRunner(ABC):
     @abstractmethod
     async def run(
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
@@ -198,6 +199,7 @@ class PythonAndLegacyRunner(AbstractRunner):
 
     async def run(  # noqa: D102
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
@@ -208,7 +210,7 @@ class PythonAndLegacyRunner(AbstractRunner):
                 protocol_source=protocol_source, python_parse_mode=python_parse_mode
             )
 
-        self.play()
+        self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
         await self._task_queue.join()
 
@@ -309,6 +311,7 @@ class JsonRunner(AbstractRunner):
 
     async def run(  # noqa: D102
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
@@ -316,7 +319,7 @@ class JsonRunner(AbstractRunner):
         if protocol_source:
             await self.load(protocol_source)
 
-        self.play()
+        self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
         await self._task_queue.join()
 
@@ -353,11 +356,12 @@ class LiveRunner(AbstractRunner):
 
     async def run(  # noqa: D102
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()
-        self.play()
+        self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
         await self._task_queue.join()
 

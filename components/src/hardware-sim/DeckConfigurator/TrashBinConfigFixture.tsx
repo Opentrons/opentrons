@@ -1,38 +1,21 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import {
-  getDeckDefFromRobotType,
-  FLEX_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-
 import { Icon } from '../../icons'
-import { Btn, Flex, Text } from '../../primitives'
+import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
+import {
+  FIXTURE_HEIGHT,
+  SINGLE_SLOT_FIXTURE_WIDTH,
+  TRASH_BIN_DISPLAY_NAME,
+} from './constants'
 
-import type { Cutout } from '@opentrons/shared-data'
-
-// TODO: replace stubs with JSON definitions when available
-const trashBinDef = {
-  schemaVersion: 1,
-  version: 1,
-  namespace: 'opentrons',
-  metadata: {
-    displayName: 'Trash bin',
-  },
-  parameters: {
-    loadName: 'trash_bin',
-  },
-  boundingBox: {
-    xDimension: 246.5,
-    yDimension: 106.0,
-    zDimension: 0,
-  },
-}
+import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
 
 interface TrashBinConfigFixtureProps {
+  deckDefinition: DeckDefinition
   fixtureLocation: Cutout
   handleClickRemove?: (fixtureLocation: Cutout) => void
 }
@@ -40,56 +23,59 @@ interface TrashBinConfigFixtureProps {
 export function TrashBinConfigFixture(
   props: TrashBinConfigFixtureProps
 ): JSX.Element {
-  const { handleClickRemove, fixtureLocation } = props
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const { deckDefinition, handleClickRemove, fixtureLocation } = props
 
-  // TODO: migrate to fixture location for v4
-  const trashBinSlot = deckDef.locations.orderedSlots.find(
+  const trashBinSlot = deckDefinition.locations.cutouts.find(
     slot => slot.id === fixtureLocation
   )
   const [xSlotPosition = 0, ySlotPosition = 0] = trashBinSlot?.position ?? []
   // TODO: remove adjustment when reading from fixture position
   // adjust x differently for right side/left side
   const isLeftSideofDeck =
-    fixtureLocation === 'A1' ||
-    fixtureLocation === 'B1' ||
-    fixtureLocation === 'C1' ||
-    fixtureLocation === 'D1'
+    fixtureLocation === 'cutoutA1' ||
+    fixtureLocation === 'cutoutB1' ||
+    fixtureLocation === 'cutoutC1' ||
+    fixtureLocation === 'cutoutD1'
   const xAdjustment = isLeftSideofDeck ? -101.5 : -17
   const x = xSlotPosition + xAdjustment
   const yAdjustment = -10
   const y = ySlotPosition + yAdjustment
 
-  const { xDimension, yDimension } = trashBinDef.boundingBox
-
   return (
     <RobotCoordsForeignObject
-      width={xDimension}
-      height={yDimension}
+      width={SINGLE_SLOT_FIXTURE_WIDTH}
+      height={FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex css={TRASH_BIN_CONFIG_STYLE}>
-        <Text css={TYPOGRAPHY.bodyTextSemiBold}>
-          {trashBinDef.metadata.displayName}
+      <Btn
+        css={
+          handleClickRemove != null
+            ? TRASH_BIN_CONFIG_STYLE_EDTIABLE
+            : TRASH_BIN_CONFIG_STYLE_READ_ONLY
+        }
+        cursor={handleClickRemove != null ? 'pointer' : 'default'}
+        onClick={
+          handleClickRemove != null
+            ? () => handleClickRemove(fixtureLocation)
+            : () => {}
+        }
+      >
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
+          {TRASH_BIN_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
-          <Btn
-            display={DISPLAY_FLEX}
-            justifyContent={JUSTIFY_CENTER}
-            onClick={() => handleClickRemove(fixtureLocation)}
-          >
-            <Icon name="remove" color={COLORS.white} height="2.25rem" />
-          </Btn>
+          <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
-      </Flex>
+      </Btn>
     </RobotCoordsForeignObject>
   )
 }
 
-const TRASH_BIN_CONFIG_STYLE = css`
+const TRASH_BIN_CONFIG_STYLE_READ_ONLY = css`
+  display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.grey2};
   border-radius: ${BORDERS.borderRadiusSize1};
@@ -97,6 +83,10 @@ const TRASH_BIN_CONFIG_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing8};
   width: 100%;
+`
+
+const TRASH_BIN_CONFIG_STYLE_EDTIABLE = css`
+  ${TRASH_BIN_CONFIG_STYLE_READ_ONLY}
 
   &:active {
     background-color: ${COLORS.darkBlack90};

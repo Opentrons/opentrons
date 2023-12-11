@@ -46,7 +46,7 @@ export function RobotCoordinateSpaceWithDOMCoords(
     const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
     const [deckXDimension, deckYDimension] = deckDef.dimensions
 
-    deckSlotsById = deckDef.locations.orderedSlots.reduce(
+    deckSlotsById = deckDef.locations.addressableAreas.reduce(
       (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
       {}
     )

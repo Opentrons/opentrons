@@ -17,5 +17,5 @@
 }
 
 .hover_outline {
-  stroke: #006cfa;
+  stroke: var(--c-blue-enabled);
 }

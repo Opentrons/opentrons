@@ -1,9 +1,10 @@
 import {
-  FLEX_TRASH_DEF_URI,
-  OT_2_TRASH_DEF_URI,
-} from '@opentrons/step-generation'
-
-import type { CreateCommand } from '@opentrons/shared-data'
+  AddressableAreaName,
+  CreateCommand,
+  FIXED_TRASH_ID,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+} from '@opentrons/shared-data'
 import type { InitialDeckSetup } from '../../../step-forms'
 
 interface UnusedTrash {
@@ -11,29 +12,41 @@ interface UnusedTrash {
   wasteChuteUnused: boolean
 }
 
-//  TODO(jr, 10/30/23): plug in waste chute logic when we know the commands!
 export const getUnusedTrash = (
-  labwareOnDeck: InitialDeckSetup['labware'],
+  additionalEquipment: InitialDeckSetup['additionalEquipmentOnDeck'],
   commands?: CreateCommand[]
 ): UnusedTrash => {
-  const trashBin = Object.values(labwareOnDeck).find(
-    labware =>
-      labware.labwareDefURI === FLEX_TRASH_DEF_URI ||
-      labware.labwareDefURI === OT_2_TRASH_DEF_URI
+  const trashBin = Object.values(additionalEquipment).find(
+    aE => aE.name === 'trashBin'
   )
 
   const hasTrashBinCommands =
     trashBin != null
       ? commands?.some(
           command =>
-            (command.commandType === 'dropTip' &&
-              command.params.labwareId === trashBin.id) ||
-            (command.commandType === 'dispense' &&
-              command.params.labwareId === trashBin.id)
+            command.commandType === 'moveToAddressableArea' &&
+            (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName as AddressableAreaName
+            ) ||
+              command.params.addressableAreaName === FIXED_TRASH_ID)
         )
       : null
+  const wasteChute = Object.values(additionalEquipment).find(
+    aE => aE.name === 'wasteChute'
+  )
+  const hasWasteChuteCommands =
+    wasteChute != null
+      ? commands?.some(
+          command =>
+            command.commandType === 'moveToAddressableArea' &&
+            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+              command.params.addressableAreaName as AddressableAreaName
+            )
+        )
+      : null
+
   return {
     trashBinUnused: trashBin != null && !hasTrashBinCommands,
-    wasteChuteUnused: false,
+    wasteChuteUnused: wasteChute != null && !hasWasteChuteCommands,
   }
 }
