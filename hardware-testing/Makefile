@@ -31,7 +31,7 @@ ssh_key ?= $(default_ssh_key)
 ssh_opts ?= $(default_ssh_opts)
 # Helper to safely bundle ssh options
 ssh_helper = $(if $(ssh_key),-i $(ssh_key)) $(ssh_opts)
-ssh_helper_ot3 = $(ssh_helper) -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa
+ssh_helper_ot3 = $(ssh_helper) #-o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa
 
 # Source discovery
 # For the python sources
