@@ -6,7 +6,6 @@ import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
-import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -15,7 +14,6 @@ import { ProtocolSetupDeckConfiguration } from '..'
 import type { UseQueryResult } from 'react-query'
 import type {
   CompletedProtocolAnalysis,
-  CutoutConfig,
   DeckConfiguration,
 } from '@opentrons/shared-data'
 
@@ -33,11 +31,6 @@ const PROTOCOL_DETAILS = {
   } as unknown) as CompletedProtocolAnalysis,
   protocolKey: 'fakeProtocolKey',
   robotType: 'OT-3 Standard' as const,
-}
-
-const mockCutoutConfig: CutoutConfig = {
-  cutoutId: 'cutoutD1',
-  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
 }
 
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
