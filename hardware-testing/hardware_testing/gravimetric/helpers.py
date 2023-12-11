@@ -16,6 +16,7 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api._types import OffDeckType
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import OT3Mount, Axis
@@ -386,12 +387,9 @@ def _load_pipette(
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
-        hwapi = get_sync_hw_api(ctx)
-        mnt = OT3Mount.LEFT if pipette_mount == "left" else OT3Mount.RIGHT
-        hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
-        hwpipette._config.pick_up_tip_configurations.press_fit.current_by_tip_count[
-            8
-        ] = 0.2
+        pipette.configure_nozzle_layout(NozzleLayout.SINGLE, "A1")
+    else:
+        pipette.configure_nozzle_layout(NozzleLayout.ALL)
     return pipette
 
 
