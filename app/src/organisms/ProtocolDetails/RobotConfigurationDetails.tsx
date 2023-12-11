@@ -35,7 +35,6 @@ import type {
   RobotType,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import { getIs96ChannelPipetteAttached } from '../Devices/utils'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
