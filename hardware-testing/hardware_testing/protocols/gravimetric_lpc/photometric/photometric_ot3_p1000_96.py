@@ -18,7 +18,6 @@ PHOTOPLATE_LABWARE = "corning_96_wellplate_360ul_flat"
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-
     reservoir = ctx.load_labware(RESERVOIR_LABWARE, SLOT_RESERVOIR)
     plate = ctx.load_labware(PHOTOPLATE_LABWARE, SLOT_PLATE)
     pipette = ctx.load_instrument("flex_96channel_1000", "left")

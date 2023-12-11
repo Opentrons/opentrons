@@ -17,7 +17,6 @@ LABWARE_ON_SCALE = "nest_1_reservoir_195ml"
 
 def run(ctx: ProtocolContext) -> None:
     """Run."""
-
     scale_labware = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
     pipette = ctx.load_instrument("flex_96channel_1000", "left")
     adapters = [
