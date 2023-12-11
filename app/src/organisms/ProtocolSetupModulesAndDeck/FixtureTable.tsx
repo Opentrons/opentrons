@@ -73,9 +73,9 @@ export function FixtureTable({
         lineHeight={TYPOGRAPHY.lineHeight28}
         paddingX={SPACING.spacing24}
       >
-        <StyledText flex="4 0 0">{t('fixture')}</StyledText>
+        <StyledText flex="3.5 0 0">{t('fixture')}</StyledText>
         <StyledText flex="2 0 0">{t('location')}</StyledText>
-        <StyledText flex="3 0 0"> {t('status')}</StyledText>
+        <StyledText flex="4 0 0"> {t('status')}</StyledText>
       </Flex>
       {requiredDeckConfigCompatibility.map((fixtureCompatibility, index) => {
         return (
@@ -181,7 +181,7 @@ function FixtureTableItem({
         onClick={handleClick}
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
-        <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
+        <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null &&
             (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
@@ -193,7 +193,7 @@ function FixtureTableItem({
           <LocationIcon slotName={getCutoutDisplayName(cutoutId)} />
         </Flex>
         <Flex
-          flex="3 0 0"
+          flex="4 0 0"
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >

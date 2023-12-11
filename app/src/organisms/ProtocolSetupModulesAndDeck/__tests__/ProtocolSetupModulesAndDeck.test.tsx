@@ -363,7 +363,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
     ])
     const [{ getByText }] = render()
     getByText('mock FixtureTable')
-    getByText('Location conflict').click()
+    getByText('Resolve').click()
     getByText('mock location conflict modal')
   })
 

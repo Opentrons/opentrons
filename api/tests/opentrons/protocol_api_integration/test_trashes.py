@@ -25,12 +25,6 @@ import pytest
             "2.16",
             "OT-2",
             protocol_api.TrashBin,
-            marks=[
-                pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
-                pytest.mark.xfail(
-                    strict=True, reason="https://opentrons.atlassian.net/browse/RSS-417"
-                ),
-            ],
         ),
         pytest.param(
             "2.16",
@@ -58,7 +52,10 @@ def test_fixed_trash_presence(
     )
 
     if expected_trash_class is None:
-        with pytest.raises(Exception, match="No trash container has been defined"):
+        with pytest.raises(
+            Exception,
+            match="Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
+        ):
             protocol.fixed_trash
         with pytest.raises(Exception, match="No trash container has been defined"):
             instrument.trash_container
@@ -75,7 +72,10 @@ def test_trash_search() -> None:
     instrument = protocol.load_instrument("flex_1channel_50", mount="left")
 
     # By default, there should be no trash.
-    with pytest.raises(Exception, match="No trash container has been defined"):
+    with pytest.raises(
+        Exception,
+        match="Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
+    ):
         protocol.fixed_trash
     with pytest.raises(Exception, match="No trash container has been defined"):
         instrument.trash_container
@@ -84,7 +84,10 @@ def test_trash_search() -> None:
     loaded_second = protocol.load_trash_bin("B1")
 
     # After loading some trashes, there should still be no protocol.fixed_trash...
-    with pytest.raises(Exception, match="No trash container has been defined"):
+    with pytest.raises(
+        Exception,
+        match="Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",
+    ):
         protocol.fixed_trash
     # ...but instrument.trash_container should automatically update to point to
     # the first trash that we loaded.

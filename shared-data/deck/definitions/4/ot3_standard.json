@@ -262,7 +262,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in D1",
         "ableToDropTips": true
       },
       {
@@ -274,7 +274,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in C1",
         "ableToDropTips": true
       },
       {
@@ -286,7 +286,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in B1",
         "ableToDropTips": true
       },
       {
@@ -298,7 +298,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in A1",
         "ableToDropTips": true
       },
       {
@@ -310,7 +310,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in D3",
         "ableToDropTips": true
       },
       {
@@ -322,7 +322,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in C3",
         "ableToDropTips": true
       },
       {
@@ -334,7 +334,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in B3",
         "ableToDropTips": true
       },
       {
@@ -346,7 +346,7 @@
           "yDimension": 91.5,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
+        "displayName": "Trash Bin in A3",
         "ableToDropTips": true
       },
       {
@@ -358,7 +358,7 @@
           "yDimension": 0,
           "zDimension": 0
         },
-        "displayName": "1 Channel Waste Chute",
+        "displayName": "Waste Chute",
         "ableToDropTips": true
       },
       {
@@ -370,7 +370,7 @@
           "yDimension": 63,
           "zDimension": 0
         },
-        "displayName": "8 Channel Waste Chute",
+        "displayName": "Waste Chute",
         "ableToDropTips": true
       },
       {
@@ -382,7 +382,7 @@
           "yDimension": 63,
           "zDimension": 0
         },
-        "displayName": "96 Channel Waste Chute",
+        "displayName": "Waste Chute",
         "ableToDropTips": true
       },
       {
@@ -394,7 +394,7 @@
           "yDimension": 0,
           "zDimension": 0
         },
-        "displayName": "Gripper Waste Chute",
+        "displayName": "Waste Chute",
         "ableToDropLabware": true
       }
     ],
