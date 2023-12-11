@@ -113,7 +113,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-
   (
     fileMetadata,
     initialRobotState,
@@ -283,6 +282,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           location = { labwareId: labware.slot }
         } else if (isAddressableAreaName) {
           location = { addressableAreaName: labware.slot }
+        } else if (labware.slot === 'offDeck') {
+          location = 'offDeck'
         }
 
         const loadLabwareCommands = {
