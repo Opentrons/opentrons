@@ -111,11 +111,11 @@ export function ProtocolSetupDeckConfiguration({
           marginTop="4rem"
           paddingX={SPACING.spacing40}
           justifyContent={JUSTIFY_CENTER}
+          height="28.4375rem"
         >
           <BaseDeck
             deckConfig={currentDeckConfig}
             robotType={FLEX_ROBOT_TYPE}
-            height="455px"
           />
         </Flex>
       </Flex>

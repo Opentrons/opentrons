@@ -78,7 +78,6 @@ interface BaseDeckProps {
   animatedSVG?: boolean
   /** extra props to pass to svg tag */
   svgProps?: React.ComponentProps<typeof Svg>
-  height?: string
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
@@ -95,7 +94,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     showSlotLabels = true,
     animatedSVG = false,
     svgProps = {},
-    height = '100%',
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
@@ -128,7 +126,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
       animated={animatedSVG}
       {...svgProps}
-      height={height}
     >
       {robotType === OT2_ROBOT_TYPE ? (
         <DeckFromLayers
