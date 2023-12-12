@@ -299,6 +299,20 @@ export const delayWithOffset = (
 // =================
 export const dropTipHelper = (pipette?: string): CreateCommand[] => [
   {
+    commandType: 'moveToAddressableAreaForDropTip',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+      addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
+      alternateDropLocation: true,
+    },
+  },
+]
+export const dropTipIntoWasteChuteHelper = (
+  pipette?: string
+): CreateCommand[] => [
+  {
     commandType: 'moveToAddressableArea',
     key: expect.any(String),
     params: {

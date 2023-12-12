@@ -273,6 +273,20 @@ export function CommandText(props: Props): JSX.Element | null {
         </StyledText>
       )
     }
+    case 'moveToAddressableAreaForDropTip': {
+      const addressableAreaDisplayName = getAddressableAreaDisplayName(
+        robotSideAnalysis,
+        command.id,
+        t
+      )
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('move_to_addressable_area_drop_tip', {
+            addressable_area: addressableAreaDisplayName,
+          })}
+        </StyledText>
+      )
+    }
     case 'touchTip':
     case 'home':
     case 'savePosition':

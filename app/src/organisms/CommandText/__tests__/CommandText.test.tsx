@@ -4,6 +4,7 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  MoveToAddressableAreaForDropTipRunTimeCommand,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
@@ -283,6 +284,27 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )[0]
     getByText('Moving to Trash Bin in D3')
+  })
+  it('renders correct text for moveToAddressableAreaForDropTip for Trash Bin', () => {
+    const { getByText } = renderWithProviders(
+      <CommandText
+        robotSideAnalysis={mockRobotSideAnalysis}
+        robotType={OT2_ROBOT_TYPE}
+        command={
+          {
+            id: 'aca688ed-4916-496d-aae8-ca0e6e56c47d',
+            commandType: 'moveToAddressableAreaForDropTip',
+            params: {
+              pipetteId: 'f6d1c83c-9d1b-4d0d-9de3-e6d649739cfb',
+              addressableAreaName: 'movableTrashD3',
+              alternateDropLocation: true,
+            },
+          } as MoveToAddressableAreaForDropTipRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )[0]
+    getByText('Moving to Trash Bin in D3 to drop tip')
   })
   it('renders correct text for moveToAddressableArea for slots', () => {
     const { getByText } = renderWithProviders(

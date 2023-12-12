@@ -1,14 +1,14 @@
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { curryCommandCreator } from '../utils'
 import { movableTrashCommandsUtil } from '../utils/movableTrashCommandsUtil'
-import type { PipetteEntities } from '../types'
 import {
   aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
-  dropTipInPlace,
   moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
 } from '../commandCreators/atomic'
+import type { PipetteEntities } from '../types'
 
 jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 jest.mock('../utils/curryCommandCreator')
@@ -89,12 +89,9 @@ describe('movableTrashCommandsUtil', () => {
       },
     })
     expect(curryCommandCreatorMock).toHaveBeenCalledWith(
-      moveToAddressableArea,
+      moveToAddressableAreaForDropTip,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dropTipInPlace, {
-      pipetteId: mockId,
-    })
   })
   it('returns correct commands for aspirate in place (air gap)', () => {
     movableTrashCommandsUtil({
