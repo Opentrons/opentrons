@@ -33,6 +33,7 @@ import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
   getFixtureDisplayName,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
@@ -80,6 +81,8 @@ import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
+import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '../../../resources/deck_configuration/utils'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../../App/types'
@@ -302,6 +305,14 @@ function PrepareToRun({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
+  const deckConfigCompatibility = useDeckConfigurationCompatibility(
+    robotType,
+    mostRecentAnalysis
+  )
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
+  )
+
   // True if any server request is still pending.
   const isLoading =
     mostRecentAnalysis == null ||
@@ -314,24 +325,43 @@ function PrepareToRun({
         (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
       : 0
 
-  const missingProtocolHardware = useMissingProtocolHardwareFromAnalysis(
+  const { missingProtocolHardware } = useMissingProtocolHardwareFromAnalysis(
     robotType,
     mostRecentAnalysis
   )
-  const isLocationConflict = missingProtocolHardware.conflictedSlots.length > 0
 
-  const missingPipettes = missingProtocolHardware.missingProtocolHardware.filter(
+  const locationConflictSlots = requiredDeckConfigCompatibility.map(
+    fixtureCompatibility => {
+      const {
+        compatibleCutoutFixtureIds,
+        cutoutFixtureId,
+      } = fixtureCompatibility
+      const isCurrentFixtureCompatible =
+        cutoutFixtureId != null &&
+        compatibleCutoutFixtureIds.includes(cutoutFixtureId)
+      return (
+        !isCurrentFixtureCompatible &&
+        cutoutFixtureId != null &&
+        !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+      )
+    }
+  )
+  const isLocationConflict = locationConflictSlots.some(
+    conflictSlot => conflictSlot
+  )
+
+  const missingPipettes = missingProtocolHardware.filter(
     hardware => hardware.hardwareType === 'pipette'
   )
 
-  const missingGripper = missingProtocolHardware.missingProtocolHardware.filter(
+  const missingGripper = missingProtocolHardware.filter(
     hardware => hardware.hardwareType === 'gripper'
   )
 
-  const missingModules = missingProtocolHardware.missingProtocolHardware.filter(
+  const missingModules = missingProtocolHardware.filter(
     hardware => hardware.hardwareType === 'module'
   )
-  const missingFixtures = missingProtocolHardware.missingProtocolHardware.filter(
+  const missingFixtures = missingProtocolHardware.filter(
     (hardware): hardware is ProtocolFixture =>
       hardware.hardwareType === 'fixture'
   )
