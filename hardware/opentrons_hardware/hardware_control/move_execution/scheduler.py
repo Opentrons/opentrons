@@ -1,7 +1,58 @@
 """Move Scheduler."""
 import asyncio
+from collections import defaultdict
 import logging
+from typing import List, Set, Tuple, Iterator, Union, Optional
+import numpy as np
+import time
 
+from opentrons_shared_data.errors.exceptions import (
+    GeneralError,
+    MoveConditionNotMetError,
+    EnumeratedError,
+    EStopActivatedError,
+    MotionFailedError,
+    PythonException,
+)
+
+from opentrons_hardware.firmware_bindings import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    ErrorCode,
+    ErrorSeverity,
+    GearMotorId,
+    MoveAckId,
+)
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    ClearAllMoveGroupsRequest,
+    AddLinearMoveRequest,
+    MoveCompleted,
+    ExecuteMoveGroupRequest,
+    HomeRequest,
+    GripperGripRequest,
+    GripperHomeRequest,
+    AddBrushedLinearMoveRequest,
+    TipActionRequest,
+    TipActionResponse,
+    ErrorMessage,
+    StopRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    AddLinearMoveRequestPayload,
+    ExecuteMoveGroupRequestPayload,
+    HomeRequestPayload,
+    GripperMoveRequestPayload,
+    TipActionRequestPayload,
+    EmptyPayload,
+)
+from opentrons_hardware.hardware_control.constants import (
+    interrupts_per_sec,
+    tip_interrupts_per_sec,
+    brushed_motor_interrupts_per_sec,
+)
+from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -10,7 +61,22 @@ from opentrons_hardware.hardware_control.motion import (
     MoveType,
     SingleMoveStep,
 )
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    UInt32Field,
+    Int32Field,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    PipetteTipActionTypeField,
+    MoveStopConditionField,
+)
+from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motor_position_status import (
+    extract_motor_status_info,
+)
 
+from ..types import NodeDict, MotorPositionStatus
+from .dispatcher import MoveExecutor
 
 class MoveScheduler:
 
@@ -23,8 +89,9 @@ class MoveScheduler:
         self._move_groups = move_groups
         self._start_index = start_index
         self._ignore_stalls = ignore_stalls
+        self._all_nodes = self._get_all_nodes(move_groups)
         self._scheduled = []
-        self._ready_for_dispatch = False
+        self._ready_for_executor = False
 
     def has_moves(self) -> bool:
         for move_group in self._move_groups:
@@ -33,26 +100,47 @@ class MoveScheduler:
                     return True
         return False
 
+    @staticmethod
+    def _get_all_nodes(move_groups: MoveGroups) -> Set[NodeId]:
+        """Get all of the nodes in the move group runner's move gruops."""
+        node_set: Set[NodeId] = set()
+        for group in move_groups:
+            for sequence in group:
+                for node in sequence.keys():
+                    node_set.add(node)
+        return node_set
+
     @property
-    def ready_for_dispatch(self) -> bool:
-        return self._ready_for_dispatch
+    def ready_for_executor(self) -> bool:
+        return self._ready_for_executor
+    
+    async def _clear_groups(self, can_messenger: CanMessenger) -> None:
+        """Send commands to clear all previously scheduled message groups.
+
+        Args:
+            can_messenger: a can messenger
+        """
+        error = await can_messenger.ensure_send(
+            node_id=NodeId.broadcast,
+            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
+            expected_nodes=list(self._all_nodes),
+        )
+        if error != ErrorCode.ok:
+            log.warning("Clear move group failed")
+        
+    async def _schedule_groups(self, can_messenger: CanMessenger) -> None:
+        for group_id, group in enumerate(self._move_groups, self._start_index):
+            for step_id, steps in enumerate(group):
+
+            group_info = await self._schedule_move_group(group, group_id, can_messenger)
+            self._scheduled.append(group_info)
 
     async def schedule(self, can_messenger: CanMessenger) -> None:
+        """First clear existing moves sent to devices, then send new move groups."""
         if self.has_moves():
-            for index, group in enumerate(self._move_groups, self._start_index):
-                group_info = await self._schedule_move_group(group, index, can_messenger)
-                self._scheduled.append(group_info)
-            self._ready_for_dispatch = True
-    
-    async def _schedule_move(
-        self,
-        step: MoveGroupStep,
-        seq_id: int,
-        can_messenger: CanMessenger
-    ):
-        for node, node_step in step.items():
-            message = self._get_message_type(group_id, seq_id, )
-
+            self._clear_groups(can_messenger)
+            self._schedule_groups(can_messenger)
+            self._ready_for_executor = True
 
     async def _schedule_move_group(
         self,
@@ -60,12 +148,8 @@ class MoveScheduler:
         group_id: int,
         can_messenger: CanMessenger
     ) -> ScheduledGroupInfo:
-        moves: List[ScheduledMove] = []
-        for seq_id, step in enumerate(move_group):
-            for node, step in move_seq.items():
-                message = self._get_message_type(step, group_id, seq_id)
-                moves.append(self.)
-
+        
+        
 
     def _get_message_type(
         self, step: SingleMoveStep, group: int, seq: int

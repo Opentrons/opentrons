@@ -76,6 +76,7 @@ from opentrons_hardware.hardware_control.motor_position_status import (
 )
 
 from ..types import NodeDict, MotorPositionStatus
+from .scheduler import MoveScheduler
 from .dispatcher import MoveDispatcher
 
 log = logging.getLogger(__name__)
@@ -96,8 +97,16 @@ class MoveGroupRunner:
         start_index: int = 0,
         ignore_stalls: bool = False,
     ) -> None:
-        self._scheduler = MoveDispatcher(move_groups, start_index, ignore_stalls)
+        self._scheduler = MoveScheduler(
+            move_groups=move_groups,
+            start_index=start_index,
+            ignore_stalls=ignore_stalls
+        )
         self._is_prepped: bool = False
+    
+    @property
+    def scheduler(self) -> MoveScheduler:
+        return self._scheduler
 
     @staticmethod
     def _has_moves(move_groups: MoveGroups) -> bool:
@@ -107,18 +116,13 @@ class MoveGroupRunner:
                     return True
         return False
 
-    async def prep(self, can_messenger: CanMessenger) -> None:
-        """Prepare the move group. The first thing that happens during run().
-
-        prep() and execute() can be used to replace a single call to run() to
-        ensure tighter timing, if you want something else to start as soon as
-        possible to the actual execution of the move.
-        """
+    async def schedule(self, can_messenger: CanMessenger) -> None:
+        """Schedule the moves. The first thing that happens during run()."""
         if not self._scheduler.has_moves():
             log.debug("No moves. Nothing to do.")
             return
         await self._clear_groups(can_messenger)
-        await self._send_groups(can_messenger)
+        await self._schedule_groups(can_messenger)
         self._is_prepped = True
 
     async def execute(
@@ -150,15 +154,15 @@ class MoveGroupRunner:
             The current position after the move for all the axes that
             acknowledged completing moves.
 
-        This function first prepares all connected devices to move (by sending
-        all the data for the moves over) and then executes the move with a
-        single call.
+        This function does two things:
+        1. Schedule by sending all the data for the moves over to the devices
+        2. Execute the coordinated moves
 
-        prep() and execute() can be used to replace a single call to run() to
+        schedule() and execute() can be used to replace a single call to run() to
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
         """
-        await self.prep(can_messenger)
+        await self.schedule(can_messenger)
         return await self.execute(can_messenger)
 
     @staticmethod
@@ -209,28 +213,9 @@ class MoveGroupRunner:
             for node, poslist in position.items()
         }
 
-    async def _clear_groups(self, can_messenger: CanMessenger) -> None:
-        """Send commands to clear the message groups.
+    
 
-        Args:
-            can_messenger: a can messenger
-        """
-        error = await can_messenger.ensure_send(
-            node_id=NodeId.broadcast,
-            message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
-            expected_nodes=list(self.all_nodes()),
-        )
-        if error != ErrorCode.ok:
-            log.warning("Clear move group failed")
-
-    def all_nodes(self) -> Set[NodeId]:
-        """Get all of the nodes in the move group runner's move gruops."""
-        node_set: Set[NodeId] = set()
-        for group in self._move_groups:
-            for sequence in group:
-                for node in sequence.keys():
-                    node_set.add(node)
-        return node_set
+    
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to set up the message groups."""

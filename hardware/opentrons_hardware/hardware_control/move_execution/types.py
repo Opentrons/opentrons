@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Dict
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -21,6 +21,7 @@ Completions = List[CompletionPacket]
 class ScheduledMove:
 
     message_index: UInt32Field
+    group_id: int
     seq_id: int
     node_id: int
     stop_condition: MoveStopCondition
@@ -31,6 +32,7 @@ class ScheduledMove:
 
     def accept_ack(self, ack: MoveAckId) -> bool:
         return True if ack in self.acceptable_acks else False
+
 
 
 @dataclass(order=True)
@@ -45,14 +47,9 @@ class ScheduledTipActionMove(ScheduledMove):
 @dataclass
 class ScheduledGroupInfo:
 
-    group_id: int
-    moves: List[SchedulableMoves]
-    duration: float = field(init=False)
-    expected_nodes: List[NodeId] = field(init=False)
+    moves: Dict[int, SchedulableMoves]
+    awaiting: List[int] = field(init=False)
+    duration: float = field(init=False)        
 
-    def __post_init__(self) -> Moves:
-        self.duration = sum(m.duration for m in self.moves)
-        self.expected_nodes = list(set(NodeId(m.node_id) for m in self.moves))
-
-    def all_moves_completed(self) -> bool:
-        reutrn self.moves
+    def moves_completed(self) -> bool:
+        return not self.awaiting
