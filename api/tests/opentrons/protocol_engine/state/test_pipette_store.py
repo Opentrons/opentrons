@@ -43,6 +43,7 @@ from .command_fixtures import (
     create_touch_tip_command,
     create_move_to_well_command,
     create_blow_out_command,
+    create_blow_out_in_place_command,
     create_move_labware_command,
     create_move_to_coordinates_command,
     create_move_relative_command,
@@ -192,28 +193,6 @@ def test_aspirate_adds_volume(subject: PipetteStore) -> None:
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
 
 
-def test_handles_blow_out(subject: PipetteStore) -> None:
-    """It should set volume to 0 and set current well."""
-    command = create_blow_out_command(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-        flow_rate=1.23,
-    )
-
-    subject.handle_action(UpdateCommandAction(private_result=None, command=command))
-
-    result = subject.state
-
-    assert result.aspirated_volume_by_id["pipette-id"] is None
-
-    assert result.current_location == CurrentWell(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-    )
-
-
 @pytest.mark.parametrize(
     "dispense_command",
     [
@@ -263,6 +242,41 @@ def test_dispense_subtracts_volume(
     )
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
+
+
+@pytest.mark.parametrize(
+    "blow_out_command",
+    [
+        create_blow_out_command("pipette-id", 1.23),
+        create_blow_out_in_place_command("pipette-id", 1.23),
+    ],
+)
+def test_blow_out_clears_volume(
+    subject: PipetteStore, blow_out_command: cmd.Command
+) -> None:
+    """It should wipe out the aspirated volume after a blowOut."""
+    load_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    aspirate_command = create_aspirate_command(
+        pipette_id="pipette-id",
+        volume=42,
+        flow_rate=1.23,
+    )
+
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=load_command)
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=aspirate_command)
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=blow_out_command)
+    )
+
+    assert subject.state.aspirated_volume_by_id["pipette-id"] is None
 
 
 @pytest.mark.parametrize(

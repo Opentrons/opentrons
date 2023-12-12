@@ -467,6 +467,27 @@ def create_blow_out_command(
     )
 
 
+def create_blow_out_in_place_command(
+    pipette_id: str,
+    flow_rate: float,
+) -> cmd.BlowOutInPlace:
+    """Get a completed blowOutInPlace command."""
+    params = cmd.BlowOutInPlaceParams(
+        pipetteId=pipette_id,
+        flowRate=flow_rate,
+    )
+    result = cmd.BlowOutInPlaceResult()
+
+    return cmd.BlowOutInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=1, day=1),
+        params=params,
+        result=result,
+    )
+
+
 def create_touch_tip_command(
     pipette_id: str,
     labware_id: str = "labware-id",
