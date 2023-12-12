@@ -35,6 +35,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 from .command_fixtures import (
     create_load_pipette_command,
     create_aspirate_command,
+    create_aspirate_in_place_command,
     create_dispense_command,
     create_dispense_in_place_command,
     create_pick_up_tip_command,
@@ -164,17 +165,23 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
     assert subject.state.aspirated_volume_by_id["xyz"] is None
 
 
-def test_aspirate_adds_volume(subject: PipetteStore) -> None:
+@pytest.mark.parametrize(
+    "aspirate_command",
+    [
+        create_aspirate_command(pipette_id="pipette-id", volume=42, flow_rate=1.23),
+        create_aspirate_in_place_command(
+            pipette_id="pipette-id", volume=42, flow_rate=1.23
+        ),
+    ],
+)
+def test_aspirate_adds_volume(
+    subject: PipetteStore, aspirate_command: cmd.Command
+) -> None:
     """It should add volume to pipette after an aspirate."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
-    )
-    aspirate_command = create_aspirate_command(
-        pipette_id="pipette-id",
-        volume=42,
-        flow_rate=1.23,
     )
 
     subject.handle_action(

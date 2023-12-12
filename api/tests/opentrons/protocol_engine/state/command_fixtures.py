@@ -217,6 +217,29 @@ def create_aspirate_command(
     )
 
 
+def create_aspirate_in_place_command(
+    pipette_id: str,
+    volume: float,
+    flow_rate: float,
+) -> cmd.AspirateInPlace:
+    """Get a completed Aspirate command."""
+    params = cmd.AspirateInPlaceParams(
+        pipetteId=pipette_id,
+        volume=volume,
+        flowRate=flow_rate,
+    )
+    result = cmd.AspirateInPlaceResult(volume=volume)
+
+    return cmd.AspirateInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_dispense_command(
     pipette_id: str,
     volume: float,
