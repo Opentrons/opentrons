@@ -221,16 +221,16 @@ def check_safe_for_tip_pickup_and_return(
             )
         elif not is_partial_config and tiprack_height > adapter_height:
             raise PipetteMovementNotAllowed(
-                f"Tiprack {tiprack_name}  must be on a Flex Tiprack Adapter (or similar)"
-                f" in order to pick up or drop tips with full 96-channel nozzles."
+                f"Tiprack {tiprack_name} must be on a Flex Tiprack Adapter (or similar)"
+                f" in order to pick up or return tips with all 96-channel nozzles."
             )
 
     elif (
         not is_partial_config
     ):  # tiprack is not on adapter and pipette is in full config
         raise PipetteMovementNotAllowed(
-            f"Tiprack {tiprack_name}  must be on a Flex Tiprack Adapter (or similar)"
-            f" in order to pick up or drop tips with full 96-channel nozzles."
+            f"Tiprack {tiprack_name} must be on a Flex Tiprack Adapter (or similar)"
+            f" in order to pick up or return tips with all 96-channel nozzles."
         )
 
 
