@@ -83,7 +83,7 @@ describe('ExitModal', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(props.goBack).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'exit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Exit' }))
     expect(props.proceed).toHaveBeenCalled()
   })
 })

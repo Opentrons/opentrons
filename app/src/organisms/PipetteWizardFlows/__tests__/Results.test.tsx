@@ -312,7 +312,7 @@ describe('Results', () => {
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    fireEvent.click(screen.getByRole('button', {name: 'Try again'}))
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })

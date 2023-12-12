@@ -107,30 +107,30 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
 
     &:focus {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-      .activeBackgroundColor};
+        .activeBackgroundColor};
       box-shadow: none;
     }
     &:hover {
       border: none;
       box-shadow: none;
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
+        .defaultBackgroundColor};
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-      .defaultBackgroundColor};
+        .defaultBackgroundColor};
     }
 
     &:active {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-      .activeBackgroundColor};
+        .activeBackgroundColor};
     }
 
     &:disabled {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
-      .disabledBackgroundColor};
+        .disabledBackgroundColor};
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
     }
   `
@@ -152,7 +152,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
-          <Flex aria-label={iconName === 'ot-spinner' ? "loading indicator" : iconName}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginRight={SPACING.spacing8}
@@ -170,7 +174,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           {buttonText}
         </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
-          <Flex aria-label={iconName === 'ot-spinner' ? "loading indicator" : iconName}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginLeft={SPACING.spacing8}

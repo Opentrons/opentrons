@@ -864,7 +864,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
-  it.only('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {
+  it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
@@ -954,6 +954,7 @@ describe('ProtocolRunHeader', () => {
 
   it('renders the devices page when robot is not viewable but protocol is loaded', async () => {
     mockUseIsRobotViewable.mockReturnValue(false)
+    render()
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/devices')
     })

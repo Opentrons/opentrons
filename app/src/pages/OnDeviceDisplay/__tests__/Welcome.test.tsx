@@ -36,14 +36,14 @@ describe('Welcome', () => {
     screen.getByText(
       "Quickly run protocols and check on your robot's status right on your lab bench."
     )
-    screen.getByRole('button', {name: 'Get started'})
+    screen.getByRole('button', { name: 'Get started' })
     const image = screen.getByRole('img')
     expect(image.getAttribute('src')).toEqual(PNG_FILE_NAME)
   })
 
   it('should call mockPush when tapping Get started', () => {
     render()
-    fireEvent.click(screen.getByRole('button', {name: 'Get started'}))
+    fireEvent.click(screen.getByRole('button', { name: 'Get started' }))
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 })

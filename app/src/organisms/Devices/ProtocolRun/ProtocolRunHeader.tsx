@@ -25,7 +25,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   getPipetteModelSpecs,
-  HEATERSHAKER_MODULE_TYPE,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -355,9 +354,9 @@ export function ProtocolRunHeader({
         ) : null}
         {/* Note: This banner is for before running a protocol */}
         {isDoorOpen &&
-          runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-          runStatus != null &&
-          CANCELLABLE_STATUSES.includes(runStatus) ? (
+        runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
+        runStatus != null &&
+        CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
         {isRunCurrent ? (
@@ -448,8 +447,8 @@ export function ProtocolRunHeader({
           />
         ) : null}
         {showDropTipWizard &&
-          pipettesWithTip[0]?.specs != null &&
-          isRunCurrent ? (
+        pipettesWithTip[0]?.specs != null &&
+        isRunCurrent ? (
           <DropTipWizard
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={pipettesWithTip[0].mount}
@@ -635,28 +634,18 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const activeHeaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.moduleType === 'heaterShakerModuleType' &&
       module?.data != null &&
       module.data.speedStatus !== 'idle'
   )
   const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule => {
-
-        console.log('atype,', module.moduleType, HEATERSHAKER_MODULE_TYPE, module.moduleType === HEATERSHAKER_MODULE_TYPE)
-        return module.moduleType === HEATERSHAKER_MODULE_TYPE
-      }
-    )
+    .filter((module): module is HeaterShakerModule => {
+      return module.moduleType === 'heaterShakerModuleType'
+    })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
-  console.log(
-    '/n/n/n modules', attachedModules
-  )
-  console.log(
-    '/n/n/n is shaking', isHeaterShakerShaking
-  )
 
   let buttonText: string = ''
-  let handleButtonClick = (): void => { }
+  let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
   let disableReason = null
 
@@ -727,13 +716,6 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
     }
   }
-
-  console.table({
-    showIsShakingModal,
-    activeHeaterShaker,
-    isHeaterShakerInProtocol,
-    runId
-  })
 
   return (
     <>

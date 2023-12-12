@@ -86,13 +86,9 @@ describe('InstrumentInfo', () => {
     screen.getByText('12')
     screen.getByText('serial number')
     screen.getByText('123')
-    fireEvent.click(
-      screen.getByRole('button', { name: 'detach' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
     screen.getByText('mock GripperWizardFlows')
-    fireEvent.click(
-      screen.getByRole('button', { name: 'recalibrate' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'calibrate' }))
     screen.getByText('mock GripperWizardFlows')
   })
 
@@ -107,13 +103,9 @@ describe('InstrumentInfo', () => {
     screen.getByText('12')
     screen.getByText('serial number')
     screen.getByText('123')
-    fireEvent.click(
-      screen.getByRole('button', { name: 'detach' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
     screen.getByText('mock GripperWizardFlows')
-    fireEvent.click(
-      screen.getByRole('button', { name: 'recalibrate' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'recalibrate' }))
     screen.getByText('mock GripperWizardFlows')
   })
 
@@ -126,9 +118,7 @@ describe('InstrumentInfo', () => {
     screen.getByText('8/25/20 20:25 UTC')
     screen.getByText('serial number')
     screen.getByText('abc')
-    fireEvent.click(
-      screen.getByRole('button', { name: 'detach' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'detach' }))
     screen.getByText('mock PipetteWizardFlows')
     expect(screen.queryByText('Calibrate')).not.toBeInTheDocument()
   })
