@@ -41,7 +41,6 @@ const IN_PROGRESS_STYLE = css`
 `
 const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
-
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.275rem;
     line-height: 1.75rem;
@@ -126,15 +125,17 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
 
   const bodyText = (
     <>
-      <Trans
-        t={t}
-        i18nKey={'pipette_wizard_flows:install_probe'}
-        values={{ location: probeLocation }}
-        components={{
-          strong: <strong />,
-          block: <StyledText css={BODY_STYLE} />,
-        }}
-      />
+      <StyledText css={BODY_STYLE}>
+        <Trans
+          t={t}
+          i18nKey={'pipette_wizard_flows:install_probe'}
+          values={{ location: probeLocation }}
+          components={{
+            bold: <strong />,
+          }}
+        />
+      </StyledText>
+
       {wasteChuteConflict && (
         <Banner
           type={isWasteChuteOnDeck ? 'error' : 'warning'}
