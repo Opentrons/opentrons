@@ -82,7 +82,7 @@ describe('ProtocolInstrumentMountItem', () => {
     screen.getByText('No data')
     screen.getByText('Flex 8-Channel 1000 μL')
     screen.getByText('Attach')
-    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    fireEvent.click(screen.getByRole('button'))
     screen.getByText('pipette wizard flow')
   })
   it('renders the correct information when there is no pipette attached for 96 channel', () => {

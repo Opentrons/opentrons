@@ -183,7 +183,7 @@ describe('ODDProtocolDetails', () => {
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
       } as any)
     render()
-    const deleteButton = screen.getByRole('button', { name: 'Delete' })
+    const deleteButton = screen.getByRole('button', { name: 'Delete protocol' })
     fireEvent.click(deleteButton)
     const confirmDeleteButton = screen.getByText('Delete')
     fireEvent.click(confirmDeleteButton)

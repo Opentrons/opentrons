@@ -90,7 +90,7 @@ describe('NameRobot', () => {
 
   it('should show an error message when tapping confirm without typing anything', async () => {
     render()
-    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    fireEvent.click(screen.getByRole('button', {name: 'Confirm'}))
     const error = await screen.findByText(
       'Oops! Robot name must follow the character count and limitations.'
     )
@@ -105,7 +105,7 @@ describe('NameRobot', () => {
     fireEvent.change(input, {
       target: { value: 'connectableOtie' },
     })
-    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    fireEvent.click(screen.getByRole('button', {name: 'Confirm'}))
     const error = await screen.findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -120,7 +120,7 @@ describe('NameRobot', () => {
     fireEvent.change(input, {
       target: { value: 'reachableOtie' },
     })
-    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    fireEvent.click(screen.getByRole('button', {name: 'Confirm'}))
     const error = await screen.findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -134,7 +134,7 @@ describe('NameRobot', () => {
     fireEvent.click(screen.getByRole('button', { name: 'a' }))
     fireEvent.click(screen.getByRole('button', { name: 'b' }))
     fireEvent.click(screen.getByRole('button', { name: 'c' }))
-    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    fireEvent.click(screen.getByRole('button', {name: 'Confirm'}))
     expect(mockTrackEvent).toHaveBeenCalled()
   })
 

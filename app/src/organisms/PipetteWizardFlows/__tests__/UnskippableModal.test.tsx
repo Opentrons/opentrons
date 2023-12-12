@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UnskippableModal } from '../UnskippableModal'
@@ -18,12 +19,12 @@ describe('UnskippableModal', () => {
       isOnDevice: false,
       isRobotMoving: false,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('This is a critical step that should not be skipped')
-    getByText(
+    render(props)
+    screen.getByText('This is a critical step that should not be skipped')
+    screen.getByText(
       'You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.'
     )
-    getByRole('button', { name: 'Go back' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(props.goBack).toHaveBeenCalled()
   })
   it('renders the is on device button with correct text when it is on device display', () => {
@@ -33,12 +34,12 @@ describe('UnskippableModal', () => {
       isOnDevice: true,
       isRobotMoving: false,
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('This is a critical step that should not be skipped')
-    getByText(
+    render(props)
+    screen.getByText('This is a critical step that should not be skipped')
+    screen.getByText(
       'You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.'
     )
-    getByLabelText('SmallButton_alert').click()
+    fireEvent.click(screen.getByRole('button', {name: 'exit'}))
     expect(props.proceed).toHaveBeenCalled()
   })
 })

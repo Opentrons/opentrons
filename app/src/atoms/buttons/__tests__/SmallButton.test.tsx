@@ -93,7 +93,7 @@ describe('SmallButton', () => {
       iconPlacement: 'startIcon',
     }
     render(props)
-    screen.getByLabelText('SmallButton_alert_positionStart')
+    screen.getByLabelText('alert')
   })
   it('renders an icon with end placement', () => {
     props = {
@@ -102,6 +102,6 @@ describe('SmallButton', () => {
       iconPlacement: 'endIcon',
     }
     render(props)
-    screen.getByLabelText('SmallButton_alert_positionEnd')
+    screen.getByLabelText('alert')
   })
 })

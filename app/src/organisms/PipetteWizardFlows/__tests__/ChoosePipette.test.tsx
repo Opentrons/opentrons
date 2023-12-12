@@ -101,7 +101,7 @@ describe('ChoosePipette', () => {
     fireEvent.click(singleMountPipettes)
     expect(props.setSelectedPipette).toHaveBeenCalled()
 
-    const proceedBtn = screen.getByLabelText('SmallButton_primary')
+    const proceedBtn = screen.getByRole('button', {name: 'Continue'})
     fireEvent.click(proceedBtn)
     expect(props.proceed).toHaveBeenCalled()
   })

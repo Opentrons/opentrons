@@ -46,7 +46,7 @@ describe('GenericWizardTile', () => {
     render(props)
     screen.getByText('body')
     screen.getByText('header')
-    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
+    fireEvent.click(screen.getByRole('button'))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct generic tile information with a back button', () => {

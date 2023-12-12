@@ -89,7 +89,7 @@ describe('MediumButton', () => {
       iconName: 'restart',
     }
     const { getByLabelText } = render(props)
-    getByLabelText('MediumButton_restart')
+    getByLabelText('restart icon')
   })
   it('renders the rounded button category', () => {
     props = {

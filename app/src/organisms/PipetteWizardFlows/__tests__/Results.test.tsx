@@ -297,7 +297,7 @@ describe('Results', () => {
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     screen.getByRole('img', { name: 'Success Icon' })
-    fireEvent.click(screen.getByRole('button', { name: 'SmallButton_primary' }))
+    fireEvent.click(screen.getByRole('button'))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the correct information when pipette wizard is a fail for attach flow on ODD', async () => {
@@ -312,7 +312,7 @@ describe('Results', () => {
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.errorEnabled)}`
     )
-    fireEvent.click(screen.getByRole('button', { name: 'SmallButton_primary' }))
+    fireEvent.click(screen.getByRole('button', {name: 'Try again'}))
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })
