@@ -93,7 +93,6 @@ stages:
               - id: fixedTrash
                 loadName: opentrons_1_trash_1100ml_fixed
                 definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-                displayName: Trash
                 location:
                   slotName: '12'
               - id: sourcePlateId
@@ -234,24 +233,6 @@ stages:
                   displayName: Opentrons 96 Tip Rack 10 µL
                 result:
                   labwareId: tipRackId
-                  definition: !anydict
-                startedAt: !anystr
-                completedAt: !anystr
-              - id: !anystr
-                createdAt: !anystr
-                commandType: loadLabware
-                key: !anystr
-                status: succeeded
-                params:
-                  location:
-                    slotName: '12'
-                  loadName: opentrons_1_trash_1100ml_fixed
-                  namespace: opentrons
-                  version: 1
-                  labwareId: fixedTrash
-                  displayName: Trash
-                result:
-                  labwareId: fixedTrash
                   definition: !anydict
                 startedAt: !anystr
                 completedAt: !anystr
@@ -526,6 +507,7 @@ stages:
                 status: succeeded
                 params:
                   pipetteId: pipetteId
+                  failOnNotHomed: true
                 result:
                   positionId: !anystr
                   position:
@@ -558,6 +540,7 @@ stages:
                 params:
                   pipetteId: pipetteId
                   positionId: positionId
+                  failOnNotHomed: true
                 result:
                   positionId: positionId
                   position:

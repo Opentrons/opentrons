@@ -29,6 +29,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import HardwareFeatureFlags
 
 from ..data import get_git_description, csv_report
 from .types import (
@@ -232,7 +233,7 @@ async def build_async_ot3_hardware_api(
         except ValueError as e:
             print(e)
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
-    kwargs = {"config": config}
+    kwargs = {"config": config, "feature_flags": HardwareFeatureFlags.build_from_ff()}
     if is_simulating:
         # This Callable type annotation works around mypy complaining about slight mismatches
         # between the signatures of build_hardware_simulator() and build_hardware_controller().

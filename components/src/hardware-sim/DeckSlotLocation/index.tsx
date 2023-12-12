@@ -1,207 +1,83 @@
 import * as React from 'react'
-import { DeckDefinition, DeckSlot, ModuleType } from '@opentrons/shared-data'
+import { getPositionFromSlotId, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import ot2DeckDefV4 from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
 
-// TODO(BC, 8/2/2023): as soon as the deck definitions have a concept of base locations, use their
-// identity to key this mapping instead of slotNames
-interface DeckSlotLocationProps extends React.SVGProps<SVGGElement> {
+import { SlotBase } from '../BaseDeck/SlotBase'
+
+import type {
+  DeckDefinition,
+  DeckSlot,
+  RobotType,
+} from '@opentrons/shared-data'
+
+interface LegacyDeckSlotLocationProps extends React.SVGProps<SVGGElement> {
+  robotType: RobotType
   slotName: DeckSlot['id']
-  deckDefinition: DeckDefinition
-  moduleType?: ModuleType
   slotBaseColor?: React.SVGProps<SVGPathElement>['fill']
   slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
-  showExtensions?: boolean
 }
 
-// TODO(bh, 2023-10-11): replace usage of this component with base deck fixtures
-export function DeckSlotLocation(
-  props: DeckSlotLocationProps
+// dimensions of the OT-2 fixed trash, not in deck definition
+export const OT2_FIXED_TRASH_X_DIMENSION = 172.86
+export const OT2_FIXED_TRASH_Y_DIMENSION = 165.86
+
+/**
+ * This is a legacy component for rendering an OT-2 deck slot by reference to the V4 deck definition
+ */
+export function LegacyDeckSlotLocation(
+  props: LegacyDeckSlotLocationProps
 ): JSX.Element | null {
   const {
+    robotType,
     slotName,
-    deckDefinition,
     slotBaseColor,
     slotClipColor,
-    showExtensions = false,
     ...restProps
   } = props
 
-  const slotDef = deckDefinition?.locations.addressableAreas.find(
+  if (robotType !== OT2_ROBOT_TYPE) return null
+
+  const slotDef = ot2DeckDefV4.locations.addressableAreas.find(
     s => s.id === slotName
   )
   if (slotDef == null) {
     console.warn(
-      `cannot render DeckSlotLocation, no deck slot named: ${slotName} in deck def ${deckDefinition?.otId}`
+      `cannot render DeckSlotLocation, no deck slot named: ${slotName} in OT-2 deck definition`
     )
     return null
   }
 
-  const contentsBySlotName: { [slotName: string]: JSX.Element } = {
-    A1: (
-      <>
-        {showExtensions ? (
-          <SlotBase
-            fill={slotBaseColor}
-            d="M-97.8,496.6h239c2.3,0,4.2-1.9,4.2-4.2v-70c0-2.3-1.9-4.2-4.2-4.2h-239c-2.3,0-4.2,1.9-4.2,4.2v70 C-102,494.7-100.1,496.6-97.8,496.6z"
-          />
-        ) : null}
-        <SlotBase
-          fill={slotBaseColor}
-          d="M-97.7,417.1h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4 C-102,415.1-100.1,417.1-97.7,417.1z"
-        />
-        <SlotClip d="M-1.9,398.9V409H8.9" stroke={slotClipColor} />
-        <SlotClip d="M-1.9,329.8v-10.5H8.7" stroke={slotClipColor} />
-        <SlotClip d="M129.9,398.9V409h-10.8" stroke={slotClipColor} />
-        <SlotClip d="M129.9,329.8v-10.7h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    A2: (
-      <>
-        <SlotBase
-          d="M150.8,417.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,415.1,148.4,417.1,150.8,417.1z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M162.1,398.9V409h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M162.1,329.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M293.9,398.9V409h-10.8" stroke={slotClipColor} />,
-        <SlotClip d="M293.9,329.8v-10.7h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    A3: (
-      <>
-        <SlotBase
-          d="M314.8,417.1h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,415.1,312.4,417.1,314.8,417.1z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M326,398.9V409h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M326,329.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M457.8,398.9V409H447" stroke={slotClipColor} />,
-        <SlotClip d="M457.8,329.8v-10.7H447" stroke={slotClipColor} />
-      </>
-    ),
-    B1: (
-      <>
-        <SlotBase
-          d="M-97.7,310h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.2C-102,308.1-100.1,310-97.7,310z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M-1.9,291.9V302H8.9" stroke={slotClipColor} />,
-        <SlotClip d="M-1.9,222.8v-10.5H8.7" stroke={slotClipColor} />,
-        <SlotClip d="M129.9,291.9V302h-10.8" stroke={slotClipColor} />,
-        <SlotClip d="M129.9,222.8v-10.7h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    B2: (
-      <>
-        <SlotBase
-          d="M150.8,310h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C146.5,308.1,148.4,310,150.8,310z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M162.1,291.9V302h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M162.1,222.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M293.9,291.9V302h-10.8" stroke={slotClipColor} />,
-        <SlotClip d="M293.9,222.8v-10.7h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    B3: (
-      <>
-        <SlotBase
-          d="M314.8,310h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.2c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.2C310.5,308.1,312.4,310,314.8,310z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M326,291.9V302h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M326,222.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M457.8,291.9V302H447" stroke={slotClipColor} />,
-        <SlotClip d="M457.8,222.8v-10.7H447" stroke={slotClipColor} />
-      </>
-    ),
-    C1: (
-      <>
-        <SlotBase
-          d="M-97.7,203.1h238.8c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4C-102,201.2-100.1,203.1-97.7,203.1z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M-1.9,185v10.1H8.9" stroke={slotClipColor} />
-        <SlotClip d="M-1.9,115.8v-10.5H8.7" stroke={slotClipColor} />
-        <SlotClip d="M129.9,185v10.1h-10.8" stroke={slotClipColor} />
-        <SlotClip d="M129.9,115.8v-10.7h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    C2: (
-      <>
-        <SlotBase
-          d="M150.8,203.1h154.3c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,201.2,148.4,203.1,150.8,203.1z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M162.1,185v10.1h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M162.1,115.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M293.9,185v10.1h-10.8" stroke={slotClipColor} />,
-        <SlotClip d="M293.9,115.8v-10.7h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    C3: (
-      <>
-        <SlotBase
-          d="M314.8,203.1h238.9c2.4,0,4.3-1.9,4.3-4.3v-97.4c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,201.2,312.4,203.1,314.8,203.1z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M326,185v10.1h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M326,115.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M457.8,185v10.1H447" stroke={slotClipColor} />,
-        <SlotClip d="M457.8,115.8v-10.7H447" stroke={slotClipColor} />
-      </>
-    ),
-    D1: (
-      <>
-        <SlotBase
-          fill={slotBaseColor}
-          d="M-97.7,96.1h238.8c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H-97.7c-2.4,0-4.3,1.9-4.3,4.3v97.4C-102,94.2-100.1,96.1-97.7,96.1z"
-        />
-        <SlotClip d="M-1.9,77.9V88H8.9" stroke={slotClipColor} />
-        <SlotClip d="M-1.9,8.8V-1.7H8.7" stroke={slotClipColor} />
-        <SlotClip d="M129.9,77.9V88h-10.8" stroke={slotClipColor} />
-        <SlotClip d="M129.9,8.8V-1.9h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    D2: (
-      <>
-        <SlotBase
-          fill={slotBaseColor}
-          d="M150.8,96.1h154.3c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H150.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C146.5,94.2,148.4,96.1,150.8,96.1z"
-        />
-        <SlotClip d="M162.1,77.9V88h10.8" stroke={slotClipColor} />
-        <SlotClip d="M162.1,8.8V-1.7h10.6" stroke={slotClipColor} />
-        <SlotClip d="M293.9,77.9V88h-10.8" stroke={slotClipColor} />
-        <SlotClip d="M293.9,8.8V-1.9h-10.8" stroke={slotClipColor} />
-      </>
-    ),
-    D3: (
-      <>
-        <SlotBase
-          d="M314.8,96.1h238.9c2.4,0,4.3-1.9,4.3-4.3V-5.6c0-2.4-1.9-4.3-4.3-4.3H314.8c-2.4,0-4.3,1.9-4.3,4.3v97.4C310.5,94.2,312.4,96.1,314.8,96.1z"
-          fill={slotBaseColor}
-        />
-        <SlotClip d="M326,77.9V88h10.8" stroke={slotClipColor} />
-        <SlotClip d="M326,8.8V-1.7h10.6" stroke={slotClipColor} />
-        <SlotClip d="M457.8,77.9V88H447" stroke={slotClipColor} />
-        <SlotClip d="M457.8,8.8V-1.9H447" stroke={slotClipColor} />
-      </>
-    ),
-  }
+  const slotPosition = getPositionFromSlotId(
+    slotName,
+    (ot2DeckDefV4 as unknown) as DeckDefinition
+  )
 
-  return <g {...restProps}>{contentsBySlotName[slotName]}</g>
-}
+  const isFixedTrash = slotName === 'fixedTrash'
 
-function SlotBase(props: React.SVGProps<SVGPathElement>): JSX.Element {
-  return <path fill="#CCCCCC" {...props} />
-}
-function SlotClip(props: React.SVGProps<SVGPathElement>): JSX.Element {
+  const [xPosition, yPosition] = slotPosition ?? [0, 0]
+  const { xDimension, yDimension } = isFixedTrash
+    ? {
+        xDimension: OT2_FIXED_TRASH_X_DIMENSION,
+        yDimension: OT2_FIXED_TRASH_Y_DIMENSION,
+      }
+    : slotDef.boundingBox
+  const [xOffset, yOffset] = slotDef.offsetFromCutoutFixture
+
+  // adjust the fixed trash position and dimension to fit inside deck SVG
+  const fixedTrashPositionAdjustment = isFixedTrash ? 7 : 0
+  const fixedTrashDimensionAdjustment = isFixedTrash ? -9 : 0
+
+  const adjustedXPosition = xPosition + fixedTrashPositionAdjustment - xOffset
+  const adjustedYPosition = yPosition + fixedTrashPositionAdjustment - yOffset
+  const adjustedXDimension = xDimension + fixedTrashDimensionAdjustment
+  const adjustedYDimension = yDimension + fixedTrashDimensionAdjustment
+
   return (
-    <path
-      fill="none"
-      stroke="#16212D"
-      strokeWidth={3}
-      strokeOpacity={0.7}
-      {...props}
-    />
+    <g {...restProps}>
+      <SlotBase
+        fill={slotBaseColor}
+        d={`M${adjustedXPosition},${adjustedYPosition}h${adjustedXDimension}v${adjustedYDimension}h${-adjustedXDimension}v${-adjustedYDimension}z`}
+      />
+    </g>
   )
 }

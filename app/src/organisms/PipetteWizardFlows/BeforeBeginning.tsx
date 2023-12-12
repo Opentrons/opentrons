@@ -254,25 +254,25 @@ export const BeforeBeginning = (
               )}
           </Flex>
           {selectedPipette === NINETY_SIX_CHANNEL &&
-          (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH) ? (
-            <Banner
-              type={isWasteChuteOnDeck ? 'error' : 'warning'}
-              size={isOnDevice ? '1.5rem' : '1rem'}
-              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-            >
-              {isWasteChuteOnDeck
-                ? t('waste_chute_error')
-                : t('waste_chute_warning')}
-            </Banner>
-          ) : (
-            <Banner
-              type="warning"
-              size={isOnDevice ? '1.5rem' : '1rem'}
-              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-            >
-              {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
-            </Banner>
-          )}
+            (flowType === FLOWS.CALIBRATE || flowType === FLOWS.ATTACH ? (
+              <Banner
+                type={isWasteChuteOnDeck ? 'error' : 'warning'}
+                size={isOnDevice ? '1.5rem' : '1rem'}
+                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+              >
+                {isWasteChuteOnDeck
+                  ? t('waste_chute_error')
+                  : t('waste_chute_warning')}
+              </Banner>
+            ) : (
+              <Banner
+                type="warning"
+                size={isOnDevice ? '1.5rem' : '1rem'}
+                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+              >
+                {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
+              </Banner>
+            ))}
         </>
       }
       proceedButtonText={proceedButtonText}

@@ -34,6 +34,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     LabwareLocation,
+    AddressableAreaLocation,
     OFF_DECK_LOCATION,
     OverlapOffset,
     LabwareMovementOffsetData,
@@ -1105,41 +1106,9 @@ def test_get_by_slot() -> None:
         labware_by_id={"1": labware_1, "2": labware_2, "3": labware_3}
     )
 
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "2"}) == labware_1
-    assert subject.get_by_slot(DeckSlotName.SLOT_2, {"1", "2"}) == labware_2
-    assert subject.get_by_slot(DeckSlotName.SLOT_3, {"1", "2"}) is None
-
-
-def test_get_by_slot_prefers_later() -> None:
-    """It should get the labware in a slot, preferring later items if locations match."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1", "1-again"}) == labware_1_again
-
-
-def test_get_by_slot_filter_ids() -> None:
-    """It should filter labwares in the same slot using IDs."""
-    labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-    labware_1_again = LoadedLabware.construct(  # type: ignore[call-arg]
-        id="1-again", location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
-    )
-
-    subject = get_labware_view(
-        labware_by_id={"1": labware_1, "1-again": labware_1_again}
-    )
-
-    assert subject.get_by_slot(DeckSlotName.SLOT_1, {"1"}) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_1) == labware_1
+    assert subject.get_by_slot(DeckSlotName.SLOT_2) == labware_2
+    assert subject.get_by_slot(DeckSlotName.SLOT_3) is None
 
 
 @pytest.mark.parametrize(
@@ -1226,6 +1195,67 @@ def test_get_all_labware_definition_empty() -> None:
     result = subject.get_loaded_labware_definitions()
 
     assert result == []
+
+
+def test_raise_if_labware_inaccessible_by_pipette_staging_area() -> None:
+    """It should raise if the labware is on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            )
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_off_deck() -> None:
+    """It should raise if the labware is off-deck."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OFF_DECK_LOCATION,
+            )
+        },
+    )
+
+    with pytest.raises(errors.LocationNotAccessibleByPipetteError, match="off-deck"):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+def test_raise_if_labware_inaccessible_by_pipette_stacked_labware_on_staging_area() -> None:
+    """It should raise if the labware is stacked on a staging slot."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=OnLabwareLocation(labwareId="lower-labware-id"),
+            ),
+            "lower-labware-id": LoadedLabware(
+                id="lower-labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=AddressableAreaLocation(addressableAreaName="B4"),
+            ),
+        },
+    )
+
+    with pytest.raises(
+        errors.LocationNotAccessibleByPipetteError, match="on staging slot"
+    ):
+        subject.raise_if_labware_inaccessible_by_pipette("labware-id")
 
 
 def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:

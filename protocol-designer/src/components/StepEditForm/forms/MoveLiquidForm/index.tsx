@@ -1,8 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { useSelector } from 'react-redux'
 import { i18n } from '../../../../localization'
-import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import {
   VolumeField,
   PipetteField,
@@ -21,7 +19,6 @@ import type { StepFormProps } from '../../types'
 
 export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
-  const allLabware = useSelector(getLabwareDefsByURI)
 
   const toggleCollapsed = (): void => _setCollapsed(!collapsed)
 
@@ -73,14 +70,12 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
             prefix="aspirate"
             propsForFields={propsForFields}
             formData={formData}
-            allLabware={allLabware}
           />
           <SourceDestFields
             className={styles.section_column}
             prefix="dispense"
             propsForFields={propsForFields}
             formData={formData}
-            allLabware={allLabware}
           />
         </div>
       )}

@@ -33,6 +33,7 @@ export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2Cutout } = {
   9: 'cutout9',
   10: 'cutout10',
   11: 'cutout11',
+  fixedTrash: 'cutout12',
 }
 
 // mapping of Flex deck slots to cutouts
@@ -106,7 +107,7 @@ export function getFixtureDisplayName(
   } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE) {
     return 'Waste chute only'
   } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE) {
-    return 'Waste chute only covered'
+    return 'Waste chute only with cover'
   } else if (
     cutoutFixtureId ===
     STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
@@ -116,7 +117,7 @@ export function getFixtureDisplayName(
     cutoutFixtureId ===
     STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
   ) {
-    return 'Waste chute with staging area slot covered'
+    return 'Waste chute with staging area slot and cover'
   } else {
     return 'Slot'
   }

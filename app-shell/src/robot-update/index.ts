@@ -180,13 +180,6 @@ export function getRobotSystemUpdateUrls(
     .then(manifest => {
       const urls = getReleaseSet(manifest, CURRENT_VERSION)
 
-      if (urls === null) {
-        log.warn('No release files in manifest', {
-          version: CURRENT_VERSION,
-          manifest,
-        })
-      }
-
       return urls
     })
     .catch((error: Error) => {

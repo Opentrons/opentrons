@@ -63,7 +63,11 @@
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
-        "blowout_checkbox": "Redundant with disposal volume"
+        "aspirate_touchTip_checkbox": "Touch tip is not supported with this labware",
+        "blowout_checkbox": "Redundant with disposal volume",
+        "dispense_mix_checkbox": "Unable to mix in a waste chute",
+        "dispense_mmFromBottom": "Tip position adjustment not supported in waste chute",
+        "dispense_touchTip_checkbox": "Touch tip is not supported"
       }
     },
     "moveLabware": {
@@ -92,9 +96,6 @@
       "disabled": {
         "latchOpen": "Labware Latch cannot be open while the module is shaking"
       }
-    },
-    "touchTip": {
-      "disabled": "Touch tip is not supported with this labware"
     }
   },
   "edit_module_card": {

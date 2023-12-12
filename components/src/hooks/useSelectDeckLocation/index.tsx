@@ -3,12 +3,18 @@ import isEqual from 'lodash/isEqual'
 
 import {
   FLEX_CUTOUT_BY_SLOT_ID,
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import {
+  DeckFromLayers,
+  LegacyDeckSlotLocation,
+  OT2_FIXED_TRASH_X_DIMENSION,
+  OT2_FIXED_TRASH_Y_DIMENSION,
   RobotCoordinateSpace,
   RobotCoordsForeignDiv,
   SingleSlotFixture,
@@ -17,7 +23,7 @@ import {
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { COLORS, SPACING } from '../../ui-style-constants'
+import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type {
   DeckDefinition,
@@ -30,6 +36,17 @@ export type DeckLocationSelectThemes = 'default' | 'grey'
 const X_CROP_MM = 0
 const X_ADJUSTMENT_FOR_TC = '-50'
 const Y_ADJUSTMENT_FOR_TC = '214'
+
+const OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST: string[] = [
+  'calibrationMarkings',
+  'fixedBase',
+  'doorStops',
+  'metalFrame',
+  'removalHandle',
+  'removableDeckOutline',
+  'screwHoles',
+  'slotNumbers',
+]
 
 export function useDeckLocationSelect(
   robotType: RobotType,
@@ -68,6 +85,8 @@ export function DeckLocationSelect({
   theme = 'default',
   isThermocycler = false,
 }: DeckLocationSelectProps): JSX.Element {
+  const robotType = deckDef.robot.model
+
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0] + X_CROP_MM} ${
@@ -76,8 +95,11 @@ export function DeckLocationSelect({
     >
       {deckDef.locations.addressableAreas
         // only render standard slot fixture components
-        .filter(addressableArea =>
-          isAddressableAreaStandardSlot(addressableArea.id, deckDef)
+        .filter(
+          addressableArea =>
+            isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
+            // special case the OT-2 trash addressable area
+            addressableArea.id === 'fixedTrash'
         )
         .map(slot => {
           const slotLocation = { slotName: slot.id }
@@ -129,37 +151,66 @@ export function DeckLocationSelect({
           const cutoutId = FLEX_CUTOUT_BY_SLOT_ID[slot.id]
 
           return (
-            <React.Fragment key={cutoutId}>
-              <SingleSlotFixture
-                cutoutId={cutoutId}
-                fixtureBaseColor={fill}
-                slotClipColor={COLORS.white}
-                onClick={() =>
-                  !isDisabled &&
-                  setSelectedLocation != null &&
-                  setSelectedLocation(slotLocation)
-                }
-                cursor={
-                  setSelectedLocation == null || isDisabled || isSelected
-                    ? 'default'
-                    : 'pointer'
-                }
-                deckDefinition={deckDef}
-              />
+            <React.Fragment key={slot.id}>
+              {robotType === FLEX_ROBOT_TYPE ? (
+                <SingleSlotFixture
+                  cutoutId={cutoutId}
+                  fixtureBaseColor={fill}
+                  slotClipColor={COLORS.white}
+                  onClick={() =>
+                    !isDisabled &&
+                    setSelectedLocation != null &&
+                    setSelectedLocation(slotLocation)
+                  }
+                  cursor={
+                    setSelectedLocation == null || isDisabled || isSelected
+                      ? 'default'
+                      : 'pointer'
+                  }
+                  deckDefinition={deckDef}
+                />
+              ) : (
+                <LegacyDeckSlotLocation
+                  robotType={robotType}
+                  slotBaseColor={fill}
+                  slotName={slot.id}
+                  slotClipColor={COLORS.white}
+                  onClick={() =>
+                    !isDisabled &&
+                    setSelectedLocation != null &&
+                    setSelectedLocation(slotLocation)
+                  }
+                  cursor={
+                    setSelectedLocation == null || isDisabled || isSelected
+                      ? 'default'
+                      : 'pointer'
+                  }
+                />
+              )}
               {isSelected && slotPosition != null ? (
                 <RobotCoordsForeignDiv
-                  x={slotPosition[0]}
-                  y={slotPosition[1]}
-                  width={slot.boundingBox.xDimension}
-                  height={slot.boundingBox.yDimension}
+                  x={slotPosition[0] - slot.offsetFromCutoutFixture[0]}
+                  y={slotPosition[1] - slot.offsetFromCutoutFixture[1]}
+                  width={
+                    slot.id === 'fixedTrash'
+                      ? OT2_FIXED_TRASH_X_DIMENSION
+                      : slot.boundingBox.xDimension
+                  }
+                  height={
+                    slot.id === 'fixedTrash'
+                      ? OT2_FIXED_TRASH_Y_DIMENSION
+                      : slot.boundingBox.yDimension
+                  }
                   innerDivProps={INNER_DIV_PROPS}
                 >
-                  <Icon
-                    name="check-circle"
-                    size="1.5rem"
+                  <Text
                     color={COLORS.white}
-                  />
-                  <Text color={COLORS.white} fontSize="1.5rem">
+                    css={
+                      robotType === FLEX_ROBOT_TYPE
+                        ? TYPOGRAPHY.level4HeaderSemiBold
+                        : TYPOGRAPHY.bodyTextSemiBold
+                    }
+                  >
                     Selected
                   </Text>
                 </RobotCoordsForeignDiv>
@@ -167,10 +218,13 @@ export function DeckLocationSelect({
             </React.Fragment>
           )
         })}
-      <SlotLabels
-        robotType={deckDef.robot.model}
-        color={COLORS.darkGreyEnabled}
-      />
+      {robotType === OT2_ROBOT_TYPE ? (
+        <DeckFromLayers
+          robotType={robotType}
+          layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
+        />
+      ) : null}
+      <SlotLabels robotType={robotType} color={COLORS.darkGreyEnabled} />
     </RobotCoordinateSpace>
   )
 }

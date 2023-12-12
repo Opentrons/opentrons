@@ -179,21 +179,21 @@ const COLUMN = 'COLUMN'
 const SINGLE = 'SINGLE'
 const ROW = 'ROW'
 const QUADRANT = 'QUADRANT'
-const EMPTY = 'EMPTY'
+const ALL = 'ALL'
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
   | typeof SINGLE
   | typeof ROW
   | typeof QUADRANT
-  | typeof EMPTY
+  | typeof ALL
 
 interface NozzleConfigurationParams {
-  primary_nozzle: string
+  primaryNozzle: string
   style: NozzleConfigurationStyle
 }
 
 interface ConfigureNozzleLayoutParams {
   pipetteId: string
-  configuration_params: NozzleConfigurationParams
+  configurationParams: NozzleConfigurationParams
 }

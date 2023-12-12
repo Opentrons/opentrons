@@ -15,6 +15,7 @@ import {
   TrashCutoutId,
   useOnClickOutside,
   WasteChuteFixture,
+  WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
   AdditionalEquipmentEntity,
@@ -38,7 +39,6 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { FLEX_TRASH_DEF_URI, OT_2_TRASH_DEF_URI } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
@@ -502,12 +502,11 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const trash = Object.values(activeDeckSetup.labware).find(
-    lw =>
-      lw.labwareDefURI === OT_2_TRASH_DEF_URI ||
-      lw.labwareDefURI === FLEX_TRASH_DEF_URI
+  const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
+    ae => ae.name === 'trashBin'
   )
-  const trashSlot = trash?.slot
+
+  const trashSlot = trash?.location
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
@@ -524,27 +523,38 @@ export const DeckSetup = (): JSX.Element => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
     },
   })
-
   const trashBinFixtures = [
     {
-      cutoutId:
-        trash?.slot != null
-          ? getCutoutIdForAddressableArea(
-              trash?.slot as AddressableAreaName,
-              deckDef.cutoutFixtures
-            )
-          : null,
+      cutoutId: trash?.location as CutoutId,
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     },
   ]
   const wasteChuteFixtures = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => WASTE_CHUTE_CUTOUT.includes(aE.location as CutoutId))
+  ).filter(
+    aE =>
+      WASTE_CHUTE_CUTOUT.includes(aE.location as CutoutId) &&
+      aE.name === 'wasteChute'
+  )
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
-  ).filter(aE => STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId))
+  ).filter(
+    aE =>
+      STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
+      aE.name === 'stagingArea'
+  )
 
-  const hasWasteChute = wasteChuteFixtures.length > 0
+  const wasteChuteStagingAreaFixtures = Object.values(
+    activeDeckSetup.additionalEquipmentOnDeck
+  ).filter(
+    aE =>
+      STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
+      aE.name === 'stagingArea' &&
+      aE.location === WASTE_CHUTE_CUTOUT
+  )
+
+  const hasWasteChute =
+    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
 
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
@@ -618,6 +628,15 @@ export const DeckSetup = (): JSX.Element => {
                     : null}
                   {wasteChuteFixtures.map(fixture => (
                     <WasteChuteFixture
+                      key={fixture.id}
+                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
+                      deckDefinition={deckDef}
+                      slotClipColor={darkFill}
+                      fixtureBaseColor={lightFill}
+                    />
+                  ))}
+                  {wasteChuteStagingAreaFixtures.map(fixture => (
+                    <WasteChuteStagingAreaFixture
                       key={fixture.id}
                       cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
                       deckDefinition={deckDef}

@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
+  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
@@ -130,7 +130,10 @@ export function DeckConfigurationEditor(): JSX.Element {
           />
         ) : null}
       </Portal>
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_AROUND}
+      >
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}
           onClickBack={handleClickBack}
@@ -138,12 +141,7 @@ export function DeckConfigurationEditor(): JSX.Element {
           onClickButton={handleClickConfirm}
           secondaryButtonProps={secondaryButtonProps}
         />
-        <Flex
-          marginTop="7.75rem"
-          paddingX={SPACING.spacing40}
-          paddingBottom={SPACING.spacing40}
-          justifyContent={JUSTIFY_CENTER}
-        >
+        <Flex marginTop="7.75rem" justifyContent={JUSTIFY_CENTER}>
           <DeckConfigurator
             deckConfig={currentDeckConfig}
             handleClickAdd={handleClickAdd}

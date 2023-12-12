@@ -5,6 +5,10 @@ import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+import {
+  getFixtureDisplayName,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
@@ -56,8 +60,9 @@ describe('Touchscreen AddFixtureModal', () => {
     )
     getByText('Staging area slot')
     getByText('Trash bin')
-    getByText('Waste chute only')
-    expect(getAllByText('Add').length).toBe(6)
+    getByText('Waste chute')
+    expect(getAllByText('Add').length).toBe(2)
+    expect(getAllByText('Select options').length).toBe(1)
   })
 
   it('should a mock function when tapping app button', () => {
@@ -92,8 +97,9 @@ describe('Desktop AddFixtureModal', () => {
     )
     getByText('Staging area slot')
     getByText('Trash bin')
-    getByText('Waste chute only')
-    expect(getAllByRole('button', { name: 'Add' }).length).toBe(6)
+    getByText('Waste chute')
+    expect(getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(getAllByRole('button', { name: 'Select options' }).length).toBe(1)
   })
 
   it('should render text and buttons slot A1', () => {
@@ -124,5 +130,30 @@ describe('Desktop AddFixtureModal', () => {
     const [{ getByRole }] = render(props)
     getByRole('button', { name: 'Add' }).click()
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
+  })
+
+  it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
+    const [{ getByText, getByRole, getAllByRole }] = render(props)
+    getByRole('button', { name: 'Select options' }).click()
+    expect(getAllByRole('button', { name: 'Add' }).length).toBe(
+      WASTE_CHUTE_FIXTURES.length
+    )
+
+    WASTE_CHUTE_FIXTURES.forEach(cutoutId => {
+      const displayText = getFixtureDisplayName(cutoutId)
+      getByText(displayText)
+    })
+  })
+
+  it('should allow a user to exit the Waste Chute submenu by clicking "go back"', () => {
+    const [{ getByText, getByRole, getAllByRole }] = render(props)
+    getByRole('button', { name: 'Select options' }).click()
+
+    getByText('Go back').click()
+    getByText('Staging area slot')
+    getByText('Trash bin')
+    getByText('Waste chute')
+    expect(getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(getAllByRole('button', { name: 'Select options' }).length).toBe(1)
   })
 })

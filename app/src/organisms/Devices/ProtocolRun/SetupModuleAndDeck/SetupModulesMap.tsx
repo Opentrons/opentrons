@@ -10,9 +10,9 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { getSimplestDeckConfigForProtocolCommands } from '../../../../resources/deck_configuration/utils'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getAttachedProtocolModuleMatches } from '../../../ProtocolSetupModulesAndDeck/utils'
 import { ModuleInfo } from '../../ModuleInfo'
@@ -51,7 +51,7 @@ export const SetupModulesMap = ({
     protocolModulesInfo
   )
 
-  const moduleLocations = attachedProtocolModuleMatches.map(module => ({
+  const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
     moduleModel: module.moduleDef.model,
     moduleLocation: { slotName: module.slotName },
     moduleChildren: (
@@ -64,9 +64,7 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis.commands
-  )
+  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
     <Flex
@@ -83,8 +81,8 @@ export const SetupModulesMap = ({
           }))}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           robotType={robotType}
-          labwareLocations={[]}
-          moduleLocations={moduleLocations}
+          labwareOnDeck={[]}
+          modulesOnDeck={modulesOnDeck}
         />
       </Box>
     </Flex>

@@ -1,5 +1,6 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
+  | AspirateInPlaceRunTimeCommand
   | AspirateRunTimeCommand
   | AspirateInPlaceRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
@@ -12,6 +13,8 @@ export type PipettingRunTimeCommand =
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
   | TouchTipRunTimeCommand
+  | GetTipPresenceRunTimeCommand
+  | VerifyTipPresenceRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -26,6 +29,8 @@ export type PipettingCreateCommand =
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
   | TouchTipCreateCommand
+  | GetTipPresenceCreateCommand
+  | VerifyTipPresenceCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -151,6 +156,29 @@ export interface PrepareToAspirateRunTimeCommand
   result?: any
 }
 
+export interface GetTipPresenceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'getTipPresence'
+  params: PipetteIdentityParams
+}
+
+export interface GetTipPresenceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    GetTipPresenceCreateCommand {
+  result?: TipPresenceResult
+}
+
+export interface VerifyTipPresenceCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'verifyTipPresence'
+  params: VerifyTipPresenceParams
+}
+
+export interface VerifyTipPresenceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    VerifyTipPresenceCreateCommand {
+  result?: any
+}
+
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -222,6 +250,15 @@ interface WellLocationParam {
   }
 }
 
+interface VerifyTipPresenceParams extends PipetteIdentityParams {
+  expectedState?: 'present' | 'absent'
+}
+
 interface BasicLiquidHandlingResult {
   volume: number // Amount of liquid in uL handled in the operation
+}
+
+interface TipPresenceResult {
+  // ot2 should alwasy return unknown
+  status?: 'present' | 'absent' | 'unknown'
 }

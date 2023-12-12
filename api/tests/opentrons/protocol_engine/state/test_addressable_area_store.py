@@ -8,18 +8,14 @@ from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.actions import UpdateCommandAction
-from opentrons.protocol_engine.errors import (
-    # AreaNotInDeckConfigurationError,
-    IncompatibleAddressableAreaError,
-)
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.addressable_areas import (
     AddressableAreaStore,
     AddressableAreaState,
 )
 from opentrons.protocol_engine.types import (
-    DeckConfigurationType,
     DeckType,
+    DeckConfigurationType,
     ModuleModel,
     LabwareMovementStrategy,
     DeckSlotLocation,
@@ -30,6 +26,7 @@ from .command_fixtures import (
     create_load_labware_command,
     create_load_module_command,
     create_move_labware_command,
+    create_move_to_addressable_area_command,
 )
 
 
@@ -91,6 +88,8 @@ def test_initial_state_simulated(
         loaded_addressable_areas_by_name={},
         potential_cutout_fixtures_by_cutout_id={},
         deck_definition=ot3_standard_deck_def,
+        deck_configuration=[],
+        robot_type="OT-3 Standard",
         use_simulated_deck_config=True,
     )
 
@@ -103,8 +102,9 @@ def test_initial_state(
     assert subject.state.potential_cutout_fixtures_by_cutout_id == {}
     assert not subject.state.use_simulated_deck_config
     assert subject.state.deck_definition == ot3_standard_deck_def
-    # Loading 9 regular slots, 1 trash, 2 Staging Area slots and 3 waste chute types
-    assert len(subject.state.loaded_addressable_areas_by_name) == 15
+    assert subject.state.deck_configuration == _make_deck_config()
+    # Loading 9 regular slots, 1 trash, 2 Staging Area slots and 4 waste chute types
+    assert len(subject.state.loaded_addressable_areas_by_name) == 16
 
 
 @pytest.mark.parametrize(
@@ -160,6 +160,12 @@ def test_initial_state(
             ),
             "A4",
         ),
+        (
+            create_move_to_addressable_area_command(
+                pipette_id="pipette-id", addressable_area_name="gripperWasteChute"
+            ),
+            "gripperWasteChute",
+        ),
     ),
 )
 def test_addressable_area_referencing_commands_load_on_simulated_deck(
@@ -172,51 +178,6 @@ def test_addressable_area_referencing_commands_load_on_simulated_deck(
         UpdateCommandAction(private_result=None, command=command)
     )
     assert expected_area in simulated_subject.state.loaded_addressable_areas_by_name
-
-
-@pytest.mark.parametrize(
-    "command",
-    (
-        create_load_labware_command(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-            labware_id="test-labware-id",
-            definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-                parameters=Parameters.construct(loadName="blah"),  # type: ignore[call-arg]
-                namespace="bleh",
-                version=123,
-            ),
-            offset_id="offset-id",
-            display_name="display-name",
-        ),
-        create_load_module_command(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-            module_id="test-module-id",
-            model=ModuleModel.TEMPERATURE_MODULE_V2,
-        ),
-        create_move_labware_command(
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-            strategy=LabwareMovementStrategy.USING_GRIPPER,
-        ),
-    ),
-)
-def test_handles_command_simulated_raises(
-    command: Command,
-    simulated_subject: AddressableAreaStore,
-) -> None:
-    """It should raise when two incompatible areas are referenced."""
-    initial_command = create_move_labware_command(
-        new_location=AddressableAreaLocation(addressableAreaName="gripperWasteChute"),
-        strategy=LabwareMovementStrategy.USING_GRIPPER,
-    )
-
-    simulated_subject.handle_action(
-        UpdateCommandAction(private_result=None, command=initial_command)
-    )
-
-    with pytest.raises(IncompatibleAddressableAreaError):
-        simulated_subject.handle_action(
-            UpdateCommandAction(private_result=None, command=command)
-        )
 
 
 @pytest.mark.parametrize(
@@ -282,38 +243,3 @@ def test_addressable_area_referencing_commands_load(
     """It should check that the addressable area is in the deck config."""
     subject.handle_action(UpdateCommandAction(private_result=None, command=command))
     assert expected_area in subject.state.loaded_addressable_areas_by_name
-
-
-# TODO Uncomment this out once this check is back in
-# @pytest.mark.parametrize(
-#     "command",
-#     (
-#         create_load_labware_command(
-#             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-#             labware_id="test-labware-id",
-#             definition=LabwareDefinition.construct(  # type: ignore[call-arg]
-#                 parameters=Parameters.construct(loadName="blah"),  # type: ignore[call-arg]
-#                 namespace="bleh",
-#                 version=123,
-#             ),
-#             offset_id="offset-id",
-#             display_name="display-name",
-#         ),
-#         create_load_module_command(
-#             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-#             module_id="test-module-id",
-#             model=ModuleModel.TEMPERATURE_MODULE_V2,
-#         ),
-#         create_move_labware_command(
-#             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-#             strategy=LabwareMovementStrategy.USING_GRIPPER,
-#         ),
-#     ),
-# )
-# def test_handles_load_labware_raises(
-#     command: Command,
-#     subject: AddressableAreaStore,
-# ) -> None:
-#     """It should raise when referencing an addressable area not in the deck config."""
-#     with pytest.raises(AreaNotInDeckConfigurationError):
-#         subject.handle_action(UpdateCommandAction(private_result=None, command=command))

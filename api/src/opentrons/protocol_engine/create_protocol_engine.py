@@ -106,6 +106,9 @@ async def _protocol_engine(
         load_fixed_trash=load_fixed_trash,
     )
     try:
+        # TODO(mm, 2023-11-21): Callers like opentrons.execute need to be able to pass in
+        # the deck_configuration argument to ProtocolEngine.play().
+        # https://opentrons.atlassian.net/browse/RSS-400
         protocol_engine.play()
         yield protocol_engine
     finally:

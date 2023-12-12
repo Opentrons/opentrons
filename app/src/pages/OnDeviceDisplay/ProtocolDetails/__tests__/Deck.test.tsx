@@ -8,7 +8,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
-import { DeckThumbnail } from '../../../../molecules/DeckThumbnail'
 import { Deck } from '../Deck'
 
 import type { UseQueryResult } from 'react-query'
@@ -16,11 +15,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { Protocol } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../molecules/DeckThumbnail')
 
-const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
-  typeof DeckThumbnail
->
 const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
   typeof useProtocolAnalysisAsDocumentQuery
 >
@@ -134,6 +129,7 @@ const MOCK_PROTOCOL_ANALYSIS = {
       completedAt: '2022-09-07T19:47:42.786412+00:00',
     },
   ],
+  labware: [],
   liquids: [
     {
       id: '1',
@@ -162,7 +158,6 @@ describe('Deck', () => {
     props = {
       protocolId: MOCK_PROTOCOL_ID,
     }
-    mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
     when(mockUseProtocolQuery)
       .calledWith(MOCK_PROTOCOL_ID)
       .mockReturnValue({
@@ -183,7 +178,7 @@ describe('Deck', () => {
   })
 
   it('renders deck view section', () => {
-    const { getByText } = render(props)[0]
-    expect(getByText('mock Deck Thumbnail')).toBeInTheDocument()
+    const { getByLabelText } = render(props)[0]
+    expect(getByLabelText('protocol deck map')).toBeInTheDocument()
   })
 })
