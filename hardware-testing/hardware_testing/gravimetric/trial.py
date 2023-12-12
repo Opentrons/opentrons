@@ -242,9 +242,6 @@ def _finish_test(
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
             trash = resources.pipette.trash_container.wells()[0]
-            dispense_location = trash.top()
-            if resources.pipette.channels == 96:
-                dispense_location = dispense_location.move(Point(-36.0, -25.5, 0))
             # FIXME: this should be a blow_out() at max volume,
             #        but that is not available through PyAPI yet
             #        so instead just dispensing.
