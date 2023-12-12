@@ -37,7 +37,7 @@ class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
 
 
 class PipetteMovementNotAllowed(MotionPlanningFailureError):
-    """Error raised when trying to perform a pipette movement to a tiprack beased on adapter status."""
+    """Error raised when trying to perform a pipette movement to a tip rack, based on adapter status."""
 
     def __init__(self, message: str) -> None:
         super().__init__(
@@ -216,13 +216,13 @@ def check_safe_for_tip_pickup_and_return(
         adapter_height = engine_state.labware.get_dimensions(tiprack_parent.labwareId).z
         if is_partial_config and tiprack_height < adapter_height:
             raise PartialTipMovementNotAllowedError(
-                f"Tiprack {tiprack_name} cannot be on an adapter taller than the tiprack"
-                f"  when the 96-channel is configured for using partial nozzles."
+                f"Tip rack {tiprack_name} cannot be on an adapter taller than the tip rack"
+                f" when picking up fewer than 96 tips."
             )
         elif not is_partial_config and tiprack_height > adapter_height:
             raise PipetteMovementNotAllowed(
-                f"Tiprack {tiprack_name} must be on a Flex Tiprack Adapter (or similar)"
-                f" in order to pick up or return tips with all 96-channel nozzles."
+                f"Tip rack {tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+                f" in order to pick up or return 96 tips simultaneously."
             )
 
     elif (
