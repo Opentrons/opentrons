@@ -241,7 +241,7 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully calibrated')
     const image = getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
@@ -256,7 +256,7 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully calibrated')
     const image = getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
@@ -271,7 +271,7 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     const { getByText, getByRole } = render(props)
-    getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    getByText('Flex 1-Channel 1000 μL successfully calibrated')
     const image = getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })

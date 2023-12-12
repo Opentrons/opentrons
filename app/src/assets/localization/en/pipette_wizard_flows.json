@@ -56,7 +56,7 @@
   "ninety_six_detached_success": "{{pipetteName}} pipette successfully detached",
   "ninety_six_probe_location": "A1 (back left corner)",
   "pip_cal_failed": "pipette calibration failed",
-  "pip_cal_success": "{{pipetteName}} successfully attached and calibrated",
+  "pip_cal_success": "{{pipetteName}} successfully calibrated",
   "pip_recal_success": "{{pipetteName}} successfully recalibrated",
   "pipette_attached": "{{pipetteName}} successfully attached",
   "pipette_calibrating": "Stand back, {{pipetteName}} is calibrating",
