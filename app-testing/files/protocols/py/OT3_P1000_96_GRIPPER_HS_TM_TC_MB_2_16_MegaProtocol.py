@@ -1,3 +1,4 @@
+
 from opentrons import protocol_api
 
 metadata = {
@@ -21,24 +22,22 @@ PREFER_MOVE_OFF_DECK = True
 ### CONSTANTS ###
 #################
 
+HEATER_SHAKER_ADAPTER_NAME = "opentrons_96_pcr_adapter"
 HEATER_SHAKER_NAME = "heaterShakerModuleV1"
 MAGNETIC_BLOCK_NAME = "magneticBlockV1"
-PCR_PLATE_96_NAME = "nest_96_wellplate_100ul_pcr_full_skirt"
-STARTING_VOL = 100
+TEMPERATURE_MODULE_ADAPTER_NAME = "opentrons_96_well_aluminum_block"
 TEMPERATURE_MODULE_NAME = "temperature module gen2"
 THERMOCYCLER_NAME = "thermocycler module gen2"
+
+PCR_PLATE_96_NAME = "nest_96_wellplate_100ul_pcr_full_skirt"
+RESERVOIR_NAME = "nest_1_reservoir_290ml"
+TIPRACK_96_ADAPTER_NAME = "opentrons_flex_96_tiprack_adapter"
 TIPRACK_96_NAME = "opentrons_flex_96_tiprack_1000ul"
-TRANSFER_VOL = 10
+
+PIPETTE_96_CHANNEL_NAME = "flex_96channel_1000"
+
 USING_GRIPPER = True
 RESET_AFTER_EACH_MOVE = True
-DONT_RESET_AFTER_EACH_MOVE = False
-
-TIP_RACK_LOCATION_1 = "C3"
-TIP_RACK_LOCATION_2 = "D2"
-
-
-def default_well(tiprack: protocol_api.labware) -> protocol_api.labware.Well:
-    return tiprack["A1"]
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -65,8 +64,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### MODULE ADAPTERS ###
     #######################
 
-    temperature_module_adapter = temperature_module.load_adapter("opentrons_96_well_aluminum_block")
-    heater_shaker_adapter = heater_shaker.load_adapter("opentrons_96_pcr_adapter")
+    temperature_module_adapter = temperature_module.load_adapter(TEMPERATURE_MODULE_ADAPTER_NAME)
+    heater_shaker_adapter = heater_shaker.load_adapter(HEATER_SHAKER_ADAPTER_NAME)
 
     adapters = [temperature_module_adapter, heater_shaker_adapter]
 
@@ -74,11 +73,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### LABWARE ###
     ###############
 
-    source_reservoir = ctx.load_labware("nest_1_reservoir_290ml", "D2")
+    source_reservoir = ctx.load_labware(RESERVOIR_NAME, "D2")
     dest_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "C2")
 
     tip_rack_1 = ctx.load_labware(
-        TIPRACK_96_NAME, "A2", adapter="opentrons_flex_96_tiprack_adapter"
+        TIPRACK_96_NAME, "A2", adapter=TIPRACK_96_ADAPTER_NAME
     )
     tip_rack_adapter = tip_rack_1.parent
     
@@ -95,21 +94,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### PIPETTE DEFINITION ###
     ##########################
 
-    pipette_96_channel = ctx.load_instrument("flex_96channel_1000", mount="left", tip_racks=tip_racks)
+    pipette_96_channel = ctx.load_instrument(PIPETTE_96_CHANNEL_NAME, mount="left", tip_racks=tip_racks)
 
     ########################
     ### LOAD SOME LIQUID ###
     ########################
 
     water = ctx.define_liquid(name="water", description="High Quality H₂O", display_color="#42AB2D")
-
-    acetone = ctx.define_liquid(name="acetone", description="C₃H₆O", display_color="#38588a")
-
-    [
-        well.load_liquid(liquid=water if i % 2 == 0 else acetone, volume=STARTING_VOL)
-        for i, column in enumerate(source_reservoir.columns())
-        for well in column
-    ]
+    source_reservoir.wells_by_name()["A1"].load_liquid(liquid=water, volume=29000)
 
     ################################
     ### GRIPPER LABWARE MOVEMENT ###
