@@ -330,6 +330,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :type rate: float
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                          leaves the tip. Measured in µL. The default value is ``None``.
+                         
+                         See :ref:`push-out-dispense` for details.
         :type push_out: float
 
         :returns: This instance.
@@ -340,6 +342,9 @@ class InstrumentContext(publisher.CommandPublisher):
             that argument as ``volume``. If you want to call ``dispense`` with only
             ``location``, specify it as a keyword argument:
             ``pipette.dispense(location=plate['A1'])``.
+
+        .. versionchanged:: 2.15
+            Added the ``push_out`` parameter.
 
         """
         if self.api_version < APIVersion(2, 15) and push_out:
