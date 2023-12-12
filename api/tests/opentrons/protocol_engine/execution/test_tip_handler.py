@@ -8,6 +8,7 @@ from contextlib import nullcontext as does_not_raise
 from opentrons.types import Mount, MountType
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import TipStateType
+from opentrons.hardware_control.protocols.types import OT2RobotType, FlexRobotType
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.state import StateView
@@ -27,7 +28,9 @@ from opentrons.protocol_engine.execution.tip_handler import (
 @pytest.fixture
 def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
     """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
+    mock = decoy.mock(cls=HardwareAPI)
+    decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
+    return mock
 
 
 @pytest.fixture
@@ -365,6 +368,7 @@ async def test_get_tip_presence_on_ot3(
         from opentrons.hardware_control.ot3api import OT3API
 
         ot3_hardware_api = decoy.mock(cls=OT3API)
+        decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
 
         subject = HardwareTipHandler(
             state_view=mock_state_view,
@@ -399,6 +403,7 @@ async def test_verify_tip_presence_on_ot3(
         from opentrons.hardware_control.ot3api import OT3API
 
         ot3_hardware_api = decoy.mock(cls=OT3API)
+        decoy.when(ot3_hardware_api.get_robot_type()).then_return(FlexRobotType)
 
         subject = HardwareTipHandler(
             state_view=mock_state_view,
