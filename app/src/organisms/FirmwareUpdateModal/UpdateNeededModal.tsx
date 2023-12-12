@@ -28,7 +28,7 @@ interface UpdateNeededModalProps {
 export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
-  const [updateId, setUpdateId] = React.useState('')
+  const [updateId, setUpdateId] = React.useState<string | null>(null)
   const {
     data: instrumentsData,
     refetch: refetchInstruments,
