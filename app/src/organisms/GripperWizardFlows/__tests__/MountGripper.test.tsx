@@ -71,26 +71,15 @@ describe('MountGripper', () => {
       data: null,
     } as any)
     render()
-    const continueButton = screen.getByRole('button', { name: 'Continue' })
-    fireEvent.click(continueButton)
-    await waitFor(() =>
-      expect(mockProceed).not.toHaveBeenCalled()
-    )
-    screen.getByText('Unable to detect Gripper')
-    let tryAgainButton = screen.getByRole('button', { name: 'Try again' })
-    fireEvent.click(tryAgainButton)
-    await waitFor(() =>
-      expect(mockProceed).not.toHaveBeenCalled()
-    )
-    tryAgainButton = screen.getByRole('button', { name: 'Try again' })
-    fireEvent.click(tryAgainButton)
-    const goBackButton = screen.getByRole('button', { name: 'Go back' })
-    fireEvent.click(goBackButton)
-    const nextContinue = screen.getByRole('button', { name: 'Continue' })
-    fireEvent.click(nextContinue)
-    await waitFor(() =>
-      expect(mockProceed).not.toHaveBeenCalled()
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
+    await waitFor(() => expect(screen.getByText('Unable to detect Gripper')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
   })
 
   it('renders correct text', () => {

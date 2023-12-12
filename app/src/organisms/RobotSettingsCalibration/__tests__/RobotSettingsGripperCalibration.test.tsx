@@ -88,7 +88,7 @@ describe('RobotSettingsGripperCalibration', () => {
     })
     fireEvent.click(overflowButton)
     const calibrateButton = screen.getByText('Calibrate gripper')
-    calibrateButton.click()
+    fireEvent.click(calibrateButton)
     screen.getByText('Mock Wizard Flow')
   })
 
