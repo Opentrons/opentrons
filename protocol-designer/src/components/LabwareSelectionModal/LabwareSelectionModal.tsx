@@ -210,9 +210,9 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
       const { dimensions, parameters } = labwareDef
       const { xDimension, yDimension } = dimensions
 
-      const smallXDimension = xDimension < 127.75
-      const smallYDimension = yDimension < 85.48
-      const irregularSize = smallXDimension && smallYDimension
+      const isSmallXDimension = xDimension < 127.75
+      const isSmallYDimension = yDimension < 85.48
+      const isIrregularSize = isSmallXDimension && isSmallYDimension
 
       const isAdapter = labwareDef.allowedRoles?.includes('adapter')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
@@ -227,7 +227,7 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
           )) ||
         !getLabwareCompatible(labwareDef) ||
         (isAdapter &&
-          irregularSize &&
+          isIrregularSize &&
           !slot?.includes(HEATERSHAKER_MODULE_TYPE)) ||
         (isAdapter96Channel && !has96Channel) ||
         (slot === 'offDeck' && isAdapter)
