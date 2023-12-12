@@ -39,7 +39,7 @@ export function UpdateResultsModal(
 
   return (
     <>
-      {!isSuccess || instrument?.ok !== true ? (
+      {!isSuccess ? (
         <Modal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" marginBottom={SPACING.spacing32}>

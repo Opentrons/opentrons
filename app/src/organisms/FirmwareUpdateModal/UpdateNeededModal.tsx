@@ -98,7 +98,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
         subsystem={subsystem}
       />
     )
-  } else if (status === 'done' || instrument?.ok) {
+  } else if (status === 'done') {
     modalContent = (
       <UpdateResultsModal
         instrument={instrument}
