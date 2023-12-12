@@ -985,7 +985,7 @@ def test_find_applicable_labware_offset() -> None:
     )
 
 
-def test_get_display_name() -> None:
+def test_get_user_specified_display_name() -> None:
     """It should get a labware's user-specified display name."""
     subject = get_labware_view(
         labware_by_id={
@@ -994,8 +994,38 @@ def test_get_display_name() -> None:
         },
     )
 
-    assert subject.get_display_name("plate_with_display_name") == "Fancy Plate Name"
-    assert subject.get_display_name("reservoir_without_display_name") is None
+    assert (
+        subject.get_user_specified_display_name("plate_with_display_name")
+        == "Fancy Plate Name"
+    )
+    assert (
+        subject.get_user_specified_display_name("reservoir_without_display_name")
+        is None
+    )
+
+
+def test_get_display_name(
+    well_plate_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+) -> None:
+    """It should get the labware's display name."""
+    subject = get_labware_view(
+        labware_by_id={
+            "plate_with_custom_display_name": plate,
+            "reservoir_with_default_display_name": reservoir,
+        },
+        definitions_by_uri={
+            "some-plate-uri": well_plate_def,
+            "some-reservoir-uri": reservoir_def,
+        },
+    )
+    assert (
+        subject.get_display_name("plate_with_custom_display_name") == "Fancy Plate Name"
+    )
+    assert (
+        subject.get_display_name("reservoir_with_default_display_name")
+        == "NEST 12 Well Reservoir 15 mL"
+    )
 
 
 def test_get_fixed_trash_id() -> None:
