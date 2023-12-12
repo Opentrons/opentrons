@@ -49,7 +49,6 @@ def create_worker_thread(
     may be required to allow clients to process data in time, since many desktop
     OS serial drivers do not have very large data buffers.
     """
-
     queue: QUEUE_TYPE = Queue(QUEUE_MAX_ITEMS)
     thread = threading.Thread(
         target=_worker,

@@ -113,9 +113,11 @@ export function createSerialPortListMonitor(
 class SerialPortSocket extends SerialPort {
   // added these to squash keepAlive errors
   setKeepAlive(): void {}
+
   unref(): SerialPortSocket {
     return this
   }
+
   setTimeout(): void {}
 
   ref(): SerialPortSocket {
