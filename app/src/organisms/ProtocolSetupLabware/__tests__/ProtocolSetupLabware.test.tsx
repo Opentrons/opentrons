@@ -7,8 +7,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -25,7 +24,6 @@ import {
 } from '../__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -36,9 +34,6 @@ const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.Mo
 >
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
   typeof useModulesQuery
->
-const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
-  typeof getDeckDefFromRobotType
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
@@ -72,9 +67,6 @@ describe('ProtocolSetupLabware', () => {
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue(mockRecentAnalysis)
-    when(mockGetDeckDefFromRobotType)
-      .calledWith('OT-3 Standard')
-      .mockReturnValue(ot3StandardDeckDef as any)
     when(mockGetProtocolModulesInfo)
       .calledWith(mockRecentAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue(mockProtocolModuleInfo)
@@ -94,7 +86,7 @@ describe('ProtocolSetupLabware', () => {
   it('renders the Labware Setup page', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Labware')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Location')
     getByRole('button', { name: 'Map View' })
   })

@@ -70,12 +70,12 @@ export interface GripperWizardStepProps {
   flowType: GripperWizardFlowType
   proceed: () => void
   goBack: () => void
-  chainRunCommands: (
+  chainRunCommands?: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  maintenanceRunId: string
+  maintenanceRunId?: string
   attachedGripper: {} | null
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void

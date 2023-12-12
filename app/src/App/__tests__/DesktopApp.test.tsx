@@ -13,11 +13,11 @@ import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
-import { Alerts } from '../../organisms/Alerts'
+import { AlertsModal } from '../../organisms/Alerts/AlertsModal'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useSoftwareUpdatePoll } from '../hooks'
 import { DesktopApp } from '../DesktopApp'
 
-jest.mock('../../organisms/Alerts')
 jest.mock('../../organisms/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/AppSettings/GeneralSettings')
@@ -28,6 +28,7 @@ jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../hooks')
+jest.mock('../../organisms/Alerts/AlertsModal')
 
 const mockCalibrationDashboard = CalibrationDashboard as jest.MockedFunction<
   typeof CalibrationDashboard
@@ -47,14 +48,15 @@ const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
 const mockRobotSettings = RobotSettings as jest.MockedFunction<
   typeof RobotSettings
 >
-const mockAlerts = Alerts as jest.MockedFunction<typeof Alerts>
 const mockAppSettings = GeneralSettings as jest.MockedFunction<
   typeof GeneralSettings
 >
+const mockAlertsModal = AlertsModal as jest.MockedFunction<typeof AlertsModal>
 const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 const mockUseSoftwareUpdatePoll = useSoftwareUpdatePoll as jest.MockedFunction<
   typeof useSoftwareUpdatePoll
 >
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -75,9 +77,10 @@ describe('DesktopApp', () => {
     mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
     mockProtocolRunDetails.mockReturnValue(<div>Mock ProtocolRunDetails</div>)
     mockRobotSettings.mockReturnValue(<div>Mock RobotSettings</div>)
-    mockAlerts.mockReturnValue(<div>Mock Alerts</div>)
     mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
     mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
+    mockAlertsModal.mockReturnValue(<></>)
+    mockUseIsFlex.mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -124,11 +127,6 @@ describe('DesktopApp', () => {
       '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
     )
     getByText('Mock ProtocolRunDetails')
-  })
-
-  it('should render app-wide Alerts', () => {
-    const [{ getByText }] = render()
-    getByText('Mock Alerts')
   })
 
   it('should poll for software updates', () => {

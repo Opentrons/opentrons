@@ -9,13 +9,13 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { DeviceDetailsDeckConfiguration } from '../../../organisms/DeviceDetailsDeckConfiguration'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
-
-const ESTOP_STATUS_REFETCH_INTERVAL = 10000
+import { useIsFlex } from '../../../organisms/Devices/hooks'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -24,8 +24,9 @@ interface DeviceDetailsComponentProps {
 export function DeviceDetailsComponent({
   robotName,
 }: DeviceDetailsComponentProps): JSX.Element {
-  const { data: estopStatus } = useEstopQuery({
-    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
+  const isFlex = useIsFlex(robotName)
+  const { data: estopStatus, error: estopError } = useEstopQuery({
+    enabled: isFlex,
   })
   const { isEmergencyStopModalDismissed } = useEstopContext()
 
@@ -37,7 +38,9 @@ export function DeviceDetailsComponent({
       paddingTop={SPACING.spacing16}
       paddingBottom={SPACING.spacing48}
     >
-      {estopStatus?.data.status !== DISENGAGED &&
+      {isFlex &&
+      estopStatus?.data.status !== DISENGAGED &&
+      estopError == null &&
       isEmergencyStopModalDismissed ? (
         <Flex marginBottom={SPACING.spacing16}>
           <EstopBanner status={estopStatus?.data.status} />
@@ -57,6 +60,7 @@ export function DeviceDetailsComponent({
         <RobotOverview robotName={robotName} />
         <InstrumentsAndModules robotName={robotName} />
       </Flex>
+      {isFlex ? <DeviceDetailsDeckConfiguration robotName={robotName} /> : null}
       <RecentProtocolRuns robotName={robotName} />
     </Box>
   )

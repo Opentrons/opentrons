@@ -16,9 +16,10 @@ import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { LEFT } from '../../../redux/pipettes'
 import {
   useAttachedPipettes,
-  useIsOT3,
+  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../organisms/Devices/hooks'
 
@@ -65,11 +66,14 @@ export function PipetteOffsetCalibrationItems({
   })
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
   const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
-  const isOT3 = useIsOT3(robotName)
-  const attachedPipettes = Boolean(isOT3)
+  const isFlex = useIsFlex(robotName)
+  const attachedPipettes = isFlex
     ? attachedPipetteFromInstrumentQuery
     : attachedPipettesFromPipetteQuery
 
+  const is96Attached =
+    // @ts-expect-error isFlex is a type narrower but not recognized as one
+    isFlex && attachedPipettes?.[LEFT]?.instrumentName === 'p1000_96'
   return (
     <StyledTable>
       <thead>
@@ -77,7 +81,9 @@ export function PipetteOffsetCalibrationItems({
           <StyledTableHeader>{t('model_and_serial')}</StyledTableHeader>
           <StyledTableHeader>{t('mount')}</StyledTableHeader>
           {/* omit tip rack column for OT-3 */}
-          {isOT3 ? null : <StyledTableHeader>{t('tiprack')}</StyledTableHeader>}
+          {isFlex ? null : (
+            <StyledTableHeader>{t('tiprack')}</StyledTableHeader>
+          )}
           <StyledTableHeader>{t('last_calibrated_label')}</StyledTableHeader>
         </tr>
       </thead>
@@ -95,10 +101,10 @@ export function PipetteOffsetCalibrationItems({
                     as="p"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                   >
-                    {calibration.mount}
+                    {is96Attached ? t('both') : calibration.mount}
                   </StyledText>
                 </StyledTableCell>
-                {isOT3 ? null : (
+                {isFlex ? null : (
                   <StyledTableCell>
                     <StyledText as="p">
                       {calibration.tiprack != null &&
@@ -140,7 +146,7 @@ export function PipetteOffsetCalibrationItems({
                     serialNumber={calibration.serialNumber ?? null}
                     updateRobotStatus={updateRobotStatus}
                     pipetteName={
-                      isOT3
+                      isFlex
                         ? attachedPipetteFromInstrumentQuery[calibration.mount]
                             ?.instrumentName ?? null
                         : attachedPipettesFromPipetteQuery[calibration.mount]

@@ -28,7 +28,12 @@ import {
   getDevtoolsEnabled,
   getFeatureFlags,
   toggleDevInternalFlag,
+  toggleDevtools,
+  toggleHistoricOffsets,
 } from '../../../redux/config'
+import { StyledText } from '../../../atoms/text'
+import { InlineNotification } from '../../../atoms/InlineNotification'
+import { getRobotSettings, updateSetting } from '../../../redux/robot-settings'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
@@ -38,21 +43,30 @@ import { RobotSettingButton } from './RobotSettingButton'
 
 import type { Dispatch, State } from '../../../redux/types'
 import type { SetSettingOption } from './'
-import { StyledText } from '../../../atoms/text'
 
+const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
 }
 
 export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { setCurrentOption } = props
-  const { t } = useTranslation(['device_settings', 'app_settings'])
+  const { t, i18n } = useTranslation(['device_settings', 'app_settings'])
+  const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
 
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
+
+  const allRobotSettings = useSelector((state: State) =>
+    getRobotSettings(state, robotName)
+  )
+
+  const isHomeGantryOn =
+    allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??
+    false
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
@@ -63,85 +77,117 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
         <RobotSettingButton
           settingName={t('network_settings')}
+          dataTestId="RobotSettingButton_network_settings"
           settingInfo={networkConnection?.connectionStatus}
-          currentOption="NetworkSettings"
-          setCurrentOption={setCurrentOption}
+          onClick={() => setCurrentOption('NetworkSettings')}
           iconName="wifi"
         />
         <Link to="/robot-settings/rename-robot">
           <RobotSettingButton
             settingName={t('robot_name')}
             settingInfo={robotName}
-            currentOption="RobotName"
-            setCurrentOption={setCurrentOption}
+            onClick={() => setCurrentOption('RobotName')}
             iconName="flex-robot"
           />
         </Link>
         <RobotSettingButton
           settingName={t('robot_system_version')}
+          dataTestId="RobotSettingButton_robot_system_version"
           settingInfo={
             robotServerVersion != null
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')
           }
-          currentOption="RobotSystemVersion"
-          setCurrentOption={setCurrentOption}
-          isUpdateAvailable={isUpdateAvailable}
+          onClick={() => setCurrentOption('RobotSystemVersion')}
           iconName="update"
+          rightElement={
+            <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
+              {isUpdateAvailable ? (
+                <InlineNotification
+                  type="alert"
+                  heading={i18n.format(
+                    t('app_settings:update_available'),
+                    'capitalize'
+                  )}
+                  hug={true}
+                />
+              ) : null}
+              <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
+            </Flex>
+          }
         />
         <RobotSettingButton
           settingName={t('display_led_lights')}
+          dataTestId="RobotSettingButton_display_led_lights"
           settingInfo={t('display_led_lights_description')}
-          setCurrentOption={setCurrentOption}
           iconName="light"
-          ledLights
-          lightsOn={lightsEnabled}
-          toggleLights={toggleLights}
+          rightElement={<OnOffToggle isOn={lightsEnabled} />}
+          onClick={toggleLights}
         />
         <RobotSettingButton
           settingName={t('touchscreen_sleep')}
-          currentOption="TouchscreenSleep"
-          setCurrentOption={setCurrentOption}
+          dataTestId="RobotSettingButton_touchscreen_sleep"
+          onClick={() => setCurrentOption('TouchscreenSleep')}
           iconName="sleep"
         />
         <RobotSettingButton
           settingName={t('touchscreen_brightness')}
-          currentOption="TouchscreenBrightness"
-          setCurrentOption={setCurrentOption}
+          dataTestId="RobotSettingButton_touchscreen_brightness"
+          onClick={() => setCurrentOption('TouchscreenBrightness')}
           iconName="brightness"
         />
         <RobotSettingButton
+          settingName={t('app_settings:privacy')}
+          dataTestId="RobotSettingButton_privacy"
+          settingInfo={t('app_settings:choose_what_data_to_share')}
+          onClick={() => setCurrentOption('Privacy')}
+          iconName="privacy"
+        />
+        <RobotSettingButton
           settingName={t('apply_historic_offsets')}
+          dataTestId="RobotSettingButton_apply_historic_offsets"
           settingInfo={t('historic_offsets_description')}
           iconName="reticle"
-          enabledHistoricOffests
-          historicOffsetsOn={historicOffsetsOn}
+          rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
+          onClick={() => dispatch(toggleHistoricOffsets())}
         />
         <RobotSettingButton
           settingName={t('device_reset')}
-          currentOption="DeviceReset"
-          setCurrentOption={setCurrentOption}
+          dataTestId="RobotSettingButton_device_reset"
+          onClick={() => setCurrentOption('DeviceReset')}
           iconName="reset"
         />
         <RobotSettingButton
+          settingName={t('gantry_homing')}
+          dataTestId="RobotSettingButton_home_gantry_on_restart"
+          settingInfo={t('gantry_homing_description')}
+          iconName="gantry-homing"
+          rightElement={<OnOffToggle isOn={!isHomeGantryOn} />}
+          onClick={() =>
+            dispatch(
+              updateSetting(robotName, HOME_GANTRY_SETTING_ID, !isHomeGantryOn)
+            )
+          }
+        />
+        <RobotSettingButton
           settingName={t('app_settings:update_channel')}
-          currentOption="UpdateChannel"
-          setCurrentOption={setCurrentOption}
+          dataTestId="RobotSettingButton_update_channel"
+          onClick={() => setCurrentOption('UpdateChannel')}
           iconName="update-channel"
         />
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
+          dataTestId="RobotSettingButton_enable_dev_tools"
           settingInfo={t('dev_tools_description')}
           iconName="build"
-          enabledDevTools
-          devToolsOn={devToolsOn}
+          rightElement={<OnOffToggle isOn={devToolsOn} />}
+          onClick={() => dispatch(toggleDevtools())}
         />
         {devToolsOn ? <FeatureFlags /> : null}
       </Flex>
@@ -169,7 +215,6 @@ function FeatureFlags(): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
           onClick={() => {
-            console.log('CLICKED TOGGLE flag', flag)
             dispatch(toggleDevInternalFlag(flag))
           }}
         >
@@ -191,22 +236,27 @@ function FeatureFlags(): JSX.Element {
               </StyledText>
             </Flex>
           </Flex>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing12}
-            alignItems={ALIGN_CENTER}
-            backgroundColor={COLORS.transparent}
-            padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-            borderRadius={BORDERS.borderRadiusSize4}
-          >
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-              {Boolean(devInternalFlags?.[flag])
-                ? t('shared:on')
-                : t('shared:off')}
-            </StyledText>
-          </Flex>
+          <OnOffToggle isOn={Boolean(devInternalFlags?.[flag])} />
         </Btn>
       ))}
     </>
+  )
+}
+
+export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
+  const { t } = useTranslation('shared')
+  return (
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacing12}
+      alignItems={ALIGN_CENTER}
+      backgroundColor={COLORS.transparent}
+      padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+      borderRadius={BORDERS.borderRadiusSize4}
+    >
+      <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+        {props.isOn ? t('on') : t('off')}
+      </StyledText>
+    </Flex>
   )
 }

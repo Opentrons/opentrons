@@ -4,6 +4,7 @@ import json
 import time
 from pathlib import Path
 from typing import Any, Dict, Generator
+from datetime import datetime
 
 import pytest
 import requests
@@ -18,6 +19,7 @@ _SESSION_SERVER_SCHEME = "http://"
 _SESSION_SERVER_HOST = "localhost"
 _OT2_SESSION_SERVER_PORT = "31950"
 _OT3_SESSION_SERVER_PORT = "31960"
+_INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
 
 def pytest_tavern_beta_before_every_test_run(
@@ -110,7 +112,11 @@ def _requests_session() -> Generator[requests.Session, None, None]:
 
 def _wait_until_ready(base_url: str) -> None:
     with _requests_session() as requests_session:
+        started = datetime.now()
         while True:
+            now = datetime.now()
+            if (now - started).total_seconds() > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
+                raise RuntimeError("Could not start dev server")
             try:
                 health_response = requests_session.get(f"{base_url}/health")
             except requests.ConnectionError:
@@ -134,6 +140,10 @@ def _clean_server_state(base_url: str) -> None:
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
 
+            await _delete_all_sessions(robot_client)
+
+            await _reset_deck_configuration(robot_client)
+
     asyncio.run(_clean_server_state_async())
 
 
@@ -151,3 +161,14 @@ async def _delete_all_protocols(robot_client: RobotClient) -> None:
     protocol_ids = [p["id"] for p in response.json()["data"]]
     for protocol_id in protocol_ids:
         await robot_client.delete_protocol(protocol_id)
+
+
+async def _delete_all_sessions(robot_client: RobotClient) -> None:
+    all_sessions_response = await robot_client.get_sessions()
+    session_ids = [s["id"] for s in all_sessions_response.json()["data"]]
+    for session_id in session_ids:
+        await robot_client.delete_session(session_id)
+
+
+async def _reset_deck_configuration(robot_client: RobotClient) -> None:
+    await robot_client.post_setting_reset_options({"deckConfiguration": True})

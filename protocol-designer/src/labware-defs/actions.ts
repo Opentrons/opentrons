@@ -11,10 +11,10 @@ import {
   OPENTRONS_LABWARE_NAMESPACE,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
-import { ThunkAction } from '../types'
-import { LabwareUploadMessage } from './types'
+import * as labwareDefSelectors from './selectors'
+import type { ThunkAction } from '../types'
+import type { LabwareUploadMessage } from './types'
 export interface LabwareUploadMessageAction {
   type: 'LABWARE_UPLOAD_MESSAGE'
   payload: LabwareUploadMessage
@@ -92,11 +92,11 @@ const _createCustomLabwareDef: (
 ) => (
   event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
-  const allLabwareDefs: LabwareDefinition2[] = values(
-    labwareDefSelectors.getLabwareDefsByURI(getState())
-  )
-  const customLabwareDefs: LabwareDefinition2[] = values(
+  const customLabwareDefs = values(
     labwareDefSelectors.getCustomLabwareDefsByURI(getState())
+  )
+  const allLabwareDefs = values(
+    labwareDefSelectors.getLabwareDefsByURI(getState())
   )
   // @ts-expect-error(sa, 2021-6-20): null check
   const file = event.currentTarget.files[0]
@@ -243,9 +243,11 @@ const _createCustomLabwareDef: (
 export const createCustomLabwareDef: (
   event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = _createCustomLabwareDef(false)
+
 export const createCustomTiprackDef: (
   event: React.SyntheticEvent<HTMLInputElement>
 ) => ThunkAction<any> = _createCustomLabwareDef(true)
+
 interface DismissLabwareUploadMessage {
   type: 'DISMISS_LABWARE_UPLOAD_MESSAGE'
 }

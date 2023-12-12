@@ -26,10 +26,10 @@ sdist_file = $(call python_get_sdistname,usb-bridge,$(project_ot3_default),ot3us
 # Find the branch, sha, version that will be used to update the VERSION.json file
 version_file = $(call python_get_git_version,usb-bridge,$(project_ot3_default),ot3usb)
 
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Other SSH args for buildroot robots
-br_ssh_opts ?= $(default_ssh_opts)
+# Host key location for robot
+ssh_key ?= $(default_ssh_key)
+# Other SSH args for robot
+ssh_opts ?= $(default_ssh_opts)
 
 .PHONY: setup
 setup:
@@ -74,5 +74,5 @@ sdist: clean
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/ot3usb,ot3usb,,,$(version_file))
-	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-usb-bridge)
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),dist/$(sdist_file),/opt/ot3usb,ot3usb,,,$(version_file))
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-usb-bridge)

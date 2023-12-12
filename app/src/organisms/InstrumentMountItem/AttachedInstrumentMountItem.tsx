@@ -5,8 +5,6 @@ import {
   getGripperDisplayName,
   getPipetteModelSpecs,
   GripperModel,
-  LEFT,
-  NINETY_SIX_CHANNEL,
   PipetteModel,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
@@ -15,7 +13,6 @@ import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { LabeledMount } from './LabeledMount'
 import type { InstrumentData } from '@opentrons/api-client'
 import type { Mount } from '../../redux/pipettes/types'
@@ -45,7 +42,6 @@ export function AttachedInstrumentMountItem(
     selectedPipette,
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const handleClick: React.MouseEventHandler = () => {
     if (attachedInstrument == null && mount !== 'extension') {
@@ -61,7 +57,6 @@ export function AttachedInstrumentMountItem(
         },
         closeFlow: () => setWizardProps(null),
       })
-      setODDMaintenanceFlowInProgress()
     } else {
       history.push(`/instruments/${mount}`)
     }
@@ -88,10 +83,7 @@ export function AttachedInstrumentMountItem(
         <ChoosePipette
           proceed={() => {
             setWizardProps({
-              mount:
-                selectedPipette === NINETY_SIX_CHANNEL
-                  ? LEFT
-                  : (mount as Mount),
+              mount: mount as Mount,
               flowType: FLOWS.ATTACH,
               selectedPipette,
               closeFlow: () => {
@@ -107,7 +99,6 @@ export function AttachedInstrumentMountItem(
                 )
               },
             })
-            setODDMaintenanceFlowInProgress()
             setShowChoosePipetteModal(false)
           }}
           setSelectedPipette={setSelectedPipette}

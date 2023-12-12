@@ -5,24 +5,31 @@ import functools
 """ Classes and functions for pipette state tracking
 """
 import logging
-from typing import Any, Dict, Optional, Set, Tuple, Union, cast, List
+from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     PlungerPositions,
     MotorConfigurations,
     SupportedTipsDefinition,
-    TipHandlingConfigurations,
+    PickUpTipConfigurations,
+    DropTipConfigurations,
     PipetteModelVersionType,
     PipetteNameType,
+    PipetteLiquidPropertiesDefinition,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
     types as pip_types,
 )
+from opentrons_shared_data.errors.exceptions import (
+    InvalidLiquidClassName,
+    CommandPreconditionViolated,
+)
+
 
 from opentrons.types import Point, Mount
-from opentrons.config import robot_configs, feature_flags as ff
+from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig
 from opentrons.drivers.types import MoveSplit
 from ..instrument_abc import AbstractInstrument
@@ -39,7 +46,8 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     BoardRevision,
 )
-from opentrons.hardware_control.errors import InvalidMoveError
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.hardware_control import nozzle_manager
 
 
 from opentrons_shared_data.pipette.dev_types import (
@@ -48,15 +56,12 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
 )
 from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
-from typing_extensions import Final
 
 
 RECONFIG_KEYS = {"quirks"}
 
 
 mod_log = logging.getLogger(__name__)
-
-INTERNOZZLE_SPACING_MM: Final[float] = 9
 
 # TODO (lc 11-1-2022) Once we unify calibration loading
 # for the hardware controller, we will be able to
@@ -78,6 +83,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         config: PipetteConfigurations,
         pipette_offset_cal: PipetteOffsetByPipetteMount,
         pipette_id: Optional[str] = None,
+        use_old_aspiration_functions: bool = False,
     ) -> None:
         self._config = config
         self._config_as_dict = config.dict()
@@ -86,6 +92,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pipette_version = self._config.version
         self._max_channels = self._config.channels
         self._backlash_distance = config.backlash_distance
+        self._pick_up_configurations = config.pick_up_tip_configurations
+
+        self._liquid_class_name = pip_types.LiquidClasses.default
+        self._liquid_class = self._config.liquid_properties[self._liquid_class_name]
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
         self._pipette_name = PipetteNameType(
@@ -100,8 +110,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             pipette_version=config.version,
         )
         self._nozzle_offset = self._config.nozzle_offset
+        self._nozzle_manager = (
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
+        )
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self._liquid_class.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
@@ -117,19 +130,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self.ready_to_aspirate = False
         #: True if ready to aspirate
 
-        self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._config.max_volume)
+        self._active_tip_settings = self._liquid_class.supported_tips[
+            pip_types.PipetteTipType(self._liquid_class.max_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._aspirate_flow_rates_lookup = (
-            self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
-        )
-        self._dispense_flow_rates_lookup = (
-            self._active_tip_settings.default_dispense_flowrate.values_by_api_level
-        )
-        self._blowout_flow_rates_lookup = (
-            self._active_tip_settings.default_blowout_flowrate.values_by_api_level
-        )
+
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
         )
@@ -140,12 +145,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
 
-        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
+        self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
-        if ff.use_old_aspiration_functions():
+        if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
         else:
             self._pipetting_function_version = PIPETTING_FUNCTION_LATEST_VERSION
+
+    @property
+    def push_out_volume(self) -> float:
+        return self._active_tip_settings.default_push_out_volume
 
     def act_as(self, name: PipetteNameType) -> None:
         """Reconfigure to act as ``name``. ``name`` must be either the
@@ -164,12 +173,15 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             name.pipette_type, name.pipette_channels, name.get_version()
         )
         # TODO need to grab name config here to deal with act as test
-        self.working_volume = liquid_model.max_volume
+        self._liquid_class.max_volume = liquid_model["default"].max_volume
+        self._liquid_class.min_volume = liquid_model["default"].min_volume
+        self.working_volume = liquid_model["default"].max_volume
         self.update_config_item(
             {
-                "min_volume": liquid_model.min_volume,
-                "max_volume": liquid_model.max_volume,
-            }
+                "min_volume": liquid_model["default"].min_volume,
+                "max_volume": liquid_model["default"].max_volume,
+            },
+            pip_types.LiquidClasses.default,
         )
 
     @property
@@ -181,8 +193,20 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._config
 
     @property
-    def nozzle_offset(self) -> List[float]:
-        return self._nozzle_offset
+    def liquid_class(self) -> PipetteLiquidPropertiesDefinition:
+        return self._liquid_class
+
+    @property
+    def liquid_class_name(self) -> pip_types.LiquidClasses:
+        return self._liquid_class_name
+
+    @property
+    def nozzle_offset(self) -> Point:
+        return self._nozzle_manager.starting_nozzle_offset
+
+    @property
+    def nozzle_manager(self) -> nozzle_manager.NozzleConfigurationManager:
+        return self._nozzle_manager
 
     @property
     def pipette_offset(self) -> PipetteOffsetByPipetteMount:
@@ -198,34 +222,36 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def plunger_positions(self) -> PlungerPositions:
-        return self._config.plunger_positions_configurations
+        return self._config.plunger_positions_configurations[self._liquid_class_name]
 
     @property
     def plunger_motor_current(self) -> MotorConfigurations:
         return self._config.plunger_motor_configurations
 
     @property
-    def pick_up_configurations(self) -> TipHandlingConfigurations:
+    def pick_up_configurations(self) -> PickUpTipConfigurations:
         return self._config.pick_up_tip_configurations
 
     @pick_up_configurations.setter
-    def pick_up_configurations(
-        self, pick_up_configs: TipHandlingConfigurations
-    ) -> None:
+    def pick_up_configurations(self, pick_up_configs: PickUpTipConfigurations) -> None:
         self._pick_up_configurations = pick_up_configs
 
     @property
-    def drop_configurations(self) -> TipHandlingConfigurations:
+    def drop_configurations(self) -> DropTipConfigurations:
         return self._config.drop_tip_configurations
 
     @property
     def active_tip_settings(self) -> SupportedTipsDefinition:
         return self._active_tip_settings
 
-    def update_config_item(self, elements: Dict[str, Any]) -> None:
+    def update_config_item(
+        self,
+        elements: Dict[str, Any],
+        liquid_class: Optional[pip_types.LiquidClasses] = None,
+    ) -> None:
         self._log.info(f"updated config: {elements}")
         self._config = load_pipette_data.update_pipette_configuration(
-            self._config, elements
+            self._config, elements, liquid_class
         )
         # Update the cached dict representation
         self._config_as_dict = self._config.dict()
@@ -240,13 +266,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def reset_state(self) -> None:
         self._current_volume = 0.0
-        self._working_volume = float(self._config.max_volume)
+        self._working_volume = float(self.liquid_class.max_volume)
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._has_tip = False
         self.ready_to_aspirate = False
         #: True if ready to aspirate
-        self._active_tip_settings = self._config.supported_tips[
+        self._active_tip_settings = self.liquid_class.supported_tips[
             pip_types.PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self.active_tip_settings.default_tip_length
@@ -261,7 +287,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self.active_tip_settings.default_blowout_flowrate.default
         )
 
-        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
+        self._tip_overlap_lookup = self.liquid_class.tip_overlap_dictionary
+        self._nozzle_manager = (
+            nozzle_manager.NozzleConfigurationManager.build_from_config(self._config)
+        )
 
     def reset_pipette_offset(self, mount: Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -303,54 +332,30 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
         critical point will be used.
         """
-        instr = Point(*self._pipette_offset.offset)
-        offsets = self.nozzle_offset
 
         if cp_override in [
             CriticalPoint.GRIPPER_JAW_CENTER,
             CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
             CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
-            raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a pipette"
-            )
+            raise InvalidCriticalPoint(cp_override.name, "pipette")
 
-        if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
-            cp_type = CriticalPoint.NOZZLE
-            tip_length = 0.0
-        else:
-            cp_type = CriticalPoint.TIP
-            tip_length = self.current_tip_length
-        if cp_override == CriticalPoint.XY_CENTER:
-            mod_offset_xy = [
-                offsets[0],
-                offsets[1] - (INTERNOZZLE_SPACING_MM * (self._config.channels - 1) / 2),
-                offsets[2],
-            ]
-            cp_type = CriticalPoint.XY_CENTER
-        elif cp_override == CriticalPoint.FRONT_NOZZLE:
-            mod_offset_xy = [
-                0,
-                (offsets[1] - INTERNOZZLE_SPACING_MM * (self._config.channels - 1)),
-                offsets[2],
-            ]
-            cp_type = CriticalPoint.FRONT_NOZZLE
-        else:
-            mod_offset_xy = list(offsets)
-        mod_and_tip = Point(
-            mod_offset_xy[0], mod_offset_xy[1], mod_offset_xy[2] - tip_length
+        instr = Point(*self._pipette_offset.offset)
+        cp_with_tip_length = self._nozzle_manager.critical_point_with_tip_length(
+            cp_override,
+            self.current_tip_length if cp_override != CriticalPoint.NOZZLE else 0.0,
         )
 
-        cp = mod_and_tip + instr
+        cp = cp_with_tip_length + instr
 
         if self._log.isEnabledFor(logging.DEBUG):
             info_str = "cp: {}{}: {} (from: ".format(
-                cp_type, " (from override)" if cp_override else "", cp
+                cp_override, " (from override)" if cp_override else "", cp
             )
             info_str += "model offset: {} + instrument offset: {}".format(
-                mod_offset_xy, instr
+                cp_with_tip_length, instr
             )
-            info_str += " - tip_length: {}".format(tip_length)
+            info_str += " - tip_length: {}".format(self.current_tip_length)
             info_str += ")"
             self._log.debug(info_str)
 
@@ -411,15 +416,15 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._aspirate_flow_rates_lookup
+        return self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
 
     @property
     def dispense_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._dispense_flow_rates_lookup
+        return self._active_tip_settings.default_dispense_flowrate.values_by_api_level
 
     @property
     def blow_out_flow_rates_lookup(self) -> Dict[str, float]:
-        return self._blowout_flow_rates_lookup
+        return self.active_tip_settings.default_blowout_flowrate.values_by_api_level
 
     @property
     def working_volume(self) -> float:
@@ -429,12 +434,17 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @working_volume.setter
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
-        self._working_volume = min(self.config.max_volume, tip_volume)
+        self._working_volume = min(self.liquid_class.max_volume, tip_volume)
         tip_size_type = pip_types.PipetteTipType.check_and_return_type(
-            int(self._working_volume), self.config.max_volume
+            int(self._working_volume), self.liquid_class.max_volume
         )
-        self._active_tip_settings = self._config.supported_tips[tip_size_type]
+        self._active_tip_settings = self.liquid_class.supported_tips[tip_size_type]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
+
+    @property
+    def minimum_volume(self) -> float:
+        """The smallest controllable volume the pipette can handle with the current liquid class.."""
+        return self.liquid_class.min_volume
 
     @property
     def available_volume(self) -> float:
@@ -456,6 +466,30 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     def ok_to_add_volume(self, volume_incr: float) -> bool:
         return self.current_volume + volume_incr <= self.working_volume
+
+    def ok_to_push_out(self, push_out_dist_mm: float) -> bool:
+        return push_out_dist_mm <= (
+            self.plunger_positions.bottom - self.plunger_positions.blow_out
+        )
+
+    def update_nozzle_configuration(
+        self,
+        back_left_nozzle: str,
+        front_right_nozzle: str,
+        starting_nozzle: Optional[str] = None,
+    ) -> None:
+        """
+        Update nozzle configuration manager.
+        """
+        self._nozzle_manager.update_nozzle_configuration(
+            back_left_nozzle, front_right_nozzle, starting_nozzle
+        )
+
+    def reset_nozzle_configuration(self) -> None:
+        """
+        Reset nozzle configuration manager.
+        """
+        self._nozzle_manager.reset_to_default_configuration()
 
     def add_tip(self, tip_length: float) -> None:
         """
@@ -530,23 +564,35 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
-                "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate.values_by_api_level,
-                "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate.values_by_api_level,
-                "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate.values_by_api_level,
+                "default_aspirate_flow_rates": self.aspirate_flow_rates_lookup,
+                "default_blow_out_flow_rates": self.blow_out_flow_rates_lookup,
+                "default_dispense_flow_rates": self.dispense_flow_rates_lookup,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
-                "supported_tips": self._config.supported_tips,
+                "supported_tips": self.liquid_class.supported_tips,
             }
         )
         return self._config_as_dict
+
+    def set_liquid_class_by_name(self, class_name: str) -> None:
+        """Change the currently active liquid class."""
+        if self.current_volume > 0:
+            raise CommandPreconditionViolated(
+                "Cannot switch liquid classes when liquid is in the tip"
+            )
+        if class_name != "default":
+            raise InvalidLiquidClassName(
+                message=f"Liquid class {class_name} is not valid for {self._config.display_name}"
+            )
 
 
 def _reload_and_check_skip(
     new_config: PipetteConfigurations,
     attached_instr: Pipette,
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -567,7 +613,12 @@ def _reload_and_check_skip(
                 changed.add(k)
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
-            p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
+            p = Pipette(
+                new_config,
+                pipette_offset,
+                attached_instr._pipette_id,
+                use_old_aspiration_functions,
+            )
             p.act_as(attached_instr.acting_as)
             return p, False
     # Good to skip
@@ -580,6 +631,7 @@ def load_from_config_and_check_skip(
     requested: Optional[PipetteName],
     serial: Optional[str],
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -607,16 +659,23 @@ def load_from_config_and_check_skip(
                 # configured to the request
                 if requested == str(attached.acting_as):
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached, pipette_offset)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset, use_old_aspiration_functions
+                    )
             else:
                 # if there is no request, make sure that the old pipette
                 # did not have backcompat applied
                 if str(attached.acting_as) == attached.name:
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached, pipette_offset)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset, use_old_aspiration_functions
+                    )
 
     if config:
-        return Pipette(config, pipette_offset, serial), False
+        return (
+            Pipette(config, pipette_offset, serial, use_old_aspiration_functions),
+            False,
+        )
     else:
         return None, False
 

@@ -71,7 +71,10 @@ export const UnmountGripper = (
       .then(() => {
         setIsPending(false)
         if (!isGripperStillAttached) {
-          chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
+          chainRunCommands?.(
+            [{ commandType: 'home' as const, params: {} }],
+            true
+          )
             .then(() => {
               proceed()
             })
@@ -98,7 +101,6 @@ export const UnmountGripper = (
     <SimpleWizardBody
       iconColor={COLORS.errorEnabled}
       header={t('gripper_still_attached')}
-      subHeader={t('please_retry_gripper_detach')}
       isSuccess={false}
     >
       <Flex
@@ -107,7 +109,10 @@ export const UnmountGripper = (
         alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
         gridGap={SPACING.spacing8}
       >
-        <Btn onClick={() => setShowGripperStillDetected(false)}>
+        <Btn
+          paddingLeft={isOnDevice ? 0 : SPACING.spacing32}
+          onClick={() => setShowGripperStillDetected(false)}
+        >
           <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
             {t('shared:go_back')}
           </StyledText>

@@ -21,11 +21,11 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   SPAN7_8_10_11_SLOT,
-  FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
   MAGNETIC_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
   TEMPERATURE_MODULE_V2,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
   actions as stepFormActions,
@@ -45,13 +45,18 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
-import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
+import {
+  createDeckFixture,
+  toggleIsGripperRequired,
+} from '../../../step-forms/actions/additionalItems'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
 import { FirstPipetteTipsTile, SecondPipetteTipsTile } from './PipetteTipsTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
+import { StagingAreaTile } from './StagingAreaTile'
+import { getTrashSlot } from './utils'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
@@ -63,6 +68,7 @@ type WizardStep =
   | 'first_pipette_tips'
   | 'second_pipette_type'
   | 'second_pipette_tips'
+  | 'staging_area'
   | 'modulesAndOther'
 const WIZARD_STEPS: WizardStep[] = [
   'robotType',
@@ -71,8 +77,20 @@ const WIZARD_STEPS: WizardStep[] = [
   'first_pipette_tips',
   'second_pipette_type',
   'second_pipette_tips',
+  'staging_area',
   'modulesAndOther',
 ]
+const WIZARD_STEPS_OT2: WizardStep[] = [
+  'robotType',
+  'metadata',
+  'first_pipette_type',
+  'first_pipette_tips',
+  'second_pipette_type',
+  'second_pipette_tips',
+  'modulesAndOther',
+]
+export const adapter96ChannelDefUri =
+  'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 export function CreateFileWizard(): JSX.Element | null {
   const { t } = useTranslation()
@@ -81,8 +99,10 @@ export function CreateFileWizard(): JSX.Element | null {
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-
-  const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
+  const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
+  const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
+    WIZARD_STEPS
+  )
 
   React.useEffect(() => {
     // re-initialize wizard step count when modal is closed
@@ -184,20 +204,35 @@ export function CreateFileWizard(): JSX.Element | null {
           },
         })
       )
-      // default trash labware locations in initial deck setup step
-      dispatch(
-        steplistActions.changeSavedStepForm({
-          stepId: INITIAL_DECK_SETUP_STEP_ID,
-          update: {
-            labwareLocationUpdate: {
-              [FIXED_TRASH_ID]: {
-                slotName:
-                  values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
-              },
-            },
-          },
-        })
+
+      //  add trash
+      if (values.additionalEquipment.includes('trashBin')) {
+        // defaulting trash to appropriate locations
+        dispatch(
+          createDeckFixture(
+            'trashBin',
+            values.fields.robotType === FLEX_ROBOT_TYPE
+              ? getTrashSlot(values)
+              : 'cutout12'
+          )
+        )
+      }
+
+      // add waste chute
+      if (values.additionalEquipment.includes('wasteChute')) {
+        dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
+      }
+      //  add staging areas
+      const stagingAreas = values.additionalEquipment.filter(equipment =>
+        equipment.includes('stagingArea')
       )
+      if (stagingAreas.length > 0) {
+        stagingAreas.forEach(stagingArea => {
+          const [, location] = stagingArea.split('_')
+          dispatch(createDeckFixture('stagingArea', location))
+        })
+      }
+
       // create modules
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
@@ -210,10 +245,20 @@ export function CreateFileWizard(): JSX.Element | null {
       const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
-      newTiprackModels.forEach(tiprackDefURI => {
+      newTiprackModels.forEach((tiprackDefURI, index) => {
+        const ot2Slots = index === 0 ? '2' : '5'
+        const flexSlots = index === 0 ? 'C2' : 'B2'
         dispatch(
           labwareIngredActions.createContainer({
+            slot:
+              values.fields.robotType === FLEX_ROBOT_TYPE
+                ? flexSlots
+                : ot2Slots,
             labwareDefURI: tiprackDefURI,
+            adapterUnderLabwareDefURI:
+              values.pipettesByMount.left.pipetteName === 'p1000_96'
+                ? adapter96ChannelDefUri
+                : undefined,
           })
         )
       })
@@ -223,18 +268,18 @@ export function CreateFileWizard(): JSX.Element | null {
     <WizardHeader
       title={t('modal.create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
-      totalSteps={WIZARD_STEPS.length - 1}
+      totalSteps={wizardSteps.length - 1}
       onExit={handleCancel}
     />
   )
-  const currentWizardStep = WIZARD_STEPS[currentStepIndex]
+  const currentWizardStep = wizardSteps[currentStepIndex]
   const goBack = (stepsBack: number = 1): void => {
     if (currentStepIndex >= 0 + stepsBack) {
       setCurrentStepIndex(currentStepIndex - stepsBack)
     }
   }
   const proceed = (stepsForward: number = 1): void => {
-    if (currentStepIndex + stepsForward < WIZARD_STEPS.length) {
+    if (currentStepIndex + stepsForward < wizardSteps.length) {
       setCurrentStepIndex(currentStepIndex + stepsForward)
     }
   }
@@ -246,6 +291,7 @@ export function CreateFileWizard(): JSX.Element | null {
         createProtocolFile={createProtocolFile}
         proceed={proceed}
         goBack={goBack}
+        setWizardSteps={setWizardSteps}
       />
     </ModalShell>
   ) : null
@@ -300,7 +346,9 @@ const initialFormState: FormState = {
       slot: SPAN7_8_10_11_SLOT,
     },
   },
-  additionalEquipment: [],
+  //  defaulting to selecting trashBin already to avoid user having to
+  //  click to add a trash bin/waste chute. Delete once we support returnTip()
+  additionalEquipment: ['trashBin'],
 }
 
 const pipetteValidationShape = Yup.object().shape({
@@ -351,10 +399,25 @@ interface CreateFileFormProps {
   createProtocolFile: (values: FormState) => void
   goBack: () => void
   proceed: () => void
+  setWizardSteps: React.Dispatch<React.SetStateAction<WizardStep[]>>
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
-  const { currentWizardStep, createProtocolFile, proceed, goBack } = props
+  const {
+    currentWizardStep,
+    createProtocolFile,
+    proceed,
+    goBack,
+    setWizardSteps,
+  } = props
+
+  const handleProceedRobotType = (robotType: string): void => {
+    if (robotType === OT2_ROBOT_TYPE) {
+      setWizardSteps(WIZARD_STEPS_OT2)
+    } else {
+      setWizardSteps(WIZARD_STEPS)
+    }
+  }
 
   const contentsByWizardStep: {
     [wizardStep in WizardStep]: (
@@ -362,7 +425,14 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     ) => JSX.Element
   } = {
     robotType: (formikProps: FormikProps<FormState>) => (
-      <RobotTypeTile {...{ ...formikProps, proceed, goBack }} />
+      <RobotTypeTile
+        {...formikProps}
+        goBack={goBack}
+        proceed={() => {
+          handleProceedRobotType(formikProps.values.fields.robotType)
+          proceed()
+        }}
+      />
     ),
     metadata: (formikProps: FormikProps<FormState>) => (
       <MetadataTile {...formikProps} proceed={proceed} goBack={goBack} />
@@ -378,6 +448,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     ),
     second_pipette_tips: (formikProps: FormikProps<FormState>) => (
       <SecondPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
+    ),
+    staging_area: (formikProps: FormikProps<FormState>) => (
+      <StagingAreaTile {...{ ...formikProps, proceed, goBack }} />
     ),
     modulesAndOther: (formikProps: FormikProps<FormState>) => (
       <ModulesAndOtherTile

@@ -19,7 +19,7 @@
     "links": []
   },
   "metadata": {
-    "displayName": "Opentrons 96 Deep Well Adapter with NEST Deep Well Plate 2 mL",
+    "displayName": "Opentrons 96 Deep Well Heater-Shaker Adapter with NEST Deep Well Plate 2 mL",
     "displayCategory": "aluminumBlock",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1105,7 +1105,7 @@
   ],
   "parameters": {
     "format": "96Standard",
-    "quirks": [],
+    "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep"

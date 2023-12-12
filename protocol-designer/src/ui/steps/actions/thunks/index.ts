@@ -182,6 +182,10 @@ export const saveStepForm: () => ThunkAction<any> = () => (
     dispatch(tutorialActions.addHint('protocol_can_enter_batch_edit'))
   }
 
+  if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {
+    dispatch(tutorialActions.addHint('waste_chute_warning'))
+  }
+
   // save the form
   dispatch(_saveStepForm(unsavedForm))
 }
@@ -239,6 +243,14 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
     changeFormInput({
       update: {
         pauseAction: PAUSE_UNTIL_TEMP,
+      },
+    })
+  )
+  const tempertureModuleId = unsavedSetTemperatureForm?.moduleId
+  dispatch(
+    changeFormInput({
+      update: {
+        moduleId: tempertureModuleId,
       },
     })
   )

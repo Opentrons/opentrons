@@ -2,7 +2,9 @@
 from datetime import datetime
 from typing import List, NamedTuple, Optional
 
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -22,6 +24,8 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
+from opentrons.protocol_engine.types import DeckConfigurationType
+
 
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
@@ -29,6 +33,10 @@ class EngineConflictError(RuntimeError):
     The store will not create a new engine unless the "current" runner/engine
     pair is idle.
     """
+
+
+class NoRunnerEnginePairError(RuntimeError):
+    """Raised if you try to get the current engine or runner while there is none."""
 
 
 class RunnerEnginePair(NamedTuple):
@@ -88,13 +96,15 @@ class MaintenanceEngineStore:
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" ProtocolEngine."""
-        assert self._runner_engine_pair is not None, "Engine not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.engine
 
     @property
     def runner(self) -> LiveRunner:
         """Get the "current" ProtocolRunner."""
-        assert self._runner_engine_pair is not None, "Runner not yet created."
+        if self._runner_engine_pair is None:
+            raise NoRunnerEnginePairError()
         return self._runner_engine_pair.runner
 
     @property
@@ -117,6 +127,7 @@ class MaintenanceEngineStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        deck_configuration: Optional[DeckConfigurationType] = [],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
@@ -138,8 +149,11 @@ class MaintenanceEngineStore:
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
                 deck_type=self._deck_type,
-                block_on_door_open=feature_flags.enable_door_safety_switch(),
+                block_on_door_open=feature_flags.enable_door_safety_switch(
+                    RobotTypeEnum.robot_literal_to_enum(self._robot_type)
+                ),
             ),
+            deck_configuration=deck_configuration,
         )
 
         # Using LiveRunner as the runner to allow for future refactor of maintenance runs
@@ -171,7 +185,11 @@ class MaintenanceEngineStore:
         state_view = engine.state_view
 
         if state_view.commands.get_is_okay_to_clear():
-            await engine.finish(drop_tips_and_home=False, set_run_status=False)
+            await engine.finish(
+                drop_tips_after_run=False,
+                set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
+            )
         else:
             raise EngineConflictError("Current run is not idle or stopped.")
 

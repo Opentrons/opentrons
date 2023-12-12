@@ -12,10 +12,8 @@ import {
   Btn,
   COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_STICKY,
@@ -28,34 +26,42 @@ import {
 import {
   useProtocolQuery,
   useRunQuery,
-  useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
+  useDoorQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
-  HEATERSHAKER_MODULE_TYPE,
+  getFixtureDisplayName,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
-import { Skeleton } from '../../../atoms/Skeleton'
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { useMaintenanceRunTakeover } from '../../../organisms/TakeoverModal'
+import {
+  ProtocolSetupTitleSkeleton,
+  ProtocolSetupStepSkeleton,
+} from '../../../organisms/OnDeviceDisplay/ProtocolSetup'
 import {
   useAttachedModules,
   useLPCDisabledReason,
+  useModuleCalibrationStatus,
+  useRobotType,
 } from '../../../organisms/Devices/hooks'
+import {
+  useRequiredProtocolHardwareFromAnalysis,
+  useMissingProtocolHardwareFromAnalysis,
+} from '../../Protocols/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
+import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
+import { ProtocolSetupDeckConfiguration } from '../../../organisms/ProtocolSetupDeckConfiguration'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
+import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
-  getAreInstrumentsReady,
+  getIncompleteInstrumentCount,
   getProtocolUsesGripper,
 } from '../../../organisms/ProtocolSetupInstruments/utils'
 import {
@@ -65,18 +71,22 @@ import {
 import { useToaster } from '../../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
 import { getLabwareSetupItemGroups } from '../../Protocols/utils'
-import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
+import { getLocalRobot } from '../../../redux/discovery'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
-
-import type { OnDeviceRouteParams } from '../../../App/types'
-import type { HeaterShakerModule } from '../../../redux/modules/types'
 import { getLatestCurrentOffsets } from '../../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { CloseButton, PlayButton } from './Buttons'
 
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type { OnDeviceRouteParams } from '../../../App/types'
+import type { ProtocolHardware, ProtocolFixture } from '../../Protocols/hooks'
+import type { ProtocolModuleInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+
+const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: 'ready' | 'not ready' | 'general'
@@ -113,6 +123,26 @@ export function ProtocolSetupStep({
     }
   }
 
+  let backgroundColor: string
+  if (!disabled) {
+    switch (status) {
+      case 'general':
+        backgroundColor = COLORS.darkBlack40
+        break
+      case 'ready':
+        backgroundColor = COLORS.green3Pressed
+        break
+      default:
+        backgroundColor = COLORS.yellow3Pressed
+    }
+  } else backgroundColor = ''
+
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${backgroundColor};
+    }
+  `
+
   return (
     <Btn
       onClick={() =>
@@ -128,6 +158,7 @@ export function ProtocolSetupStep({
         borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
+        css={PUSHED_STATE_STYLE}
       >
         {status !== 'general' && !disabled ? (
           <Icon
@@ -155,123 +186,15 @@ export function ProtocolSetupStep({
           </StyledText>
         </Flex>
         {disabled ? null : (
-          <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
+          <Icon
+            marginLeft={SPACING.spacing8}
+            name="more"
+            size="3rem"
+            // Required to prevent inconsistent component height.
+            style={{ backgroundColor: disabled ? 'transparent' : 'initial' }}
+          />
         )}
       </Flex>
-    </Btn>
-  )
-}
-
-const CLOSE_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.red2Pressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.red2};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.red2};
-  }
-
-  &:active {
-    background-color: ${COLORS.red2Pressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
-// TODO(ew, 05/03/2023): refactor the run buttons into a shared component
-interface CloseButtonProps {
-  onClose: () => void
-}
-
-function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.red2}
-      borderRadius="6.25rem"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      onClick={onClose}
-      aria-label="close"
-      css={CLOSE_BUTTON_STYLE}
-    >
-      <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
-    </Btn>
-  )
-}
-
-const PLAY_BUTTON_STYLE = css`
-  -webkit-tap-highlight-color: transparent;
-  &:focus {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:hover {
-    background-color: ${COLORS.blueEnabled};
-    color: ${COLORS.white};
-  }
-
-  &:focus-visible {
-    box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.blueEnabled};
-  }
-
-  &:active {
-    background-color: ${COLORS.bluePressed};
-    color: ${COLORS.white};
-  }
-
-  &:disabled {
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
-  }
-`
-interface PlayButtonProps {
-  ready: boolean
-  onPlay: () => void
-  disabled?: boolean
-}
-
-function PlayButton({
-  disabled = false,
-  onPlay,
-  ready,
-}: PlayButtonProps): JSX.Element {
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={
-        disabled || !ready ? COLORS.darkBlack20 : COLORS.blueEnabled
-      }
-      borderRadius="6.25rem"
-      display={DISPLAY_FLEX}
-      height="6.25rem"
-      justifyContent={JUSTIFY_CENTER}
-      width="6.25rem"
-      disabled={disabled}
-      onClick={onPlay}
-      aria-label="play"
-      css={PLAY_BUTTON_STYLE}
-    >
-      <Icon
-        color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
-        name="play-icon"
-        size="2.5rem"
-      />
     </Btn>
   )
 }
@@ -289,9 +212,11 @@ function PrepareToRun({
   confirmAttachment,
   play,
 }: PrepareToRunProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -299,7 +224,7 @@ function PrepareToRun({
   const observer = new IntersectionObserver(([entry]) => {
     setIsScrolled(!entry.isIntersecting)
   })
-  if (scrollRef.current) {
+  if (scrollRef.current != null) {
     observer.observe(scrollRef.current)
   }
 
@@ -310,15 +235,14 @@ function PrepareToRun({
   })
 
   const { data: attachedInstruments } = useInstrumentsQuery()
-  const {
-    data: allPipettesCalibrationData,
-  } = useAllPipetteOffsetCalibrationsQuery()
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
-    protocolRecord?.data.files[0].name
+    protocolRecord?.data.files[0].name ??
+    ''
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
+
+  const robotType = useRobotType(robotName)
+  const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -328,18 +252,27 @@ function PrepareToRun({
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
-  const attachedModules = useAttachedModules()
+  const attachedModules =
+    useAttachedModules({
+      refetchInterval: FETCH_DURATION_MS,
+    }) ?? []
+
+  const { requiredProtocolHardware } = useRequiredProtocolHardwareFromAnalysis(
+    mostRecentAnalysis
+  )
+
+  const requiredFixtures = requiredProtocolHardware.filter(
+    (hardware): hardware is ProtocolFixture => {
+      return hardware.hardwareType === 'fixture'
+    }
+  )
+
+  const protocolHasFixtures = requiredFixtures.length > 0
 
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
-  const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
-    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo =
     mostRecentAnalysis != null
@@ -350,59 +283,120 @@ function PrepareToRun({
     attachedModules,
     protocolModulesInfo
   )
+  const incompleteInstrumentCount: number | null =
+    mostRecentAnalysis != null && attachedInstruments != null
+      ? getIncompleteInstrumentCount(mostRecentAnalysis, attachedInstruments)
+      : null
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
     runId,
     hasMissingModulesForOdd: isMissingModules,
-    hasMissingPipCalForOdd: allPipettesCalibrationData == null,
+    hasMissingCalForOdd:
+      incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
+  const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
   const [
     showConfirmCancelModal,
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  if (
+  // True if any server request is still pending.
+  const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules == null) ||
-    allPipettesCalibrationData == null
+    (protocolHasModules && attachedModules == null)
+
+  const speccedInstrumentCount =
+    mostRecentAnalysis !== null
+      ? mostRecentAnalysis.pipettes.length +
+        (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
+      : 0
+
+  const missingProtocolHardware = useMissingProtocolHardwareFromAnalysis(
+    robotType,
+    mostRecentAnalysis
+  )
+  const isLocationConflict = missingProtocolHardware.conflictedSlots.length > 0
+
+  const missingPipettes = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'pipette'
+  )
+
+  const missingGripper = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'gripper'
+  )
+
+  const missingModules = missingProtocolHardware.missingProtocolHardware.filter(
+    hardware => hardware.hardwareType === 'module'
+  )
+  const missingFixtures = missingProtocolHardware.missingProtocolHardware.filter(
+    (hardware): hardware is ProtocolFixture =>
+      hardware.hardwareType === 'fixture'
+  )
+
+  let instrumentsDetail
+  if (missingPipettes.length > 0 && missingGripper.length > 0) {
+    instrumentsDetail = t('missing_instruments', {
+      count: missingPipettes.length + missingGripper.length,
+    })
+  } else if (missingPipettes.length > 0) {
+    instrumentsDetail = t('missing_pipettes', { count: missingPipettes.length })
+  } else if (missingGripper.length > 0) {
+    instrumentsDetail = t('missing_gripper')
+  } else if (incompleteInstrumentCount === 0) {
+    instrumentsDetail = t('instruments_connected', {
+      count: speccedInstrumentCount,
+    })
+  } else if (
+    incompleteInstrumentCount != null &&
+    incompleteInstrumentCount > 0
   ) {
-    return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
+    instrumentsDetail = t('instrument_calibrations_missing', {
+      count: incompleteInstrumentCount,
+    })
+  } else {
+    instrumentsDetail = null
   }
 
-  const areInstrumentsReady = getAreInstrumentsReady(
-    mostRecentAnalysis,
-    attachedInstruments,
-    allPipettesCalibrationData
-  )
-  const speccedInstrumentCount =
-    mostRecentAnalysis.pipettes.length +
-    (getProtocolUsesGripper(mostRecentAnalysis) ? 1 : 0)
-  const instrumentsDetail = t('instruments_connected', {
-    count: speccedInstrumentCount,
-  })
-  const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
+  const instrumentsStatus =
+    incompleteInstrumentCount === 0 ? 'ready' : 'not ready'
 
-  const modulesStatus = isMissingModules ? 'not ready' : 'ready'
+  const areModulesReady = !isMissingModules && moduleCalibrationStatus.complete
 
-  const isReadyToRun = areInstrumentsReady && !isMissingModules
+  const isMissingFixtures = missingFixtures.length > 0
 
+  const areFixturesReady = !isMissingFixtures
+
+  const modulesStatus =
+    areModulesReady && areFixturesReady && !isLocationConflict
+      ? 'ready'
+      : 'not ready'
+
+  // TODO: (ND: 11/6/23) check for areFixturesReady once we removed stubbed fixtures in useRequiredProtocolHardwareFromAnalysis
+  // const isReadyToRun =
+  //   incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
+
+  const isReadyToRun = incompleteInstrumentCount === 0 && areModulesReady
   const onPlay = (): void => {
-    if (
-      isHeaterShakerInProtocol &&
-      !isHeaterShakerShaking &&
-      (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
-    ) {
-      confirmAttachment()
+    if (isDoorOpen) {
+      makeSnackbar(t('shared:close_robot_door'))
     } else {
-      if (isReadyToRun) {
-        play()
+      if (
+        isHeaterShakerInProtocol &&
+        isReadyToRun &&
+        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+      ) {
+        confirmAttachment()
       } else {
-        makeSnackbar(
-          i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
-        )
+        if (isReadyToRun) {
+          play()
+        } else {
+          makeSnackbar(
+            i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
+          )
+        }
       }
     }
   }
@@ -417,21 +411,86 @@ function PrepareToRun({
       ? getModuleDisplayName(firstMissingModuleModel)
       : ''
 
-  // determine modules detail messages
-  const connectedModulesText =
-    protocolModulesInfo.length === 0
-      ? t('no_modules_used_in_this_protocol')
-      : t('modules_connected', {
-          count: attachedModules.length,
-        })
+  const getConnectedHardwareText = (
+    protocolModulesInfo: ProtocolModuleInfo[],
+    requiredFixtures: ProtocolHardware[]
+  ): {
+    detail: string
+    subdetail?: string
+  } => {
+    if (protocolModulesInfo.length === 0 && requiredFixtures.length === 0) {
+      return { detail: t('no_modules_used_in_this_protocol') }
+    } else if (
+      protocolModulesInfo.length > 0 &&
+      requiredFixtures.length === 0
+    ) {
+      // protocol only uses modules
+      return {
+        detail: t('modules_connected', {
+          count: protocolModulesInfo.length,
+        }),
+      }
+    } else if (
+      protocolModulesInfo.length === 0 &&
+      requiredFixtures.length > 0
+    ) {
+      // protocol only uses fixtures
+      return {
+        detail: t('fixtures_connected', {
+          count: requiredFixtures.length,
+        }),
+      }
+    } else {
+      // protocol uses fixtures and modules
+      return {
+        detail: t('fixtures_connected', {
+          count: requiredFixtures.length,
+        }),
+        subdetail: t('modules_connected', {
+          count: protocolModulesInfo.length,
+        }),
+      }
+    }
+  }
+
   const missingModulesText =
     missingModuleIds.length === 1
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
-      : t('multiple_modules_missing')
+      : t('multiple_modules_missing', { count: missingModuleIds.length })
 
-  const modulesDetail = isMissingModules
-    ? missingModulesText
-    : connectedModulesText
+  const missingFixturesText =
+    missingFixtures.length === 1
+      ? `${t('missing')} ${getFixtureDisplayName(
+          missingFixtures[0].cutoutFixtureId
+        )}`
+      : t('multiple_fixtures_missing', { count: missingFixtures.length })
+
+  const missingMultipleHardwareTypes =
+    [missingModules, missingFixtures].filter(
+      missingHardwareArr => missingHardwareArr.length > 0
+    ).length > 1
+
+  let modulesDetail: string
+  let modulesSubDetail: string | null = null
+  if (isLocationConflict) {
+    modulesDetail = t('location_conflict')
+  } else if (missingMultipleHardwareTypes) {
+    modulesDetail = t('hardware_missing')
+  } else if (missingFixtures.length > 0) {
+    modulesDetail = missingFixturesText
+  } else if (isMissingModules) {
+    modulesDetail = missingModulesText
+  } else if (!moduleCalibrationStatus.complete) {
+    modulesDetail = t('calibration_required')
+  } else {
+    // modules and deck are ready
+    const hardwareDetail = getConnectedHardwareText(
+      protocolModulesInfo,
+      requiredFixtures
+    )
+    modulesDetail = hardwareDetail.detail
+    modulesSubDetail = hardwareDetail?.subdetail ?? null
+  }
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -456,6 +515,13 @@ function PrepareToRun({
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
 
+  const { data: doorStatus } = useDoorQuery({
+    refetchInterval: FETCH_DURATION_MS,
+  })
+  const isDoorOpen =
+    doorStatus?.data.status === 'open' &&
+    doorStatus?.data.doorRequiredClosedForProtocol
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -469,7 +535,7 @@ function PrepareToRun({
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
-        overflowY="hidden"
+        overflowY="auto"
         marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -478,29 +544,37 @@ function PrepareToRun({
             gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
-            <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
-              {t('prepare_to_run')}
-            </StyledText>
-            <StyledText
-              as="h4"
-              color={COLORS.darkGreyEnabled}
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              overflowWrap="anywhere"
-            >
-              {truncateString(protocolName as string, 100)}
-            </StyledText>
+            {!isLoading ? (
+              <>
+                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                  {t('prepare_to_run')}
+                </StyledText>
+                <StyledText
+                  as="h4"
+                  color={COLORS.darkGreyEnabled}
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  overflowWrap="anywhere"
+                >
+                  {truncateString(protocolName, 100)}
+                </StyledText>
+              </>
+            ) : (
+              <ProtocolSetupTitleSkeleton />
+            )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
-            <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton
-              disabled={
-                mostRecentAnalysis == null ||
-                attachedInstruments == null ||
-                (protocolHasModules && attachedModules == null) ||
-                allPipettesCalibrationData == null
+            <CloseButton
+              onClose={
+                !isLoading
+                  ? () => setShowConfirmCancelModal(true)
+                  : onConfirmCancelClose
               }
-              onPlay={onPlay}
-              ready={isReadyToRun}
+            />
+            <PlayButton
+              disabled={isLoading}
+              onPlay={!isLoading ? onPlay : undefined}
+              ready={!isLoading ? isReadyToRun : false}
+              isDoorOpen={isDoorOpen}
             />
           </Flex>
         </Flex>
@@ -511,59 +585,69 @@ function PrepareToRun({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing8}
       >
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('instruments')}
-          title={t('instruments')}
-          detail={instrumentsDetail}
-          status={instrumentsStatus}
-          disabled={speccedInstrumentCount === 0}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('modules')}
-          title={t('modules')}
-          detail={modulesDetail}
-          status={modulesStatus}
-          disabled={protocolModulesInfo.length === 0}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => {
-            setODDMaintenanceFlowInProgress()
-            launchLPC()
-          }}
-          title={t('labware_position_check')}
-          detail={t(
-            lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
-          )}
-          subDetail={
-            latestCurrentOffsets.length > 0
-              ? t('offsets_applied', { count: latestCurrentOffsets.length })
-              : null
-          }
-          status="general"
-          disabled={lpcDisabledReason != null}
-          disabledReason={lpcDisabledReason}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('labware')}
-          title={t('labware')}
-          detail={labwareDetail}
-          subDetail={labwareSubDetail}
-          status="general"
-          disabled={labwareDetail === null}
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('liquids')}
-          title={t('liquids')}
-          status="general"
-          detail={
-            liquidsInProtocol.length > 0
-              ? t('initial_liquids_num', {
-                  count: liquidsInProtocol.length,
-                })
-              : t('liquids_not_in_setup')
-          }
-          disabled={liquidsInProtocol.length === 0}
-        />
+        {!isLoading ? (
+          <>
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('instruments')}
+              title={t('instruments')}
+              detail={instrumentsDetail}
+              status={instrumentsStatus}
+              disabled={speccedInstrumentCount === 0}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('modules')}
+              title={t('modules_and_deck')}
+              detail={modulesDetail}
+              subDetail={modulesSubDetail}
+              status={modulesStatus}
+              disabled={
+                protocolModulesInfo.length === 0 && !protocolHasFixtures
+              }
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => {
+                launchLPC()
+              }}
+              title={t('labware_position_check')}
+              detail={t(
+                lpcDisabledReason != null
+                  ? 'currently_unavailable'
+                  : 'recommended'
+              )}
+              subDetail={
+                latestCurrentOffsets.length > 0
+                  ? t('offsets_applied', { count: latestCurrentOffsets.length })
+                  : null
+              }
+              status="general"
+              disabled={lpcDisabledReason != null}
+              disabledReason={lpcDisabledReason}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('labware')}
+              title={t('labware')}
+              detail={labwareDetail}
+              subDetail={labwareSubDetail}
+              status="general"
+              disabled={labwareDetail == null}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('liquids')}
+              title={t('liquids')}
+              status="general"
+              detail={
+                liquidsInProtocol.length > 0
+                  ? t('initial_liquids_num', {
+                      count: liquidsInProtocol.length,
+                    })
+                  : t('liquids_not_in_setup')
+              }
+              disabled={liquidsInProtocol.length === 0}
+            />
+          </>
+        ) : (
+          <ProtocolSetupStepSkeleton />
+        )}
       </Flex>
       {LPCWizard}
       {showConfirmCancelModal ? (
@@ -584,6 +668,7 @@ export type SetupScreens =
   | 'modules'
   | 'labware'
   | 'liquids'
+  | 'deck configuration'
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -604,6 +689,10 @@ export function ProtocolSetup(): JSX.Element {
     handleProceedToRunClick,
     !configBypassHeaterShakerAttachmentConfirmation
   )
+  const [cutoutId, setCutoutId] = React.useState<CutoutId | null>(null)
+  const [providedFixtureOptions, setProvidedFixtureOptions] = React.useState<
+    CutoutFixtureId[]
+  >([])
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -622,13 +711,26 @@ export function ProtocolSetup(): JSX.Element {
       <ProtocolSetupInstruments runId={runId} setSetupScreen={setSetupScreen} />
     ),
     modules: (
-      <ProtocolSetupModules runId={runId} setSetupScreen={setSetupScreen} />
+      <ProtocolSetupModulesAndDeck
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        setCutoutId={setCutoutId}
+        setProvidedFixtureOptions={setProvidedFixtureOptions}
+      />
     ),
     labware: (
       <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
     ),
     liquids: (
       <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
+    ),
+    'deck configuration': (
+      <ProtocolSetupDeckConfiguration
+        cutoutId={cutoutId}
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        providedFixtureOptions={providedFixtureOptions}
+      />
     ),
   }
 
@@ -652,35 +754,5 @@ export function ProtocolSetup(): JSX.Element {
         {setupComponentByScreen[setupScreen]}
       </Flex>
     </>
-  )
-}
-
-interface ProtocolSetupSkeletonProps {
-  cancelAndClose: () => void
-}
-function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing40}
-      marginTop={SPACING.spacing40}
-    >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
-          <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
-          <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
-        </Flex>
-        <Flex gridGap={SPACING.spacing24}>
-          <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton onPlay={() => {}} ready={false} />
-        </Flex>
-      </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-        <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
-      </Flex>
-    </Flex>
   )
 }

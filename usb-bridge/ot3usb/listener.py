@@ -5,7 +5,10 @@ import select
 from typing import Optional, List, Any
 import serial  # type: ignore[import]
 
-from . import usb_config, default_config, usb_monitor, tcp_conn
+from . import usb_config, usb_monitor, tcp_conn
+
+from .default_config import DEFAULT_IP, DEFAULT_PORT
+from .serial_thread import QUEUE_TYPE, QUEUE_MAX_ITEMS
 
 LOG = logging.getLogger(__name__)
 
@@ -39,7 +42,7 @@ def update_ser_handle(
     elif connected and not ser:
         LOG.debug("New USB host connected")
         ser = config.get_handle()
-        tcp.connect(default_config.DEFAULT_IP, default_config.DEFAULT_PORT)
+        tcp.connect(DEFAULT_IP, DEFAULT_PORT)
     return ser
 
 
@@ -62,6 +65,7 @@ def listen(
     config: usb_config.SerialGadget,
     ser: Optional[serial.Serial],
     tcp: tcp_conn.TCPConnection,
+    worker_queue: QUEUE_TYPE,
 ) -> Optional[serial.Serial]:
     """Process any available incoming data.
 
@@ -79,6 +83,8 @@ def listen(
         ser: Handle for the serial port
 
         tcp: Handle for the socket connection to the internal server
+
+        worker_queue: Handle for queue to the serial worker thread
     """
     rlist: List[Any] = [monitor]
     if ser is not None:
@@ -105,6 +111,7 @@ def listen(
     if ser and tcp in ready:
         # Ready TCP data to echo to serial
         data = tcp.read()
-        if len(data) > 0:
-            ser.write(data)
+        worker_queue.put((ser, data))
+        if worker_queue.qsize() >= QUEUE_MAX_ITEMS:
+            LOG.warning("Worker queue appears full")
     return ser

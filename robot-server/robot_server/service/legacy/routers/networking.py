@@ -4,10 +4,11 @@ import subprocess
 
 from starlette import status
 from starlette.responses import JSONResponse
-from fastapi import APIRouter, HTTPException, File, Path, UploadFile
+from typing import Optional
+from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
+
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.system import nmcli, wifi
-
 from robot_server.errors import LegacyErrorResponse
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.networking import (
@@ -36,7 +37,7 @@ router = APIRouter()
 @router.get(
     "/networking/status",
     summary="Query the current network connectivity state",
-    description="Gets information about the OT-2's network interfaces "
+    description="Gets information about the robot's network interfaces "
     "including their connectivity, their "
     "addresses, and their networking info",
     response_model=NetworkingStatus,
@@ -60,19 +61,30 @@ async def get_networking_status() -> NetworkingStatus:
 @router.get(
     "/wifi/list",
     summary="Scan for visible Wi-Fi networks",
-    description="Scans for beaconing WiFi networks and returns the "
-    "list of visible ones along with some data about "
-    "their security and strength",
+    description="Returns the list of the visible wifi networks "
+    "along with some data about their security and strength. "
+    "Only use rescan=True based on the user needs like clicking on"
+    "the scan network button and not to just poll.",
     response_model=WifiNetworks,
 )
-async def get_wifi_networks() -> WifiNetworks:
-    networks = await nmcli.available_ssids()
+async def get_wifi_networks(
+    rescan: Optional[bool] = Query(
+        default=False,
+        description=(
+            "If `true` it forces a rescan for beaconing WiFi networks, "
+            "this is an expensive operation which can take ~10 seconds."
+            "If `false` it returns the cached wifi networks, "
+            "letting the system decide when to do a rescan."
+        ),
+    )
+) -> WifiNetworks:
+    networks = await nmcli.available_ssids(rescan)
     return WifiNetworks(list=[WifiNetworkFull(**n) for n in networks])
 
 
 @router.post(
     path="/wifi/configure",
-    summary="Configure the OT-2's Wi-Fi",
+    summary="Configure the robot's Wi-Fi",
     description=(
         "Configures the wireless network interface to " "connect to a network"
     ),
@@ -134,7 +146,7 @@ async def get_wifi_keys():
 
 @router.post(
     "/wifi/keys",
-    description="Send a new key file to the OT-2",
+    description="Send a new key file to the robot",
     responses={status.HTTP_200_OK: {"model": AddWifiKeyFileResponse}},
     response_model=AddWifiKeyFileResponse,
     status_code=status.HTTP_201_CREATED,
@@ -158,7 +170,7 @@ async def post_wifi_key(key: UploadFile = File(...)):
 
 @router.delete(
     path="/wifi/keys/{key_uuid}",
-    description="Delete a key file from the OT-2",
+    description="Delete a key file from the robot",
     response_model=V1BasicResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
@@ -211,7 +223,7 @@ async def get_eap_options() -> EapOptions:
 
 @router.post(
     "/wifi/disconnect",
-    summary="Disconnect the OT-2 from Wi-Fi",
+    summary="Disconnect the robot from Wi-Fi",
     description="Deactivates the Wi-Fi connection and removes it "
     "from known connections",
     response_model=V1BasicResponse,

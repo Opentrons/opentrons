@@ -28,24 +28,25 @@ import {
   MODULE_ICON_NAME_BY_TYPE,
   BORDERS,
   ALIGN_FLEX_END,
+  Icon,
   LocationIcon,
 } from '@opentrons/components'
-import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
 } from '../../redux/config'
+import { SmallButton } from '../../atoms/buttons'
+import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
+import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
+import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { getDisplayLocation } from './utils/getDisplayLocation'
 
-import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type {
   LabwareOffset,
   LabwareOffsetCreateData,
 } from '@opentrons/api-client'
-import { getDisplayLocation } from './utils/getDisplayLocation'
-import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { SmallButton } from '../../atoms/buttons'
+import type { ResultsSummaryStep, WorkingOffset } from './types'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -55,6 +56,8 @@ interface ResultsSummaryProps extends ResultsSummaryStep {
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleApplyOffsets: (offsets: LabwareOffsetCreateData[]) => void
+  isApplyingOffsets: boolean
+  isDeletingMaintenanceRun: boolean
 }
 export const ResultsSummary = (
   props: ResultsSummaryProps
@@ -65,10 +68,13 @@ export const ResultsSummary = (
     workingOffsets,
     handleApplyOffsets,
     existingOffsets,
+    isApplyingOffsets,
+    isDeletingMaintenanceRun,
   } = props
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )
+  const isSubmittingAndClosing = isApplyingOffsets || isDeletingMaintenanceRun
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
@@ -168,6 +174,9 @@ export const ResultsSummary = (
           alignSelf={ALIGN_FLEX_END}
           onClick={() => handleApplyOffsets(offsetsToApply)}
           buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
+          iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
+          iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
+          disabled={isSubmittingAndClosing}
         />
       ) : (
         <Flex
@@ -177,8 +186,23 @@ export const ResultsSummary = (
           alignItems={ALIGN_CENTER}
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
-          <PrimaryButton onClick={() => handleApplyOffsets(offsetsToApply)}>
-            {i18n.format(t('apply_offsets'), 'capitalize')}
+          <PrimaryButton
+            onClick={() => handleApplyOffsets(offsetsToApply)}
+            disabled={isSubmittingAndClosing}
+          >
+            <Flex>
+              {isSubmittingAndClosing ? (
+                <Icon
+                  size="1rem"
+                  spin
+                  name="ot-spinner"
+                  marginRight={SPACING.spacing8}
+                />
+              ) : null}
+              <StyledText>
+                {i18n.format(t('apply_offsets'), 'capitalize')}
+              </StyledText>
+            </Flex>
           </PrimaryButton>
         </Flex>
       )}
@@ -226,7 +250,7 @@ interface OffsetTableProps {
 
 const OffsetTable = (props: OffsetTableProps): JSX.Element => {
   const { offsets, labwareDefinitions } = props
-  const { t } = useTranslation('labware_position_check')
+  const { t, i18n } = useTranslation('labware_position_check')
   return (
     <Table>
       <thead>
@@ -244,6 +268,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
           )
           const labwareDisplayName =
             labwareDef != null ? getLabwareDisplayName(labwareDef) : ''
+
           return (
             <TableRow key={index}>
               <TableDatum>
@@ -251,7 +276,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
-                  {getDisplayLocation(location, t)}
+                  {getDisplayLocation(location, labwareDefinitions, t, i18n)}
                 </StyledText>
               </TableDatum>
               <TableDatum>

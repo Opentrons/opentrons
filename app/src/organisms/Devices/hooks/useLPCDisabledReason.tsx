@@ -14,7 +14,7 @@ interface LPCDisabledReasonProps {
   runId: string
   robotName?: string
   hasMissingModulesForOdd?: boolean
-  hasMissingPipCalForOdd?: boolean
+  hasMissingCalForOdd?: boolean
 }
 export function useLPCDisabledReason(
   props: LPCDisabledReasonProps
@@ -23,7 +23,7 @@ export function useLPCDisabledReason(
     runId,
     robotName,
     hasMissingModulesForOdd,
-    hasMissingPipCalForOdd,
+    hasMissingCalForOdd,
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const runHasStarted = useRunHasStarted(runId)
@@ -34,7 +34,7 @@ export function useLPCDisabledReason(
   )
 
   const isCalibrationComplete =
-    robotName != null ? complete : !hasMissingPipCalForOdd
+    robotName != null ? complete : !hasMissingCalForOdd
   const { missingModuleIds } = unmatchedModuleResults
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)

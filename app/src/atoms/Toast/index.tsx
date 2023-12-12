@@ -1,8 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import {
+  DefaultTheme,
+  FlattenSimpleInterpolation,
+  ThemedCssFunction,
+  css,
+} from 'styled-components'
 
 import {
+  Btn,
   Flex,
   Icon,
   Link,
@@ -44,9 +50,14 @@ export interface ToastProps extends StyleProps {
   duration?: number
   heading?: string
   displayType?: 'desktop' | 'odd'
+  exitNow?: boolean
+  linkText?: string
+  onLinkClick?: () => void
 }
 
-const TOAST_ANIMATION_DURATION = 500
+// TODO: (jh: 08/10/23) refactor toast component and render logic.
+
+export const TOAST_ANIMATION_DURATION = 500
 
 export function Toast(props: ToastProps): JSX.Element {
   const {
@@ -57,13 +68,16 @@ export function Toast(props: ToastProps): JSX.Element {
     closeButton,
     onClose,
     disableTimeout = false,
-    duration = 8000,
+    duration = 7000,
     heading,
     displayType,
+    exitNow = false,
+    linkText,
+    onLinkClick = () => null,
     ...styleProps
   } = props
   const { t } = useTranslation('shared')
-  const [isClosed, setIsClosed] = React.useState<boolean>(false)
+  const [isClosed, setIsClosed] = React.useState<boolean>(exitNow)
 
   // We want to be able to storybook both the ODD and the Desktop versions,
   // so let it (and unit tests, for that matter) be able to pass in a parameter
@@ -75,16 +89,26 @@ export function Toast(props: ToastProps): JSX.Element {
     showODDStyle = true
   }
 
-  const closeText =
-    buttonText !== undefined && buttonText.length > 0
-      ? buttonText
-      : closeButton === true
-      ? t('close')
-      : ''
-  const DESKTOP_ANIMATION_IN = css`
+  let closeText: string | null = null
+  if (buttonText != null) {
+    closeText = buttonText
+  } else if (closeButton) {
+    if (displayType === 'odd') closeText = t('close')
+    else closeText = ''
+  }
+
+  const ANIMATION_OVERFLOW = `
+  overflow: hidden;
+  `
+  const ODD_ANIMATION_OPTIMIZATIONS = `
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: opacity, transform;
+  `
+  const DESKTOP_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidein;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
 
     @keyframes slidein {
       from {
@@ -95,10 +119,10 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const DESKTOP_ANIMATION_OUT = css`
+  const DESKTOP_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideout;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
 
     @keyframes slideout {
       from {
@@ -109,40 +133,90 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const desktopAnimation = isClosed
-    ? DESKTOP_ANIMATION_OUT
-    : DESKTOP_ANIMATION_IN
 
-  const ODD_ANIMATION_IN = css`
+  const desktopAnimation = isClosed
+    ? DESKTOP_ANIMATION_SLIDE_DOWN_AND_OUT
+    : DESKTOP_ANIMATION_SLIDE_UP_AND_IN
+
+  const ODD_ANIMATION_SLIDE_UP_AND_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideup;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
 
     @keyframes slideup {
       from {
-        transform: translateY(100%);
+        transform: translate3d(0%, 50%, 0);
+        filter: opacity(0);
       }
       to {
-        transform: translateY(0%);
+        transform: translate3d(0%, 0%, 0);
+        filter: opacity(100%);
       }
     }
   `
-  const ODD_ANIMATION_OUT = css`
+  const ODD_ANIMATION_SLIDE_DOWN_AND_OUT = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidedown;
-    overflow: hidden;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
 
     @keyframes slidedown {
       from {
-        transform: translateY(0%);
+        filter: opacity(100%);
       }
       to {
-        transform: translateY(100%);
+        filter: opacity(0);
+      }
+    }
+  `
+  const ODD_ANIMATION_FADE_UP_AND_OUT = css`
+    animation-duration: ${TOAST_ANIMATION_DURATION}ms;
+    animation-name: fadeUpAndOut;
+    ${ANIMATION_OVERFLOW}
+    ${ODD_ANIMATION_OPTIMIZATIONS}
+
+    @keyframes fadeUpAndOut {
+      from {
+        filter: opacity(100%);
+      }
+      to {
+        filter: opacity(0%);
       }
     }
   `
 
-  const oddAnimation = isClosed ? ODD_ANIMATION_OUT : ODD_ANIMATION_IN
+  const ODD_ANIMATION_NONE = css``
+
+  const TEXT_STYLE = css`
+    color: ${COLORS.darkBlackEnabled};
+    font-size: ${showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP};
+    font-weight: ${showODDStyle
+      ? TYPOGRAPHY.fontWeightSemiBold
+      : TYPOGRAPHY.fontWeightRegular};
+    line-height: ${showODDStyle
+      ? TYPOGRAPHY.lineHeight28
+      : TYPOGRAPHY.lineHeight20};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `
+
+  let oddAnimation: FlattenSimpleInterpolation | ThemedCssFunction<DefaultTheme>
+
+  if (isClosed) {
+    if (exitNow) {
+      oddAnimation = ODD_ANIMATION_FADE_UP_AND_OUT
+    } else {
+      oddAnimation = ODD_ANIMATION_SLIDE_DOWN_AND_OUT
+    }
+  } else {
+    if (exitNow) {
+      oddAnimation = ODD_ANIMATION_NONE
+    } else {
+      oddAnimation = ODD_ANIMATION_SLIDE_UP_AND_IN
+    }
+  }
 
   const toastStyleByType: {
     [k in ToastType]: {
@@ -194,6 +268,7 @@ export function Toast(props: ToastProps): JSX.Element {
     duration: number | undefined
   ): number => {
     const combinedDuration = (message.length + heading.length) * 50
+    if (exitNow) return 0
     if (duration !== undefined) {
       return duration
     }
@@ -206,13 +281,28 @@ export function Toast(props: ToastProps): JSX.Element {
     return combinedDuration
   }
 
-  if (!disableTimeout) {
+  // Handle dismissal of toast when no timer is set.
+  const onCloseHandler = (): void => {
+    setIsClosed(true)
+    setTimeout(() => {
+      onClose?.()
+    }, TOAST_ANIMATION_DURATION - 50)
+  }
+
+  const isAutomaticAnimationExit = !disableTimeout || exitNow
+
+  if (isAutomaticAnimationExit) {
     setTimeout(() => {
       setIsClosed(true)
       setTimeout(() => {
         onClose?.()
       }, TOAST_ANIMATION_DURATION - 50)
     }, calculatedDuration(message, headingText, duration))
+  }
+
+  // Require intentional clicking if links and close button present on toast.
+  const toastClose = (): void => {
+    if (closeButton == null || linkText == null) onCloseHandler()
   }
 
   return (
@@ -228,7 +318,7 @@ export function Toast(props: ToastProps): JSX.Element {
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
-      onClick={closeText.length > 0 ? onClose : undefined}
+      onClick={toastClose}
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
@@ -289,29 +379,28 @@ export function Toast(props: ToastProps): JSX.Element {
               {headingText}
             </StyledText>
           ) : null}
-          <StyledText
-            color={COLORS.darkBlackEnabled}
-            fontSize={
-              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
-            }
-            fontWeight={
-              showODDStyle
-                ? TYPOGRAPHY.fontWeightSemiBold
-                : TYPOGRAPHY.fontWeightRegular
-            }
-            lineHeight={
-              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
-            }
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
-          >
-            {message}
-          </StyledText>
+          <Flex alignItems={ALIGN_CENTER}>
+            <StyledText css={TEXT_STYLE}>{message}</StyledText>
+            {linkText ? (
+              <Link
+                role="button"
+                onClick={() => {
+                  onLinkClick()
+                  onCloseHandler()
+                }}
+                css={TEXT_STYLE}
+                marginLeft={SPACING.spacing4}
+                marginRight={SPACING.spacing8}
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              >
+                {linkText}
+              </Link>
+            ) : null}
+          </Flex>
         </Flex>
       </Flex>
-      {closeText.length > 0 && (
-        <Link role="button">
+      {closeText ? (
+        <Link role="button" onClick={() => onCloseHandler()}>
           <StyledText
             color={COLORS.darkBlackEnabled}
             fontSize={
@@ -334,7 +423,18 @@ export function Toast(props: ToastProps): JSX.Element {
             {closeText}
           </StyledText>
         </Link>
-      )}
+      ) : null}
+      {!closeText && closeButton ? (
+        <Btn onClick={() => onCloseHandler()}>
+          <Icon
+            width={SPACING.spacing24}
+            height={SPACING.spacing24}
+            marginTop={SPACING.spacing6}
+            name="close"
+            aria-label="close_icon"
+          />
+        </Btn>
+      ) : null}
     </Flex>
   )
 }

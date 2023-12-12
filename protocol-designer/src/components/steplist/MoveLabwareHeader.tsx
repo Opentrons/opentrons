@@ -1,6 +1,19 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
+import {
+  getLabwareDisplayName,
+  getModuleDisplayName,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
+import {
+  getAdditionalEquipmentEntities,
+  getLabwareEntities,
+  getModuleEntities,
+} from '../../step-forms/selectors'
+import { getHasWasteChute } from '../labware'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
@@ -12,9 +25,14 @@ interface MoveLabwareHeaderProps {
   useGripper: boolean
 }
 
-//  TODO(jr, 7/31/23): add text to i18n
 export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   const { sourceLabwareNickname, destinationSlot, useGripper } = props
+  const { i18n } = useTranslation()
+  const moduleEntities = useSelector(getModuleEntities)
+  const labwareEntities = useSelector(getLabwareEntities)
+  const additionalEquipmentEntities = useSelector(
+    getAdditionalEquipmentEntities
+  )
 
   const [sourceTargetProps, sourceTooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
@@ -26,16 +44,40 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
     strategy: TOOLTIP_FIXED,
   })
 
-  const destSlot = destinationSlot === 'offDeck' ? 'off deck' : destinationSlot
+  let destSlot: string | null | undefined = null
+  if (destinationSlot === 'offDeck') {
+    destSlot = 'off-deck'
+  } else if (
+    destinationSlot != null &&
+    moduleEntities[destinationSlot] != null
+  ) {
+    destSlot = `${getModuleDisplayName(moduleEntities[destinationSlot].model)}`
+  } else if (
+    destinationSlot != null &&
+    labwareEntities[destinationSlot] != null
+  ) {
+    destSlot = getLabwareDisplayName(labwareEntities[destinationSlot].def)
+  } else if (
+    getHasWasteChute(additionalEquipmentEntities) &&
+    destinationSlot === WASTE_CHUTE_CUTOUT
+  ) {
+    destSlot = i18n.t('application.waste_chute_slot')
+  } else {
+    destSlot = destinationSlot
+  }
   return (
     <>
       <li className={styles.substep_header}>
-        <span>{useGripper ? 'With gripper' : 'Manually'} </span>
+        <span>
+          {useGripper
+            ? i18n.t('application.with_gripper')
+            : i18n.t('application.manually')}
+        </span>
       </li>
       <li className={styles.substep_header}>
-        <span>LABWARE</span>
+        <span>{i18n.t('application.labware')}</span>
         <span className={styles.spacer} />
-        <span>DESTINATION SLOT</span>
+        <span>{i18n.t('application.new_location')}</span>
       </li>
 
       <Tooltip {...sourceTooltipProps}>
@@ -43,7 +85,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
       </Tooltip>
 
       <Tooltip {...destTooltipProps}>
-        <LabwareTooltipContents labwareNickname={destinationSlot} />
+        <LabwareTooltipContents labwareNickname={destSlot} />
       </Tooltip>
 
       <PDListItem

@@ -41,28 +41,120 @@ import {
   LabwareEntity,
   PipetteEntity,
   InvariantContext,
+  LabwareEntities,
+  AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
-import { StepFieldName } from '../../form-types'
-import type { LabwareLocation } from '@opentrons/shared-data'
+import { getStagingAreaAddressableAreas } from '../../utils'
+import type { StepFieldName } from '../../form-types'
+import type {
+  AddressableAreaName,
+  CutoutId,
+  LabwareLocation,
+} from '@opentrons/shared-data'
+
 export type { StepFieldName }
 
-const getLabwareEntity = (
+interface LabwareEntityWithTouchTip extends LabwareEntity {
+  isTouchTipAllowed: boolean
+}
+
+interface AdditionalEquipmentEntityWithTouchTip
+  extends AdditionalEquipmentEntity {
+  isTouchTipAllowed: boolean
+}
+
+type LabwareOrAdditionalEquipmentEntity =
+  | LabwareEntityWithTouchTip
+  | AdditionalEquipmentEntityWithTouchTip
+
+const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
   id: string
-): LabwareEntity | null => {
-  return state.labwareEntities[id] || null
+): LabwareOrAdditionalEquipmentEntity | null => {
+  if (state.labwareEntities[id] != null) {
+    const labwareDisallowsTouchTip =
+      state.labwareEntities[id]?.def.parameters.quirks?.includes(
+        'touchTipDisabled'
+      ) ?? false
+    return {
+      ...state.labwareEntities[id],
+      isTouchTipAllowed: !labwareDisallowsTouchTip,
+    }
+  } else if (state.additionalEquipmentEntities[id] != null) {
+    return {
+      ...state.additionalEquipmentEntities[id],
+      isTouchTipAllowed: false,
+    }
+  } else return null
+}
+
+const getIsAdapterLocation = (
+  newLocation: string,
+  labwareEntities: LabwareEntities
+): boolean => {
+  if (labwareEntities[newLocation] == null) return false
+  return (
+    labwareEntities[newLocation].def.allowedRoles?.includes('adapter') ?? false
+  )
+}
+const getIsAdditionalEquipmentLocation = (
+  newLocation: string,
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+): boolean => {
+  const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'wasteChute'
+  )
+  const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
+    .filter(aE => aE.name === 'stagingArea')
+    ?.map(equipment => {
+      return equipment.location ?? ''
+    })
+  const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
+    stagingAreaCutoutIds as CutoutId[]
+  )
+
+  const isNewLocationInWasteChute =
+    wasteChuteEntity?.name === 'wasteChute' &&
+    wasteChuteEntity?.location === newLocation
+
+  const isNewLocationInStagingArea =
+    stagingAreaCutoutIds != null &&
+    stagingAreaAddressableAreaNames.includes(newLocation as AddressableAreaName)
+
+  return isNewLocationInWasteChute || isNewLocationInStagingArea
 }
 
 const getLabwareLocation = (
   state: InvariantContext,
   newLocationString: string
 ): LabwareLocation | null => {
+  const isWasteChuteLocation =
+    Object.values(state.additionalEquipmentEntities).find(
+      aE => aE.location === newLocationString && aE.name === 'wasteChute'
+    ) != null
+
   if (newLocationString === 'offDeck') {
     return 'offDeck'
   } else if (newLocationString in state.moduleEntities) {
     return { moduleId: newLocationString }
+  } else if (
+    newLocationString != null &&
+    getIsAdapterLocation(newLocationString, state.labwareEntities)
+  ) {
+    return { labwareId: newLocationString }
+  } else if (
+    getIsAdditionalEquipmentLocation(
+      newLocationString,
+      state.additionalEquipmentEntities
+    )
+  ) {
+    return {
+      addressableAreaName: isWasteChuteLocation
+        ? 'gripperWasteChute'
+        : newLocationString,
+    }
   } else {
-    // assume it is a slot
     return { slotName: newLocationString }
   }
 }
@@ -91,7 +183,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   aspirate_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -122,7 +214,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   dispense_labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   dispense_mix_times: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
@@ -140,7 +232,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   dispense_wells: {
-    getErrors: composeErrors(requiredField, minimumWellCount(1)),
+    getErrors: composeErrors(requiredField, minimumWellCount(0)),
     maskValue: defaultTo([]),
   },
   disposalVolume_volume: {
@@ -153,7 +245,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   labware: {
     getErrors: composeErrors(requiredField),
-    hydrate: getLabwareEntity,
+    hydrate: getLabwareOrAdditionalEquipmentEntity,
   },
   aspirate_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),

@@ -14,6 +14,7 @@ import type {
   ModuleModel,
   PipetteNameSpecs,
   PipetteName,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -40,6 +41,7 @@ export interface LabwareTemporalProperties {
 
 export interface PipetteTemporalProperties {
   mount: Mount
+  nozzles?: NozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -112,9 +114,15 @@ export interface NormalizedPipetteById {
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
-    name: 'gripper'
+    name: 'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
     id: string
+    location?: string
   }
+}
+
+export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export interface AdditionalEquipmentEntities {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
@@ -159,12 +167,13 @@ interface CommonArgs {
 
 export type SharedTransferLikeArgs = CommonArgs & {
   pipette: string // PipetteId
-
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
   volume: number
-
+  /** drop tip location entity id */
+  dropTipLocation: string
   // ===== ASPIRATE SETTINGS =====
   /** Pre-wet tip with ??? uL liquid from the first source well. */
   preWetTip: boolean
@@ -202,7 +211,7 @@ export type ConsolidateArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'consolidate'
 
   sourceWells: string[]
-  destWell: string
+  destWell: string | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -219,7 +228,7 @@ export type TransferArgs = SharedTransferLikeArgs & {
   commandCreatorFnName: 'transfer'
 
   sourceWells: string[]
-  destWells: string[]
+  destWells: string[] | null
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: string | null | undefined
@@ -254,6 +263,7 @@ export type MixArgs = CommonArgs & {
   commandCreatorFnName: 'mix'
   labware: string
   pipette: string
+  nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   wells: string[]
   /** Mix volume (should not exceed pipette max) */
   volume: number
@@ -264,7 +274,8 @@ export type MixArgs = CommonArgs & {
   touchTipMmFromBottom: number
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions
-
+  /** drop tip location entity id */
+  dropTipLocation: string
   /** If given, blow out in the specified destination after mixing each well */
   blowoutLocation: string | null | undefined
   blowoutFlowRateUlSec: number
@@ -439,6 +450,7 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
+  additionalEquipmentEntities: AdditionalEquipmentEntities
   config: Config
 }
 
@@ -477,31 +489,42 @@ export interface RobotState {
         [well: string]: LocationLiquidState
       }
     }
+    additionalEquipment: {
+      /** for the waste chute and trash bin */
+      [additionalEquipmentId: string]: LocationLiquidState
+    }
   }
 }
 
 export type ErrorType =
+  | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
+  | 'EQUIPMENT_DOES_NOT_EXIST'
+  | 'GRIPPER_REQUIRED'
+  | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
+  | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
+  | 'HEATER_SHAKER_IS_SHAKING'
+  | 'HEATER_SHAKER_LATCH_CLOSED'
+  | 'HEATER_SHAKER_LATCH_OPEN'
+  | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
+  | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'INSUFFICIENT_TIPS'
+  | 'INVALID_SLOT'
   | 'LABWARE_DOES_NOT_EXIST'
+  | 'LABWARE_OFF_DECK'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
+  | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
+  | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'NO_TIP_ON_PIPETTE'
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'PIPETTE_VOLUME_EXCEEDED'
-  | 'TIP_VOLUME_EXCEEDED'
-  | 'MISSING_TEMPERATURE_STEP'
-  | 'THERMOCYCLER_LID_CLOSED'
-  | 'INVALID_SLOT'
-  | 'HEATER_SHAKER_LATCH_OPEN'
-  | 'HEATER_SHAKER_IS_SHAKING'
+  | 'PIPETTING_INTO_COLUMN_4'
+  | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
+  | 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
-  | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
-  | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
-  | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
-  | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
-  | 'HEATER_SHAKER_LATCH_CLOSED'
-  | 'LABWARE_OFF_DECK'
+  | 'THERMOCYCLER_LID_CLOSED'
+  | 'TIP_VOLUME_EXCEEDED'
 
 export interface CommandCreatorError {
   message: string
@@ -511,6 +534,8 @@ export interface CommandCreatorError {
 export type WarningType =
   | 'ASPIRATE_MORE_THAN_WELL_CONTENTS'
   | 'ASPIRATE_FROM_PRISTINE_WELL'
+  | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
+  | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
 
 export interface CommandCreatorWarning {
   message: string
@@ -554,6 +579,3 @@ export interface RobotStateAndWarnings {
   robotState: RobotState
   warnings: CommandCreatorWarning[]
 }
-
-// Copied from PD
-export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'

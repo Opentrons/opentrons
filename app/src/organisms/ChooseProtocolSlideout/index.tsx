@@ -21,6 +21,7 @@ import {
   Icon,
   PrimaryButton,
   COLORS,
+  ProtocolDeck,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -30,7 +31,6 @@ import { appShellRequestor } from '../../redux/shell/remote'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
@@ -205,56 +205,60 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
           selectedProtocol != null &&
           storedProtocol.protocolKey === selectedProtocol.protocolKey
         return (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            key={storedProtocol.protocolKey}
-          >
-            <MiniCard
-              isSelected={isSelected}
-              isError={runCreationError != null}
-              onClick={() => handleSelectProtocol(storedProtocol)}
+          <>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              key={storedProtocol.protocolKey}
             >
-              <Box display="grid" gridTemplateColumns="1fr 3fr">
-                <Box
-                  marginY={SPACING.spacingAuto}
-                  backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                  marginRight={SPACING.spacing16}
-                  height="4.25rem"
-                  width="4.75rem"
-                >
-                  <DeckThumbnail
-                    commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
-                    labware={storedProtocol.mostRecentAnalysis?.labware ?? []}
-                  />
+              <MiniCard
+                isSelected={isSelected}
+                isError={runCreationError != null}
+                onClick={() => handleSelectProtocol(storedProtocol)}
+              >
+                <Box display="grid" gridTemplateColumns="1fr 3fr">
+                  <Box
+                    marginY={SPACING.spacingAuto}
+                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                    marginRight={SPACING.spacing16}
+                    height="4.25rem"
+                    width="4.75rem"
+                  >
+                    {storedProtocol.mostRecentAnalysis != null ? (
+                      <ProtocolDeck
+                        protocolAnalysis={storedProtocol.mostRecentAnalysis}
+                      />
+                    ) : null}
+                  </Box>
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    overflowWrap="anywhere"
+                  >
+                    {storedProtocol.mostRecentAnalysis?.metadata
+                      ?.protocolName ??
+                      first(storedProtocol.srcFileNames) ??
+                      storedProtocol.protocolKey}
+                  </StyledText>
                 </Box>
-                <StyledText
-                  as="p"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  overflowWrap="anywhere"
-                >
-                  {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
-                    first(storedProtocol.srcFileNames) ??
-                    storedProtocol.protocolKey}
-                </StyledText>
-              </Box>
-              {runCreationError != null && isSelected ? (
-                <>
-                  <Box flex="1 1 auto" />
-                  <Icon
-                    name="alert-circle"
-                    size="1.25rem"
-                    color={COLORS.errorEnabled}
-                  />
-                </>
-              ) : null}
-            </MiniCard>
+                {runCreationError != null && isSelected ? (
+                  <>
+                    <Box flex="1 1 auto" />
+                    <Icon
+                      name="alert-circle"
+                      size="1.25rem"
+                      color={COLORS.errorEnabled}
+                    />
+                  </>
+                ) : null}
+              </MiniCard>
+            </Flex>
             {runCreationError != null && isSelected ? (
               <StyledText
                 as="label"
                 color={COLORS.errorText}
                 overflowWrap="anywhere"
                 display={DISPLAY_BLOCK}
-                marginTop={`-${SPACING.spacing4}`}
+                marginTop={`-${SPACING.spacing8}`}
                 marginBottom={SPACING.spacing8}
               >
                 {runCreationErrorCode === 409 ? (
@@ -278,7 +282,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 )}
               </StyledText>
             ) : null}
-          </Flex>
+          </>
         )
       })}
     </Flex>
@@ -290,7 +294,12 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       width="100%"
       minHeight="11rem"
       padding={SPACING.spacing16}
-      css={BORDERS.cardOutlineBorder}
+      css={css`
+        ${BORDERS.cardOutlineBorder}
+        &:hover {
+          border-color: ${COLORS.medGreyEnabled};
+        }
+      `}
     >
       <Icon size="1.25rem" name="alert-circle" color={COLORS.medGreyEnabled} />
       <StyledText

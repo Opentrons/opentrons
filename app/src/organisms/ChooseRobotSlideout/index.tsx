@@ -200,7 +200,12 @@ export function ChooseRobotSlideout(
         </Flex>
         {!isScanning && healthyReachableRobots.length === 0 ? (
           <Flex
-            css={BORDERS.cardOutlineBorder}
+            css={css`
+              ${BORDERS.cardOutlineBorder}
+              &:hover {
+                border-color: ${COLORS.medGreyEnabled};
+              }
+            `}
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
@@ -217,7 +222,7 @@ export function ChooseRobotSlideout(
             const isSelected =
               selectedRobot != null && selectedRobot.ip === robot.ip
             return (
-              <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
+              <>
                 <AvailableRobotOption
                   key={robot.ip}
                   robot={robot}
@@ -242,7 +247,7 @@ export function ChooseRobotSlideout(
                     color={COLORS.errorText}
                     overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
-                    marginTop={`-${SPACING.spacing4}`}
+                    marginTop={`-${SPACING.spacing8}`}
                     marginBottom={SPACING.spacing8}
                   >
                     {runCreationErrorCode === 409 ? (
@@ -266,7 +271,7 @@ export function ChooseRobotSlideout(
                     )}
                   </StyledText>
                 )}
-              </Flex>
+              </>
             )
           })
         )}

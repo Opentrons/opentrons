@@ -177,6 +177,17 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
   }
 }
 
+function truncateAndAnnotate(changelog, limit, prevtag, thistag) {
+  const linkmessage = `\n...and more! Log link: https://github.com/${REPO_DETAILS.owner}/${REPO_DETAILS.repo}/compare/${prevtag}...${thistag}`
+  const limitWithMessage = limit - linkmessage.length
+  if (changelog.length < limitWithMessage) {
+    return changelog
+  }
+  const truncated = changelog.substring(0, limitWithMessage)
+
+  return truncated + linkmessage
+}
+
 async function main() {
   const { args, flags } = parseArgs(process.argv.slice(2))
 
@@ -197,12 +208,18 @@ async function main() {
     currentVersion,
     previousVersion
   )
+  const truncatedChangelog = truncateAndAnnotate(
+    changelog,
+    10000,
+    prefixForProject(project) + previousVersion,
+    prefixForProject(project) + currentVersion
+  )
   return await createRelease(
     token,
     tag,
     project,
     currentVersion,
-    changelog,
+    truncatedChangelog,
     deploy
   )
 }

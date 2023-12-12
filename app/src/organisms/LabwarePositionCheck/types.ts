@@ -21,6 +21,8 @@ export interface CheckTipRacksStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  definitionUri: string
+  adapterId?: string
 }
 export interface AttachProbeStep {
   section: typeof SECTIONS.ATTACH_PROBE
@@ -31,12 +33,15 @@ export interface PickUpTipStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  definitionUri: string
+  adapterId?: string
 }
 export interface CheckPositionsStep {
   section: typeof SECTIONS.CHECK_POSITIONS
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  definitionUri: string
   moduleId?: string
 }
 export interface CheckLabwareStep {
@@ -44,13 +49,17 @@ export interface CheckLabwareStep {
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  definitionUri: string
   moduleId?: string
+  adapterId?: string
 }
 export interface ReturnTipStep {
   section: typeof SECTIONS.RETURN_TIP
   pipetteId: string
   labwareId: string
   location: LabwareOffsetLocation
+  definitionUri: string
+  adapterId?: string
 }
 export interface DetachProbeStep {
   section: typeof SECTIONS.DETACH_PROBE

@@ -49,7 +49,6 @@ export function WizardRequiredEquipmentList(
           >
             {t('you_will_need')}
           </StyledText>
-
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
@@ -77,7 +76,11 @@ export function WizardRequiredEquipmentList(
         </>
       ) : (
         <>
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <StyledText
+            as="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginBottom={SPACING.spacing8}
+          >
             {t('you_will_need')}
           </StyledText>
           <Divider />
@@ -106,12 +109,13 @@ interface RequiredEquipmentCardProps {
   loadName: string
   displayName: string
   subtitle?: string
+  bottomDivider?: boolean
 }
 
 function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
-  const { loadName, displayName, subtitle } = props
+  const { loadName, displayName, subtitle, bottomDivider = true } = props
 
-  let imageSrc: string = labwareImages.generic_custom_tiprack
+  let imageSrc: string | null = null
   if (loadName in labwareImages) {
     imageSrc = labwareImages[loadName as keyof typeof labwareImages]
   } else if (loadName in equipmentImages) {
@@ -125,24 +129,26 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <Flex
-          height={loadName in equipmentImages ? '3.5rem' : '6rem'}
-          flex="0 1 30%"
-          justifyContent={JUSTIFY_CENTER}
-          alignItems={ALIGN_CENTER}
-          marginRight={SPACING.spacing16}
-        >
-          <img
-            css={css`
-              max-width: 100%;
-              max-height: 100%;
-              flex: ${loadName in equipmentImages ? `0` : `0 1 5rem`};
-              display: block;
-            `}
-            src={imageSrc}
-            alt={displayName}
-          />
-        </Flex>
+        {imageSrc != null ? (
+          <Flex
+            height={loadName in equipmentImages ? '3.5rem' : '6rem'}
+            flex="0 1 30%"
+            justifyContent={JUSTIFY_CENTER}
+            alignItems={ALIGN_CENTER}
+            marginRight={SPACING.spacing16}
+          >
+            <img
+              css={css`
+                max-width: 100%;
+                max-height: 100%;
+                flex: ${loadName in equipmentImages ? `0` : `0 1 5rem`};
+                display: block;
+              `}
+              src={imageSrc}
+              alt={displayName}
+            />
+          </Flex>
+        ) : null}
         <Flex
           flex="0 1 70%"
           flexDirection={DIRECTION_COLUMN}
@@ -156,7 +162,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
           ) : null}
         </Flex>
       </Flex>
-      <Divider />
+      {bottomDivider ? <Divider /> : null}
     </>
   )
 }

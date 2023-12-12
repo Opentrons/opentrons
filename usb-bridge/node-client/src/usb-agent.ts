@@ -2,7 +2,7 @@ import * as http from 'http'
 import agent from 'agent-base'
 import type { Duplex } from 'stream'
 
-import { ReadlineParser, SerialPort } from 'serialport'
+import { SerialPort } from 'serialport'
 
 import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
@@ -108,6 +108,7 @@ export function createSerialPortListMonitor(
   return { start, stop }
 }
 
+const SOCKET_OPEN_RETRY_TIME = 10000
 class SerialPortSocket extends SerialPort {
   // allow node socket destroy
   destroy(): void {}
@@ -195,10 +196,18 @@ class SerialPortHttpAgent extends http.Agent {
 
     const socket = new SerialPortSocket({
       path: this.options.path,
-      baudRate: 115200,
+      baudRate: 1152000,
     })
     if (!socket.isOpen && !socket.opening) {
-      socket.open()
+      socket.open(error => {
+        this.log(
+          'error',
+          `could not open serialport socket: ${error?.message}. Retrying in ${SOCKET_OPEN_RETRY_TIME} ms`
+        )
+        setTimeout(() => {
+          socket.open()
+        }, SOCKET_OPEN_RETRY_TIME)
+      })
     }
     if (socket != null) oncreate(null, socket)
   }
@@ -230,6 +239,11 @@ function installListeners(
   }
   s.on('free', onFree)
 
+  function onError(err: Error): void {
+    agent.log('error', `CLIENT socket onError: ${err?.message}`)
+  }
+  s.on('error', onError)
+
   function onClose(): void {
     agent.log('debug', 'CLIENT socket onClose')
     // This is the only place where sockets get removed from the Agent.
@@ -241,27 +255,17 @@ function installListeners(
   s.on('close', onClose)
 
   function onTimeout(): void {
-    agent.log('debug', 'CLIENT socket onTimeout')
+    agent.log(
+      'debug',
+      'CLIENT socket onTimeout, closing and reopening the socket'
+    )
 
-    // Destroy if in free list.
-    // TODO(ronag): Always destroy, even if not in free list.
-    const sockets = agent.freeSockets
-    if (
-      Object.keys(sockets).some(name =>
-        sockets[name]?.includes((s as unknown) as Socket)
-      )
-    ) {
-      return s.destroy()
-    }
+    s.close()
+    setTimeout(() => {
+      s.open()
+    }, 3000)
   }
   s.on('timeout', onTimeout)
-
-  function onLineParserData(line: string): void {
-    agent.log('info', line)
-  }
-  // TODO(bh, 2023-05-05): determine delimiter for end of response body or use different parser
-  const parser = s.pipe(new ReadlineParser())
-  parser.on('data', onLineParserData)
 
   function onFinish(): void {
     agent.log('info', 'socket finishing: closing serialport')
@@ -283,7 +287,6 @@ function installListeners(
     s.removeListener('close', onClose)
     s.removeListener('free', onFree)
     s.removeListener('timeout', onTimeout)
-    parser.removeListener('data', onLineParserData)
     s.removeListener('finish', onFinish)
     s.removeListener('agentRemove', onRemove)
     if (agent[kOnKeylog] != null) {

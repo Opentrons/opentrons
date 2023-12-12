@@ -51,7 +51,7 @@ describe('useEstopQuery hook', () => {
   })
 
   it('should return no data if estop request fails', () => {
-    when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetEstopStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
     const { result } = renderHook(useEstopQuery, { wrapper })
@@ -60,7 +60,7 @@ describe('useEstopQuery hook', () => {
   })
 
   it('should return estop state response data', async () => {
-    when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
+    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetEstopStatus)
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({

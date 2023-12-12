@@ -16,7 +16,7 @@ describe('NoProtocols', () => {
   it('should render text and image', () => {
     const [{ getByText, getByRole }] = render()
     getByText('No protocols to show!')
-    getByText('Send a protocol from the Opentrons app to get started.')
+    getByText('Send a protocol from the Opentrons App to get started.')
     const image = getByRole('img')
     expect(image.getAttribute('src')).toEqual(NO_PROTOCOLS_PNG_FINE_NAME)
   })

@@ -1,11 +1,10 @@
 """Opentrons API Workarounds."""
-from atexit import register as atexit_register
 from datetime import datetime
 from urllib.request import Request, urlopen
 from typing import List
 import platform
 from json import loads as json_loads
-
+from hardware_testing.data import ui
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
@@ -44,7 +43,6 @@ def http_get_all_labware_offsets() -> List[dict]:
     runs_response = urlopen(req)
     runs_response_data = runs_response.read()
     stop_server_ot3()
-    atexit_register(start_server_ot3)
 
     runs_json = json_loads(runs_response_data)
     protocols_list = runs_json["data"]
@@ -84,7 +82,8 @@ def get_latest_offset_for_labware(
         if _o["location"]["slotName"] != lw_slot:
             return False
         offset_uri = _o["definitionUri"]
-        if offset_uri != lw_uri:
+        if offset_uri[0:-1] != lw_uri[0:-1]:  # drop schema version number
+            ui.print_info(f"{_o} does not apply {offset_uri} != {lw_uri}")
             # NOTE: we're allowing tip-rack adapters to share offsets
             #       because it doesn't make a difference which volume
             #       of tip it holds

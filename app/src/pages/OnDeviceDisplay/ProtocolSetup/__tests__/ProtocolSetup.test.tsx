@@ -9,23 +9,35 @@ import {
   useInstrumentsQuery,
   useRunQuery,
   useProtocolQuery,
+  useDoorQuery,
+  useModulesQuery,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
+import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
+import {
+  FLEX_ROBOT_TYPE,
+  getDeckDefFromRobotType,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+} from '@opentrons/shared-data'
+import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
 import { i18n } from '../../../../i18n'
+import { useToaster } from '../../../../organisms/ToasterOven'
 import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
   useLPCDisabledReason,
   useRunCreatedAtTimestamp,
+  useModuleCalibrationStatus,
+  useRobotType,
 } from '../../../../organisms/Devices/hooks'
+import { getLocalRobot } from '../../../../redux/discovery'
 import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupModules } from '../../../../organisms/ProtocolSetupModules'
-import { getUnmatchedModulesForProtocol } from '../../../../organisms/ProtocolSetupModules/utils'
+import { ProtocolSetupModulesAndDeck } from '../../../../organisms/ProtocolSetupModulesAndDeck'
+import { getUnmatchedModulesForProtocol } from '../../../../organisms/ProtocolSetupModulesAndDeck/utils'
 import { useLaunchLPC } from '../../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '../../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockProtocolModuleInfo } from '../../../../organisms/ProtocolSetupInstruments/__fixtures__'
@@ -34,10 +46,15 @@ import {
   useRunStatus,
 } from '../../../../organisms/RunTimeControl/hooks'
 import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
+import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ProtocolSetup } from '..'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type {
+  DeckConfiguration,
+  CompletedProtocolAnalysis,
+} from '@opentrons/shared-data'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
@@ -62,14 +79,16 @@ jest.mock(
 jest.mock(
   '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 )
-jest.mock('../../../../organisms/ProtocolSetupModules')
-jest.mock('../../../../organisms/ProtocolSetupModules/utils')
+jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck')
+jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck/utils')
 jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolSetupLiquids')
 jest.mock('../../../../organisms/ModuleCard/hooks')
-jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
+jest.mock('../../../../organisms/ToasterOven')
+jest.mock('../../../../resources/deck_configuration/hooks')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -83,8 +102,8 @@ const mockUseRunCreatedAtTimestamp = useRunCreatedAtTimestamp as jest.MockedFunc
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
 >
-const mockProtocolSetupModules = ProtocolSetupModules as jest.MockedFunction<
-  typeof ProtocolSetupModules
+const mockProtocolSetupModulesAndDeck = ProtocolSetupModulesAndDeck as jest.MockedFunction<
+  typeof ProtocolSetupModulesAndDeck
 >
 const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jest.MockedFunction<
   typeof getUnmatchedModulesForProtocol
@@ -123,8 +142,30 @@ const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
 const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
   typeof useIsHeaterShakerInProtocol
 >
+const mockUseRobotType = useRobotType as jest.MockedFunction<
+  typeof useRobotType
+>
 const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
   typeof ConfirmAttachedModal
+>
+const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
+  typeof useDoorQuery
+>
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
+>
+const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
+  typeof useDeckConfigurationQuery
+>
+const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
+const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
+  typeof useModuleCalibrationStatus
+>
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
+const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility as jest.MockedFunction<
+  typeof useDeckConfigurationCompatibility
 >
 
 const render = (path = '/') => {
@@ -140,6 +181,7 @@ const render = (path = '/') => {
   )
 }
 
+const ROBOT_NAME = 'fake-robot-name'
 const RUN_ID = 'my-run-id'
 const PROTOCOL_ID = 'my-protocol-id'
 const PROTOCOL_NAME = 'Mock Protocol Name'
@@ -185,14 +227,27 @@ const mockOffset = {
   vector: { x: 1, y: 2, z: 3 },
 }
 
+const mockDoorStatus = {
+  data: {
+    status: 'closed',
+    doorRequiredClosedForProtocol: true,
+  },
+}
+const mockFixture = {
+  cutoutId: 'cutoutD1',
+  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+}
+
+const MOCK_MAKE_SNACKBAR = jest.fn()
+
 describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
   beforeEach(() => {
     mockLaunchLPC = jest.fn()
     mockUseLPCDisabledReason.mockReturnValue(null)
     mockUseAttachedModules.mockReturnValue([])
-    mockProtocolSetupModules.mockReturnValue(
-      <div>Mock ProtocolSetupModules</div>
+    mockProtocolSetupModulesAndDeck.mockReturnValue(
+      <div>Mock ProtocolSetupModulesAndDeck</div>
     )
     mockProtocolSetupLiquids.mockReturnValue(
       <div>Mock ProtocolSetupLiquids</div>
@@ -200,6 +255,11 @@ describe('ProtocolSetup', () => {
     mockConfirmCancelRunModal.mockReturnValue(
       <div>Mock ConfirmCancelRunModal</div>
     )
+    mockUseModuleCalibrationStatus.mockReturnValue({ complete: true })
+    mockGetLocalRobot.mockReturnValue({ name: ROBOT_NAME } as any)
+    when(mockUseRobotType)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockUseRunControls)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -254,7 +314,7 @@ describe('ProtocolSetup', () => {
       .calledWith()
       .mockReturnValue({ data: { data: [] } } as any)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, PROTOCOL_NAME)
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
@@ -263,6 +323,19 @@ describe('ProtocolSetup', () => {
     mockConfirmAttachedModal.mockReturnValue(
       <div>mock ConfirmAttachedModal</div>
     )
+    mockUseDoorQuery.mockReturnValue({ data: mockDoorStatus } as any)
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [mockFixture],
+    } as UseQueryResult<DeckConfiguration>)
+    when(mockUseToaster)
+      .calledWith()
+      .mockReturnValue(({
+        makeSnackbar: MOCK_MAKE_SNACKBAR,
+      } as unknown) as any)
+    when(mockUseDeckConfigurationCompatibility).mockReturnValue([])
   })
 
   afterEach(() => {
@@ -274,7 +347,7 @@ describe('ProtocolSetup', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByText('Prepare to run')
     getByText('Instruments')
-    getByText('Modules')
+    getByText('Modules & deck')
     getByText('Labware')
     getByText('Labware Position Check')
     getByText('Liquids')
@@ -307,9 +380,9 @@ describe('ProtocolSetup', () => {
       .calledWith([], mockProtocolModuleInfo)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
-    queryByText('Modules')?.click()
-    getByText('Mock ProtocolSetupModules')
+    expect(queryByText('Mock ProtocolSetupModulesAndDeck')).toBeNull()
+    queryByText('Modules & deck')?.click()
+    getByText('Mock ProtocolSetupModulesAndDeck')
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
@@ -347,5 +420,25 @@ describe('ProtocolSetup', () => {
     const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByRole('button', { name: 'play' }).click()
     getByText('mock ConfirmAttachedModal')
+  })
+  it('should render a loading skeleton while awaiting a response from the server', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
+    const [{ getAllByTestId }] = render(`/runs/${RUN_ID}/setup/`)
+    expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+  })
+
+  it('should render toast and make a button disabled when a robot door is open', () => {
+    const mockOpenDoorStatus = {
+      data: {
+        status: 'open',
+        doorRequiredClosedForProtocol: true,
+      },
+    }
+    mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
+    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
+    getByRole('button', { name: 'play' }).click()
+    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
+      'Close the robot door before starting the run.'
+    )
   })
 })

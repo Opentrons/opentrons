@@ -1,0 +1,17 @@
+config BR2_PACKAGE_PYTHON_OPENTRONS_HARDWARE
+  bool "python-opentrons-hardware"
+  depends on BR2_PACKAGE_PYTHON3
+  select BR2_PACKAGE_PYTHON_AIONOTIFY # runtime
+  select BR2_PACKAGE_PYTHON_ANYIO # runtime
+  select BR2_PACKAGE_PYTHON_JSONSCHEMA # runtime
+  select BR2_PACKAGE_PYTHON_NUMPY # runtime
+  select BR2_PACKAGE_PYTHON_PYDANTIC # runtime
+  select BR2_PACKAGE_PYTHON_SERIAL # runtime
+  select BR2_PACKAGE_PYTHON_SYSTEMD # runtime
+  select BR2_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
+  select BR2_PACKAGE_PYTHON_CLICK # runtime
+
+  help
+    Opentrons hardware package. Provides an interface for OT-2 and Flex control.
+
+    https://opentrons.com

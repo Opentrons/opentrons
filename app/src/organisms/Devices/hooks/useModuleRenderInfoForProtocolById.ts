@@ -1,20 +1,24 @@
 import {
   checkModuleCompatibility,
+  FLEX_ROBOT_TYPE,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
-import {
-  useAttachedModules,
-  useProtocolDetailsForRun,
-  useStoredProtocolAnalysis,
-} from '.'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
+import { useAttachedModules } from './useAttachedModules'
+import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
+
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../redux/modules/types'
+import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null
+  conflictedFixture?: CutoutConfig
 }
 
 export interface ModuleRenderInfoById {
@@ -22,20 +26,20 @@ export interface ModuleRenderInfoById {
 }
 
 export function useModuleRenderInfoForProtocolById(
-  robotName: string,
   runId: string
 ): ModuleRenderInfoById {
-  const { robotType } = useProtocolDetailsForRun(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-
+  const { data: deckConfig } = useDeckConfigurationQuery()
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
-  const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()
-  if (protocolData == null) return {}
+  if (protocolAnalysis == null) return {}
 
-  const deckDef = getDeckDefFromRobotType(robotType)
+  const deckDef = getDeckDefFromRobotType(
+    protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
+  )
 
-  const protocolModulesInfo = getProtocolModulesInfo(protocolData, deckDef)
+  const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const protocolModulesInfoInLoadOrder = protocolModulesInfo.sort(
     (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder
@@ -51,20 +55,34 @@ export function useModuleRenderInfoForProtocolById(
               protocolMod.moduleDef.model
             ) && !matchedAmod.find(m => m === attachedMod)
         ) ?? null
+
+      const cutoutIdForSlotName = getCutoutIdForSlotName(
+        protocolMod.slotName,
+        deckDef
+      )
+
+      const conflictedFixture = deckConfig?.find(
+        fixture =>
+          fixture.cutoutId === cutoutIdForSlotName &&
+          fixture.cutoutFixtureId != null &&
+          !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
+      )
+
       if (compatibleAttachedModule !== null) {
         matchedAmod = [...matchedAmod, compatibleAttachedModule]
         return {
           ...protocolMod,
           attachedModuleMatch: compatibleAttachedModule,
+          conflictedFixture,
         }
       }
       return {
         ...protocolMod,
         attachedModuleMatch: null,
+        conflictedFixture,
       }
     }
   )
-
   return allModuleRenderInfo.reduce(
     (acc, moduleInfo) => ({
       ...acc,

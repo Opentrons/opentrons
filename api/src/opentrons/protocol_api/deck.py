@@ -6,16 +6,23 @@ from opentrons_shared_data.deck.dev_types import SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.types import DeckLocation, DeckSlotName, Location, Point
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.types import DeckLocation, DeckSlotName, StagingSlotName, Location, Point
+from opentrons_shared_data.robot.dev_types import RobotType
+
 
 from .core.common import ProtocolCore
 from .core.core_map import LoadedCoreMap
+from .core.module import AbstractModuleCore
 from .labware import Labware
 from .module_contexts import ModuleContext
+from ._types import OFF_DECK
 from . import validation
 
 
 DeckItem = Union[Labware, ModuleContext]
+
+STAGING_SLOT_VERSION_GATE = APIVersion(2, 16)
 
 
 @dataclass(frozen=True)
@@ -33,11 +40,16 @@ class CalibrationPosition:
     displayName: str
 
 
-def _get_slot_name(slot_key: DeckLocation, api_version: APIVersion) -> DeckSlotName:
+def _get_slot_name(
+    slot_key: DeckLocation, api_version: APIVersion, robot_type: RobotType
+) -> Union[DeckSlotName, StagingSlotName]:
     try:
-        return validation.ensure_deck_slot(slot_key, api_version)
+        slot = validation.ensure_and_convert_deck_slot(
+            slot_key, api_version, robot_type
+        )
+        return slot
     except (TypeError, ValueError) as error:
-        raise KeyError(str(error)) from error
+        raise KeyError(slot_key) from error
 
 
 class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
@@ -58,9 +70,12 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
         deck_locations = protocol_core.get_deck_definition()["locations"]
 
-        self._slot_definitions_by_name = {
-            slot["id"]: slot for slot in deck_locations["orderedSlots"]
-        }
+        self._slot_definitions_by_name = self._protocol_core.get_slot_definitions()
+        if self._api_version >= STAGING_SLOT_VERSION_GATE:
+            self._slot_definitions_by_name.update(
+                self._protocol_core.get_staging_slot_definitions()
+            )
+
         self._calibration_positions = [
             CalibrationPosition(
                 id=point["id"],
@@ -76,11 +91,51 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
     def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         """Get the item, if any, located in a given slot."""
-        slot_name = _get_slot_name(key, self._api_version)
+        slot_name = _get_slot_name(
+            key, self._api_version, self._protocol_core.robot_type
+        )
         item_core = self._protocol_core.get_slot_item(slot_name)
         item = self._core_map.get(item_core)
 
         return item
+
+    def __delitem__(self, key: DeckLocation) -> None:
+        if self._api_version == APIVersion(2, 14):
+            # __delitem__() support history:
+            #
+            # * PAPIv<=2.13 (non Protocol Engine): Yes, but that goes through a different Deck class
+            # * PAPIv2.14 (Protocol Engine): No
+            # * PAPIv2.15 (Protocol Engine): Yes
+            raise APIVersionError(
+                f"Deleting deck elements is not supported with apiLevel {self._api_version}."
+                f" Try increasing your apiLevel to {APIVersion(2, 15)}."
+            )
+
+        slot_name = _get_slot_name(
+            key, self._api_version, self._protocol_core.robot_type
+        )
+        item_core = self._protocol_core.get_slot_item(slot_name)
+
+        if item_core is None:
+            # No-op if trying to delete from an empty slot.
+            # This matches pre-Protocol-Engine (PAPIv<=2.13) behavior.
+            pass
+        elif isinstance(item_core, AbstractModuleCore):
+            # Protocol Engine does not support removing modules from the deck.
+            # This is a change from pre-Protocol-Engine (PAPIv<=2.13) behavior, unfortunately.
+            raise TypeError(
+                f"Slot {repr(key)} contains a module, {item_core.get_display_name()}."
+                f" You can only delete labware, not modules."
+            )
+        else:
+            self._protocol_core.move_labware(
+                item_core,
+                new_location=OFF_DECK,
+                use_gripper=False,
+                pause_for_manual_move=False,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
 
     def __iter__(self) -> Iterator[str]:
         """Iterate through all deck slots."""
@@ -93,16 +148,27 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the right of the given slot, if any."""
-        slot_name = _get_slot_name(slot, self._api_version)
-        east_slot = adjacent_slots_getters.get_east_slot(slot_name.as_int())
+        slot_name = _get_slot_name(
+            slot, self._api_version, self._protocol_core.robot_type
+        )
+        if isinstance(slot_name, DeckSlotName):
+            east_slot = adjacent_slots_getters.get_east_slot(slot_name.as_int())
+        else:
+            east_slot = None
 
         return self[east_slot] if east_slot is not None else None
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the left of the given slot, if any."""
-        slot_name = _get_slot_name(slot, self._api_version)
-        west_slot = adjacent_slots_getters.get_west_slot(slot_name.as_int())
+        slot_name = _get_slot_name(
+            slot, self._api_version, self._protocol_core.robot_type
+        )
+        west_slot: Optional[DeckLocation]
+        if isinstance(slot_name, DeckSlotName):
+            west_slot = adjacent_slots_getters.get_west_slot(slot_name.as_int())
+        else:
+            west_slot = adjacent_slots_getters.get_west_of_staging_slot(slot_name)
 
         return self[west_slot] if west_slot is not None else None
 
@@ -111,23 +177,30 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     # and remove it from this class. Jira RSS-236.
     def position_for(self, slot: DeckLocation) -> Location:
         """Get the absolute location of a deck slot's front-left corner."""
-        slot_definition = self.get_slot_definition(slot)
+        slot_name = _get_slot_name(
+            slot, self._api_version, self._protocol_core.robot_type
+        )
+        slot_definition = self._slot_definitions_by_name[slot_name.id]
         x, y, z = slot_definition["position"]
-
-        return Location(point=Point(x, y, z), labware=slot_definition["id"])
+        normalized_slot_name = validation.internal_slot_to_public_string(
+            slot_name, self._protocol_core.robot_type
+        )
+        return Location(point=Point(x, y, z), labware=normalized_slot_name)
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
-        slot_name = validation.ensure_deck_slot_string(
-            _get_slot_name(slot, self._api_version), self._protocol_core.robot_type
+        slot_name = _get_slot_name(
+            slot, self._api_version, self._protocol_core.robot_type
         )
-        return self._slot_definitions_by_name[slot_name]
+        return self._slot_definitions_by_name[slot_name.id]
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_center(self, slot: DeckLocation) -> Point:
         """Get the absolute coordinates of a slot's center."""
-        slot_name = _get_slot_name(slot, self._api_version)
+        slot_name = _get_slot_name(
+            slot, self._api_version, self._protocol_core.robot_type
+        )
         return self._protocol_core.get_slot_center(slot_name)
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.

@@ -1,0 +1,86 @@
+test_name: Test the protocol analysis endpoints
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload a protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+
+  - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Check that the analysis data is present in /protocols/:id/analyses/:id
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+    response:
+      save:
+        json:
+          analysis_data: data
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id}'
+          commands:
+            # Check for this command's presence as a smoke test that the analysis isn't empty.
+            - commandType: loadPipette
+
+
+  - name: Check that the analysis data is present in /protocols/:id/analyses
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+    response:
+      json:
+        data:
+          - !force_format_include '{analysis_data}'
+        meta:
+          cursor: 0
+          totalLength: 1
+
+  - name: Check that the analysis data is present in /protocols/:id/analyses/:id/asDocument
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}/asDocument'
+    response:
+      headers:
+        # This endpoint's steps outside our usual FastAPI implementation.
+        # We need to make sure we get the Content-Type right because FastAPI won't do it for us.
+        Content-Type: application/json
+      json: !force_format_include '{analysis_data}'

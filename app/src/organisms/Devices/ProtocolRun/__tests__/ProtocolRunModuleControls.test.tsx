@@ -1,15 +1,13 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
 import { i18n } from '../../../../i18n'
-import {
-  componentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '../../../ModuleCard'
 import {
@@ -24,6 +22,7 @@ import {
 } from '../../../../redux/modules/__fixtures__'
 import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../ModuleCard')
 jest.mock('../../hooks')
 
@@ -34,10 +33,12 @@ const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolByI
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
 
 const _fixtureAnalysis = (fixtureAnalysis as unknown) as CompletedProtocolAnalysis
 
-const ROBOT_NAME = 'otie'
 const RUN_ID = 'test123'
 
 const mockTempMod = {
@@ -83,6 +84,9 @@ describe('ProtocolRunModuleControls', () => {
       protocolKey: 'fakeProtocolKey',
       robotType: 'OT-2 Standard',
     })
+    when(mockUseInstrumentsQuery).mockReturnValue({
+      data: { data: [] },
+    } as any)
   })
 
   afterEach(() => {
@@ -92,7 +96,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a magnetic module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockMagMod.moduleId]: {
           moduleId: 'magModModuleId',
@@ -106,16 +110,7 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockMagneticModuleGen2,
         },
       } as any)
-    when(mockModuleCard)
-      .calledWith(
-        componentPropsMatcher({
-          robotName: 'otie',
-          module: mockMagneticModuleGen2,
-          runId: 'test123',
-          isLoadedInRun: true, // this can never be false in this component since isModuleControl true is hardcoded in
-        })
-      )
-      .mockReturnValue(<div>mock Magnetic Module Card</div>)
+    when(mockModuleCard).mockReturnValue(<div>mock Magnetic Module Card</div>)
     const { getByText } = render({
       robotName: 'otie',
       runId: 'test123',
@@ -126,7 +121,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a temperature module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockTempMod.moduleId]: {
           moduleId: 'temperatureModuleId',
@@ -140,16 +135,9 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockTemperatureModuleGen2,
         },
       } as any)
-    when(mockModuleCard)
-      .calledWith(
-        componentPropsMatcher({
-          robotName: 'otie',
-          module: mockTemperatureModuleGen2,
-          runId: 'test123',
-          isLoadedInRun: true,
-        })
-      )
-      .mockReturnValue(<div>mock Temperature Module Card</div>)
+    when(mockModuleCard).mockReturnValue(
+      <div>mock Temperature Module Card</div>
+    )
     const { getByText } = render({
       robotName: 'otie',
       runId: 'test123',
@@ -160,7 +148,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a thermocycler module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockTCModule.moduleId]: {
           moduleId: mockTCModule.moduleId,
@@ -175,16 +163,9 @@ describe('ProtocolRunModuleControls', () => {
         },
       } as any)
 
-    when(mockModuleCard)
-      .calledWith(
-        componentPropsMatcher({
-          robotName: 'otie',
-          module: mockThermocycler,
-          runId: 'test123',
-          isLoadedInRun: true,
-        })
-      )
-      .mockReturnValue(<div>mock Thermocycler Module Card</div>)
+    when(mockModuleCard).mockReturnValue(
+      <div>mock Thermocycler Module Card</div>
+    )
 
     const { getByText } = render({
       robotName: 'otie',
@@ -196,7 +177,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders a heater-shaker module card', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',
@@ -210,16 +191,9 @@ describe('ProtocolRunModuleControls', () => {
           attachedModuleMatch: mockHeaterShaker,
         },
       } as any)
-    when(mockModuleCard)
-      .calledWith(
-        componentPropsMatcher({
-          robotName: 'otie',
-          module: mockHeaterShaker,
-          runId: 'test123',
-          isLoadedInRun: true,
-        })
-      )
-      .mockReturnValue(<div>mock Heater-Shaker Module Card</div>)
+    when(mockModuleCard).mockReturnValue(
+      <div>mock Heater-Shaker Module Card</div>
+    )
 
     const { getByText } = render({
       robotName: 'otie',
@@ -231,7 +205,7 @@ describe('ProtocolRunModuleControls', () => {
 
   it('renders correct text when module is not attached but required for protocol', () => {
     when(mockUseModuleRenderInfoForProtocolById)
-      .calledWith(ROBOT_NAME, RUN_ID)
+      .calledWith(RUN_ID)
       .mockReturnValue({
         [mockHeaterShakerDef.moduleId]: {
           moduleId: 'heaterShakerModuleId',

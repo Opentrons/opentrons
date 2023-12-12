@@ -69,8 +69,7 @@ jobs:
           yarn config set cache-folder ./.yarn-cache
           make setup-js
       - name: 'run labware library unit tests'
-        run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="labware-library/src/**/*.(js|ts|tsx)" labware-library/src
+        run: make -C labware-library test-cov
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
@@ -117,6 +116,7 @@ jobs:
   build-ll:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
+    timeout-minutes: 30
     runs-on: 'ubuntu-20.04'
     if: github.event_name != 'pull_request'
     steps:

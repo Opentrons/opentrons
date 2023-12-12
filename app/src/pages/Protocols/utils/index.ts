@@ -3,14 +3,12 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import type {
   LabwareDefinition2,
-  ModuleModel,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import type {
   LabwareLocation,
   LoadModuleRunTimeCommand,
   ModuleLocation,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  ModuleModel,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 export interface LabwareSetupItem {
   definition: LabwareDefinition2
@@ -18,6 +16,7 @@ export interface LabwareSetupItem {
   initialLocation: LabwareLocation
   moduleModel: ModuleModel | null
   moduleLocation: ModuleLocation | null
+  labwareId?: string
 }
 
 export interface GroupedLabwareSetupItems {
@@ -88,6 +87,7 @@ export function getLabwareSetupItemGroups(
             moduleModel,
             moduleLocation,
             nickName,
+            labwareId: c.result?.labwareId,
           },
         ]
       } else if (

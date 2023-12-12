@@ -15,7 +15,7 @@ type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
 ): MixStepArgs => {
-  const { labware, pipette } = hydratedFormData
+  const { labware, pipette, dropTip_location, nozzles } = hydratedFormData
   const unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
   const orderSecond = hydratedFormData.mix_wellOrder_second
@@ -55,7 +55,9 @@ export const mixFormToArgs = (
     ? hydratedFormData.blowout_location
     : null
   // Blowout settings
-  const blowoutFlowRateUlSec = dispenseFlowRateUlSec
+  const blowoutFlowRateUlSec =
+    hydratedFormData.dispense_flowRate ??
+    pipette.spec.defaultBlowOutFlowRate.value
   const blowoutOffsetFromTopMm = blowoutLocation
     ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
     : 0
@@ -93,5 +95,7 @@ export const mixFormToArgs = (
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
     dispenseDelaySeconds,
+    dropTipLocation: dropTip_location,
+    nozzles,
   }
 }

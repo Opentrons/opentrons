@@ -52,13 +52,13 @@ export const SUPPORTED_MODULE_SLOTS_OT2: SupportedSlotMap = {
 export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
   [MAGNETIC_MODULE_TYPE]: [
     {
-      name: 'Slot D1 (supported)',
+      name: 'Slot D1',
       value: 'D1',
     },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
-      name: 'Slot D3 (supported)',
+      name: 'Slot D3',
       value: 'D3',
     },
   ],
@@ -70,17 +70,18 @@ export const SUPPORTED_MODULE_SLOTS_FLEX: SupportedSlotMap = {
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     {
-      name: 'Slot D1 (supported)',
+      name: 'Slot D1',
       value: 'D1',
     },
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     {
-      name: 'Slot D2 (supported)',
+      name: 'Slot D2',
       value: 'D2',
     },
   ],
 }
+
 const ALL_MODULE_SLOTS_OT2: DropdownOption[] = [
   {
     name: 'Slot 1',
@@ -138,22 +139,14 @@ const HEATER_SHAKER_SLOTS_OT2: DropdownOption[] = [
     value: '10',
   },
 ]
-const HS_AND_TEMP_SLOTS_FLEX: DropdownOption[] = [
+export const OUTER_SLOTS_FLEX: DropdownOption[] = [
   {
-    name: 'Slot D1',
-    value: 'D1',
+    name: 'Slot A1',
+    value: 'A1',
   },
   {
-    name: 'Slot D3',
-    value: 'D3',
-  },
-  {
-    name: 'Slot C1',
-    value: 'C1',
-  },
-  {
-    name: 'Slot C3',
-    value: 'C3',
+    name: 'Slot A3',
+    value: 'A3',
   },
   {
     name: 'Slot B1',
@@ -164,35 +157,35 @@ const HS_AND_TEMP_SLOTS_FLEX: DropdownOption[] = [
     value: 'B3',
   },
   {
-    name: 'Slot A1',
-    value: 'A1',
+    name: 'Slot C1',
+    value: 'C1',
   },
-]
-
-const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
+  {
+    name: 'Slot C3',
+    value: 'C3',
+  },
   {
     name: 'Slot D1',
     value: 'D1',
   },
   {
-    name: 'Slot D2',
-    value: 'D2',
-  },
-  {
     name: 'Slot D3',
     value: 'D3',
   },
+]
+
+const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
   {
-    name: 'Slot C1',
-    value: 'C1',
+    name: 'Slot A1',
+    value: 'A1',
   },
   {
-    name: 'Slot C2',
-    value: 'C2',
+    name: 'Slot A2',
+    value: 'A2',
   },
   {
-    name: 'Slot C3',
-    value: 'C3',
+    name: 'Slot A3',
+    value: 'A3',
   },
   {
     name: 'Slot B1',
@@ -207,12 +200,28 @@ const MAG_BLOCK_SLOTS_FLEX: DropdownOption[] = [
     value: 'B3',
   },
   {
-    name: 'Slot A1',
-    value: 'A1',
+    name: 'Slot C1',
+    value: 'C1',
   },
   {
-    name: 'Slot A2',
-    value: 'A2',
+    name: 'Slot C2',
+    value: 'C2',
+  },
+  {
+    name: 'Slot C3',
+    value: 'C3',
+  },
+  {
+    name: 'Slot D1',
+    value: 'D1',
+  },
+  {
+    name: 'Slot D2',
+    value: 'D2',
+  },
+  {
+    name: 'Slot D3',
+    value: 'D3',
   },
 ]
 export function getAllModuleSlotsByType(
@@ -248,12 +257,14 @@ export function getAllModuleSlotsByType(
       moduleType === HEATERSHAKER_MODULE_TYPE ||
       moduleType === TEMPERATURE_MODULE_TYPE
     ) {
-      slot = HS_AND_TEMP_SLOTS_FLEX.filter(
-        s => s.value !== supportedSlotOption[0].value
+      slot = supportedSlotOption.concat(
+        OUTER_SLOTS_FLEX.filter(s => s.value !== supportedSlotOption[0].value)
       )
     } else {
-      slot = MAG_BLOCK_SLOTS_FLEX.filter(
-        s => s.value !== supportedSlotOption[0].value
+      slot = supportedSlotOption.concat(
+        MAG_BLOCK_SLOTS_FLEX.filter(
+          s => s.value !== supportedSlotOption[0].value
+        )
       )
     }
   }

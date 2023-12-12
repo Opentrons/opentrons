@@ -1,13 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  ModuleLocation,
+  getDeckDefFromRobotType,
+  getModuleDisplayName,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   RESPONSIVENESS,
   TYPOGRAPHY,
   SPACING,
   SIZE_1,
-  Flex,
+  DeckLocationSelect,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
@@ -22,18 +28,26 @@ export const BODY_STYLE = css`
     line-height: 1.75rem;
   }
 `
-
+interface SelectLocationProps extends ModuleCalibrationWizardStepProps {
+  setSlotName: React.Dispatch<React.SetStateAction<string>>
+  availableSlotNames: string[]
+}
 export const SelectLocation = (
-  props: ModuleCalibrationWizardStepProps
+  props: SelectLocationProps
 ): JSX.Element | null => {
-  const { proceed, attachedModule } = props
+  const {
+    proceed,
+    attachedModule,
+    slotName,
+    setSlotName,
+    availableSlotNames,
+  } = props
   const { t } = useTranslation('module_wizard_flows')
   const moduleName = getModuleDisplayName(attachedModule.moduleModel)
-  // TODO: keep track of the selected slot in a state variable that can be
-  // used in calibration step
   const handleOnClick = (): void => {
     proceed()
   }
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const bodyText = (
     <>
       <Banner type="warning" size={SIZE_1} marginY={SPACING.spacing4}>
@@ -47,9 +61,23 @@ export const SelectLocation = (
   return (
     <GenericWizardTile
       header={t('select_location')}
-      // TODO: swap this out with the deck map
-      // if slot != null it will be pre-selected
-      rightHandBody={<Flex>TODO: DECK LOCATION SELECT</Flex>}
+      rightHandBody={
+        <DeckLocationSelect
+          deckDef={deckDef}
+          selectedLocation={{ slotName }}
+          setSelectedLocation={loc => setSlotName(loc.slotName)}
+          disabledLocations={deckDef.locations.addressableAreas.reduce<
+            ModuleLocation[]
+          >((acc, slot) => {
+            if (availableSlotNames.some(slotName => slotName === slot.id))
+              return acc
+            return [...acc, { slotName: slot.id }]
+          }, [])}
+          isThermocycler={
+            attachedModule.moduleType === THERMOCYCLER_MODULE_TYPE
+          }
+        />
+      }
       bodyText={bodyText}
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}

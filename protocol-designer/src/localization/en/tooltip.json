@@ -1,71 +1,73 @@
 {
-  "not_in_beta": "ⓘ Coming Soon",
   "advanced_settings": "Advanced Settings",
-
+  "disabled_no_trash": "Select the Trash Bin or Waste Chute in order to continue",
+  "disabled_cannot_delete_trash": "A Trash Bin or Waste Chute is required",
+  "disabled_off_deck": "Off-deck labware cannot be modified unless on starting deck state.",
   "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
+  "disabled_no_space_additional_items": "No space for this combination of staging area slots and modules.",
+  "not_in_beta": "ⓘ Coming Soon",
 
   "step_description": {
+    "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module",
+    "magnet": "Engage or disengage the Magnetic module.",
     "mix": "Mix contents of wells/tubes.",
-    "pause": "Enable pause within protocol.",
     "moveLabware": "Move labware to and from deck slot and module locations.",
     "moveLiquid": "Move liquid to and from wells/tubes.",
-    "magnet": "Engage or disengage the Magnetic module.",
+    "pause": "Enable pause within protocol.",
     "temperature": "Set temperature command for Temperature module.",
-    "thermocycler": "Change Thermocycler state or program a profile.",
-    "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module"
+    "thermocycler": "Change Thermocycler state or program a profile."
   },
 
   "step_fields": {
     "defaults": {
       "aspirate_airGap_checkbox": "Aspirate air before moving to next well",
-      "dispense_airGap_checkbox": "Aspirate air before moving to Trash to dispose of tip. Tip will be disposed of at the end of steps using this setting.",
-      "aspirate_flowRate": "The speed at which the pipette aspirates",
-      "dispense_flowRate": "The speed at which the pipette dispenses",
-      "aspirate_mix_checkbox": "Pipette up and down before aspirating",
-      "dispense_mix_checkbox": "Pipette up and down after dispensing",
       "aspirate_delay_checkbox": "Delay pipette movement after each aspirate in this step, including any Air Gap",
-      "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
-
+      "aspirate_delay_mmFromBottom": "Distance from the bottom of the well",
+      "aspirate_flowRate": "The speed at which the pipette aspirates",
+      "aspirate_mix_checkbox": "Pipette up and down before aspirating",
+      "aspirate_mmFromBottom": "Distance from the bottom of the well",
+      "aspirate_touchTip_checkbox": "Touch tip to each side of well after aspirating",
+      "aspirate_touchTip_mmFromBottom": "Distance from the bottom of the well",
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
       "blowout_location": "Where to dispose of remaining volume in tip",
-      "disposalVolume_checkbox": "Aspirate extra volume that is disposed of after a multi-dispense is complete. We recommend a disposal volume of at least the pipette's minimum.",
-
       "changeTip": "Choose when the robot picks up fresh tips",
-      "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
-      "aspirate_mmFromBottom": "Distance from the bottom of the well",
-      "dispense_mmFromBottom": "Distance from the bottom of the well",
-      "aspirate_touchTip_mmFromBottom": "Distance from the bottom of the well",
-      "dispense_touchTip_mmFromBottom": "Distance from the bottom of the well",
-      "aspirate_delay_mmFromBottom": "Distance from the bottom of the well",
+      "dispense_airGap_checkbox": "Aspirate air before moving to Trash to dispose of tip. Tip will be disposed of at the end of steps using this setting.",
+      "dispense_delay_checkbox": "Delay pipette movement after each dispense in this step",
       "dispense_delay_mmFromBottom": "Distance from the bottom of the well",
-      "mix_mmFromBottom": "Distance from the bottom of the well",
-      "mix_touchTip_mmFromBottom": "Distance from the bottom of the well",
-
-      "aspirate_touchTip_checkbox": "Touch tip to each side of well after aspirating",
+      "dispense_flowRate": "The speed at which the pipette dispenses",
+      "dispense_mix_checkbox": "Pipette up and down after dispensing",
+      "dispense_mmFromBottom": "Distance from the bottom of the well",
       "dispense_touchTip_checkbox": "Touch tip to each side of well after dispensing",
+      "dispense_touchTip_mmFromBottom": "Distance from the bottom of the well",
+      "disposalVolume_checkbox": "Aspirate extra volume that is disposed of after a multi-dispense is complete. We recommend a disposal volume of at least the pipette's minimum.",
+      "heaterShakerSetTimer": "Once this counter has elapsed, the module will deactivate the heater and shaker",
+      "mix_mmFromBottom": "Distance from the bottom of the well",
       "mix_touchTip_checkbox": "Touch tip to each side of the well after mixing",
-
-      "volume": "Volume to dispense in each well",
-
-      "heaterShakerSetTimer": "Once this counter has elapsed, the module will deactivate the heater and shaker"
+      "mix_touchTip_mmFromBottom": "Distance from the bottom of the well",
+      "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
+      "volume": "Volume to dispense in each well"
     },
     "indeterminate": {
       "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
-      "dispense_airGap_checkbox": "Not all selected steps are using this setting",
-      "aspirate_mix_checkbox": "Not all selected steps are using this setting",
-      "dispense_mix_checkbox": "Not all selected steps are using this setting",
       "aspirate_delay_checkbox": "Not all selected steps are using this setting",
-      "dispense_delay_checkbox": "Not all selected steps are using this setting",
-      "preWetTip": "Not all selected steps are using this setting",
+      "aspirate_mix_checkbox": "Not all selected steps are using this setting",
       "aspirate_touchTip_checkbox": "Not all selected steps are using this setting",
+      "blowout_checkbox": "Not all selected steps are using this setting",
+      "dispense_airGap_checkbox": "Not all selected steps are using this setting",
+      "dispense_delay_checkbox": "Not all selected steps are using this setting",
+      "dispense_mix_checkbox": "Not all selected steps are using this setting",
       "dispense_touchTip_checkbox": "Not all selected steps are using this setting",
       "mix_touchTip_checkbox": "Not all selected steps are using this setting",
-      "blowout_checkbox": "Not all selected steps are using this setting"
+      "preWetTip": "Not all selected steps are using this setting"
     },
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
-        "blowout_checkbox": "Redundant with disposal volume"
+        "aspirate_touchTip_checkbox": "Touch tip is not supported with this labware",
+        "blowout_checkbox": "Redundant with disposal volume",
+        "dispense_mix_checkbox": "Unable to mix in a waste chute",
+        "dispense_mmFromBottom": "Tip position adjustment not supported in waste chute",
+        "dispense_touchTip_checkbox": "Touch tip is not supported"
       }
     },
     "moveLabware": {
@@ -75,14 +77,14 @@
     },
     "batch_edit": {
       "disabled": {
-        "pipette-different": "Cannot edit unless selected steps share the same pipette.",
-        "labware-different": "Cannot edit unless selected steps share the same type of labware.",
         "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware.",
         "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware.",
-        "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
+        "labware-different": "Cannot edit unless selected steps share the same type of labware.",
         "multi-aspirate-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette.",
+        "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
+        "multi-dispense-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette.",
         "multi-dispense-present": "Cannot edit while one or more selected steps uses the multi-dispense path.",
-        "multi-dispense-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette."
+        "pipette-different": "Cannot edit unless selected steps share the same pipette."
       }
     },
     "pauseAction": {
@@ -94,9 +96,6 @@
       "disabled": {
         "latchOpen": "Labware Latch cannot be open while the module is shaking"
       }
-    },
-    "touchTip": {
-      "disabled": "Touch tip is not supported with this labware"
     }
   },
   "edit_module_card": {
@@ -108,14 +107,14 @@
   },
   "profile": {
     "add_cycle": "Add a series of steps that cycle",
-    "add_step": "Add a single non-cycling step",
     "add_step_to_cycle": "Add a step to the cycle",
-    "delete_step": "Delete profile step",
-    "delete_cycle": "Delete cycle and steps"
+    "add_step": "Add a single non-cycling step",
+    "delete_cycle": "Delete cycle and steps",
+    "delete_step": "Delete profile step"
   },
   "save_batch_edit": {
-    "enabled": "Apply changes to all selected steps",
-    "disabled": "No new changes to save"
+    "disabled": "No new changes to save",
+    "enabled": "Apply changes to all selected steps"
   },
   "cancel_batch_edit": "Reset unsaved changes to the form"
 }

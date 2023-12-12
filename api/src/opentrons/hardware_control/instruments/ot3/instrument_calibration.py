@@ -1,5 +1,6 @@
 import typing
-from dataclasses import dataclass
+from typing_extensions import Literal, Final
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from opentrons.config import feature_flags as ff
@@ -10,13 +11,27 @@ from opentrons.config.robot_configs import (
 from opentrons.types import Point, Mount
 
 # TODO change this when imports are fixed
-from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
+from opentrons.calibration_storage.ot3.pipette_offset import (
+    save_pipette_calibration,
+    get_pipette_offset,
+)
 from opentrons.calibration_storage import (
     types as cal_top_types,
-    get_pipette_offset,
-    ot3_gripper_offset,
+    gripper_offset,
 )
 from opentrons.hardware_control.types import OT3Mount
+
+PIPETTE_OFFSET_CONSISTENCY_LIMIT: Final = 1.5
+
+
+@dataclass
+class InconsistentPipetteOffsets:
+    kind: Literal["inconsistent-pipette-offset"]
+    offsets: typing.Dict[Mount, Point]
+    limit: float
+
+
+ReasonabilityCheckFailure = typing.Union[InconsistentPipetteOffsets]
 
 
 @dataclass
@@ -29,6 +44,13 @@ class PipetteOffsetByPipetteMount:
     source: cal_top_types.SourceType
     status: cal_top_types.CalibrationStatus
     last_modified: typing.Optional[datetime] = None
+
+
+@dataclass
+class PipetteOffsetSummary(PipetteOffsetByPipetteMount):
+    reasonability_check_failures: typing.List[ReasonabilityCheckFailure] = field(
+        default_factory=list
+    )
 
 
 @dataclass
@@ -100,7 +122,7 @@ def load_gripper_calibration_offset(
         status=cal_top_types.CalibrationStatus(),
     )
     if gripper_id and ff.enable_ot3_hardware_controller():
-        grip_offset_data = ot3_gripper_offset.get_gripper_calibration_offset(gripper_id)
+        grip_offset_data = gripper_offset.get_gripper_calibration_offset(gripper_id)
         if grip_offset_data:
             return GripperCalibrationOffset(
                 offset=grip_offset_data.offset,
@@ -119,4 +141,26 @@ def save_gripper_calibration_offset(
     gripper_id: typing.Optional[str], delta: Point
 ) -> None:
     if gripper_id and ff.enable_ot3_hardware_controller():
-        ot3_gripper_offset.save_gripper_calibration(delta, gripper_id)
+        gripper_offset.save_gripper_calibration(delta, gripper_id)
+
+
+def check_instrument_offset_reasonability(
+    left_offset: Point, right_offset: Point
+) -> typing.List[ReasonabilityCheckFailure]:
+    if (
+        not left_offset
+        or left_offset == Point(0, 0, 0)
+        or not right_offset
+        or right_offset == Point(0, 0, 0)
+    ):
+        return []
+    diff = left_offset - right_offset
+    if any(abs(d) > PIPETTE_OFFSET_CONSISTENCY_LIMIT for d in diff):
+        return [
+            InconsistentPipetteOffsets(
+                "inconsistent-pipette-offset",
+                {Mount.LEFT: left_offset, Mount.RIGHT: right_offset},
+                PIPETTE_OFFSET_CONSISTENCY_LIMIT,
+            )
+        ]
+    return []

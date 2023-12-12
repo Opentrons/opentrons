@@ -1,38 +1,43 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  COLORS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_HIDDEN,
-  ALIGN_FLEX_END,
-  POSITION_ABSOLUTE,
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_STRETCH,
   ALIGN_FLEX_START,
+  ALIGN_STRETCH,
   BORDERS,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
-  SIZE_2,
-  Btn,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_HIDDEN,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  WRAP,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useProtocolQuery,
+  useRunQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
-import { LargeButton, TertiaryButton } from '../../atoms/buttons'
+import { LargeButton } from '../../atoms/buttons'
 import {
   useRunTimestamps,
   useRunControls,
@@ -52,17 +57,29 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
-import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-
-import type { Run } from '@opentrons/api-client'
-import type { OnDeviceRouteParams } from '../../App/types'
 import { getLocalRobot } from '../../redux/discovery'
+import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
+import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
+import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import type { OnDeviceRouteParams } from '../../App/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+
+interface PipettesWithTip {
+  mount: 'left' | 'right'
+  specs?: PipetteModelSpecs | null
+}
 
 export function RunSummary(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
   const { t } = useTranslation('run_details')
   const history = useHistory()
+  const host = useHost()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const isRunCurrent = Boolean(runRecord?.data?.current)
+  const { data: attachedInstruments } = useInstrumentsQuery()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const protocolId = runRecord?.data.protocolId ?? null
@@ -88,15 +105,19 @@ export function RunSummary(): JSX.Element {
     runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
   )
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  const onResetSuccess = (_createRunResponse: Run): void =>
-    history.push(`/runs/${runId}/setup`)
-  const { reset } = useRunControls(runId, onResetSuccess)
+  const { reset } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
+    false
+  )
+  const [pipettesWithTip, setPipettesWithTip] = React.useState<
+    PipettesWithTip[]
+  >([])
+  const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
     false
   )
 
@@ -108,17 +129,38 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleReturnToDash = (): void => {
-    closeCurrentRun()
-    history.push('/')
+    const { mount, specs } = pipettesWithTip[0] || {}
+    if (isRunCurrent && pipettesWithTip.length !== 0 && specs != null) {
+      handleTipsAttachedModal(
+        mount,
+        specs,
+        FLEX_ROBOT_TYPE,
+        setPipettesWithTip
+      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+    } else {
+      closeCurrentRun()
+      history.push('/')
+    }
   }
 
   const handleRunAgain = (): void => {
-    reset()
-    trackEvent({
-      name: 'proceedToRun',
-      properties: { sourceLocation: 'RunSummary' },
-    })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+    const { mount, specs } = pipettesWithTip[0] || {}
+    if (isRunCurrent && pipettesWithTip.length !== 0 && specs != null) {
+      handleTipsAttachedModal(
+        mount,
+        specs,
+        FLEX_ROBOT_TYPE,
+        setPipettesWithTip
+      ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
+    } else {
+      setShowRunAgainSpinner(true)
+      reset()
+      trackEvent({
+        name: 'proceedToRun',
+        properties: { sourceLocation: 'RunSummary' },
+      })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+    }
   }
 
   const handleViewErrorDetails = (): void => {
@@ -133,155 +175,181 @@ export function RunSummary(): JSX.Element {
     setShowSplash(false)
   }
 
+  React.useEffect(() => {
+    getPipettesWithTipAttached({
+      host,
+      runId,
+      runRecord,
+      attachedInstruments,
+      isFlex: true,
+    })
+      .then(pipettesWithTipAttached => {
+        const pipettesWithTip = pipettesWithTipAttached.map(pipette => {
+          const specs = getPipetteModelSpecs(pipette.instrumentModel)
+          return {
+            specs,
+            mount: pipette.mount,
+          }
+        })
+        setPipettesWithTip(() => pipettesWithTip)
+      })
+      .catch(e => {
+        console.log(`Error checking pipette tip attachement state: ${e}`)
+      })
+  }, [])
+
+  const RUN_AGAIN_SPINNER_TEXT = (
+    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="25.5rem">
+      {t('run_again')}
+      <Icon
+        name="ot-spinner"
+        aria-label="icon_ot-spinner"
+        spin={true}
+        size="2.5rem"
+        color={COLORS.white}
+      />
+    </Flex>
+  )
+
   return (
-    <>
-      <Btn
-        display={DISPLAY_FLEX}
-        width="100%"
-        height="100vh"
-        flexDirection={DIRECTION_COLUMN}
-        position={POSITION_RELATIVE}
-        overflow={OVERFLOW_HIDDEN}
-        disabled={isClosingCurrentRun}
-        onClick={handleClickSplash}
-      >
-        {showSplash ? (
+    <Btn
+      display={DISPLAY_FLEX}
+      width="100%"
+      height="100vh"
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      overflow={OVERFLOW_HIDDEN}
+      disabled={isClosingCurrentRun}
+      onClick={handleClickSplash}
+    >
+      {showSplash ? (
+        <Flex
+          height="100vh"
+          width="100%"
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          position={POSITION_ABSOLUTE}
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing40}
+          padding={SPACING.spacing40}
+          backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
+        >
+          <SplashFrame>
+            <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
+              <Icon
+                name={didRunSucceed ? 'ot-check' : 'ot-alert'}
+                size="4.5rem"
+                color={COLORS.white}
+              />
+              <SplashHeader>
+                {didRunSucceed
+                  ? t('run_complete_splash')
+                  : t('run_failed_splash')}
+              </SplashHeader>
+            </Flex>
+            <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
+              <SplashBody>{protocolName}</SplashBody>
+            </Flex>
+          </SplashFrame>
+        </Flex>
+      ) : (
+        <Flex
+          height="100vh"
+          width="100%"
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          padding={SPACING.spacing40}
+        >
+          {showRunFailedModal ? (
+            <RunFailedModal
+              runId={runId}
+              setShowRunFailedModal={setShowRunFailedModal}
+              errors={runRecord?.data.errors}
+            />
+          ) : null}
           <Flex
-            height="100vh"
-            width="100%"
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-            position={POSITION_ABSOLUTE}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing40}
-            padding={SPACING.spacing40}
-            backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
+            alignItems={ALIGN_FLEX_START}
+            gridGap={SPACING.spacing16}
           >
-            <SplashFrame>
-              <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
-                <Icon
-                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
-                  size="4.5rem"
-                  color={COLORS.white}
+            <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+              <Icon
+                name={didRunSucceed ? 'ot-check' : 'ot-alert'}
+                size="2rem"
+                color={
+                  didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
+                }
+              />
+              <SummaryHeader>{headerText}</SummaryHeader>
+            </Flex>
+            <ProtocolName>{protocolName}</ProtocolName>
+            <Flex gridGap={SPACING.spacing8} flexWrap={WRAP}>
+              <SummaryDatum>
+                {`${t('run')}: ${formatTimeWithUtcLabel(createdAtTimestamp)}`}
+              </SummaryDatum>
+              <SummaryDatum>
+                {`${t('duration')}: `}
+                <RunTimer
+                  {...{
+                    runStatus,
+                    startedAt,
+                    stoppedAt,
+                    completedAt,
+                  }}
+                  style={DURATION_TEXT_STYLE}
                 />
-                <SplashHeader>
-                  {didRunSucceed
-                    ? t('run_complete_splash')
-                    : t('run_failed_splash')}
-                </SplashHeader>
-              </Flex>
-              <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
-                <SplashBody>{protocolName}</SplashBody>
-              </Flex>
-            </SplashFrame>
+              </SummaryDatum>
+              <SummaryDatum>
+                {`${t('start')}: ${formatTimeWithUtcLabel(startedAtTimestamp)}`}
+              </SummaryDatum>
+              <SummaryDatum>
+                {`${t('end')}: ${formatTimeWithUtcLabel(completedAtTimestamp)}`}
+              </SummaryDatum>
+            </Flex>
           </Flex>
-        ) : (
-          <Flex
-            height="100vh"
-            width="100%"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            padding={SPACING.spacing40}
-          >
-            {showRunFailedModal ? (
-              <RunFailedModal
-                runId={runId}
-                setShowRunFailedModal={setShowRunFailedModal}
-                errors={runRecord?.data.errors}
+          <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
+            <LargeButton
+              flex="1"
+              iconName="arrow-left"
+              buttonType="secondary"
+              onClick={handleReturnToDash}
+              buttonText={t('return_to_dashboard')}
+              height="17rem"
+            />
+            <LargeButton
+              flex="1"
+              iconName="play-round-corners"
+              onClick={handleRunAgain}
+              buttonText={
+                showRunAgainSpinner ? RUN_AGAIN_SPINNER_TEXT : t('run_again')
+              }
+              height="17rem"
+              css={showRunAgainSpinner ? RUN_AGAIN_CLICKED_STYLE : undefined}
+            />
+            {!didRunSucceed ? (
+              <LargeButton
+                flex="1"
+                iconName="info"
+                buttonType="alert"
+                onClick={handleViewErrorDetails}
+                buttonText={t('view_error_details')}
+                height="17rem"
+                disabled={
+                  runRecord?.data.errors == null ||
+                  runRecord?.data.errors.length === 0
+                }
               />
             ) : null}
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              alignItems={ALIGN_FLEX_START}
-              gridGap={SPACING.spacing16}
-            >
-              <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-                <Icon
-                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
-                  size={SIZE_2}
-                  color={
-                    didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
-                  }
-                />
-                <SummaryHeader>{headerText}</SummaryHeader>
-              </Flex>
-              <ProtocolName>{protocolName}</ProtocolName>
-              <Flex gridGap={SPACING.spacing8}>
-                <SummaryDatum>{`${t(
-                  'run'
-                )}: ${createdAtTimestamp}`}</SummaryDatum>
-                <SummaryDatum>
-                  {`${t('duration')}: `}
-                  <RunTimer
-                    {...{
-                      runStatus,
-                      startedAt,
-                      stoppedAt,
-                      completedAt,
-                    }}
-                    style={DURATION_TEXT_STYLE}
-                  />
-                </SummaryDatum>
-                <SummaryDatum>{`${t(
-                  'start'
-                )}: ${startedAtTimestamp}`}</SummaryDatum>
-                <SummaryDatum>{`${t(
-                  'end'
-                )}: ${completedAtTimestamp}`}</SummaryDatum>
-              </Flex>
-            </Flex>
-            <Flex alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing16}>
-              <LargeButton
-                flex="1"
-                iconName="arrow-left"
-                buttonType="secondary"
-                onClick={handleReturnToDash}
-                buttonText={t('return_to_dashboard')}
-                height="17rem"
-              />
-              <LargeButton
-                flex="1"
-                iconName="play-round-corners"
-                onClick={handleRunAgain}
-                buttonText={t('run_again')}
-                height="17rem"
-              />
-              {!didRunSucceed ? (
-                <LargeButton
-                  flex="1"
-                  iconName="info"
-                  buttonType="alert"
-                  onClick={handleViewErrorDetails}
-                  buttonText={t('view_error_details')}
-                  height="17rem"
-                  disabled={
-                    runRecord?.data.errors == null ||
-                    runRecord?.data.errors.length === 0
-                  }
-                />
-              ) : null}
-            </Flex>
           </Flex>
-        )}
-      </Btn>
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing24}
-        width="fit-content"
-        paddingRight={SPACING.spacing32}
-      >
-        <Link to="/dashboard">
-          <TertiaryButton>back to RobotDashboard</TertiaryButton>
-        </Link>
-      </Flex>
-    </>
+        </Flex>
+      )}
+    </Btn>
   )
 }
 
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: 80px;
   line-height: 94px;
   color: ${COLORS.white};
@@ -322,7 +390,6 @@ const SplashFrame = styled(Flex)`
 const ProtocolName = styled.h4`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize28};
   line-height: ${TYPOGRAPHY.lineHeight36};
   color: ${COLORS.darkBlack70};
@@ -349,9 +416,24 @@ const SummaryDatum = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   width: max-content;
 `
-
 const DURATION_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
+`
+
+const RUN_AGAIN_CLICKED_STYLE = css`
+  background-color: ${COLORS.bluePressed};
+  &:focus {
+    background-color: ${COLORS.bluePressed};
+  }
+  &:hover {
+    background-color: ${COLORS.bluePressed};
+  }
+  &:focus-visible {
+    background-color: ${COLORS.bluePressed};
+  }
+  &:active {
+    background-color: ${COLORS.bluePressed};
+  }
 `

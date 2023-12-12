@@ -88,7 +88,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: false,
-          hasMissingPipCalForOdd: false,
+          hasMissingCalForOdd: false,
         }),
       { wrapper }
     )
@@ -100,7 +100,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: true,
-          hasMissingPipCalForOdd: true,
+          hasMissingCalForOdd: true,
         }),
       { wrapper }
     )
@@ -128,7 +128,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: false,
-          hasMissingPipCalForOdd: true,
+          hasMissingCalForOdd: true,
         }),
       { wrapper }
     )
@@ -150,7 +150,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: true,
-          hasMissingPipCalForOdd: false,
+          hasMissingCalForOdd: false,
         }),
       { wrapper }
     )
@@ -177,7 +177,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: false,
-          hasMissingPipCalForOdd: false,
+          hasMissingCalForOdd: false,
         }),
       { wrapper }
     )
@@ -201,7 +201,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: false,
-          hasMissingPipCalForOdd: false,
+          hasMissingCalForOdd: false,
         }),
       { wrapper }
     )
@@ -227,7 +227,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: false,
-          hasMissingPipCalForOdd: false,
+          hasMissingCalForOdd: false,
         }),
       { wrapper }
     )
@@ -256,7 +256,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: false,
-          hasMissingPipCalForOdd: false,
+          hasMissingCalForOdd: false,
         }),
       { wrapper }
     )
@@ -283,7 +283,7 @@ describe('useLPCDisabledReason', () => {
         useLPCDisabledReason({
           runId: RUN_ID_1,
           hasMissingModulesForOdd: false,
-          hasMissingPipCalForOdd: false,
+          hasMissingCalForOdd: false,
         }),
       { wrapper }
     )

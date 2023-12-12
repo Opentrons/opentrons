@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -11,6 +11,7 @@ import {
   ALIGN_FLEX_END,
   useConditionalConfirm,
 } from '@opentrons/components'
+import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -21,14 +22,12 @@ import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_DELETE_PROTOCOL_FROM_APP,
 } from '../../redux/analytics'
-import { getSendAllProtocolsToOT3 } from '../../redux/config'
 import {
   analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
 import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
-import { getIsOT3Protocol } from './utils'
 
 import type { StyleProps } from '@opentrons/components'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -66,9 +65,6 @@ export function ProtocolOverflowMenu(
     dispatch(removeProtocol(protocolKey))
     trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
   }, true)
-  const sendAllProtocolsToOT3 = useSelector(getSendAllProtocolsToOT3)
-
-  const isOT3Protocol = getIsOT3Protocol(storedProtocolData?.mostRecentAnalysis)
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -139,15 +135,14 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
-
-          {sendAllProtocolsToOT3 || isOT3Protocol ? (
-            <MenuItem
-              onClick={handleClickSendToOT3}
-              data-testid="ProtocolOverflowMenu_sendToOT3"
-            >
-              {t('send_to_ot3')}
-            </MenuItem>
-          ) : null}
+          <MenuItem
+            onClick={handleClickSendToOT3}
+            data-testid="ProtocolOverflowMenu_sendToOT3"
+          >
+            {t('protocol_list:send_to_robot_overflow', {
+              robot_display_name: FLEX_DISPLAY_NAME,
+            })}
+          </MenuItem>
           <MenuItem
             onClick={handleClickShowInFolder}
             data-testid="ProtocolOverflowMenu_showInFolder"

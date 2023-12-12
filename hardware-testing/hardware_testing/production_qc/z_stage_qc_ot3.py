@@ -22,6 +22,8 @@ from hardware_testing.data.csv_report import (
 )
 
 from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
+from opentrons.config.advanced_settings import get_adv_setting, set_adv_setting
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 import logging
 
@@ -58,7 +60,7 @@ thread_sensor = False
 force_output = []
 
 
-def _connect_to_mark10_fixture(simulate: bool) -> Mark10:
+def _connect_to_mark10_fixture(simulate: bool) -> Union[Mark10, SimMark10]:
     """Connect to the force Gauge."""
     if not simulate:
         fixture = Mark10.create(port="/dev/ttyUSB0")
@@ -116,6 +118,8 @@ def _record_force(mark10: Mark10) -> None:
     """Record force in a separate thread."""
     global thread_sensor
     global force_output
+    if mark10.is_simulator():
+        force_output.append(0.0)  # to make it pass analysis
     try:
         while thread_sensor:
             force = mark10.read_force()
@@ -134,7 +138,7 @@ def analyze_force(force_output: List) -> Tuple[bool, float, float]:
     LOG.debug(f"analyze_force: {force_output}")
 
     # Check for first 0 to ensure gauge is zeroed
-    if not force_output[0] == 0:
+    if not force_output[0] == 0.0:
         return (False, 0, 0)
 
     max_force = max(force_output)
@@ -145,7 +149,7 @@ def analyze_force(force_output: List) -> Tuple[bool, float, float]:
         return (False, 0, 0)
 
     count = 0
-    sum = 0
+    sum = 0.0
     for force in force_output:
         if force > max_force / 2:
             count += 1
@@ -219,9 +223,9 @@ async def _force_gauge(
     await api.home([z_ax])
     home_pos = await api.gantry_position(mount)
     LOG.info(f"Home Position: {home_pos}")
-    pre_test_pos = home_pos._replace(z=home_pos.z - 10)
+    pre_test_pos = home_pos._replace(z=home_pos.z - 15)
     LOG.info(f"Pre-Test Position: {pre_test_pos}")
-    press_pos = home_pos._replace(z=pre_test_pos.z - 12)
+    press_pos = home_pos._replace(z=pre_test_pos.z - 30)
     LOG.info(f"Press Position: {press_pos}")
 
     qc_pass = True
@@ -241,13 +245,16 @@ async def _force_gauge(
             await api.move_to(mount=mount, abs_position=pre_test_pos)
 
             ui.print_header(f"Cycle {i+1}: Testing Current = {test_current}")
+            if mark10.is_simulator():
+                mark10.set_simulation_force(test["F_MAX"])  # type: ignore[union-attr]
             TH = Thread(target=_record_force, args=(mark10,))
             thread_sensor = True
             force_output = []
             TH.start()
             try:
-                async with api._backend.restore_current():
-                    await api._backend.set_active_current({z_ax: test_current})
+                async with api._backend.motor_current(
+                    run_currents={z_ax: test_current}
+                ):
                     await api.move_to(
                         mount=mount,
                         abs_position=press_pos,
@@ -273,6 +280,7 @@ async def _force_gauge(
             # we expect a stall has happened during pick up, so we want to
             # update the motor estimation
             await api._update_position_estimation([Axis.by_mount(mount)])
+            await api.refresh_positions()
 
             await api.move_to(mount=mount, abs_position=pre_test_pos)
 
@@ -316,7 +324,8 @@ async def _main(arguments: argparse.Namespace) -> None:
     await api.set_gantry_load(api.gantry_load)
 
     report = _build_csv_report()
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report)
+    dut = helpers_ot3.DeviceUnderTest.OTHER
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
 
     for k, v in TEST_PARAMETERS.items():
         report("TEST_PARAMETERS", k, [v])
@@ -355,6 +364,8 @@ async def _main(arguments: argparse.Namespace) -> None:
             ui.print_title("Test Done - PASSED")
         else:
             ui.print_title("Test Done - FAILED")
+        report.save_to_disk()
+        report.print_results()
 
 
 if __name__ == "__main__":
@@ -362,4 +373,14 @@ if __name__ == "__main__":
     arg_parser.add_argument("--simulate", action="store_true")
     arg_parser.add_argument("--skip_left", action="store_true")
     arg_parser.add_argument("--skip_right", action="store_true")
-    asyncio.run(_main(arg_parser.parse_args()))
+    old_stall_setting = get_adv_setting("disableStallDetection", RobotTypeEnum.FLEX)
+    try:
+        asyncio.run(set_adv_setting("disableStallDetection", True))
+        asyncio.run(_main(arg_parser.parse_args()))
+    finally:
+        asyncio.run(
+            set_adv_setting(
+                "disableStallDetection",
+                False if old_stall_setting is None else old_stall_setting.value,
+            )
+        )

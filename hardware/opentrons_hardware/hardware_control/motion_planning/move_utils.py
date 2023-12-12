@@ -26,6 +26,9 @@ FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitati
 
 MINIMUM_DISPLACEMENT = 0.05
 
+# Minimum vector component of 0.1%
+MINIMUM_VECTOR_COMPONENT = np.float64(0.001)
+
 
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
@@ -57,6 +60,79 @@ def get_unit_vector(
     return unit_vector, distance
 
 
+def split_unit_vector(
+    initial_vector: Coordinates[AxisKey, np.float64],
+    initial_distance: np.float64,
+    to_remove: AxisKey,
+) -> Tuple[
+    Tuple[Coordinates[AxisKey, np.float64], np.float64],
+    Tuple[Coordinates[AxisKey, np.float64], np.float64],
+]:
+    """Split a unit vector into two sequential vectors.
+
+    Exactly one axis should be specified to be removed. This function will return a tuple
+    of two vectors: the first will only contain the axis requested for removal, and the
+    second will contain the rest of the movement.
+    """
+    origin = {ax: np.float64(0) for ax in initial_vector.keys()}
+
+    displacement_first = origin.copy()
+
+    displacement_second = {
+        ax: val * initial_distance for ax, val in initial_vector.items()
+    }
+    displacement_first[to_remove] = displacement_second[to_remove]
+    displacement_second[to_remove] = np.float64(0)
+
+    return (
+        get_unit_vector(origin, displacement_first),
+        get_unit_vector(origin, displacement_second),
+    )
+
+
+def de_diagonalize_unit_vector(
+    initial_vector: Coordinates[AxisKey, np.float64],
+    initial_distance: np.float64,
+    min_unit_vector: np.float64,
+) -> List[Tuple[Coordinates[AxisKey, np.float64], np.float64]]:
+    """Split a unit vector into consecutive movements if any component is too small.
+
+    If the component of the unit vector for certain movement axis is extremely
+    small, the resulting speed for that axis may be low enough to cause erroneous
+    stepping behavior on that motor. To deal with this, we "de-diagonalize" those
+    movements by splitting the very small part of the movement into its own
+    dedicated movement.
+
+    For example, if a movement goes 100mm in X but 0.1mm in Y, we split it into
+    two separate movements that will run in sequence.
+
+    Returns a list of resultant unit vectors once the original vector was (maybe) split.
+    """
+    vectors: List[Tuple[Coordinates[AxisKey, np.float64], np.float64]] = [
+        (initial_vector, initial_distance)
+    ]
+    while True:
+        vector, distance = vectors[-1]
+        # Check for any component under the min
+        to_split = [
+            ax
+            for ax in vector.keys()
+            if vector[ax] != np.float64(0) and abs(vector[ax]) < min_unit_vector
+        ]
+        if len(to_split) == 0:
+            # Everything is good and we can return the list as-is.
+            return vectors
+        # We need to split this vector into multiple sequential vectors
+        vectors.pop()
+        for ax in to_split:
+            first, second = split_unit_vector(vector, distance, ax)
+            vectors.append(first)
+            vector, distance = second
+        # Always put the larger vector in LAST so, when we re-check, we are looking
+        # at the movement that may have more than one axis.
+        vectors.append((vector, distance))
+
+
 def limit_max_speed(
     unit_vector: Coordinates[AxisKey, np.float64],
     max_linear_speed: np.float64,
@@ -83,6 +159,38 @@ def limit_max_speed(
     return max_linear_speed * scale
 
 
+def _unit_vector_to_move(
+    unit_vector: Coordinates[AxisKey, np.float64],
+    distance: np.float64,
+    max_speed: np.float64,
+    constraints: SystemConstraints[AxisKey],
+) -> Move[AxisKey]:
+    speed = limit_max_speed(unit_vector, max_speed, constraints)
+    third_distance = np.float64(distance / 3)
+    return Move(
+        unit_vector=unit_vector,
+        distance=distance,
+        max_speed=speed,
+        blocks=(
+            Block(
+                distance=third_distance,
+                initial_speed=speed,
+                acceleration=np.float64(0),
+            ),
+            Block(
+                distance=third_distance,
+                initial_speed=speed,
+                acceleration=np.float64(0),
+            ),
+            Block(
+                distance=third_distance,
+                initial_speed=speed,
+                acceleration=np.float64(0),
+            ),
+        ),
+    )
+
+
 def targets_to_moves(
     initial: Coordinates[AxisKey, CoordinateValue],
     targets: List[MoveTarget[AxisKey]],
@@ -96,33 +204,18 @@ def targets_to_moves(
     initial_checked = {k: np.float64(initial.get(k, 0)) for k in all_axes}
     for target in targets:
         position = {k: np.float64(target.position.get(k, 0)) for k in all_axes}
-        unit_vector, distance = get_unit_vector(initial_checked, position)
-        speed = limit_max_speed(unit_vector, target.max_speed, constraints)
-        third_distance = np.float64(distance / 3)
-        m = Move(
-            unit_vector=unit_vector,
-            distance=distance,
-            max_speed=speed,
-            blocks=(
-                Block(
-                    distance=third_distance,
-                    initial_speed=speed,
-                    acceleration=np.float64(0),
-                ),
-                Block(
-                    distance=third_distance,
-                    initial_speed=speed,
-                    acceleration=np.float64(0),
-                ),
-                Block(
-                    distance=third_distance,
-                    initial_speed=speed,
-                    acceleration=np.float64(0),
-                ),
-            ),
+        initial_unit_vector, initial_distance = get_unit_vector(
+            initial_checked, position
         )
-        log.debug(f"Built move from {initial} to {target} as {m}")
-        yield m
+        de_diagonalized_vectors = de_diagonalize_unit_vector(
+            initial_unit_vector, initial_distance, MINIMUM_VECTOR_COMPONENT
+        )
+        for unit_vector, distance in de_diagonalized_vectors:
+            m = _unit_vector_to_move(
+                unit_vector, distance, target.max_speed, constraints
+            )
+            log.debug(f"Built move from {initial} to {target} as {m}")
+            yield m
         initial_checked = position
 
 

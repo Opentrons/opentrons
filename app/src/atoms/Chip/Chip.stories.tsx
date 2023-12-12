@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { Flex, COLORS, SPACING } from '@opentrons/components'
+import { touchScreenViewport } from '../../DesignTokens/constants'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Chip',
   component: Chip,
+  parameters: touchScreenViewport,
 } as Meta
 
 interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {

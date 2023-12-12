@@ -158,6 +158,11 @@ def _get_legacy_ot_types() -> List[_LegacyTypeInfo]:
         _LegacyTypeInfo(original_name="LabwareMovementStrategy", current_type=LabwareMovementStrategy)
     )
 
+    from opentrons_shared_data.labware.labware_definition import LabwareRole
+    _legacy_ot_types.append(
+        _LegacyTypeInfo(original_name="LabwareRole", current_type=LabwareRole)
+    )
+
     from opentrons.protocol_engine import ModuleModel
     _legacy_ot_types.append(
         _LegacyTypeInfo(original_name="ModuleModel", current_type=ModuleModel)

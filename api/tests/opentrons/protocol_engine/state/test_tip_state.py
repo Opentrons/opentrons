@@ -1,4 +1,6 @@
 """Tests for tip state store and selectors."""
+from collections import OrderedDict
+
 import pytest
 
 from typing import Optional
@@ -9,11 +11,19 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.pipette import pipette_definition
 
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state.tips import TipStore, TipView
 from opentrons.protocol_engine.types import FlowRates, DeckPoint
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
+)
+from opentrons.types import Point
+
+from ..pipette_fixtures import (
+    NINETY_SIX_MAP,
+    NINETY_SIX_COLS,
+    NINETY_SIX_ROWS,
 )
 
 _tip_rack_parameters = LabwareParameters.construct(isTiprack=True)  # type: ignore[call-arg]
@@ -107,7 +117,9 @@ def test_get_next_tip_returns_none(
     load_labware_command: commands.LoadLabware, subject: TipStore
 ) -> None:
     """It should start at the first tip in the labware."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -123,7 +135,9 @@ def test_get_next_tip_returns_first_tip(
     load_labware_command: commands.LoadLabware, subject: TipStore, input_tip_amount: int
 ) -> None:
     """It should start at the first tip in the labware."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -142,7 +156,9 @@ def test_get_next_tip_used_starting_tip(
     result_well_name: str,
 ) -> None:
     """It should start searching at the given starting tip."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -178,30 +194,40 @@ def test_get_next_tip_skips_picked_up_tip(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should get the next tip in the column if one has been picked up."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
     subject.handle_action(
-        actions.AddPipetteConfigAction(
-            pipette_id="pipette-id",
-            serial_number="pipette-serial",
-            config=LoadedStaticPipetteData(
-                channels=input_tip_amount,
-                max_volume=15,
-                min_volume=3,
-                model="gen a",
-                display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
-                nozzle_offset_z=1.23,
-                home_position=4.56,
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=input_tip_amount,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
             ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
-    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(command=pick_up_tip_command, private_result=None)
+    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -212,12 +238,137 @@ def test_get_next_tip_skips_picked_up_tip(
     assert result == result_well_name
 
 
+def test_get_next_tip_with_starting_tip(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+) -> None:
+    """It should return the starting tip, and then the following tip after that."""
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=1,
+        starting_tip_name="B2",
+    )
+
+    assert result == "B2"
+
+    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+        params=commands.PickUpTipParams.construct(
+            pipetteId="pipette-id",
+            labwareId="cool-labware",
+            wellName="B2",
+        ),
+        result=commands.PickUpTipResult.construct(
+            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
+        ),
+    )
+
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=pick_up_tip)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=1,
+        starting_tip_name="B2",
+    )
+
+    assert result == "C2"
+
+
+def test_get_next_tip_with_starting_tip_8_channel(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+) -> None:
+    """It should return the starting tip, and then the following tip after that."""
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=8,
+        starting_tip_name="A2",
+    )
+
+    assert result == "A2"
+
+    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+        params=commands.PickUpTipParams.construct(
+            pipetteId="pipette-id",
+            labwareId="cool-labware",
+            wellName="A2",
+        ),
+        result=commands.PickUpTipResult.construct(
+            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
+        ),
+    )
+
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=pick_up_tip)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=8,
+        starting_tip_name="A2",
+    )
+
+    assert result == "A3"
+
+
+def test_get_next_tip_with_starting_tip_out_of_tips(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+) -> None:
+    """It should return the starting tip of H12 and then None after that."""
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=1,
+        starting_tip_name="H12",
+    )
+
+    assert result == "H12"
+
+    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+        params=commands.PickUpTipParams.construct(
+            pipetteId="pipette-id",
+            labwareId="cool-labware",
+            wellName="H12",
+        ),
+        result=commands.PickUpTipResult.construct(
+            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
+        ),
+    )
+
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=pick_up_tip)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=1,
+        starting_tip_name="H12",
+    )
+
+    assert result is None
+
+
 def test_get_next_tip_with_column_and_starting_tip(
     subject: TipStore,
     load_labware_command: commands.LoadLabware,
 ) -> None:
     """It should return the first tip in a column, taking starting tip into account."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
@@ -235,30 +386,42 @@ def test_reset_tips(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should be able to reset tip tracking state."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
     subject.handle_action(
-        actions.AddPipetteConfigAction(
-            pipette_id="pipette-id",
-            serial_number="pipette-serial",
-            config=LoadedStaticPipetteData(
-                channels=8,
-                max_volume=15,
-                min_volume=3,
-                model="gen a",
-                display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
-                nozzle_offset_z=1.23,
-                home_position=4.56,
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
             ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+        ),
+    )
+
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
-    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
+
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=pick_up_tip_command)
+    )
     subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
 
     result = TipView(subject.state).get_next_tip(
@@ -274,30 +437,37 @@ def test_handle_pipette_config_action(
     subject: TipStore, supported_tip_fixture: pipette_definition.SupportedTipsDefinition
 ) -> None:
     """Should add pipette channel to state."""
-    subject.handle_action(
-        actions.AddPipetteConfigAction(
-            pipette_id="pipette-id",
-            serial_number="pipette-serial",
-            config=LoadedStaticPipetteData(
-                channels=8,
-                max_volume=15,
-                min_volume=3,
-                model="gen a",
-                display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
-                nozzle_offset_z=1.23,
-                home_position=4.56,
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
             ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
 
-    assert TipView(subject.state).get_pipette_channels(pipette_id="pipette-id") == 8
+    assert TipView(subject.state).get_pipette_channels("pipette-id") == 8
+    assert TipView(subject.state).get_pipette_active_channels("pipette-id") == 8
 
 
 @pytest.mark.parametrize(
@@ -313,7 +483,9 @@ def test_has_tip_not_tip_rack(
     load_labware_command: commands.LoadLabware, subject: TipStore
 ) -> None:
     """It should return False if labware isn't a tip rack."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     result = TipView(state=subject.state).has_clean_tip("cool-labware", "A1")
 
@@ -324,7 +496,9 @@ def test_has_tip_tip_rack(
     load_labware_command: commands.LoadLabware, subject: TipStore
 ) -> None:
     """It should return False if labware isn't a tip rack."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
 
     result = TipView(state=subject.state).has_clean_tip("cool-labware", "A1")
 
@@ -340,43 +514,232 @@ def test_drop_tip(
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should be clear tip length when a tip is dropped."""
-    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
     subject.handle_action(
-        actions.AddPipetteConfigAction(
-            pipette_id="pipette-id",
-            serial_number="pipette-serial",
-            config=LoadedStaticPipetteData(
-                channels=8,
-                max_volume=15,
-                min_volume=3,
-                model="gen a",
-                display_name="display name",
-                flow_rates=FlowRates(
-                    default_aspirate={},
-                    default_dispense={},
-                    default_blow_out={},
-                ),
-                tip_configuration_lookup_table={15: supported_tip_fixture},
-                nominal_tip_overlap={},
-                nozzle_offset_z=1.23,
-                home_position=4.56,
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=8,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
             ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
-    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 1.23
 
-    subject.handle_action(actions.UpdateCommandAction(command=drop_tip_command))
-    result = TipView(subject.state).get_tip_length("pipette-id")
-    assert result == 0
-
-    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=pick_up_tip_command)
+    )
     result = TipView(subject.state).get_tip_length("pipette-id")
     assert result == 1.23
 
     subject.handle_action(
-        actions.UpdateCommandAction(command=drop_tip_in_place_command)
+        actions.UpdateCommandAction(private_result=None, command=drop_tip_command)
     )
     result = TipView(subject.state).get_tip_length("pipette-id")
     assert result == 0
+
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=pick_up_tip_command)
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 1.23
+
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=None, command=drop_tip_in_place_command
+        )
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 0
+
+
+@pytest.mark.parametrize(
+    argnames=["nozzle_map", "expected_channels"],
+    argvalues=[
+        (
+            NozzleMap.build(
+                physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+                physical_rows=OrderedDict({"A": ["A1"]}),
+                physical_columns=OrderedDict({"1": ["A1"]}),
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="A1",
+            ),
+            1,
+        ),
+        (
+            NozzleMap.build(
+                physical_nozzles=NINETY_SIX_MAP,
+                physical_rows=NINETY_SIX_ROWS,
+                physical_columns=NINETY_SIX_COLS,
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="H12",
+            ),
+            96,
+        ),
+        (
+            NozzleMap.build(
+                physical_nozzles=NINETY_SIX_MAP,
+                physical_rows=NINETY_SIX_ROWS,
+                physical_columns=NINETY_SIX_COLS,
+                starting_nozzle="A1",
+                back_left_nozzle="A1",
+                front_right_nozzle="E1",
+            ),
+            5,
+        ),
+        (None, 9),
+    ],
+)
+def test_active_channels(
+    subject: TipStore,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    nozzle_map: NozzleMap,
+    expected_channels: int,
+) -> None:
+    """Should update active channels after pipette configuration change."""
+    # Load pipette to update state
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=9,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
+    )
+
+    # Configure nozzle for partial configuration
+    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
+        result=commands.ConfigureNozzleLayoutResult()
+    )
+    configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
+        pipette_id="pipette-id",
+        nozzle_map=nozzle_map,
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=configure_nozzle_private_result,
+            command=configure_nozzle_layout_cmd,
+        )
+    )
+    assert (
+        TipView(subject.state).get_pipette_active_channels("pipette-id")
+        == expected_channels
+    )
+
+
+def test_next_tip_uses_active_channels(
+    subject: TipStore,
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    load_labware_command: commands.LoadLabware,
+    pick_up_tip_command: commands.PickUpTip,
+) -> None:
+    """Test that tip tracking logic uses pipette's active channels."""
+    # Load labware
+    subject.handle_action(
+        actions.UpdateCommandAction(private_result=None, command=load_labware_command)
+    )
+
+    # Load pipette
+    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+        result=commands.LoadPipetteResult(pipetteId="pipette-id")
+    )
+    load_pipette_private_result = commands.LoadPipettePrivateResult(
+        pipette_id="pipette-id",
+        serial_number="pipette-serial",
+        config=LoadedStaticPipetteData(
+            channels=96,
+            max_volume=15,
+            min_volume=3,
+            model="gen a",
+            display_name="display name",
+            flow_rates=FlowRates(
+                default_aspirate={},
+                default_dispense={},
+                default_blow_out={},
+            ),
+            tip_configuration_lookup_table={15: supported_tip_fixture},
+            nominal_tip_overlap={},
+            nozzle_offset_z=1.23,
+            home_position=4.56,
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=load_pipette_private_result, command=load_pipette_command
+        )
+    )
+
+    # Configure nozzle for partial configuration
+    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
+        result=commands.ConfigureNozzleLayoutResult()
+    )
+    configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
+        pipette_id="pipette-id",
+        nozzle_map=NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A12",
+            back_left_nozzle="A12",
+            front_right_nozzle="H12",
+        ),
+    )
+    subject.handle_action(
+        actions.UpdateCommandAction(
+            private_result=configure_nozzle_private_result,
+            command=configure_nozzle_layout_cmd,
+        )
+    )
+    # Pick up partial tips
+    subject.handle_action(
+        actions.UpdateCommandAction(command=pick_up_tip_command, private_result=None)
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=5,
+        starting_tip_name=None,
+    )
+    assert result == "A2"

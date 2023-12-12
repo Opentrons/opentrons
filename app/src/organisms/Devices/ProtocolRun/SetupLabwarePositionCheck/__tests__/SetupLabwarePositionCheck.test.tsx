@@ -5,6 +5,11 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
+import {
+  useRunQuery,
+  useProtocolQuery,
+  useProtocolAnalysisAsDocumentQuery,
+} from '@opentrons/react-api-client'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLPC } from '../../../../LabwarePositionCheck/useLaunchLPC'
@@ -15,8 +20,10 @@ import {
   useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
+  useRobotType,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 jest.mock('../../../../LabwarePositionCheck/useLaunchLPC')
 jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
@@ -24,6 +31,7 @@ jest.mock('../../../../RunTimeControl/hooks')
 jest.mock('../../../../../redux/config')
 jest.mock('../../../hooks')
 jest.mock('../../../hooks/useLPCSuccessToast')
+jest.mock('@opentrons/react-api-client')
 
 const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
   typeof getModuleTypesThatRequireExtraAttention
@@ -51,6 +59,16 @@ const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
 >
 const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
   typeof useLaunchLPC
+>
+const mockUseRobotType = useRobotType as jest.MockedFunction<
+  typeof useRobotType
+>
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
+  typeof useProtocolQuery
+>
+const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
+  typeof useProtocolAnalysisAsDocumentQuery
 >
 const DISABLED_REASON = 'MOCK_DISABLED_REASON'
 const ROBOT_NAME = 'otie'
@@ -149,12 +167,26 @@ describe('SetupLabware', () => {
       } as any)
     when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
     when(mockUseLPCDisabledReason).mockReturnValue(null)
+    when(mockUseRobotType)
+      .calledWith(ROBOT_NAME)
+      .mockReturnValue(FLEX_ROBOT_TYPE)
     when(mockUseLaunchLPC)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, 'test protocol')
       .mockReturnValue({
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
       })
+    when(mockUseRunQuery).mockReturnValue({
+      data: {
+        data: { protocolId: 'fakeProtocolId' },
+      },
+    } as any)
+    when(mockUseProtocolQuery).mockReturnValue({
+      data: { data: { metadata: { protocolName: 'test protocol' } } },
+    } as any)
+    when(mockUseProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: null,
+    } as any)
   })
 
   afterEach(() => {

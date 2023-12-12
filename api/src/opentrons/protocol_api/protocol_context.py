@@ -14,14 +14,16 @@ from typing import (
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
-from opentrons.broker import Broker
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -41,11 +43,12 @@ from .core.module import (
     AbstractMagneticBlockCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
-from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -101,7 +104,7 @@ class ProtocolContext(CommandPublisher):
         self,
         api_version: APIVersion,
         core: ProtocolCore,
-        broker: Optional[Broker] = None,
+        broker: Optional[LegacyBroker] = None,
         core_map: Optional[LoadedCoreMap] = None,
         deck: Optional[Deck] = None,
         bundled_data: Optional[Dict[str, bytes]] = None,
@@ -232,6 +235,14 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def commands(self) -> List[str]:
+        """Return the run log.
+
+        This is a list of human-readable strings representing what's been done in the protocol so
+        far. For example, "Aspirating 123 µL from well A1 of 96 well plate in slot 1."
+
+        The exact format of these entries is not guaranteed. The format here may differ from other
+        places that show the run log, such as the Opentrons App.
+        """
         return self._commands
 
     @requires_version(2, 0)
@@ -350,7 +361,7 @@ class ProtocolContext(CommandPublisher):
             )
 
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName, LabwareCore]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName, LabwareCore]
         if adapter is not None:
             if self._api_version < APIVersion(2, 15):
                 raise APIVersionError(
@@ -365,7 +376,9 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_labware(
             load_name=load_name,
@@ -426,6 +439,46 @@ class ProtocolContext(CommandPublisher):
             location=location,
         )
 
+    @requires_version(2, 16)
+    def load_trash_bin(self, location: DeckLocation) -> TrashBin:
+        slot_name = validation.ensure_and_convert_deck_slot(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        if not isinstance(slot_name, DeckSlotName):
+            raise ValueError("Staging areas not permitted for trash bin.")
+        addressable_area_name = validation.ensure_and_convert_trash_bin_location(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        trash_bin = TrashBin(
+            location=slot_name, addressable_area_name=addressable_area_name
+        )
+        self._core.append_disposal_location(trash_bin)
+        return trash_bin
+
+    @requires_version(2, 16)
+    def load_waste_chute(
+        self,
+        *,
+        with_staging_area_slot_d4: bool = False,
+    ) -> WasteChute:
+        """Load the waste chute on the deck.
+
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
+        """
+        if with_staging_area_slot_d4:
+            raise NotImplementedError(
+                "The waste chute staging area slot is not currently implemented."
+            )
+        waste_chute = WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        self._core.append_disposal_location(waste_chute)
+        return waste_chute
+
     @requires_version(2, 15)
     def load_adapter(
         self,
@@ -467,11 +520,13 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName]
+        load_location: Union[OffDeckType, DeckSlotName, StagingSlotName]
         if isinstance(location, OffDeckType):
             load_location = location
         else:
-            load_location = validation.ensure_deck_slot(location, self._api_version)
+            load_location = validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
 
         labware_core = self._core.load_adapter(
             load_name=load_name,
@@ -527,7 +582,9 @@ class ProtocolContext(CommandPublisher):
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, Labware, ModuleTypes, OffDeckType],
+        new_location: Union[
+            DeckLocation, Labware, ModuleTypes, OffDeckType, WasteChute
+        ],
         use_gripper: bool = False,
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
@@ -569,13 +626,22 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[ModuleCore, LabwareCore, OffDeckType, DeckSlotName]
+        location: Union[
+            ModuleCore,
+            LabwareCore,
+            WasteChute,
+            OffDeckType,
+            DeckSlotName,
+            StagingSlotName,
+        ]
         if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
-        elif isinstance(new_location, OffDeckType):
+        elif isinstance(new_location, (OffDeckType, WasteChute)):
             location = new_location
         else:
-            location = validation.ensure_deck_slot(new_location, self._api_version)
+            location = validation.ensure_and_convert_deck_slot(
+                new_location, self._api_version, self._core.robot_type
+            )
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
@@ -591,6 +657,7 @@ class ProtocolContext(CommandPublisher):
             labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
+            pause_for_manual_move=True,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
@@ -672,8 +739,12 @@ class ProtocolContext(CommandPublisher):
         deck_slot = (
             None
             if location is None
-            else validation.ensure_deck_slot(location, self._api_version)
+            else validation.ensure_and_convert_deck_slot(
+                location, self._api_version, self._core.robot_type
+            )
         )
+        if isinstance(deck_slot, StagingSlotName):
+            raise ValueError("Cannot load a module onto a staging slot.")
 
         module_core = self._core.load_module(
             model=requested_model,
@@ -748,15 +819,20 @@ class ProtocolContext(CommandPublisher):
                              replaced by `instrument_name`.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        is_96_channel = instrument_name in ("p1000_96", "flex_96channel_1000")
-        if is_96_channel and isinstance(self._core, ProtocolEngineCore):
-            checked_instrument_name = instrument_name
-            checked_mount = Mount.LEFT
-        else:
-            checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-            checked_mount = validation.ensure_mount(mount)
+        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
+
+        checked_mount = Mount.LEFT if is_96_channel else validation.ensure_mount(mount)
 
         tip_racks = tip_racks or []
+
+        # TODO (tz, 9-12-23): move validation into PE
+        on_right_mount = self._instruments[Mount.RIGHT]
+        if is_96_channel and on_right_mount is not None:
+            raise RuntimeError(
+                f"Instrument already present on right:"
+                f" {on_right_mount.name}. In order to load a 96 channel pipette both mounts need to be available."
+            )
 
         existing_instrument = self._instruments[checked_mount]
         if existing_instrument is not None and not replace:
@@ -770,10 +846,8 @@ class ProtocolContext(CommandPublisher):
             f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        # TODO (tz, 11-22-22): was added to support 96 channel pipette.
-        #  Should remove when working on https://opentrons.atlassian.net/browse/RLIQ-255
         instrument_core = self._core.load_instrument(
-            instrument_name=checked_instrument_name,  # type: ignore[arg-type]
+            instrument_name=checked_instrument_name,
             mount=checked_mount,
         )
 
@@ -784,13 +858,19 @@ class ProtocolContext(CommandPublisher):
                 log=logger,
             )
 
+        trash: Optional[Labware]
+        try:
+            trash = self.fixed_trash
+        except NoTrashDefinedError:
+            trash = None
+
         instrument = InstrumentContext(
             core=instrument_core,
             protocol_core=self._core,
             broker=self._broker,
             api_version=self._api_version,
             tip_racks=tip_racks,
-            trash=self.fixed_trash,
+            trash=trash,
             requested_as=instrument_name,
         )
 
@@ -909,6 +989,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def deck(self) -> Deck:
         """An interface to provide information about what's currently loaded on the deck.
+        This object is useful for determining if a slot in the deck is free.
 
         This object behaves like a dictionary whose keys are the deck slot names.
         For instance, ``protocol.deck[1]``, ``protocol.deck["1"]``, and ``protocol.deck["D1"]``
@@ -918,14 +999,23 @@ class ProtocolContext(CommandPublisher):
         labware, a :py:obj:`~opentrons.protocol_api.ModuleContext` if the slot contains a hardware
         module, or ``None`` if the slot doesn't contain anything.
 
-        This object is useful for determining if a slot in the deck is free.
-
         Rather than filtering the objects in the deck map yourself,
-        you can also use :py:attr:`loaded_labwares` to see a dict of labwares
-        and :py:attr:`loaded_modules` to see a dict of modules.
+        you can also use :py:attr:`loaded_labwares` to get a dict of labwares
+        and :py:attr:`loaded_modules` to get a dict of modules.
 
-        For advanced control, you can delete an item of labware from the deck
-        with e.g. ``del protocol.deck['1']`` to free a slot for new labware.
+        For :ref:`advanced-control` *only*, you can delete an element of the ``deck`` dict.
+        This only works for deck slots that contain labware objects. For example, if slot
+        1 contains a labware, ``del protocol.deck['1']`` will free the slot so you can
+        load another labware there.
+
+        .. warning::
+            Deleting labware from a deck slot does not pause the protocol. Subsequent
+            commands continue immediately. If you need to physically move the labware to
+            reflect the new deck state, add a :py:meth:`.pause` or use
+            :py:meth:`.move_labware` instead.
+
+        .. versionchanged:: 2.15
+           ``del`` sets the corresponding labware's location to ``OFF_DECK``.
         """
         return self._deck
 
@@ -937,17 +1027,23 @@ class ProtocolContext(CommandPublisher):
         It has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
         """
-        return self._core_map.get(self._core.fixed_trash)
+        fixed_trash = self._core_map.get(self._core.fixed_trash)
+        if fixed_trash is None:
+            raise NoTrashDefinedError(
+                "No trash container has been defined in this protocol."
+            )
+        return fixed_trash
 
     def _load_fixed_trash(self) -> None:
         fixed_trash_core = self._core.fixed_trash
-        fixed_trash = Labware(
-            core=fixed_trash_core,
-            api_version=self._api_version,
-            protocol_core=self._core,
-            core_map=self._core_map,
-        )
-        self._core_map.add(fixed_trash_core, fixed_trash)
+        if fixed_trash_core is not None:
+            fixed_trash = Labware(
+                core=fixed_trash_core,
+                api_version=self._api_version,
+                protocol_core=self._core,
+                core_map=self._core_map,
+            )
+            self._core_map.add(fixed_trash_core, fixed_trash)
 
     @requires_version(2, 5)
     def set_rail_lights(self, on: bool) -> None:
@@ -995,7 +1091,7 @@ def _create_module_context(
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,
-    broker: Broker,
+    broker: LegacyBroker,
 ) -> ModuleTypes:
     module_cls: Optional[Type[ModuleTypes]] = None
     if isinstance(module_core, AbstractTemperatureModuleCore):

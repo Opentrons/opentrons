@@ -41,7 +41,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       .mockResolvedValue({ data: 'something' } as any)
 
     const { result, waitFor } = renderHook(
-      () => useCreateMaintenanceCommandMutation(MAINTENANCE_RUN_ID),
+      () => useCreateMaintenanceCommandMutation(),
       {
         wrapper,
       }
@@ -50,6 +50,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
     expect(result.current.data).toBeUndefined()
     act(() => {
       result.current.createMaintenanceCommand({
+        maintenanceRunId: MAINTENANCE_RUN_ID,
         command: mockAnonLoadCommand,
       })
     })
@@ -70,7 +71,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
       .mockResolvedValue({ data: 'something' } as any)
 
     const { result, waitFor } = renderHook(
-      () => useCreateMaintenanceCommandMutation(MAINTENANCE_RUN_ID),
+      () => useCreateMaintenanceCommandMutation(),
       {
         wrapper,
       }
@@ -79,6 +80,7 @@ describe('useCreateMaintenanceCommandMutation hook', () => {
     expect(result.current.data).toBeUndefined()
     act(() => {
       result.current.createMaintenanceCommand({
+        maintenanceRunId: MAINTENANCE_RUN_ID,
         command: mockAnonLoadCommand,
         waitUntilComplete,
         timeout,

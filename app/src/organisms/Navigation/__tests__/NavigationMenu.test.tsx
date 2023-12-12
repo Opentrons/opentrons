@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -12,6 +12,15 @@ jest.mock('../../../redux/robot-admin')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../Devices/hooks')
 jest.mock('../RestartRobotConfirmationModal')
+
+const mockPush = jest.fn()
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
 
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockHome = home as jest.MockedFunction<typeof home>
@@ -33,6 +42,7 @@ describe('NavigationMenu', () => {
     props = {
       onClick: jest.fn(),
       robotName: 'otie',
+      setShowNavMenu: jest.fn(),
     }
     mockUseLights.mockReturnValue({
       lightsOn: false,
@@ -42,14 +52,18 @@ describe('NavigationMenu', () => {
       <div>mock RestartRobotConfirmationModal</div>
     )
   })
-  it('should render the home menu item and clicking home robot arm, dispatches home', () => {
+
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should render the home menu item and clicking home gantry, dispatches home and call a mock function', () => {
     const { getByText, getByLabelText } = render(props)
     getByLabelText('BackgroundOverlay_ModalShell').click()
     expect(props.onClick).toHaveBeenCalled()
-    const home = getByText('Home gantry')
-    getByLabelText('home-gantry_icon')
-    home.click()
+    getByLabelText('reset-position_icon')
+    getByText('Home gantry').click()
     expect(mockHome).toHaveBeenCalled()
+    expect(props.setShowNavMenu).toHaveBeenCalled()
   })
 
   it('should render the restart robot menu item and clicking it, dispatches restart robot', () => {
@@ -75,5 +89,17 @@ describe('NavigationMenu', () => {
     })
     const { getByText } = render(props)
     getByText('Lights off')
+  })
+
+  it('should render the deck configuration menu item', () => {
+    const { getByText, getByLabelText } = render(props)
+    getByText('Deck configuration')
+    getByLabelText('deck-map_icon')
+  })
+
+  it('should call a mock function when tapping deck configuration', () => {
+    const { getByText } = render(props)
+    getByText('Deck configuration').click()
+    expect(mockPush).toHaveBeenCalledWith('/deck-configuration')
   })
 })

@@ -3,7 +3,10 @@ import { saveAs } from 'file-saver'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
@@ -25,7 +28,7 @@ import {
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useDeckCalibrationData,
-  useIsOT3,
+  useIsFlex,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
@@ -51,9 +54,12 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
 const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
+>
+const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
+  typeof useModulesQuery
 >
 
 let mockTrackEvent: jest.Mock
@@ -94,7 +100,7 @@ describe('CalibrationDataDownload', () => {
         deckCalibrationData: mockDeckCalData,
         isDeckCalibrated: true,
       })
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     when(mockUsePipetteOffsetCalibrations)
       .calledWith()
       .mockReturnValue([
@@ -113,6 +119,9 @@ describe('CalibrationDataDownload', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [] },
     } as any)
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [] },
+    } as any)
   })
 
   afterEach(() => {
@@ -121,13 +130,13 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a title and description for OT2', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
     const [{ getByText }] = render()
     getByText('Download Calibration Data')
   })
 
   it('renders an OT-3 title and description - About Calibration', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
@@ -139,7 +148,7 @@ describe('CalibrationDataDownload', () => {
 
   it('renders a download calibration data button', () => {
     const [{ getByText }] = render()
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
@@ -149,18 +158,18 @@ describe('CalibrationDataDownload', () => {
   })
 
   it('renders a download calibration button for Flex when cal data is present', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     mockUseInstrumentsQuery.mockReturnValue({
       data: { data: [instrumentsResponseFixture.data[0]] },
     } as any)
     const [{ getByText }] = render()
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     downloadButton.click()
     expect(saveAs).toHaveBeenCalled()
   })
 
   it('renders a See how robot calibration works link', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByRole }] = render()
     const SUPPORT_LINK = 'https://support.opentrons.com'
     expect(
@@ -175,7 +184,7 @@ describe('CalibrationDataDownload', () => {
     getByText('Download Calibration Data')
     getByText('Save all three types of calibration data as a JSON file.')
 
-    const downloadButton = getByText('Download calibration data')
+    const downloadButton = getByText('Download calibration logs')
     expect(downloadButton).toBeEnabled()
   })
 
@@ -192,7 +201,7 @@ describe('CalibrationDataDownload', () => {
     getByText('No calibration data available.')
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
     expect(downloadButton).toBeDisabled()
   })
@@ -203,13 +212,13 @@ describe('CalibrationDataDownload', () => {
     getByText('No calibration data available.')
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
     expect(downloadButton).toBeDisabled()
   })
 
   it('renders disabled button for Flex when no instrument is calibrated', () => {
-    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ getByRole, queryByText }] = render()
     queryByText(
       `For the robot to move accurately and precisely, you need to calibrate it. Pipette and gripper calibration is an automated process that uses a calibration probe or pin.`
@@ -219,9 +228,9 @@ describe('CalibrationDataDownload', () => {
     )
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
-    expect(downloadButton).toBeDisabled()
+    expect(downloadButton).toBeEnabled() // allow download for empty cal data
   })
 
   it('renders disabled button when tip lengths are not calibrated', () => {
@@ -230,7 +239,7 @@ describe('CalibrationDataDownload', () => {
     getByText('No calibration data available.')
 
     const downloadButton = getByRole('button', {
-      name: 'Download calibration data',
+      name: 'Download calibration logs',
     })
     expect(downloadButton).toBeDisabled()
   })

@@ -65,7 +65,6 @@ describe('ModuleFields', () => {
         [MAGNETIC_BLOCK_TYPE]: magneticBlockNotOnDeck,
       },
       onFieldChange: jest.fn(),
-      onSetFieldValue: jest.fn(),
       onSetFieldTouched: jest.fn(),
       onBlur: jest.fn(),
       touched: null,
@@ -105,7 +104,6 @@ describe('ModuleFields', () => {
     temperatureSelectChange(expectedEvent)
 
     expect(props.onFieldChange).toHaveBeenCalledWith(expectedEvent)
-    expect(props.onSetFieldValue).toHaveBeenCalledWith(targetToClear, null)
     expect(props.onSetFieldTouched).toHaveBeenCalledWith(targetToClear, false)
   })
 

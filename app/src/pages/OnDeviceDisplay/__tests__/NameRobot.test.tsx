@@ -9,7 +9,7 @@ import {
   getConnectableRobots,
   getReachableRobots,
 } from '../../../redux/discovery'
-import { getOnDeviceDisplaySettings } from '../../../redux/config'
+import { useIsUnboxingFlowOngoing } from '../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -17,11 +17,10 @@ import {
 
 import { NameRobot } from '../NameRobot'
 
-import type { OnDeviceDisplaySettings } from '../../../redux/config/types'
-
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/analytics')
+jest.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings/hooks')
 
 const mockPush = jest.fn()
 
@@ -33,13 +32,6 @@ jest.mock('react-router-dom', () => {
   }
 })
 
-const mockSettings = {
-  sleepMs: 0,
-  brightness: 1,
-  textSize: 1,
-  unfinishedUnboxingFlowRoute: '/robot-settings/rename-robot',
-} as OnDeviceDisplaySettings
-
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
 >
@@ -49,8 +41,8 @@ const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
-  typeof getOnDeviceDisplaySettings
+const mockuseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
+  typeof useIsUnboxingFlowOngoing
 >
 let mockTrackEvent: jest.Mock
 
@@ -71,13 +63,13 @@ describe('NameRobot', () => {
     mockReachableRobot.name = 'reachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
+    mockuseIsUnboxingFlowOngoing.mockReturnValue(true)
   })
 
   it('should render text, button and keyboard', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Name your robot')
-    getByText('Don’t worry, you can change this later in your settings.')
+    getByText('Don’t worry, you can always change this in your settings.')
     getByText('Enter up to 17 characters (letters and numbers only)')
     getByRole('textbox')
     getByText('Confirm')
@@ -98,7 +90,7 @@ describe('NameRobot', () => {
     const [{ findByText, getByLabelText }] = render()
     getByLabelText('SmallButton_primary').click()
     const error = await findByText(
-      'Oops! Robot name must follow the character count and limitations'
+      'Oops! Robot name must follow the character count and limitations.'
     )
     await waitFor(() => {
       expect(error).toBeInTheDocument()
@@ -145,19 +137,18 @@ describe('NameRobot', () => {
   })
 
   it('should render text and button when coming from robot settings', () => {
-    mockSettings.unfinishedUnboxingFlowRoute = null
-    mockGetOnDeviceDisplaySettings.mockReturnValue(mockSettings)
+    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
     const [{ getByText, queryByText }] = render()
     getByText('Rename robot')
     expect(
-      queryByText('Don’t worry, you can change this later in your settings.')
+      queryByText('Don’t worry, you can always change this in your settings.')
     ).not.toBeInTheDocument()
     getByText('Enter up to 17 characters (letters and numbers only)')
     getByText('Confirm')
   })
 
   it('should call a mock function when tapping back button', () => {
-    mockSettings.unfinishedUnboxingFlowRoute = null
+    mockuseIsUnboxingFlowOngoing.mockReturnValue(false)
     const [{ getByTestId }] = render()
     getByTestId('name_back_button').click()
     expect(mockPush).toHaveBeenCalledWith('/robot-settings')

@@ -12,7 +12,9 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperJawState,
 )
-from opentrons.hardware_control.errors import InvalidMoveError
+from opentrons.hardware_control.errors import (
+    InvalidCriticalPoint,
+)
 from .instrument_calibration import (
     GripperCalibrationOffset,
     load_gripper_calibration_offset,
@@ -20,6 +22,10 @@ from .instrument_calibration import (
 )
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    FailedGripperPickupError,
+)
 
 from opentrons_shared_data.gripper import (
     GripperDefinition,
@@ -99,6 +105,10 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._attached_probe = None
 
     @property
+    def max_allowed_grip_error(self) -> float:
+        return self._geometry.max_allowed_grip_error
+
+    @property
     def jaw_width(self) -> float:
         jaw_max = self.geometry.jaw_width["max"]
         return jaw_max - (self.current_jaw_displacement * 2.0)
@@ -111,15 +121,20 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     @current_jaw_displacement.setter
     def current_jaw_displacement(self, mm: float) -> None:
         max_mm = self._max_jaw_displacement() + 2.0
-        assert mm <= max_mm, (
-            f"jaw displacement {round(mm, 1)} mm exceeds max expected value: "
-            f"{max_mm} mm"
-        )
-        self._current_jaw_displacement = mm
+        if mm > max_mm:
+            self._log.warning(
+                f"jaw displacement {round(mm, 1)} mm exceeds max expected value: "
+                f"{max_mm} mm, setting value to max value instead."
+            )
+        self._current_jaw_displacement = min(mm, max_mm)
 
     @property
     def default_grip_force(self) -> float:
         return self.grip_force_profile.default_grip_force
+
+    @property
+    def default_idle_force(self) -> float:
+        return self.grip_force_profile.default_idle_force
 
     @property
     def default_home_force(self) -> float:
@@ -172,9 +187,38 @@ class Gripper(AbstractInstrument[GripperDefinition]):
 
     def check_calibration_pin_location_is_accurate(self) -> None:
         if not self.attached_probe:
-            raise RuntimeError("must attach a probe before starting calibration")
+            raise CommandPreconditionViolated(
+                "Cannot calibrate gripper without attaching a calibration probe",
+                detail={
+                    "probe": str(self._attached_probe),
+                    "jaw_state": str(self.state),
+                },
+            )
         if self.state != GripperJawState.GRIPPING:
-            raise RuntimeError("must grip the jaws before starting calibration")
+            raise CommandPreconditionViolated(
+                "Cannot calibrate gripper if jaw is not in gripping state",
+                detail={
+                    "probe": str(self._attached_probe),
+                    "jaw_state": str(self.state),
+                },
+            )
+
+    def check_labware_pickup(self, labware_width: float) -> None:
+        """Ensure that a gripper pickup succeeded."""
+        # check if the gripper is at an acceptable position after attempting to
+        #  pick up labware
+        expected_gripper_position = labware_width
+        current_gripper_position = self.jaw_width
+        if (
+            abs(current_gripper_position - expected_gripper_position)
+            > self.max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                details={
+                    "expected jaw width": expected_gripper_position,
+                    "actual jaw width": current_gripper_position,
+                },
+            )
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
@@ -182,9 +226,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         between the center of the gripper engagement volume and the calibration pins.
         """
         if cp_override in [CriticalPoint.NOZZLE, CriticalPoint.TIP]:
-            raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a gripper"
-            )
+            raise InvalidCriticalPoint(cp_override.name, "gripper")
 
         if not self._attached_probe:
             cp = cp_override or CriticalPoint.GRIPPER_JAW_CENTER
@@ -211,7 +253,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
                 - Point(y=self.current_jaw_displacement)
             )
         else:
-            raise InvalidMoveError(f"Critical point {cp_override} is not valid")
+            raise InvalidCriticalPoint(cp.name, "gripper")
 
     def duty_cycle_by_force(self, newton: float) -> float:
         return gripper_config.duty_cycle_by_force(newton, self.grip_force_profile)
@@ -242,10 +284,7 @@ def _reload_gripper(
     # are similar enough that we might skip, see if the configs
     # match closely enough.
     # Returns a gripper object
-    if (
-        new_config == attached_instr.config
-        and cal_offset == attached_instr._calibration_offset
-    ):
+    if new_config == attached_instr.config:
         # Same config, good enough
         return attached_instr, True
     else:

@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
 
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
@@ -17,7 +18,7 @@ from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
+from opentrons.hardware_control import API, ThreadManagedHardware
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
@@ -376,10 +377,10 @@ def test_use_filter_tips(ctx, get_labware_def):
     instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
     pipette: Pipette = ctx._core.get_hardware().hardware_instruments[mount]
 
-    assert pipette.available_volume == pipette.config.max_volume
+    assert pipette.available_volume == pipette.liquid_class.max_volume
 
     instr.pick_up_tip()
-    assert pipette.available_volume < pipette.config.max_volume
+    assert pipette.available_volume < pipette.liquid_class.max_volume
 
 
 @pytest.mark.parametrize("pipette_model", ["p10_single", "p20_single_gen2"])
@@ -447,7 +448,7 @@ def test_instrument_trash_ot3(ctx, get_labware_def):
     ctx.home()
 
     mount = Mount.LEFT
-    instr = ctx.load_instrument("p1000_single_gen3", mount)
+    instr = ctx.load_instrument("flex_1channel_1000", mount)
 
     assert instr.trash_container.name == "opentrons_1_trash_3200ml_fixed"
 
@@ -581,7 +582,7 @@ def test_prevent_liquid_handling_without_tip(ctx):
     plate = ctx.load_labware("corning_384_wellplate_112ul_flat", "2")
     pipR = ctx.load_instrument("p300_single", Mount.RIGHT, tip_racks=[tr])
 
-    with pytest.raises(NoTipAttachedError):
+    with pytest.raises(UnexpectedTipRemovalError):
         pipR.aspirate(100, plate.wells()[0])
 
     pipR.pick_up_tip()
@@ -589,7 +590,7 @@ def test_prevent_liquid_handling_without_tip(ctx):
     pipR.aspirate(100, plate.wells()[0])
     pipR.drop_tip()
 
-    with pytest.raises(NoTipAttachedError):
+    with pytest.raises(UnexpectedTipRemovalError):
         pipR.dispense(100, plate.wells()[1])
 
 

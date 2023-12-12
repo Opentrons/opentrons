@@ -24,6 +24,17 @@ import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 import type { WifiNetwork } from '../../redux/networking/types'
 
 const NETWORK_ROW_STYLE = css`
+  display: ${DISPLAY_FLEX};
+  width: 100%;
+  height: 5rem;
+  padding: ${SPACING.spacing20} ${SPACING.spacing32};
+  align-items: ${ALIGN_CENTER};
+  grid-gap: ${SPACING.spacing16};
+
+  background-color: ${COLORS.light1};
+  margin-bottom: ${SPACING.spacing8};
+  border-radius: ${BORDERS.borderRadiusSize4};
+
   &:hover {
     border: none;
     box-shadow: none;
@@ -81,18 +92,9 @@ export function DisplayWifiList({
         {list != null && list.length > 0
           ? list.map(nw => (
               <Btn
-                display={DISPLAY_FLEX}
-                width="100%"
-                height="5rem"
                 key={nw.ssid}
-                backgroundColor={COLORS.light1}
-                marginBottom={SPACING.spacing8}
-                borderRadius={BORDERS.borderRadiusSize3}
                 css={NETWORK_ROW_STYLE}
                 flexDirection={DIRECTION_ROW}
-                padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
-                alignItems={ALIGN_CENTER}
-                gridGap={SPACING.spacing4}
                 onClick={() => handleNetworkPress(nw.ssid)}
               >
                 <Icon name="wifi" size="2.5rem" />

@@ -9,8 +9,6 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import (
@@ -20,8 +18,10 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
+from opentrons.util.broker import Broker
 
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
@@ -39,7 +39,7 @@ from opentrons.protocol_api.core.legacy.load_info import (
     ModuleLoadInfo as LegacyModuleLoadInfo,
 )
 
-from opentrons.protocols.parse import parse
+from opentrons.protocols.parse import PythonParseMode, parse
 from opentrons.protocols.execution.execute import run_protocol
 from opentrons.protocols.types import (
     Protocol as LegacyProtocol,
@@ -68,6 +68,7 @@ class LegacyFileReader:
     def read(
         protocol_source: ProtocolSource,
         labware_definitions: Iterable[LabwareDefinition],
+        python_parse_mode: PythonParseMode,
     ) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
@@ -93,6 +94,7 @@ class LegacyFileReader:
             extra_data={
                 data_path.name: data_path.read_bytes() for data_path in data_file_paths
             },
+            python_parse_mode=python_parse_mode,
         )
 
 
@@ -122,8 +124,8 @@ class LegacyContextCreator:
     def create(
         self,
         protocol: LegacyProtocol,
-        broker: Optional[Broker],
-        equipment_broker: Optional[EquipmentBroker[LegacyLoadInfo]],
+        broker: Optional[LegacyBroker],
+        equipment_broker: Optional[Broker[LegacyLoadInfo]],
     ) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""
         extra_labware = (

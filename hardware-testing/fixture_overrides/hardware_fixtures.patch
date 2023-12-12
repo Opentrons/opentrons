@@ -1,8 +1,8 @@
 diff --git a/api/src/opentrons/config/feature_flags.py b/api/src/opentrons/config/feature_flags.py
-index f46674fb56..f59f3826de 100644
+index 5bf289a49d..dabdcff855 100644
 --- a/api/src/opentrons/config/feature_flags.py
 +++ b/api/src/opentrons/config/feature_flags.py
-@@ -76,6 +76,4 @@ def tip_presence_detection_enabled() -> bool:
+@@ -74,6 +74,4 @@ def tip_presence_detection_enabled() -> bool:
  
  def require_estop() -> bool:
      """Whether the OT3 should allow gantry movements with no Estop plugged in."""
@@ -11,7 +11,7 @@ index f46674fb56..f59f3826de 100644
 -    )
 +    return False
 diff --git a/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py b/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
-index 318deea522..8d351e4a77 100644
+index 4c2a664c60..8e0d2d49c6 100644
 --- a/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
 +++ b/hardware/opentrons_hardware/hardware_control/motion_planning/move_utils.py
 @@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
@@ -21,5 +21,5 @@ index 318deea522..8d351e4a77 100644
 -MINIMUM_DISPLACEMENT = 0.05
 +MINIMUM_DISPLACEMENT = 0.01
  
- 
- def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
+ # Minimum vector component of 0.1%
+ MINIMUM_VECTOR_COMPONENT = np.float64(0.001)

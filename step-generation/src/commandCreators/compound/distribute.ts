@@ -1,12 +1,28 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
-import { getWellDepth } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  getWellDepth,
+  LOW_VOLUME_PIPETTES,
+} from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import {
+  curryCommandCreator,
+  reduceCommandCreators,
+  blowoutUtil,
+  wasteChuteCommandsUtil,
+  getDispenseAirGapLocation,
+  getIsTallLabwareWestOf96Channel,
+  getWasteChuteAddressableAreaNamePip,
+} from '../../utils'
 import {
   aspirate,
+  configureForVolume,
+  configureNozzleLayout,
   delay,
   dispense,
   dropTip,
@@ -15,12 +31,6 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
-import {
-  curryCommandCreator,
-  reduceCommandCreators,
-  blowoutUtil,
-  getDispenseAirGapLocation,
-} from '../../utils'
 import type {
   DistributeArgs,
   CommandCreator,
@@ -46,6 +56,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
@@ -65,6 +77,53 @@ export const distribute: CommandCreator<DistributeArgs> = (
       errorCreators.labwareDoesNotExist({
         actionName,
         labware: args.sourceLabware,
+      })
+    )
+  }
+
+  if (
+    !args.dropTipLocation ||
+    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  ) {
+    errors.push(errorCreators.dropTipLocationDoesNotExist())
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === COLUMN &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.sourceLabware,
+      args.pipette
+    )
+  ) {
+    errors.push(
+      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        source: 'aspirate',
+        labware:
+          invariantContext.labwareEntities[args.sourceLabware].def.metadata
+            .displayName,
+      })
+    )
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === COLUMN &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.destLabware,
+      args.pipette
+    )
+  ) {
+    errors.push(
+      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+        source: 'dispense',
+        labware:
+          invariantContext.labwareEntities[args.destLabware].def.metadata
+            .displayName,
       })
     )
   }
@@ -99,6 +158,18 @@ export const distribute: CommandCreator<DistributeArgs> = (
     (maxVolume - disposalVolume) / args.volume
   )
   const { pipette } = args
+
+  const isWasteChute =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
+    'wasteChute'
+  const isTrashBin =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
+    'trashBin'
+
+  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
@@ -232,6 +303,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
+            dropTipLocation: args.dropTipLocation,
           }),
         ]
       }
@@ -274,15 +346,33 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 : []),
             ]
           : []
+
+      let dropTipCommand = [
+        curryCommandCreator(dropTip, {
+          pipette: args.pipette,
+          dropTipLocation: args.dropTipLocation,
+        }),
+      ]
+      if (isWasteChute) {
+        dropTipCommand = wasteChuteCommandsUtil({
+          type: 'dropTip',
+          pipetteId: args.pipette,
+          prevRobotState,
+          addressableAreaName: addressableAreaNameWasteChute,
+        })
+      }
+      if (isTrashBin) {
+        dropTipCommand = movableTrashCommandsUtil({
+          type: 'dropTip',
+          pipetteId: args.pipette,
+          prevRobotState,
+          invariantContext,
+        })
+      }
+
       // if using dispense > air gap, drop or change the tip at the end
       const dropTipAfterDispenseAirGap =
-        airGapAfterDispenseCommands.length > 0
-          ? [
-              curryCommandCreator(dropTip, {
-                pipette: args.pipette,
-              }),
-            ]
-          : []
+        airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
       const blowoutCommands = disposalVolume
         ? blowoutUtil({
             pipette: pipette,
@@ -345,8 +435,34 @@ export const distribute: CommandCreator<DistributeArgs> = (
               dispenseDelaySeconds: dispenseDelay?.seconds,
             })
           : []
+
+      const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
+        invariantContext.pipetteEntities[args.pipette].name
+      )
+        ? [
+            curryCommandCreator(configureForVolume, {
+              pipetteId: args.pipette,
+              volume: args.volume * destWellChunk.length + disposalVolume,
+            }),
+          ]
+        : []
+
+      const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
+      const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+        //  only emit the command if previous nozzle state is different
+        is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
+          ? [
+              curryCommandCreator(configureNozzleLayout, {
+                nozzles: args.nozzles,
+                pipetteId: args.pipette,
+              }),
+            ]
+          : []
+
       return [
+        ...configureNozzleLayoutCommand,
         ...tipCommands,
+        ...configureForVolumeCommand,
         ...mixBeforeAspirateCommands,
         curryCommandCreator(aspirate, {
           pipette,

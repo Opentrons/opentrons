@@ -7,8 +7,13 @@ from typing_extensions import Literal
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareIsNotAllowedInLocationError
-from ..resources import labware_validation
-from ..types import LabwareLocation, OnLabwareLocation, DeckSlotLocation
+from ..resources import labware_validation, fixture_validation
+from ..types import (
+    LabwareLocation,
+    OnLabwareLocation,
+    DeckSlotLocation,
+    AddressableAreaLocation,
+)
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -105,21 +110,30 @@ class LoadLabwareImplementation(
                 f"{params.loadName} is not allowed in slot {params.location.slotName}"
             )
 
+        if isinstance(params.location, AddressableAreaLocation):
+            if not fixture_validation.is_deck_slot(params.location.addressableAreaName):
+                raise LabwareIsNotAllowedInLocationError(
+                    f"Cannot load {params.loadName} onto addressable area {params.location.addressableAreaName}"
+                )
+
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location
+        )
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
             namespace=params.namespace,
             version=params.version,
-            location=params.location,
+            location=verified_location,
             labware_id=params.labwareId,
         )
 
         # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
         #   on the definition. In practice this will not cause any issues since they will raise protocol ending
         #   exception, but for correctness should be refactored to do this check beforehand.
-        if isinstance(params.location, OnLabwareLocation):
+        if isinstance(verified_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=loaded_labware.definition,
-                bottom_labware_id=params.location.labwareId,
+                bottom_labware_id=verified_location.labwareId,
             )
 
         return LoadLabwareResult(

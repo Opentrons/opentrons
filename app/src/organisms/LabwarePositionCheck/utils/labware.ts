@@ -2,17 +2,18 @@ import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getTiprackVolume,
-  LabwareDefinition2,
   getLabwareDefURI,
-  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+  LabwareLocation,
+  LoadLabwareRunTimeCommand,
+  PickUpTipRunTimeCommand,
   ProtocolAnalysisOutput,
   RunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
-import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+} from '@opentrons/shared-data'
 import type { LabwareToOrder } from '../types'
 
 export const tipRackOrderSort = (
@@ -100,7 +101,6 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
     },
     []
   )
-
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
 
   const orderedTiprackIds = tipRackIdsVisited
@@ -109,7 +109,6 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
       const definition = labwareDefinitions.find(
         def => getLabwareDefURI(def) === tiprackEntity?.definitionUri
       )
-
       const tipRackLocations = getAllUniqLocationsForLabware(
         tipRackId,
         commands
@@ -169,8 +168,34 @@ export const getLabwareIdsInOrder = (
           } else if ('moduleId' in loc) {
             slot = getModuleInitialLoadInfo(loc.moduleId, commands).location
               .slotName
+          } else if ('labwareId' in loc) {
+            const matchingAdapter = commands.find(
+              (command): command is LoadLabwareRunTimeCommand =>
+                command.commandType === 'loadLabware' &&
+                command.result?.labwareId === loc.labwareId
+            )
+            const adapterLocation = matchingAdapter?.params.location
+            if (adapterLocation === 'offDeck') {
+              slot = 'offDeck'
+            } else if (
+              adapterLocation != null &&
+              'slotName' in adapterLocation
+            ) {
+              slot = adapterLocation.slotName
+            } else if (
+              adapterLocation != null &&
+              'moduleId' in adapterLocation
+            ) {
+              slot = getModuleInitialLoadInfo(
+                adapterLocation.moduleId,
+                commands
+              ).location.slotName
+            }
           } else {
-            slot = loc.slotName
+            slot =
+              'addressableAreaName' in loc
+                ? loc.addressableAreaName
+                : loc.slotName
           }
           return [
             ...innerAcc,
@@ -199,6 +224,7 @@ export function getLabwareDefinitionsFromCommands(
           command.result?.definition != null &&
           getLabwareDefURI(def) === getLabwareDefURI(command.result?.definition)
       )
+
     return isLoadingNewDef && command.result?.definition != null
       ? [...acc, command.result?.definition]
       : acc

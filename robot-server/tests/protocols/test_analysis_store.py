@@ -1,9 +1,11 @@
 """Tests for the AnalysisStore interface."""
-import pytest
+import json
 
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, NamedTuple
+
+import pytest
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -105,9 +107,13 @@ async def test_add_pending(
     result = subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
 
     assert result == expected_summary
+
     assert await subject.get("analysis-id") == expected_analysis
     assert await subject.get_by_protocol("protocol-id") == [expected_analysis]
     assert subject.get_summaries_by_protocol("protocol-id") == [expected_summary]
+    with pytest.raises(AnalysisNotFoundError, match="analysis-id"):
+        # Unlike get(), get_as_document() should raise if the analysis is pending.
+        await subject.get_as_document("analysis-id")
 
 
 async def test_returned_in_order_added(
@@ -120,6 +126,7 @@ async def test_returned_in_order_added(
         subject.add_pending(protocol_id="protocol-id", analysis_id=analysis_id)
         await subject.update(
             analysis_id=analysis_id,
+            robot_type="OT-2 Standard",
             labware=[],
             modules=[],
             pipettes=[],
@@ -167,6 +174,7 @@ async def test_update_adds_details_and_completes_analysis(
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     await subject.update(
         analysis_id="analysis-id",
+        robot_type="OT-2 Standard",
         labware=[labware],
         pipettes=[pipette],
         # TODO(mm, 2022-10-21): Give the subject some commands, errors, and liquids here
@@ -178,10 +186,12 @@ async def test_update_adds_details_and_completes_analysis(
     )
 
     result = await subject.get("analysis-id")
+    result_as_document = await subject.get_as_document("analysis-id")
 
     assert result == CompletedAnalysis(
         id="analysis-id",
         result=AnalysisResult.OK,
+        robotType="OT-2 Standard",
         labware=[labware],
         pipettes=[pipette],
         modules=[],
@@ -190,6 +200,27 @@ async def test_update_adds_details_and_completes_analysis(
         liquids=[],
     )
     assert await subject.get_by_protocol("protocol-id") == [result]
+    assert json.loads(result_as_document) == {
+        "id": "analysis-id",
+        "result": "ok",
+        "status": "completed",
+        "robotType": "OT-2 Standard",
+        "labware": [
+            {
+                "id": "labware-id",
+                "loadName": "load-name",
+                "definitionUri": "namespace/load-name/42",
+                "location": {"slotName": "1"},
+            }
+        ],
+        "pipettes": [
+            {"id": "pipette-id", "pipetteName": "p300_single", "mount": "left"}
+        ],
+        "commands": [],
+        "errors": [],
+        "liquids": [],
+        "modules": [],
+    }
 
 
 class AnalysisResultSpec(NamedTuple):
@@ -243,6 +274,7 @@ async def test_update_infers_status_from_errors(
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     await subject.update(
         analysis_id="analysis-id",
+        robot_type="OT-2 Standard",
         commands=commands,
         errors=errors,
         labware=[],

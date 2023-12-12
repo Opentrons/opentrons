@@ -241,7 +241,7 @@ def test_load_with_overrides(
 
     if serial_number == TEST_SERIAL_NUMBER:
         dict_loaded_configs = loaded_base_configurations.dict(by_alias=True)
-        dict_loaded_configs["pickUpTipConfigurations"]["speed"] = 5.0
+        dict_loaded_configs["pickUpTipConfigurations"]["pressFit"]["speed"] = 5.0
         updated_configurations_dict = updated_configurations.dict(by_alias=True)
         assert set(dict_loaded_configs.pop("quirks")) == set(
             updated_configurations_dict.pop("quirks")
@@ -249,3 +249,18 @@ def test_load_with_overrides(
         assert updated_configurations_dict == dict_loaded_configs
     else:
         assert updated_configurations == loaded_base_configurations
+
+
+def test_build_mutable_config_using_old_units() -> None:
+    """Test that MutableConfigs can build with old units."""
+    old_units_config = {
+        "value": 5,
+        "default": 5.0,
+        "units": "mm/s",
+        "type": "float",
+        "min": 0.01,
+        "max": 30,
+    }
+    assert (
+        types.MutableConfig.build(**old_units_config, name="dropTipSpeed") is not None  # type: ignore
+    )

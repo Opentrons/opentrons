@@ -23,10 +23,8 @@ export const BlowoutLocationField = (
     value,
   } = props
 
-  const disposalLabwareOptions = useSelector(
-    uiLabwareSelectors.getDisposalLabwareOptions
-  )
-  const options = [...disposalLabwareOptions, ...props.options]
+  const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
+  const options = [...disposalOptions, ...props.options]
 
   return (
     <DropdownField
@@ -36,7 +34,7 @@ export const BlowoutLocationField = (
       id={'BlowoutLocationField_dropdown'}
       onBlur={onFieldBlur}
       onFocus={onFieldFocus}
-      value={value ? String(value) : null}
+      value={value != null ? String(value) : null}
       onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         updateValue(e.currentTarget.value)
       }}

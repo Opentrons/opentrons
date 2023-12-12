@@ -1,7 +1,7 @@
 import deepClone from 'lodash/cloneDeep'
 
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
-import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
 
 import {
   mockLabwareDefinition,
@@ -14,7 +14,6 @@ import {
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
-  getLabwareDisplayLocationFromRunData,
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
   getModuleModelFromRunData,
@@ -31,58 +30,6 @@ jest.mock('@opentrons/shared-data', () => {
 const mockGetSlotHasMatingSurfaceUnitVector = getSlotHasMatingSurfaceUnitVector as jest.MockedFunction<
   typeof getSlotHasMatingSurfaceUnitVector
 >
-
-describe('getLabwareDisplayLocationFromRunData', () => {
-  const mockTranslator = jest.fn()
-
-  it('uses off_deck copy when labware location is off deck', () => {
-    getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      'offDeck',
-      mockTranslator,
-      'OT-2 Standard'
-    )
-    expect(mockTranslator).toHaveBeenLastCalledWith('off_deck')
-  })
-
-  it('uses slot copy and slot name when labware location is a slot', () => {
-    getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      {
-        slotName: '3',
-      },
-      mockTranslator,
-      'OT-2 Standard'
-    )
-    expect(mockTranslator).toHaveBeenLastCalledWith('slot', { slot_name: '3' })
-  })
-
-  it('returns an empty string if the location is a module that cannot be found in protocol data', () => {
-    const res = getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      { moduleId: 'badID' },
-      mockTranslator,
-      'OT-2 Standard'
-    )
-
-    expect(res).toEqual('')
-  })
-
-  it('uses module in slot copy when location is a module in the protocol data', () => {
-    getLabwareDisplayLocationFromRunData(
-      mockRunData,
-      { moduleId: 'mockModuleID' },
-      mockTranslator,
-      'OT-2 Standard'
-    )
-
-    expect(mockTranslator).toHaveBeenLastCalledWith('module_in_slot', {
-      count: 1,
-      module: 'Heater-Shaker Module GEN1',
-      slot_name: '3',
-    })
-  })
-})
 
 describe('getLabwareNameFromRunData', () => {
   it('returns an empty string if it cannot find matching loaded labware', () => {
@@ -194,7 +141,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
-      deckDefFixture as any
+      standardDeckDef as any
     )
     const labwareInfo = res[0]
     expect(labwareInfo).toBeTruthy()
@@ -211,7 +158,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
-      deckDefFixture as any
+      standardDeckDef as any
     )
     expect(res).toHaveLength(1) // the offdeck labware still gets added because the mating surface doesn't exist for offdeck labware
   })
@@ -220,7 +167,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
-      deckDefFixture as any
+      standardDeckDef as any
     )
     expect(res).toHaveLength(2)
     const labwareInfo = res.find(
@@ -229,7 +176,7 @@ describe('getRunLabwareRenderInfo', () => {
     expect(labwareInfo).toBeTruthy()
     expect(labwareInfo?.x).toEqual(0)
     expect(labwareInfo?.y).toEqual(
-      deckDefFixture.cornerOffsetFromOrigin[1] -
+      standardDeckDef.cornerOffsetFromOrigin[1] -
         mockLabwareDefinition.dimensions.yDimension
     )
   })
@@ -246,7 +193,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       { labware: [mockBadSlotLabware] } as any,
       mockLabwareDefinitionsByUri,
-      deckDefFixture as any
+      standardDeckDef as any
     )
 
     expect(res[0].x).toEqual(0)
@@ -264,7 +211,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
   it('returns run module render info with nested labware', () => {
     const res = getRunModuleRenderInfo(
       mockRunData,
-      deckDefFixture as any,
+      standardDeckDef as any,
       mockLabwareDefinitionsByUri
     )
     const moduleInfo = res[0]
@@ -285,7 +232,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataNoNesting,
-      deckDefFixture as any,
+      standardDeckDef as any,
       mockLabwareDefinitionsByUri
     )
 
@@ -302,7 +249,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithTC,
-      deckDefFixture as any,
+      standardDeckDef as any,
       mockLabwareDefinitionsByUri
     )
 
@@ -327,7 +274,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithBadModuleSlot,
-      deckDefFixture as any,
+      standardDeckDef as any,
       mockLabwareDefinitionsByUri
     )
 

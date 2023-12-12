@@ -6,6 +6,10 @@ from typing import Dict, List, Mapping, Optional, Tuple
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import (
+    NozzleConfigurationType,
+    NozzleMap,
+)
 from opentrons.types import MountType, Mount as HwMount
 
 from .. import errors
@@ -15,6 +19,8 @@ from ..types import (
     FlowRates,
     DeckPoint,
     CurrentWell,
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
     TipGeometry,
 )
 from ..commands import (
@@ -27,6 +33,7 @@ from ..commands import (
     MoveToCoordinatesResult,
     MoveToWellResult,
     MoveRelativeResult,
+    MoveToAddressableAreaResult,
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
@@ -36,12 +43,17 @@ from ..commands import (
     TouchTipResult,
     thermocycler,
     heater_shaker,
+    CommandPrivateResult,
+    PrepareToAspirateResult,
+)
+from ..commands.configuring_common import (
+    PipetteConfigUpdateResultMixin,
+    PipetteNozzleLayoutResultMixin,
 )
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
     UpdateCommandAction,
-    AddPipetteConfigAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -86,12 +98,13 @@ class PipetteState:
 
     pipettes_by_id: Dict[str, LoadedPipette]
     aspirated_volume_by_id: Dict[str, Optional[float]]
-    current_well: Optional[CurrentWell]
+    current_location: Optional[CurrentPipetteLocation]
     current_deck_point: CurrentDeckPoint
     attached_tip_by_id: Dict[str, Optional[TipGeometry]]
     movement_speed_by_id: Dict[str, Optional[float]]
     static_config_by_id: Dict[str, StaticPipetteConfig]
     flow_rates_by_id: Dict[str, FlowRates]
+    nozzle_configuration_by_id: Dict[str, Optional[NozzleMap]]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -105,23 +118,33 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipettes_by_id={},
             aspirated_volume_by_id={},
             attached_tip_by_id={},
-            current_well=None,
+            current_location=None,
             current_deck_point=CurrentDeckPoint(mount=None, deck_point=None),
             movement_speed_by_id={},
             static_config_by_id={},
             flow_rates_by_id={},
+            nozzle_configuration_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, UpdateCommandAction):
-            self._handle_command(action.command)
+            self._handle_command(action.command, action.private_result)
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
-        elif isinstance(action, AddPipetteConfigAction):
-            config = action.config
-            self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
-                serial_number=action.serial_number,
+
+    def _handle_command(  # noqa: C901
+        self, command: Command, private_result: CommandPrivateResult
+    ) -> None:
+        self._update_current_location(command)
+        self._update_deck_point(command)
+
+        if isinstance(private_result, PipetteConfigUpdateResultMixin):
+            config = private_result.config
+            self._state.static_config_by_id[
+                private_result.pipette_id
+            ] = StaticPipetteConfig(
+                serial_number=private_result.serial_number,
                 model=config.model,
                 display_name=config.display_name,
                 min_volume=config.min_volume,
@@ -132,11 +155,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
             )
-            self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
-
-    def _handle_command(self, command: Command) -> None:  # noqa: ANN101, C901
-        self._update_current_well(command)
-        self._update_deck_point(command)
+            self._state.flow_rates_by_id[private_result.pipette_id] = config.flow_rates
+        elif isinstance(private_result, PipetteNozzleLayoutResultMixin):
+            self._state.nozzle_configuration_by_id[
+                private_result.pipette_id
+            ] = private_result.nozzle_map
 
         if isinstance(command.result, LoadPipetteResult):
             pipette_id = command.result.pipetteId
@@ -149,6 +172,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
+            self._state.nozzle_configuration_by_id[pipette_id] = None
 
         elif isinstance(command.result, AspirateResult):
             pipette_id = command.params.pipetteId
@@ -181,9 +205,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         attached_tip.volume
                     ]
                 except KeyError:
-                    tip_configuration = static_config.tip_configuration_lookup_table[
-                        static_config.max_volume
-                    ]
+                    # TODO(seth,9/11/2023): this is a bad way of doing defaults but better than max volume.
+                    # we used to look up a default tip config via the pipette max volume, but if that isn't
+                    # tip volume (as it isn't when we're in low-volume mode) then that lookup fails. Using
+                    # the first entry in the table is ok I guess but we really need to generally rethink how
+                    # we identify tip classes - looking things up by volume is not enough.
+                    tip_configuration = list(
+                        static_config.tip_configuration_lookup_table.values()
+                    )[0]
                 self._state.flow_rates_by_id[pipette_id] = FlowRates(
                     default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -197,9 +226,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             static_config = self._state.static_config_by_id.get(pipette_id)
             if static_config:
-                tip_configuration = static_config.tip_configuration_lookup_table[
-                    static_config.max_volume
-                ]
+                # TODO(seth,9/11/2023): bad way to do defaulting, see above.
+                tip_configuration = list(
+                    static_config.tip_configuration_lookup_table.values()
+                )[0]
                 self._state.flow_rates_by_id[pipette_id] = FlowRates(
                     default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -209,9 +239,13 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
 
-    def _update_current_well(self, command: Command) -> None:
-        # These commands leave the pipette in a new well.
-        # Update current_well to reflect that.
+        elif isinstance(command.result, PrepareToAspirateResult):
+            pipette_id = command.params.pipetteId
+            self._state.aspirated_volume_by_id[pipette_id] = 0
+
+    def _update_current_location(self, command: Command) -> None:
+        # These commands leave the pipette in a new location.
+        # Update current_location to reflect that.
         if isinstance(
             command.result,
             (
@@ -224,17 +258,23 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 TouchTipResult,
             ),
         ):
-            self._state.current_well = CurrentWell(
+            self._state.current_location = CurrentWell(
                 pipette_id=command.params.pipetteId,
                 labware_id=command.params.labwareId,
                 well_name=command.params.wellName,
             )
 
+        elif isinstance(command.result, MoveToAddressableAreaResult):
+            self._state.current_location = CurrentAddressableArea(
+                pipette_id=command.params.pipetteId,
+                addressable_area_name=command.params.addressableAreaName,
+            )
+
         # These commands leave the pipette in a place that we can't logically associate
-        # with a well. Clear current_well to reflect the fact that it's now unknown.
+        # with a well. Clear current_location to reflect the fact that it's now unknown.
         #
-        # TODO(mc, 2021-11-12): Wipe out current_well on movement failures, too.
-        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current well
+        # TODO(mc, 2021-11-12): Wipe out current_location on movement failures, too.
+        # TODO(jbl 2023-02-14): Need to investigate whether move relative should clear current location
         elif isinstance(
             command.result,
             (
@@ -245,7 +285,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 thermocycler.CloseLidResult,
             ),
         ):
-            self._state.current_well = None
+            self._state.current_location = None
 
         # Heater-Shaker commands may have left the pipette in a place that we can't
         # associate with a logical location, depending on their result.
@@ -257,10 +297,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             ),
         ):
             if command.result.pipetteRetracted:
-                self._state.current_well = None
+                self._state.current_location = None
 
         # A moveLabware command may have moved the labware that contains the current
-        # well out from under the pipette. Clear the current well to reflect the
+        # well out from under the pipette. Clear the current location to reflect the
         # fact that the pipette is no longer over any labware.
         #
         # This is necessary for safe motion planning in case the next movement
@@ -269,12 +309,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             moved_labware_id = command.params.labwareId
             if command.params.strategy == "usingGripper":
                 # All mounts will have been retracted.
-                self._state.current_well = None
+                self._state.current_location = None
             elif (
-                self._state.current_well is not None
-                and self._state.current_well.labware_id == moved_labware_id
+                isinstance(self._state.current_location, CurrentWell)
+                and self._state.current_location.labware_id == moved_labware_id
             ):
-                self._state.current_well = None
+                self._state.current_location = None
 
     def _update_deck_point(self, command: Command) -> None:
         if isinstance(
@@ -283,6 +323,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 MoveToWellResult,
                 MoveToCoordinatesResult,
                 MoveRelativeResult,
+                MoveToAddressableAreaResult,
                 PickUpTipResult,
                 DropTipResult,
                 AspirateResult,
@@ -396,9 +437,9 @@ class PipetteView(HasState[PipetteState]):
 
         return HardwarePipette(mount=hw_mount, config=hw_config)
 
-    def get_current_well(self) -> Optional[CurrentWell]:
-        """Get the last accessed well and which pipette accessed it."""
-        return self._state.current_well
+    def get_current_location(self) -> Optional[CurrentPipetteLocation]:
+        """Get the last accessed location and which pipette accessed it."""
+        return self._state.current_location
 
     def get_deck_point(self, pipette_id: str) -> Optional[DeckPoint]:
         """Get the deck point of a pipette by ID, or None if it was not associated with the last move operation."""
@@ -518,6 +559,10 @@ class PipetteView(HasState[PipetteState]):
         """Get the serial number of the pipette."""
         return self.get_config(pipette_id).serial_number
 
+    def get_channels(self, pipette_id: str) -> int:
+        """Return the max channels of the pipette."""
+        return self.get_config(pipette_id).channels
+
     def get_minimum_volume(self, pipette_id: str) -> float:
         """Return the given pipette's minimum volume."""
         return self.get_config(pipette_id).min_volume
@@ -535,8 +580,9 @@ class PipetteView(HasState[PipetteState]):
         """Return the given pipette's return tip height scale."""
         max_volume = self.get_maximum_volume(pipette_id)
         working_volume = max_volume
-        if self.get_attached_tip(pipette_id):
-            working_volume = self.get_working_volume(pipette_id)
+        tip = self.get_attached_tip(pipette_id)
+        if tip:
+            working_volume = tip.volume
 
         if working_volume in self.get_config(pipette_id).tip_configuration_lookup_table:
             tip_lookup = self.get_config(pipette_id).tip_configuration_lookup_table[
@@ -579,3 +625,20 @@ class PipetteView(HasState[PipetteState]):
             if mount == MountType.LEFT
             else MotorAxis.RIGHT_PLUNGER
         )
+
+    def get_nozzle_layout_type(self, pipette_id: str) -> NozzleConfigurationType:
+        """Get the current set nozzle layout configuration."""
+        nozzle_map_for_pipette = self._state.nozzle_configuration_by_id.get(pipette_id)
+        if nozzle_map_for_pipette:
+            return nozzle_map_for_pipette.configuration
+        else:
+            return NozzleConfigurationType.FULL
+
+    def get_is_partially_configured(self, pipette_id: str) -> bool:
+        """Determine if the provided pipette is partially configured."""
+        return self.get_nozzle_layout_type(pipette_id) != NozzleConfigurationType.FULL
+
+    def get_primary_nozzle(self, pipette_id: str) -> Optional[str]:
+        """Get the primary nozzle, if any, related to the given pipette's nozzle configuration."""
+        nozzle_map = self._state.nozzle_configuration_by_id.get(pipette_id)
+        return nozzle_map.starting_nozzle if nozzle_map else None

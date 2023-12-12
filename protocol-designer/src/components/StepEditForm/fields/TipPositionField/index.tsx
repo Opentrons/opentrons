@@ -130,13 +130,21 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const { labwareId, value } = ownProps
 
   let wellDepthMm = 0
-  if (labwareId != null) {
-    const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
-      .def
+  const labwareDef =
+    labwareId != null
+      ? stepFormSelectors.getLabwareEntities(state)[labwareId]?.def
+      : null
 
+  if (labwareDef != null) {
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
     const firstWell = labwareDef.wells.A1
     if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
+  }
+
+  if (wellDepthMm === 0 && labwareId != null && labwareDef != null) {
+    console.error(
+      `expected to find the well depth mm with labwareId ${labwareId} but could not`
+    )
   }
 
   return {

@@ -101,7 +101,7 @@ def _fuse_specs_cached(
 def dummy_model_for_name(pipette_name: PipetteName) -> PipetteModel:
     if "gen2" in pipette_name:
         return "_".join(pipette_name.split("_")[:-1]) + "_v2.0"  # type: ignore
-    elif "gen3" in pipette_name or "flex" in pipette_name:
+    elif "flex" in pipette_name:
         return "_".join(pipette_name.split("_")[:-1]) + "_v3.0"  # type: ignore
     else:
         return pipette_name + "_v1"  # type: ignore

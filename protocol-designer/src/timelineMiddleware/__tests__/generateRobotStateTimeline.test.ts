@@ -5,6 +5,7 @@ import {
   MULTI_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
+  FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
 import { StepArgsAndErrorsById } from '../../steplist'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
@@ -15,6 +16,7 @@ describe('generateRobotStateTimeline', () => {
       a: {
         errors: false,
         stepArgs: {
+          dropTipLocation: FIXED_TRASH_ID,
           pipette: DEFAULT_PIPETTE,
           volume: 5,
           sourceLabware: SOURCE_LABWARE,
@@ -43,11 +45,13 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12', 'A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
         },
       },
       b: {
         errors: false,
         stepArgs: {
+          dropTipLocation: FIXED_TRASH_ID,
           pipette: MULTI_PIPETTE,
           volume: 5,
           sourceLabware: SOURCE_LABWARE,
@@ -76,11 +80,13 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
         },
       },
       c: {
         errors: false,
         stepArgs: {
+          dropTipLocation: FIXED_TRASH_ID,
           commandCreatorFnName: 'mix',
           name: 'Mix',
           description: 'description would be here 2018-03-01',
@@ -101,6 +107,7 @@ describe('generateRobotStateTimeline', () => {
           blowoutOffsetFromTopMm: 0,
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
+          nozzles: null,
         },
       },
     }
@@ -127,13 +134,15 @@ describe('generateRobotStateTimeline', () => {
           "dispense",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableArea",
+          "dropTipInPlace",
         ],
         Array [
           "pickUpTip",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableArea",
+          "dropTipInPlace",
         ],
         Array [
           "pickUpTip",
@@ -141,13 +150,15 @@ describe('generateRobotStateTimeline', () => {
           "dispense",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableArea",
+          "dropTipInPlace",
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
-          "dropTip",
+          "moveToAddressableArea",
+          "dropTipInPlace",
         ],
       ]
     `)

@@ -1,13 +1,14 @@
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-
-import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
+import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
 import {
   getLabwareDefURI,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
 
 import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
 
+const mockAdapterDef = fixture_adapter as LabwareDefinition2
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 const mockLoadLabwareCommands: RunTimeCommand[] = [
   {
@@ -85,17 +86,44 @@ const mockLoadLabwareCommands: RunTimeCommand[] = [
     params: {
       labwareId: 'onModuleLabwareId',
       location: { moduleId: 'firstModuleId', slotName: '3' },
-      displayName: 'duplicate labware nickname',
+      displayName: 'adapter labware nickname',
       version: 1,
       loadName: 'mockLoadname',
       namespace: 'mockNamespace',
     },
     result: {
       labwareId: 'onModuleLabwareId',
-      definition: mockLabwareDef,
+      definition: mockAdapterDef,
       offset: { x: 0, y: 0, z: 0 },
     },
     id: 'CommandId3',
+    status: 'succeeded',
+    error: null,
+    createdAt: 'fakeCreatedAtTimestamp',
+    startedAt: 'fakeStartedAtTimestamp',
+    completedAt: 'fakeCompletedAtTimestamp',
+  },
+  {
+    key: 'CommandKey4',
+    commandType: 'loadLabware',
+    params: {
+      labwareId: 'onAdapterOnModuleLabwareId',
+      location: {
+        moduleId: 'firstModuleId',
+        slotName: '3',
+        labwareId: 'noModuleLabwareId',
+      },
+      displayName: 'duplicate labware nickname',
+      version: 1,
+      loadName: 'mockLoadname',
+      namespace: 'mockNamespace',
+    },
+    result: {
+      labwareId: 'onAdapterOnModuleLabwareId',
+      definition: mockLabwareDef,
+      offset: { x: 0, y: 0, z: 0 },
+    },
+    id: 'CommandId4',
     status: 'succeeded',
     error: null,
     createdAt: 'fakeCreatedAtTimestamp',
@@ -135,9 +163,20 @@ const mockLabwareEntities: ProtocolAnalysisOutput['labware'] = [
   },
   {
     id: 'onModuleLabwareId',
+    loadName: mockAdapterDef.parameters.loadName,
+    definitionUri: getLabwareDefURI(mockAdapterDef),
+    location: { moduleId: 'firstModuleId', slotName: '3' },
+    displayName: 'on module labware nickname',
+  },
+  {
+    id: 'onAdapterOnModuleLabwareId',
     loadName: mockLabwareDef.parameters.loadName,
     definitionUri: getLabwareDefURI(mockLabwareDef),
-    location: { moduleId: 'firstModuleId', slotName: '3' },
+    location: {
+      moduleId: 'firstModuleId',
+      slotName: '3',
+      labwareId: 'onModuleLabwareId',
+    },
     displayName: 'on module labware nickname',
   },
 ]
@@ -174,6 +213,15 @@ describe('getLabwareLocationCombos', () => {
       {
         location: { slotName: '3', moduleModel: 'heaterShakerModuleV1' },
         labwareId: 'onModuleLabwareId',
+        moduleId: 'firstModuleId',
+        definitionUri: getLabwareDefURI(mockAdapterDef),
+      },
+      {
+        location: {
+          slotName: '3',
+          moduleModel: 'heaterShakerModuleV1',
+        },
+        labwareId: 'onAdapterOnModuleLabwareId',
         moduleId: 'firstModuleId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
@@ -283,6 +331,15 @@ describe('getLabwareLocationCombos', () => {
       {
         location: { slotName: '3', moduleModel: 'heaterShakerModuleV1' },
         labwareId: 'onModuleLabwareId',
+        moduleId: 'firstModuleId',
+        definitionUri: getLabwareDefURI(mockAdapterDef),
+      },
+      {
+        location: {
+          slotName: '3',
+          moduleModel: 'heaterShakerModuleV1',
+        },
+        labwareId: 'onAdapterOnModuleLabwareId',
         moduleId: 'firstModuleId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },

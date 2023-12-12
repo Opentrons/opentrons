@@ -47,17 +47,20 @@ import type { LabwareFilter, LabwareSort } from './types'
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 const labwareDisplayCategoryFilters: LabwareFilter[] = [
   'all',
-  'wellPlate',
-  'tipRack',
-  'tubeRack',
-  'reservoir',
+  'adapter',
   'aluminumBlock',
   'customLabware',
+  'reservoir',
+  'tipRack',
+  'tubeRack',
+  'wellPlate',
 ]
 
-const FILTER_OPTIONS: DropdownOption[] = []
-labwareDisplayCategoryFilters.forEach(category =>
-  FILTER_OPTIONS.push({ name: startCase(category), value: category })
+const FILTER_OPTIONS: DropdownOption[] = labwareDisplayCategoryFilters.map(
+  category => ({
+    name: startCase(category),
+    value: category,
+  })
 )
 
 const SORT_BY_BUTTON_STYLE = css`

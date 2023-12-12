@@ -6,6 +6,7 @@ import styles from './LabwareOverlays.css'
 type BlockedSlotMessage =
   | 'MODULE_INCOMPATIBLE_SINGLE_LABWARE'
   | 'MODULE_INCOMPATIBLE_LABWARE_SWAP'
+  | 'LABWARE_INCOMPATIBLE_WITH_ADAPTER'
 
 interface Props {
   x: number

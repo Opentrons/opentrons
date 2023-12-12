@@ -7,19 +7,23 @@ import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   LoadedPipette,
+  CreateCommand,
 } from '@opentrons/shared-data'
 import {
   useHost,
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+import {
+  useCreateTargetedMaintenanceRunMutation,
+  useChainMaintenanceCommands,
+} from '../../resources/runs/hooks'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
-import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { usePipetteFlowWizardHeaderText } from './hooks'
@@ -38,7 +42,10 @@ import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { PipetteMount } from '@opentrons/shared-data'
+import type { CommandData } from '@opentrons/api-client'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
+
+const RUN_REFETCH_INTERVAL = 5000
 
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
@@ -58,8 +65,11 @@ export const PipetteWizardFlows = (
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
-  const isGantryEmpty =
-    attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
+  const isGantryEmpty = React.useMemo(
+    () => attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null,
+    []
+  )
+
   const pipetteWizardSteps = React.useMemo(
     () =>
       memoizedPipetteInfo == null
@@ -75,16 +85,16 @@ export const PipetteWizardFlows = (
     pipette => pipette.mount === mount
   )
   const host = useHost()
-  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string>('')
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = pipetteWizardSteps.length - 1
   const currentStep = pipetteWizardSteps?.[currentStepIndex]
   const [isFetchingPipettes, setIsFetchingPipettes] = React.useState<boolean>(
     false
   )
-  const hasCalData =
-    attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
   const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
+  const hasCalData =
+    memoizedAttachedPipettes[mount]?.data.calibratedOffset?.last_modified !=
+    null
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
@@ -94,28 +104,64 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
+    string | null
+  >(null)
+  // we should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = React.useState<boolean>(false)
 
   const goBack = (): void => {
     setCurrentStepIndex(
       currentStepIndex !== totalStepCount ? 0 : currentStepIndex
     )
   }
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: createdMaintenanceRunId != null,
+  })
+
   const {
     chainRunCommands,
     isCommandMutationLoading,
-  } = useChainMaintenanceCommands(maintenanceRunId)
+  } = useChainMaintenanceCommands()
 
   const {
-    createMaintenanceRun,
+    createTargetedMaintenanceRun,
     isLoading: isCreateLoading,
-  } = useCreateMaintenanceRunMutation(
+  } = useCreateTargetedMaintenanceRunMutation(
     {
       onSuccess: response => {
-        setMaintenanceRunId(response.data.id)
+        setCreatedMaintenanceRunId(response.data.id)
       },
     },
     host
   )
+
+  // this will close the modal in case the run was deleted by the terminate
+  // activity modal on the ODD
+  React.useEffect(() => {
+    if (
+      createdMaintenanceRunId !== null &&
+      maintenanceRunData?.data.id === createdMaintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    }
+    if (
+      maintenanceRunData?.data.id !== createdMaintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
+      closeFlow()
+    }
+  }, [
+    maintenanceRunData?.data.id,
+    createdMaintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    closeFlow,
+  ])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
@@ -143,11 +189,15 @@ export const PipetteWizardFlows = (
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    if (maintenanceRunId == null) handleClose()
+    if (maintenanceRunData?.data.id == null) handleClose()
     else {
-      chainRunCommands([{ commandType: 'home' as const, params: {} }], false)
+      chainRunCommands(
+        maintenanceRunData?.data.id,
+        [{ commandType: 'home' as const, params: {} }],
+        false
+      )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunId)
+          deleteMaintenanceRun(maintenanceRunData?.data.id)
         })
         .catch(error => {
           console.error(error.message)
@@ -171,8 +221,26 @@ export const PipetteWizardFlows = (
     }
   }, [isCommandMutationLoading, isExiting])
 
+  let chainMaintenanceRunCommands
+  if (maintenanceRunData?.data.id != null) {
+    chainMaintenanceRunCommands = (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ): Promise<CommandData[]> =>
+      chainRunCommands(
+        maintenanceRunData.data.id,
+        commands,
+        continuePastCommandFailure
+      )
+  }
+
+  const maintenanceRunId =
+    maintenanceRunData?.data.id != null &&
+    maintenanceRunData?.data.id === createdMaintenanceRunId
+      ? createdMaintenanceRunId
+      : undefined
   const calibrateBaseProps = {
-    chainRunCommands,
+    chainRunCommands: chainMaintenanceRunCommands,
     isRobotMoving,
     proceed,
     maintenanceRunId,
@@ -183,7 +251,20 @@ export const PipetteWizardFlows = (
     selectedPipette,
     isOnDevice,
   }
-  const exitModal = (
+  const is96ChannelUnskippableStep =
+    currentStep.section === SECTIONS.CARRIAGE ||
+    currentStep.section === SECTIONS.MOUNTING_PLATE ||
+    (selectedPipette === NINETY_SIX_CHANNEL &&
+      currentStep.section === SECTIONS.DETACH_PIPETTE)
+
+  const exitModal = is96ChannelUnskippableStep ? (
+    <UnskippableModal
+      proceed={handleCleanUpAndClose}
+      goBack={cancelExit}
+      isOnDevice={isOnDevice}
+      isRobotMoving={isRobotMoving}
+    />
+  ) : (
     <ExitModal
       isRobotMoving={isRobotMoving}
       goBack={cancelExit}
@@ -192,16 +273,7 @@ export const PipetteWizardFlows = (
       isOnDevice={isOnDevice}
     />
   )
-  const [
-    showUnskippableStepModal,
-    setIsUnskippableStep,
-  ] = React.useState<boolean>(false)
-  const unskippableModal = (
-    <UnskippableModal
-      goBack={() => setIsUnskippableStep(false)}
-      isOnDevice={isOnDevice}
-    />
-  )
+
   let onExit
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -214,7 +286,8 @@ export const PipetteWizardFlows = (
       <BeforeBeginning
         {...currentStep}
         {...calibrateBaseProps}
-        createMaintenanceRun={createMaintenanceRun}
+        createMaintenanceRun={createTargetedMaintenanceRun}
+        createdMaintenanceRunId={createdMaintenanceRunId}
         isCreateLoading={isCreateLoading}
         requiredPipette={requiredPipette}
       />
@@ -274,13 +347,19 @@ export const PipetteWizardFlows = (
     modalContent = (
       <FirmwareUpdateModal
         proceed={proceed}
-        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        subsystem={
+          currentStep.mount === LEFT ? 'pipette_left' : 'pipette_right'
+        }
         description={t('firmware_updating')}
+        proceedDescription={t('firmware_up_to_date')}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
-    modalContent = (
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
       <DetachPipette
         {...currentStep}
         {...calibrateBaseProps}
@@ -288,37 +367,25 @@ export const PipetteWizardFlows = (
         setFetching={setIsFetchingPipettes}
       />
     )
-    if (showConfirmExit) {
-      modalContent = exitModal
-    } else if (showUnskippableStepModal) {
-      modalContent = unskippableModal
-    }
   } else if (currentStep.section === SECTIONS.CARRIAGE) {
     onExit = confirmExit
-    modalContent = showUnskippableStepModal ? (
-      unskippableModal
+    modalContent = showConfirmExit ? (
+      exitModal
     ) : (
       <Carriage {...currentStep} {...calibrateBaseProps} />
     )
   } else if (currentStep.section === SECTIONS.MOUNTING_PLATE) {
     onExit = confirmExit
-    modalContent = showUnskippableStepModal ? (
-      unskippableModal
+    modalContent = showConfirmExit ? (
+      exitModal
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   }
-  const is96ChannelUnskippableStep =
-    currentStep.section === SECTIONS.CARRIAGE ||
-    currentStep.section === SECTIONS.MOUNTING_PLATE ||
-    (selectedPipette === NINETY_SIX_CHANNEL &&
-      currentStep.section === SECTIONS.DETACH_PIPETTE)
 
   let exitWizardButton = onExit
-  if (isRobotMoving || showUnskippableStepModal) {
+  if (isRobotMoving) {
     exitWizardButton = undefined
-  } else if (is96ChannelUnskippableStep) {
-    exitWizardButton = () => setIsUnskippableStep(true)
   } else if (showConfirmExit || errorMessage != null) {
     exitWizardButton = handleCleanUpAndClose
   }

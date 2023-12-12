@@ -32,6 +32,10 @@ export const getUpdateChannel = (state: State): UpdateChannel => {
   return state.config?.update.channel ?? 'latest'
 }
 
+export const getHasJustUpdated = (state: State): boolean => {
+  return state.config?.update.hasJustUpdated ?? false
+}
+
 export const getUseTrashSurfaceForTipCal = (state: State): boolean | null => {
   return state.config?.calibration.useTrashSurfaceForTipCal ?? null
 }
@@ -75,13 +79,6 @@ export const getUpdateChannelOptions = (state: State): SelectOption[] => {
 export const getIsOnDevice: (state: State) => boolean = createSelector(
   getConfig,
   config => config?.isOnDevice ?? false
-)
-
-export const getSendAllProtocolsToOT3: (
-  state: State
-) => boolean = createSelector(
-  getConfig,
-  config => config?.protocols.sendAllProtocolsToOT3 ?? false
 )
 
 export const getProtocolsDesktopSortKey: (

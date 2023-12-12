@@ -23,6 +23,7 @@ import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
 import { ModuleDiagram } from './ModuleDiagram'
+import { FlexSlotMap } from './FlexSlotMap'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
@@ -45,7 +46,6 @@ export function ModuleRow(props: Props): JSX.Element {
   } = props
   const type: ModuleType = moduleOnDeck?.type || props.type
   const isFlex = robotType === FLEX_ROBOT_TYPE
-
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
   /*
@@ -68,16 +68,17 @@ export function ModuleRow(props: Props): JSX.Element {
   // If this module is in a deck slot + is not TC spanning Slot
   // add to occupiedSlots
   if (slot && slot !== SPAN7_8_10_11_SLOT) {
-    slotDisplayName = `Slot ${slot}`
+    slotDisplayName = slot
     occupiedSlotsForMap = [slot]
   }
   // If this Module is a TC deck slot and spanning
   // populate all 4 slots individually
   if (slot === SPAN7_8_10_11_SLOT) {
-    slotDisplayName = 'Slot 7'
+    slotDisplayName = '7,8,10,11'
     occupiedSlotsForMap = ['7', '8', '10', '11']
     //  TC on Flex
   } else if (isFlex && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
+    slotDisplayName = 'A1+B1'
     occupiedSlotsForMap = ['A1', 'B1']
   }
   // If collisionSlots are populated, check which slot is occupied
@@ -117,7 +118,7 @@ export function ModuleRow(props: Props): JSX.Element {
   })
 
   return (
-    <div>
+    <div style={{ marginBottom: '1rem' }}>
       <h4 className={styles.row_title}>
         <ModuleIcon
           moduleType={type}
@@ -149,15 +150,22 @@ export function ModuleRow(props: Props): JSX.Element {
           {collisionSlots.length > 0 && (
             <Tooltip {...tooltipProps}>{collisionTooltip}</Tooltip>
           )}
-          {slot && (
-            <div {...targetProps}>
-              <SlotMap
-                occupiedSlots={occupiedSlotsForMap}
-                collisionSlots={collisionSlots}
-                robotType={robotType}
+          {slot &&
+            (isFlex ? (
+              <FlexSlotMap
+                selectedSlots={
+                  type === THERMOCYCLER_MODULE_TYPE ? ['A1', 'B1'] : [slot]
+                }
               />
-            </div>
-          )}
+            ) : (
+              <div {...targetProps}>
+                <SlotMap
+                  occupiedSlots={occupiedSlotsForMap}
+                  collisionSlots={collisionSlots}
+                  robotType={robotType}
+                />
+              </div>
+            ))}
         </div>
         <div className={styles.modules_button_group}>
           {moduleOnDeck && (

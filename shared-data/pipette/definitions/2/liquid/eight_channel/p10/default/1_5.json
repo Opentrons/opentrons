@@ -1,0 +1,47 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
+  "supportedTips": {
+    "t10": {
+      "defaultAspirateFlowRate": {
+        "default": 5,
+        "valuesByApiLevel": { "2.0": 5 }
+      },
+      "defaultDispenseFlowRate": {
+        "default": 10,
+        "valuesByApiLevel": { "2.0": 10 }
+      },
+      "defaultBlowOutFlowRate": {
+        "default": 1000,
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
+      "defaultTipLength": 33.0,
+      "aspirate": {
+        "default": {
+          "1": [
+            [1.774444444, -0.1917910448, 1.2026],
+            [2.151481481, -0.0706286837, 1.0125],
+            [2.898518519, -0.04343083788, 0.954],
+            [6.373333333, -0.00905990194, 0.8544],
+            [11.00259259, -0.002325900358, 0.8115]
+          ]
+        }
+      },
+      "dispense": { "default": { "1": [[12.74444519, 0.0, 0.8058688085]] } },
+      "defaultPushOutVolume": 0
+    }
+  },
+  "defaultTipOverlapDictionary": {
+    "default": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1.0
+  },
+  "maxVolume": 10,
+  "minVolume": 1.0,
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1"
+  ]
+}

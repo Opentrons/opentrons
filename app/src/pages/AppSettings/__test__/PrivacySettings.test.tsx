@@ -23,7 +23,7 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 describe('PrivacySettings', () => {
   it('renders correct title, body text, and toggle', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Share Robot and App Analytics with Opentrons')
+    getByText('Share App Analytics with Opentrons')
     getByText(
       'Help Opentrons improve its products and services by automatically sending anonymous diagnostics and usage data.'
     )

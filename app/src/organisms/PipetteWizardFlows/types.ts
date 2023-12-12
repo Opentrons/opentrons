@@ -38,7 +38,7 @@ export interface AttachProbeStep extends BaseStep {
 
 export interface ResultsStep extends BaseStep {
   section: typeof SECTIONS.RESULTS
-  recalibrate?: boolean
+  nextMount?: string
 }
 export interface MountPipetteStep extends BaseStep {
   section: typeof SECTIONS.MOUNT_PIPETTE
@@ -72,12 +72,12 @@ export interface PipetteWizardStepProps {
   mount: PipetteMount
   proceed: () => void
   goBack: () => void
-  chainRunCommands: (
+  chainRunCommands?: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  maintenanceRunId: string
+  maintenanceRunId?: string
   attachedPipettes: AttachedPipettesFromInstrumentsQuery
   setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   errorMessage: string | null

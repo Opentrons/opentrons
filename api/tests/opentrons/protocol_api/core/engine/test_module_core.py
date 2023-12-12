@@ -82,7 +82,9 @@ def test_get_deck_slot_id(
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
 
     decoy.when(
-        mock_validation.ensure_deck_slot_string(DeckSlotName.SLOT_1, "OT-3 Standard")
+        mock_validation.internal_slot_to_public_string(
+            DeckSlotName.SLOT_1, "OT-3 Standard"
+        )
     ).then_return("foo")
 
     assert subject.get_deck_slot_id() == "foo"

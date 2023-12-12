@@ -2,17 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import {
-  Box,
-  Flex,
   ALIGN_CENTER,
-  COLORS,
+  ALIGN_FLEX_END,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  POSITION_RELATIVE,
-  ALIGN_FLEX_END,
-  POSITION_ABSOLUTE,
   useOnClickOutside,
 } from '@opentrons/components'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
@@ -47,7 +46,7 @@ const BODY_STYLE = css`
 `
 
 export interface RobotSettingsGripperCalibrationProps {
-  gripper: GripperData
+  gripper: GripperData | null
 }
 
 export function RobotSettingsGripperCalibration(
@@ -66,83 +65,99 @@ export function RobotSettingsGripperCalibration(
   })
   const [showWizardFlow, setShowWizardFlow] = React.useState<boolean>(false)
   const gripperCalibrationLastModified =
-    gripper.data.calibratedOffset?.last_modified
+    gripper?.data.calibratedOffset?.last_modified
+
+  const handleCalibrate = (): void => {
+    setShowOverflowMenu(false)
+    setShowWizardFlow(true)
+  }
+
   return (
-    <Box paddingTop={SPACING.spacing24} paddingBottom={SPACING.spacing4}>
-      <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing8}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing24}
+      gridGap={SPACING.spacing8}
+    >
+      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('gripper_calibration_title')}
-      </Box>
-      <StyledText as="p" marginBottom={SPACING.spacing8}>
-        {t('gripper_calibration_description')}
       </StyledText>
-      <StyledTable>
-        <thead>
-          <tr>
-            <StyledTableHeader>{t('gripper_serial')}</StyledTableHeader>
-            <StyledTableHeader>{t('last_calibrated_label')}</StyledTableHeader>
-          </tr>
-        </thead>
-        <tbody css={BODY_STYLE}>
-          <StyledTableRow>
-            <StyledTableCell>
-              <StyledText as="p">{gripper.serialNumber}</StyledText>
-            </StyledTableCell>
-            <StyledTableCell>
-              <Flex alignItems={ALIGN_CENTER}>
-                {gripperCalibrationLastModified != null ? (
-                  <StyledText as="p">
-                    {formatLastCalibrated(gripperCalibrationLastModified)}
-                  </StyledText>
-                ) : (
-                  <StyledText as="p">{t('not_calibrated_short')}</StyledText>
-                )}
-              </Flex>
-            </StyledTableCell>
-            <StyledTableCell>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                position={POSITION_RELATIVE}
-              >
-                <OverflowBtn
-                  alignSelf={ALIGN_FLEX_END}
-                  aria-label="CalibrationOverflowMenu_button_gripperCalibration"
-                  onClick={handleOverflowClick}
-                />
-                {showWizardFlow ? (
-                  <GripperWizardFlows
-                    flowType={'RECALIBRATE'}
-                    attachedGripper={gripper}
-                    closeFlow={() => setShowWizardFlow(false)}
+      <StyledText as="p">{t('gripper_calibration_description')}</StyledText>
+      {gripper == null ? (
+        <StyledText as="label" marginTop={SPACING.spacing8}>
+          {t('no_gripper_attached')}
+        </StyledText>
+      ) : (
+        <StyledTable>
+          <thead>
+            <tr>
+              <StyledTableHeader>{t('gripper_serial')}</StyledTableHeader>
+              <StyledTableHeader>
+                {t('last_calibrated_label')}
+              </StyledTableHeader>
+            </tr>
+          </thead>
+          <tbody css={BODY_STYLE}>
+            <StyledTableRow>
+              <StyledTableCell>
+                <StyledText as="p">{gripper.serialNumber}</StyledText>
+              </StyledTableCell>
+              <StyledTableCell>
+                <Flex alignItems={ALIGN_CENTER}>
+                  {gripperCalibrationLastModified != null ? (
+                    <StyledText as="p">
+                      {formatLastCalibrated(gripperCalibrationLastModified)}
+                    </StyledText>
+                  ) : (
+                    <StyledText as="p">{t('not_calibrated_short')}</StyledText>
+                  )}
+                </Flex>
+              </StyledTableCell>
+              <StyledTableCell>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  position={POSITION_RELATIVE}
+                >
+                  <OverflowBtn
+                    alignSelf={ALIGN_FLEX_END}
+                    aria-label="CalibrationOverflowMenu_button_gripperCalibration"
+                    onClick={handleOverflowClick}
                   />
-                ) : null}
-                {showOverflowMenu ? (
-                  <Flex
-                    ref={calsOverflowWrapperRef}
-                    whiteSpace="nowrap"
-                    zIndex={10}
-                    borderRadius="4px 4px 0px 0px"
-                    boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-                    position={POSITION_ABSOLUTE}
-                    backgroundColor={COLORS.white}
-                    top="2.3rem"
-                    right={0}
-                    flexDirection={DIRECTION_COLUMN}
-                  >
-                    <MenuItem onClick={() => setShowWizardFlow(true)}>
-                      {t(
-                        gripperCalibrationLastModified == null
-                          ? 'calibrate_gripper'
-                          : 'recalibrate_gripper'
-                      )}
-                    </MenuItem>
-                  </Flex>
-                ) : null}
-                {menuOverlay}
-              </Flex>
-            </StyledTableCell>
-          </StyledTableRow>
-        </tbody>
-      </StyledTable>
-    </Box>
+                  {showWizardFlow ? (
+                    <GripperWizardFlows
+                      flowType={'RECALIBRATE'}
+                      attachedGripper={gripper}
+                      closeFlow={() => setShowWizardFlow(false)}
+                    />
+                  ) : null}
+                  {showOverflowMenu ? (
+                    <Flex
+                      ref={calsOverflowWrapperRef}
+                      whiteSpace="nowrap"
+                      zIndex={10}
+                      borderRadius="4px 4px 0px 0px"
+                      boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+                      position={POSITION_ABSOLUTE}
+                      backgroundColor={COLORS.white}
+                      top="2.3rem"
+                      right={0}
+                      flexDirection={DIRECTION_COLUMN}
+                    >
+                      <MenuItem onClick={handleCalibrate}>
+                        {t(
+                          gripperCalibrationLastModified == null
+                            ? 'calibrate_gripper'
+                            : 'recalibrate_gripper'
+                        )}
+                      </MenuItem>
+                    </Flex>
+                  ) : null}
+                  {menuOverlay}
+                </Flex>
+              </StyledTableCell>
+            </StyledTableRow>
+          </tbody>
+        </StyledTable>
+      )}
+    </Flex>
   )
 }

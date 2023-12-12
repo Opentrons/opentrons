@@ -1,21 +1,26 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import type { MatcherFunction } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
+import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useProtocolMetadata } from '../../Devices/hooks'
+import { getIsOnDevice } from '../../../redux/config'
 import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import type { CommandData } from '@opentrons/api-client'
+import type { MatcherFunction } from '@testing-library/react'
 
 jest.mock('../../Devices/hooks')
+jest.mock('../../../redux/config')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 
 const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
   typeof useProtocolMetadata
+>
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
 >
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
@@ -41,10 +46,12 @@ describe('PickUpTip', () => {
 
   beforeEach(() => {
     mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
+    mockGetIsOnDevice.mockReturnValue(false)
     props = {
       section: SECTIONS.PICK_UP_TIP,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
       labwareId: mockCompletedAnalysis.labware[0].id,
+      definitionUri: mockCompletedAnalysis.labware[0].definitionUri,
       location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
@@ -55,6 +62,9 @@ describe('PickUpTip', () => {
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
+      robotType: FLEX_ROBOT_TYPE,
+      protocolHasModules: false,
+      currentStepIndex: 1,
     }
     mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })
@@ -62,17 +72,47 @@ describe('PickUpTip', () => {
     jest.resetAllMocks()
     resetAllWhenMocks()
   })
-  it('renders correct copy when preparing space', () => {
+  it('renders correct copy when preparing space on desktop if protocol has modules', () => {
+    props.protocolHasModules = true
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare tip rack in slot D1' })
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    getByText('Place modules on deck')
     getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
-      matchTextWithSpans('Place a full Mock TipRack Definition into slot D1')
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
     )
-    getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
   })
-  it('renders correct copy when confirming position', () => {
+  it('renders correct copy when preparing space on touchscreen if protocol has modules', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    props.protocolHasModules = true
+    const { getByText, getByRole } = render(props)
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    getByText('Place modules on deck')
+    getByText('Clear all deck slots of labware')
+    getByText(
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
+    )
+  })
+  it('renders correct copy when preparing space on desktop if protocol has no modules', () => {
+    const { getByText, getByRole } = render(props)
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    getByText('Clear all deck slots of labware, leaving modules in place')
+    getByText(
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
+    )
+    getByRole('button', { name: 'Confirm placement' })
+  })
+  it('renders correct copy when preparing space on touchscreen if protocol has no modules', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText, getByRole } = render(props)
+    getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
+    getByText('Clear all deck slots of labware')
+    getByText(
+      matchTextWithSpans('Place a full Mock TipRack Definition into Slot D1')
+    )
+  })
+  it('renders correct copy when confirming position on desktop', () => {
     const { getByText, getByRole } = render({
       ...props,
       workingOffsets: [
@@ -84,11 +124,31 @@ describe('PickUpTip', () => {
         },
       ],
     })
-    getByRole('heading', { name: 'Pick up tip from tip rack in slot D1' })
+    getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
     getByText(
       "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
     )
     getByRole('link', { name: 'Need help?' })
+  })
+  it('renders correct copy when confirming position on touchscreen', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const { getByText, getByRole } = render({
+      ...props,
+      workingOffsets: [
+        {
+          location: { slotName: 'D1' },
+          labwareId: 'labwareId1',
+          initialPosition: { x: 1, y: 2, z: 3 },
+          finalPosition: null,
+        },
+      ],
+    })
+    getByRole('heading', { name: 'Pick up tip from tip rack in Slot D1' })
+    getByText(
+      nestedTextMatcher(
+        "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, tap Move pipette and then jog the pipette until it is properly aligned."
+      )
+    )
   })
   it('executes correct chained commands when confirm placement CTA is clicked', async () => {
     when(mockChainRunCommands)

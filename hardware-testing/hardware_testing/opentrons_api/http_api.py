@@ -9,8 +9,6 @@ from hardware_testing.opentrons_api.types import Point
 CALIBRATION_ADAPTER = {
     "temperatureModuleV1": "opentrons_calibration_adapter_temperature_module",
     "temperatureModuleV2": "opentrons_calibration_adapter_temperature_module",
-    "magneticModuleV1": "opentrons_calibration_adapter_magnetic_module",
-    "magneticModuleV2": "opentrons_calibration_adapter_magnetic_module",
     "thermocyclerModuleV1": "opentrons_calibration_adapter_thermocycler_module",
     "thermocyclerModuleV2": "opentrons_calibration_adapter_thermocycler_module",
     "heaterShakerModuleV1": "opentrons_calibration_adapter_heatershaker_module",

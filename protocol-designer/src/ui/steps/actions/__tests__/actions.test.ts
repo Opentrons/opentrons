@@ -64,6 +64,7 @@ const initialRobotState: RobotState = {
   liquidState: {
     pipettes: {},
     labware: {},
+    additionalEquipment: {},
   },
   tipState: {
     pipettes: {},
@@ -383,6 +384,7 @@ describe('steps actions', () => {
                     liquidState: {
                       labware: {},
                       pipettes: {},
+                      additionalEquipment: {},
                     },
                     modules: {},
                     pipettes: {
@@ -474,6 +476,7 @@ describe('steps actions', () => {
           stepType: 'temperature',
           setTemperature: 'true',
           targetTemperature: 10,
+          moduleId: 'mockTemp',
         } as any)
       mockGetUnsavedFormIsPristineSetTempForm.mockReturnValue(true)
       mockGetRobotStateTimeline.mockReturnValue(mockRobotStateTimeline)
@@ -490,6 +493,7 @@ describe('steps actions', () => {
             setTemperature: 'true',
             stepType: 'temperature',
             targetTemperature: 10,
+            moduleId: 'mockTemp',
           },
           type: 'SAVE_STEP_FORM',
         },
@@ -524,6 +528,7 @@ describe('steps actions', () => {
                     liquidState: {
                       labware: {},
                       pipettes: {},
+                      additionalEquipment: {},
                     },
                     modules: {},
                     pipettes: {
@@ -558,6 +563,14 @@ describe('steps actions', () => {
         {
           payload: {
             update: {
+              moduleId: 'mockTemp',
+            },
+          },
+          type: 'CHANGE_FORM_INPUT',
+        },
+        {
+          payload: {
+            update: {
               pauseTemperature: 10,
             },
           },
@@ -568,6 +581,7 @@ describe('steps actions', () => {
             setTemperature: 'true',
             stepType: 'temperature',
             targetTemperature: 10,
+            moduleId: 'mockTemp',
           },
           type: 'SAVE_STEP_FORM',
         },

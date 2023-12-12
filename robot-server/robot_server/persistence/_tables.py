@@ -2,6 +2,7 @@
 import sqlalchemy
 
 from . import legacy_pickle
+from .pickle_protocol_version import PICKLE_PROTOCOL_VERSION
 from ._utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
@@ -56,8 +57,18 @@ analysis_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column(
         "completed_analysis",
+        # Stores a pickled dict. See CompletedAnalysisStore.
+        # TODO(mm, 2023-08-30): Remove this. See https://opentrons.atlassian.net/browse/RSS-98.
         sqlalchemy.LargeBinary,
         nullable=False,
+    ),
+    sqlalchemy.Column(
+        "completed_analysis_as_document",
+        # Stores the same data as completed_analysis, but serialized as a JSON string.
+        sqlalchemy.String,
+        # This column should never be NULL in practice.
+        # It needs to be nullable=True because of limitations in SQLite and our migration code.
+        nullable=True,
     ),
 )
 
@@ -84,13 +95,13 @@ run_table = sqlalchemy.Table(
     # column added in schema v1
     sqlalchemy.Column(
         "state_summary",
-        sqlalchemy.PickleType(pickler=legacy_pickle),
+        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=True,
     ),
     # column added in schema v1
     sqlalchemy.Column(
         "commands",
-        sqlalchemy.PickleType(pickler=legacy_pickle),
+        sqlalchemy.PickleType(pickler=legacy_pickle, protocol=PICKLE_PROTOCOL_VERSION),
         nullable=True,
     ),
     # column added in schema v1

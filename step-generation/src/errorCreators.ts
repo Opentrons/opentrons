@@ -12,6 +12,20 @@ export function insufficientTips(): CommandCreatorError {
   }
 }
 
+export function missingAdapter(): CommandCreatorError {
+  return {
+    type: 'MISSING_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips fully without an adapter',
+  }
+}
+
+export function removeAdapter(): CommandCreatorError {
+  return {
+    type: 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips partially with an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
@@ -154,6 +168,16 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
+export const tallLabwareWestOf96ChannelPipetteLabware = (args: {
+  source: string
+  labware: string
+}): CommandCreatorError => {
+  return {
+    type: 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE',
+    message: `Labware to the left of the ${args.source} ${args.labware} is too tall and will collide with the 96-channel.`,
+  }
+}
+
 export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
@@ -186,5 +210,35 @@ export const labwareOffDeck = (): CommandCreatorError => {
   return {
     type: 'LABWARE_OFF_DECK',
     message: 'Attempted to interact with labware off deck',
+  }
+}
+
+export const dropTipLocationDoesNotExist = (): CommandCreatorError => {
+  return {
+    type: 'DROP_TIP_LOCATION_DOES_NOT_EXIST',
+    message: 'The destination for dropping tip does not exist',
+  }
+}
+
+export const equipmentDoesNotExist = (): CommandCreatorError => {
+  return {
+    type: 'EQUIPMENT_DOES_NOT_EXIST',
+    message: `The equipment does not exist`,
+  }
+}
+
+export const gripperRequired = (): CommandCreatorError => {
+  return {
+    type: 'GRIPPER_REQUIRED',
+    message: 'The gripper is required to fulfill this action',
+  }
+}
+
+export const pipettingIntoColumn4 = (args: {
+  typeOfStep: string
+}): CommandCreatorError => {
+  return {
+    type: 'PIPETTING_INTO_COLUMN_4',
+    message: `Cannot ${args.typeOfStep} into a column 4 slot.`,
   }
 }

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   COLORS,
   Flex,
@@ -10,6 +11,50 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../hooks'
+import type { BadPipette, PipetteData } from '@opentrons/api-client'
+
+interface PipetteStatus {
+  attachPipetteRequired: boolean
+  updatePipetteFWRequired: boolean
+}
+
+const usePipetteIsReady = (): PipetteStatus => {
+  const EQUIPMENT_POLL_MS = 5000
+
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: EQUIPMENT_POLL_MS,
+  })
+  const attachedLeftPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
+    ) ?? null
+  const leftPipetteRequiresFWUpdate =
+    attachedInstruments?.data?.find(
+      (i): i is BadPipette =>
+        i.instrumentType === 'pipette' &&
+        !i.ok &&
+        i.subsystem === 'pipette_left'
+    ) ?? null
+  const attachedRightPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
+    ) ?? null
+  const rightPipetteFWRequired =
+    attachedInstruments?.data?.find(
+      (i): i is BadPipette =>
+        i.instrumentType === 'pipette' &&
+        !i.ok &&
+        i.subsystem === 'pipette_right'
+    ) ?? null
+
+  const attachPipetteRequired =
+    attachedLeftPipette == null && attachedRightPipette == null
+  const updatePipetteFWRequired =
+    leftPipetteRequiresFWUpdate != null || rightPipetteFWRequired != null
+  return { attachPipetteRequired, updatePipetteFWRequired }
+}
 
 interface ProtocolRunModuleControlsProps {
   robotName: string
@@ -21,8 +66,10 @@ export const ProtocolRunModuleControls = ({
   runId,
 }: ProtocolRunModuleControlsProps): JSX.Element => {
   const { t } = useTranslation('protocol_details')
+
+  const { attachPipetteRequired, updatePipetteFWRequired } = usePipetteIsReady()
+
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    robotName,
     runId
   )
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
@@ -67,6 +114,8 @@ export const ProtocolRunModuleControls = ({
               module={module.attachedModuleMatch}
               slotName={module.slotName}
               isLoadedInRun={true}
+              attachPipetteRequired={attachPipetteRequired}
+              updatePipetteFWRequired={updatePipetteFWRequired}
             />
           ) : null
         )}
@@ -85,6 +134,8 @@ export const ProtocolRunModuleControls = ({
               module={module.attachedModuleMatch}
               slotName={module.slotName}
               isLoadedInRun={true}
+              attachPipetteRequired={attachPipetteRequired}
+              updatePipetteFWRequired={updatePipetteFWRequired}
             />
           ) : null
         )}

@@ -21,10 +21,11 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 interface UpdateNeededModalProps {
   setShowUpdateModal: React.Dispatch<React.SetStateAction<boolean>>
   subsystem: Subsystem
+  setInitiatedSubsystemUpdate: (subsystem: Subsystem | null) => void
 }
 
 export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
-  const { setShowUpdateModal, subsystem } = props
+  const { setShowUpdateModal, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
   const [updateId, setUpdateId] = React.useState('')
   const {
@@ -43,6 +44,12 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
 
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
+  React.useEffect(() => {
+    if (status === 'done') {
+      setInitiatedSubsystemUpdate(null)
+    }
+  }, [status, setInitiatedSubsystemUpdate])
+
   const percentComplete = updateData?.data.updateProgress ?? 0
   const updateError = updateData?.data.updateError
   const instrumentType = subsystem === 'gripper' ? 'gripper' : 'pipette'
@@ -73,7 +80,10 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
           />
         </StyledText>
         <SmallButton
-          onClick={() => updateSubsystem(subsystem)}
+          onClick={() => {
+            setInitiatedSubsystemUpdate(subsystem)
+            updateSubsystem(subsystem)
+          }}
           buttonText={t('update_firmware')}
           width="100%"
         />
@@ -81,7 +91,12 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     </Modal>
   )
   if (status === 'updating' || status === 'queued') {
-    modalContent = <UpdateInProgressModal percentComplete={percentComplete} />
+    modalContent = (
+      <UpdateInProgressModal
+        percentComplete={percentComplete}
+        subsystem={subsystem}
+      />
+    )
   } else if (status === 'done' || instrument?.ok) {
     modalContent = (
       <UpdateResultsModal

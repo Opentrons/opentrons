@@ -1,7 +1,7 @@
 """Radwag Scale Driver."""
 from abc import ABC, abstractmethod
 from typing import Tuple, Optional
-
+import datetime
 from serial import Serial  # type: ignore[import]
 
 from .commands import (
@@ -9,9 +9,12 @@ from .commands import (
     RadwagWorkingMode,
     RadwagFilter,
     RadwagValueRelease,
+    RadwagAmbiant,
     radwag_command_format,
 )
 from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_parse
+
+from hardware_testing.data import get_testing_data_directory
 
 
 class RadwagScaleBase(ABC):
@@ -37,6 +40,11 @@ class RadwagScaleBase(ABC):
     @abstractmethod
     def read_serial_number(self) -> str:
         """Read the serial number."""
+        ...
+
+    @abstractmethod
+    def read_max_capacity(self) -> float:
+        """Read the max capacity."""
         ...
 
     @abstractmethod
@@ -86,6 +94,8 @@ class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         """Constructor."""
         self._connection = connection
+        _raw_file_path = get_testing_data_directory() / "scale_raw.txt"
+        self._raw_log = open(_raw_file_path, "w")
 
     @classmethod
     def create(
@@ -102,6 +112,7 @@ class RadwagScale(RadwagScaleBase):
         cmd_str = radwag_command_format(cmd)
         cmd_bytes = cmd_str.encode("utf-8")
         send_len = self._connection.write(cmd_bytes)
+        self._raw_log.write(f"{datetime.datetime.now()} --> {cmd_bytes!r}\n")
         assert send_len == len(cmd_bytes), (
             f'Radwag command "{cmd}" ({str(cmd_bytes)} '
             f"bytes) only sent {send_len} bytes"
@@ -117,6 +128,7 @@ class RadwagScale(RadwagScaleBase):
             self._connection.timeout = prev_timeout
         else:
             response = self._connection.readline()
+        self._raw_log.write(f"{datetime.datetime.now()} <-- {response}\n")
         data = radwag_response_parse(response.decode("utf-8"), command)
         return data
 
@@ -150,6 +162,23 @@ class RadwagScale(RadwagScaleBase):
     def disconnect(self) -> None:
         """Disconnect."""
         self._connection.close()
+        self._raw_log.close()
+
+    def read_max_capacity(self) -> float:
+        """Read the max capacity."""
+        cmd = RadwagCommand.GET_MAX_CAPACITY
+        res = self._write_command_and_read_response(cmd)
+        # NOTE: very annoying, different scales give different response codes
+        #       where some will just not have a response code at all...
+        if len(res.response_list) == 3:
+            expected_code = RadwagResponseCodes.IN_PROGRESS
+        elif len(res.response_list) == 2:
+            expected_code = RadwagResponseCodes.NONE
+        else:
+            raise RuntimeError(f"unexpected reponse list: {res.response_list}")
+        assert res.code == expected_code, f"Unexpected response code: {res.code}"
+        assert res.message is not None
+        return float(res.message)
 
     def read_serial_number(self) -> str:
         """Read serial number."""
@@ -185,6 +214,14 @@ class RadwagScale(RadwagScaleBase):
             res.code == RadwagResponseCodes.CARRIED_OUT
         ), f"Unexpected response code: {res.code}"
 
+    def ambiant(self, amb_rel: RadwagAmbiant) -> None:
+        """Set the value release type."""
+        cmd = RadwagCommand.SET_AMBIENT_CONDITIONS_STATE
+        res = self._write_command_and_read_response(cmd, append=str(amb_rel.value))
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
+
     def continuous_transmission(self, enable: bool) -> None:
         """Enable/disable continuous transmissions."""
         if enable:
@@ -205,6 +242,18 @@ class RadwagScale(RadwagScaleBase):
         res = self._write_command_and_read_response(cmd)
         assert (
             res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
+
+    def zero(self) -> None:
+        """Sero the scale."""
+        cmd = RadwagCommand.ZERO
+        res = self._write_command_and_read_response(cmd)
+        assert (
+            res.code == RadwagResponseCodes.IN_PROGRESS
+        ), f"Unexpected response code: {res.code}"
+        res = self._read_response(cmd, timeout=60)
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT_AFTER_IN_PROGRESS
         ), f"Unexpected response code: {res.code}"
 
     def internal_adjustment(self) -> None:
@@ -256,6 +305,10 @@ class SimRadwagScale(RadwagScaleBase):
         """Disconnect."""
         return
 
+    def read_max_capacity(self) -> float:
+        """Read the max capacity."""
+        return 220.0  # :shrug: might as well simulate as low-rez scale
+
     def read_serial_number(self) -> str:
         """Read serial number."""
         return "radwag-sim-serial-num"
@@ -272,12 +325,20 @@ class SimRadwagScale(RadwagScaleBase):
         """Value release."""
         return
 
+    def ambiant(self, amb_rel: RadwagAmbiant) -> None:
+        """Set the value release type."""
+        return
+
     def continuous_transmission(self, enable: bool) -> None:
         """Continuous transmission."""
         return
 
     def automatic_internal_adjustment(self, enable: bool) -> None:
         """Automatic internal adjustment."""
+        return
+
+    def zero(self) -> None:
+        """Zero."""
         return
 
     def internal_adjustment(self) -> None:

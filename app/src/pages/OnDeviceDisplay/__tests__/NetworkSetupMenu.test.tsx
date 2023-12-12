@@ -31,7 +31,7 @@ describe('NetworkSetupMenu', () => {
   it('should render text and button, and step meter', () => {
     const [{ getByText }] = render()
 
-    getByText('Connect to a network')
+    getByText('Choose network type')
     getByText(
       'You’ll use this connection to run software updates and load protocols onto your Opentrons Flex.'
     )

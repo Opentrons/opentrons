@@ -8,9 +8,9 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import Mount, DeckSlotName, StagingSlotName
 from opentrons.protocol_api import OFF_DECK
-from opentrons.broker import Broker
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -58,9 +58,11 @@ def _mock_instrument_support_module(
 def mock_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock implementation core."""
     mock_core = decoy.mock(cls=ProtocolCore)
-    decoy.when(mock_core.fixed_trash.get_name()).then_return("cool trash")
-    decoy.when(mock_core.fixed_trash.get_display_name()).then_return("Cool Trash")
-    decoy.when(mock_core.fixed_trash.get_well_columns()).then_return([])
+    mock_fixed_trash = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_core.fixed_trash).then_return(mock_fixed_trash)
+    decoy.when(mock_fixed_trash.get_name()).then_return("cool trash")
+    decoy.when(mock_fixed_trash.get_display_name()).then_return("Cool Trash")
+    decoy.when(mock_fixed_trash.get_well_columns()).then_return([])
     return mock_core
 
 
@@ -107,6 +109,7 @@ def test_fixed_trash(
     """It should get the fixed trash labware from the core."""
     trash_captor = matchers.Captor()
 
+    assert mock_core.fixed_trash is not None
     decoy.verify(mock_core_map.add(mock_core.fixed_trash, trash_captor), times=1)
 
     trash = trash_captor.value
@@ -131,7 +134,7 @@ def test_load_instrument(
     mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
-    """It should create a instrument using its execution core."""
+    """It should create an instrument using its execution core."""
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
     mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
 
@@ -206,6 +209,78 @@ def test_load_instrument_replace(
         subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
 
 
+def test_96_channel_pipette_always_loads_on_the_left_mount(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should always load a 96-channel pipette on left mount, regardless of the mount arg specified."""
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("A 96 Channel Name")).then_return(
+        "a 96 channel name"
+    )
+    decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
+        PipetteNameType.P1000_96
+    )
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P1000_96,
+            mount=Mount.LEFT,
+        )
+    ).then_return(mock_instrument_core)
+
+    result = subject.load_instrument(
+        instrument_name="A 96 Channel Name", mount="shadowfax"
+    )
+    assert result == subject.loaded_instruments["left"]
+
+
+def test_96_channel_pipette_raises_if_another_pipette_attached(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should always raise when loading a 96-channel pipette when another pipette is attached."""
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("ada")).then_return("ada")
+    decoy.when(mock_validation.ensure_pipette_name("ada")).then_return(
+        PipetteNameType.P300_SINGLE
+    )
+    decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
+        Mount.RIGHT
+    )
+
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P300_SINGLE,
+            mount=Mount.RIGHT,
+        )
+    ).then_return(mock_instrument_core)
+
+    decoy.when(mock_instrument_core.get_pipette_name()).then_return("ada")
+
+    pipette_1 = subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
+    assert subject.loaded_instruments["right"] is pipette_1
+
+    decoy.when(mock_validation.ensure_lowercase_name("A 96 Channel Name")).then_return(
+        "a 96 channel name"
+    )
+    decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
+        PipetteNameType.P1000_96
+    )
+    decoy.when(
+        mock_core.load_instrument(
+            instrument_name=PipetteNameType.P1000_96,
+            mount=Mount.LEFT,
+        )
+    ).then_return(mock_instrument_core)
+
+    with pytest.raises(RuntimeError):
+        subject.load_instrument(instrument_name="A 96 Channel Name", mount="shadowfax")
+
+
 def test_load_labware(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -219,9 +294,10 @@ def test_load_labware(
     decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
         "lowercase_labware"
     )
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_5
-    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_5)
 
     decoy.when(
         mock_core.load_labware(
@@ -307,6 +383,52 @@ def test_load_labware_off_deck_raises(
         )
 
 
+def test_load_labware_on_staging_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create a labware on a staging slot using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=StagingSlotName.SLOT_B4,
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        location=42,
+        label="some_display_name",
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -320,9 +442,10 @@ def test_load_labware_from_definition(
     labware_load_params = LabwareLoadParams("you", "are", 1337)
 
     decoy.when(mock_validation.ensure_lowercase_name("are")).then_return("are")
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_1
-    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_1)
     decoy.when(mock_core.add_labware_definition(labware_definition_dict)).then_return(
         labware_load_params
     )
@@ -363,14 +486,56 @@ def test_load_adapter(
     decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
         "lowercase_adapter"
     )
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_5
-    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_5)
 
     decoy.when(
         mock_core.load_adapter(
             load_name="lowercase_adapter",
             location=DeckSlotName.SLOT_5,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_adapter(
+        load_name="UPPERCASE_ADAPTER",
+        location=42,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+def test_load_adapter_on_staging_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create an adapter on a staging slot using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
+        "lowercase_adapter"
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+
+    decoy.when(
+        mock_core.load_adapter(
+            load_name="lowercase_adapter",
+            location=StagingSlotName.SLOT_B4,
             namespace="some_namespace",
             version=1337,
         )
@@ -408,9 +573,10 @@ def test_load_labware_on_adapter(
     decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
         "lowercase_adapter"
     )
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_5
-    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_5)
     decoy.when(
         mock_core.load_adapter(
             load_name="lowercase_adapter",
@@ -487,9 +653,10 @@ def test_move_labware_to_slot(
     drop_offset = {"x": 4, "y": 5, "z": 6}
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_1
-    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_1)
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     movable_labware = Labware(
@@ -512,6 +679,51 @@ def test_move_labware_to_slot(
             labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
             use_gripper=False,
+            pause_for_manual_move=True,
+            pick_up_offset=None,
+            drop_offset=(1, 2, 3),
+        )
+    )
+
+
+def test_move_labware_to_staging_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should move labware to new slot location."""
+    drop_offset = {"x": 4, "y": 5, "z": 6}
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+    decoy.when(
+        mock_validation.ensure_valid_labware_offset_vector(drop_offset)
+    ).then_return((1, 2, 3))
+    subject.move_labware(
+        labware=movable_labware,
+        new_location=42,
+        drop_offset=drop_offset,
+    )
+
+    decoy.verify(
+        mock_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=StagingSlotName.SLOT_B4,
+            use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=(1, 2, 3),
         )
@@ -527,7 +739,7 @@ def test_move_labware_to_module(
     """It should move labware to new module location."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
     mock_module_core = decoy.mock(cls=TemperatureModuleCore)
-    mock_broker = decoy.mock(cls=Broker)
+    mock_broker = decoy.mock(cls=LegacyBroker)
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
@@ -551,6 +763,7 @@ def test_move_labware_to_module(
             labware_core=mock_labware_core,
             new_location=mock_module_core,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,
         )
@@ -581,6 +794,7 @@ def test_move_labware_off_deck(
             labware_core=mock_labware_core,
             new_location=OFF_DECK,
             use_gripper=False,
+            pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,
         )
@@ -623,9 +837,10 @@ def test_load_module(
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
-    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
-        DeckSlotName.SLOT_3
-    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_3)
 
     decoy.when(
         mock_core.load_module(
@@ -699,6 +914,26 @@ def test_load_module_with_mag_block_raises(subject: ProtocolContext) -> None:
             location=42,
             configuration="semi",
         )
+
+
+def test_load_module_on_staging_slot_raises(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should raise when attempting to load a module onto a staging slot."""
+    decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
+        TemperatureModuleModel.TEMPERATURE_V1
+    )
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(StagingSlotName.SLOT_B4)
+
+    with pytest.raises(ValueError, match="Cannot load a module onto a staging slot."):
+        subject.load_module(module_name="spline reticulator", location=42)
 
 
 def test_loaded_modules(

@@ -56,6 +56,7 @@ from robot_server.protocols.router import (
     delete_protocol_by_id,
     get_protocol_analyses,
     get_protocol_analysis_by_id,
+    get_protocol_analysis_as_document,
 )
 
 
@@ -449,7 +450,7 @@ async def test_create_protocol_not_readable(
 
     assert exc_info.value.status_code == 422
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolFilesInvalid"
-    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+    assert "oh no" in exc_info.value.content["errors"][0]["detail"]
 
 
 async def test_create_protocol_different_robot_type(
@@ -647,7 +648,7 @@ async def test_get_protocol_analysis_by_id_analysis_not_found(
     protocol_store: ProtocolStore,
     analysis_store: AnalysisStore,
 ) -> None:
-    """It should get a single full analysis by ID."""
+    """It should 404 if the analysis does not exist."""
     decoy.when(protocol_store.has("protocol-id")).then_return(True)
     decoy.when(await analysis_store.get("analysis-id")).then_raise(
         AnalysisNotFoundError("oh no")
@@ -655,6 +656,73 @@ async def test_get_protocol_analysis_by_id_analysis_not_found(
 
     with pytest.raises(ApiError) as exc_info:
         await get_protocol_analysis_by_id(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "AnalysisNotFound"
+
+
+async def test_get_protocol_analysis_as_document(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should get a single full analysis by ID."""
+    analysis = "foo"
+
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get_as_document("analysis-id")).then_return(
+        analysis
+    )
+
+    result = await get_protocol_analysis_as_document(
+        protocolId="protocol-id",
+        analysisId="analysis-id",
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+    )
+
+    assert result.status_code == 200
+    assert result.body.decode(result.charset) == analysis
+
+
+async def test_get_protocol_analysis_as_document_protocol_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should 404 if the protocol does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(False)
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_as_document(
+            protocolId="protocol-id",
+            analysisId="analysis-id",
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+        )
+
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolNotFound"
+
+
+async def test_get_protocol_analysis_as_document_analysis_not_found(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+) -> None:
+    """It should 404 if the analysis document does not exist."""
+    decoy.when(protocol_store.has("protocol-id")).then_return(True)
+    decoy.when(await analysis_store.get_as_document("analysis-id")).then_raise(
+        AnalysisNotFoundError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await get_protocol_analysis_as_document(
             protocolId="protocol-id",
             analysisId="analysis-id",
             protocol_store=protocol_store,

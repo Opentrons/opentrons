@@ -167,7 +167,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         async def _probe(distance: float, speed: float) -> float:
             if api.is_simulator:
                 return 0.0
-            pos, _ = await capacitive_probe(
+            pos = await capacitive_probe(
                 api._backend._messenger,  # type: ignore[union-attr]
                 NodeId.pipette_left,
                 NodeId.head_l,
@@ -176,7 +176,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 sensor_id=sensor_id,
                 relative_threshold_pf=default_probe_cfg.sensor_threshold_pf,
             )
-            return pos
+            return pos.motor_position
 
         if not api.is_simulator:
             ui.get_user_ready("about to probe the DECK")
@@ -225,7 +225,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         else:
             print("skipping deck-pf")
 
-        await api.home_z()
+        await api.home_z(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready("REMOVE probe")
         await api.remove_tip(OT3Mount.LEFT)

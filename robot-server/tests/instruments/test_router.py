@@ -16,7 +16,7 @@ from opentrons.hardware_control.dev_types import (
 )
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
-    PipetteOffsetByPipetteMount,
+    PipetteOffsetSummary,
 )
 from opentrons.hardware_control.types import GripperJawState, OT3Mount
 from opentrons.protocol_engine.types import Vec3f
@@ -26,6 +26,7 @@ from opentrons_shared_data.gripper.gripper_definition import (
     GripperModel,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 
 from robot_server.instruments.instrument_models import (
     Gripper,
@@ -50,7 +51,9 @@ if TYPE_CHECKING:
 @pytest.fixture
 def ot2_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mock hardware control API."""
-    return decoy.mock(cls=API)
+    mock = decoy.mock(cls=API)
+    decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
+    return mock
 
 
 def get_sample_pipette_dict(
@@ -77,7 +80,9 @@ def ot3_hardware_api(decoy: Decoy) -> HardwareControlAPI:
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
-        return decoy.mock(cls=OT3API)
+        mock = decoy.mock(cls=OT3API)
+        decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
+        return mock
     except ImportError:
         return None  # type: ignore[return-value]
 
@@ -187,21 +192,23 @@ async def test_get_all_attached_instruments(
         rehearse_instrument_retrievals
     )
     decoy.when(ot3_hardware_api.get_instrument_offset(mount=OT3Mount.LEFT)).then_return(
-        PipetteOffsetByPipetteMount(
+        PipetteOffsetSummary(
             offset=Point(1, 2, 3),
             source=SourceType.default,
             status=CalibrationStatus(),
             last_modified=None,
+            reasonability_check_failures=[],
         )
     )
     decoy.when(
         ot3_hardware_api.get_instrument_offset(mount=OT3Mount.RIGHT)
     ).then_return(
-        PipetteOffsetByPipetteMount(
+        PipetteOffsetSummary(
             offset=Point(4, 5, 6),
             source=SourceType.default,
             status=CalibrationStatus(),
             last_modified=None,
+            reasonability_check_failures=[],
         )
     )
     result = await get_attached_instruments(hardware=ot3_hardware_api)
@@ -224,6 +231,7 @@ async def test_get_all_attached_instruments(
                     offset=Vec3f(x=1, y=2, z=3),
                     source=SourceType.default,
                     last_modified=None,
+                    reasonability_check_failures=[],
                 ),
             ),
             state=PipetteState(tip_detected=True),
@@ -245,6 +253,7 @@ async def test_get_all_attached_instruments(
                     offset=Vec3f(x=4, y=5, z=6),
                     source=SourceType.default,
                     last_modified=None,
+                    reasonability_check_failures=[],
                 ),
             ),
             state=PipetteState(tip_detected=False),
@@ -263,6 +272,7 @@ async def test_get_all_attached_instruments(
                     offset=Vec3f(x=1, y=2, z=3),
                     source=SourceType.default,
                     last_modified=None,
+                    reasonability_check_failures=[],
                 ),
             ),
         ),

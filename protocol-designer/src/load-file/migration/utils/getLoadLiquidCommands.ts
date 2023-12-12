@@ -6,8 +6,8 @@ export interface DesignerApplicationData {
   ingredients: Record<
     string,
     {
-      name: string | null | undefined
-      description: string | null | undefined
+      name?: string | null
+      description?: string | null
       serialize: boolean
     }
   >
@@ -17,6 +17,7 @@ export interface DesignerApplicationData {
     }
   }
   savedStepForms: Record<string, any>
+  orderedStepIds: string[]
 }
 
 export const getLoadLiquidCommands = (

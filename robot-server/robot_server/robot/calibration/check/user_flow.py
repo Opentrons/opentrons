@@ -8,13 +8,17 @@ from opentrons.calibration_storage import (
     get_robot_deck_attitude,
     save_robot_deck_attitude,
     get_custom_tiprack_definition_for_tlc,
-    load_tip_length_calibration,
-    save_tip_length_calibration,
-    create_tip_length_data,
-    get_pipette_offset,
-    save_pipette_calibration,
     mark_bad_calibration,
 )
+
+from opentrons.calibration_storage.ot2 import (
+    get_pipette_offset,
+    save_pipette_calibration,
+    load_tip_length_calibration,
+    create_tip_length_data,
+    save_tip_length_calibration,
+)
+
 from opentrons.calibration_storage.ot2 import models
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
@@ -286,13 +290,13 @@ class CheckCalibrationUserFlow:
                 info = PipetteInfo(
                     channels=pip.config.channels,
                     rank=PipetteRank.first,
-                    max_volume=pip.config.max_volume,
+                    max_volume=pip.liquid_class.max_volume,
                     mount=mount,
                     tip_rack=self._get_tiprack_by_pipette_volume(
-                        pip.config.max_volume, pip_calibration
+                        pip.liquid_class.max_volume, pip_calibration
                     ),
                     default_tipracks=uf.get_default_tipracks(
-                        pip.config.default_tipracks
+                        pip.liquid_class.default_tipracks
                     ),
                 )
                 return info, [info]
@@ -303,26 +307,30 @@ class CheckCalibrationUserFlow:
         l_calibration = self._get_stored_pipette_offset_cal(left_pip, Mount.LEFT)
         r_info = PipetteInfo(
             channels=right_pip.config.channels,
-            max_volume=right_pip.config.max_volume,
+            max_volume=right_pip.liquid_class.max_volume,
             rank=PipetteRank.first,
             mount=Mount.RIGHT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                right_pip.config.max_volume, r_calibration
+                right_pip.liquid_class.max_volume, r_calibration
             ),
-            default_tipracks=uf.get_default_tipracks(right_pip.config.default_tipracks),
+            default_tipracks=uf.get_default_tipracks(
+                right_pip.liquid_class.default_tipracks
+            ),
         )
         l_info = PipetteInfo(
             channels=left_pip.config.channels,
-            max_volume=left_pip.config.max_volume,
+            max_volume=left_pip.liquid_class.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT,
             tip_rack=self._get_tiprack_by_pipette_volume(
-                left_pip.config.max_volume, l_calibration
+                left_pip.liquid_class.max_volume, l_calibration
             ),
-            default_tipracks=uf.get_default_tipracks(left_pip.config.default_tipracks),
+            default_tipracks=uf.get_default_tipracks(
+                left_pip.liquid_class.default_tipracks
+            ),
         )
         if (
-            left_pip.config.max_volume > right_pip.config.max_volume
+            left_pip.liquid_class.max_volume > right_pip.liquid_class.max_volume
             or right_pip.config.channels > left_pip.config.channels
         ):
             r_info.rank = PipetteRank.second
@@ -336,6 +344,7 @@ class CheckCalibrationUserFlow:
         pipette_offsets = {
             m: get_pipette_offset(p.pipette_id, m)
             for m, p in self._filtered_hw_pips.items()
+            if p.pipette_id is not None
         }
         tip_lengths = {
             m: self._get_tip_length_from_pipette(m, p)
@@ -413,9 +422,11 @@ class CheckCalibrationUserFlow:
         mount: Optional[Mount] = None,
     ) -> models.v1.InstrumentOffsetModel:
         if not pipette or not mount:
-            pip_offset = get_pipette_offset(self.hw_pipette.pipette_id, self.mount)
+            pip_offset = get_pipette_offset(
+                self.hw_pipette.pipette_id or "", self.mount
+            )
         else:
-            pip_offset = get_pipette_offset(pipette.pipette_id, mount)
+            pip_offset = get_pipette_offset(pipette.pipette_id or "", mount)
         assert pip_offset, "No Pipette Offset Found"
         return pip_offset
 

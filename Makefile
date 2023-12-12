@@ -5,6 +5,8 @@
 include ./scripts/python.mk
 
 API_DIR := api
+API_CLIENT_DIR := api-client
+APP_DIR := app
 APP_SHELL_DIR := app-shell
 APP_SHELL_ODD_DIR := app-shell-odd
 COMPONENTS_DIR := components
@@ -15,8 +17,10 @@ NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
+REACT_API_CLIENT_DIR := react-api-client
 ROBOT_SERVER_DIR := robot-server
 SERVER_UTILS_DIR := server-utils
+STEP_GENERATION_DIR := step-generation
 SYSTEM_SERVER_DIR := system-server
 HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
@@ -57,7 +61,6 @@ setup-js:
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
-	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
@@ -195,12 +198,7 @@ test-py: test-py-windows
 	$(MAKE) -C $(USB_BRIDGE_DIR) test
 
 .PHONY: test-js
-test-js:
-	yarn jest \
-		--coverage=$(cover) \
-		--watch=$(watch) \
-		--updateSnapshot=$(updateSnapshot) \
-		--ci=$(if $(CI),true,false)
+test-js: test-js-internal
 
 # lints and typechecks
 .PHONY: lint
@@ -261,3 +259,11 @@ circular-dependencies-js:
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts
+
+.PHONY: test-js-internal
+test-js-internal:
+	yarn jest $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-js-%
+test-js-%: 
+	$(MAKE) test-js-internal tests="$(if $(tests),$(foreach test,$(tests),$*/$(test)),$*)" test_opts="$(test_opts)" cov_opts="$(cov_opts)"

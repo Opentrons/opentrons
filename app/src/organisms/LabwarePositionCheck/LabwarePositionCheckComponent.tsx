@@ -7,11 +7,13 @@ import { LabwareOffsetCreateData } from '@opentrons/api-client'
 import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import {
   CompletedProtocolAnalysis,
   Coordinates,
   FIXED_TRASH_ID,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
@@ -20,7 +22,7 @@ import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { getIsOnDevice, useFeatureFlag } from '../../redux/config'
+import { getIsOnDevice } from '../../redux/config'
 import { AttachProbe } from './AttachProbe'
 import { DetachProbe } from './DetachProbe'
 import { PickUpTip } from './PickUpTip'
@@ -30,19 +32,27 @@ import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
-import type { LabwareOffset } from '@opentrons/api-client'
-import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
+import type { LabwareOffset, CommandData } from '@opentrons/api-client'
+import type {
+  CreateCommand,
+  DropTipCreateCommand,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
-import { getGoldenCheckSteps } from './utils/getGoldenCheckSteps'
 
+const RUN_REFETCH_INTERVAL = 5000
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {
-  onCloseClick: () => unknown
   runId: string
   maintenanceRunId: string
+  robotType: RobotType
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   existingOffsets: LabwareOffset[]
+  onCloseClick: () => unknown
+  protocolName: string
+  setMaintenanceRunId: (id: string | null) => void
+  isDeletingMaintenanceRun: boolean
   caughtError?: Error
 }
 
@@ -51,15 +61,58 @@ export const LabwarePositionCheckComponent = (
 ): JSX.Element | null => {
   const {
     mostRecentAnalysis,
-    onCloseClick,
     existingOffsets,
+    robotType,
     runId,
     maintenanceRunId,
+    onCloseClick,
+    setMaintenanceRunId,
+    protocolName,
+    isDeletingMaintenanceRun,
   } = props
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const protocolData = mostRecentAnalysis
+  const shouldUseMetalProbe = robotType === FLEX_ROBOT_TYPE
+
+  // we should start checking for run deletion only after the maintenance run is created
+  // and the useCurrentRun poll has returned that created id
+  const [
+    monitorMaintenanceRunForDeletion,
+    setMonitorMaintenanceRunForDeletion,
+  ] = React.useState<boolean>(false)
+
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: RUN_REFETCH_INTERVAL,
+    enabled: maintenanceRunId != null,
+  })
+
+  // this will close the modal in case the run was deleted by the terminate
+  // activity modal on the ODD
+  React.useEffect(() => {
+    if (
+      maintenanceRunId !== null &&
+      maintenanceRunData?.data.id === maintenanceRunId
+    ) {
+      setMonitorMaintenanceRunForDeletion(true)
+    }
+    if (
+      maintenanceRunData?.data.id !== maintenanceRunId &&
+      monitorMaintenanceRunForDeletion
+    ) {
+      setMaintenanceRunId(null)
+    }
+  }, [
+    maintenanceRunData?.data.id,
+    maintenanceRunId,
+    monitorMaintenanceRunForDeletion,
+    setMaintenanceRunId,
+  ])
+
   const [fatalError, setFatalError] = React.useState<string | null>(null)
+  const [isApplyingOffsets, setIsApplyingOffsets] = React.useState<boolean>(
+    false
+  )
   const [
     { workingOffsets, tipPickUpOffset },
     registerPosition,
@@ -134,30 +187,50 @@ export const LabwarePositionCheckComponent = (
   const [isExiting, setIsExiting] = React.useState(false)
   const {
     createMaintenanceCommand: createSilentCommand,
-  } = useCreateMaintenanceCommandMutation(maintenanceRunId)
+  } = useCreateMaintenanceCommandMutation()
   const {
     chainRunCommands,
     isCommandMutationLoading: isCommandChainLoading,
-  } = useChainMaintenanceCommands(maintenanceRunId)
+  } = useChainMaintenanceCommands()
 
-  const goldenLPC = useFeatureFlag('lpcWithProbe')
   const { createLabwareOffset } = useCreateLabwareOffsetMutation()
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    const dropTipToBeSafeCommands: DropTipCreateCommand[] = (
-      protocolData?.pipettes ?? []
-    ).map(pip => ({
-      commandType: 'dropTip' as const,
-      params: {
-        pipetteId: pip.id,
-        labwareId: FIXED_TRASH_ID,
-        wellName: 'A1',
-        wellLocation: { origin: 'top' as const },
-      },
-    }))
+    const dropTipToBeSafeCommands: DropTipCreateCommand[] = shouldUseMetalProbe
+      ? []
+      : (protocolData?.pipettes ?? []).map(pip => ({
+          commandType: 'dropTip' as const,
+          params: {
+            pipetteId: pip.id,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'default' as const },
+          },
+        }))
     chainRunCommands(
+      maintenanceRunId,
       [
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'leftZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'rightZ',
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'x' },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: { axis: 'y' },
+        },
         ...dropTipToBeSafeCommands,
         { commandType: 'home' as const, params: {} },
       ],
@@ -180,12 +253,15 @@ export const LabwarePositionCheckComponent = (
     )
   }
   if (protocolData == null) return null
-  const LPCSteps = goldenLPC
-    ? getGoldenCheckSteps(protocolData)
-    : getLabwarePositionCheckSteps(protocolData)
+  const LPCSteps = getLabwarePositionCheckSteps(
+    protocolData,
+    shouldUseMetalProbe
+  )
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
   if (currentStep == null) return null
+
+  const protocolHasModules = protocolData.modules.length > 0
 
   const handleJog = (
     axis: Axis,
@@ -196,6 +272,7 @@ export const LabwarePositionCheckComponent = (
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
       createSilentCommand({
+        maintenanceRunId,
         command: {
           commandType: 'moveRelative',
           params: { pipetteId: pipetteId, distance: step * dir, axis },
@@ -213,25 +290,34 @@ export const LabwarePositionCheckComponent = (
       setFatalError(`could not find pipette to jog with id: ${pipetteId ?? ''}`)
     }
   }
+  const chainMaintenanceRunCommands = (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ): Promise<CommandData[]> =>
+    chainRunCommands(maintenanceRunId, commands, continuePastCommandFailure)
   const movementStepProps = {
     proceed,
     protocolData,
-    chainRunCommands,
+    chainRunCommands: chainMaintenanceRunCommands,
     setFatalError,
     registerPosition,
     handleJog,
     isRobotMoving: isCommandChainLoading,
     workingOffsets,
     existingOffsets,
+    robotType,
   }
 
   const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
+    setIsApplyingOffsets(true)
     Promise.all(offsets.map(data => createLabwareOffset({ runId, data })))
       .then(() => {
         onCloseClick()
+        setIsApplyingOffsets(false)
       })
       .catch((e: Error) => {
         setFatalError(`error applying labware offsets: ${e.message}`)
+        setIsApplyingOffsets(false)
       })
   }
 
@@ -252,22 +338,49 @@ export const LabwarePositionCheckComponent = (
       <ExitConfirmation
         onGoBack={cancelExitLPC}
         onConfirmExit={confirmExitLPC}
+        shouldUseMetalProbe={shouldUseMetalProbe}
       />
     )
   } else if (currentStep.section === 'BEFORE_BEGINNING') {
-    modalContent = <IntroScreen {...movementStepProps} />
+    modalContent = (
+      <IntroScreen
+        {...movementStepProps}
+        {...{ existingOffsets }}
+        protocolName={protocolName}
+        shouldUseMetalProbe={shouldUseMetalProbe}
+      />
+    )
   } else if (
     currentStep.section === 'CHECK_POSITIONS' ||
     currentStep.section === 'CHECK_TIP_RACKS' ||
     currentStep.section === 'CHECK_LABWARE'
   ) {
-    modalContent = <CheckItem {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <CheckItem
+        {...currentStep}
+        {...movementStepProps}
+        shouldUseMetalProbe={shouldUseMetalProbe}
+      />
+    )
   } else if (currentStep.section === 'ATTACH_PROBE') {
-    modalContent = <AttachProbe {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <AttachProbe
+        {...currentStep}
+        {...movementStepProps}
+        isOnDevice={isOnDevice}
+      />
+    )
   } else if (currentStep.section === 'DETACH_PROBE') {
     modalContent = <DetachProbe {...currentStep} {...movementStepProps} />
   } else if (currentStep.section === 'PICK_UP_TIP') {
-    modalContent = <PickUpTip {...currentStep} {...movementStepProps} />
+    modalContent = (
+      <PickUpTip
+        {...currentStep}
+        {...movementStepProps}
+        protocolHasModules={protocolHasModules}
+        currentStepIndex={currentStepIndex}
+      />
+    )
   } else if (currentStep.section === 'RETURN_TIP') {
     modalContent = (
       <ReturnTip
@@ -281,7 +394,13 @@ export const LabwarePositionCheckComponent = (
       <ResultsSummary
         {...currentStep}
         protocolData={protocolData}
-        {...{ workingOffsets, existingOffsets, handleApplyOffsets }}
+        {...{
+          workingOffsets,
+          existingOffsets,
+          handleApplyOffsets,
+          isApplyingOffsets,
+          isDeletingMaintenanceRun,
+        }}
       />
     )
   }

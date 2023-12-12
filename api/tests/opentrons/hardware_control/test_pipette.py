@@ -2,6 +2,7 @@ import pytest
 from mock import patch
 from typing import Union, Callable
 from pathlib import Path
+from opentrons_shared_data.errors.exceptions import InvalidLiquidClassName
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Point, Mount
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
@@ -19,6 +20,7 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
     mutable_configurations,
+    types as pip_types,
 )
 
 OT2_PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
@@ -162,10 +164,9 @@ def test_critical_points_pipette_offset(
         ot3_calibration.PipetteOffsetByPipetteMount,
     ],
 ) -> None:
-
     hw_pipette = pipette_builder(model, calibration)
     # pipette offset + nozzle offset to determine critical point
-    offsets = calibration.offset + Point(*hw_pipette.nozzle_offset)
+    offsets = calibration.offset + hw_pipette.nozzle_offset
     assert hw_pipette.critical_point() == offsets
     assert hw_pipette.critical_point(types.CriticalPoint.NOZZLE) == offsets
     assert hw_pipette.critical_point(types.CriticalPoint.TIP) == offsets
@@ -339,7 +340,6 @@ def test_reset_instrument_offset(
         ot3_calibration.PipetteOffsetByPipetteMount,
     ],
 ) -> None:
-
     hw_pipette = pipette_builder(model, calibration)
     assert hw_pipette.pipette_offset.offset == Point(1, 1, 1)
     hw_pipette.reset_pipette_offset(Mount.LEFT, to_default=True)
@@ -393,11 +393,38 @@ def test_reload_instrument_cal_ot3(
         status=cal_types.CalibrationStatus(),
     )
     new_pip, skipped = ot3_pipette._reload_and_check_skip(
-        old_pip.config, old_pip, new_cal
+        old_pip.config, old_pip, new_cal, use_old_aspiration_functions=False
     )
 
     assert skipped
     # it's the same pipette
     assert new_pip == old_pip
-    # only pipette offset has been updated
-    assert new_pip._pipette_offset == new_cal
+
+
+def test_tip_type_changing(hardware_pipette_ot3: Callable) -> None:
+    pip = hardware_pipette_ot3(
+        pipette_load_name.convert_pipette_model("p1000_single_v3.3")
+    )
+    # at load, we have the max tip settings
+    assert pip.working_volume == 1000
+    # setting to the same thing works
+    pip.set_tip_type_by_volume(1000)
+    assert pip.working_volume == 1000
+    # setting to other tip types works
+    pip.set_tip_type_by_volume(200)
+    assert pip.working_volume == 200
+
+    # specifying a tip that doesn't exist raises an error
+    with pytest.raises(InvalidLiquidClassName):
+        pip.set_tip_type_by_volume(201)
+
+
+def test_liquid_class_changing(hardware_pipette_ot3: Callable) -> None:
+    pip = hardware_pipette_ot3(
+        pipette_load_name.convert_pipette_model("p50_multi_v3.3")
+    )
+    assert pip._liquid_class_name == pip_types.LiquidClasses.default
+    pip.set_liquid_class_by_name("lowVolumeDefault")
+    assert pip._liquid_class_name == pip_types.LiquidClasses.lowVolumeDefault
+    with pytest.raises(InvalidLiquidClassName):
+        pip.set_liquid_class_by_name("asdase")

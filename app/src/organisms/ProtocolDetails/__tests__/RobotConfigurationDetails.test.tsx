@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
-import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
 
 const mockRequiredModuleDetails = [
   {
@@ -72,7 +72,8 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
-      requiredModuleDetails: null,
+      requiredModuleDetails: [],
+      requiredFixtureDetails: [],
       extensionInstrumentName: null,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
@@ -86,7 +87,8 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
-      requiredModuleDetails: null,
+      requiredModuleDetails: [],
+      requiredFixtureDetails: [],
       extensionInstrumentName: null,
       isLoading: false,
       robotType: FLEX_STANDARD_MODEL,
@@ -100,7 +102,8 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
-      requiredModuleDetails: null,
+      requiredModuleDetails: [],
+      requiredFixtureDetails: [],
       extensionInstrumentName: null,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
@@ -116,7 +119,8 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
-      requiredModuleDetails: null,
+      requiredModuleDetails: [],
+      requiredFixtureDetails: [],
       extensionInstrumentName: null,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
@@ -132,7 +136,8 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
-      requiredModuleDetails: null,
+      requiredModuleDetails: [],
+      requiredFixtureDetails: [],
       extensionInstrumentName: null,
       isLoading: false,
       robotType: FLEX_STANDARD_MODEL,
@@ -145,13 +150,13 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
-      requiredModuleDetails: null,
+      requiredModuleDetails: [],
+      requiredFixtureDetails: [],
       extensionInstrumentName: null,
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
     const { queryByText } = render(props)
-    console.log(props.robotType)
     expect(queryByText('extension mount')).not.toBeInTheDocument()
   })
 
@@ -161,12 +166,13 @@ describe('RobotConfigurationDetails', () => {
       rightMountPipetteName: 'p10_single',
       extensionInstrumentName: null,
       requiredModuleDetails: mockRequiredModuleDetails,
+      requiredFixtureDetails: [],
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
 
     const { getByText } = render(props)
-    getByText('Slot 1')
+    getByText('1')
     getByText('Magnetic Module GEN2')
   })
 
@@ -174,7 +180,8 @@ describe('RobotConfigurationDetails', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
-      requiredModuleDetails: null,
+      requiredModuleDetails: [],
+      requiredFixtureDetails: [],
       extensionInstrumentName: null,
       isLoading: true,
       robotType: OT2_STANDARD_MODEL,

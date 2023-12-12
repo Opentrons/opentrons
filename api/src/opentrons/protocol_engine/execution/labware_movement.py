@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
-from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
+
+from opentrons.types import Point
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
@@ -20,6 +21,7 @@ from ..errors import (
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
     HeaterShakerLabwareLatchNotOpenError,
+    CannotPerformGripperAction,
 )
 
 from ..types import (
@@ -83,6 +85,7 @@ class LabwareMovementHandler:
         current_location: OnDeckLabwareLocation,
         new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
+        post_drop_slide_offset: Optional[Point],
     ) -> None:
         """Move a loaded labware from one location to another using gripper."""
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
@@ -96,6 +99,10 @@ class LabwareMovementHandler:
         if not ot3api.has_gripper():
             raise GripperNotAttachedError(
                 "No gripper found for performing labware movements."
+            )
+        if not ot3api.gripper_jaw_can_home():
+            raise CannotPerformGripperAction(
+                "Cannot pick up labware when gripper is already gripping."
             )
 
         gripper_mount = OT3Mount.GRIPPER
@@ -125,21 +132,42 @@ class LabwareMovementHandler:
                 to_labware_center=to_labware_center,
                 gripper_home_z=gripper_homed_position.z,
                 offset_data=final_offsets,
+                post_drop_slide_offset=post_drop_slide_offset,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(labware_id)
-
+            gripper_opened = False
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
+                    if waypoint_data.dropping:
+                        # This `disengage_axes` step is important in order to engage
+                        # the electronic brake on the Z axis of the gripper. The brake
+                        # has a stronger holding force on the axis than the hold current,
+                        # and prevents the axis from spuriously dropping when  e.g. the notch
+                        # on the side of a falling tiprack catches the jaw.
+                        await ot3api.disengage_axes([Axis.Z_G])
                     await ot3api.ungrip()
+                    gripper_opened = True
+                    if waypoint_data.dropping:
+                        # We lost the position estimation after disengaging the axis, so
+                        # it is necessary to home it next
+                        await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
+                    # we only want to check position after the gripper has opened and
+                    # should be holding labware
+                    if gripper_opened:
+                        assert ot3api.hardware_gripper
+                        ot3api.hardware_gripper.check_labware_pickup(
+                            labware_width=self._state_store.labware.get_dimensions(
+                                labware_id
+                            ).y
+                        )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )
 
-            # Keep the gripper in idly gripped position to avoid colliding with
-            # things like the thermocycler latches
-            await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE, stay_engaged=False)
+            # this makes sure gripper jaw is closed between two move labware calls
+            await ot3api.idle_gripper()
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation

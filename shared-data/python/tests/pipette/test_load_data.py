@@ -11,6 +11,7 @@ from opentrons_shared_data.pipette.types import (
     PipetteVersionType,
     PipetteTipType,
     Quirks,
+    LiquidClasses,
 )
 
 
@@ -26,9 +27,9 @@ def test_load_pipette_definition() -> None:
     assert pipette_config_one.nozzle_offset == [-8.0, -22.0, -259.15]
 
     assert (
-        pipette_config_one.supported_tips[
-            PipetteTipType.t50
-        ].default_aspirate_flowrate.default
+        pipette_config_one.liquid_properties[LiquidClasses.default]
+        .supported_tips[PipetteTipType.t50]
+        .default_aspirate_flowrate.default
         == 8.0
     )
 
@@ -43,9 +44,9 @@ def test_load_pipette_definition() -> None:
     assert pipette_config_two.pipette_type.value == "p50"
     assert pipette_config_two.nozzle_offset == [0.0, 0.0, 25.0]
     assert (
-        pipette_config_two.supported_tips[
-            PipetteTipType.t200
-        ].default_aspirate_flowrate.default
+        pipette_config_two.liquid_properties[LiquidClasses.default]
+        .supported_tips[PipetteTipType.t200]
+        .default_aspirate_flowrate.default
         == 25.0
     )
     assert pipette_config_two.quirks == [Quirks.dropTipShake]
@@ -77,20 +78,26 @@ def test_update_pipette_configuration(
     pipette_model: str, v1_configuration_changes: Dict[str, Any]
 ) -> None:
 
+    liquid_class = LiquidClasses.default
     model_name = pipette_load_name_conversions.convert_pipette_model(
         cast(dev_types.PipetteModel, pipette_model)
     )
     base_configurations = load_data.load_definition(
         model_name.pipette_type, model_name.pipette_channels, model_name.pipette_version
     )
+
     updated_configurations = load_data.update_pipette_configuration(
-        base_configurations, v1_configuration_changes
+        base_configurations, v1_configuration_changes, liquid_class
     )
 
     updated_configurations_dict = updated_configurations.dict()
     for k, v in v1_configuration_changes.items():
         if k == "tip_length":
-            for i in updated_configurations_dict["supported_tips"].values():
+            for i in updated_configurations_dict["liquid_properties"][liquid_class][
+                "supported_tips"
+            ].values():
                 assert i["default_tip_length"] == v
         else:
-            assert updated_configurations_dict[k] == v
+            assert (
+                updated_configurations_dict["liquid_properties"][liquid_class][k] == v
+            )

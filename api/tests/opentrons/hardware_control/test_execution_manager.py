@@ -3,8 +3,8 @@ import pytest
 from opentrons.hardware_control import (
     ExecutionManager,
     ExecutionState,
-    ExecutionCancelledError,
 )
+from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
 
 async def test_state_machine():

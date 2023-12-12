@@ -49,7 +49,7 @@ BLUE = Color(r=0, g=189, b=255, w=0)
 WHITE = Color(r=0, g=0, b=0, w=255)
 ORANGE = Color(r=255, g=165, b=0, w=0)
 PURPLE = Color(r=192, g=0, b=255, w=0)
-YELLOW = Color(r=248, g=255, b=0, w=0)
+YELLOW = Color(r=255, g=255, b=0, w=0)
 OFF = Color(r=0, g=0, b=0, w=0)
 
 

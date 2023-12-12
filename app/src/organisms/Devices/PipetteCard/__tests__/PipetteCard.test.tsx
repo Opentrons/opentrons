@@ -3,12 +3,16 @@ import { resetAllWhenMocks, when } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
+import {
+  useCurrentSubsystemUpdateQuery,
+  usePipetteSettingsQuery,
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData, useIsOT3 } from '../../hooks'
+import { useDeckCalibrationData, useIsFlex } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
@@ -28,6 +32,8 @@ jest.mock('../../../CalibrateTipLength')
 jest.mock('../../hooks')
 jest.mock('../AboutPipetteSlideout')
 jest.mock('../../../../redux/robot-api')
+jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../redux/pipettes')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -50,7 +56,13 @@ const mockAboutPipettesSlideout = AboutPipetteSlideout as jest.MockedFunction<
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
-const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
+const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jest.MockedFunction<
+  typeof useCurrentSubsystemUpdateQuery
+>
+const mockUsePipetteSettingsQuery = usePipetteSettingsQuery as jest.MockedFunction<
+  typeof usePipetteSettingsQuery
+>
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -62,11 +74,23 @@ const mockRobotName = 'mockRobotName'
 describe('PipetteCard', () => {
   let startWizard: any
   let dispatchApiRequest: DispatchApiRequestType
+  let props: React.ComponentProps<typeof PipetteCard>
 
   beforeEach(() => {
     startWizard = jest.fn()
     dispatchApiRequest = jest.fn()
-    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
+    props = {
+      pipetteModelSpecs: mockLeftSpecs,
+      mount: LEFT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+      pipetteIs96Channel: false,
+      isPipetteCalibrated: false,
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
     when(mockAboutPipettesSlideout).mockReturnValue(
       <div>mock about slideout</div>
     )
@@ -86,6 +110,12 @@ describe('PipetteCard', () => {
       dispatchApiRequest,
       ['id'],
     ])
+    mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
+      data: undefined,
+    } as any)
+    when(mockUsePipetteSettingsQuery)
+      .calledWith({ refetchInterval: 5000, enabled: true })
+      .mockReturnValue({} as any)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -93,26 +123,34 @@ describe('PipetteCard', () => {
   })
 
   it('renders information for a left pipette', () => {
-    const { getByText } = render({
-      pipetteInfo: mockLeftSpecs,
+    props = {
+      pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
       robotName: mockRobotName,
       pipetteId: 'id',
-      is96ChannelAttached: false,
+      pipetteIs96Channel: false,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText } = render(props)
     getByText('left Mount')
     getByText('Left Pipette')
   })
   it('renders information for a 96 channel pipette with overflow menu button not disabled', () => {
-    const { getByText, getByRole } = render({
-      pipetteInfo: mockLeftSpecs,
+    props = {
+      pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
       robotName: mockRobotName,
       pipetteId: 'id',
-      is96ChannelAttached: true,
+      pipetteIs96Channel: true,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText, getByRole } = render(props)
     getByText('Both Mounts')
     const overflowButton = getByRole('button', {
       name: /overflow/i,
@@ -122,69 +160,93 @@ describe('PipetteCard', () => {
     getByText('mock pipette overflow menu')
   })
   it('renders information for a right pipette', () => {
-    const { getByText } = render({
-      pipetteInfo: mockRightSpecs,
+    props = {
+      pipetteModelSpecs: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
       pipetteId: 'id',
-      is96ChannelAttached: false,
+      pipetteIs96Channel: false,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText } = render(props)
     getByText('right Mount')
     getByText('Right Pipette')
   })
   it('renders information for no pipette on right Mount', () => {
-    const { getByText } = render({
-      pipetteInfo: null,
+    props = {
+      pipetteModelSpecs: null,
       mount: RIGHT,
       robotName: mockRobotName,
-      is96ChannelAttached: false,
+      pipetteIs96Channel: false,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText } = render(props)
     getByText('right Mount')
     getByText('Empty')
   })
   it('renders information for no pipette on left Mount', () => {
-    const { getByText } = render({
-      pipetteInfo: null,
+    props = {
+      pipetteModelSpecs: null,
       mount: LEFT,
       robotName: mockRobotName,
-      is96ChannelAttached: false,
+      pipetteIs96Channel: false,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText } = render(props)
     getByText('left Mount')
     getByText('Empty')
   })
   it('does not render banner to calibrate for ot2 pipette if not calibrated', () => {
-    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(false)
-    const { queryByText } = render({
-      pipetteInfo: mockLeftSpecs,
+    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
+    props = {
+      pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
       robotName: mockRobotName,
-      is96ChannelAttached: false,
+      pipetteIs96Channel: false,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { queryByText } = render(props)
     expect(queryByText('Calibrate now')).toBeNull()
   })
   it('renders banner to calibrate for ot3 pipette if not calibrated', () => {
-    when(mockUseIsOT3).calledWith(mockRobotName).mockReturnValue(true)
-    const { getByText } = render({
-      pipetteInfo: { ...mockLeftSpecs, name: 'p300_single_flex' },
+    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(true)
+    props = {
+      pipetteModelSpecs: { ...mockLeftSpecs, name: 'p300_single_flex' },
       mount: LEFT,
       robotName: mockRobotName,
-      is96ChannelAttached: false,
+      pipetteIs96Channel: false,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText } = render(props)
     getByText('Calibrate now')
   })
   it('renders kebab icon, opens and closes overflow menu on click', () => {
-    const { getByRole, getByText, queryByText } = render({
-      pipetteInfo: mockRightSpecs,
+    props = {
+      pipetteModelSpecs: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
-      is96ChannelAttached: false,
+      pipetteIs96Channel: false,
       isPipetteCalibrated: false,
-    })
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByRole, getByText, queryByText } = render(props)
 
     const overflowButton = getByRole('button', {
       name: /overflow/i,
@@ -195,5 +257,50 @@ describe('PipetteCard', () => {
     const overflowMenu = getByText('mock pipette overflow menu')
     overflowMenu.click()
     expect(queryByText('mock pipette overflow menu')).toBeNull()
+  })
+  it('renders firmware update needed state if pipette is bad', () => {
+    props = {
+      pipetteModelSpecs: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteIs96Channel: false,
+      isPipetteCalibrated: false,
+      pipetteIsBad: true,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText } = render(props)
+    getByText('Right mount')
+    getByText('Instrument attached')
+    getByText('Firmware update available.')
+    getByText('Update now').click()
+    expect(props.updatePipette).toHaveBeenCalled()
+  })
+  it('renders firmware update in progress state if pipette is bad and update in progress', () => {
+    when(mockUseCurrentSubsystemUpdateQuery).mockReturnValue({
+      data: { data: { updateProgress: 50 } as any },
+    } as any)
+    props = {
+      pipetteModelSpecs: mockRightSpecs,
+      mount: RIGHT,
+      robotName: mockRobotName,
+      pipetteIs96Channel: false,
+      isPipetteCalibrated: false,
+      pipetteIsBad: true,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    const { getByText } = render(props)
+    getByText('Right mount')
+    getByText('Instrument attached')
+    getByText('Firmware update in progress...')
+  })
+  it('does not render a pipette settings slideout card if the pipette has no settings', () => {
+    const { queryByTestId } = render(props)
+    expect(
+      queryByTestId(
+        `PipetteSettingsSlideout_${mockRobotName}_${props.pipetteId}`
+      )
+    ).not.toBeInTheDocument()
   })
 })

@@ -25,6 +25,10 @@ from opentrons_hardware.firmware_bindings.messages.fields import MoveStopConditi
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.motion import create_step, create_home_step
+from opentrons_hardware.hardware_control.types import (
+    MotorPositionStatus,
+    MoveCompleteAck,
+)
 
 
 @pytest.fixture(
@@ -125,7 +129,8 @@ async def test_move_integration(
     home_runner = MoveGroupRunner([home_move])
     position = await home_runner.run(can_messenger)
     assert position == {
-        motor_node: (0.0, 0.0, False, False) for motor_node in all_motor_nodes
+        motor_node: MotorPositionStatus(0.0, 0.0, False, False, MoveCompleteAck(2))
+        for motor_node in all_motor_nodes
     }
     # these moves test position accumulation to reasonably realistic values
     # and have to do it over a kind of long time so that the velocities are low
@@ -188,7 +193,7 @@ async def test_move_integration(
     #  Also mypy doesn't like pytest.approx so we have to type ignore it
 
     # We now store the position as a tuple of assumed position + encoder value.
-    assert {k: v[0] for k, v in position.items()} == {  # type: ignore[comparison-overlap]
+    assert {k: v.motor_position for k, v in position.items()} == {  # type: ignore[comparison-overlap]
         motor_node: pytest.approx(
             motor_node.value, abs=all_motor_node_step_sizes[motor_node] * 3
         )

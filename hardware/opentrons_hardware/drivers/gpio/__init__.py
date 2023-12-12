@@ -63,6 +63,14 @@ class OT3GPIO:
         self.deactivate_eeprom_wp()
         sleep(1)
 
+    def __del__(self) -> None:
+        try:
+            self._estop_out_line.release()
+            self._nsync_out_line.release()
+            self._eeprom_wp_out_line.release()
+        except Exception:
+            pass
+
     def activate_estop(self) -> None:
         """Assert the emergency stop, which will disable all motors."""
         self._estop_out_line.set_value(0)

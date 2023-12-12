@@ -34,13 +34,19 @@ def use_mock_parse(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.mark.parametrize("filename", ["protocol.py", "protocol.PY", "protocol.Py"])
+@pytest.mark.parametrize("python_parse_mode", parse.PythonParseMode)
 async def test_python_parsing(
-    decoy: Decoy, use_mock_parse: None, filename: str
+    decoy: Decoy,
+    use_mock_parse: None,
+    filename: str,
+    python_parse_mode: parse.PythonParseMode,
 ) -> None:
     """It should use opentrons.protocols.parse() to extract basic ID info out of Python files."""
     input_file = BufferedFile(name=filename, contents=b"contents", path=None)
 
-    decoy.when(parse.parse(b"contents", filename)).then_return(
+    decoy.when(
+        parse.parse(b"contents", filename, python_parse_mode=python_parse_mode)
+    ).then_return(
         PythonProtocol(
             api_level=APIVersion(2, 1),
             robot_type="OT-3 Standard",
@@ -56,7 +62,7 @@ async def test_python_parsing(
     )
 
     subject = FileIdentifier()
-    [result] = await subject.identify([input_file])
+    [result] = await subject.identify([input_file], python_parse_mode=python_parse_mode)
 
     assert result == IdentifiedPythonMain(
         original_file=input_file,
@@ -185,7 +191,9 @@ async def test_valid_json_protocol(spec: _ValidJsonProtocolSpec) -> None:
         unvalidated_json=json.loads(spec.contents),
     )
     subject = FileIdentifier()
-    [result] = await subject.identify([input_file])
+    [result] = await subject.identify(
+        [input_file], python_parse_mode=parse.PythonParseMode.NORMAL
+    )
     assert result == expected_result
 
 
@@ -219,7 +227,9 @@ async def test_valid_labware_definition(spec: _ValidLabwareDefinitionSpec) -> No
         original_file=input_file, unvalidated_json=json.loads(spec.contents)
     )
     subject = FileIdentifier()
-    [result] = await subject.identify([input_file])
+    [result] = await subject.identify(
+        [input_file], python_parse_mode=parse.PythonParseMode.NORMAL
+    )
     assert result == expected_result
 
 
@@ -270,14 +280,21 @@ async def test_invalid_input(spec: _InvalidInputSpec) -> None:
     )
     subject = FileIdentifier()
     with pytest.raises(FileIdentificationError, match=spec.expected_message):
-        await subject.identify([input_file])
+        await subject.identify(
+            [input_file],
+            python_parse_mode=parse.PythonParseMode.NORMAL,
+        )
 
 
 async def test_invalid_python_api_level(decoy: Decoy, use_mock_parse: None) -> None:
     """It should check the apiLevel and raise if it's not supported."""
     input_file = BufferedFile(name="filename.py", contents=b"contents", path=None)
 
-    decoy.when(parse.parse(b"contents", "filename.py")).then_return(
+    decoy.when(
+        parse.parse(
+            b"contents", "filename.py", python_parse_mode=parse.PythonParseMode.NORMAL
+        )
+    ).then_return(
         PythonProtocol(
             api_level=APIVersion(999, 999),
             robot_type="OT-3 Standard",
@@ -295,14 +312,20 @@ async def test_invalid_python_api_level(decoy: Decoy, use_mock_parse: None) -> N
     subject = FileIdentifier()
 
     with pytest.raises(FileIdentificationError, match="999.999 is not supported"):
-        await subject.identify([input_file])
+        await subject.identify(
+            [input_file], python_parse_mode=parse.PythonParseMode.NORMAL
+        )
 
 
 async def test_malformed_python(decoy: Decoy, use_mock_parse: None) -> None:
     """It should propagate errors that mean the Python file was malformed."""
     input_file = BufferedFile(name="filename.py", contents=b"contents", path=None)
 
-    decoy.when(parse.parse(b"contents", "filename.py")).then_raise(
+    decoy.when(
+        parse.parse(
+            b"contents", "filename.py", python_parse_mode=parse.PythonParseMode.NORMAL
+        )
+    ).then_raise(
         MalformedPythonProtocolError(
             short_message="message 1", long_additional_message="message 2"
         )
@@ -311,7 +334,9 @@ async def test_malformed_python(decoy: Decoy, use_mock_parse: None) -> None:
     subject = FileIdentifier()
 
     with pytest.raises(FileIdentificationError) as exc_info:
-        await subject.identify([input_file])
+        await subject.identify(
+            [input_file], python_parse_mode=parse.PythonParseMode.NORMAL
+        )
 
     # TODO(mm, 2023-08-8): We probably want to propagate the longer message too, if there is one.
     # Align with the app+UI team about how to do this safely.

@@ -1,4 +1,3 @@
-import { RunTimeCommand } from '@opentrons/shared-data'
 import {
   parsePipetteEntity,
   parseInitialPipetteNamesByMount,
@@ -10,9 +9,11 @@ import {
   parseInitialLoadedModulesBySlot,
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
+  parseInitialLoadedLabwareByAdapter,
 } from '../utils'
-
 import { simpleAnalysisFileFixture } from '../__fixtures__'
+
+import { RunTimeCommand } from '@opentrons/shared-data'
 
 const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 const mockLoadLiquidRunTimeCommands = [
@@ -187,6 +188,76 @@ describe('parseRequiredModulesEntity', () => {
       },
     ]
     expect(parseRequiredModulesEntity(mockRunTimeCommands)).toEqual(expected)
+  })
+})
+describe('parseInitialLoadedLabwareByAdapter', () => {
+  it('returns only labware loaded in adapters', () => {
+    const mockCommandsWithAdapter = ([
+      {
+        id: 'commands.LOAD_LABWARE-2',
+        createdAt: '2022-04-01T15:46:01.745870+00:00',
+        commandType: 'loadLabware',
+        key: 'commands.LOAD_LABWARE-2',
+        status: 'succeeded',
+        params: {
+          location: {
+            moduleId: 'module-0',
+          },
+          loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+          namespace: 'opentrons',
+          version: 1,
+          labwareId: null,
+          displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        },
+        result: {
+          labwareId: 'labware-2',
+          definition: {},
+          offsetId: null,
+        },
+        error: null,
+        startedAt: '2022-04-01T15:46:01.745870+00:00',
+        completedAt: '2022-04-01T15:46:01.745870+00:00',
+      },
+      {
+        id: 'commands.LOAD_LABWARE-3',
+        createdAt: '2022-04-01T15:46:01.745870+00:00',
+        commandType: 'loadLabware',
+        key: 'commands.LOAD_LABWARE-3',
+        status: 'succeeded',
+        params: {
+          location: {
+            labwareId: 'labware-2',
+          },
+          loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+          namespace: 'opentrons',
+          version: 1,
+          labwareId: null,
+          displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+        },
+        result: {
+          labwareId: 'labware-3',
+          definition: {},
+          offsetId: null,
+        },
+        error: null,
+        startedAt: '2022-04-01T15:46:01.745870+00:00',
+        completedAt: '2022-04-01T15:46:01.745870+00:00',
+      },
+    ] as any) as RunTimeCommand[]
+    const labware2 = 'labware-2'
+
+    const expected = {
+      [labware2]: mockCommandsWithAdapter.find(
+        c =>
+          c.commandType === 'loadLabware' &&
+          typeof c.params.location === 'object' &&
+          'labwareId' in c.params?.location &&
+          c.params?.location?.labwareId === 'labware-2'
+      ),
+    }
+    expect(parseInitialLoadedLabwareByAdapter(mockCommandsWithAdapter)).toEqual(
+      expected
+    )
   })
 })
 describe('parseInitialLoadedLabwareBySlot', () => {

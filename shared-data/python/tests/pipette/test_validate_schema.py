@@ -11,13 +11,14 @@ from opentrons_shared_data.pipette.dev_types import PipetteModel
 
 def test_check_all_models_are_valid() -> None:
     paths_to_validate = (
-        get_shared_data_root() / "pipette" / "definitions" / "2" / "liquid"
+        get_shared_data_root() / "pipette" / "definitions" / "2" / "general"
     )
     _channel_model_str = {
         "single_channel": "single",
         "ninety_six_channel": "96",
         "eight_channel": "multi",
     }
+    assert os.listdir(paths_to_validate), "You have a path wrong"
     for channel_dir in os.listdir(paths_to_validate):
         for model_dir in os.listdir(paths_to_validate / channel_dir):
             for version_file in os.listdir(paths_to_validate / channel_dir / model_dir):

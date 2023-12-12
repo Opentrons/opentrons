@@ -3,16 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { LabwareListItem } from './LabwareListItem'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 
 interface OffDeckLabwareListProps {
   labwareItems: LabwareSetupItem[]
-  isOt3: boolean
+  isFlex: boolean
+  commands: RunTimeCommand[]
 }
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems, isOt3 } = props
+  const { labwareItems, isFlex, commands } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null
   return (
@@ -31,7 +33,9 @@ export function OffDeckLabwareList(
           attachedModuleInfo={{}}
           extraAttentionModules={[]}
           {...labwareItem}
-          isOt3={isOt3}
+          isFlex={isFlex}
+          commands={commands}
+          nestedLabwareInfo={null}
         />
       ))}
     </>

@@ -3,6 +3,7 @@ import { fireEvent } from '@testing-library/react'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { StaticRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
+import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
 import { i18n } from '../../../../../i18n'
 import {
   mockHeaterShaker,
@@ -13,7 +14,13 @@ import {
 import { mockLabwareDef } from '../../../../LabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
-import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type {
+  LoadLabwareRunTimeCommand,
+  ModuleModel,
+  ModuleType,
+  LabwareDefinition2,
+  LoadModuleRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../../redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '../../../hooks'
 
@@ -27,6 +34,8 @@ const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFu
   typeof useCreateLiveCommandMutation
 >
 
+const mockAdapterDef = fixture_adapter as LabwareDefinition2
+const mockAdapterId = 'mockAdapterId'
 const mockNestedLabwareDisplayName = 'nested labware display name'
 const mockLocationInfo = {
   labwareOffset: { x: 1, y: 1, z: 1 },
@@ -84,6 +93,7 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a thermocycler (OT2), clicking on secure labware instructions opens the modal', () => {
     const { getByText } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -98,10 +108,13 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
+      nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
-    getByText('Slot 7,8,10,11, Thermocycler Module GEN1')
+    getByText('nickName')
+    getByText('Thermocycler Module GEN1')
+    getByText('7,8,10,11')
     const button = getByText('Secure labware instructions')
     fireEvent.click(button)
     getByText('mock secure labware modal')
@@ -110,6 +123,7 @@ describe('LabwareListItem', () => {
 
   it('renders the correct info for a thermocycler (OT3)', () => {
     const { getByText } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -124,14 +138,17 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: true,
+      isFlex: true,
+      nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
-    getByText('Slot A1+B1, Thermocycler Module GEN1')
+    getByText('A1+B1')
+    getByText('Thermocycler Module GEN1')
   })
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
-    const { getByText } = render({
+    const { getByText, getByTestId } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -152,10 +169,12 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
+      nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
-    getByText('Slot 7, Magnetic Module GEN1')
+    getByTestId('slot_info_7')
+    getByText('Magnetic Module GEN1')
     const button = getByText('Secure labware instructions')
     fireEvent.click(button)
     getByText('mock secure labware modal')
@@ -163,7 +182,8 @@ describe('LabwareListItem', () => {
   })
 
   it('renders the correct info for a labware on top of a temperature module', () => {
-    const { getByText } = render({
+    const { getByText, getByTestId } = render({
+      commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
@@ -183,16 +203,126 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
+      nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
-    getByText('Slot 7, Temperature Module GEN1')
+    getByTestId('slot_info_7')
+    getByText('Temperature Module GEN1')
     getByText('nickName')
   })
 
-  it('renders the correct info for a labware on top of a heater shaker', () => {
-    const { getByText, getByLabelText } = render({
+  it('renders the correct info for a labware on an adapter on top of a temperature module', () => {
+    const mockAdapterLoadCommand: LoadLabwareRunTimeCommand = {
+      commandType: 'loadLabware',
+      params: {
+        location: { moduleId: mockModuleId },
+      },
+      result: {
+        labwareId: mockAdapterId,
+        definition: mockAdapterDef,
+      },
+      offsets: {
+        x: 0,
+        y: 1,
+        z: 1.2,
+      },
+    } as any
+    const mockModuleLoadCommand: LoadModuleRunTimeCommand = {
+      commandType: 'loadModule',
+      params: {
+        moduleId: mockModuleId,
+        location: { slotName: '7' },
+        model: 'temperatureModuleV2',
+      },
+      result: {
+        moduleId: mockModuleId,
+      },
+    } as any
+
+    const { getByText, getAllByText } = render({
+      commands: [mockAdapterLoadCommand, mockModuleLoadCommand],
       nickName: mockNickName,
+      definition: mockLabwareDef,
+      initialLocation: { labwareId: mockAdapterId },
+      moduleModel: 'temperatureModuleV1' as ModuleModel,
+      moduleLocation: mockModuleSlot,
+      extraAttentionModules: [],
+      attachedModuleInfo: {
+        [mockModuleId]: ({
+          moduleId: 'temperatureModuleId',
+          attachedModuleMatch: (mockTemperatureModule as any) as AttachedModule,
+          moduleDef: {
+            moduleId: 'someTemperatureModule',
+            model: 'temperatureModuleV2' as ModuleModel,
+            type: 'temperatureModuleType' as ModuleType,
+            ...mockLocationInfo,
+          } as any,
+          ...mockAttachedModuleInfo,
+        } as any) as ModuleRenderInfoForProtocol,
+      },
+      isFlex: false,
+      nestedLabwareInfo: {
+        nestedLabwareDisplayName: 'mock nested display name',
+        sharedSlotId: '7',
+        nestedLabwareNickName: 'nestedLabwareNickName',
+        nestedLabwareDefinition: mockLabwareDef,
+      },
+    })
+    getByText('Mock Labware Definition')
+    getAllByText('7')
+    getByText('Temperature Module GEN2')
+    getByText('mock nested display name')
+    getByText('nestedLabwareNickName')
+    getByText('nickName')
+  })
+
+  it('renders the correct info for a labware on an adapter on the deck', () => {
+    const mockAdapterLoadCommand: LoadLabwareRunTimeCommand = {
+      commandType: 'loadLabware',
+      params: {
+        location: { slotName: 'A2' },
+      },
+      result: {
+        labwareId: mockAdapterId,
+        definition: mockAdapterDef,
+      },
+      offsets: {
+        x: 0,
+        y: 1,
+        z: 1.2,
+      },
+    } as any
+
+    const { getByText } = render({
+      commands: [mockAdapterLoadCommand],
+      nickName: mockNickName,
+      definition: mockLabwareDef,
+      initialLocation: { labwareId: mockAdapterId },
+      moduleModel: null,
+      moduleLocation: null,
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: false,
+      nestedLabwareInfo: {
+        nestedLabwareDisplayName: 'mock nested display name',
+        sharedSlotId: 'A2',
+        nestedLabwareNickName: 'nestedLabwareNickName',
+        nestedLabwareDefinition: mockLabwareDef,
+      },
+    })
+    getByText('Mock Labware Definition')
+    getByText('A2')
+    getByText('mock nested display name')
+    getByText('nestedLabwareNickName')
+    getByText('nickName')
+    getByText('On deck')
+  })
+
+  it('renders the correct info for a labware on top of a heater shaker', () => {
+    const { getByText, getByLabelText, getByTestId } = render({
+      nickName: mockNickName,
+      commands: [],
       definition: mockLabwareDef,
       initialLocation: { moduleId: mockModuleId },
       moduleModel: 'heaterShakerModuleV1' as ModuleModel,
@@ -211,10 +341,12 @@ describe('LabwareListItem', () => {
           ...mockAttachedModuleInfo,
         } as any) as ModuleRenderInfoForProtocol,
       },
-      isOt3: false,
+      isFlex: false,
+      nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
-    getByText('Slot 7, Heater-Shaker Module GEN1')
+    getByTestId('slot_info_7')
+    getByText('Heater-Shaker Module GEN1')
     getByText('nickName')
     getByText('To add labware, use the toggle to control the latch')
     getByText('Labware Latch')
@@ -236,12 +368,15 @@ describe('LabwareListItem', () => {
       nickName: null,
       definition: mockLabwareDef,
       initialLocation: 'offDeck',
+      commands: [],
       moduleModel: null,
       moduleLocation: null,
       extraAttentionModules: [],
       attachedModuleInfo: {},
-      isOt3: false,
+      isFlex: false,
+      nestedLabwareInfo: null,
     })
     getByText('Mock Labware Definition')
+    getByText('Off deck')
   })
 })

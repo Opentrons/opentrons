@@ -79,9 +79,10 @@ class TipCalibrationUserFlow:
             CalibrationCommand.exit: self.exit_session,
         }
         self._default_tipracks = util.get_default_tipracks(
-            cast(List[LabwareUri], self.hw_pipette.config.default_tipracks)
+            cast(List[LabwareUri], self.hw_pipette.liquid_class.default_tipracks)
         )
         self._supported_commands = SupportedCommands(namespace="calibration")
+        self._supported_commands.loadLabware = True
 
     def _set_current_state(self, to_state: State):
         self._current_state = to_state
@@ -168,7 +169,13 @@ class TipCalibrationUserFlow:
         self,
         tiprackDefinition: Optional[LabwareDefinition] = None,
     ):
-        pass
+        self._supported_commands.loadLabware = False
+        if tiprackDefinition:
+            verified_definition = labware.verify_definition(tiprackDefinition)
+            self._tip_rack = self._get_tip_rack_lw(verified_definition)
+            if self._deck[TIP_RACK_SLOT]:
+                del self._deck[TIP_RACK_SLOT]
+            self._deck[TIP_RACK_SLOT] = self._tip_rack
 
     async def move_to_tip_rack(self):
         await self._move(Location(self.tip_origin, None))
@@ -244,7 +251,7 @@ class TipCalibrationUserFlow:
     ) -> labware.Labware:
         position = self._deck.position_for(TIP_RACK_SLOT)
         if tip_rack_def is None:
-            pip_vol = self._hw_pipette.config.max_volume
+            pip_vol = self._hw_pipette.liquid_class.max_volume
             tr_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
             return labware.load(tr_load_name, position)
         try:
@@ -253,7 +260,7 @@ class TipCalibrationUserFlow:
             raise RobotServerError(definition=CalibrationError.BAD_LABWARE_DEF)
 
     def _get_alt_tip_racks(self) -> Set[str]:
-        pip_vol = self._hw_pipette.config.max_volume
+        pip_vol = self._hw_pipette.liquid_class.max_volume
         return set(TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].alternatives)
 
     def _initialize_deck(self):

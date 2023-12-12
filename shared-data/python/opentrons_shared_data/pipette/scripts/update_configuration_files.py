@@ -27,6 +27,7 @@ from ..types import (
     PipetteTipType,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
+    LiquidClasses,
 )
 from ..load_data import _geometry, _physical, _liquid
 from ..pipette_load_name_conversions import convert_pipette_model
@@ -144,7 +145,7 @@ def update(
     Recursively update the given dictionary to ensure no data is lost when updating.
     """
     next_key = next(iter_of_configs, None)
-    if next_key and isinstance(dict_to_update[next_key], dict):
+    if next_key and isinstance(dict_to_update.get(next_key), dict):
         dict_to_update[next_key] = update(
             dict_to_update.get(next_key, {}), iter_of_configs, value_to_update
         )
@@ -156,9 +157,8 @@ def update(
 def build_nozzle_map(
     nozzle_offset: List[float], channels: PipetteChannelType
 ) -> Dict[str, List[float]]:
-    Y_OFFSET = 9
-    X_OFFSET = -9
-    breakpoint()
+    Y_OFFSET = -9
+    X_OFFSET = 9
     if channels == PipetteChannelType.SINGLE_CHANNEL:
         return {"A1": nozzle_offset}
     elif channels == PipetteChannelType.EIGHT_CHANNEL:
@@ -250,26 +250,60 @@ def load_and_update_file_from_config(
             f"{model_to_update.pipette_version.major}_{model_to_update.pipette_version.minor}",
             physical,
         )
-    elif config_to_update[0] in PipetteLiquidPropertiesDefinition.__fields__:
+    elif config_to_update[0] == "liquid_properties":
+        next(camel_list_to_update)
         liquid = _liquid(
             model_to_update.pipette_channels,
             model_to_update.pipette_type,
             model_to_update.pipette_version,
         )
-        liquid = update(physical, camel_list_to_update, value_to_update)
 
-        PipetteLiquidPropertiesDefinition.parse_obj(liquid)
-        filepath = (
-            ROOT
-            / "liquid"
-            / model_to_update.pipette_channels.name.lower()
-            / model_to_update.pipette_type.value
+        print(
+            "Please select what liquid class you wish to update.\n If you want to update all liquid classes then type 'all'.\n"
         )
-        save_data_to_file(
-            filepath,
-            f"{model_to_update.pipette_version.major}_{model_to_update.pipette_version.minor}",
-            liquid,
-        )
+
+        print(f"choose {LiquidClasses.__name__} or type 'all':")
+        for row in list_available_enum(LiquidClasses):
+            print(f"\t{row}")
+        liquid_classes = input("liquid class: ")
+        if liquid_classes == "all":
+            for c in LiquidClasses:
+                liquid = update(
+                    liquid[c.name.lower()], camel_list_to_update, value_to_update
+                )
+
+                PipetteLiquidPropertiesDefinition.parse_obj(liquid)
+                filepath = (
+                    ROOT
+                    / "liquid"
+                    / model_to_update.pipette_channels.name.lower()
+                    / model_to_update.pipette_type.value
+                    / c.name.lower()
+                )
+                save_data_to_file(
+                    filepath,
+                    f"{model_to_update.pipette_version.major}_{model_to_update.pipette_version.minor}",
+                    liquid,
+                )
+        else:
+            lc = list(LiquidClasses)[int(liquid_classes)]
+            liquid = update(
+                liquid[lc.name.lower()], camel_list_to_update, value_to_update
+            )
+            PipetteLiquidPropertiesDefinition.parse_obj(liquid)
+
+            filepath = (
+                ROOT
+                / "liquid"
+                / model_to_update.pipette_channels.name.lower()
+                / model_to_update.pipette_type.value
+                / lc.name.lower()
+            )
+            save_data_to_file(
+                filepath,
+                f"{model_to_update.pipette_version.major}_{model_to_update.pipette_version.minor}",
+                liquid,
+            )
     else:
         raise KeyError(
             f"{config_to_update} is not saved to a file. Check `pipette_definition.py` for more information."
@@ -304,7 +338,7 @@ def _update_single_model(configuration_to_update: List[str]) -> None:
 
     value_to_update = json.loads(
         input(
-            f"Please select what you would like to update {configuration_to_update} to for {built_model}\n"
+            f"Please select what you would like to update {configuration_to_update[-1]} to for {built_model}\n"
         )
     )
 
@@ -316,7 +350,7 @@ def _update_single_model(configuration_to_update: List[str]) -> None:
 
 
 def _update_all_models(configuration_to_update: List[str]) -> None:
-    paths_to_validate = ROOT / "liquid"
+    paths_to_validate = ROOT / "general"
     _channel_model_str = {
         "single_channel": "single",
         "ninety_six_channel": "96",
@@ -344,7 +378,6 @@ def _update_all_models(configuration_to_update: List[str]) -> None:
                 )
 
                 model_version = convert_pipette_model(built_model)
-
                 load_and_update_file_from_config(
                     configuration_to_update, value_to_update, model_version
                 )

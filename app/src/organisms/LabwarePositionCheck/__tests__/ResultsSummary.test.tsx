@@ -33,6 +33,8 @@ describe('ResultsSummary', () => {
       protocolData: mockCompletedAnalysis,
       workingOffsets: mockWorkingOffsets,
       existingOffsets: mockExistingOffsets,
+      isApplyingOffsets: false,
+      isDeletingMaintenanceRun: false,
       handleApplyOffsets: jest.fn(),
     }
   })
@@ -54,6 +56,22 @@ describe('ResultsSummary', () => {
     getByRole('button', { name: 'Apply offsets' }).click()
     expect(props.handleApplyOffsets).toHaveBeenCalled()
   })
+  it('does disables the CTA to apply offsets when offsets are already being applied', () => {
+    props.isApplyingOffsets = true
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'Apply offsets' })
+    expect(button).toBeDisabled()
+    button.click()
+    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
+  })
+  it('does disables the CTA to apply offsets when the maintenance run is being deleted', () => {
+    props.isDeletingMaintenanceRun = true
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'Apply offsets' })
+    expect(button).toBeDisabled()
+    button.click()
+    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
+  })
   it('renders a row per offset to apply', () => {
     const { getByRole, queryAllByRole } = render(props)
     expect(
@@ -61,8 +79,8 @@ describe('ResultsSummary', () => {
         name: mockTipRackDefinition.metadata.displayName,
       })
     ).toHaveLength(2)
-    getByRole('cell', { name: 'slot 1' })
-    getByRole('cell', { name: 'slot 3' })
+    getByRole('cell', { name: 'Slot 1' })
+    getByRole('cell', { name: 'Slot 3' })
     getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })
     getByRole('cell', { name: 'X 3.0 Y 3.0 Z 3.0' })
   })

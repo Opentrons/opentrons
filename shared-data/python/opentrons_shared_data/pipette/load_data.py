@@ -1,7 +1,7 @@
 import json
 import os
 
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, Optional, List
 from typing_extensions import Literal
 from functools import lru_cache
 
@@ -19,6 +19,7 @@ from .types import (
     PipetteVersionType,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
+    LiquidClasses,
 )
 
 
@@ -30,17 +31,31 @@ def _get_configuration_dictionary(
     channels: PipetteChannelType,
     model: PipetteModelType,
     version: PipetteVersionType,
+    liquid_class: Optional[LiquidClasses] = None,
 ) -> LoadedConfiguration:
-    config_path = (
-        get_shared_data_root()
-        / "pipette"
-        / "definitions"
-        / "2"
-        / config_type
-        / channels.name.lower()
-        / model.value
-        / f"{version.major}_{version.minor}.json"
-    )
+    if liquid_class:
+        config_path = (
+            get_shared_data_root()
+            / "pipette"
+            / "definitions"
+            / "2"
+            / config_type
+            / channels.name.lower()
+            / model.value
+            / liquid_class.name
+            / f"{version.major}_{version.minor}.json"
+        )
+    else:
+        config_path = (
+            get_shared_data_root()
+            / "pipette"
+            / "definitions"
+            / "2"
+            / config_type
+            / channels.name.lower()
+            / model.value
+            / f"{version.major}_{version.minor}.json"
+        )
     return json.loads(load_shared_data(config_path))
 
 
@@ -58,8 +73,17 @@ def _liquid(
     channels: PipetteChannelType,
     model: PipetteModelType,
     version: PipetteVersionType,
-) -> LoadedConfiguration:
-    return _get_configuration_dictionary("liquid", channels, model, version)
+) -> Dict[str, LoadedConfiguration]:
+    liquid_dict = {}
+    for liquid_class in LiquidClasses:
+        try:
+            liquid_dict[liquid_class.name] = _get_configuration_dictionary(
+                "liquid", channels, model, version, liquid_class
+            )
+        except FileNotFoundError:
+            continue
+
+    return liquid_dict
 
 
 @lru_cache(maxsize=None)
@@ -74,7 +98,7 @@ def _physical(
 @lru_cache(maxsize=None)
 def load_serial_lookup_table() -> Dict[str, str]:
     """Load a serial abbreviation lookup table mapped to model name."""
-    config_path = get_shared_data_root() / "pipette" / "definitions" / "2" / "liquid"
+    config_path = get_shared_data_root() / "pipette" / "definitions" / "2" / "general"
     _lookup_table = {}
     _channel_shorthand = {
         "eight_channel": "M",
@@ -112,9 +136,12 @@ def load_liquid_model(
     model: PipetteModelType,
     channels: PipetteChannelType,
     version: PipetteVersionType,
-) -> PipetteLiquidPropertiesDefinition:
+) -> Dict[str, PipetteLiquidPropertiesDefinition]:
     liquid_dict = _liquid(channels, model, version)
-    return PipetteLiquidPropertiesDefinition.parse_obj(liquid_dict)
+    return {
+        k: PipetteLiquidPropertiesDefinition.parse_obj(v)
+        for k, v in liquid_dict.items()
+    }
 
 
 def _change_to_camel_case(c: str) -> str:
@@ -125,9 +152,44 @@ def _change_to_camel_case(c: str) -> str:
     return f"{config_name[0]}" + "".join(s.capitalize() for s in config_name[1::])
 
 
+def _edit_non_quirk_with_lc_override(
+    mutable_config_key: str,
+    new_mutable_value: Any,
+    base_dict: Dict[str, Any],
+    liquid_class: Optional[LiquidClasses],
+) -> None:
+    def _do_edit_non_quirk(
+        new_value: Any, existing: Dict[Any, Any], keypath: List[Any]
+    ) -> None:
+        thiskey: Any = keypath[0]
+        if thiskey in [lc.name for lc in LiquidClasses]:
+            if liquid_class:
+                thiskey = liquid_class
+            else:
+                thiskey = LiquidClasses[thiskey]
+        if len(keypath) > 1:
+            restkeys = keypath[1:]
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    _do_edit_non_quirk(new_value, existing[key], restkeys)
+            else:
+                _do_edit_non_quirk(new_value, existing[thiskey], restkeys)
+        else:
+            # This was the last key
+            if thiskey == "##EACHTIP##":
+                for key in existing.keys():
+                    existing[key] = new_value
+            else:
+                existing[thiskey] = new_value
+
+    new_names = _MAP_KEY_TO_V2[mutable_config_key]
+    _do_edit_non_quirk(new_mutable_value, base_dict, new_names)
+
+
 def update_pipette_configuration(
     base_configurations: PipetteConfigurations,
     v1_configuration_changes: Dict[str, Any],
+    liquid_class: Optional[LiquidClasses] = None,
 ) -> PipetteConfigurations:
     """Helper function to update 'V1' format configurations (left over from PipetteDict).
 
@@ -142,32 +204,30 @@ def update_pipette_configuration(
         if c == "quirks" and isinstance(v, dict):
             quirks_list.extend([b.name for b in v.values() if b.value])
         else:
-            try:
-                dict_of_base_model.pop(lookup_key)
-                dict_of_base_model[lookup_key] = v
-            except KeyError:
-                # The name is not the same format as previous so
-                # we need to look it up from the V2 key map
-                new_names = _MAP_KEY_TO_V2[lookup_key]
-                top_name = new_names["top_level_name"]
-                nested_name = new_names["nested_name"]
-                if lookup_key == "tipLength":
-                    # This is only a concern for OT-2 configs and I think we can
-                    # be less smart about handling multiple tip types by updating
-                    # all tips.
-                    for k in dict_of_base_model[new_names["top_level_name"]].keys():
-                        dict_of_base_model[top_name][k][nested_name] = v
-                else:
-                    # isinstances are needed for type checking.
-                    dict_of_base_model[top_name][nested_name] = v
+            _edit_non_quirk_with_lc_override(
+                lookup_key, v, dict_of_base_model, liquid_class
+            )
+
     dict_of_base_model["quirks"] = list(
         set(dict_of_base_model["quirks"]) - set(quirks_list)
     )
 
     # re-serialization is not great for this nested enum so we need
     # to perform this workaround.
-    dict_of_base_model["supportedTips"] = {
-        k.name: v for k, v in dict_of_base_model["supportedTips"].items()
+    if not liquid_class:
+        liquid_class = LiquidClasses.default
+    dict_of_base_model["liquid_properties"][liquid_class]["supportedTips"] = {
+        k.name: v
+        for k, v in dict_of_base_model["liquid_properties"][liquid_class][
+            "supportedTips"
+        ].items()
+    }
+    dict_of_base_model["liquid_properties"] = {
+        k.name: v for k, v in dict_of_base_model["liquid_properties"].items()
+    }
+    dict_of_base_model["plungerPositionsConfigurations"] = {
+        k.name: v
+        for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
     }
     return PipetteConfigurations.parse_obj(dict_of_base_model)
 
@@ -194,7 +254,7 @@ def load_definition(
         {
             **geometry_dict,
             **physical_dict,
-            **liquid_dict,
+            "liquid_properties": liquid_dict,
             "version": version,
             "mount_configurations": mount_configs,
         }

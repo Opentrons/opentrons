@@ -1,4 +1,5 @@
 import * as React from 'react'
+import omit from 'lodash/omit'
 import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
@@ -8,18 +9,27 @@ import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import {
   CreateCommand,
+  FLEX_ROBOT_TYPE,
   getIsTiprack,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
+  LabwareLocation,
+  MoveLabwareCreateCommand,
+  RobotType,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getLabwareDef } from './utils/labware'
+import { useSelector } from 'react-redux'
+import {
+  getLabwareDef,
+  getLabwareDefinitionsFromCommands,
+} from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { useChainRunCommands } from '../../resources/runs/hooks'
+import { getIsOnDevice } from '../../redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -30,7 +40,6 @@ import type {
   WorkingOffset,
 } from './types'
 import type { Jog } from '../../molecules/JogControls/types'
-import { useFeatureFlag } from '../../redux/config'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -45,12 +54,15 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   existingOffsets: LabwareOffset[]
   handleJog: Jog
   isRobotMoving: boolean
+  robotType: RobotType
+  shouldUseMetalProbe: boolean
 }
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
     labwareId,
     pipetteId,
     moduleId,
+    adapterId,
     location,
     protocolData,
     chainRunCommands,
@@ -61,13 +73,19 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     isRobotMoving,
     existingOffsets,
     setFatalError,
+    robotType,
+    shouldUseMetalProbe,
   } = props
-  const goldenLPC = useFeatureFlag('lpcWithProbe')
-  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const labwareDef = getLabwareDef(labwareId, protocolData)
   const pipette = protocolData.pipettes.find(
     pipette => pipette.id === pipetteId
   )
+  const adapterDisplayName =
+    adapterId != null
+      ? getLabwareDef(adapterId, protocolData)?.metadata.displayName
+      : ''
 
   const pipetteMount = pipette?.mount
   const pipetteName = pipette?.pipetteName
@@ -122,23 +140,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
 
   if (pipetteName == null || labwareDef == null || pipetteMount == null)
     return null
+
+  const labwareDefs = getLabwareDefinitionsFromCommands(protocolData.commands)
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
   const isTiprack = getIsTiprack(labwareDef)
-  const displayLocation = getDisplayLocation(location, t)
+  const displayLocation = getDisplayLocation(location, labwareDefs, t, i18n)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
-  const placeItemInstruction = isTiprack ? (
-    <Trans
-      t={t}
-      i18nKey="place_a_full_tip_rack_in_location"
-      tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
-      components={{
-        bold: (
-          <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
-        ),
-      }}
-    />
-  ) : (
+
+  let placeItemInstruction: JSX.Element = (
     <Trans
       t={t}
       i18nKey="place_labware_in_location"
@@ -151,18 +161,89 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     />
   )
 
+  if (isTiprack) {
+    placeItemInstruction = (
+      <Trans
+        t={t}
+        i18nKey="place_a_full_tip_rack_in_location"
+        tOptions={{ tip_rack: labwareDisplayName, location: displayLocation }}
+        components={{
+          bold: (
+            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          ),
+        }}
+      />
+    )
+  } else if (adapterId != null) {
+    placeItemInstruction = (
+      <Trans
+        t={t}
+        i18nKey="place_labware_in_adapter_in_location"
+        tOptions={{
+          adapter: adapterDisplayName,
+          labware: labwareDisplayName,
+          location: getDisplayLocation(
+            omit(location, ['definitionUri']), // only want the adapter's location here
+            labwareDefs,
+            t,
+            i18n
+          ),
+        }}
+        components={{
+          bold: (
+            <StyledText as="span" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+          ),
+        }}
+      />
+    )
+  }
+
+  let newLocation: LabwareLocation
+  if (moduleId != null) {
+    newLocation = { moduleId }
+  } else {
+    newLocation = { slotName: location.slotName }
+  }
+
+  let moveLabware: MoveLabwareCreateCommand[]
+  if (adapterId != null) {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId: adapterId,
+          newLocation,
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation:
+            adapterId != null
+              ? { labwareId: adapterId }
+              : { slotName: location.slotName },
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  } else {
+    moveLabware = [
+      {
+        commandType: 'moveLabware' as const,
+        params: {
+          labwareId,
+          newLocation,
+          strategy: 'manualMoveWithoutPause',
+        },
+      },
+    ]
+  }
   const handleConfirmPlacement = (): void => {
     chainRunCommands(
       [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation:
-              moduleId != null ? { moduleId } : { slotName: location.slotName },
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabware,
         ...protocolData.modules.reduce<CreateCommand[]>((acc, mod) => {
           if (getModuleType(mod.model) === HEATERSHAKER_MODULE_TYPE) {
             return [
@@ -178,14 +259,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         {
           commandType: 'moveToWell' as const,
           params: {
-            pipetteId: pipetteId,
-            labwareId: labwareId,
+            pipetteId,
+            labwareId,
             wellName: 'A1',
             wellLocation: {
               origin: 'top' as const,
-              offset: goldenLPC
-                ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
-                : IDENTITY_VECTOR,
+              offset:
+                robotType === FLEX_ROBOT_TYPE
+                  ? { x: 0, y: 0, z: PROBE_LENGTH_MM }
+                  : IDENTITY_VECTOR,
             },
           },
         },
@@ -215,9 +297,50 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         )
       })
   }
+  const moveLabwareOffDeck: CreateCommand[] =
+    adapterId != null
+      ? [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: adapterId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
+      : [
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: labwareId,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
+          },
+        ]
 
   const handleConfirmPosition = (): void => {
-    let confirmPositionCommands: CreateCommand[] = [
+    const heaterShakerPrepCommands: CreateCommand[] =
+      moduleId != null &&
+      moduleType != null &&
+      moduleType === HEATERSHAKER_MODULE_TYPE
+        ? [
+            {
+              commandType: 'heaterShaker/openLabwareLatch',
+              params: { moduleId },
+            },
+          ]
+        : []
+    const confirmPositionCommands: CreateCommand[] = [
       {
         commandType: 'retractAxis' as const,
         params: {
@@ -232,29 +355,10 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         commandType: 'retractAxis' as const,
         params: { axis: 'y' },
       },
-      {
-        commandType: 'moveLabware' as const,
-        params: {
-          labwareId: labwareId,
-          newLocation: 'offDeck',
-          strategy: 'manualMoveWithoutPause',
-        },
-      },
+      ...heaterShakerPrepCommands,
+      ...moveLabwareOffDeck,
     ]
-    if (
-      moduleId != null &&
-      moduleType != null &&
-      moduleType === HEATERSHAKER_MODULE_TYPE
-    ) {
-      confirmPositionCommands = [
-        confirmPositionCommands[0],
-        {
-          commandType: 'heaterShaker/openLabwareLatch',
-          params: { moduleId },
-        },
-        confirmPositionCommands[1],
-      ]
-    }
+
     chainRunCommands(
       [
         { commandType: 'savePosition', params: { pipetteId } },
@@ -288,14 +392,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       [
         ...modulePrepCommands,
         { commandType: 'home', params: {} },
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
+        ...moveLabwareOffDeck,
       ],
       false
     )
@@ -332,11 +429,23 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             location: displayLocation,
           })}
           body={
-            <StyledText as="p">
-              {isTiprack
-                ? t('ensure_nozzle_is_above_tip')
-                : t('ensure_tip_is_above_well')}
-            </StyledText>
+            <Trans
+              t={t}
+              i18nKey={
+                isOnDevice
+                  ? 'ensure_nozzle_position_odd'
+                  : 'ensure_nozzle_position_desktop'
+              }
+              values={{
+                tip_type: shouldUseMetalProbe
+                  ? t('calibration_probe')
+                  : t('pipette_nozzle'),
+                item_location: isTiprack
+                  ? t('check_tip_location')
+                  : t('check_well_location'),
+              }}
+              components={{ block: <StyledText as="p" />, bold: <strong /> }}
+            />
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
@@ -345,6 +454,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           handleJog={handleJog}
           initialPosition={initialPosition}
           existingOffset={existingOffset}
+          shouldUseMetalProbe={shouldUseMetalProbe}
         />
       ) : (
         <PrepareSpace
@@ -355,11 +465,15 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           })}
           body={
             <UnorderedList
-              items={[t('clear_all_slots'), placeItemInstruction]}
+              items={[
+                isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+                placeItemInstruction,
+              ]}
             />
           }
           labwareDef={labwareDef}
           confirmPlacement={handleConfirmPlacement}
+          robotType={robotType}
         />
       )}
     </Flex>

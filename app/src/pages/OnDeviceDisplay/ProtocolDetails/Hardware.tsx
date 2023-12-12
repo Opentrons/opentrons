@@ -14,10 +14,12 @@ import {
 } from '@opentrons/components'
 import {
   GRIPPER_V1,
+  getCutoutDisplayName,
   getGripperDisplayName,
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  getFixtureDisplayName,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
@@ -66,8 +68,10 @@ const getHardwareLocation = (
     return translator(`extension_mount`)
   } else if (protocolHardware.hardwareType === 'pipette') {
     return translator(`${protocolHardware.mount}_mount`)
-  } else {
+  } else if (protocolHardware.hardwareType === 'module') {
     return translator('slot', { slotName: protocolHardware.slot })
+  } else {
+    return 'location unknown'
   }
 }
 
@@ -76,8 +80,10 @@ const getHardwareName = (protocolHardware: ProtocolHardware): string => {
     return getGripperDisplayName(GRIPPER_V1)
   } else if (protocolHardware.hardwareType === 'pipette') {
     return getPipetteNameSpecs(protocolHardware.pipetteName)?.displayName ?? ''
-  } else {
+  } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
+  } else {
+    return getFixtureDisplayName(protocolHardware.cutoutFixtureId)
   }
 }
 
@@ -117,24 +123,24 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
       </thead>
       <tbody>
         {requiredProtocolHardware.map((hardware, id) => {
+          let location: JSX.Element = (
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
+            </StyledText>
+          )
+          if (hardware.hardwareType === 'module') {
+            location = <LocationIcon slotName={hardware.slot} />
+          } else if (hardware.hardwareType === 'fixture') {
+            location = (
+              <LocationIcon
+                slotName={getCutoutDisplayName(hardware.location.cutout)}
+              />
+            )
+          }
           return (
             <TableRow key={id}>
               <TableDatum>
-                <Flex paddingLeft={SPACING.spacing24}>
-                  {hardware.hardwareType === 'module' ? (
-                    <LocationIcon slotName={hardware.slot} />
-                  ) : (
-                    <StyledText
-                      as="p"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    >
-                      {i18n.format(
-                        getHardwareLocation(hardware, t),
-                        'titleCase'
-                      )}
-                    </StyledText>
-                  )}
-                </Flex>
+                <Flex paddingLeft={SPACING.spacing24}>{location}</Flex>
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24}>

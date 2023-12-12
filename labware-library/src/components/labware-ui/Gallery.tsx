@@ -13,12 +13,16 @@ export interface GalleryProps {
 
 export function Gallery(props: GalleryProps): JSX.Element {
   const { definition, className } = props
-  const { parameters: params, dimensions: dims } = definition
+  const {
+    parameters: params,
+    dimensions: dims,
+    cornerOffsetFromSlot,
+  } = definition
   const [currentImage, setCurrentImage] = React.useState(0)
   const render = (
     <RobotWorkSpace
       key="center"
-      viewBox={`0 0 ${dims.xDimension} ${dims.yDimension}`}
+      viewBox={`${cornerOffsetFromSlot.x} ${cornerOffsetFromSlot.y} ${dims.xDimension} ${dims.yDimension}`}
       width="100%"
       height="100%"
     >
@@ -30,7 +34,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
     labwareImages[params.loadName] || []
   ).map((src, key) => <img key={key} src={src} />)
 
-  const images = [render, ...staticImages]
+  const images = [...staticImages, render]
 
   return (
     <div className={className}>

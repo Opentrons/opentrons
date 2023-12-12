@@ -40,13 +40,13 @@ For example, these two ``load_labware()`` commands are equivalent:
 
     protocol.load_labware("nest_96_wellplate_200ul_flat", "A1")
     
-.. versionadded:: 2.0
+.. versionadded:: 2.15
 
 .. code-block:: python
 
     protocol.load_labware("nest_96_wellplate_200ul_flat", 10)
     
-.. versionadded:: 2.15
+.. versionadded:: 2.0
 
 Both of these commands would require you to load the well plate in the back left slot of the robot.
 

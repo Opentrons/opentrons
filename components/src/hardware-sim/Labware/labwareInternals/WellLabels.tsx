@@ -85,7 +85,7 @@ export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
     highlightedWellLabels,
     wellLabelColor,
   } = props
-  const letterColumn = definition.ordering[0]
+  const letterColumn = definition.ordering[0] ?? []
   // TODO(bc, 2021-03-08): replace types here with real ones once shared data is in TS
   const numberRow = definition.ordering.map((wellCol: any[]) => wellCol[0])
 

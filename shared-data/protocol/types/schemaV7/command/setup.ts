@@ -5,6 +5,7 @@ import type {
   LabwareOffset,
   PipetteName,
   ModuleModel,
+  Cutout,
 } from '../../../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -58,21 +59,39 @@ export interface LoadLiquidRunTimeCommand
     LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
+export interface LoadFixtureCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'loadFixture'
+  params: LoadFixtureParams
+}
+export interface LoadFixtureRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadFixtureCreateCommand {
+  result?: LoadLabwareResult
+}
 
 export type SetupRunTimeCommand =
   | LoadPipetteRunTimeCommand
   | LoadLabwareRunTimeCommand
+  | LoadFixtureRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
   | MoveLabwareRunTimeCommand
+
 export type SetupCreateCommand =
   | LoadPipetteCreateCommand
   | LoadLabwareCreateCommand
+  | LoadFixtureCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
 
 export type LabwareLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
+  | { labwareId: string }
+
+export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
@@ -116,7 +135,7 @@ interface MoveLabwareResult {
   offsetId: string
 }
 interface LoadModuleParams {
-  moduleId: string
+  moduleId?: string
   location: ModuleLocation
   model: ModuleModel
 }
@@ -130,4 +149,10 @@ interface LoadLiquidParams {
 }
 interface LoadLiquidResult {
   liquidId: string
+}
+
+interface LoadFixtureParams {
+  location: { cutout: Cutout }
+  loadName: string
+  fixtureId?: string
 }

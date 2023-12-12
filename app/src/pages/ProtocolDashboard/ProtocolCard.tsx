@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { format, formatDistance } from 'date-fns'
+import { formatDistance } from 'date-fns'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
@@ -15,18 +15,21 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
-import { useHost, useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useProtocolAnalysisAsDocumentQuery,
+} from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
+import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -36,7 +39,7 @@ export function ProtocolCard(props: {
   protocol: ProtocolResource
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
-  setTargetProtocol: (targetProtocol: ProtocolResource) => void
+  setTargetProtocolId: (targetProtocolId: string) => void
   lastRun?: string
 }): JSX.Element {
   const {
@@ -44,7 +47,7 @@ export function ProtocolCard(props: {
     lastRun,
     longPress,
     setShowDeleteConfirmationModal,
-    setTargetProtocol,
+    setTargetProtocolId,
   } = props
   const history = useHistory()
   const [showIcon, setShowIcon] = React.useState<boolean>(false)
@@ -57,15 +60,21 @@ export function ProtocolCard(props: {
   const longpress = useLongPress()
   const queryClient = useQueryClient()
   const host = useHost()
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocol.id, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
+
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocol.id,
+    last(protocol.analysisSummaries)?.id ?? null,
+    { enabled: protocol != null }
+  )
+
   const isFailedAnalysis =
-    (mostRecentAnalysis != null &&
-      'result' in mostRecentAnalysis &&
-      (mostRecentAnalysis.result === 'error' ||
-        mostRecentAnalysis.result === 'not-ok')) ??
+    (mostRecentAnalysis == null ||
+      (mostRecentAnalysis != null &&
+        'result' in mostRecentAnalysis &&
+        (mostRecentAnalysis.result === 'error' ||
+          mostRecentAnalysis.result === 'not-ok'))) ??
     false
 
   const handleProtocolClick = (
@@ -74,7 +83,7 @@ export function ProtocolCard(props: {
   ): void => {
     if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
-    } else if (longpress.isLongPressed !== true) {
+    } else if (!longpress.isLongPressed) {
       history.push(`/protocols/${protocolId}`)
     }
   }
@@ -82,9 +91,9 @@ export function ProtocolCard(props: {
   React.useEffect(() => {
     if (longpress.isLongPressed) {
       longPress(true)
-      setTargetProtocol(protocol)
+      setTargetProtocolId(protocol.id)
     }
-  }, [longpress.isLongPressed, longPress])
+  }, [longpress.isLongPressed, longPress, protocol.id, setTargetProtocolId])
 
   const failedAnalysisHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
@@ -125,6 +134,17 @@ export function ProtocolCard(props: {
       )
     }
   }
+
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${longpress.isLongPressed
+        ? ''
+        : isFailedAnalysis
+        ? COLORS.red3Pressed
+        : COLORS.darkBlack40};
+    }
+  `
+
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
@@ -135,9 +155,10 @@ export function ProtocolCard(props: {
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}
       ref={longpress.ref}
+      css={PUSHED_STATE_STYLE}
     >
       <Flex
-        width="30.75rem"
+        width="28.9375rem"
         overflowWrap="anywhere"
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
@@ -162,7 +183,7 @@ export function ProtocolCard(props: {
           {protocolName}
         </StyledText>
       </Flex>
-      <Flex width="9.25rem" justifyContent={JUSTIFY_CENTER}>
+      <Flex width="9.25rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
@@ -171,14 +192,15 @@ export function ProtocolCard(props: {
             : t('no_history')}
         </StyledText>
       </Flex>
-      <Flex width="10rem">
+      <Flex width="12.5rem" whiteSpace="nowrap">
         <StyledText as="p" color={COLORS.darkBlack70}>
-          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
+          {formatTimeWithUtcLabel(protocol.createdAt)}
         </StyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
             protocolId={protocol.id}
+            setTargetProtocolId={setTargetProtocolId}
             setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
           />
         )}
@@ -197,6 +219,7 @@ export function ProtocolCard(props: {
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
                 maxWidth="100%"
+                whiteSpace="break-spaces"
               >
                 <Trans
                   t={t}

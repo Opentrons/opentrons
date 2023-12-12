@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
@@ -20,11 +20,11 @@ import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 import { getLocalRobot } from '../../redux/discovery'
-import { getNetworkInterfaces } from '../../redux/networking'
+import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
 
 interface WifiConnectionDetailsProps {
   ssid?: string
@@ -40,6 +40,7 @@ export function WifiConnectionDetails({
   const history = useHistory()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const dispatch = useDispatch<Dispatch>()
   const { wifi } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
   )
@@ -53,6 +54,11 @@ export function WifiConnectionDetails({
     showNetworkDetailsModal,
     setShowNetworkDetailsModal,
   ] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    dispatch(fetchStatus(robotName))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
@@ -86,7 +92,9 @@ export function WifiConnectionDetails({
             <MediumButton
               flex="1"
               buttonText={i18n.format(t('continue'), 'capitalize')}
-              onClick={() => history.push('/robot-settings/update-robot')}
+              onClick={() =>
+                history.push('/robot-settings/update-robot-during-onboarding')
+              }
             />
           </Flex>
         </Flex>

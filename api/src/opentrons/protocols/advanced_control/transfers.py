@@ -13,9 +13,10 @@ from typing import (
     TYPE_CHECKING,
     TypeVar,
 )
-from opentrons.protocol_api.labware import Well
+from opentrons.protocol_api.labware import Labware, Well
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
+
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -485,6 +486,11 @@ class TransferPlan:
         """
         # reform source target lists
         sources, dests = self._extend_source_target_lists(self._sources, self._dests)
+        self._check_valid_volume_parameters(
+            disposal_volume=self._strategy.disposal_volume,
+            air_gap=self._strategy.air_gap,
+            max_volume=self._instr.max_volume,
+        )
         plan_iter = self._expand_for_volume_constraints(
             self._volumes,
             zip(sources, dests),
@@ -571,6 +577,13 @@ class TransferPlan:
                .. Dispense air gap -> ...*
 
         """
+
+        self._check_valid_volume_parameters(
+            disposal_volume=self._strategy.disposal_volume,
+            air_gap=self._strategy.air_gap,
+            max_volume=self._instr.max_volume,
+        )
+
         # TODO: decide whether default disposal vol for distribute should be
         # pipette min_vol or should we leave it to being 0 by default and
         # recommend users to specify a disposal vol when using distribute.
@@ -633,6 +646,10 @@ class TransferPlan:
         """Split a sequence of proposed transfers if necessary to keep each
         transfer under the given max volume.
         """
+        # A final defense against an infinite loop.
+        # Raising a proper exception with a helpful message is left to calling code,
+        # because it has more context about what the user is trying to do.
+        assert max_volume > 0
         for volume, target in zip(volumes, targets):
             while volume > max_volume * 2:
                 yield max_volume, target
@@ -680,6 +697,12 @@ class TransferPlan:
                *.. Aspirate -> Air gap -> Touch tip ->..
                .. Aspirate -> .....*
         """
+        # TODO: verify if _check_valid_volume_parameters should be re-enabled here
+        # self._check_valid_volume_parameters(
+        #     disposal_volume=self._strategy.disposal_volume,
+        #     air_gap=self._strategy.air_gap,
+        #     max_volume=self._instr.max_volume,
+        # )
         plan_iter = self._expand_for_volume_constraints(
             # todo(mm, 2021-03-09): Is it right to use _instr.max_volume here?
             # Why don't we account for tip max volume, disposal volume, or air
@@ -778,9 +801,13 @@ class TransferPlan:
                 self._strategy.blow_out_strategy == BlowOutStrategy.TRASH
                 or self._strategy.disposal_volume
             ):
-                yield self._format_dict(
-                    "blow_out", [self._instr.trash_container.wells()[0]]
-                )
+                if isinstance(self._instr.trash_container, Labware):
+                    yield self._format_dict(
+                        "blow_out", [self._instr.trash_container.wells()[0]]
+                    )
+                else:
+                    yield self._format_dict("blow_out", [self._instr.trash_container])
+
         else:
             # Used by distribute
             if self._strategy.air_gap:
@@ -842,6 +869,22 @@ class TransferPlan:
             return (rel_y * diff_vol) + min_v
 
         return [_map_volume(i) for i in range(total)]
+
+    def _check_valid_volume_parameters(
+        self, disposal_volume: float, air_gap: float, max_volume: float
+    ):
+        if air_gap >= max_volume:
+            raise ValueError(
+                "The air gap must be less than the maximum volume of the pipette"
+            )
+        elif disposal_volume >= max_volume:
+            raise ValueError(
+                "The disposal volume must be less than the maximum volume of the pipette"
+            )
+        elif disposal_volume + air_gap >= max_volume:
+            raise ValueError(
+                "The sum of the air gap and disposal volume must be less than the maximum volume of the pipette"
+            )
 
     def _check_valid_well_list(self, well_list, id, old_well_list):
         if self._api_version >= APIVersion(2, 2) and len(well_list) < 1:

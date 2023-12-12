@@ -11,9 +11,9 @@ import type {
   HostConfig,
   CreateCommandParams,
 } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
+import type { CreateCommand } from '@opentrons/shared-data'
 
-interface CreateLiveCommandMutateParams extends CreateCommandParams {
+export interface CreateLiveCommandMutateParams extends CreateCommandParams {
   command: CreateCommand
   waitUntilComplete?: boolean
   timeout?: number

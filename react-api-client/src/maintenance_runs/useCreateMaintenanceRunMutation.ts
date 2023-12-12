@@ -13,16 +13,18 @@ import {
 import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 
+export type CreateMaintenanceRunType = UseMutateAsyncFunction<
+  MaintenanceRun,
+  AxiosError,
+  CreateMaintenanceRunData
+>
+
 export type UseCreateMaintenanceRunMutationResult = UseMutationResult<
   MaintenanceRun,
   AxiosError,
   CreateMaintenanceRunData
 > & {
-  createMaintenanceRun: UseMutateAsyncFunction<
-    MaintenanceRun,
-    AxiosError,
-    CreateMaintenanceRunData
-  >
+  createMaintenanceRun: CreateMaintenanceRunType
 }
 
 export type UseCreateMaintenanceRunMutationOptions = UseMutationOptions<

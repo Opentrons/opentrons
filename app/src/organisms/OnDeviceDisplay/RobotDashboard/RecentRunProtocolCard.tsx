@@ -6,11 +6,13 @@ import { formatDistance } from 'date-fns'
 
 import {
   Flex,
+  Icon,
   COLORS,
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   BORDERS,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
@@ -21,8 +23,7 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useTrackProtocolRunEvent } from '../../Devices/hooks'
-import { useMissingHardwareText } from './hooks'
+import { useHardwareStatusText } from './hooks'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
@@ -67,15 +68,21 @@ export function ProtocolWithLastRun({
   const {
     missingProtocolHardware,
     isLoading: isLookingForHardware,
+    conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useMissingHardwareText(missingProtocolHardware)
+  const chipText = useHardwareStatusText(
+    missingProtocolHardware,
+    conflictedSlots
+  )
   const trackEvent = useTrackEvent()
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
+  // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
+  // const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runData.id)
   const onResetSuccess = (createRunResponse: Run): void =>
-    history.push(`protocols/${createRunResponse.data.id}/setup`)
+    history.push(`runs/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
+  const [showSpinner, setShowSpinner] = React.useState<boolean>(false)
 
   const protocolName =
     protocolData.metadata.protocolName ?? protocolData.files[0].name
@@ -92,6 +99,16 @@ export function ProtocolWithLastRun({
     }
   `
 
+  const PROTOCOL_CARD_CLICKED_STYLE = css`
+    flex: 1 0 0;
+    background-color: ${isReadyToBeReRun
+      ? COLORS.green3Pressed
+      : COLORS.yellow3Pressed};
+    &:focus-visible {
+      box-shadow: ${ODD_FOCUS_VISIBLE};
+    }
+  `
+
   const PROTOCOL_TEXT_STYLE = css`
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -102,12 +119,14 @@ export function ProtocolWithLastRun({
   `
 
   const handleCardClick = (): void => {
+    setShowSpinner(true)
     cloneRun()
     trackEvent({
       name: 'proceedToRun',
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
-    trackProtocolRunEvent({ name: 'runAgain' })
+    // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
+    // trackProtocolRunEvent({ name: 'runAgain' })
   }
 
   const terminationTypeMap: { [runStatus in RunStatus]?: string } = {
@@ -134,7 +153,7 @@ export function ProtocolWithLastRun({
   ) : (
     <Flex
       aria-label="RecentRunProtocolCard"
-      css={PROTOCOL_CARD_STYLE}
+      css={!showSpinner ? PROTOCOL_CARD_STYLE : PROTOCOL_CARD_CLICKED_STYLE}
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
@@ -144,13 +163,22 @@ export function ProtocolWithLastRun({
       borderRadius={BORDERS.borderRadiusSize4}
       onClick={handleCardClick}
     >
-      <Flex>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Chip
           paddingLeft="0"
           type={isReadyToBeReRun ? 'success' : 'warning'}
           background={false}
           text={i18n.format(chipText, 'capitalize')}
         />
+        {showSpinner && (
+          <Icon
+            name="ot-spinner"
+            aria-label="icon_ot-spinner"
+            spin={true}
+            size="2.5rem"
+            color={COLORS.darkBlack100}
+          />
+        )}
       </Flex>
       <Flex width="100%" height="14rem">
         <StyledText

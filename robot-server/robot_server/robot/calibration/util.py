@@ -1,18 +1,15 @@
 import logging
-import contextlib
 from typing import Set, Dict, Any, Union, List, Optional, TYPE_CHECKING
 
-from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.util import plan_arc
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocol_api.core.legacy.deck import Deck
-from opentrons.calibration_storage import (
-    helpers,
-    create_tip_length_data,
-    save_tip_length_calibration as cal_storage_save_tip_length,
-)
+from opentrons.calibration_storage import helpers
+
+from opentrons.calibration_storage import ot2 as ot2_cal_storage
+
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
@@ -109,19 +106,10 @@ CalibrationUserFlow = Union[
 async def invalidate_tip(user_flow: CalibrationUserFlow):
     await user_flow.return_tip()
     user_flow.reset_tip_origin()
+    await user_flow.hardware.update_nozzle_configuration_for_mount(
+        user_flow.mount, None, None
+    )
     await user_flow.move_to_tip_rack()
-
-
-@contextlib.contextmanager
-def save_default_pick_up_current(instr: Pipette):
-    # reduce pick up current for multichannel pipette picking up 1 tip
-    saved_default = instr.pick_up_configurations.current
-    instr.update_config_item({"pick_up_current": 0.1})
-
-    try:
-        yield
-    finally:
-        instr.update_config_item({"pick_up_current": saved_default})
 
 
 async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):
@@ -130,12 +118,14 @@ async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):
     user_flow.tip_origin = await user_flow.hardware.gantry_position(
         user_flow.mount, critical_point=cp
     )
-
-    with contextlib.ExitStack() as stack:
-        if user_flow.hw_pipette.config.channels > 1:
-            stack.enter_context(save_default_pick_up_current(user_flow.hw_pipette))
-
-        await user_flow.hardware.pick_up_tip(user_flow.mount, tip_length)
+    if user_flow.hw_pipette.config.channels > 1:
+        await user_flow.hardware.update_nozzle_configuration_for_mount(
+            user_flow.mount,
+            back_left_nozzle="H1",
+            front_right_nozzle="H1",
+            starting_nozzle="H1",
+        )
+    await user_flow.hardware.pick_up_tip(user_flow.mount, tip_length)
 
 
 async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
@@ -155,6 +145,9 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
         )
         await user_flow.hardware.drop_tip(user_flow.mount)
         user_flow.reset_tip_origin()
+        await user_flow.hardware.update_nozzle_configuration_for_mount(
+            user_flow.mount, None, None
+        )
 
 
 async def move(
@@ -203,10 +196,10 @@ def save_tip_length_calibration(
     # TODO: 07-22-2020 parent slot is not important when tracking
     # tip length data, hence the empty string, we should remove it
     # from create_tip_length_data in a refactor
-    tip_length_data = create_tip_length_data(
+    tip_length_data = ot2_cal_storage.create_tip_length_data(
         tip_rack._core.get_definition(), tip_length_offset
     )
-    cal_storage_save_tip_length(pipette_id, tip_length_data)
+    ot2_cal_storage.save_tip_length_calibration(pipette_id, tip_length_data)
 
 
 def get_default_tipracks(default_uris: List["LabwareUri"]) -> List["LabwareDefinition"]:

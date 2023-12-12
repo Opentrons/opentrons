@@ -1,7 +1,4 @@
-import assert from 'assert'
 import mapValues from 'lodash/mapValues'
-// TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
-import definitions from '../build/labware.json'
 
 import {
   FIXED_TRASH_RENDER_HEIGHT,
@@ -14,11 +11,6 @@ import type {
   LabwareDefinition2,
   WellDefinition,
 } from './types'
-
-assert(
-  definitions && Object.keys(definitions).length > 0,
-  'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
-)
 
 // do not list in any "available labware" UI.
 // TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?
@@ -35,6 +27,7 @@ export const LABWAREV2_DO_NOT_LIST = [
   // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
   // (https://opentrons.atlassian.net/browse/RLAB-230):
   'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  'opentrons_96_pcr_adapter_armadillo_wellplate_200ul',
   // Special labware that users probably shouldn't know about or load:
   // these all should eventually be given a new namespace like "opentrons-internal"
   // so that they can be filtered out by namespace rather than a block list like this
@@ -44,17 +37,12 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
   'opentrons_calibration_adapter_heatershaker_module',
-  'opentrons_calibration_adapter_magnetic_module',
   'opentrons_calibration_adapter_temperature_module',
   'opentrons_calibration_adapter_thermocycler_module',
-  // TODO(lc 8-24-2022) We are temporarily filtering
-  // out ot-3 labware definitions right now. We should
-  // have a way to filter these in the future to display
-  // the definitions. See RLIQ-117 for details.
-  'opentrons_flex_96_tiprack_20ul',
-  'opentrons_flex_96_tiprack_200ul',
-  'opentrons_flex_96_tiprack_1000ul',
-  'opentrons_flex_96_tiprack_50ul',
+  'opentrons_ot3_96_tiprack_20ul',
+  'opentrons_ot3_96_tiprack_200ul',
+  'opentrons_ot3_96_tiprack_1000ul',
+  'opentrons_ot3_96_tiprack_50ul',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
@@ -62,16 +50,9 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
+  'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+  'opentrons_96_aluminumblock_nest_wellplate_100ul',
 ]
-
-export function getLabwareV1Def(
-  labwareName: string
-): LabwareDefinition1 | null | undefined {
-  const labware: LabwareDefinition1 | null | undefined =
-    // @ts-expect-error(mc, 2021-04-27): make lookup more strict or remove v1 defs entirely
-    definitions[labwareName]
-  return labware
-}
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)

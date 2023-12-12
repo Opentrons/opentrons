@@ -133,7 +133,7 @@ mock_bad_security:50:no:foobar
         return mock_nmcli_output, ""
 
     monkeypatch.setattr(nmcli, "_call", mock_call)
-    result = await nmcli.available_ssids()
+    result = await nmcli.available_ssids(True)
     assert result == expected
 
 

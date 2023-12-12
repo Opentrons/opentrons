@@ -19,8 +19,8 @@ async def test_single_subscriber() -> None:
     await result
 
 
-@pytest.mark.parametrize("count", range(10))
-async def test_multiple_subscribers(count: int) -> None:
+@pytest.mark.parametrize("_test_repetition", range(10))
+async def test_multiple_subscribers(_test_repetition: int) -> None:
     """Test that multiple subscribers can wait for a notification.
 
     This test checks that the subscribers are awoken in the order they

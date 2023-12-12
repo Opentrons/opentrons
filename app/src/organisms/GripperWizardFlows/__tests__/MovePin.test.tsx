@@ -47,6 +47,7 @@ describe('MovePin', () => {
           createRunCommand={mockCreateRunCommand}
           errorMessage={null}
           setErrorMessage={mockSetErrorMessage}
+          isExiting={false}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -62,6 +63,7 @@ describe('MovePin', () => {
     const { getByRole } = render()[0]
     await getByRole('button', { name: 'Begin calibration' }).click()
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
         params: { axes: ['extensionZ', 'extensionJaw'] },
@@ -69,13 +71,23 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
+      command: {
+        commandType: 'home',
+        params: { skipIfMountPositionOk: 'extension' },
+      },
+      waitUntilComplete: true,
+    })
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: { jaw: 'front' },
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
         params: { mount: 'extension' },
@@ -85,15 +97,25 @@ describe('MovePin', () => {
     await expect(mockProceed).toHaveBeenCalled()
   })
 
-  it('clicking go back calls back', () => {
-    const { getByLabelText } = render()[0]
+  it('clicking go back calls back on moving pin from front to rear jaw', () => {
+    const { getByLabelText } = render({
+      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
+    })[0]
+    getByLabelText('back').click()
+    expect(mockGoBack).toHaveBeenCalled()
+  })
+
+  it('clicking go back calls back on removing pin from rear jaw', () => {
+    const { getByLabelText } = render({
+      movement: REMOVE_PIN_FROM_REAR_JAW,
+    })[0]
     getByLabelText('back').click()
     expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('renders correct text for move pin to front jaw', () => {
     const { getByRole, getByText } = render()[0]
-    getByText('Insert Calibration Pin into Front Jaw')
+    getByText('Insert calibration pin in front jaw')
     getByText(
       'Take the calibration pin from its storage location. Magnetically attach the pin to the hole on the underside of the front gripper jaw.'
     )
@@ -102,20 +124,21 @@ describe('MovePin', () => {
 
   it('renders correct loader for move pin to front jaw', () => {
     const { getByText } = render({ isRobotMoving: true })[0]
-    getByText('Stand Back, Flex Gripper is Calibrating')
+    getByText('Stand back, gripper is calibrating')
   })
 
   it('renders correct text for move pin from front jaw to rear with correct callbacks', async () => {
     const { getByRole, getByText } = render({
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
-    getByText('Insert Calibration Pin into Rear Jaw')
+    getByText('Insert calibration pin in rear jaw')
     getByText(
-      'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
+      'Remove the calibration pin from the front jaw and attach it to the rear jaw.'
     )
-    await getByRole('button', { name: 'Continue' }).click()
+    await getByRole('button', { name: 'Continue calibration' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
         params: { axes: ['extensionZ', 'extensionJaw'] },
@@ -123,6 +146,15 @@ describe('MovePin', () => {
       waitUntilComplete: true,
     })
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+      maintenanceRunId: 'fakeRunId',
+      command: {
+        commandType: 'home',
+        params: { skipIfMountPositionOk: 'extension' },
+      },
+      waitUntilComplete: true,
+    })
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
         params: {
@@ -132,7 +164,8 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
+      maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
         params: { mount: 'extension' },
@@ -147,14 +180,14 @@ describe('MovePin', () => {
       isRobotMoving: true,
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
-    getByText('Stand Back, Flex Gripper is Calibrating')
+    getByText('Stand back, gripper is calibrating')
   })
 
   it('renders correct text for remove pin from rear jaw', () => {
     const { getByRole, getByText } = render({
       movement: REMOVE_PIN_FROM_REAR_JAW,
     })[0]
-    getByText('Remove Calibration Pin')
+    getByText('Remove calibration pin')
     getByText(
       'Take the calibration pin from the rear gripper jaw and return it to its storage location.'
     )
@@ -167,6 +200,15 @@ describe('MovePin', () => {
       isRobotMoving: true,
       movement: REMOVE_PIN_FROM_REAR_JAW,
     })[0]
-    getByText('Stand Back, Robot is in Motion')
+    getByText('Stand back, robot is in motion')
+  })
+
+  it('renders correct loader for early exiting', () => {
+    const { getByText } = render({
+      isRobotMoving: true,
+      isExiting: true,
+      movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
+    })[0]
+    getByText('Stand back, robot is in motion')
   })
 })

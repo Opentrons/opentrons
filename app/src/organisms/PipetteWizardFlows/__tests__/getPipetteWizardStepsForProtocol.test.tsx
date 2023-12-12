@@ -127,6 +127,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
       )
     ).toStrictEqual(mockFlowSteps)
   })
+
   it('returns the correct array of info when the attached 96-channel pipette needs to be switched out for single mount', () => {
     const mockFlowSteps = [
       {
@@ -149,7 +150,12 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mount: LEFT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: LEFT,
+      },
       {
         section: SECTIONS.MOUNT_PIPETTE,
         mount: LEFT,
@@ -197,7 +203,12 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mount: LEFT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -255,7 +266,12 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -313,13 +329,23 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mount: LEFT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.DETACH,
+        nextMount: RIGHT,
+      },
       {
         section: SECTIONS.DETACH_PIPETTE,
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
-      { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
+      {
+        section: SECTIONS.RESULTS,
+        mount: RIGHT,
+        flowType: FLOWS.DETACH,
+        nextMount: 'both',
+      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,

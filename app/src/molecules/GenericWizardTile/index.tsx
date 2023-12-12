@@ -49,9 +49,11 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
-
     &:hover {
       opacity: 100%;
+    }
+    &:active {
+      opacity: 70%;
     }
   }
 `
@@ -128,7 +130,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing24}
+          gridGap={isOnDevice ? SPACING.spacing8 : SPACING.spacing16}
         >
           <Flex display={DISPLAY_INLINE_BLOCK}>
             {typeof header === 'string' ? <Title>{header}</Title> : header}
@@ -156,7 +158,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
-            <SmallButton buttonText={proceedButtonText} onClick={proceed} />
+            <SmallButton
+              disabled={proceedIsDisabled}
+              buttonText={proceedButtonText}
+              onClick={proceed}
+            />
           ) : (
             <PrimaryButton
               disabled={proceedIsDisabled}

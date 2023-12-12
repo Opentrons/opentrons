@@ -1,14 +1,16 @@
 import * as React from 'react'
+import { Provider } from 'react-redux'
+import configureStore from 'redux-mock-store'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import { renderWithProviders } from '@opentrons/components'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
-  useCreateMaintenanceRunMutation,
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
   useRunQuery,
 } from '@opentrons/react-api-client'
+import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs/hooks'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 
@@ -16,14 +18,15 @@ import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
 import type { LabwareOffset } from '@opentrons/api-client'
-import { LabwareDefinition2 } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('../')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../resources/runs/hooks')
 jest.mock('../useMostRecentCompletedAnalysis')
 
-const mockUseCreateMaintenanceRunMutation = useCreateMaintenanceRunMutation as jest.MockedFunction<
-  typeof useCreateMaintenanceRunMutation
+const mockUseCreateTargetedMaintenanceRunMutation = useCreateTargetedMaintenanceRunMutation as jest.MockedFunction<
+  typeof useCreateTargetedMaintenanceRunMutation
 >
 const mockUseCreateMaintenanceRunLabwareDefinitionMutation = useCreateMaintenanceRunLabwareDefinitionMutation as jest.MockedFunction<
   typeof useCreateMaintenanceRunLabwareDefinitionMutation
@@ -64,6 +67,7 @@ describe('useLaunchLPC hook', () => {
   let mockCreateMaintenanceRun: jest.Mock
   let mockCreateLabwareDefinition: jest.Mock
   let mockDeleteMaintenanceRun: jest.Mock
+  const mockStore = configureStore()
 
   beforeEach(() => {
     const queryClient = new QueryClient()
@@ -76,11 +80,15 @@ describe('useLaunchLPC hook', () => {
       Promise.resolve({ data: { definitionUri: 'fakeDefUri' } })
     )
     mockDeleteMaintenanceRun = jest.fn((_data, opts) => {
-      opts?.onSuccess()
+      opts?.onSettled()
     })
-
+    const store = mockStore({ isOnDevice: false })
     wrapper = ({ children }) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </Provider>
     )
     mockLabwarePositionCheck.mockImplementation(({ onCloseClick }) => (
       <div
@@ -100,10 +108,10 @@ describe('useLaunchLPC hook', () => {
           },
         },
       } as any)
-    when(mockUseCreateMaintenanceRunMutation)
+    when(mockUseCreateTargetedMaintenanceRunMutation)
       .calledWith()
       .mockReturnValue({
-        createMaintenanceRun: mockCreateMaintenanceRun,
+        createTargetedMaintenanceRun: mockCreateMaintenanceRun,
       } as any)
     when(mockUseCreateMaintenanceRunLabwareDefinitionMutation)
       .calledWith()
@@ -148,12 +156,18 @@ describe('useLaunchLPC hook', () => {
   })
 
   it('returns and no wizard by default', () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID), { wrapper })
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
     expect(result.current.LPCWizard).toEqual(null)
   })
 
   it('returns creates maintenance run with current offsets and definitions when create callback is called, closes and deletes when exit is clicked', async () => {
-    const { result } = renderHook(() => useLaunchLPC(MOCK_RUN_ID), { wrapper })
+    const { result } = renderHook(
+      () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
+      { wrapper }
+    )
     await result.current.launchLPC()
     await expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
       maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
@@ -176,7 +190,7 @@ describe('useLaunchLPC hook', () => {
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(
       MOCK_MAINTENANCE_RUN_ID,
       {
-        onSuccess: expect.any(Function),
+        onSettled: expect.any(Function),
       }
     )
     expect(result.current.LPCWizard).toBeNull()

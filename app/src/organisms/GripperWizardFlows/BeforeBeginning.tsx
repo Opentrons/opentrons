@@ -55,6 +55,7 @@ interface BeforeBeginningProps extends GripperWizardStepProps {
     unknown
   >
   isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
 }
 
 export const BeforeBeginning = (
@@ -68,11 +69,15 @@ export const BeforeBeginning = (
     isRobotMoving,
     chainRunCommands,
     errorMessage,
+    maintenanceRunId,
     setErrorMessage,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createMaintenanceRun({})
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
   }, [])
 
   const commandsOnProceed: CreateCommand[] = [
@@ -86,7 +91,7 @@ export const BeforeBeginning = (
   ]
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, false)
+    chainRunCommands?.(commandsOnProceed, false)
       .then(() => {
         proceed()
       })
@@ -141,7 +146,7 @@ export const BeforeBeginning = (
         />
       }
       proceedButtonText={t('move_gantry_to_front')}
-      proceedIsDisabled={isCreateLoading}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={handleOnClick}
     />
   )

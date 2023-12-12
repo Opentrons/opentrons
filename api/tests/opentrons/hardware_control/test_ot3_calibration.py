@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from mock import patch, AsyncMock, Mock, call as mock_call
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis, InstrumentProbeType
 from opentrons.config.types import OT3CalibrationSettings
 from opentrons.hardware_control.ot3_calibration import (
     find_edge_binary,
@@ -142,6 +142,11 @@ def _other_axis_val(point: Tuple[float, float, float], main_axis: Axis) -> float
     raise KeyError(main_axis)
 
 
+# Mock Capacitive Probe Result (found_position[float], hit_deck[bool])
+_HIT = (1, True)
+_MISS = (-1, False)
+
+
 @pytest.mark.parametrize(
     "search_axis,direction_if_hit,probe_results,search_result",
     [
@@ -149,12 +154,12 @@ def _other_axis_val(point: Tuple[float, float, float], main_axis: Axis) -> float
         # 1. hit-miss-miss
         # 2. miss-hit-hit
         # 3. miss-hit-miss
-        (Axis.X, -1, (1, -1, -1), -1),
-        (Axis.X, -1, (-1, 1, 1), 1),
-        (Axis.X, -1, (-1, 1, -1), 3),
-        (Axis.X, 1, (1, -1, -1), 1),
-        (Axis.X, 1, (-1, 1, 1), -1),
-        (Axis.X, 1, (-1, 1, -1), -3),
+        (Axis.X, -1, (_HIT, _MISS, _MISS), -1),
+        (Axis.X, -1, (_MISS, _HIT, _HIT), 1),
+        (Axis.X, -1, (_MISS, _HIT, _MISS), 3),
+        (Axis.X, 1, (_HIT, _MISS, _MISS), 1),
+        (Axis.X, 1, (_MISS, _HIT, _HIT), -1),
+        (Axis.X, 1, (_MISS, _HIT, _MISS), -3),
     ],
 )
 async def test_find_edge(
@@ -192,8 +197,8 @@ async def test_find_edge(
 @pytest.mark.parametrize(
     "search_axis,direction_if_hit,probe_results",
     [
-        (Axis.X, -1, (1, 1)),
-        (Axis.Y, -1, (-1, -1)),
+        (Axis.X, -1, (_HIT, _HIT)),
+        (Axis.Y, -1, (_MISS, _MISS)),
     ],
 )
 async def test_edge_not_found(
@@ -224,7 +229,7 @@ async def test_find_edge_early_trigger(
     override_cal_config: None,
 ) -> None:
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = (3,)
+    mock_capacitive_probe.side_effect = ((3, True), ())
     with pytest.raises(EarlyCapacitiveSenseTrigger):
         await find_edge_binary(
             ot3_hardware,
@@ -241,7 +246,7 @@ async def test_deck_not_found(
     override_cal_config: None,
 ) -> None:
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = (-25,)
+    mock_capacitive_probe.side_effect = ((-25, False), ())
     with pytest.raises(CalibrationStructureNotFoundError):
         await find_calibration_structure_height(
             ot3_hardware,
@@ -263,7 +268,7 @@ async def test_find_deck_checks_z_only(
 ) -> None:
     await ot3_hardware.home()
     here = await ot3_hardware.gantry_position(mount)
-    mock_capacitive_probe.side_effect = (-1.8,)
+    mock_capacitive_probe.side_effect = ((-1.8, True),)
     await find_calibration_structure_height(ot3_hardware, mount, target)
 
     z_prep_loc = target + PREP_OFFSET_DEPTH
@@ -273,6 +278,7 @@ async def test_find_deck_checks_z_only(
         mount,
         z_prep_loc,
         ot3_hardware.config.calibration.z_offset.pass_settings,
+        probe=InstrumentProbeType.PRIMARY,
     )
     # first we move only to safe height from current position
     first_move_point = mock_move_to.call_args_list[0][0][1]

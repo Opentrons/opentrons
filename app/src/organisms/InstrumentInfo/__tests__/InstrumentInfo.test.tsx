@@ -56,7 +56,7 @@ const mockGripperDataWithCalData: GripperData = {
     calibratedOffset: {
       offset: { x: 1, y: 2, z: 1 },
       source: 'mockSource',
-      last_modified: 'mockLastModified',
+      last_modified: '2023-08-15T20:25',
     },
   },
   firmwareVersion: '12',
@@ -97,7 +97,7 @@ describe('InstrumentInfo', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('last calibrated')
-    getByText('mockLastModified')
+    getByText('8/15/23 20:25 UTC')
     getByText('firmware version')
     getByText('12')
     getByText('serial number')
@@ -112,14 +112,13 @@ describe('InstrumentInfo', () => {
     props = {
       instrument: mockPipetteData1Channel,
     }
-    const { getByText, getByRole } = render(props)
+    const { getByText, getByRole, queryByText } = render(props)
     getByText('last calibrated')
-    getByText('08/25/2020 20:25:00')
+    getByText('8/25/20 20:25 UTC')
     getByText('serial number')
     getByText('abc')
     getByRole('button', { name: 'MediumButton_secondary' }).click()
     getByText('mock PipetteWizardFlows')
-    getByRole('button', { name: 'MediumButton_primary' }).click()
-    getByText('mock PipetteWizardFlows')
+    expect(queryByText('Calibrate')).not.toBeInTheDocument()
   })
 })

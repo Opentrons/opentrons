@@ -7,7 +7,7 @@ from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
 
 from ..resources.ot3_validation import ensure_ot3_hardware
 from ..state import StateStore
-from ..types import MotorAxis
+from ..types import MotorAxis, PostRunHardwareState
 from ..errors import HardwareNotSupportedError
 
 from .movement import MovementHandler
@@ -87,17 +87,27 @@ class HardwareStopper:
                 # should not happen during an actual run
                 log.debug(f"Pipette ID {pipette_id} no longer attached.")
 
-    async def do_halt(self) -> None:
+    async def do_halt(self, disengage_before_stopping: bool = False) -> None:
         """Issue a halt signal to the hardware API.
 
         After issuing a halt, you must call do_stop_and_recover after
         anything using the HardwareAPI has settled.
         """
-        await self._hardware_api.halt()
+        await self._hardware_api.halt(
+            disengage_before_stopping=disengage_before_stopping
+        )
 
-    async def do_stop_and_recover(self, drop_tips_and_home: bool = False) -> None:
+    async def do_stop_and_recover(
+        self,
+        post_run_hardware_state: PostRunHardwareState,
+        drop_tips_after_run: bool = False,
+    ) -> None:
         """Stop and reset the HardwareAPI, optionally dropping tips and homing."""
-        if drop_tips_and_home:
+        if drop_tips_after_run:
             await self._drop_tip()
 
-        await self._hardware_api.stop(home_after=drop_tips_and_home)
+        home_after_stop = post_run_hardware_state in (
+            PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+            PostRunHardwareState.HOME_THEN_DISENGAGE,
+        )
+        await self._hardware_api.stop(home_after=home_after_stop)

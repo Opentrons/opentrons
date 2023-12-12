@@ -9,6 +9,7 @@ import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { ConnectionTroubleshootingModal } from '../ConnectionTroubleshootingModal'
 import { RobotOverflowMenu } from '../RobotOverflowMenu'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsRobotBusy } from '../hooks'
 
 import {
   mockUnreachableRobot,
@@ -19,6 +20,7 @@ jest.mock('../../../redux/robot-update/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../ChooseProtocolSlideout')
 jest.mock('../ConnectionTroubleshootingModal')
+jest.mock('../hooks')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -31,6 +33,9 @@ const mockConnectionTroubleshootingModal = ConnectionTroubleshootingModal as jes
 >
 const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
   typeof getRobotUpdateDisplayInfo
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const render = (props: React.ComponentProps<typeof RobotOverflowMenu>) => {
@@ -60,6 +65,7 @@ describe('RobotOverflowMenu', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
+    mockUseIsRobotBusy.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -102,5 +108,21 @@ describe('RobotOverflowMenu', () => {
     fireEvent.click(btn)
     const run = getByText('Run a protocol')
     expect(run).toBeDisabled()
+  })
+
+  it('should only render robot settings when e-stop is pressed or disconnected', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const { getByText, getByLabelText, queryByText } = render(props)
+    const btn = getByLabelText('RobotOverflowMenu_button')
+    fireEvent.click(btn)
+    expect(queryByText('Run a protocol')).not.toBeInTheDocument()
+    getByText('Robot settings')
   })
 })

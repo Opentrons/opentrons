@@ -46,8 +46,7 @@ import { Portal } from '../../App/portal'
 
 import type { Dispatch, State } from '../../redux/types'
 
-const SOFTWARE_SYNC_URL =
-  'https://support.opentrons.com/s/article/Get-started-Update-your-OT-2'
+const SOFTWARE_SYNC_URL = 'https://support.opentrons.com/s/'
 const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 
@@ -113,7 +112,7 @@ export function GeneralSettings(): JSX.Element {
               type="warning"
               onCloseClick={() => setShowUpdateBanner(false)}
             >
-              {t('update_available')}
+              {t('opentrons_app_update_available_variation')}
               <Link
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"

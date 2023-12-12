@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -18,12 +18,10 @@ import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import {
-  getRobotUpdateDisplayInfo,
-  startRobotUpdate,
-} from '../../../../redux/robot-update'
+import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
+import { useDispatchStartRobotUpdate } from '../../../../redux/robot-update/hooks'
 
-import type { State, Dispatch } from '../../../../redux/types'
+import type { State } from '../../../../redux/types'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
 const HIDDEN_CSS = css`
@@ -43,19 +41,24 @@ export function UpdateRobotSoftware({
   isRobotBusy,
 }: UpdateRobotSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
     if (files?.length === 1 && !updateDisabled) {
-      dispatch(startRobotUpdate(robotName, files[0].path))
+      dispatchStartRobotUpdate(robotName, files[0].path)
       onUpdateStart()
+    }
+    // this is to reset the state of the file picker so users can reselect the same
+    // system image if the upload fails
+    if (inputRef.current?.value != null) {
+      inputRef.current.value = ''
     }
   }
 

@@ -6,11 +6,13 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
-import {
+import type {
   ModuleOnDeck,
   LabwareOnDeck,
   InitialDeckSetup,
 } from '../../step-forms/types'
+import type { SavedStepFormState } from '../../step-forms'
+
 export function getModuleOnDeckByType(
   initialDeckSetup: InitialDeckSetup,
   type: ModuleType
@@ -29,12 +31,35 @@ export function getLabwareOnModule(
 }
 export function getModuleUnderLabware(
   initialDeckSetup: InitialDeckSetup,
+  savedStepFormState: SavedStepFormState,
   labwareId: string
 ): ModuleOnDeck | null | undefined {
-  return values(initialDeckSetup.modules).find(
-    (moduleOnDeck: ModuleOnDeck) =>
-      initialDeckSetup.labware[labwareId]?.slot === moduleOnDeck.id
-  )
+  //  latest moveLabware step related to labwareId
+  const moveLabwareStep = Object.values(savedStepFormState)
+    .filter(
+      state =>
+        state.stepType === 'moveLabware' &&
+        labwareId != null &&
+        state.labware === labwareId
+    )
+    .reverse()[0]
+  const newLocation = moveLabwareStep?.newLocation
+
+  return values(initialDeckSetup.modules).find((moduleOnDeck: ModuleOnDeck) => {
+    const labwareSlot = initialDeckSetup.labware[labwareId]?.slot
+    let location
+    if (newLocation != null) {
+      location = newLocation
+    } else if (
+      labwareSlot != null &&
+      initialDeckSetup.labware[labwareSlot] != null
+    ) {
+      location = initialDeckSetup.labware[labwareSlot].slot
+    } else {
+      location = labwareSlot
+    }
+    return location === moduleOnDeck.id
+  })
 }
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,
@@ -44,21 +69,21 @@ export function getModuleLabwareOptions(
   const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
   const labware =
     moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
-  const prefix = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
+  const module = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
   let options: Options = []
 
   if (moduleOnDeck) {
     if (labware) {
       options = [
         {
-          name: `${prefix} ${nicknamesById[labware.id]}`,
+          name: `${nicknamesById[labware.id]} in ${module}`,
           value: moduleOnDeck.id,
         },
       ]
     } else {
       options = [
         {
-          name: `${prefix} No labware on module`,
+          name: `${module} No labware on module`,
           value: moduleOnDeck.id,
         },
       ]

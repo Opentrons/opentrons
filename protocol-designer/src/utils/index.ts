@@ -1,8 +1,25 @@
 import uuidv1 from 'uuid/v4'
-import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
+import {
+  WellSetHelpers,
+  makeWellSetHelpers,
+  AddressableAreaName,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
+  CutoutId,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  isAddressableAreaStandardSlot,
+  CutoutFixtureId,
+  RobotType,
+} from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
+import type {
+  AdditionalEquipmentEntity,
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
     ? // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -104,3 +121,79 @@ export const makeTimerText = (
     : `${targetMinutes}  ${i18n.t(
         'application.units.minutes'
       )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
+
+export const getIsAdapter = (
+  labwareId: string,
+  labwareEntities: LabwareEntities
+): boolean => {
+  if (labwareEntities[labwareId] == null) return false
+  return (
+    labwareEntities[labwareId].def.allowedRoles?.includes('adapter') ?? false
+  )
+}
+
+export const getStagingAreaSlots = (
+  stagingAreas?: AdditionalEquipmentEntity[]
+): string[] | null => {
+  if (stagingAreas == null) return null
+  //  we can assume that the location is always a string
+  return stagingAreas.map(area => area.location as string)
+}
+
+export const getHas96Channel = (pipettes: PipetteEntities): boolean => {
+  return Object.values(pipettes).some(pip => pip.spec.channels === 96)
+}
+
+export const getStagingAreaAddressableAreas = (
+  cutoutIds: CutoutId[]
+): AddressableAreaName[] => {
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const cutoutFixtures = deckDef.cutoutFixtures
+
+  return cutoutIds
+    .flatMap(cutoutId => {
+      const addressableAreasOnCutout = cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === STAGING_AREA_RIGHT_SLOT_FIXTURE
+      )?.providesAddressableAreas[cutoutId]
+      return addressableAreasOnCutout ?? []
+    })
+    .filter(aa => !isAddressableAreaStandardSlot(aa, deckDef))
+}
+
+export const getCutoutIdByAddressableArea = (
+  addressableAreaName: AddressableAreaName,
+  cutoutFixtureId: CutoutFixtureId,
+  robotType: RobotType
+): CutoutId => {
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const cutoutFixtures = deckDef.cutoutFixtures
+  const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
+    cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)
+  )?.providesAddressableAreas
+
+  const findCutoutIdByAddressableArea = (
+    addressableAreaName: AddressableAreaName
+  ): CutoutId | null => {
+    if (providesAddressableAreasForAddressableArea != null) {
+      for (const cutoutId in providesAddressableAreasForAddressableArea) {
+        if (
+          providesAddressableAreasForAddressableArea[
+            cutoutId as keyof typeof providesAddressableAreasForAddressableArea
+          ].includes(addressableAreaName)
+        ) {
+          return cutoutId as CutoutId
+        }
+      }
+    }
+    return null
+  }
+
+  const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
+
+  if (cutoutId == null) {
+    throw Error(
+      `expected to find cutoutId from addressableAreaName ${addressableAreaName} but could not`
+    )
+  }
+  return cutoutId
+}

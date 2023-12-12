@@ -8,7 +8,6 @@ export {
   delay,
   disengageMagnet,
   dispense,
-  dropAllTips,
   dropTip,
   engageMagnet,
   mix,

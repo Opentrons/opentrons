@@ -16,10 +16,13 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 
-from opentrons import calibration_storage
+from opentrons import calibration_storage, types as top_types
 from opentrons.calibration_storage import helpers as calibration_storage_helpers
 from opentrons.calibration_storage.ot2.models import v1 as v1_models
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration as subject
+from opentrons.hardware_control.instruments.ot3 import (
+    instrument_calibration as subject_ot3,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -29,6 +32,10 @@ def _use_mock_calibration_storage(
     """Mock out the opentrons.calibration_storage module."""
     for name, func in inspect.getmembers(calibration_storage, inspect.isfunction):
         monkeypatch.setattr(calibration_storage, name, decoy.mock(func=func))
+    for name, func in inspect.getmembers(calibration_storage.ot2, inspect.isfunction):
+        monkeypatch.setattr(calibration_storage.ot2, name, decoy.mock(func=func))
+    for name, func in inspect.getmembers(calibration_storage.ot3, inspect.isfunction):
+        monkeypatch.setattr(calibration_storage.ot3, name, decoy.mock(func=func))
 
     for name, func in inspect.getmembers(
         calibration_storage_helpers, inspect.isfunction
@@ -84,7 +91,7 @@ def test_load_tip_length(
     )
 
     decoy.when(
-        calibration_storage.load_tip_length_calibration(
+        calibration_storage.ot2.load_tip_length_calibration(
             pip_id="abc123", definition=tip_rack_dict
         )
     ).then_return(tip_length_data)
@@ -110,3 +117,35 @@ def test_load_tip_length(
             markedAt=datetime(year=2023, month=2, day=2),
         ),
     )
+
+
+@pytest.mark.parametrize(
+    "left,right,ok",
+    [
+        # If either point is all 0 (uncalibrated) then the check should pass
+        (top_types.Point(0, 0, 0), top_types.Point(0, 0, 2), True),
+        (top_types.Point(0, 0, 2), top_types.Point(0, 0, 0), True),
+        (top_types.Point(0, 0, 0), top_types.Point(0, 0, 0), True),
+        # If both points are non-zero but all values are within the range the
+        # check should pass
+        (top_types.Point(0, 1.0, 1.5), top_types.Point(-1, 0, 0.2), True),
+        # If both points are non-zero but at least one element is more than
+        # the range different the test should fail
+        (top_types.Point(0.1, -1, 1.5), top_types.Point(1.7, 0, 0.2), False),
+        (top_types.Point(0.1, -1, 1.5), top_types.Point(0.6, 0.6, 1.3), False),
+        (top_types.Point(0.1, -1, 1.5), top_types.Point(-0.2, -0.1, 5), False),
+    ],
+)
+def test_instrument_consistency_check_ot3(
+    left: top_types.Point, right: top_types.Point, ok: bool
+) -> None:
+    result = subject_ot3.check_instrument_offset_reasonability(left, right)
+    if ok:
+        assert result == []
+    else:
+        assert result[0].kind == "inconsistent-pipette-offset"
+        assert result[0].offsets == {
+            top_types.Mount.LEFT: left,
+            top_types.Mount.RIGHT: right,
+        }
+        assert result[0].limit == 1.5

@@ -6,10 +6,9 @@ from abc import ABC, abstractmethod
 
 import anyio
 
-from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -21,6 +20,8 @@ from opentrons.protocol_engine import (
     Command,
     commands as pe_commands,
 )
+from opentrons.protocols.parse import PythonParseMode
+from opentrons.util.broker import Broker
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -34,6 +35,7 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
+from ..protocol_engine.types import PostRunHardwareState, DeckConfigurationType
 
 
 class RunResult(NamedTuple):
@@ -57,6 +59,21 @@ class AbstractRunner(ABC):
 
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
+        self._broker = LegacyBroker()
+
+    # TODO(mm, 2023-10-03): `LegacyBroker` is specific to Python protocols and JSON protocols ≤v5.
+    # We'll need to extend this in order to report progress from newer JSON protocols.
+    #
+    # TODO(mm, 2023-10-04): When we switch this to return a new `Broker` instead of a
+    # `LegacyBroker`, we should annotate the return type as a `ReadOnlyBroker`.
+    @property
+    def broker(self) -> LegacyBroker:
+        """Return a broker that you can subscribe to in order to monitor protocol progress.
+
+        Currently, this only returns messages for `PythonAndLegacyRunner`.
+        Otherwise, it's a no-op.
+        """
+        return self._broker
 
     def was_started(self) -> bool:
         """Whether the run has been started.
@@ -65,9 +82,9 @@ class AbstractRunner(ABC):
         """
         return self._protocol_engine.state_view.commands.has_been_played()
 
-    def play(self) -> None:
+    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
         """Start or resume the run."""
-        self._protocol_engine.play()
+        self._protocol_engine.play(deck_configuration=deck_configuration)
 
     def pause(self) -> None:
         """Pause the run."""
@@ -79,13 +96,15 @@ class AbstractRunner(ABC):
             await self._protocol_engine.stop()
         else:
             await self._protocol_engine.finish(
-                drop_tips_and_home=False,
+                drop_tips_after_run=False,
                 set_run_status=False,
+                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
 
     @abstractmethod
     async def run(
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
@@ -116,7 +135,9 @@ class PythonAndLegacyRunner(AbstractRunner):
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
 
-    async def load(self, protocol_source: ProtocolSource) -> None:
+    async def load(
+        self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode
+    ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
             protocol_source=protocol_source
@@ -128,26 +149,31 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
         # the event loop. Jira RSS-165.
-        protocol = self._legacy_file_reader.read(protocol_source, labware_definitions)
-        broker = None
+        protocol = self._legacy_file_reader.read(
+            protocol_source, labware_definitions, python_parse_mode
+        )
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            broker = Broker()
-            equipment_broker = EquipmentBroker[LegacyLoadInfo]()
-
+            equipment_broker = Broker[LegacyLoadInfo]()
             self._protocol_engine.add_plugin(
-                LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
+                LegacyContextPlugin(
+                    broker=self._broker, equipment_broker=equipment_broker
+                )
             )
+            self._hardware_api.should_taskify_movement_execution(taskify=True)
+        else:
+            self._hardware_api.should_taskify_movement_execution(taskify=False)
 
         context = self._legacy_context_creator.create(
             protocol=protocol,
-            broker=broker,
+            broker=self._broker,
             equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         self._task_queue.set_run_func(
@@ -158,14 +184,18 @@ class PythonAndLegacyRunner(AbstractRunner):
 
     async def run(  # noqa: D102
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
+        python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
-            await self.load(protocol_source=protocol_source)
+            await self.load(
+                protocol_source=protocol_source, python_parse_mode=python_parse_mode
+            )
 
-        self.play()
+        self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
         await self._task_queue.join()
 
@@ -194,6 +224,7 @@ class JsonRunner(AbstractRunner):
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -238,6 +269,7 @@ class JsonRunner(AbstractRunner):
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
+        # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         for command in commands:
@@ -248,6 +280,7 @@ class JsonRunner(AbstractRunner):
 
     async def run(  # noqa: D102
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
@@ -255,7 +288,7 @@ class JsonRunner(AbstractRunner):
         if protocol_source:
             await self.load(protocol_source)
 
-        self.play()
+        self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
         await self._task_queue.join()
 
@@ -280,6 +313,7 @@ class LiveRunner(AbstractRunner):
         # of runner interface
         self._hardware_api = hardware_api
         self._task_queue = task_queue or TaskQueue(cleanup_func=protocol_engine.finish)
+        self._hardware_api.should_taskify_movement_execution(taskify=False)
 
     def prepare(self) -> None:
         """Set the task queue to wait until all commands are executed."""
@@ -287,11 +321,12 @@ class LiveRunner(AbstractRunner):
 
     async def run(  # noqa: D102
         self,
+        deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()
-        self.play()
+        self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
         await self._task_queue.join()
 

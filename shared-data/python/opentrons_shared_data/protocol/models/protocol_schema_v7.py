@@ -51,10 +51,11 @@ class Params(BaseModel):
     offset: Optional[OffsetVector]
     profile: Optional[List[ProfileStep]]
     radius: Optional[float]
+    # schema v7 add-ons
     newLocation: Optional[Union[Location, Literal["offDeck"]]]
     strategy: Optional[str]
-    # schema v7 add-ons
-    adapterId: Optional[str]
+    pickUpOffset: Optional[OffsetVector]
+    dropOffset: Optional[OffsetVector]
     homeAfter: Optional[bool]
     alternateDropLocation: Optional[bool]
     holdTimeSeconds: Optional[float]
@@ -64,6 +65,7 @@ class Params(BaseModel):
     loadName: Optional[str]
     namespace: Optional[str]
     version: Optional[int]
+    pushOut: Optional[float]
 
 
 class Command(BaseModel):

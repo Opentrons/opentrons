@@ -99,6 +99,7 @@ export interface CreateRunActionData {
 export interface LabwareOffsetLocation {
   slotName: string
   moduleModel?: ModuleModel
+  definitionUri?: string
 }
 export interface LabwareOffsetCreateData {
   definitionUri: string

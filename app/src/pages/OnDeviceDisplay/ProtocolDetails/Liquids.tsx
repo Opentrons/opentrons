@@ -22,7 +22,10 @@ import { getTotalVolumePerLiquidId } from '../../../organisms/Devices/ProtocolRu
 import { StyledText } from '../../../atoms/text'
 import { EmptySection } from './EmptySection'
 
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import {
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const Table = styled('table')`
@@ -61,10 +64,14 @@ const TableDatum = styled('td')`
 
 export const Liquids = (props: { protocolId: string }): JSX.Element => {
   const { protocolId } = props
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
-    staleTime: Infinity,
-  })
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? []
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
   const liquidsInOrder = parseLiquidsInLoadOrder(
     (mostRecentAnalysis as CompletedProtocolAnalysis).liquids ?? [],
     (mostRecentAnalysis as CompletedProtocolAnalysis).commands ?? []

@@ -22,6 +22,11 @@ export const mockHealthResponse = {
   protocol_api_version: [2, 0] as [number, number],
 }
 
+export const mockHealthResponseWithSerial = {
+  ...mockHealthResponse,
+  robot_serial: 'this is a robot serial from robot server',
+}
+
 export const mockUpdateServerHealthResponse = {
   name: 'robot-name',
   apiServerVersion: '0.0.0-mock',
@@ -46,6 +51,11 @@ export const mockDiscoveryClientRobot = {
       serverHealthError: null,
     },
   ],
+}
+
+export const mockDiscoveryClientRobotWithHealthSerial = {
+  ...mockDiscoveryClientRobot,
+  health: mockHealthResponseWithSerial,
 }
 
 export const mockBaseRobot: BaseRobot = {

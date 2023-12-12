@@ -10,8 +10,9 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters as LabwareDefinitionParameters,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import Mount, DeckSlotName, Location, Point
+from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location, Point
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     MagneticModuleModel,
@@ -64,14 +65,27 @@ def test_ensure_mount_input_invalid() -> None:
 @pytest.mark.parametrize(
     ["input_value", "expected"],
     [
+        # Every OT-2 pipette:
+        ("p10_single", PipetteNameType.P10_SINGLE),
+        ("p10_multi", PipetteNameType.P10_MULTI),
+        ("p50_single", PipetteNameType.P50_SINGLE),
+        ("p50_multi", PipetteNameType.P50_MULTI),
         ("p300_single", PipetteNameType.P300_SINGLE),
-        ("P300_muLTI_gen2", PipetteNameType.P300_MULTI_GEN2),
-        (
-            "p50_single_gen3",
-            PipetteNameType.P50_SINGLE_FLEX,
-        ),  # Remove this line once we phase out '_gen3' names
+        ("p300_multi", PipetteNameType.P300_MULTI),
+        ("p1000_single", PipetteNameType.P1000_SINGLE),
+        ("p20_single_gen2", PipetteNameType.P20_SINGLE_GEN2),
+        ("p20_multi_gen2", PipetteNameType.P20_MULTI_GEN2),
+        ("p300_single_gen2", PipetteNameType.P300_SINGLE_GEN2),
+        ("p300_multi_gen2", PipetteNameType.P300_MULTI_GEN2),
+        ("p1000_single_gen2", PipetteNameType.P1000_SINGLE_GEN2),
+        # Every Flex pipette:
+        ("flex_1channel_50", PipetteNameType.P50_SINGLE_FLEX),
+        ("flex_8channel_50", PipetteNameType.P50_MULTI_FLEX),
+        ("flex_1channel_1000", PipetteNameType.P1000_SINGLE_FLEX),
         ("flex_8channel_1000", PipetteNameType.P1000_MULTI_FLEX),
         ("flex_96channel_1000", PipetteNameType.P1000_96),
+        # Weird capitalization:
+        ("P300_muLTI_gen2", PipetteNameType.P300_MULTI_GEN2),
     ],
 )
 def test_ensure_pipette_name(input_value: str, expected: PipetteNameType) -> None:
@@ -80,30 +94,60 @@ def test_ensure_pipette_name(input_value: str, expected: PipetteNameType) -> Non
     assert result == expected
 
 
-def test_ensure_pipette_input_invalid() -> None:
+@pytest.mark.parametrize(
+    "input_value",
+    [
+        "oh-no",  # Not even remotely a pipette name.
+        "p1000_single_gen3",  # Obsolete name for Flex pipette.
+        "p1000_single_flex",  # Internal-only name for Flex pipette.
+        "p1000_96",  # Internal-only name for Flex pipette.
+    ],
+)
+def test_ensure_pipette_input_invalid(input_value: str) -> None:
     """It should raise a ValueError if given an invalid name."""
-    with pytest.raises(ValueError, match="must be given valid pipette name"):
-        subject.ensure_pipette_name("oh-no")
+    with pytest.raises(
+        ValueError,
+        match=f"Cannot resolve {input_value} to pipette, must be given valid pipette name",
+    ):
+        subject.ensure_pipette_name(input_value)
 
 
 @pytest.mark.parametrize(
-    ["input_value", "input_api_version", "expected"],
+    ["input_value", "input_api_version", "input_robot_type", "expected"],
     [
-        ("1", APIVersion(2, 0), DeckSlotName.SLOT_1),
-        (1, APIVersion(2, 0), DeckSlotName.SLOT_1),
-        ("12", APIVersion(2, 0), DeckSlotName.FIXED_TRASH),
-        (12, APIVersion(2, 0), DeckSlotName.FIXED_TRASH),
-        ("d1", APIVersion(2, 15), DeckSlotName.SLOT_D1),
-        ("D1", APIVersion(2, 15), DeckSlotName.SLOT_D1),
-        ("a3", APIVersion(2, 15), DeckSlotName.SLOT_A3),
-        ("A3", APIVersion(2, 15), DeckSlotName.SLOT_A3),
+        # Integer or integer-as-string slots:
+        ("1", APIVersion(2, 0), "OT-2 Standard", DeckSlotName.SLOT_1),
+        ("1", APIVersion(2, 0), "OT-3 Standard", DeckSlotName.SLOT_D1),
+        (1, APIVersion(2, 0), "OT-2 Standard", DeckSlotName.SLOT_1),
+        (1, APIVersion(2, 0), "OT-3 Standard", DeckSlotName.SLOT_D1),
+        ("12", APIVersion(2, 0), "OT-2 Standard", DeckSlotName.FIXED_TRASH),
+        (12, APIVersion(2, 0), "OT-3 Standard", DeckSlotName.SLOT_A3),
+        # Coordinate slots:
+        ("d1", APIVersion(2, 15), "OT-2 Standard", DeckSlotName.SLOT_1),
+        ("d1", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_D1),
+        ("D1", APIVersion(2, 15), "OT-2 Standard", DeckSlotName.SLOT_1),
+        ("D1", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_D1),
+        ("a3", APIVersion(2, 15), "OT-2 Standard", DeckSlotName.FIXED_TRASH),
+        ("a3", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_A3),
+        ("A3", APIVersion(2, 15), "OT-2 Standard", DeckSlotName.FIXED_TRASH),
+        ("A3", APIVersion(2, 15), "OT-3 Standard", DeckSlotName.SLOT_A3),
+        # Staging slots:
+        ("A4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_A4),
+        ("b4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_B4),
+        ("C4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_C4),
+        ("d4", APIVersion(2, 16), "OT-3 Standard", StagingSlotName.SLOT_D4),
     ],
 )
-def test_ensure_deck_slot(
-    input_value: Union[str, int], input_api_version: APIVersion, expected: DeckSlotName
+def test_ensure_and_convert_deck_slot(
+    input_value: Union[str, int],
+    input_api_version: APIVersion,
+    input_robot_type: RobotType,
+    expected: DeckSlotName,
 ) -> None:
     """It should map strings and ints to DeckSlotName values."""
-    result = subject.ensure_deck_slot(input_value, input_api_version)
+    result = subject.ensure_and_convert_deck_slot(
+        input_value, input_api_version, input_robot_type
+    )
     assert result == expected
 
 
@@ -123,17 +167,22 @@ def test_ensure_deck_slot(
             APIVersionError,
             '"A1" requires apiLevel 2.15. Increase your protocol\'s apiLevel, or use slot "10" instead.',
         ),
+        ("A4", APIVersion(2, 15), APIVersionError, "Using a staging deck slot"),
     ],
 )
+@pytest.mark.parametrize("input_robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_ensure_deck_slot_invalid(
     input_value: object,
     input_api_version: APIVersion,
+    input_robot_type: RobotType,
     expected_error_type: Type[Exception],
     expected_error_match: str,
 ) -> None:
     """It should raise an exception if given an invalid name."""
     with pytest.raises(expected_error_type, match=expected_error_match):
-        subject.ensure_deck_slot(input_value, input_api_version)  # type: ignore[arg-type]
+        subject.ensure_and_convert_deck_slot(
+            input_value, input_api_version, input_robot_type  # type: ignore[arg-type]
+        )
 
 
 def test_ensure_lowercase_name() -> None:

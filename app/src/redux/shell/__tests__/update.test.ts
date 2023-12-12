@@ -23,7 +23,10 @@ describe('shell/update', () => {
         name: 'shell:DOWNLOAD_UPDATE',
         creator: ShellUpdate.downloadShellUpdate,
         args: [],
-        expected: { type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } },
+        expected: {
+          type: 'shell:DOWNLOAD_UPDATE',
+          meta: { shell: true },
+        },
       },
       {
         name: 'shell:APPLY_UPDATE',
@@ -69,10 +72,20 @@ describe('shell/update', () => {
         name: 'handles shell:CHECK_UPDATE_RESULT with error',
         action: {
           type: 'shell:CHECK_UPDATE_RESULT',
-          payload: { error: { message: 'AH' } },
+          payload: { error: { message: 'AH' }, available: false, info: null },
         },
-        initialState: { checking: true, error: null } as any,
-        expected: { checking: false, error: { message: 'AH' } },
+        initialState: {
+          checking: true,
+          error: null,
+          available: false,
+          info: undefined,
+        } as any,
+        expected: {
+          checking: false,
+          error: { message: 'AH' },
+          available: false,
+          info: null,
+        },
       },
       {
         name: 'handles shell:DOWNLOAD_UPDATE',

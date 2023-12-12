@@ -8,12 +8,10 @@ import {
   Btn,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
-import { UNREACHABLE } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { UpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
+import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
 
 import type { StyleProps } from '@opentrons/components'
 import type { State } from '../../redux/types'
@@ -32,16 +30,6 @@ export function UpdateRobotBanner(
   const { autoUpdateAction } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robot?.name)
   })
-  const [
-    showSoftwareUpdateModal,
-    setShowSoftwareUpdateModal,
-  ] = React.useState<boolean>(false)
-
-  const handleLaunchModal: React.MouseEventHandler = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowSoftwareUpdateModal(true)
-  }
 
   return (autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
     robot !== null &&
@@ -52,23 +40,13 @@ export function UpdateRobotBanner(
           {t('robot_software_update_required')}
         </StyledText>
         <Btn
-          onClick={handleLaunchModal}
+          onClick={() => handleUpdateBuildroot(robot)}
           css={TYPOGRAPHY.pRegular}
           textDecoration={TYPOGRAPHY.textDecorationUnderline}
         >
           {t('view_update')}
         </Btn>
       </Banner>
-      {showSoftwareUpdateModal &&
-      robot != null &&
-      robot.status !== UNREACHABLE ? (
-        <Portal level="top">
-          <UpdateBuildroot
-            robot={robot}
-            close={() => setShowSoftwareUpdateModal(false)}
-          />
-        </Portal>
-      ) : null}
     </Flex>
   ) : null
 }

@@ -3,13 +3,7 @@ import type {
   LoadedPipette,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import {
-  AllPipetteOffsetCalibrations,
-  GripperData,
-  Instruments,
-  PipetteData,
-  PipetteOffsetCalibration,
-} from '@opentrons/api-client'
+import { GripperData, Instruments, PipetteData } from '@opentrons/api-client'
 
 export function getProtocolUsesGripper(
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
@@ -49,23 +43,9 @@ export function getPipetteMatch(
   )
 }
 
-export function getCalibrationDataForPipetteMatch(
-  attachedPipetteMatch: PipetteData,
-  allPipettesCalibrationData: AllPipetteOffsetCalibrations
-): PipetteOffsetCalibration | null {
-  return (
-    allPipettesCalibrationData?.data.find(
-      cal =>
-        cal.mount === attachedPipetteMatch.mount &&
-        cal.pipette === attachedPipetteMatch.instrumentName
-    ) ?? null
-  )
-}
-
 export function getAreInstrumentsReady(
   analysis: CompletedProtocolAnalysis,
-  attachedInstruments: Instruments,
-  allPipettesCalibrationData: AllPipetteOffsetCalibrations
+  attachedInstruments: Instruments
 ): boolean {
   const speccedPipettes = analysis?.pipettes ?? []
   const allSpeccedPipettesReady = speccedPipettes.every(loadedPipette => {
@@ -73,19 +53,34 @@ export function getAreInstrumentsReady(
       loadedPipette,
       attachedInstruments
     )
-    // const calibrationData =
-    //   attachedPipetteMatch != null
-    //     ? getCalibrationDataForPipetteMatch(
-    //         attachedPipetteMatch,
-    //         allPipettesCalibrationData
-    //       )
-    //     : null
-    return attachedPipetteMatch != null // TODO: check for presence of calibration data once instruments endpoint
-    // returns calibration data for pipettes
+    return attachedPipetteMatch?.data.calibratedOffset?.last_modified != null
   })
   const isExtensionMountReady = getProtocolUsesGripper(analysis)
-    ? getAttachedGripper(attachedInstruments) != null
+    ? getAttachedGripper(attachedInstruments)?.data.calibratedOffset
+        ?.last_modified != null
     : true
 
   return allSpeccedPipettesReady && isExtensionMountReady
+}
+
+export function getIncompleteInstrumentCount(
+  analysis: CompletedProtocolAnalysis,
+  attachedInstruments: Instruments
+): number {
+  const speccedPipettes = analysis?.pipettes ?? []
+
+  const incompleteInstrumentCount = speccedPipettes.filter(loadedPipette => {
+    const attachedPipetteMatch = getPipetteMatch(
+      loadedPipette,
+      attachedInstruments
+    )
+    return attachedPipetteMatch?.data.calibratedOffset?.last_modified == null
+  }).length
+
+  const isExtensionMountReady = getProtocolUsesGripper(analysis)
+    ? getAttachedGripper(attachedInstruments)?.data.calibratedOffset
+        ?.last_modified != null
+    : true
+
+  return incompleteInstrumentCount + (isExtensionMountReady ? 0 : 1)
 }

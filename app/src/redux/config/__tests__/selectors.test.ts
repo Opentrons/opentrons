@@ -43,6 +43,20 @@ describe('shell selectors', () => {
     })
   })
 
+  describe('getHasJustUpdated', () => {
+    it('should return false if config is unknown', () => {
+      const state: State = { config: null } as any
+      expect(Selectors.getHasJustUpdated(state)).toEqual(false)
+    })
+
+    it('should return config.update.hasJustUpdated if config is known', () => {
+      const state: State = {
+        config: { update: { hasJustUpdated: false } },
+      } as any
+      expect(Selectors.getHasJustUpdated(state)).toEqual(false)
+    })
+  })
+
   describe('getUpdateChannelOptions', () => {
     it('should return "latest" and "beta" options if config is unknown', () => {
       const state: State = { config: null } as any

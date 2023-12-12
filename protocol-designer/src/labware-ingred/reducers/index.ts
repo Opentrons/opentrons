@@ -3,7 +3,6 @@ import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
-import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   SingleLabwareLiquidState,
@@ -108,11 +107,7 @@ const selectedLiquidGroup = handleActions(
   },
   unselectedLiquidGroupState
 )
-const initialLabwareState: ContainersState = {
-  [FIXED_TRASH_ID]: {
-    nickname: 'Trash',
-  },
-}
+const initialLabwareState: ContainersState = {}
 // @ts-expect-error(sa, 2021-6-20): cannot use string literals as action type
 // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
 export const containers: Reducer<ContainersState, any> = handleActions(
@@ -185,7 +180,6 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       )
     },
   },
-
   initialLabwareState
 )
 type SavedLabwareState = Record<string, boolean>
@@ -212,11 +206,12 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
       action: LoadFileAction
     ): SavedLabwareState => {
       const file = action.payload.file
-      const loadLabwareCommands = Object.values(file.commands).filter(
+      const loadLabwareAndAdapterCommands = Object.values(file.commands).filter(
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
-      const labware = loadLabwareCommands.reduce(
+
+      const labware = loadLabwareAndAdapterCommands.reduce(
         (
           acc: Record<
             string,
@@ -228,13 +223,17 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
           >,
           command
         ) => {
-          const { labwareId, displayName, loadName } = command.params
+          const { displayName, loadName, labwareId } = command.params
           const location = command.params.location
           let slot
           if (location === 'offDeck') {
             slot = 'offDeck'
           } else if ('moduleId' in location) {
             slot = location.moduleId
+          } else if ('labwareId' in location) {
+            slot = location.labwareId
+          } else if ('addressableAreaName' in location) {
+            slot = location.addressableAreaName
           } else {
             slot = location.slotName
           }

@@ -2,11 +2,12 @@
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Sequence, Union
+from typing import Any, Dict, Sequence, Union, Optional
 
 import anyio
 
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
@@ -96,12 +97,31 @@ IdentifiedFile = Union[
 class FileIdentificationError(ProtocolFilesInvalidError):
     """Raised when FileIdentifier detects an invalid file."""
 
+    def __init__(
+        self,
+        message: str,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+        only_message: bool = False,
+    ) -> None:
+        super().__init__(message=message)
+        self._only_message = only_message
+
+    def __str__(self) -> str:
+        """Special stringifier to conform to expecations about python protocol errors."""
+        if self._only_message:
+            return self.message
+        else:
+            return super().__str__()
+
 
 class FileIdentifier:
     """File identifier interface."""
 
     @staticmethod
-    async def identify(files: Sequence[BufferedFile]) -> Sequence[IdentifiedFile]:
+    async def identify(
+        files: Sequence[BufferedFile], python_parse_mode: parse.PythonParseMode
+    ) -> Sequence[IdentifiedFile]:
         """Identify the type and extract basic information from each file.
 
         This is intended to take ≲1 second per protocol on an OT-2, so it can extract
@@ -109,20 +129,25 @@ class FileIdentifier:
         and validating protocols can take 10-100x longer, so that's left to other units,
         for only when it's really needed.
         """
-        return [await _identify(file) for file in files]
+        return [await _identify(file, python_parse_mode) for file in files]
 
 
-async def _identify(file: BufferedFile) -> IdentifiedFile:
+async def _identify(
+    file: BufferedFile, python_parse_mode: parse.PythonParseMode
+) -> IdentifiedFile:
     lower_file_name = file.name.lower()
     if lower_file_name.endswith(".json"):
         return await _analyze_json(json_file=file)
     elif lower_file_name.endswith(".py"):
-        return _analyze_python_protocol(py_file=file)
+        return _analyze_python_protocol(
+            py_file=file, python_parse_mode=python_parse_mode
+        )
     elif lower_file_name.endswith(".csv") or lower_file_name.endswith(".txt"):
         return IdentifiedData(original_file=file)
     else:
         raise FileIdentificationError(
-            f"{file.name} has an unrecognized file extension."
+            message=f"{file.name} has an unrecognized file extension.",
+            detail={"type": "bad-file-extension", "file": file.name},
         )
 
 
@@ -133,7 +158,9 @@ async def _analyze_json(
         json_contents = await anyio.to_thread.run_sync(json.loads, json_file.contents)
     except json.JSONDecodeError as e:
         raise FileIdentificationError(
-            f"{json_file.name} is not valid JSON. {str(e)}"
+            message=f"{json_file.name} is not valid JSON. {str(e)}",
+            detail={"type": "invalid-json", "file": json_file.name},
+            wrapping=[PythonException(e)],
         ) from e
 
     if _json_seems_like_labware(json_contents):
@@ -148,7 +175,8 @@ async def _analyze_json(
         )
     else:
         raise FileIdentificationError(
-            f"{json_file.name} is not a known Opentrons format."
+            message=f"{json_file.name} is not a known Opentrons format.",
+            detail={"type": "no-schema-match", "file": json_file.name},
         )
 
 
@@ -176,19 +204,34 @@ def _analyze_json_protocol(
         schema_version = json_contents["schemaVersion"]
         robot_type = json_contents["robot"]["model"]
     except KeyError as e:
-        raise FileIdentificationError(error_message) from e
+        raise FileIdentificationError(
+            message=error_message,
+            detail={"kind": "missing-json-metadata", "missing-key": str(e)},
+            wrapping=[PythonException(e)],
+        ) from e
 
     # todo(mm, 2022-12-22): A JSON protocol file's metadata is not quite just an
     # arbitrary dict: its fields are supposed to follow a schema. Should we validate
     # this metadata against that schema instead of doing this simple isinstance() check?
     if not isinstance(metadata, dict):
-        raise FileIdentificationError(error_message)
+        raise FileIdentificationError(
+            message=error_message, detail={"kind": "json-metadata-not-object"}
+        )
 
     if not isinstance(schema_version, int):
-        raise FileIdentificationError(error_message)
+        raise FileIdentificationError(
+            message=error_message,
+            detail={
+                "kind": "json-schema-version-not-int",
+                "schema-version": schema_version,
+            },
+        )
 
     if robot_type not in ("OT-2 Standard", "OT-3 Standard"):
-        raise FileIdentificationError(error_message)
+        raise FileIdentificationError(
+            message=error_message,
+            detail={"kind": "bad-json-protocol-robot-type", "robot-type": robot_type},
+        )
 
     return IdentifiedJsonMain(
         original_file=original_file,
@@ -201,11 +244,21 @@ def _analyze_json_protocol(
 
 def _analyze_python_protocol(
     py_file: BufferedFile,
+    python_parse_mode: parse.PythonParseMode,
 ) -> IdentifiedPythonMain:
     try:
-        parsed = parse.parse(protocol_file=py_file.contents, filename=py_file.name)
+        parsed = parse.parse(
+            protocol_file=py_file.contents,
+            filename=py_file.name,
+            python_parse_mode=python_parse_mode,
+        )
     except MalformedPythonProtocolError as e:
-        raise FileIdentificationError(e.short_message) from e
+        raise FileIdentificationError(
+            message=e.short_message,
+            detail={"kind": "malformed-python-protocol"},
+            wrapping=[PythonException(e)],
+            only_message=True,
+        ) from e
 
     # We know this should never be a JsonProtocol. Help out the type-checker.
     assert isinstance(
@@ -214,9 +267,13 @@ def _analyze_python_protocol(
 
     if parsed.api_level > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(
-            f"API version {parsed.api_level} is not supported by this "
-            f"robot software. Please either reduce your requested API "
-            f"version or update your robot."
+            message=(
+                f"API version {parsed.api_level} is not supported by this "
+                f"robot software. Please either reduce your requested API "
+                f"version or update your robot."
+            ),
+            detail={"kind": "future-api-version", "api-version": str(parsed.api_level)},
+            only_message=True,
         )
 
     return IdentifiedPythonMain(

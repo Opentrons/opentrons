@@ -2,6 +2,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from pathlib import Path
+from time import time
 from typing import List, Any
 
 from hardware_testing.data import create_folder_for_test_data
@@ -54,60 +55,50 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             raise ValueError(f'Unexpected file type for file "{_file_name}"')
         self._send_response_bytes(file, content_type=c_type)
 
-    def _list_files_in_directory(self, includes: str = "") -> List[Path]:
-        _file_list = [
-            Path(f).resolve() for f in self.plot_directory.iterdir() if f.is_file()
-        ]
-        if includes:
-            _file_list = [f for f in _file_list if includes in f.stem]
-        _file_list.sort(key=lambda f: f.stat().st_mtime)
-        _file_list.reverse()
-        return _file_list
-
-    def _get_file_name_list(self, substring: str = "") -> List[str]:
-        return [f.stem for f in self._list_files_in_directory(substring)]
-
-    def _get_file_contents(self, file_name: str) -> str:
-        req_file_name = f"{file_name}.csv"
-        req_file_path = self.plot_directory / req_file_name
-        with open(req_file_path.resolve(), "r") as f:
-            return f.read()
+    def _list_file_paths_in_directory(
+        self, directory: Path, includes: str = ""
+    ) -> List[Path]:
+        _ret: List[Path] = []
+        for p in [Path(f) for f in directory.iterdir()]:
+            if p.is_file() and includes in p.stem:
+                _ret.append(p.absolute())  # found a file, get absolute path
+            elif p.is_dir():
+                # recursively look for files
+                sub_dir_paths = self._list_file_paths_in_directory(p, includes)
+                for sub_p in sub_dir_paths:
+                    _ret.append(sub_p)
+        # sort newest to oldest
+        # NOTE: system time on machines in SZ will randomly switch to the wrong time
+        #       so here we can sort relative to whatever the current system time is
+        _ret.sort(key=lambda f: abs(time() - f.stat().st_mtime))
+        return _ret
 
     def _respond_to_data_request(self) -> None:
         req_cmd = self.path_elements[1]
+        if req_cmd != "latest":
+            raise NotImplementedError(f"unable to process command: {req_cmd}")
+        path_list_grav = self._list_file_paths_in_directory(
+            self.plot_directory, "GravimetricRecorder"
+        )
+        path_list_pip = self._list_file_paths_in_directory(
+            self.plot_directory, "CSVReport"
+        )
         response_data = {
             "directory": str(self.plot_directory.resolve()),
             "files": [],
-            "name": None,
-            "csv": None,
-            "csvPipette": None,
+            "name": "",
+            "csv": "",
+            "csvPipette": "",
         }
-        _grav_name = "GravimetricRecorder"
-        _pip_name = "PipetteLiquidClass"
-        if req_cmd == "list":
-            f = self._get_file_name_list(_grav_name)  # type: ignore[assignment]
-            response_data["files"] = f
-        else:
-            file_name_grav = ""
-            file_name_pip = ""
-            if req_cmd == "latest":
-                file_list_grav = self._get_file_name_list(_grav_name)
-                file_list_pip = self._get_file_name_list(_pip_name)
-                if file_list_grav:
-                    file_name_grav = file_list_grav[0]
-                if file_list_pip:
-                    file_name_pip = file_list_pip[0]
-            else:
-                raise ValueError(f"Unable to find response for request: {self.path}")
-            response_data["name"] = file_name_grav
-            response_data["csv"] = (
-                self._get_file_contents(file_name_grav) if file_name_grav else ""
-            )
-            response_data["csvPipette"] = ""
-            if file_name_pip:
-                response_data["csvPipette"] = (
-                    self._get_file_contents(file_name_pip) if file_name_pip else ""
-                )
+        if path_list_grav:
+            file_name_grav = path_list_grav[0]
+            response_data["name"] = str(file_name_grav.stem)
+            with open(file_name_grav, "r") as f:
+                response_data["csv"] = f.read()
+        if path_list_pip:
+            file_name_pip = path_list_pip[0]
+            with open(file_name_pip, "r") as f:
+                response_data["csvPipette"] = f.read()
         response_str = json.dumps({req_cmd: response_data})
         self._send_response_bytes(response_str.encode("utf-8"))
 

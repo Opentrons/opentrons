@@ -40,7 +40,7 @@ describe('RobotSystemVersionModal', () => {
   it('should render text and buttons', () => {
     const [{ getByText }] = render(props)
     getByText('Robot System Version mockVersion available')
-    getByText('Updating the robot system requires a restart')
+    getByText('Updating the robot software requires restarting the robot')
     getByText('mockReleaseNote')
     getByText('Not now')
     getByText('Update')

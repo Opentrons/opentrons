@@ -43,7 +43,7 @@ describe('DetachProbe', () => {
     const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
     getByText('Remove calibration probe')
     getByText(
-      'Unlatch the calibration probe, remove it from the nozzle, and return it to its storage location.'
+      'Unlock the calibration probe, remove it from the nozzle, and return it to its storage location.'
     )
     getByTestId('Pipette_Detach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Complete calibration' })
@@ -69,7 +69,7 @@ describe('DetachProbe', () => {
     const { getByText, getByTestId, getByRole } = render(props)
     getByText('Remove calibration probe')
     getByText(
-      'Unlatch the calibration probe, remove it from the nozzle, and return it to its storage location.'
+      'Unlock the calibration probe, remove it from the nozzle, and return it to its storage location.'
     )
     getByTestId('Pipette_Detach_Probe_1.webm')
     const proceedBtn = getByRole('button', { name: 'Exit calibration' })

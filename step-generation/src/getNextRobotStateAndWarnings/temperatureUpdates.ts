@@ -6,9 +6,10 @@ import {
   TEMPERATURE_AT_TARGET,
 } from '../constants'
 import type {
+  TemperatureModuleAwaitTemperatureParams,
   TemperatureParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotStateAndWarnings,
@@ -39,7 +40,7 @@ export function forSetTemperature(
   _setTemperatureAndStatus(moduleState, celsius, TEMPERATURE_APPROACHING_TARGET)
 }
 export function forAwaitTemperature(
-  params: TemperatureParams,
+  params: TemperatureModuleAwaitTemperatureParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {

@@ -1,4 +1,4 @@
-import { getIsOT3Protocol, getRobotTypeDisplayName } from '../utils'
+import { getisFlexProtocol, getRobotTypeDisplayName } from '../utils'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const mockOT3ProtocolAnalysisOutput = {
@@ -9,24 +9,24 @@ const mockOT2ProtocolAnalysisOutput = {
   robotType: 'OT-2 Standard',
 } as ProtocolAnalysisOutput
 
-describe('getIsOT3Protocol', () => {
+describe('getisFlexProtocol', () => {
   it('should return true for protocols intended for an OT-3', () => {
-    const result = getIsOT3Protocol(mockOT3ProtocolAnalysisOutput)
+    const result = getisFlexProtocol(mockOT3ProtocolAnalysisOutput)
     expect(result).toBe(true)
   })
 
   it('should return false for protocols intended for an OT-2', () => {
-    const result = getIsOT3Protocol(mockOT2ProtocolAnalysisOutput)
+    const result = getisFlexProtocol(mockOT2ProtocolAnalysisOutput)
     expect(result).toBe(false)
   })
 
   it('should return false for protocols that do not specify a robot type', () => {
-    const result = getIsOT3Protocol({} as ProtocolAnalysisOutput)
+    const result = getisFlexProtocol({} as ProtocolAnalysisOutput)
     expect(result).toBe(false)
   })
 
   it('should return false given null', () => {
-    const result = getIsOT3Protocol(null)
+    const result = getisFlexProtocol(null)
     expect(result).toBe(false)
   })
 })

@@ -10,7 +10,12 @@ import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '../../../../../redux/discovery/__fixtures__'
-import { postWifiDisconnect } from '../../../../../redux/networking'
+import {
+  clearWifiStatus,
+  getNetworkInterfaces,
+  INTERFACE_WIFI,
+  postWifiDisconnect,
+} from '../../../../../redux/networking'
 import { mockWifiNetwork } from '../../../../../redux/networking/__fixtures__'
 import {
   dismissRequest,
@@ -38,6 +43,9 @@ const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
 const mockGetRequestById = getRequestById as jest.MockedFunction<
   typeof getRequestById
 >
+const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
+  typeof getNetworkInterfaces
+>
 const mockPostWifiDisconnect = postWifiDisconnect as jest.MockedFunction<
   typeof postWifiDisconnect
 >
@@ -45,10 +53,19 @@ const mockDismissRequest = dismissRequest as jest.MockedFunction<
   typeof dismissRequest
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+const mockClearWifiStatus = clearWifiStatus as jest.MockedFunction<
+  typeof clearWifiStatus
+>
 
 const ROBOT_NAME = 'otie'
 const LAST_ID = 'a request id'
 const mockOnCancel = jest.fn()
+const MOCK_WIFI = {
+  ipAddress: '127.0.0.100',
+  subnetMask: '255.255.255.230',
+  macAddress: 'WI:FI:00:00:00:00',
+  type: INTERFACE_WIFI,
+}
 
 const render = () => {
   return renderWithProviders(
@@ -73,6 +90,9 @@ describe('DisconnectModal', () => {
     when(mockGetRequestById)
       .calledWith({} as State, LAST_ID)
       .mockReturnValue({} as RequestState)
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue({ wifi: MOCK_WIFI, ethernet: null })
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
       .mockReturnValue(mockConnectableRobot)
@@ -101,6 +121,7 @@ describe('DisconnectModal', () => {
     getByText('Disconnect from foo')
     getByText('Disconnecting from Wi-Fi network foo')
     getByRole('button', { name: 'cancel' })
+    expect(mockClearWifiStatus).not.toHaveBeenCalled()
   })
 
   it('renders success body when request is pending and robot is not connectable', () => {
@@ -117,6 +138,7 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     getByRole('button', { name: 'Done' })
+    expect(mockClearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders success body when request is successful', () => {
@@ -130,6 +152,24 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     getByRole('button', { name: 'Done' })
+    expect(mockClearWifiStatus).toHaveBeenCalled()
+  })
+
+  it('renders success body when wifi is not connected', () => {
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue({
+        wifi: { ...MOCK_WIFI, ipAddress: null },
+        ethernet: null,
+      })
+    const { getByRole, getByText } = render()
+
+    getByText('Disconnected from Wi-Fi')
+    getByText(
+      'Your robot has successfully disconnected from the Wi-Fi network.'
+    )
+    getByRole('button', { name: 'Done' })
+    expect(mockClearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders error body when request is unsuccessful', () => {
@@ -149,6 +189,7 @@ describe('DisconnectModal', () => {
     )
     getByRole('button', { name: 'cancel' })
     getByRole('button', { name: 'Disconnect' })
+    expect(mockClearWifiStatus).not.toHaveBeenCalled()
   })
 
   it('dispatches postWifiDisconnect on click Disconnect', () => {

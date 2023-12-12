@@ -10,11 +10,10 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { PipetteRecalibrationODDWarning } from '../../pages/OnDeviceDisplay/PipetteRealibrationODDWarning'
+import { getShowPipetteCalibrationWarning } from '../Devices/utils'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
@@ -34,9 +33,6 @@ export function ProtocolSetupInstruments({
 }: ProtocolSetupInstrumentsProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
   const { data: attachedInstruments, refetch } = useInstrumentsQuery()
-  const {
-    data: allPipettesCalibrationData,
-  } = useAllPipetteOffsetCalibrationsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const usesGripper =
@@ -45,7 +41,7 @@ export function ProtocolSetupInstruments({
       : false
   const attachedGripperMatch = usesGripper
     ? (attachedInstruments?.data ?? []).find(
-        (i): i is GripperData => i.instrumentType === 'gripper'
+        (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
       ) ?? null
     : null
 
@@ -59,6 +55,11 @@ export function ProtocolSetupInstruments({
         label={t('instruments')}
         onClick={() => setSetupScreen('prepare to run')}
       />
+      {getShowPipetteCalibrationWarning(attachedInstruments) && (
+        <Flex paddingBottom={SPACING.spacing16}>
+          <PipetteRecalibrationODDWarning />
+        </Flex>
+      )}
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
@@ -84,16 +85,6 @@ export function ProtocolSetupInstruments({
             mount={loadedPipette.mount}
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
-            mostRecentAnalysis={mostRecentAnalysis}
-            attachedCalibrationData={
-              attachedPipetteMatch != null
-                ? allPipettesCalibrationData?.data.find(
-                    cal =>
-                      cal.mount === attachedPipetteMatch.mount &&
-                      cal.pipette === attachedPipetteMatch.instrumentName
-                  ) ?? null
-                : null
-            }
             instrumentsRefetch={refetch}
           />
         )
@@ -104,9 +95,6 @@ export function ProtocolSetupInstruments({
           mount="extension"
           speccedName={'gripperV1' as GripperModel}
           attachedInstrument={attachedGripperMatch}
-          attachedCalibrationData={
-            attachedGripperMatch?.data.calibratedOffset ?? null
-          }
         />
       ) : null}
     </Flex>

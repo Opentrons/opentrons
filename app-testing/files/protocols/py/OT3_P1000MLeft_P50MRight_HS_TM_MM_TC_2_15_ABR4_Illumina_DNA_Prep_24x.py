@@ -5,7 +5,6 @@ metadata = {
     "protocolName": "Illumina DNA Prep 24x",
     "author": "Opentrons <protocols@opentrons.com>",
     "source": "Protocol Library",
-    "apiLevel": "2.15",
 }
 
 requirements = {
@@ -40,16 +39,16 @@ def run(protocol: protocol_api.ProtocolContext):
     # ========== FIRST ROW ===========
     heatershaker = protocol.load_module("heaterShakerModuleV1", "1")
     sample_plate_1 = heatershaker.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
-    tiprack_200_1 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "2")
+    tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "2")
     temp_block = protocol.load_module("temperature module gen2", "3")
     reagent_plate = temp_block.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
     # ========== SECOND ROW ==========
     mag_block = protocol.load_module("magneticBlockV1", 4)
     reservoir = protocol.load_labware("nest_96_wellplate_2ml_deep", "5")
-    tiprack_200_2 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul", "6")
+    tiprack_200_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "6")
     # ========== THIRD ROW ===========
     thermocycler = protocol.load_module("thermocycler module gen2")
-    tiprack_20 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul", "9")
+    tiprack_20 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "9")
     # ========== FOURTH ROW ==========
 
     # =========== RESERVOIR ==========
@@ -70,8 +69,8 @@ def run(protocol: protocol_api.ProtocolContext):
     Barcodes3 = reagent_plate.wells_by_name()["A9"]
 
     # pipette
-    p1000 = protocol.load_instrument("p1000_multi_gen3", "right", tip_racks=[tiprack_200_1, tiprack_200_2])
-    p50 = protocol.load_instrument("p50_multi_gen3", "left", tip_racks=[tiprack_20])
+    p1000 = protocol.load_instrument("flex_8channel_1000", "right", tip_racks=[tiprack_200_1, tiprack_200_2])
+    p50 = protocol.load_instrument("flex_8channel_50", "left", tip_racks=[tiprack_20])
 
     # tip and sample tracking
     if COLUMNS == 3:

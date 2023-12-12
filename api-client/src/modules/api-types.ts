@@ -18,7 +18,7 @@ type ModuleOffsetSource =
   | 'legacy'
   | 'unknown'
 
-interface ModuleOffset {
+export interface ModuleOffset {
   offset: Coordinates
   slot?: string
   source?: ModuleOffsetSource

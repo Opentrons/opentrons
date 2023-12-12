@@ -1011,6 +1011,7 @@
   ],
   "parameters": {
     "format": "96Standard",
+    "quirks": ["gripperIncompatible"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul"

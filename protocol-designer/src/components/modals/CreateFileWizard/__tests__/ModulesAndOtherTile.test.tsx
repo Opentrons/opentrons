@@ -10,10 +10,10 @@ import { EquipmentOption } from '../EquipmentOption'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
 
-jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../modules')
 jest.mock('../../FilePipettesModal/ModuleFields')
 jest.mock('../EquipmentOption')
+jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../FilePipettesModal')
 
 const mockEquipmentOption = EquipmentOption as jest.MockedFunction<
@@ -48,7 +48,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
       robotType: FLEX_ROBOT_TYPE,
     },
     pipettesByMount: {
-      left: { pipetteName: 'p1000_single_gen3', tiprackDefURI: 'mocktip' },
+      left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
       right: { pipetteName: null, tiprackDefURI: null },
     } as FormPipettesByMount,
     modulesByType: {
@@ -74,11 +74,26 @@ describe('ModulesAndOtherTile', () => {
     mockGetDisableModuleRestrictions.mockReturnValue(false)
     mockModuleFields.mockReturnValue(<div>mock ModuleFields</div>)
   })
-
-  it('renders correct module + gripper length for flex', () => {
+  it('renders correct module, gripper and trash length for flex with disabled button', () => {
     const { getByText, getAllByText, getByRole } = render(props)
     getByText('Choose additional items')
-    expect(getAllByText('mock EquipmentOption')).toHaveLength(5)
+    expect(getAllByText('mock EquipmentOption')).toHaveLength(7)
+    getByText('Go back')
+    getByRole('button', { name: 'GoBack_button' }).click()
+    expect(props.goBack).toHaveBeenCalled()
+    expect(getByText('Review file details')).toBeDisabled()
+  })
+  it('renders correct module, gripper and trash length for flex', () => {
+    props = {
+      ...props,
+      values: {
+        ...mockWizardTileProps.values,
+        additionalEquipment: ['trashBin'],
+      },
+    } as WizardTileProps
+    const { getByText, getAllByText, getByRole } = render(props)
+    getByText('Choose additional items')
+    expect(getAllByText('mock EquipmentOption')).toHaveLength(7)
     getByText('Go back')
     getByRole('button', { name: 'GoBack_button' }).click()
     expect(props.goBack).toHaveBeenCalled()

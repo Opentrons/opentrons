@@ -30,20 +30,27 @@ import {
 
 import type {
   CompletedProtocolAnalysis,
+  RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { RunStatus } from '@opentrons/api-client'
 import type { TrackProtocolRunEvent } from '../../Devices/hooks'
 import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
+const ODD_ANIMATION_OPTIMIZATIONS = `
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: opacity, transform;
+  `
+
 const fadeIn = keyframes`
 from {
   opacity: 0;
-  transform: translateY(100%);
+  transform: translate3d(0,15%,0);
 }
 to {
   opacity: 1;
-  transform: translateY(0%);
+  transform: translate3d(0,0,0);
 }
 `
 
@@ -79,6 +86,7 @@ const COMMAND_ROW_STYLE_ANIMATED = css`
   -webkit-line-clamp: 2;
   overflow: hidden;
   animation: ${fadeIn} 1.5s ease-in-out;
+  ${ODD_ANIMATION_OPTIMIZATIONS}
 `
 
 const COMMAND_ROW_STYLE = css`
@@ -104,6 +112,7 @@ interface RunTimerInfo {
 interface CurrentRunningProtocolCommandProps {
   runStatus: RunStatus | null
   robotSideAnalysis: CompletedProtocolAnalysis | null
+  robotType: RobotType
   runTimerInfo: RunTimerInfo
   playRun: () => void
   pauseRun: () => void
@@ -125,6 +134,7 @@ export function CurrentRunningProtocolCommand({
   setShowConfirmCancelRunModal,
   trackProtocolRunEvent,
   robotAnalyticsData,
+  robotType,
   protocolName,
   currentRunCommandIndex,
   lastAnimatedCommand,
@@ -224,6 +234,8 @@ export function CurrentRunningProtocolCommand({
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
+            robotType={robotType}
+            isOnDevice={true}
           />
         ) : null}
       </Flex>

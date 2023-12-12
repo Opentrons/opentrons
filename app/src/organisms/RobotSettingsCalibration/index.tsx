@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { SpinnerModalPage, AlertModal } from '@opentrons/components'
+import { SpinnerModalPage, AlertModal, SPACING } from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
   useCalibrationStatusQuery,
   useInstrumentsQuery,
+  useModulesQuery,
 } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
@@ -18,7 +19,7 @@ import { CheckCalibration } from '../../organisms/CheckCalibration'
 import {
   useRobot,
   useRunStatuses,
-  useIsOT3,
+  useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../organisms/Devices/hooks'
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
@@ -32,6 +33,7 @@ import { RobotSettingsDeckCalibration } from './RobotSettingsDeckCalibration'
 import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
+import { RobotSettingsModuleCalibration } from './RobotSettingsModuleCalibration'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
@@ -82,7 +84,7 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
-  const isOT3 = useIsOT3(robotName)
+  const isFlex = useIsFlex(robotName)
   const dispatch = useDispatch<Dispatch>()
 
   React.useEffect(() => {
@@ -118,6 +120,12 @@ export function RobotSettingsCalibration({
       }
     }
   )
+
+  // Modules Calibration
+  const attachedModules =
+    useModulesQuery({
+      refetchInterval: CALS_FETCH_MS,
+    })?.data?.data ?? []
 
   // Note: following fetch need to reflect the latest state of calibrations
   // when a user does calibration or rename a robot.
@@ -191,7 +199,7 @@ export function RobotSettingsCalibration({
 
   const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 
-  if (!isOT3 && attachedPipettes != null) {
+  if (!isFlex && attachedPipettes != null) {
     formattedPipetteOffsetCalibrations.push({
       modelName: attachedPipettes.left?.displayName,
       serialNumber: attachedPipettes.left?.serialNumber,
@@ -302,12 +310,12 @@ export function RobotSettingsCalibration({
           onCloseClick={() => setShowHowCalibrationWorksModal(false)}
         />
       ) : null}
-      {isOT3 ? (
+      {isFlex ? (
         <>
           <CalibrationDataDownload
             {...{ robotName, setShowHowCalibrationWorksModal }}
           />
-          <Line />
+          <Line marginTop={SPACING.spacing24} />
           <RobotSettingsPipetteOffsetCalibration
             formattedPipetteOffsetCalibrations={
               formattedPipetteOffsetCalibrations
@@ -316,9 +324,15 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
           <Line />
-          {attachedGripper != null && (
-            <RobotSettingsGripperCalibration gripper={attachedGripper} />
-          )}
+          <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          <Line />
+          <RobotSettingsModuleCalibration
+            attachedModules={attachedModules}
+            updateRobotStatus={updateRobotStatus}
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
+          />
         </>
       ) : (
         <>
@@ -349,7 +363,7 @@ export function RobotSettingsCalibration({
             isPending={isPending}
             robotName={robotName}
           />
-          <Line />
+          <Line marginBottom={SPACING.spacing24} />
           <CalibrationDataDownload
             robotName={robotName}
             setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}

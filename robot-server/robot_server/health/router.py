@@ -141,9 +141,11 @@ async def get_health(
     )
 
     if robot_type == "OT-3 Standard":
+        minimum_protocol_api_version = protocol_api.MIN_SUPPORTED_VERSION_FOR_FLEX
         logs = FLEX_LOG_PATHS
         health_links.oddLog = "/logs/touchscreen.log"
     else:
+        minimum_protocol_api_version = protocol_api.MIN_SUPPORTED_VERSION
         logs = OT2_LOG_PATHS
 
     return Health(
@@ -154,7 +156,8 @@ async def get_health(
         logs=logs,
         system_version=versions.system_version,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
-        minimum_protocol_api_version=list(protocol_api.MIN_SUPPORTED_VERSION),
+        minimum_protocol_api_version=list(minimum_protocol_api_version),
         robot_model=robot_type,
         links=health_links,
+        robot_serial=(await hardware.get_serial_number()),
     )

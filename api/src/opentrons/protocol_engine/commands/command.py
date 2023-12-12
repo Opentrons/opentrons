@@ -6,7 +6,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Generic, Optional, TypeVar, Tuple
 
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
+
+CommandPrivateResultT = TypeVar("CommandPrivateResultT")
 
 
 class CommandStatus(str, Enum):
@@ -155,6 +157,10 @@ class AbstractCommandImpl(
 
     - Create a command resource from the request model
     - Execute the command, mapping data from execution into the result model
+
+    This class should be used as the base class for new commands by default. You should only
+    use AbstractCommandWithPrivateResultImpl if you actually need private results to send to
+    the rest of the engine wihtout being published outside of it.
     """
 
     def __init__(
@@ -176,5 +182,48 @@ class AbstractCommandImpl(
 
     @abstractmethod
     async def execute(self, params: CommandParamsT) -> CommandResultT:
+        """Execute the command, mapping data from execution into a response model."""
+        ...
+
+
+class AbstractCommandWithPrivateResultImpl(
+    ABC,
+    Generic[CommandParamsT, CommandResultT, CommandPrivateResultT],
+):
+    """Abstract command creation and execution implementation if the command has private results.
+
+    A given command request should map to a specific command implementation,
+    which defines how to:
+
+    - Create a command resource from the request model
+    - Execute the command, mapping data from execution into the result model
+
+    This class should be used instead of AbstractCommandImpl as a base class if your command needs
+    to send data to result handlers that should not be published outside of the engine.
+
+    Note that this class needs an extra type-parameter for the private result.
+    """
+
+    def __init__(
+        self,
+        state_view: StateView,
+        hardware_api: HardwareControlAPI,
+        equipment: execution.EquipmentHandler,
+        movement: execution.MovementHandler,
+        gantry_mover: execution.GantryMover,
+        labware_movement: execution.LabwareMovementHandler,
+        pipetting: execution.PipettingHandler,
+        tip_handler: execution.TipHandler,
+        run_control: execution.RunControlHandler,
+        rail_lights: execution.RailLightsHandler,
+        status_bar: execution.StatusBarHandler,
+    ) -> None:
+        """Initialize the command implementation with execution handlers."""
+        pass
+
+    @abstractmethod
+    async def execute(
+        self, params: CommandParamsT
+    ) -> Tuple[CommandResultT, CommandPrivateResultT]:
         """Execute the command, mapping data from execution into a response model."""
         ...

@@ -1,33 +1,30 @@
 import * as React from 'react'
 import last from 'lodash/last'
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 
-import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
-
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import { Flex, ProtocolDeck, SPACING } from '@opentrons/components'
+import {
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 
 export const Deck = (props: { protocolId: string }): JSX.Element => {
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(
+  const { data: protocolData } = useProtocolQuery(props.protocolId)
+  const {
+    data: mostRecentAnalysis,
+  } = useProtocolAnalysisAsDocumentQuery(
     props.protocolId,
-    {
-      staleTime: Infinity,
-    }
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
   )
-  const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
   return (
-    <DeckThumbnail
-      commands={
-        (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
-      }
-      labware={(mostRecentAnalysis as CompletedProtocolAnalysis)?.labware ?? []}
-      liquids={
-        (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids != null
-          ? (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids
-          : []
-      }
-      showSlotLabels
-      marginX="12rem"
-    />
+    <Flex height="26.9375rem" paddingY={SPACING.spacing24}>
+      {mostRecentAnalysis != null ? (
+        <ProtocolDeck
+          protocolAnalysis={mostRecentAnalysis}
+          baseDeckProps={{ showSlotLabels: true }}
+        />
+      ) : null}
+    </Flex>
   )
 }

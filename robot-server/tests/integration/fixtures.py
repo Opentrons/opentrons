@@ -3,12 +3,13 @@
 
 from box import Box
 from requests import Response
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION_FOR_FLEX,
+)
 from opentrons import __version__, config
 from opentrons_shared_data.module.dev_types import ModuleModel
-
-minimum_version = list(MIN_SUPPORTED_VERSION)
-maximum_version = list(MAX_SUPPORTED_VERSION)
 
 
 def check_health_response(response: Response) -> None:
@@ -20,8 +21,8 @@ def check_health_response(response: Response) -> None:
         "logs": ["/logs/serial.log", "/logs/api.log", "/logs/server.log"],
         "system_version": config.OT_SYSTEM_VERSION,
         "robot_model": "OT-2 Standard",
-        "minimum_protocol_api_version": minimum_version,
-        "maximum_protocol_api_version": maximum_version,
+        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION),
+        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",
@@ -29,9 +30,11 @@ def check_health_response(response: Response) -> None:
             "systemTime": "/system/time",
             "serverLog": "/logs/server.log",
         },
+        "robot_serial": "simulator",
     }
+    got = response.json()
 
-    assert response.json() == expected
+    assert got == expected, f"health response failed:\n {got}"
 
 
 def check_ot3_health_response(response: Response) -> None:
@@ -48,8 +51,8 @@ def check_ot3_health_response(response: Response) -> None:
         ],
         "system_version": config.OT_SYSTEM_VERSION,
         "robot_model": "OT-3 Standard",
-        "minimum_protocol_api_version": minimum_version,
-        "maximum_protocol_api_version": maximum_version,
+        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION_FOR_FLEX),
+        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",
@@ -58,9 +61,11 @@ def check_ot3_health_response(response: Response) -> None:
             "systemTime": "/system/time",
             "serverLog": "/logs/server.log",
         },
+        "robot_serial": "simulator",
     }
+    got = response.json()
 
-    assert response.json() == expected
+    assert got == expected, f"health response failed:\n {got}"
 
 
 def get_module_id(response: Response, module_model: ModuleModel) -> Box:

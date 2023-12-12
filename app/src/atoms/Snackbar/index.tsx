@@ -22,10 +22,17 @@ export interface SnackbarProps extends StyleProps {
 
 const SNACKBAR_ANIMATION_DURATION = 500
 
+const ODD_ANIMATION_OPTIMIZATIONS = `
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: opacity;
+  `
+
 const OPEN_STYLE = css`
   animation-duration: ${SNACKBAR_ANIMATION_DURATION}ms;
   animation-name: fadein;
   overflow: hidden;
+  ${ODD_ANIMATION_OPTIMIZATIONS}
 
   @keyframes fadein {
     0% {
@@ -41,6 +48,7 @@ const CLOSE_STYLE = css`
   animation-duration: ${SNACKBAR_ANIMATION_DURATION}ms;
   animation-name: fadeout;
   overflow: hidden;
+  ${ODD_ANIMATION_OPTIMIZATIONS}
 
   @keyframes fadeout {
     0% {

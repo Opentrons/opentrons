@@ -13,7 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 from ..state import StateStore
 from ..resources import ModelUtils
-from ..commands import CommandStatus
+from ..commands import CommandStatus, AbstractCommandImpl
 from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
@@ -99,13 +99,19 @@ class CommandExecutor:
             }
         )
 
-        self._action_dispatcher.dispatch(UpdateCommandAction(command=running_command))
+        self._action_dispatcher.dispatch(
+            UpdateCommandAction(command=running_command, private_result=None)
+        )
 
         try:
             log.debug(
                 f"Executing {command.id}, {command.commandType}, {command.params}"
             )
-            result = await command_impl.execute(command.params)  # type: ignore[arg-type]
+            if isinstance(command_impl, AbstractCommandImpl):
+                result = await command_impl.execute(command.params)  # type: ignore[arg-type]
+                private_result = None
+            else:
+                result, private_result = await command_impl.execute(command.params)  # type: ignore[arg-type]
 
         except (Exception, asyncio.CancelledError) as error:
             log.warning(f"Execution of {command.id} failed", exc_info=error)
@@ -126,7 +132,6 @@ class CommandExecutor:
                     failed_at=self._model_utils.get_timestamp(),
                 )
             )
-
         else:
             completed_command = running_command.copy(
                 update={
@@ -136,5 +141,7 @@ class CommandExecutor:
                 }
             )
             self._action_dispatcher.dispatch(
-                UpdateCommandAction(command=completed_command)
+                UpdateCommandAction(
+                    command=completed_command, private_result=private_result
+                ),
             )

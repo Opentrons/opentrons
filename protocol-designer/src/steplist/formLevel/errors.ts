@@ -79,6 +79,10 @@ const WELL_RATIO_MOVE_LIQUID: FormError = {
   title: 'Well selection must be 1 to many, many to 1, or N to N',
   dependentFields: ['aspirate_wells', 'dispense_wells'],
 }
+const WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE: FormError = {
+  title: 'Well selection must be many to 1, or 1 to 1',
+  dependentFields: ['aspirate_wells'],
+}
 const MAGNET_ACTION_TYPE_REQUIRED: FormError = {
   title: 'Action type must be either engage or disengage',
   dependentFields: ['magnetAction'],
@@ -128,19 +132,23 @@ const LID_TEMPERATURE_HOLD_REQUIRED: FormError = {
   title: 'Temperature is required',
   dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
 }
-export type FormErrorChecker = (arg: unknown) => FormError | null
+interface HydratedFormData {
+  [key: string]: any
+}
+
+export type FormErrorChecker = (arg: HydratedFormData) => FormError | null
 // TODO: test these
 
 /*******************
  ** Error Checkers **
  ********************/
 // TODO: real HydratedFormData type
-type HydratedFormData = any
 export const incompatibleLabware = (
   fields: HydratedFormData
 ): FormError | null => {
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
+  //  trashBin and wasteChute cannot mix into a labware
   return !canPipetteUseLabware(pipette.spec, labware.def)
     ? INCOMPATIBLE_LABWARE
     : null
@@ -150,7 +158,11 @@ export const incompatibleDispenseLabware = (
 ): FormError | null => {
   const { dispense_labware, pipette } = fields
   if (!dispense_labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.spec, dispense_labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec,
+    'def' in dispense_labware ? dispense_labware.def : undefined,
+    'name' in dispense_labware ? dispense_labware.name : undefined
+  )
     ? INCOMPATIBLE_DISPENSE_LABWARE
     : null
 }
@@ -159,6 +171,7 @@ export const incompatibleAspirateLabware = (
 ): FormError | null => {
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
+  //  trashBin and wasteChute cannot aspirate into a labware
   return !canPipetteUseLabware(pipette.spec, aspirate_labware.def)
     ? INCOMPATIBLE_ASPIRATE_LABWARE
     : null
@@ -206,11 +219,21 @@ export const pauseForTimeOrUntilTold = (
 export const wellRatioMoveLiquid = (
   fields: HydratedFormData
 ): FormError | null => {
-  const { aspirate_wells, dispense_wells } = fields
-  if (!aspirate_wells || !dispense_wells) return null
-  return getWellRatio(aspirate_wells, dispense_wells)
-    ? null
+  const { aspirate_wells, dispense_wells, dispense_labware } = fields
+  const dispenseLabware = dispense_labware?.name ?? null
+  const isDispensingIntoTrash =
+    dispenseLabware != null
+      ? dispenseLabware === 'wasteChute' || dispenseLabware === 'trashBin'
+      : false
+  if (!aspirate_wells || (!isDispensingIntoTrash && !dispense_wells))
+    return null
+  const wellRatioFormError = isDispensingIntoTrash
+    ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
+
+  return getWellRatio(aspirate_wells, dispense_wells, isDispensingIntoTrash)
+    ? null
+    : wellRatioFormError
 }
 export const volumeTooHigh = (fields: HydratedFormData): FormError | null => {
   const { pipette } = fields
@@ -338,7 +361,7 @@ export const engageHeightRangeExceeded = (
  ********************/
 type ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
-) => (arg: unknown) => FormError[]
+) => (arg: HydratedFormData) => FormError[]
 export const composeErrors: ComposeErrors = (
   ...errorCheckers: FormErrorChecker[]
 ) => value =>

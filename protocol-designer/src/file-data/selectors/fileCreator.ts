@@ -6,16 +6,13 @@ import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import {
-  FIXED_TRASH_ID,
   FLEX_ROBOT_TYPE,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
   FLEX_STANDARD_DECKID,
-  PipetteName,
   SPAN7_8_10_11_SLOT,
+  LabwareLocation,
 } from '@opentrons/shared-data'
-import { getFileMetadata, getRobotType } from './fileFields'
-import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
 import {
   selectors as labwareDefSelectors,
@@ -25,7 +22,10 @@ import { uuid } from '../../utils'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import {
+  DesignerApplicationData,
+  getLoadLiquidCommands,
+} from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { swatchColors } from '../../components/swatchColors'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -33,22 +33,33 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import type {
+import { getFileMetadata, getRobotType } from './fileFields'
+import { getInitialRobotState, getRobotStateTimeline } from './commands'
+
+import {
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
   RobotState,
+  COLUMN_4_SLOTS,
 } from '@opentrons/step-generation'
 import type {
+  CommandAnnotationV1Mixin,
+  CommandV8Mixin,
   CreateCommand,
-  ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV7'
-import type { Selector } from '../../types'
-import type {
+  LabwareV2Mixin,
+  LiquidV1Mixin,
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+  OT2RobotMixin,
+  OT3RobotMixin,
+  PipetteName,
+  ProtocolBase,
+  ProtocolFile,
+} from '@opentrons/shared-data'
+import type { Selector } from '../../types'
+
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -77,6 +88,7 @@ export const getLabwareDefinitionsInUse = (
     ...tiprackDefURIsInUse,
     ...labwareDefURIsOnDeck,
   ])
+
   return labwareDefURIsInUse.reduce<LabwareDefByDefURI>(
     (acc, labwareDefURI: string) => ({
       ...acc,
@@ -101,7 +113,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-
   (
     fileMetadata,
     initialRobotState,
@@ -202,6 +213,44 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
       {}
     )
+    // initiate "adapter" commands first so we can map through them to get the
+    //  labware that goes on top of it's location
+    const loadAdapterCommands = reduce<
+      RobotState['labware'],
+      LoadLabwareCreateCommand[]
+    >(
+      initialRobotState.labware,
+      (
+        acc,
+        labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
+        labwareId: string
+      ): LoadLabwareCreateCommand[] => {
+        const { def } = labwareEntities[labwareId]
+        const isAdapter = def.allowedRoles?.includes('adapter')
+        if (!isAdapter) return acc
+        const isOnTopOfModule = labware.slot in initialRobotState.modules
+        const namespace = def.namespace
+        const loadName = def.parameters.loadName
+        const version = def.version
+        const loadAdapterCommands = {
+          key: uuid(),
+          commandType: 'loadLabware' as const,
+          params: {
+            displayName: def.metadata.displayName,
+            labwareId,
+            loadName,
+            namespace: namespace,
+            version: version,
+            location: isOnTopOfModule
+              ? { moduleId: labware.slot }
+              : { slotName: labware.slot },
+          },
+        }
+
+        return [...acc, loadAdapterCommands]
+      },
+      []
+    )
 
     const loadLabwareCommands = reduce<
       RobotState['labware'],
@@ -213,27 +262,45 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
       ): LoadLabwareCreateCommand[] => {
-        if (labwareId === FIXED_TRASH_ID) return [...acc]
-        const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
-        const { labwareDefURI, def } = labwareEntities[labwareId]
+        const { def } = labwareEntities[labwareId]
+        const isAdapter = def.allowedRoles?.includes('adapter')
+        if (isAdapter || def.metadata.displayCategory === 'trash') return acc
+        const isOnTopOfModule = labware.slot in initialRobotState.modules
+        const isOnAdapter =
+          loadAdapterCommands.find(
+            command => command.params.labwareId === labware.slot
+          ) != null
         const namespace = def.namespace
-        const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
+        const loadName = def.parameters.loadName
         const version = def.version
-        const loadLabwareCommand = {
+        const isAddressableAreaName = COLUMN_4_SLOTS.includes(labware.slot)
+
+        let location: LabwareLocation = { slotName: labware.slot }
+        if (isOnTopOfModule) {
+          location = { moduleId: labware.slot }
+        } else if (isOnAdapter) {
+          location = { labwareId: labware.slot }
+        } else if (isAddressableAreaName) {
+          location = { addressableAreaName: labware.slot }
+        } else if (labware.slot === 'offDeck') {
+          location = 'offDeck'
+        }
+
+        const loadLabwareCommands = {
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
-            displayName: def.metadata.displayName,
+            displayName:
+              labwareNicknamesById[labwareId] ?? def.metadata.displayName,
             labwareId: labwareId,
             loadName,
             namespace: namespace,
             version: version,
-            location: isLabwareOnTopOfModule
-              ? { moduleId: labware.slot }
-              : { slotName: labware.slot },
+            location,
           },
         }
-        return [...acc, loadLabwareCommand]
+
+        return [...acc, loadLabwareCommands]
       },
       []
     )
@@ -272,6 +339,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const loadCommands: CreateCommand[] = [
       ...loadPipetteCommands,
       ...loadModuleCommands,
+      ...loadAdapterCommands,
       ...loadLabwareCommands,
       ...loadLiquidCommands,
     ]
@@ -283,7 +351,44 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const commands = [...loadCommands, ...nonLoadCommands]
 
-    const protocolFile = {
+    const flexDeckSpec: OT3RobotMixin = {
+      robot: {
+        model: FLEX_ROBOT_TYPE,
+        deckId: FLEX_STANDARD_DECKID,
+      },
+    }
+    const ot2DeckSpec: OT2RobotMixin = {
+      robot: {
+        model: OT2_STANDARD_MODEL,
+        deckId: OT2_STANDARD_DECKID,
+      },
+    }
+    const deckStructure =
+      robotType === FLEX_ROBOT_TYPE ? flexDeckSpec : ot2DeckSpec
+
+    const labwareV2Mixin: LabwareV2Mixin = {
+      labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
+      labwareDefinitions,
+    }
+
+    const liquidV1Mixin: LiquidV1Mixin = {
+      liquidSchemaId: 'opentronsLiquidSchemaV1',
+      liquids,
+    }
+
+    const commandv8Mixin: CommandV8Mixin = {
+      commandSchemaId: 'opentronsCommandSchemaV8',
+      commands,
+    }
+
+    const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {
+      commandAnnotationSchemaId: 'opentronsCommandAnnotationSchemaV1',
+      commandAnnotations: [],
+    }
+
+    const protocolBase: ProtocolBase<DesignerApplicationData> = {
+      $otSharedSchema: '#/protocol/schemas/8',
+      schemaVersion: 8,
       metadata: {
         protocolName: name,
         author,
@@ -296,18 +401,15 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         tags: [],
       },
       designerApplication,
-      robot:
-        robotType === FLEX_ROBOT_TYPE
-          ? { model: FLEX_ROBOT_TYPE, deckId: FLEX_STANDARD_DECKID }
-          : { model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID },
-      liquids,
-      labwareDefinitions,
     }
+
     return {
-      ...protocolFile,
-      $otSharedSchema: '#/protocol/schemas/7',
-      schemaVersion: 7,
-      commands,
+      ...protocolBase,
+      ...deckStructure,
+      ...labwareV2Mixin,
+      ...liquidV1Mixin,
+      ...commandv8Mixin,
+      ...commandAnnotionaV1Mixin,
     }
   }
 )

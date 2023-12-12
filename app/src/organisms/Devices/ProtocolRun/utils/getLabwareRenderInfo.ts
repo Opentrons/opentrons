@@ -1,38 +1,11 @@
-import {
+import { getPositionFromSlotId } from '@opentrons/shared-data'
+import type {
   CompletedProtocolAnalysis,
   DeckDefinition,
-  getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
-  ProtocolAnalysisFile,
+  LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-
-const getSlotPosition = (
-  deckDef: DeckDefinition,
-  slotName: string
-): [number, number, number] => {
-  let x = 0
-  let y = 0
-  let z = 0
-  const slotPosition = deckDef.locations.orderedSlots.find(
-    orderedSlot => orderedSlot.id === slotName
-  )?.position
-
-  if (slotPosition == null) {
-    console.error(
-      `expected to find a slot position for slot ${slotName} in ${String(
-        deckDef.metadata.displayName
-      )}, but could not`
-    )
-  } else {
-    x = slotPosition[0]
-    y = slotPosition[1]
-    z = slotPosition[2]
-  }
-
-  return [x, y, z]
-}
 
 export interface LabwareRenderInfoById {
   [labwareId: string]: {
@@ -41,14 +14,12 @@ export interface LabwareRenderInfoById {
     z: number
     labwareDef: LabwareDefinition2
     displayName: string | null
+    slotName: string
   }
 }
 
 export const getLabwareRenderInfo = (
-  protocolData:
-    | ProtocolAnalysisFile<{}>
-    | CompletedProtocolAnalysis
-    | ProtocolAnalysisOutput,
+  protocolData: CompletedProtocolAnalysis | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands
@@ -77,15 +48,24 @@ export const getLabwareRenderInfo = (
           )} but could not`
         )
       }
-      const slotName = location.slotName.toString()
-      const slotPosition = getSlotPosition(deckDef, slotName)
 
-      const slotHasMatingSurfaceVector = getSlotHasMatingSurfaceUnitVector(
-        deckDef,
-        slotName
+      const slotName =
+        'addressableAreaName' in location
+          ? location.addressableAreaName
+          : location.slotName
+      const slotPosition = getPositionFromSlotId(slotName, deckDef)
+
+      if (slotPosition == null) {
+        console.warn(
+          `expected to find a position for slot ${slotName} in the standard deck definition, but could not`
+        )
+        return acc
+      }
+      const isSlot = deckDef.locations.addressableAreas.some(
+        aa => aa.id === slotName && aa.areaType === 'slot'
       )
 
-      return slotHasMatingSurfaceVector
+      return isSlot
         ? {
             ...acc,
             [labwareId]: {
@@ -94,7 +74,8 @@ export const getLabwareRenderInfo = (
               z: slotPosition[2],
               labwareDef,
               displayName,
+              slotName,
             },
           }
-        : { ...acc }
+        : acc
     }, {})

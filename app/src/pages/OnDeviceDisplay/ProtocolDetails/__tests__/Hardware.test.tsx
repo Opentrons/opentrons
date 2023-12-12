@@ -1,16 +1,21 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
+import {
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  WASTE_CHUTE_CUTOUT,
+} from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useRequiredProtocolHardware } from '../../../Protocols/hooks'
 import { Hardware } from '../Hardware'
 
 jest.mock('../../../Protocols/hooks')
+jest.mock('../../../../redux/config')
 
 const mockUseRequiredProtocolHardware = useRequiredProtocolHardware as jest.MockedFunction<
   typeof useRequiredProtocolHardware
 >
-
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 
 const render = (props: React.ComponentProps<typeof Hardware>) => {
@@ -45,13 +50,27 @@ describe('Hardware', () => {
             hardwareType: 'module',
             moduleModel: 'heaterShakerModuleV1',
             slot: '1',
+            hasSlotConflict: false,
             connected: true,
           },
           {
             hardwareType: 'module',
             moduleModel: 'temperatureModuleV2',
             slot: '3',
+            hasSlotConflict: false,
             connected: false,
+          },
+          {
+            hardwareType: 'fixture',
+            cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+            location: { cutout: WASTE_CHUTE_CUTOUT },
+            hasSlotConflict: false,
+          },
+          {
+            hardwareType: 'fixture',
+            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+            location: { cutout: 'cutoutB3' },
+            hasSlotConflict: false,
           },
         ],
         isLoading: false,
@@ -74,5 +93,7 @@ describe('Hardware', () => {
     })
     getByRole('row', { name: '1 Heater-Shaker Module GEN1' })
     getByRole('row', { name: '3 Temperature Module GEN2' })
+    getByRole('row', { name: 'D3 Waste chute only' })
+    getByRole('row', { name: 'B3 Staging area slot' })
   })
 })

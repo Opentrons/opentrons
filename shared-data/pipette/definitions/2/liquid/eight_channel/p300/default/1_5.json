@@ -1,0 +1,67 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
+  "supportedTips": {
+    "t200": {
+      "defaultAspirateFlowRate": {
+        "default": 150,
+        "valuesByApiLevel": { "2.0": 150 }
+      },
+      "defaultDispenseFlowRate": {
+        "default": 300,
+        "valuesByApiLevel": { "2.0": 300 }
+      },
+      "defaultBlowOutFlowRate": {
+        "default": 1000,
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
+      "defaultTipLength": 51.7,
+      "aspirate": {
+        "default": {
+          "1": [
+            [57.25698968, 0.017, 18.132],
+            [309.2612689, 0.001, 19.03]
+          ]
+        }
+      },
+      "dispense": { "default": { "1": [[309.2612689, 0.0, 19.29389273]] } },
+      "defaultPushOutVolume": 0
+    },
+    "t300": {
+      "defaultAspirateFlowRate": {
+        "default": 150,
+        "valuesByApiLevel": { "2.0": 150 }
+      },
+      "defaultDispenseFlowRate": {
+        "default": 300,
+        "valuesByApiLevel": { "2.0": 300 }
+      },
+      "defaultBlowOutFlowRate": {
+        "default": 1000,
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
+      "defaultTipLength": 51.7,
+      "aspirate": {
+        "default": {
+          "1": [
+            [57.25698968, 0.017, 18.132],
+            [309.2612689, 0.001, 19.03]
+          ]
+        }
+      },
+      "dispense": { "default": { "1": [[309.2612689, 0.0, 19.29389273]] } },
+      "defaultPushOutVolume": 0
+    }
+  },
+  "defaultTipOverlapDictionary": {
+    "default": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47
+  },
+  "maxVolume": 300,
+  "minVolume": 30.0,
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1"
+  ]
+}

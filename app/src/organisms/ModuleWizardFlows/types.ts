@@ -1,6 +1,7 @@
 import { AttachedModule } from '@opentrons/api-client'
+import { FLOWS, SECTIONS } from './constants'
 import type { CreateCommand } from '@opentrons/shared-data'
-import { SECTIONS } from './constants'
+import type { PipetteInformation } from '../Devices/hooks'
 
 export type ModuleCalibrationWizardStep =
   | BeforeBeginningStep
@@ -8,21 +9,27 @@ export type ModuleCalibrationWizardStep =
   | SelectLocationStep
   | PlaceAdapterStep
   | AttachProbeStep
+  | DetachProbeStep
   | SuccessStep
 
 export interface ModuleCalibrationWizardStepProps {
   proceed: () => void
   goBack: () => void
-  chainRunCommands: (
+  chainRunCommands?: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean
   ) => Promise<unknown>
   isRobotMoving: boolean
-  maintenanceRunId: string
+  maintenanceRunId?: string
   attachedModule: AttachedModule
+  attachedPipette: PipetteInformation
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
+  slotName: string
+  isOnDevice: boolean | null
 }
+
+export type ModuleWizardFlow = typeof FLOWS.CALIBRATE
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
@@ -38,6 +45,9 @@ export interface PlaceAdapterStep {
 }
 export interface AttachProbeStep {
   section: typeof SECTIONS.ATTACH_PROBE
+}
+export interface DetachProbeStep {
+  section: typeof SECTIONS.DETACH_PROBE
 }
 export interface SuccessStep {
   section: typeof SECTIONS.SUCCESS

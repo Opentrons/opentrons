@@ -3,6 +3,7 @@ from typing_extensions import Protocol
 
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.types import Mount
+from .types import MountArgType
 
 # TODO (lc 12-05-2022) This protocol has deviated from the OT3 api. We
 # need to figure out how to combine them again in follow-up refactors.
@@ -11,10 +12,10 @@ from ..dev_types import PipetteDict
 from ..types import CriticalPoint
 
 
-class InstrumentConfigurer(Protocol):
+class InstrumentConfigurer(Protocol[MountArgType]):
     """A protocol specifying how to interact with instrument presence and detection."""
 
-    def reset_instrument(self, mount: Optional[Mount] = None) -> None:
+    def reset_instrument(self, mount: Optional[MountArgType] = None) -> None:
         """
         Reset the internal state of a pipette by its mount, without doing
         any lower level reconfiguration. This is useful to make sure that no
@@ -66,7 +67,7 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    def get_attached_instrument(self, mount: Mount) -> PipetteDict:
+    def get_attached_instrument(self, mount: MountArgType) -> PipetteDict:
         """Get the status dict of a single cached instrument.
 
         Return values and caveats are as get_attached_instruments.
@@ -77,9 +78,21 @@ class InstrumentConfigurer(Protocol):
     def attached_instruments(self) -> Dict[Mount, PipetteDict]:
         return self.get_attached_instruments()
 
+    def get_attached_pipettes(self) -> Dict[Mount, PipetteDict]:
+        """Get the status dicts of cached attached pipettes.
+
+        Works like get_attached_instruments but for pipettes only - on the Flex,
+        there will be no gripper information here.
+        """
+        ...
+
+    @property
+    def attached_pipettes(self) -> Dict[Mount, PipetteDict]:
+        return self.get_attached_pipettes()
+
     def calibrate_plunger(
         self,
-        mount: Mount,
+        mount: MountArgType,
         top: Optional[float] = None,
         bottom: Optional[float] = None,
         blow_out: Optional[float] = None,
@@ -100,7 +113,7 @@ class InstrumentConfigurer(Protocol):
 
     def set_flow_rate(
         self,
-        mount: Mount,
+        mount: MountArgType,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
@@ -110,7 +123,7 @@ class InstrumentConfigurer(Protocol):
 
     def set_pipette_speed(
         self,
-        mount: Mount,
+        mount: MountArgType,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
@@ -120,7 +133,7 @@ class InstrumentConfigurer(Protocol):
 
     def get_instrument_max_height(
         self,
-        mount: Mount,
+        mount: MountArgType,
         critical_point: Optional[CriticalPoint] = None,
     ) -> float:
         """Return max achievable height of the attached instrument
@@ -128,7 +141,7 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    async def add_tip(self, mount: Mount, tip_length: float) -> None:
+    async def add_tip(self, mount: MountArgType, tip_length: float) -> None:
         """Inform the hardware that a tip is now attached to a pipette.
 
         This changes the critical point of the pipette to make sure that
@@ -136,7 +149,7 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    async def remove_tip(self, mount: Mount) -> None:
+    async def remove_tip(self, mount: MountArgType) -> None:
         """Inform the hardware that a tip is no longer attached to a pipette.
 
         This changes the critical point of the system to the end of the
@@ -145,7 +158,7 @@ class InstrumentConfigurer(Protocol):
         ...
 
     def set_current_tiprack_diameter(
-        self, mount: Mount, tiprack_diameter: float
+        self, mount: MountArgType, tiprack_diameter: float
     ) -> None:
         """Inform the hardware of the diameter of the tiprack.
 
@@ -154,7 +167,7 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    def set_working_volume(self, mount: Mount, tip_volume: float) -> None:
+    def set_working_volume(self, mount: MountArgType, tip_volume: float) -> None:
         """Inform the hardware how much volume a pipette can aspirate.
 
         This will set the limit of aspiration for the pipette, and is
@@ -167,5 +180,14 @@ class InstrumentConfigurer(Protocol):
         """Return the underlying hardware representation of the instruments.
 
         This should rarely be used. Do not write new code that uses it.
+        """
+        ...
+
+    def has_gripper(self) -> bool:
+        """Return whether there is a gripper attached to this instance.
+
+         - On robots that do not support a gripper, this will always return False.
+         - On robots that support a gripper, this will return based on the current
+        presence of a gripper.
         """
         ...

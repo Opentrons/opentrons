@@ -7,39 +7,115 @@ import {
   LoadedModule,
   getDeckDefFromRobotType,
   getModuleDef2,
+  getPositionFromSlotId,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../ui-style-constants'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
-import { StyledDeck } from './StyledDeck'
+import { BaseDeck } from '../BaseDeck'
 
 import type {
   Coordinates,
   LabwareDefinition2,
   LabwareLocation,
   RobotType,
-  DeckSlot,
   DeckDefinition,
+  DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
-import type { TrashSlotName } from './FlexTrash'
+import type { TrashCutoutId } from './FlexTrash'
+
+const getModulePosition = (
+  deckDef: DeckDefinition,
+  moduleId: string,
+  loadedModules: LoadedModule[]
+): Coordinates | null => {
+  const loadedModule = loadedModules.find(m => m.id === moduleId)
+  if (loadedModule == null) return null
+  const modSlot = deckDef.locations.addressableAreas.find(
+    s => s.id === loadedModule.location.slotName
+  )
+  if (modSlot == null) return null
+
+  const modPosition = getPositionFromSlotId(loadedModule.id, deckDef)
+  if (modPosition == null) return null
+  const [modX, modY] = modPosition
+
+  const deckSpecificAffineTransform =
+    getModuleDef2(loadedModule.model).slotTransforms?.[deckDef.otId]?.[
+      modSlot.id
+    ]?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
+  const [[labwareX], [labwareY], [labwareZ]] = multiplyMatrices(
+    [[modX], [modY], [1], [1]],
+    deckSpecificAffineTransform
+  )
+  return { x: labwareX, y: labwareY, z: labwareZ }
+}
 
 function getLabwareCoordinates({
-  orderedSlots,
+  deckDef,
   location,
-  deckId,
   loadedModules,
+  loadedLabware,
 }: {
-  orderedSlots: DeckSlot[]
+  deckDef: DeckDefinition
   location: LabwareLocation
-  deckId: DeckDefinition['otId']
   loadedModules: LoadedModule[]
+  loadedLabware: LoadedLabware[]
 }): Coordinates | null {
   if (location === 'offDeck') {
     return null
+  } else if ('labwareId' in location) {
+    const loadedAdapter = loadedLabware.find(l => l.id === location.labwareId)
+    if (loadedAdapter == null) return null
+    const loadedAdapterLocation = loadedAdapter.location
+
+    if (
+      loadedAdapterLocation === 'offDeck' ||
+      'labwareId' in loadedAdapterLocation
+    )
+      return null
+    //  adapter on module
+    if ('moduleId' in loadedAdapterLocation) {
+      return getModulePosition(
+        deckDef,
+        loadedAdapterLocation.moduleId,
+        loadedModules
+      )
+    }
+
+    //  adapter on deck
+    const loadedAdapterSlotPosition = getPositionFromSlotId(
+      'slotName' in loadedAdapterLocation
+        ? loadedAdapterLocation.slotName
+        : loadedAdapterLocation.addressableAreaName,
+      deckDef
+    )
+    return loadedAdapterSlotPosition != null
+      ? {
+          x: loadedAdapterSlotPosition[0],
+          y: loadedAdapterSlotPosition[1],
+          z: loadedAdapterSlotPosition[2],
+        }
+      : null
+  } else if ('addressableAreaName' in location) {
+    const slotCoordinateTuple = getPositionFromSlotId(
+      location.addressableAreaName,
+      deckDef
+    )
+    return slotCoordinateTuple != null
+      ? {
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
+        }
+      : null
   } else if ('slotName' in location) {
-    const slotCoordinateTuple =
-      orderedSlots.find(s => s.id === location.slotName)?.position ?? null
+    const slotCoordinateTuple = getPositionFromSlotId(
+      location.slotName,
+      deckDef
+    )
     return slotCoordinateTuple != null
       ? {
           x: slotCoordinateTuple[0],
@@ -48,21 +124,7 @@ function getLabwareCoordinates({
         }
       : null
   } else {
-    const loadedModule = loadedModules.find(m => m.id === location.moduleId)
-    if (loadedModule == null) return null
-    const modSlot = orderedSlots.find(
-      s => s.id === loadedModule.location.slotName
-    )
-    if (modSlot == null) return null
-    const [modX, modY] = modSlot.position
-    const deckSpecificAffineTransform =
-      getModuleDef2(loadedModule.model).slotTransforms?.[deckId]?.[modSlot.id]
-        ?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
-    const [[labwareX], [labwareY], [labwareZ]] = multiplyMatrices(
-      [[modX], [modY], [1], [1]],
-      deckSpecificAffineTransform
-    )
-    return { x: labwareX, y: labwareY, z: labwareZ }
+    return getModulePosition(deckDef, location.moduleId, loadedModules)
   }
 }
 
@@ -75,9 +137,11 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   initialLabwareLocation: LabwareLocation
   finalLabwareLocation: LabwareLocation
   loadedModules: LoadedModule[]
+  loadedLabware: LoadedLabware[]
+  deckConfig: DeckConfiguration
   backgroundItems?: React.ReactNode
   deckFill?: string
-  trashSlotName?: TrashSlotName
+  trashCutoutId?: TrashCutoutId
 }
 export function MoveLabwareOnDeck(
   props: MoveLabwareOnDeckProps
@@ -85,20 +149,32 @@ export function MoveLabwareOnDeck(
   const {
     robotType,
     movedLabwareDef,
+    loadedLabware,
     initialLabwareLocation,
     finalLabwareLocation,
     loadedModules,
+    deckConfig,
     backgroundItems = null,
-    deckFill = '#e6e6e6',
-    trashSlotName,
     ...styleProps
   } = props
   const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
     robotType,
   ])
 
+  const initialSlotId =
+    initialLabwareLocation === 'offDeck' ||
+    !('slotName' in initialLabwareLocation)
+      ? deckDef.locations.addressableAreas[1].id
+      : initialLabwareLocation.slotName
+
+  const slotPosition = getPositionFromSlotId(initialSlotId, deckDef) ?? [
+    0,
+    0,
+    0,
+  ]
+
   const offDeckPosition = {
-    x: deckDef.locations.orderedSlots[1].position[0],
+    x: slotPosition[0],
     y:
       deckDef.cornerOffsetFromOrigin[1] -
       movedLabwareDef.dimensions.xDimension -
@@ -106,17 +182,17 @@ export function MoveLabwareOnDeck(
   }
   const initialPosition =
     getLabwareCoordinates({
-      orderedSlots: deckDef.locations.orderedSlots,
+      deckDef,
       location: initialLabwareLocation,
       loadedModules,
-      deckId: deckDef.otId,
+      loadedLabware,
     }) ?? offDeckPosition
   const finalPosition =
     getLabwareCoordinates({
-      orderedSlots: deckDef.locations.orderedSlots,
+      deckDef,
       location: finalLabwareLocation,
       loadedModules,
-      deckId: deckDef.otId,
+      loadedLabware,
     }) ?? offDeckPosition
 
   const springProps = useSpring({
@@ -140,26 +216,16 @@ export function MoveLabwareOnDeck(
 
   if (deckDef == null) return null
 
-  const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
-  const [deckXDimension, deckYDimension] = deckDef.dimensions
-  const wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
-
   return (
-    <AnimatedSvg
-      viewBox={wholeDeckViewBox}
-      opacity="1"
-      style={{ opacity: springProps.deckOpacity }}
-      transform="scale(1, -1)" // reflect horizontally about the center
-      {...styleProps}
+    <BaseDeck
+      deckConfig={deckConfig}
+      robotType={robotType}
+      svgProps={{
+        style: { opacity: springProps.deckOpacity },
+        ...styleProps,
+      }}
+      animatedSVG
     >
-      {deckDef != null && (
-        <StyledDeck
-          def={deckDef}
-          deckFill={deckFill}
-          layerBlocklist={[]}
-          trashSlotName={trashSlotName}
-        />
-      )}
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
         <g
@@ -200,7 +266,7 @@ export function MoveLabwareOnDeck(
           </AnimatedG>
         </g>
       </AnimatedG>
-    </AnimatedSvg>
+    </BaseDeck>
   )
 }
 
@@ -208,7 +274,6 @@ export function MoveLabwareOnDeck(
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
 const AnimatedG = styled(animated.g)<any>``
-const AnimatedSvg = styled(animated.svg)<any>``
 
 interface WellProps {
   wellDef: LabwareWell

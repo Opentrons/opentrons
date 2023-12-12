@@ -1,0 +1,300 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1", "D1"],
+    ["A2", "B2", "C2", "D2"],
+    ["A3", "B3", "C3", "D3"],
+    ["A4", "B4", "C4", "D4"],
+    ["A5", "B5", "C5", "D5"],
+    ["A6", "B6", "C6", "D6"]
+  ],
+  "brand": {
+    "brand": "Corning",
+    "brandId": ["3337", "3524", "3526", "3527", "3473", "3738", "3987"],
+    "links": [
+      "https://ecatalog.corning.com/life-sciences/b2c/US/en/Microplates/Assay-Microplates/96-Well-Microplates/Costar%C2%AE-Multiple-Well-Cell-Culture-Plates/p/3738"
+    ]
+  },
+  "schemaVersion": 2,
+  "version": 2,
+  "namespace": "opentrons",
+  "metadata": {
+    "displayName": "Corning 24 Well Plate 3.4 mL Flat",
+    "displayVolumeUnits": "mL",
+    "displayCategory": "wellPlate",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.47,
+    "zDimension": 20.27
+  },
+  "wells": {
+    "D1": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 17.48,
+      "y": 13.77,
+      "z": 2.87
+    },
+    "C1": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 17.48,
+      "y": 33.07,
+      "z": 2.87
+    },
+    "B1": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 17.48,
+      "y": 52.37,
+      "z": 2.87
+    },
+    "A1": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 17.48,
+      "y": 71.67,
+      "z": 2.87
+    },
+    "D2": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 36.78,
+      "y": 13.77,
+      "z": 2.87
+    },
+    "C2": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 36.78,
+      "y": 33.07,
+      "z": 2.87
+    },
+    "B2": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 36.78,
+      "y": 52.37,
+      "z": 2.87
+    },
+    "A2": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 36.78,
+      "y": 71.67,
+      "z": 2.87
+    },
+    "D3": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 56.08,
+      "y": 13.77,
+      "z": 2.87
+    },
+    "C3": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 56.08,
+      "y": 33.07,
+      "z": 2.87
+    },
+    "B3": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 56.08,
+      "y": 52.37,
+      "z": 2.87
+    },
+    "A3": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 56.08,
+      "y": 71.67,
+      "z": 2.87
+    },
+    "D4": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 75.38,
+      "y": 13.77,
+      "z": 2.87
+    },
+    "C4": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 75.38,
+      "y": 33.07,
+      "z": 2.87
+    },
+    "B4": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 75.38,
+      "y": 52.37,
+      "z": 2.87
+    },
+    "A4": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 75.38,
+      "y": 71.67,
+      "z": 2.87
+    },
+    "D5": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 94.68,
+      "y": 13.77,
+      "z": 2.87
+    },
+    "C5": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 94.68,
+      "y": 33.07,
+      "z": 2.87
+    },
+    "B5": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 94.68,
+      "y": 52.37,
+      "z": 2.87
+    },
+    "A5": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 94.68,
+      "y": 71.67,
+      "z": 2.87
+    },
+    "D6": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 113.98,
+      "y": 13.77,
+      "z": 2.87
+    },
+    "C6": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 113.98,
+      "y": 33.07,
+      "z": 2.87
+    },
+    "B6": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 113.98,
+      "y": 52.37,
+      "z": 2.87
+    },
+    "A6": {
+      "shape": "circular",
+      "depth": 17.4,
+      "diameter": 16.26,
+      "totalLiquidVolume": 3400,
+      "x": 113.98,
+      "y": 71.67,
+      "z": 2.87
+    }
+  },
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "corning_24_wellplate_3.4ml_flat"
+  },
+  "groups": [
+    {
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "D1",
+        "A2",
+        "B2",
+        "C2",
+        "D2",
+        "A3",
+        "B3",
+        "C3",
+        "D3",
+        "A4",
+        "B4",
+        "C4",
+        "D4",
+        "A5",
+        "B5",
+        "C5",
+        "D5",
+        "A6",
+        "B6",
+        "C6",
+        "D6"
+      ],
+      "metadata": {
+        "wellBottomShape": "flat"
+      }
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "stackingOffsetWithLabware": {
+    "opentrons_aluminum_flat_bottom_plate": {
+      "x": 0,
+      "y": 0,
+      "z": 4.15
+    }
+  }
+}

@@ -34,6 +34,7 @@ describe('RobotSystemVersion', () => {
       currentVersion: 'mock7.0.0',
       isUpdateAvailable: false,
       setCurrentOption: mockBack,
+      robotUpdateInfo: null,
     }
     mockRobotSystemVersionModal.mockReturnValue(
       <div>mock RobotSystemVersionModal</div>
@@ -48,9 +49,9 @@ describe('RobotSystemVersion', () => {
     const [{ getByText }] = render(props)
     getByText('Robot System Version')
     getByText(
-      'View latest release notes at https://github.com/Opentrons/opentrons'
+      'View latest release notes at https://github.com/Opentrons/opentrons/releases'
     )
-    getByText('Current Version:')
+    getByText('Current Version')
     getByText('mock7.0.0')
   })
 
@@ -58,6 +59,11 @@ describe('RobotSystemVersion', () => {
     props = {
       ...props,
       isUpdateAvailable: true,
+      robotUpdateInfo: {
+        target: 'flex',
+        version: 'mock1.2.3',
+        releaseNotes: null,
+      },
     }
     const [{ getByText }] = render(props)
     getByText('Update available')

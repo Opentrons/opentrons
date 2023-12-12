@@ -27,6 +27,7 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
     Liquid,
+    PostRunHardwareState,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -342,15 +343,23 @@ def test_play(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+            PlayAction(
+                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+            )
         ),
-    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+    ).then_return(
+        PlayAction(
+            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+        )
+    )
 
-    subject.play()
+    subject.play(deck_configuration=[])
 
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
+            PlayAction(
+                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+            )
         ),
         hardware_api.resume(HardwarePauseType.PAUSE),
     )
@@ -370,17 +379,25 @@ def test_play_blocked_by_door(
     )
     decoy.when(
         state_store.commands.validate_action_allowed(
-            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+            PlayAction(
+                requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+            )
         ),
-    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+    ).then_return(
+        PlayAction(
+            requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+        )
+    )
     decoy.when(state_store.commands.get_is_door_blocking()).then_return(True)
 
-    subject.play()
+    subject.play(deck_configuration=[])
 
     decoy.verify(hardware_api.resume(HardwarePauseType.PAUSE), times=0)
     decoy.verify(
         action_dispatcher.dispatch(
-            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
+            PlayAction(
+                requested_at=datetime(year=2022, month=2, day=2), deck_configuration=[]
+            )
         ),
         hardware_api.pause(HardwarePauseType.PAUSE),
     )
@@ -408,8 +425,17 @@ def test_pause(
     )
 
 
-@pytest.mark.parametrize("drop_tips_and_home", [True, False])
+@pytest.mark.parametrize("drop_tips_after_run", [True, False])
 @pytest.mark.parametrize("set_run_status", [True, False])
+@pytest.mark.parametrize(
+    argnames=["post_run_hardware_state", "expected_halt_disengage"],
+    argvalues=[
+        (PostRunHardwareState.HOME_AND_STAY_ENGAGED, True),
+        (PostRunHardwareState.HOME_THEN_DISENGAGE, True),
+        (PostRunHardwareState.STAY_ENGAGED_IN_PLACE, False),
+        (PostRunHardwareState.DISENGAGE_IN_PLACE, True),
+    ],
+)
 async def test_finish(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
@@ -417,8 +443,10 @@ async def test_finish(
     queue_worker: QueueWorker,
     subject: ProtocolEngine,
     hardware_stopper: HardwareStopper,
-    drop_tips_and_home: bool,
+    drop_tips_after_run: bool,
     set_run_status: bool,
+    post_run_hardware_state: PostRunHardwareState,
+    expected_halt_disengage: bool,
     model_utils: ModelUtils,
     state_store: StateStore,
     door_watcher: DoorWatcher,
@@ -430,16 +458,21 @@ async def test_finish(
     decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
 
     await subject.finish(
-        drop_tips_and_home=drop_tips_and_home,
+        drop_tips_after_run=drop_tips_after_run,
         set_run_status=set_run_status,
+        post_run_hardware_state=post_run_hardware_state,
     )
 
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(set_run_status=set_run_status)),
         await queue_worker.join(),
+        await hardware_stopper.do_halt(
+            disengage_before_stopping=expected_halt_disengage
+        ),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
-            drop_tips_and_home=drop_tips_and_home
+            drop_tips_after_run=drop_tips_after_run,
+            post_run_hardware_state=post_run_hardware_state,
         ),
         await plugin_starter.stop(),
         action_dispatcher.dispatch(
@@ -461,11 +494,21 @@ async def test_finish_with_defaults(
 
     decoy.verify(
         action_dispatcher.dispatch(FinishAction(set_run_status=True)),
-        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
+        await hardware_stopper.do_halt(disengage_before_stopping=True),
+        await hardware_stopper.do_stop_and_recover(
+            drop_tips_after_run=True,
+            post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+        ),
     )
 
 
-@pytest.mark.parametrize("stopped_by_estop", [True, False])
+@pytest.mark.parametrize(
+    argnames=["stopped_by_estop", "expected_drop_tips", "expected_end_state"],
+    argvalues=[
+        (True, False, PostRunHardwareState.DISENGAGE_IN_PLACE),
+        (False, True, PostRunHardwareState.HOME_AND_STAY_ENGAGED),
+    ],
+)
 async def test_finish_with_error(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
@@ -477,6 +520,8 @@ async def test_finish_with_error(
     door_watcher: DoorWatcher,
     state_store: StateStore,
     stopped_by_estop: bool,
+    expected_drop_tips: bool,
+    expected_end_state: PostRunHardwareState,
 ) -> None:
     """It should be able to tell the engine it's finished because of an error."""
     error = RuntimeError("oh no")
@@ -501,9 +546,11 @@ async def test_finish_with_error(
             FinishAction(error_details=expected_error_details, set_run_status=True)
         ),
         await queue_worker.join(),
+        await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(
-            drop_tips_and_home=not stopped_by_estop
+            drop_tips_after_run=expected_drop_tips,
+            post_run_hardware_state=expected_end_state,
         ),
         await plugin_starter.stop(),
         action_dispatcher.dispatch(
@@ -551,8 +598,12 @@ async def test_finish_with_estop_error_will_not_drop_tip_and_home(
             FinishAction(error_details=expected_error_details, set_run_status=True)
         ),
         await queue_worker.join(),
+        await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
-        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=False),
+        await hardware_stopper.do_stop_and_recover(
+            drop_tips_after_run=False,
+            post_run_hardware_state=PostRunHardwareState.DISENGAGE_IN_PLACE,
+        ),
         await plugin_starter.stop(),
         action_dispatcher.dispatch(
             HardwareStoppedAction(
@@ -594,8 +645,12 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         action_dispatcher.dispatch(FinishAction()),
         # await queue_worker.join() should be called, and should raise, here.
         # We can't verify that step in the sequence here because of a Decoy limitation.
+        await hardware_stopper.do_halt(disengage_before_stopping=True),
         door_watcher.stop(),
-        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
+        await hardware_stopper.do_stop_and_recover(
+            drop_tips_after_run=True,
+            post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+        ),
         await plugin_starter.stop(),
         action_dispatcher.dispatch(
             HardwareStoppedAction(
@@ -631,7 +686,7 @@ async def test_stop(
     state_store: StateStore,
     subject: ProtocolEngine,
 ) -> None:
-    """It should be able to stop the engine and halt the hardware."""
+    """It should be able to stop the engine and run execution."""
     expected_action = StopAction()
 
     decoy.when(
@@ -643,7 +698,33 @@ async def test_stop(
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
         queue_worker.cancel(),
-        await hardware_stopper.do_halt(),
+    )
+
+
+async def test_stop_for_legacy_core_protocols(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    hardware_stopper: HardwareStopper,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should be able to stop the engine & run execution and cancel movement tasks."""
+    expected_action = StopAction()
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(expected_action)
+
+    decoy.when(hardware_api.is_movement_execution_taskified()).then_return(True)
+
+    await subject.stop()
+
+    decoy.verify(
+        action_dispatcher.dispatch(expected_action),
+        queue_worker.cancel(),
+        await hardware_api.cancel_execution_and_running_tasks(),
     )
 
 

@@ -22,6 +22,7 @@ import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { EmergencyStop } from '../../pages/EmergencyStop'
+import { DeckConfigurationEditor } from '../../pages/DeckConfiguration'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
 import { getLocalRobot } from '../../redux/discovery'
@@ -46,6 +47,7 @@ jest.mock('../../pages/OnDeviceDisplay/RunSummary')
 jest.mock('../../pages/OnDeviceDisplay/NameRobot')
 jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
 jest.mock('../../pages/EmergencyStop')
+jest.mock('../../pages/DeckConfiguration')
 jest.mock('../../redux/config')
 jest.mock('../../redux/shell')
 jest.mock('../../redux/discovery')
@@ -100,6 +102,9 @@ const mockNameRobot = NameRobot as jest.MockedFunction<typeof NameRobot>
 const mockEmergencyStop = EmergencyStop as jest.MockedFunction<
   typeof EmergencyStop
 >
+const mockDeckConfigurationEditor = DeckConfigurationEditor as jest.MockedFunction<
+  typeof DeckConfigurationEditor
+>
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings
 >
@@ -149,6 +154,9 @@ describe('OnDeviceDisplayApp', () => {
     mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
     mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
     mockEmergencyStop.mockReturnValue(<div>Mock EmergencyStop</div>)
+    mockDeckConfigurationEditor.mockReturnValue(
+      <div>Mock DeckConfiguration</div>
+    )
     mockUseCurrentRunRoute.mockReturnValue(null)
     mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
   })
@@ -226,6 +234,11 @@ describe('OnDeviceDisplayApp', () => {
     mockUseCurrentRunRoute.mockReturnValue('/emergency-stop')
     const [{ getByText }] = render('/emergency-stop')
     getByText('Mock EmergencyStop')
+  })
+  it('renders DeckConfiguration component from /deck-configuration', () => {
+    mockUseCurrentRunRoute.mockReturnValue('/deck-configuration')
+    const [{ getByText }] = render('/deck-configuration')
+    getByText('Mock DeckConfiguration')
   })
   it('renders protocol receipt toasts', () => {
     render('/')

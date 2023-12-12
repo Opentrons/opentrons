@@ -68,7 +68,11 @@ export function UpdateChannel({
         header={t('app_settings:update_channel')}
         onClickBack={handleBackPress}
       />
-      <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        paddingX={SPACING.spacing40}
+        marginTop="7.75rem"
+      >
         <StyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}

@@ -93,10 +93,6 @@ function Input(props: InputFieldProps): JSX.Element {
       ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: 0;
-    }
-
     &:active {
       border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
     }
@@ -130,6 +126,21 @@ function Input(props: InputFieldProps): JSX.Element {
     }
   `
 
+  const FORM_BOTTOM_SPACE_STYLE = css`
+    padding-bottom: ${SPACING.spacing4};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding-bottom: 0;
+    }
+  `
+
+  const ERROR_TEXT_STYLE = css`
+    color: ${COLORS.errorEnabled};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: ${TYPOGRAPHY.fontSize22};
+      color: ${COLORS.red2};
+    }
+  `
+
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex css={INPUT_FIELD}>
@@ -157,11 +168,11 @@ function Input(props: InputFieldProps): JSX.Element {
         paddingTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
       >
-        <Flex paddingBottom={SPACING.spacing4}>{props.caption}</Flex>
+        <Flex css={FORM_BOTTOM_SPACE_STYLE}>{props.caption}</Flex>
         {props.secondaryCaption != null ? (
-          <Flex paddingBottom={SPACING.spacing4}>{props.secondaryCaption}</Flex>
+          <Flex css={FORM_BOTTOM_SPACE_STYLE}>{props.secondaryCaption}</Flex>
         ) : null}
-        <Flex color={COLORS.errorEnabled}>{props.error}</Flex>
+        <Flex css={ERROR_TEXT_STYLE}>{props.error}</Flex>
       </Flex>
     </Flex>
   )

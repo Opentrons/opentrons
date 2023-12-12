@@ -16,7 +16,7 @@ import {
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../../redux/analytics'
-import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
+import { getLocationInfoNames } from '../../utils/getLocationInfoNames'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
   getTotalVolumePerLiquidId,
@@ -52,7 +52,7 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
 }
 
 jest.mock('../utils')
-jest.mock('../../utils/getSlotLabwareName')
+jest.mock('../../utils/getLocationInfoNames')
 jest.mock('../LiquidsLabwareDetailsModal')
 jest.mock('@opentrons/api-client')
 jest.mock('../../../../../redux/analytics')
@@ -66,8 +66,8 @@ const mockGetTotalVolumePerLiquidId = getTotalVolumePerLiquidId as jest.MockedFu
 const mockGetTotalVolumePerLiquidLabwarePair = getTotalVolumePerLiquidLabwarePair as jest.MockedFunction<
   typeof getTotalVolumePerLiquidLabwarePair
 >
-const mockGetSlotLabwareName = getSlotLabwareName as jest.MockedFunction<
-  typeof getSlotLabwareName
+const mockGetLocationInfoNames = getLocationInfoNames as jest.MockedFunction<
+  typeof getLocationInfoNames
 >
 const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
   typeof parseLiquidsInLoadOrder
@@ -92,7 +92,7 @@ describe('SetupLiquidsList', () => {
     props = { runId: '123' }
     mockGetTotalVolumePerLiquidId.mockReturnValue(400)
     mockGetTotalVolumePerLiquidLabwarePair.mockReturnValue(200)
-    mockGetSlotLabwareName.mockReturnValue({
+    mockGetLocationInfoNames.mockReturnValue({
       labwareName: 'mock labware name',
       slotName: '4',
     })
@@ -127,10 +127,10 @@ describe('SetupLiquidsList', () => {
       properties: {},
     })
     getByText('Location')
-    getByText('Labware Name')
+    getByText('Labware name')
     getByText('Volume')
     getAllByText(nestedTextMatcher('200 µL'))
-    getByText('Slot 4')
+    getByText('4')
     getByText('mock labware name')
   })
 

@@ -434,7 +434,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                             errors={errors.modulesByType ?? null}
                             values={values.modulesByType}
                             onFieldChange={handleChange}
-                            onSetFieldValue={setFieldValue}
                             onBlur={handleBlur}
                             // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
                             touched={touched.modulesByType ?? null}

@@ -14,6 +14,7 @@ import {
 import {
   getPipetteNameSpecs,
   LEFT,
+  RIGHT,
   LoadedPipette,
   MotorAxes,
   NINETY_SIX_CHANNEL,
@@ -34,6 +35,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   setFetching: React.Dispatch<React.SetStateAction<boolean>>
   hasCalData: boolean
   requiredPipette?: LoadedPipette
+  nextMount?: string
 }
 
 export const Results = (props: ResultsProps): JSX.Element => {
@@ -54,7 +56,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
+    errorMessage,
     setShowErrorMessage,
+    nextMount,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteName =
@@ -120,10 +124,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
             header = t('ninety_six_detached_success', {
               pipetteName: NINETY_SIX_CHANNEL,
             })
-          } else {
+          } else if (
+            attachedPipettes[LEFT] == null &&
+            attachedPipettes[RIGHT] == null
+          ) {
             header = t('all_pipette_detached')
             subHeader = t('gantry_empty_for_96_channel_success')
             buttonText = t('attach_pip')
+          } else {
+            buttonText = t('detach_next_pipette')
           }
         }
       }
@@ -134,27 +143,22 @@ export const Results = (props: ResultsProps): JSX.Element => {
   const handleProceed = (): void => {
     if (currentStepIndex === totalStepCount || !isSuccess) {
       handleCleanUpAndClose()
-    } else if (
-      isSuccess &&
-      flowType === FLOWS.ATTACH &&
-      currentStepIndex !== totalStepCount
-    ) {
-      const axes: MotorAxes =
-        mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
-      chainRunCommands(
+    } else if (isSuccess && nextMount != null) {
+      // move the gantry into the correct position for the next step of strung together flows
+      chainRunCommands?.(
         [
-          {
-            commandType: 'loadPipette' as const,
-            params: {
-              pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
-              pipetteId: attachedPipettes[mount]?.serialNumber ?? '',
-              mount: mount,
-            },
-          },
           {
             commandType: 'home' as const,
             params: {
-              axes: axes,
+              axes: ['leftZ', 'rightZ'],
+            },
+          },
+          {
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: {
+              mount: nextMount === 'right' ? RIGHT : 'left',
+              maintenancePosition:
+                nextMount === 'both' ? 'attachPlate' : 'attachInstrument',
             },
           },
         ],
@@ -168,15 +172,26 @@ export const Results = (props: ResultsProps): JSX.Element => {
         })
     } else if (
       isSuccess &&
-      flowType === FLOWS.DETACH &&
+      flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
-      chainRunCommands(
+      // proceeding to attach probe for calibration
+      const axes: MotorAxes =
+        mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
+      chainRunCommands?.(
         [
           {
-            commandType: 'calibration/moveToMaintenancePosition' as const,
+            commandType: 'loadPipette' as const,
             params: {
+              pipetteName: attachedPipettes[mount]?.instrumentName ?? '',
+              pipetteId: attachedPipettes[mount]?.serialNumber ?? '',
               mount: mount,
+            },
+          },
+          {
+            commandType: 'home' as const,
+            params: {
+              axes: axes,
             },
           },
         ],
@@ -266,7 +281,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
             aria-label="Results_errorExit"
             marginRight={SPACING.spacing4}
           >
-            {i18n.format(t('cancel_attachment'), 'capitalize')}
+            {flowType === FLOWS.DETACH
+              ? i18n.format(t('cancel_detachment'))
+              : i18n.format(t('cancel_attachment'))}
           </SecondaryButton>
         )}
         <CheckPipetteButton
@@ -280,7 +297,16 @@ export const Results = (props: ResultsProps): JSX.Element => {
     )
   }
   if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
-
+  if (errorMessage != null) {
+    return (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.errorEnabled}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
+    )
+  }
   return (
     <SimpleWizardBody
       iconColor={iconColor}

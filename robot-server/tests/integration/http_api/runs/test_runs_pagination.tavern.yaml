@@ -92,11 +92,7 @@ stages:
             errors: [ ]
             pipettes: [ ]
             modules: [ ]
-            labware:
-              - id: !anystr
-                loadName: !anystr
-                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-                location: !anydict
+            labware: [ ]
             labwareOffsets: [ ]
             liquids: [ ]
           - id: '{second_run_id}'
@@ -107,11 +103,7 @@ stages:
             errors: [ ]
             pipettes: [ ]
             modules: [ ]
-            labware:
-              - id: !anystr
-                loadName: !anystr
-                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-                location: !anydict
+            labware: [ ]
             labwareOffsets: [ ]
             liquids: [ ]
           - id: '{third_run_id}'
@@ -122,11 +114,7 @@ stages:
             errors: [ ]
             pipettes: [ ]
             modules: [ ]
-            labware:
-              - id: !anystr
-                loadName: !anystr
-                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
-                location: !anydict
+            labware: [ ]
             labwareOffsets: [ ]
             liquids: [ ]
         links:

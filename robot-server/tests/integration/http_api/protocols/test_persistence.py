@@ -167,7 +167,13 @@ async def _get_all_analyses(robot_client: RobotClient) -> Dict[str, List[object]
                 protocol_id=protocol_id,
                 analysis_id=analysis_id,
             )
-            analyses_on_this_protocol.append(analysis_response.json()["data"])
+            analysis_as_document_response = await robot_client.get_analysis_as_document(
+                protocol_id=protocol_id,
+                analysis_id=analysis_id,
+            )
+            analyses_on_this_protocol.append(
+                (analysis_response.json()["data"], analysis_as_document_response.json())
+            )
 
         analyses_by_protocol_id[protocol_id] = analyses_on_this_protocol
 

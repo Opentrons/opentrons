@@ -1,6 +1,6 @@
 """Utilities for gathering motor position/status for an OT3 axis."""
 import asyncio
-from typing import Set, Tuple
+from typing import Set, Union, Optional
 import logging
 
 from opentrons_shared_data.errors.exceptions import (
@@ -15,6 +15,8 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MotorPositionRequest,
     MotorPositionResponse,
+    MoveCompleted,
+    TipActionResponse,
     UpdateMotorPositionEstimationRequest,
     UpdateMotorPositionEstimationResponse,
 )
@@ -25,46 +27,56 @@ from opentrons_hardware.firmware_bindings.constants import (
     MotorPositionFlags,
 )
 
-from .types import NodeMap
+from .types import NodeMap, MotorPositionStatus, MoveCompleteAck
 
 
 log = logging.getLogger(__name__)
 
 
-MotorPositionStatus = NodeMap[Tuple[float, float, bool, bool]]
+_MotorStatusMoves = Union[
+    MoveCompleted,
+    TipActionResponse,
+    MotorPositionResponse,
+    UpdateMotorPositionEstimationResponse,
+]
+
+
+def extract_motor_status_info(msg: _MotorStatusMoves) -> MotorPositionStatus:
+    """Extract motor position status from CAN responses."""
+    move_ack: Optional[MoveCompleteAck] = None
+    if isinstance(msg, MoveCompleted) or isinstance(msg, TipActionResponse):
+        move_ack = MoveCompleteAck(msg.payload.ack_id.value)
+    return MotorPositionStatus(
+        motor_position=float(msg.payload.current_position_um.value / 1000.0),
+        encoder_position=float(msg.payload.encoder_position_um.value) / 1000.0,
+        motor_ok=bool(
+            msg.payload.position_flags.value
+            & MotorPositionFlags.stepper_position_ok.value
+        ),
+        encoder_ok=bool(
+            msg.payload.position_flags.value
+            & MotorPositionFlags.encoder_position_ok.value
+        ),
+        move_ack=move_ack,
+    )
 
 
 async def _parser_motor_position_response(
     reader: WaitableCallback,
-) -> MotorPositionStatus:
+) -> NodeMap[MotorPositionStatus]:
     data = {}
     async for response, arb_id in reader:
         assert isinstance(response, MotorPositionResponse)
         node = NodeId(arb_id.parts.originating_node_id)
-        data.update(
-            {
-                node: (
-                    float(response.payload.current_position.value / 1000.0),
-                    float(response.payload.encoder_position.value) / 1000.0,
-                    bool(
-                        response.payload.position_flags.value
-                        & MotorPositionFlags.stepper_position_ok.value
-                    ),
-                    bool(
-                        response.payload.position_flags.value
-                        & MotorPositionFlags.encoder_position_ok.value
-                    ),
-                )
-            }
-        )
+        data.update({node: extract_motor_status_info(response)})
     return data
 
 
 async def get_motor_position(
     can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-) -> MotorPositionStatus:
+) -> NodeMap[MotorPositionStatus]:
     """Request node to respond with motor and encoder status."""
-    data: MotorPositionStatus = {}
+    data: NodeMap[MotorPositionStatus] = {}
 
     def _listener_filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) in nodes) and (
@@ -92,29 +104,18 @@ async def get_motor_position(
 
 async def _parser_update_motor_position_response(
     reader: WaitableCallback, expected: NodeId
-) -> Tuple[float, float, bool, bool]:
+) -> MotorPositionStatus:
     async for response, arb_id in reader:
         assert isinstance(response, UpdateMotorPositionEstimationResponse)
         node = NodeId(arb_id.parts.originating_node_id)
         if node == expected:
-            return (
-                float(response.payload.current_position.value / 1000.0),
-                float(response.payload.encoder_position.value) / 1000.0,
-                bool(
-                    response.payload.position_flags.value
-                    & MotorPositionFlags.stepper_position_ok.value
-                ),
-                bool(
-                    response.payload.position_flags.value
-                    & MotorPositionFlags.encoder_position_ok.value
-                ),
-            )
+            return extract_motor_status_info(response)
     raise StopAsyncIteration
 
 
 async def update_motor_position_estimation(
     can_messenger: CanMessenger, nodes: Set[NodeId], timeout: float = 1.0
-) -> MotorPositionStatus:
+) -> NodeMap[MotorPositionStatus]:
     """Updates the estimation of motor position on selected nodes.
 
     Request node to update motor position from its encoder and respond
@@ -138,7 +139,7 @@ async def update_motor_position_estimation(
                 data[node] = await asyncio.wait_for(
                     _parser_update_motor_position_response(reader, node), timeout
                 )
-                if not data[node][2]:
+                if not data[node].motor_ok:
                     # If the stepper_ok flag isn't set, that means the node didn't update position.
                     # This probably is because the motor is off. It's rare.
                     raise RoboticsControlError(

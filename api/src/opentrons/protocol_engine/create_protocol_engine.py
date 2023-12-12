@@ -10,6 +10,7 @@ from opentrons.util.async_helpers import async_context_manager_in_thread
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, ModuleDataProvider
 from .state import Config, StateStore
+from .types import PostRunHardwareState, DeckConfigurationType
 
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
@@ -17,16 +18,24 @@ from .state import Config, StateStore
 async def create_protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
+    load_fixed_trash: bool = False,
+    deck_configuration: typing.Optional[DeckConfigurationType] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
         config: ProtocolEngine configuration.
+        load_fixed_trash: Automatically load fixed trash labware in engine.
+        deck_configuration: The initial deck configuration the engine will be instantiated with.
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
-    deck_fixed_labware = await deck_data.get_deck_fixed_labware(deck_definition)
+    deck_fixed_labware = (
+        await deck_data.get_deck_fixed_labware(deck_definition)
+        if load_fixed_trash
+        else []
+    )
     module_calibration_offsets = ModuleDataProvider.load_module_calibrations()
 
     state_store = StateStore(
@@ -35,6 +44,7 @@ async def create_protocol_engine(
         deck_fixed_labware=deck_fixed_labware,
         is_door_open=hardware_api.door_state is DoorState.OPEN,
         module_calibration_offsets=module_calibration_offsets,
+        deck_configuration=deck_configuration,
     )
 
     return ProtocolEngine(state_store=state_store, hardware_api=hardware_api)
@@ -44,7 +54,9 @@ async def create_protocol_engine(
 def create_protocol_engine_in_thread(
     hardware_api: HardwareControlAPI,
     config: Config,
-    drop_tips_and_home_after: bool,
+    drop_tips_after_run: bool,
+    post_run_hardware_state: PostRunHardwareState,
+    load_fixed_trash: bool = False,
 ) -> typing.Generator[
     typing.Tuple[ProtocolEngine, asyncio.AbstractEventLoop], None, None
 ]:
@@ -66,7 +78,13 @@ def create_protocol_engine_in_thread(
     3. Joins the thread.
     """
     with async_context_manager_in_thread(
-        _protocol_engine(hardware_api, config, drop_tips_and_home_after)
+        _protocol_engine(
+            hardware_api,
+            config,
+            drop_tips_after_run,
+            post_run_hardware_state,
+            load_fixed_trash,
+        )
     ) as (
         protocol_engine,
         loop,
@@ -78,14 +96,23 @@ def create_protocol_engine_in_thread(
 async def _protocol_engine(
     hardware_api: HardwareControlAPI,
     config: Config,
-    drop_tips_and_home_after: bool,
+    drop_tips_after_run: bool,
+    post_run_hardware_state: PostRunHardwareState,
+    load_fixed_trash: bool = False,
 ) -> typing.AsyncGenerator[ProtocolEngine, None]:
     protocol_engine = await create_protocol_engine(
         hardware_api=hardware_api,
         config=config,
+        load_fixed_trash=load_fixed_trash,
     )
     try:
+        # TODO(mm, 2023-11-21): Callers like opentrons.execute need to be able to pass in
+        # the deck_configuration argument to ProtocolEngine.play().
+        # https://opentrons.atlassian.net/browse/RSS-400
         protocol_engine.play()
         yield protocol_engine
     finally:
-        await protocol_engine.finish(drop_tips_and_home=drop_tips_and_home_after)
+        await protocol_engine.finish(
+            drop_tips_after_run=drop_tips_after_run,
+            post_run_hardware_state=post_run_hardware_state,
+        )

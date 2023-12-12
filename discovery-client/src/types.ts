@@ -20,6 +20,7 @@ export interface HealthResponse {
   minimum_protocol_api_version?: [number, number]
   maximum_protocol_api_version?: [number, number]
   robot_model?: string
+  robot_serial?: string | null
 }
 
 export type Capability =
@@ -169,6 +170,8 @@ export interface DiscoveryClientOptions {
   onListChange: (robots: DiscoveryClientRobot[]) => unknown
   /** Optional logger */
   logger?: Logger
+  /** Whether to enable discovering robots over MDNS (defaults to true) */
+  enableMDNS?: boolean
 }
 
 export interface DiscoveryClient {

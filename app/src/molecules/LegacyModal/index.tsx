@@ -16,6 +16,7 @@ export interface LegacyModalProps extends StyleProps {
   fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
+  footer?: React.ReactNode
 }
 
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
@@ -26,6 +27,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     title,
     childrenPadding = `${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24}`,
     children,
+    footer,
     ...styleProps
   } = props
 
@@ -67,6 +69,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       // center within viewport aside from nav
       marginLeft="7.125rem"
       {...props}
+      footer={footer}
     >
       <Box padding={childrenPadding}>{children}</Box>
     </LegacyModalShell>

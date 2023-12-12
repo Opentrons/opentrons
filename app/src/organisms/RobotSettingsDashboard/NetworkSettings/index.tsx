@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -54,6 +55,7 @@ export function NetworkSettings({
         onClickBack={() => setCurrentOption(null)}
       />
       <Flex
+        marginTop="7.75rem"
         paddingX={SPACING.spacing40}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
@@ -97,6 +99,14 @@ function NetworkSettingButton({
   networkName,
   onClick,
 }: NetworkSettingButtonProps): JSX.Element {
+  const PUSHED_STATE_STYLE = css`
+    &:active {
+      background-color: ${chipType === 'success'
+        ? COLORS.green3Pressed
+        : COLORS.darkBlack40};
+    }
+  `
+
   return (
     <Btn
       width="100%"
@@ -104,6 +114,7 @@ function NetworkSettingButton({
       paddingY={SPACING.spacing20}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadiusSize3}
+      css={PUSHED_STATE_STYLE}
       onClick={onClick}
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>

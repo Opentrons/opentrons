@@ -42,5 +42,6 @@ export type LabwareFilter =
   | 'reservoir'
   | 'aluminumBlock'
   | 'customLabware'
+  | 'adapter'
 
 export type LabwareSort = 'alphabetical' | 'reverse'

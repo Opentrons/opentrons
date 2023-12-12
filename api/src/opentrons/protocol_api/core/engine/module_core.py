@@ -81,7 +81,7 @@ class ModuleCore(AbstractModuleCore):
 
     def get_deck_slot_id(self) -> str:
         slot_name = self.get_deck_slot()
-        return validation.ensure_deck_slot_string(
+        return validation.internal_slot_to_public_string(
             slot_name, robot_type=self._engine_client.state.config.robot_type
         )
 
@@ -137,7 +137,7 @@ class NonConnectedModuleCore(AbstractModuleCore):
 
     def get_deck_slot_id(self) -> str:
         slot_name = self.get_deck_slot()
-        return validation.ensure_deck_slot_string(
+        return validation.internal_slot_to_public_string(
             slot_name, robot_type=self._engine_client.state.config.robot_type
         )
 

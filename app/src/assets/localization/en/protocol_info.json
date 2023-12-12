@@ -3,7 +3,6 @@
   "browse_protocol_library": "Open Protocol Library",
   "cancel_run": "Cancel Run",
   "choose_file": "Choose File...",
-  "choose_protocol_file": "Choose File",
   "choose_snippet_type": "Choose the Labware Offset Data Python Snippet based on target execution environment.",
   "continue_proceed_to_calibrate": "Proceed to Calibrate",
   "continue_verify_calibrations": "Verify pipette and labware calibrations",
@@ -74,10 +73,11 @@
   "rerunning_protocol_modal_link": "Learn more about Labware Offset Data",
   "rerunning_protocol_modal_title": "See How Rerunning a Protocol Works",
   "robot_name_last_run": "{{robot_name}}’s last run",
+  "robot_type_first": "{{robotType}} protocols first",
   "run_again": "Run again",
   "run_protocol": "Run protocol",
   "run_timestamp_title": "Run timestamp",
-  "send_a_protocol_to_store": "Send a protocol from the Opentrons app to get started.",
+  "send_a_protocol_to_store": "Send a protocol from the Opentrons App to get started.",
   "simulation_in_progress": "Simulation in Progress",
   "timestamp": "+{{index}}",
   "too_many_pins_body": "Remove a protocol in order to add more protocols to your pinned list.",
@@ -85,6 +85,7 @@
   "unpin_protocol": "Unpin protocol",
   "unpinned_protocol": "Unpinned protocol",
   "update_robot_for_custom_labware": "You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols",
+  "upload": "Upload",
   "upload_and_simulate": "Open a protocol to run on {{robot_name}}",
   "valid_file_types": "Valid file types: Python files (.py) or Protocol Designer files (.json)"
 }

@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
+    "@ebay/nice-modal-react": "1.2.13",
     "@fontsource/dejavu-sans": "5.0.3",
     "@fontsource/public-sans": "5.0.3",
     "@hot-loader/react-dom": "17.0.1",
@@ -37,6 +38,7 @@
     "history": "4.7.2",
     "i18next": "^19.8.3",
     "is-ip": "3.1.0",
+    "jszip": "3.2.2",
     "lodash": "4.17.21",
     "mixpanel-browser": "2.22.1",
     "netmask": "2.0.2",

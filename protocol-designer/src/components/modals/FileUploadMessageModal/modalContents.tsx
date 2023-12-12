@@ -1,6 +1,5 @@
 import * as React from 'react'
 import assert from 'assert'
-import semver from 'semver'
 import styles from './modalContents.css'
 import { ModalContents } from './types'
 import { FileUploadMessage } from '../../../load-file'
@@ -52,8 +51,7 @@ export const genericDidMigrateMessage: ModalContents = {
       </p>
       <p>
         Updating the file may make changes to liquid handling actions. Please
-        review your file in the Protocol Designer as well as with a water run on
-        the robot.
+        review your file in the Protocol Designer.
       </p>
       <p>As always, please contact us with any questions or feedback.</p>
     </>
@@ -71,6 +69,27 @@ export const noBehaviorChangeMessage: ModalContents = {
         Because of this we do not expect any changes in how the robot will
         execute this protocol. To be safe we will still recommend keeping a
         separate copy of the file you just imported.
+      </p>
+      <p>As always, please contact us with any questions or feedback.</p>
+    </div>
+  ),
+}
+
+export const toV8MigrationMessage: ModalContents = {
+  title: 'Your protocol was made in an older version of Protocol Designer',
+  body: (
+    <div className={styles.migration_message}>
+      <p>Your protocol will be automatically updated to the latest version.</p>
+      <p>
+        Protocol Designer no longer supports aspirate or mix actions in a trash
+        bin. If your protocol contains these actions, an error icon will appear
+        next to them in the Protocol Timeline. To resolve the error, choose
+        another location for aspirating or mixing.
+      </p>
+      <p>
+        Additionally, we have addressed a bug where blow out speeds were slower
+        than expected. Your protocol will automatically update the flow rates
+        unless they were specifically initialized.
       </p>
       <p>As always, please contact us with any questions or feedback.</p>
     </div>
@@ -126,8 +145,20 @@ export function getMigrationMessage(migrationsRan: string[]): ModalContents {
   if (migrationsRan.includes('3.0.0')) {
     return toV3MigrationMessage
   }
-  if (migrationsRan.every(migration => semver.gt(migration, '4.0.0'))) {
+  const noBehaviorMigrations = [
+    ['5.0.0'],
+    ['5.0.0', '5.1.0'],
+    ['5.0.0', '5.1.0', '5.2.0'],
+  ]
+  if (
+    noBehaviorMigrations.some(migrationList =>
+      migrationsRan.every(migration => migrationList.includes(migration))
+    )
+  ) {
     return noBehaviorChangeMessage
+  }
+  if (migrationsRan.includes('8.0.0')) {
+    return toV8MigrationMessage
   }
   return genericDidMigrateMessage
 }

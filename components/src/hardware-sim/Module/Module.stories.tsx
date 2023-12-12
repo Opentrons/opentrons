@@ -6,7 +6,7 @@ import {
   MAGNETIC_MODULE_V2,
   ModuleModel,
   OT2_STANDARD_DECKID,
-  OT3_STANDARD_DECKID,
+  FLEX_STANDARD_DECKID,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
@@ -42,7 +42,7 @@ const Template: Story<{
   model: ModuleModel
   orientation: 'left' | 'right'
   hasLabware: boolean
-  deckType: typeof OT2_STANDARD_DECKID | typeof OT3_STANDARD_DECKID
+  deckType: typeof OT2_STANDARD_DECKID | typeof FLEX_STANDARD_DECKID
 }> = args => {
   return (
     <RobotWorkSpace deckDef={getDeckDefinitions()[args.deckType]}>
@@ -99,7 +99,7 @@ Module.argTypes = {
   deckType: {
     control: {
       type: 'select',
-      options: [OT2_STANDARD_DECKID, OT3_STANDARD_DECKID],
+      options: [OT2_STANDARD_DECKID, FLEX_STANDARD_DECKID],
     },
     defaultValue: 'left',
   },

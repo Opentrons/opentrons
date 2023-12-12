@@ -7,13 +7,13 @@ control the OT2.
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
-from ._types import OFF_DECK
 from .module_contexts import (
     ModuleContext,
     ThermocyclerContext,
@@ -23,6 +23,13 @@ from .module_contexts import (
     MagneticBlockContext,
 )
 from ._liquid import Liquid
+from ._types import OFF_DECK
+from ._trash_bin import TrashBin
+from ._waste_chute import WasteChute
+from ._nozzle_layout import (
+    COLUMN,
+    ALL,
+)
 
 from .create_protocol_context import (
     create_protocol_context,
@@ -32,6 +39,7 @@ from .create_protocol_context import (
 __all__ = [
     "MAX_SUPPORTED_VERSION",
     "MIN_SUPPORTED_VERSION",
+    "MIN_SUPPORTED_VERSION_FOR_FLEX",
     "ProtocolContext",
     "Deck",
     "ModuleContext",
@@ -42,8 +50,12 @@ __all__ = [
     "HeaterShakerContext",
     "MagneticBlockContext",
     "Labware",
+    "TrashBin",
+    "WasteChute",
     "Well",
     "Liquid",
+    "COLUMN",
+    "ALL",
     "OFF_DECK",
     # For internal Opentrons use only:
     "create_protocol_context",

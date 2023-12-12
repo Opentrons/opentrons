@@ -1,20 +1,28 @@
 import * as React from 'react'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
-  useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
   useRunQuery,
 } from '@opentrons/react-api-client'
+import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/hooks'
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
+import { RobotType } from '@opentrons/shared-data'
 
 export function useLaunchLPC(
-  runId: string
+  runId: string,
+  robotType: RobotType,
+  protocolName?: string
 ): { launchLPC: () => void; LPCWizard: JSX.Element | null } {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
-  const { createMaintenanceRun } = useCreateMaintenanceRunMutation()
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const {
+    createTargetedMaintenanceRun,
+  } = useCreateTargetedMaintenanceRunMutation()
+  const {
+    deleteMaintenanceRun,
+    isLoading: isDeletingMaintenanceRun,
+  } = useDeleteMaintenanceRunMutation()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(
     null
@@ -27,7 +35,7 @@ export function useLaunchLPC(
   const handleCloseLPC = (): void => {
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {
-        onSuccess: () => {
+        onSettled: () => {
           setMaintenanceRunId(null)
         },
       })
@@ -35,7 +43,7 @@ export function useLaunchLPC(
   }
   return {
     launchLPC: () =>
-      createMaintenanceRun({
+      createTargetedMaintenanceRun({
         labwareOffsets: currentOffsets.map(
           ({ vector, location, definitionUri }) => ({
             vector,
@@ -68,6 +76,10 @@ export function useLaunchLPC(
           mostRecentAnalysis={mostRecentAnalysis}
           existingOffsets={runRecord?.data?.labwareOffsets ?? []}
           maintenanceRunId={maintenanceRunId}
+          setMaintenanceRunId={setMaintenanceRunId}
+          protocolName={protocolName ?? ''}
+          robotType={robotType}
+          isDeletingMaintenanceRun={isDeletingMaintenanceRun}
         />
       ) : null,
   }

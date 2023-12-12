@@ -21,16 +21,23 @@ from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.calibration_storage import (
     helpers,
+    save_robot_deck_attitude,
+)
+
+# NOTE(FS 10-24-2023), the fixtures using these functions currently ONLY
+# get pulled in by OT-2 server tests. If this ever changes, we need to
+# conditionally set up ot2/ot3 calibration structures instead of invariably
+# calling the OT2 functions.
+from opentrons.calibration_storage.ot2 import (
     save_pipette_calibration,
     create_tip_length_data,
     save_tip_length_calibration,
-    save_robot_deck_attitude,
 )
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 
 from robot_server import app
-from robot_server.hardware import get_hardware
+from robot_server.hardware import get_hardware, get_ot2_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
 from robot_server.persistence import get_sql_engine, create_sql_engine
@@ -140,10 +147,22 @@ def _override_version_with_mock(versions: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
+def _override_ot2_hardware_with_mock(hardware: MagicMock) -> Iterator[None]:
+    async def get_ot2_hardware_override() -> API:
+        """Override for the get_ot2_hardware FastAPI dependency."""
+        return MagicMock(spec=API)
+
+    app.dependency_overrides[get_ot2_hardware] = get_ot2_hardware_override
+    yield
+    del app.dependency_overrides[get_ot2_hardware]
+
+
+@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
+    _override_ot2_hardware_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
