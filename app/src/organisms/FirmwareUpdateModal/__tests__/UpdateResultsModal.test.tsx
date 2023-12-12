@@ -18,6 +18,7 @@ describe('UpdateResultsModal', () => {
       onClose: jest.fn(),
       instrument: {
         ok: true,
+        instrumentType: 'gripper',
         subsystem: 'gripper',
         instrumentModel: 'gripper',
       } as any,
