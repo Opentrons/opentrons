@@ -100,7 +100,7 @@ class LabwareMovementHandler:
             raise GripperNotAttachedError(
                 "No gripper found for performing labware movements."
             )
-        if not ot3api._gripper_handler.is_ready_for_jaw_home():
+        if not ot3api.gripper_jaw_can_home():
             raise CannotPerformGripperAction(
                 "Cannot pick up labware when gripper is already gripping."
             )
