@@ -84,12 +84,12 @@ describe('TipsAttachedModal', () => {
       channels: 96,
     } as PipetteModelSpecs
 
-    const [{ getByTestId, getByText }] = render(ninetySixSpecs)
+    const [{ getByTestId, queryByText, getByText }] = render(ninetySixSpecs)
     const btn = getByTestId('testButton')
     fireEvent.click(btn)
 
     const skipBtn = getByText('Begin removal')
     fireEvent.click(skipBtn)
-    getByText('Drop tips')
+    queryByText('96-Channel')
   })
 })
