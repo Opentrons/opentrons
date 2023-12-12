@@ -224,8 +224,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
         const isTrashSlot =
           robotType === FLEX_ROBOT_TYPE
             ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
-            : slotId === 'fixedTrash'
-
+            : slotId === 'fixedTrash' || slotId === '12'
         return (
           !slotIdsOccupiedByModules.includes(slotId) &&
           !Object.values(labware)
