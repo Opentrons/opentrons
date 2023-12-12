@@ -38,4 +38,8 @@ names = Literal[
     "OT3_P1000MLeft_P50MRight_HS_TM_MM_TC_2_15_ABR4_Illumina_DNA_Prep_24x",
     "OT3_P1000SRight_None_2_15_ABR_Simple_Normalize_Long_Right",
     "OT3_P50MLeft_P1000MRight_None_2_15_ABRKAPALibraryQuantLongv2",
+    "OT3_None_None_2_16_AnalysisError_FixtureUsesMiddleColumn",
+    "OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3",
+    "OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol4",
+    "OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash"
 ]

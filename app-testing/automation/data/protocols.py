@@ -329,3 +329,43 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    OT3_None_None_2_16_AnalysisError_FixtureUsesMiddleColumn: Protocol = Protocol(
+        file_name="OT3_None_None_2_16_AnalysisError_FixtureUsesMiddleColumn",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Fixture Uses Middle Column",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="InvalidTrashBinLocationError [line 15]: Invalid location for trash bin: C2. Valid slots: Any slot in column 1 or 3.",  # noqa: E501
+    )
+
+    OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3: Protocol = Protocol(
+        file_name="OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Trash Bin Staging Area Column 3",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="ProtocolCommandFailedError [line 21]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleAddressableAreaError: Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Slot C4",  # noqa: E501
+    )
+
+    OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol4: Protocol = Protocol(
+        file_name="OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol4",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Trash Bin Staging Area Column 4",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="ValueError [line 19]: Staging areas not permitted for trash bin.",  # noqa: E501
+    )
+
+    OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash: Protocol = Protocol(
+        file_name="OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Drop Tips With No Trash",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="NoTrashDefinedError [line 24]: Error 4000 GENERAL_ERROR (NoTrashDefinedError): No trash container has been defined in this protocol.",  # noqa: E501
+    )

@@ -1,8 +1,7 @@
 from opentrons import protocol_api
 
 metadata = {
-    "protocolName": "QA Protocol - Invalid Deck Configuration 1 - Module In Staging Area Column 4",
-    "apiLevel": "2.16",
+    "protocolName": "QA Protocol - Analysis Error - Module In Staging Area Column 3",
     "author": "Derek Maggio <derek.maggio@opentrons.com>",
 }
 
@@ -11,21 +10,18 @@ requirements = {
     "apiLevel": "2.16",
 }
 
-THERMOCYCLER_NAME = "thermocycler module gen2"
-MAGNETIC_BLOCK_NAME = "magneticBlockV1"
-PCR_PLATE_96_NAME = "nest_96_wellplate_100ul_pcr_full_skirt"
-TIPRACK_96_NAME = "opentrons_flex_96_tiprack_1000ul"
-HEATER_SHAKER_NAME = "heaterShakerModuleV1"
-TEMPERATURE_MODULE_NAME = "temperature module gen2"
-
-USING_GRIPPER = True
-
-
 def run(ctx: protocol_api.ProtocolContext) -> None:
 
     ################
     ### FIXTURES ###
     ################
-
-    on_deck_tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, "B4")
-    temperature_module = ctx.load_module(TEMPERATURE_MODULE_NAME, "B3")
+    ctx.load_waste_chute()
+    ctx.load_labware("nest_1_reservoir_290ml", "C4")  # Implicitly define a Staging Area
+    tip_rack = ctx.load_labware("opentrons_flex_96_tiprack_1000ul", "A1", adapter="opentrons_flex_96_tiprack_adapter")
+    temp_module = ctx.load_module("temperature module gen2", "C3")
+    temp_module.deactivate()
+    pipette_96_channel = ctx.load_instrument("flex_96channel_1000", mount="left", tip_racks=[tip_rack])
+    pipette_96_channel.pick_up_tip()
+    pipette_96_channel.drop_tip()
+    
+    
