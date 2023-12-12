@@ -3,6 +3,7 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import DeckPoint, AddressableOffsetVector
 from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.state import StateView
 from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.move_to_addressable_area import (
@@ -14,10 +15,13 @@ from opentrons.protocol_engine.commands.move_to_addressable_area import (
 
 async def test_move_to_addressable_area_implementation(
     decoy: Decoy,
+    state_view: StateView,
     movement: MovementHandler,
 ) -> None:
     """A MoveToAddressableArea command should have an execution implementation."""
-    subject = MoveToAddressableAreaImplementation(movement=movement)
+    subject = MoveToAddressableAreaImplementation(
+        movement=movement, state_view=state_view
+    )
 
     data = MoveToAddressableAreaParams(
         pipetteId="abc",

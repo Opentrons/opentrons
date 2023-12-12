@@ -292,6 +292,7 @@ export const DropTipWizardComponent = (
         commandType: 'savePosition' as const,
         params: {
           pipetteId: MANAGED_PIPETTE_ID,
+          failOnNotHomed: false,
         },
       },
     ]

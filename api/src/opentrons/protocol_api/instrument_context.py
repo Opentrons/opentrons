@@ -1636,7 +1636,11 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 16)
     def active_channels(self) -> int:
-        """The number of channels configured for active use using configure_nozzle_layout()."""
+        """The number of channels the pipette will use to pick up tips.
+
+        By default, all channels on the pipette. Use :py:meth:`.configure_nozzle_layout`
+        to set the pipette to use fewer channels.
+        """
         return self._core.get_active_channels()
 
     @property  # type: ignore
@@ -1798,24 +1802,35 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. note::
             When picking up fewer than 96 tips at once, the tip rack *must not* be
-            placed in a tip rack adapter in the deck. If you try to perform partial tip
-            pickup on a tip rack that is in an adapter, the API will raise an error.
+            placed in a tip rack adapter in the deck. If you try to pick up fewer than 96
+            tips from a tip rack that is in an adapter, the API will raise an error.
 
         :param style: The shape of the nozzle layout.
 
             - ``COLUMN`` sets the pipette to use 8 nozzles, aligned from front to back
               with respect to the deck. This corresponds to a column of wells on labware.
-            - ``ALL`` resets the pipette to use all of its nozzles. Calling ``configure_nozzle_layout`` with no arguments also resets the pipette.
+            - ``ALL`` resets the pipette to use all of its nozzles. Calling
+              ``configure_nozzle_layout`` with no arguments also resets the pipette.
 
         :type style: ``NozzleLayout`` or ``None``
         :param start: The nozzle at the back left of the layout, which the robot uses
             to determine how it will move to different locations on the deck. The string
-            should be of the same format used when identifying wells by name. Use
-            ``"A1"`` to have the pipette use its leftmost nozzles to pick up tips
-            *left-to-right* from a tip rack. Use ``"A12"`` to have the pipette use its
-            rightmost nozzles to pick up tips *right-to-left* from a tip rack.
+            should be of the same format used when identifying wells by name.
+            Required unless setting ``style=ALL``.
+
+            .. note::
+                When using the ``COLUMN`` layout, the only fully supported value is
+                ``start="A12"``. You can use ``start="A1"``, but this will disable tip
+                tracking and you will have to specify the ``location`` every time you
+                call :py:meth:`.pick_up_tip`, such that the pipette picks up columns of
+                tips *from right to left* on the tip rack.
+
         :type start: str or ``None``
-        :param tip_racks: List of tip racks to use during this configuration.
+        :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
+            :py:meth:`.load_instrument`. If not specified, the new configuration resets
+            :py:obj:`.InstrumentContext.tip_racks` and you must specify the location
+            every time you call :py:meth:`~.InstrumentContext.pick_up_tip`.
+        :type tip_racks: List[:py:class:`.Labware`]
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
         #

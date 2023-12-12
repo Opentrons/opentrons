@@ -156,6 +156,7 @@ interface MoveRelativeParams {
 interface SavePositionParams {
   pipetteId: string // pipette to use in measurement
   positionId?: string // position ID, auto-assigned if left blank
+  failOnNotHomed?: boolean // Defaults to true if blank. Require every possible axis to be homed to save.
 }
 
 interface HomeParams {

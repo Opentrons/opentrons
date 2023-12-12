@@ -1,3 +1,4 @@
+import { getLabwareOnDeck } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -5,6 +6,7 @@ import {
   getCutoutFixturesForCutoutId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import type {
@@ -19,6 +21,8 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
 export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
   compatibleCutoutFixtureIds: CutoutFixtureId[]
+  // the missing on-deck labware display name for a single slot cutout
+  missingLabwareDisplayName: string | null
 }
 export function useDeckConfigurationCompatibility(
   robotType: RobotType,
@@ -33,6 +37,9 @@ export function useDeckConfigurationCompatibility(
     protocolAnalysis != null
       ? getAddressableAreasInProtocol(protocolAnalysis)
       : []
+  const labwareOnDeck =
+    protocolAnalysis != null ? getLabwareOnDeck(protocolAnalysis) : []
+
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
       const fixturesThatMountToCutoutId = getCutoutFixturesForCutoutId(
@@ -45,19 +52,46 @@ export function useDeckConfigurationCompatibility(
           cutoutId
       )
 
+      const compatibleCutoutFixtureIds = fixturesThatMountToCutoutId
+        .filter(cf =>
+          requiredAddressableAreasForCutoutId.every(aa =>
+            cf.providesAddressableAreas[cutoutId].includes(aa)
+          )
+        )
+        .map(cf => cf.id)
+
+      // get the on-deck labware name for a missing single-slot addressable area
+      const missingSingleSlotLabware =
+        cutoutFixtureId != null &&
+        // fixture mismatch
+        !compatibleCutoutFixtureIds.includes(cutoutFixtureId) &&
+        compatibleCutoutFixtureIds[0] != null &&
+        // compatible fixture is single-slot
+        SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
+          ? labwareOnDeck.find(
+              ({ labwareLocation }) =>
+                labwareLocation !== 'offDeck' &&
+                // match the addressable area to an on-deck labware
+                (('slotName' in labwareLocation &&
+                  requiredAddressableAreasForCutoutId[0] ===
+                    labwareLocation.slotName) ||
+                  ('addressableAreaName' in labwareLocation &&
+                    requiredAddressableAreasForCutoutId[0] ===
+                      labwareLocation.addressableAreaName))
+            )
+          : null
+
+      const missingLabwareDisplayName =
+        missingSingleSlotLabware?.displayName ?? null
+
       return [
         ...acc,
         {
           cutoutId,
           cutoutFixtureId: cutoutFixtureId,
           requiredAddressableAreas: requiredAddressableAreasForCutoutId,
-          compatibleCutoutFixtureIds: fixturesThatMountToCutoutId
-            .filter(cf =>
-              requiredAddressableAreasForCutoutId.every(aa =>
-                cf.providesAddressableAreas[cutoutId].includes(aa)
-              )
-            )
-            .map(cf => cf.id),
+          compatibleCutoutFixtureIds,
+          missingLabwareDisplayName,
         },
       ]
     },

@@ -655,7 +655,6 @@ class LabwareView(HasState[LabwareState]):
                 DeckSlotName.SLOT_A3,
             }:
                 return labware.id
-
         return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:
