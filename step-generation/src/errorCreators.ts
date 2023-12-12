@@ -242,3 +242,10 @@ export const pipettingIntoColumn4 = (args: {
     message: `Cannot ${args.typeOfStep} into a column 4 slot.`,
   }
 }
+
+export const cannotMoveWithGripper = (): CommandCreatorError => {
+  return {
+    type: 'CANNOT_MOVE_WITH_GRIPPER',
+    message: 'The gripper cannot move aluminum blocks',
+  }
+}

@@ -80,10 +80,6 @@ export const getLabwareOptions: Selector<Options> = createSelector(
           labwareId
         )
 
-        const isAdapterOrAluminumBlock =
-          isAdapter ||
-          labwareEntity.def.metadata.displayCategory === 'aluminumBlock'
-
         const moduleOnDeck = getModuleUnderLabware(
           initialDeckSetup,
           savedStepForms ?? {},
@@ -126,9 +122,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
                 },
               ]
         } else {
-          //  filter out moving trash, aluminum blocks, adapters and labware in
+          //  filter out moving trash, adapters, and labware in
           //  waste chute for moveLabware
-          return isAdapterOrAluminumBlock || isLabwareInWasteChute
+          return isAdapter || isLabwareInWasteChute
             ? acc
             : [
                 ...acc,
