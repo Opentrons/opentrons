@@ -115,37 +115,48 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### GRIPPER LABWARE MOVEMENT ###
     ################################
 
-    # This tests moving the labware with the gripper all around the deck.
-    # It will perform 2 types of movements:
-    #   Moving to a sequence of locations
-    #   Moving to a sequence of locations with a reset to the original labware location after each move
-
-    # Iterations:
-    # Deck -> Deck
-    # Deck -> Staging Area Slot 3
-    # Deck -> Staging Area Slot 4
-    # Deck -> Each Module
-
-    # Staging Area Slot 3 -> Staging Area Slot 4
-    # Staging Area Slot 3 -> Each Module
-    # Staging Area Slot 3 -> Deck
-
-    # Staging Area Slot 4 -> Staging Area Slot 4
-    # Staging Area Slot 4 -> Staging Area Slot 3
-    # Staging Area Slot 4 -> Each ModuleSTAGING_AREA_SLOT_3_RESET_LOCATION
-    # Staging Area Slot 4 -> Deck
-
-    # Module -> Staging Area Slot 3
-    # Module -> Staging Area Slot 4
-    # Module -> Deck
-    # Module -> Other Module
-
     def get_disposal_preference():
+        """
+        Get the disposal preference based on the PREFER_MOVE_OFF_DECK flag.
+
+        Returns:
+            tuple: A tuple containing the disposal preference. The first element is the location preference,
+                   either `protocol_api.OFF_DECK` or `waste_chute`. The second element is a boolean indicating
+                   whether the gripper is being used or not.
+        """
         return (protocol_api.OFF_DECK, not USING_GRIPPER) if PREFER_MOVE_OFF_DECK else (waste_chute, USING_GRIPPER)
 
     def run_moves(labware, move_sequences, reset_location, use_gripper):
+        """
+        Perform a series of moves for a given labware using specified move sequences.
+        
+        Will perform 2 versions of the moves:
+            1. Moves to each location in the sequence, resetting to the reset location after each move.
+            2. Moves to each location in the sequence, resetting to the reset location after all moves.
+
+        Args:
+            labware (str): The labware to be moved.
+            move_sequences (list): A list of move sequences, where each sequence is a list of locations.
+            reset_location (str): The location to reset the labware after each move sequence.
+            use_gripper (bool): Flag indicating whether to use the gripper during the moves.
+        """
+
         def move_to_locations(labware_to_move, move_locations, reset_after_each_move, use_gripper, reset_location):
+            """
+            Move the labware to the specified locations.
+
+            Args:
+                labware_to_move (str): The labware to be moved.
+                move_locations (list): A list of locations to move the labware to.
+                reset_after_each_move (bool): Flag indicating whether to reset the labware after each move.
+                use_gripper (bool): Flag indicating whether to use the gripper during the moves.
+                reset_location (str): The location to reset the labware after each move sequence.
+            """
+
             def reset_labware():
+                """
+                Reset the labware to the reset location.
+                """
                 ctx.move_labware(labware_to_move, reset_location, use_gripper=use_gripper)
 
             if len(move_locations) == 0:
@@ -162,10 +173,33 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
         for move_sequence in move_sequences:
             move_to_locations(labware, move_sequence, RESET_AFTER_EACH_MOVE, use_gripper, reset_location)
-            move_to_locations(labware, move_sequence, DONT_RESET_AFTER_EACH_MOVE, use_gripper, reset_location)
+            move_to_locations(labware, move_sequence, not RESET_AFTER_EACH_MOVE, use_gripper, reset_location)
+
 
     def test_gripper_moves():
-        def deck_moves(pcr_plate, reset_location):
+        """
+        Function to test the movement of the gripper in various locations.
+
+        This function contains several helper functions to perform the movement of labware using a gripper.
+        Each function performs a sequence of moves, starting with a specific location on the deck.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        def deck_moves(labware, reset_location):
+            """
+            Function to perform the movement of labware, with the inital position being on the deck.
+
+            Args:
+                pcr_plate (str): The labware to be moved on the deck.
+                reset_location (str): The reset location on the deck.
+
+            Returns:
+                None
+            """
             deck_move_sequence = [
                 ["B2"],  # Deck Moves
                 ["C3"],  # Staging Area Slot 3 Moves
@@ -173,9 +207,19 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 [thermocycler, temperature_module_adapter, heater_shaker_adapter, magnetic_block],  # Module Moves
             ]
 
-            run_moves(pcr_plate, deck_move_sequence, reset_location, USING_GRIPPER)
+            run_moves(labware, deck_move_sequence, reset_location, USING_GRIPPER)
 
         def staging_area_slot_3_moves(labware, reset_location):
+            """
+            Function to perform the movement of labware, with the inital position being on staging area slot 3.
+
+            Args:
+                labware (str): The labware to be moved in staging area slot 3.
+                reset_location (str): The reset location in staging area slot 3.
+
+            Returns:
+                None
+            """
             staging_area_slot_3_move_sequence = [
                 ["B2", "C2"],  # Deck Moves
                 [],  # Don't have Staging Area Slot 3 open
@@ -186,7 +230,16 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             run_moves(labware, staging_area_slot_3_move_sequence, reset_location, USING_GRIPPER)
 
         def staging_area_slot_4_moves(labware, reset_location):
+            """
+            Function to perform the movement of labware, with the inital position being on staging area slot 4.
 
+            Args:
+                labware (str): The labware to be moved in staging area slot 4.
+                reset_location (str): The reset location in staging area slot 4.
+
+            Returns:
+                None
+            """
             staging_area_slot_4_move_sequence = [
                 ["C2", "B2"],  # Deck Moves
                 ["C3"],  # Staging Area Slot 3 Moves
@@ -197,7 +250,16 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             run_moves(labware, staging_area_slot_4_move_sequence, reset_location, USING_GRIPPER)
 
         def module_moves(labware, module_locations):
+            """
+            Function to perform the movement of labware, with the inital position being on a module.
 
+            Args:
+                labware (str): The labware to be moved with modules.
+                module_locations (list): The locations of the modules.
+
+            Returns:
+                None
+            """
             module_move_sequence = [
                 ["C2", "B2"],  # Deck Moves
                 ["C3"],  # Staging Area Slot 3 Moves
