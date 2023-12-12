@@ -13,6 +13,8 @@ import {
 import {
   DeckFromLayers,
   LegacyDeckSlotLocation,
+  OT2_FIXED_TRASH_X_DIMENSION,
+  OT2_FIXED_TRASH_Y_DIMENSION,
   RobotCoordinateSpace,
   RobotCoordsForeignDiv,
   SingleSlotFixture,
@@ -187,10 +189,18 @@ export function DeckLocationSelect({
               )}
               {isSelected && slotPosition != null ? (
                 <RobotCoordsForeignDiv
-                  x={slotPosition[0]}
-                  y={slotPosition[1]}
-                  width={slot.boundingBox.xDimension}
-                  height={slot.boundingBox.yDimension}
+                  x={slotPosition[0] - slot.offsetFromCutoutFixture[0]}
+                  y={slotPosition[1] - slot.offsetFromCutoutFixture[1]}
+                  width={
+                    slot.id === 'fixedTrash'
+                      ? OT2_FIXED_TRASH_X_DIMENSION
+                      : slot.boundingBox.xDimension
+                  }
+                  height={
+                    slot.id === 'fixedTrash'
+                      ? OT2_FIXED_TRASH_Y_DIMENSION
+                      : slot.boundingBox.yDimension
+                  }
                   innerDivProps={INNER_DIV_PROPS}
                 >
                   <Text

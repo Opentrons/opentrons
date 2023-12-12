@@ -17,6 +17,10 @@ interface LegacyDeckSlotLocationProps extends React.SVGProps<SVGGElement> {
   slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
 }
 
+// dimensions of the OT-2 fixed trash, not in deck definition
+export const OT2_FIXED_TRASH_X_DIMENSION = 172.86
+export const OT2_FIXED_TRASH_Y_DIMENSION = 165.86
+
 /**
  * This is a legacy component for rendering an OT-2 deck slot by reference to the V4 deck definition
  */
@@ -48,17 +52,23 @@ export function LegacyDeckSlotLocation(
     (ot2DeckDefV4 as unknown) as DeckDefinition
   )
 
-  const [xPosition, yPosition] = slotPosition ?? [0, 0]
-  const { xDimension, yDimension } = slotDef.boundingBox
-
   const isFixedTrash = slotName === 'fixedTrash'
 
-  // adjust the fixed trash position and dimension
+  const [xPosition, yPosition] = slotPosition ?? [0, 0]
+  const { xDimension, yDimension } = isFixedTrash
+    ? {
+        xDimension: OT2_FIXED_TRASH_X_DIMENSION,
+        yDimension: OT2_FIXED_TRASH_Y_DIMENSION,
+      }
+    : slotDef.boundingBox
+  const [xOffset, yOffset] = slotDef.offsetFromCutoutFixture
+
+  // adjust the fixed trash position and dimension to fit inside deck SVG
   const fixedTrashPositionAdjustment = isFixedTrash ? 7 : 0
   const fixedTrashDimensionAdjustment = isFixedTrash ? -9 : 0
 
-  const adjustedXPosition = xPosition + fixedTrashPositionAdjustment
-  const adjustedYPosition = yPosition + fixedTrashPositionAdjustment
+  const adjustedXPosition = xPosition + fixedTrashPositionAdjustment - xOffset
+  const adjustedYPosition = yPosition + fixedTrashPositionAdjustment - yOffset
   const adjustedXDimension = xDimension + fixedTrashDimensionAdjustment
   const adjustedYDimension = yDimension + fixedTrashDimensionAdjustment
 
