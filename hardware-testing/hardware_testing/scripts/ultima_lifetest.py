@@ -1,6 +1,7 @@
 """Ultima High Viscosity Fluid Lifetest."""
 import argparse
 import asyncio
+from asyncio import sleep
 
 from typing import List, Optional
 from opentrons.hardware_control.ot3api import OT3API
@@ -11,6 +12,9 @@ from opentrons.config.defaults_ot3 import (
 )
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 from opentrons_shared_data.labware import load_definition
+
+from opentrons_hardware.firmware_bindings.constants import SensorId
+from opentrons.hardware_control.backends.ot3utils import sensor_id_for_instrument
 
 from hardware_testing.gravimetric.config import _get_liquid_probe_settings
 from opentrons.hardware_control.types import InstrumentProbeType
@@ -42,6 +46,9 @@ RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
 RESERVOIR_SLOT = 5
 
 OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
+
+NUM_PRESSURE_READINGS = 10
+SECONDS_BETWEEN_READINGS = 0.25
 
 def _get_test_tag(flow: float, trial: int) -> str:
     return f"flow-{flow}-trial-{trial}"
@@ -148,6 +155,32 @@ async def test_cycle(
         await move_twin_plunger_absolute_ot3(api, positions[1], speed=speed)
         starting_cycle += 1
 
+
+async def _read_from_sensor(
+    api: OT3API,
+    sensor_id: SensorId,
+    num_readings: int,
+    robot_mount: OT3Mount,
+) -> float:
+    readings: List[float] = []
+    sequential_failures = 0
+    while len(readings) != num_readings:
+        try:
+            r = await helpers_ot3.get_pressure_ot3(api, robot_mount, sensor_id)
+            sequential_failures = 0
+            readings.append(r)
+            print(f"\t{r}")
+            if not api.is_simulator:
+                await sleep(SECONDS_BETWEEN_READINGS)
+        except helpers_ot3.SensorResponseBad as e:
+            sequential_failures += 1
+            if sequential_failures == 3:
+                raise e
+            else:
+                continue
+    return sum(readings) / num_readings
+
+
 async def _main(is_simulating: bool, trials: int, flow: float,
                 liquid_probe: bool, continue_after_stall: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -205,6 +238,18 @@ async def _main(is_simulating: bool, trials: int, flow: float,
 
     # Liquid probe
     if liquid_probe:
+        for m in mounts:
+            for _probe in InstrumentProbeType:
+                sensor_id = sensor_id_for_instrument(_probe)
+                print(f"Mount: {m}")
+                print(f"Sensor: {_probe}")
+                open_pa = 0.0
+                try:
+                    open_pa = await _read_from_sensor(api, sensor_id, NUM_PRESSURE_READINGS, m)
+                except helpers_ot3.SensorResponseBad:
+                    ui.print_error(f"{_probe} pressure sensor not working, skipping")
+                    continue
+                print(f"open-pa: {open_pa}")
         # input("move to pre position...")
         # await helpers_ot3.move_to_arched_ot3(
         #     api, OT3Mount.LEFT, reservoir_a1_nominal + Point(z=8)
