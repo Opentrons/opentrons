@@ -36,7 +36,13 @@ export function UpdateResultsModal(
     iconName: 'ot-alert',
     iconColor: COLORS.red2,
   }
-
+  let instrumentName = 'instrument'
+  if (instrument?.ok) {
+    instrumentName =
+      instrument?.instrumentType === 'pipette'
+        ? instrument?.instrumentName
+        : instrument.instrumentType
+  }
   return (
     <>
       {!isSuccess ? (
@@ -93,11 +99,7 @@ export function UpdateResultsModal(
                   t={t}
                   i18nKey="ready_to_use"
                   values={{
-                    instrument: capitalize(
-                      instrument?.ok && instrument?.instrumentName != null
-                        ? instrument?.instrumentName
-                        : 'instrument'
-                    ),
+                    instrument: capitalize(instrumentName),
                   }}
                   components={{
                     bold: <strong />,
