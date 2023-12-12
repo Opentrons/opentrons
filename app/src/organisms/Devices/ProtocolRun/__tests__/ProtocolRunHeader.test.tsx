@@ -831,7 +831,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
 
     getByText('View error').click()
-    expect(mockCloseCurrentRun).toBeCalled()
+    expect(mockCloseCurrentRun).not.toHaveBeenCalled()
     getByText('mock RunFailedModal')
   })
 
