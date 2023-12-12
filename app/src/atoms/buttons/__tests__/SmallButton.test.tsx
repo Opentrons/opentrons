@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders, COLORS, BORDERS } from '@opentrons/components'
 
 import { SmallButton } from '../SmallButton'
@@ -17,13 +18,13 @@ describe('SmallButton', () => {
     }
   })
   it('renders the primary button and it works as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('small button').click()
+    render(props)
+    fireEvent.click(screen.getByText('small button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(getByRole('button')).toHaveStyle(
+    expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.blueEnabled}`
     )
-    expect(getByRole('button')).toHaveStyle(
+    expect(screen.getByRole('button')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize4}`
     )
   })
@@ -32,16 +33,16 @@ describe('SmallButton', () => {
       ...props,
       buttonType: 'alert',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
   })
   it('renders the secondary button', () => {
     props = {
       ...props,
       buttonType: 'secondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.mediumBlueEnabled}`
     )
   })
@@ -50,16 +51,16 @@ describe('SmallButton', () => {
       ...props,
       buttonType: 'tertiaryHighLight',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
   })
   it('renders the tertiary low light', () => {
     props = {
       ...props,
       buttonType: 'tertiaryLowLight',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
       `color: ${COLORS.darkBlackEnabled}${COLORS.opacity70HexCode}`
     )
   })
@@ -68,16 +69,16 @@ describe('SmallButton', () => {
       ...props,
       disabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
   it('renders the rounded button category', () => {
     props = {
       ...props,
       buttonCategory: 'rounded',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadiusSize5}`
     )
   })
@@ -87,8 +88,8 @@ describe('SmallButton', () => {
       iconName: 'alert',
       iconPlacement: 'startIcon',
     }
-    const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_alert_positionStart')
+    render(props)
+    screen.getByLabelText('SmallButton_alert_positionStart')
   })
   it('renders an icon with end placement', () => {
     props = {
@@ -96,7 +97,7 @@ describe('SmallButton', () => {
       iconName: 'alert',
       iconPlacement: 'endIcon',
     }
-    const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_alert_positionEnd')
+    render(props)
+    screen.getByLabelText('SmallButton_alert_positionEnd')
   })
 })

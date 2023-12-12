@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
@@ -52,7 +52,7 @@ jest.mock('../Hardware')
 jest.mock('../Labware')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
-const mockCreateRun = jest.fn((id: string) => {})
+const mockCreateRun = jest.fn((id: string) => { })
 const mockHardware = Hardware as jest.MockedFunction<typeof Hardware>
 const mockLabware = Labware as jest.MockedFunction<typeof Labware>
 const mockDeck = Deck as jest.MockedFunction<typeof Deck>
@@ -187,13 +187,17 @@ describe('ODDProtocolDetails', () => {
     fireEvent.click(deleteButton)
     const confirmDeleteButton = screen.getByText('Delete')
     fireEvent.click(confirmDeleteButton)
-    // flush promises and then make assertions
-    await new Promise(setImmediate)
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
-    expect(mockDeleteProtocol).toHaveBeenCalledWith(
-      MOCK_HOST_CONFIG,
-      'fakeProtocolId'
+    await waitFor(() =>
+      expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
+    )
+    await waitFor(() =>
+      expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+    )
+    await waitFor(() =>
+      expect(mockDeleteProtocol).toHaveBeenCalledWith(
+        MOCK_HOST_CONFIG,
+        'fakeProtocolId'
+      )
     )
   })
   it('renders the navigation buttons', () => {

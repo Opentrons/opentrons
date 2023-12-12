@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
@@ -52,7 +52,7 @@ describe('MountGripper', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking confirm calls proceed if attached gripper', () => {
+  it('clicking confirm calls proceed if attached gripper', async () => {
     mockUseInstrumentsQuery.mockReturnValue({
       refetch: mockRefetch,
       data: instrumentsResponseFixture,
@@ -60,7 +60,9 @@ describe('MountGripper', () => {
     render()
     const button = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(button)
-    expect(mockProceed).toHaveBeenCalled()
+    await waitFor(() =>
+      expect(mockProceed).toHaveBeenCalled()
+    )
   })
 
   it('clicking confirm shows unable to detect if no gripper attached', async () => {
@@ -71,18 +73,24 @@ describe('MountGripper', () => {
     render()
     const continueButton = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(continueButton)
-    expect(mockProceed).not.toHaveBeenCalled()
+    await waitFor(() =>
+      expect(mockProceed).not.toHaveBeenCalled()
+    )
     screen.getByText('Unable to detect Gripper')
     let tryAgainButton = screen.getByRole('button', { name: 'Try again' })
     fireEvent.click(tryAgainButton)
-    expect(mockProceed).not.toHaveBeenCalled()
+    await waitFor(() =>
+      expect(mockProceed).not.toHaveBeenCalled()
+    )
     tryAgainButton = screen.getByRole('button', { name: 'Try again' })
     fireEvent.click(tryAgainButton)
     const goBackButton = screen.getByRole('button', { name: 'Go back' })
     fireEvent.click(goBackButton)
     const nextContinue = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(nextContinue)
-    expect(mockProceed).not.toHaveBeenCalled()
+    await waitFor(() =>
+      expect(mockProceed).not.toHaveBeenCalled()
+    )
   })
 
   it('renders correct text', () => {

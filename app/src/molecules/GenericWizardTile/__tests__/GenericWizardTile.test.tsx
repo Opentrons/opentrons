@@ -32,21 +32,21 @@ describe('GenericWizardTile', () => {
     mockGetIsOnDevice.mockReturnValue(false)
   })
   it('renders correct generic tile information with a help link', () => {
-    const { getByText } = render(props)
-    getByText('body')
-    const btn = getByText('Continue')
-    getByText('header')
+    render(props)
+    screen.getByText('body')
+    const btn = screen.getByText('Continue')
+    screen.getByText('header')
     fireEvent.click(btn)
     expect(props.proceed).toHaveBeenCalled()
-    getByText('Need help?')
+    screen.getByText('Need help?')
     expect(screen.queryByText('Go back')).not.toBeInTheDocument()
   })
   it('renders correct generic tile information for on device display', () => {
     mockGetIsOnDevice.mockReturnValue(true)
-    const { getByText, getByLabelText } = render(props)
-    getByText('body')
-    getByText('header')
-    getByLabelText('SmallButton_primary').click()
+    render(props)
+    screen.getByText('body')
+    screen.getByText('header')
+    fireEvent.click(screen.getByLabelText('SmallButton_primary'))
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct generic tile information with a back button', () => {
@@ -54,8 +54,8 @@ describe('GenericWizardTile', () => {
       ...props,
       back: jest.fn(),
     }
-    const { getByText } = render(props)
-    const btn = getByText('Go back')
+    render(props)
+    const btn = screen.getByText('Go back')
     fireEvent.click(btn)
     expect(props.back).toHaveBeenCalled()
   })
@@ -65,8 +65,8 @@ describe('GenericWizardTile', () => {
       back: jest.fn(),
       backIsDisabled: true,
     }
-    const { getByLabelText } = render(props)
-    const btn = getByLabelText('back')
+    render(props)
+    const btn = screen.getByLabelText('back')
     fireEvent.click(btn)
     expect(btn).toBeDisabled()
   })

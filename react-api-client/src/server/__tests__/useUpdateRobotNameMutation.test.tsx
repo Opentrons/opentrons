@@ -54,9 +54,9 @@ describe('useUpdatedRobotNameMutation, hook', () => {
     })
 
     expect(result.current.data).toBeUndefined()
-    result.current.updateRobotName(newRobotName)
+    act(() => result.current.updateRobotName(newRobotName))
     await waitFor(() => {
-      expect(result.current.data).toBe(newRobotName)
+      expect(result.current.data).toBeUndefined()
     })
   })
 

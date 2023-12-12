@@ -88,7 +88,7 @@ describe('MeasureNozzle', () => {
   it('clicking proceed sends only move to tip rack commands for cal health check', () => {
     render({ sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK })
     const button = screen.getByRole('button', { name: 'Confirm placement' })
-    button.click()
+    fireEvent.click(button)
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
     })

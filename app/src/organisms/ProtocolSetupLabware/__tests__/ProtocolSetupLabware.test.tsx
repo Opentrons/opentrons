@@ -94,14 +94,14 @@ describe('ProtocolSetupLabware', () => {
 
   it('correctly navigates with the nav button', () => {
     render()
-    screen.getAllByRole('button')[0].click()
+    fireEvent.click(screen.getAllByRole('button')[0])
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })
 
   it('should launch and close the deck map', () => {
     render()
-    screen.getByRole('button', { name: 'Map View' }).click()
-    screen.getByLabelText('closeIcon').click()
+    fireEvent.click(screen.getByRole('button', { name: 'Map View' }))
+    fireEvent.click(screen.getByLabelText('closeIcon'))
     screen.getByText('Labware')
   })
 

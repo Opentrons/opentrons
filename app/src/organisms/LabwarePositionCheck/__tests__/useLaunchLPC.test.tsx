@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
@@ -183,10 +183,10 @@ describe('useLaunchLPC hook', () => {
       ),
     })
     expect(result.current.LPCWizard).not.toBeNull()
-    const { getByText } = renderWithProviders(
+    renderWithProviders(
       result.current.LPCWizard ?? <></>
     )[0]
-    getByText('exit').click()
+    fireEvent.click(screen.getByText('exit'))
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(
       MOCK_MAINTENANCE_RUN_ID,
       {

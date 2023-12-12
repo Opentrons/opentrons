@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { i18n } from '../../../i18n'
@@ -66,7 +66,7 @@ describe('DeckSetup', () => {
 
   it('clicking continue proceeds to next step', () => {
     render()
-    screen.getByRole('button', { name: 'Confirm placement' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm placement' }))
 
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,

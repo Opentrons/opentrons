@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import { resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -53,77 +54,75 @@ describe('CalibrationStatusCard', () => {
   }
 
   it('renders a calibration status title and description', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('Calibration Status')
-    getByText(
+    render(props)
+    screen.getByText('Calibration Status')
+    screen.getByText(
       `For accurate and precise movement, calibrate the robot's deck, pipette offsets, and tip lengths.`
     )
   })
 
   it('renders a complete status label', () => {
-    const [{ getByText }] = render(props)
-    getByText('Calibration complete')
+    render(props)
+    screen.getByText('Calibration complete')
   })
 
   it('renders a missing status label', () => {
     mockUseCalibrationTaskList.mockReturnValue(
       expectedIncompleteDeckCalTaskList
     )
-    const [{ getByText }] = render(props)
-    getByText('Missing calibration data')
+    render(props)
+    screen.getByText('Missing calibration data')
   })
 
   it('renders a recommended status label when the deck is bad', () => {
     mockUseCalibrationTaskList.mockReturnValue(expectedBadDeckTaskList)
-    const [{ getByText }] = render(props)
-    getByText('Calibration recommended')
+    render(props)
+    screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when both the deck and offset is bad', () => {
     mockUseCalibrationTaskList.mockReturnValue(
       expectedBadDeckAndPipetteOffsetTaskList
     )
-    const [{ getByText }] = render(props)
-    getByText('Calibration recommended')
+    render(props)
+    screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when everything is bad', () => {
     mockUseCalibrationTaskList.mockReturnValue(expectedBadEverythingTaskList)
-    const [{ getByText }] = render(props)
-    getByText('Calibration recommended')
+    render(props)
+    screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when the offset is bad', () => {
     mockUseCalibrationTaskList.mockReturnValue(expectedBadPipetteOffsetTaskList)
-    const [{ getByText }] = render(props)
-    getByText('Calibration recommended')
+    render(props)
+    screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when the tip length is bad', () => {
     mockUseCalibrationTaskList.mockReturnValue(expectedBadTipLengthTaskList)
-    const [{ getByText }] = render(props)
-    getByText('Calibration recommended')
+    render(props)
+    screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when both the tip length and offset is bad', () => {
     mockUseCalibrationTaskList.mockReturnValue(
       expectedBadTipLengthAndOffsetTaskList
     )
-    const [{ getByText }] = render(props)
-    getByText('Calibration recommended')
+    render(props)
+    screen.getByText('Calibration recommended')
   })
 
   it('renders a "See how robot calibration works button"', () => {
-    const [{ getByRole }] = render(props)
-    getByRole('button', { name: 'See how robot calibration works' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'See how robot calibration works' }))
     expect(mockSetShowHowCalibrationWorksModal).toBeCalled()
   })
 
   it('renders a link to launch the calibration dashboard', () => {
-    const [{ getByRole }] = render(props)
-
-    const calibrationDashboardLink = getByRole('link', {
+    render(props)
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Launch calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(

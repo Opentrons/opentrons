@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
 import { useProtocolAnalysisAsDocumentQuery } from '@opentrons/react-api-client'
@@ -97,10 +97,13 @@ describe('ProtocolCard', () => {
   })
 
   it('should display modal after long click', async () => {
+    jest.useFakeTimers()
     render()
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    jest.advanceTimersByTime(1005)
+    act(() => {
+      jest.advanceTimersByTime(1005)
+    })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByText('Run protocol')
     screen.getByText('Pin protocol')
@@ -108,13 +111,16 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing', async () => {
+    jest.useFakeTimers()
     mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    jest.advanceTimersByTime(1005)
+    act(() => {
+      jest.advanceTimersByTime(1005)
+    })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('failedAnalysis_icon')
     screen.getByText('Failed analysis')
@@ -127,13 +133,16 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing - undefined case', async () => {
+    jest.useFakeTimers()
     mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
       data: undefined as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    jest.advanceTimersByTime(1005)
+    act(() => {
+      jest.advanceTimersByTime(1005)
+    })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('failedAnalysis_icon')
     screen.getByText('Failed analysis')
