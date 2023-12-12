@@ -117,7 +117,7 @@ export const RobotConfigurationDetails = (
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
       <RobotConfigurationDetailsItem
-        label={is96PipetteUsed ? t('left_and_right_mounts') : t('left_mount')}
+        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
         item={isLoading ? loadingText : leftMountItem}
       />
       {!is96PipetteUsed && (

@@ -20,7 +20,7 @@
   "labware": "labware",
   "last_analyzed": "last analyzed",
   "last_updated": "last updated",
-  "left_and_right_mounts": "Both Mounts",
+  "both_mounts": "Both Mounts",
   "left_mount": "left mount",
   "liquid_name": "liquid name",
   "liquids_not_in_protocol": "no liquids are specified for this protocol",
