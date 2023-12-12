@@ -490,8 +490,8 @@ def test_deck_conflict_raises_for_bad_partial_8_channel_move(
             Dimensions(x=0, y=0, z=50),
             False,
             pytest.raises(
-                deck_conflict.PipetteMovementNotAllowed,
-                match="must be on a Flex Tiprack Adapter",
+                deck_conflict.UnsuitableTiprackForPipetteMotion,
+                match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
             ),
         ),
         (
@@ -505,8 +505,8 @@ def test_deck_conflict_raises_for_bad_partial_8_channel_move(
             Dimensions(x=0, y=0, z=101),
             False,
             pytest.raises(
-                deck_conflict.PipetteMovementNotAllowed,
-                match="must be on a Flex Tiprack Adapter",
+                deck_conflict.UnsuitableTiprackForPipetteMotion,
+                match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
             ),
         ),
         (
@@ -515,7 +515,7 @@ def test_deck_conflict_raises_for_bad_partial_8_channel_move(
             True,
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
-                match="cannot be on an adapter taller than the tiprack",
+                match="A cool tiprack cannot be on an adapter taller than the tip rack",
             ),
         ),
         (
@@ -545,7 +545,9 @@ def test_valid_96_pipette_movement_for_tiprack_and_adapter(
     decoy.when(mock_state_view.labware.get_dimensions("adapter-id")).then_return(
         Dimensions(x=0, y=0, z=100)
     )
-
+    decoy.when(mock_state_view.labware.get_display_name("labware-id")).then_return(
+        "A cool tiprack"
+    )
     decoy.when(
         mock_state_view.pipettes.get_is_partially_configured("pipette-id")
     ).then_return(is_partial_config)

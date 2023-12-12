@@ -36,7 +36,7 @@ class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
         )
 
 
-class PipetteMovementNotAllowed(MotionPlanningFailureError):
+class UnsuitableTiprackForPipetteMotion(MotionPlanningFailureError):
     """Error raised when trying to perform a pipette movement to a tip rack, based on adapter status."""
 
     def __init__(self, message: str) -> None:
@@ -209,28 +209,28 @@ def check_safe_for_tip_pickup_and_return(
         return
 
     is_partial_config = engine_state.pipettes.get_is_partially_configured(pipette_id)
-    tiprack_name = engine_state.labware.get_load_name(labware_id)
+    tiprack_name = engine_state.labware.get_display_name(labware_id)
     tiprack_parent = engine_state.labware.get_location(labware_id)
     if isinstance(tiprack_parent, OnLabwareLocation):  # tiprack is on an adapter
         tiprack_height = engine_state.labware.get_dimensions(labware_id).z
         adapter_height = engine_state.labware.get_dimensions(tiprack_parent.labwareId).z
         if is_partial_config and tiprack_height < adapter_height:
             raise PartialTipMovementNotAllowedError(
-                f"Tip rack {tiprack_name} cannot be on an adapter taller than the tip rack"
+                f"{tiprack_name} cannot be on an adapter taller than the tip rack"
                 f" when picking up fewer than 96 tips."
             )
         elif not is_partial_config and tiprack_height > adapter_height:
-            raise PipetteMovementNotAllowed(
-                f"Tip rack {tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
-                f" in order to pick up or return 96 tips simultaneously."
+            raise UnsuitableTiprackForPipetteMotion(
+                f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+                f" in order to pick up or return all 96 tips simultaneously."
             )
 
     elif (
         not is_partial_config
     ):  # tiprack is not on adapter and pipette is in full config
-        raise PipetteMovementNotAllowed(
-            f"Tiprack {tiprack_name} must be on a Flex Tiprack Adapter (or similar)"
-            f" in order to pick up or return tips with all 96-channel nozzles."
+        raise UnsuitableTiprackForPipetteMotion(
+            f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+            f" in order to pick up or return all 96 tips simultaneously."
         )
 
 
