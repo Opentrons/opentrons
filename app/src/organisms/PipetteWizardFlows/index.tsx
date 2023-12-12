@@ -104,6 +104,7 @@ export const PipetteWizardFlows = (
     attachedPipettes: memoizedAttachedPipettes,
     pipetteInfo: memoizedPipetteInfo,
   })
+  const memoizedWizardTitle = React.useMemo(() => wizardTitle, [])
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
   >(null)
@@ -396,7 +397,7 @@ export const PipetteWizardFlows = (
   const wizardHeader = (
     <WizardHeader
       exitDisabled={isRobotMoving || isFetchingPipettes}
-      title={wizardTitle}
+      title={memoizedWizardTitle}
       currentStep={
         progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
       }
