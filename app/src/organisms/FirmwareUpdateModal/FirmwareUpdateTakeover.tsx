@@ -42,13 +42,6 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   })
   const [indexToUpdate, setIndexToUpdate] = React.useState(0)
 
-  // for debugging - remove before merge
-  React.useEffect(() => {
-    console.log('Change in index or instruments array:')
-    console.log('index to update: ', indexToUpdate)
-    console.log('instruments to update array:', instrumentsToUpdate)
-  }, [indexToUpdate, instrumentsToUpdate])
-
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
   })
@@ -97,13 +90,13 @@ export function FirmwareUpdateTakeover(): JSX.Element {
           onClose={() => {
             // if no more instruments need updating, close the modal
             // otherwise start over with next instrument
-            if (instrumentsToUpdate.length <= indexToUpdate) {
+            if (instrumentsToUpdate.length <= indexToUpdate + 1) {
               setShowUpdateNeededModal(false)
             } else {
               setIndexToUpdate(prevIndexToUpdate => prevIndexToUpdate + 1)
             }
           }}
-          shouldExit={instrumentsToUpdate.length <= indexToUpdate}
+          shouldExit={instrumentsToUpdate.length <= indexToUpdate + 1}
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
       ) : null}

@@ -94,8 +94,8 @@ export function UpdateResultsModal(
                   i18nKey="ready_to_use"
                   values={{
                     instrument: capitalize(
-                      instrument?.ok && instrument?.instrumentModel != null
-                        ? instrument?.instrumentModel
+                      instrument?.ok && instrument?.instrumentName != null
+                        ? instrument?.instrumentName
                         : 'instrument'
                     ),
                   }}
