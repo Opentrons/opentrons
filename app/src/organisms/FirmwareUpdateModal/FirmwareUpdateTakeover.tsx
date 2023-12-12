@@ -27,8 +27,9 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   const instrumentsData = useInstrumentsQuery({
     refetchInterval: POLL_INTERVAL_MS,
   }).data?.data
-
-  const instrumentsToUpdate = [] as InstrumentData[]
+  const [instrumentsToUpdate, setInstrumentsToUpdate] = React.useState<
+    InstrumentData[]
+  >([])
   instrumentsData?.forEach(instrument => {
     if (
       !instrument.ok &&
@@ -36,14 +37,17 @@ export function FirmwareUpdateTakeover(): JSX.Element {
         (i): i is InstrumentData => i.subsystem === instrument.subsystem
       ) == null
     ) {
-      instrumentsToUpdate.push(instrument)
+      setInstrumentsToUpdate([...instrumentsToUpdate, instrument])
     }
   })
   const [indexToUpdate, setIndexToUpdate] = React.useState(0)
-  const subsystemToUpdate =
-    instrumentsToUpdate.length > indexToUpdate
-      ? instrumentsToUpdate[indexToUpdate]?.subsystem
-      : null
+
+  // for debugging - remove before merge
+  React.useEffect(() => {
+    console.log('Change in index or instruments array:')
+    console.log('index to update: ', indexToUpdate)
+    console.log('instruments to update array:', instrumentsToUpdate)
+  }, [indexToUpdate, instrumentsToUpdate])
 
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
@@ -67,7 +71,8 @@ export function FirmwareUpdateTakeover(): JSX.Element {
 
   React.useEffect(() => {
     if (
-      subsystemToUpdate != null &&
+      instrumentsToUpdate.length > indexToUpdate &&
+      instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
       maintenanceRunData == null &&
       !isUnboxingFlowOngoing &&
       externalSubsystemUpdate == null
@@ -75,7 +80,8 @@ export function FirmwareUpdateTakeover(): JSX.Element {
       setShowUpdateNeededModal(true)
     }
   }, [
-    subsystemToUpdate,
+    instrumentsToUpdate,
+    indexToUpdate,
     maintenanceRunData,
     isUnboxingFlowOngoing,
     externalSubsystemUpdate,
@@ -83,9 +89,11 @@ export function FirmwareUpdateTakeover(): JSX.Element {
 
   return (
     <>
-      {subsystemToUpdate != null && showUpdateNeededModal ? (
+      {instrumentsToUpdate.length > indexToUpdate &&
+      instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
+      showUpdateNeededModal ? (
         <UpdateNeededModal
-          subsystem={subsystemToUpdate}
+          subsystem={instrumentsToUpdate[indexToUpdate]?.subsystem}
           onClose={() => {
             // if no more instruments need updating, close the modal
             // otherwise start over with next instrument
