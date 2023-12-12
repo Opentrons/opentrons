@@ -125,7 +125,7 @@ function FixtureTableItem({
   let handleClick
   if (!isCurrentFixtureCompatible) {
     const isConflictingFixtureConfigured =
-      cutoutFixtureId != null && SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+      cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
     chipLabel = (
       <>
         <Chip
