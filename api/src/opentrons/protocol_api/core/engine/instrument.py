@@ -383,6 +383,11 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             absolute_point=location.point,
         )
+        deck_conflict.check_safe_for_tip_pickup_and_return(
+            engine_state=self._engine_client.state,
+            pipette_id=self._pipette_id,
+            labware_id=labware_id,
+        )
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
@@ -434,12 +439,19 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         else:
             well_location = DropTipWellLocation()
+
+        if self._engine_client.state.labware.is_tiprack(labware_id):
+            deck_conflict.check_safe_for_tip_pickup_and_return(
+                engine_state=self._engine_client.state,
+                pipette_id=self._pipette_id,
+                labware_id=labware_id,
+            )
         deck_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
             pipette_id=self._pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=WellLocation(),
+            well_location=well_location,
         )
         self._engine_client.drop_tip(
             pipette_id=self._pipette_id,
