@@ -110,7 +110,7 @@ Which fixtures you need to configure depend on both load methods and the effects
 Staging Area Slots
 ------------------
 
-Slots A4 through D4, which are not accessible by pipettes, are always available in the API for loading and moving labware. Using a slot in column 4 as the ``location`` argument of :py:meth:`.load_labware` or the ``new_location`` argument of :py:meth:`.move_labware` will require the corresponding staging area slot in the robot's deck configuration::
+Slots A4 through D4 are the staging area slots. Pipettes can't reach the staging area, but these slots are always available in the API for loading and moving labware. Using a slot in column 4 as the ``location`` argument of :py:meth:`.load_labware` or the ``new_location`` argument of :py:meth:`.move_labware` will require the corresponding staging area slot in the robot's deck configuration::
 
     plate_1 = protocol.load_labware(
         load_name="corning_96_wellplate_360ul_flat", location="C3"
@@ -159,7 +159,7 @@ Call ``load_trash_bin()`` multiple times to add more than one bin. See :ref:`Add
 Waste Chute
 -----------
 
-The waste chute accepts various waste materials from Flex pipettes or the Flex Gripper. Pipettes can dispense liquid or drop tips in the chute. The gripper can drop tip racks and other labware into the chute.
+The waste chute accepts various materials from Flex pipettes or the Flex Gripper and uses gravity to transport them outside of the robot for disposal. Pipettes can dispose of liquid or drop tips into the chute. The gripper can drop tip racks and other labware into the chute.
 
 To use the waste chute, first use :py:meth:`.load_waste_chute` to load it in slot D3::
 
@@ -187,7 +187,7 @@ In total, there are four possible deck configurations for the waste chute.
 Deck Conflicts
 ==============
 
-When a Flex analyzes a Python protocol, it will check whether there are any conflicts with its current deck configuration. You can't start the protocol run until any conflicts are resolved. You can resolve them one of two ways:
+A deck conflict check occurs when preparing to run a Python protocol on a Flex running robot system version 7.1.0 or higher. The Opentrons App and touchscreen will prevent you from starting the protocol run until any conflicts are resolved. You can resolve them one of two ways:
 
     - Physically move hardware around the deck, and update the deck configuration.
     - Alter your protocol to work with the current deck configuration, and resend the protocol to your Flex.
