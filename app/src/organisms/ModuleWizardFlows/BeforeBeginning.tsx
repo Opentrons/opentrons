@@ -128,7 +128,9 @@ const useAddEquipmentToSpecificModules = (
   ) {
     equipmentList.unshift({
       loadName: 't10_torx_screwdriver',
-      displayName: t('t10_torx_screwdriver'),
+      displayName: t('t10_torx_screwdriver', {
+        name: 'T10 Torx',
+      }),
       subtitle: t('t10_torx_screwdriver_subtitle'),
     })
   }
