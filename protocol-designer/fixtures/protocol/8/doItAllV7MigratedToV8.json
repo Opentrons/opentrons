@@ -6,7 +6,7 @@
     "author": "",
     "description": "",
     "created": 1689346890165,
-    "lastModified": 1701365576566,
+    "lastModified": 1702420809427,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -15,7 +15,7 @@
     "name": "opentrons/protocol-designer",
     "version": "8.0.0",
     "data": {
-      "_internalAppBuildDate": "Thu, 30 Nov 2023 17:25:23 GMT",
+      "_internalAppBuildDate": "Tue, 12 Dec 2023 22:33:57 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -175,7 +175,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "100",
           "blowout_checkbox": false,
-          "blowout_location": "55a5cf3b-0fb6-40a5-921e-0020a7b99c7e:trashBin",
+          "blowout_location": "4824b094-5999-4549-9e6b-7098a9b30a8b:trashBin",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
           "aspirate_airGap_volume": "0",
@@ -187,7 +187,7 @@
           "dispense_delay_checkbox": false,
           "dispense_delay_seconds": "1",
           "dispense_delay_mmFromBottom": null,
-          "dropTip_location": "55a5cf3b-0fb6-40a5-921e-0020a7b99c7e:trashBin",
+          "dropTip_location": "4824b094-5999-4549-9e6b-7098a9b30a8b:trashBin",
           "id": "f9a294f1-f42b-4cae-893a-592405349d56",
           "stepType": "moveLiquid",
           "stepName": "transfer",
@@ -200,7 +200,7 @@
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
           "blowout_checkbox": false,
-          "blowout_location": "55a5cf3b-0fb6-40a5-921e-0020a7b99c7e:trashBin",
+          "blowout_location": "4824b094-5999-4549-9e6b-7098a9b30a8b:trashBin",
           "mix_mmFromBottom": 0.5,
           "pipette": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
           "volume": "10",
@@ -213,7 +213,7 @@
           "dispense_delay_seconds": "1",
           "mix_touchTip_checkbox": false,
           "mix_touchTip_mmFromBottom": null,
-          "dropTip_location": "55a5cf3b-0fb6-40a5-921e-0020a7b99c7e:trashBin",
+          "dropTip_location": "4824b094-5999-4549-9e6b-7098a9b30a8b:trashBin",
           "id": "5fdb9a12-fab4-42fd-886f-40af107b15d6",
           "stepType": "mix",
           "stepName": "mix",
@@ -3745,7 +3745,7 @@
   "commandSchemaId": "opentronsCommandSchemaV8",
   "commands": [
     {
-      "key": "79db08d3-e469-400b-847b-d9c35431254d",
+      "key": "67a85572-e7b6-4b39-9370-424aa3a8919b",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p1000_single_flex",
@@ -3754,7 +3754,7 @@
       }
     },
     {
-      "key": "d9031e6e-df82-4ced-ac0e-5127ca40f999",
+      "key": "9eaf88dc-37f8-4ab5-bd99-59fb5602e5f7",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p50_multi_flex",
@@ -3763,7 +3763,7 @@
       }
     },
     {
-      "key": "b04324d7-9581-4177-9f66-5b5ab1127a6a",
+      "key": "5fd85f47-9d69-4dda-abc3-828314b342f5",
       "commandType": "loadModule",
       "params": {
         "model": "magneticBlockV1",
@@ -3772,7 +3772,7 @@
       }
     },
     {
-      "key": "9c52a18a-0284-4bb1-810d-49796f16a987",
+      "key": "b96e97b5-55cd-4531-9d0b-1ed3b3b7994d",
       "commandType": "loadModule",
       "params": {
         "model": "heaterShakerModuleV1",
@@ -3781,7 +3781,7 @@
       }
     },
     {
-      "key": "9cefc7af-9c7f-4598-8efe-6e08803d200c",
+      "key": "052aa59d-ac12-4ae6-b546-5072025b4a98",
       "commandType": "loadModule",
       "params": {
         "model": "temperatureModuleV2",
@@ -3790,7 +3790,7 @@
       }
     },
     {
-      "key": "8c43763c-9d87-4354-9ec6-701f73d1f1f7",
+      "key": "d3b2158d-120b-438b-b8ed-49750ff8c20e",
       "commandType": "loadModule",
       "params": {
         "model": "thermocyclerModuleV2",
@@ -3799,7 +3799,7 @@
       }
     },
     {
-      "key": "891ec122-2f65-4f06-98b0-81cb0a18d2d1",
+      "key": "e7229332-1fdf-4221-8a79-3adfbe9dbe6e",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons 96 Flat Bottom Heater-Shaker Adapter",
@@ -3813,7 +3813,7 @@
       }
     },
     {
-      "key": "180b0cdb-16df-494a-9d0b-fd99885c6da7",
+      "key": "a84c66f6-0d0f-42cc-81a8-790fbcfc1da2",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
@@ -3825,7 +3825,7 @@
       }
     },
     {
-      "key": "3a772cf0-56c7-40de-ac67-18bbec7a2c7f",
+      "key": "d1c3cb44-5de1-43c4-b9e1-5fbc5e36afa8",
       "commandType": "loadLabware",
       "params": {
         "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -3839,7 +3839,7 @@
       }
     },
     {
-      "key": "5f54f4d6-9be2-4193-a9e2-2bc8a4dfb203",
+      "key": "87f04b51-65b5-4dbf-a392-6920b6557deb",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons 24 Well Aluminum Block with NEST 1.5 mL Snapcap",
@@ -3853,7 +3853,7 @@
       }
     },
     {
-      "key": "30abb315-4c76-48b4-b2b3-d98909a18bde",
+      "key": "4aa72314-df40-4280-8ec4-8b1c008d5f80",
       "commandType": "loadLabware",
       "params": {
         "displayName": "NEST 96 Well Plate 200 µL Flat",
@@ -3868,7 +3868,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "b6092a65-59c6-45d5-a434-50ccd937c6b2",
+      "key": "f75fad88-17e3-4d6d-870d-deee51458d09",
       "params": {
         "liquidId": "1",
         "labwareId": "a793a135-06aa-4ed6-a1d3-c176c7810afa:opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1",
@@ -3877,7 +3877,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "a9011729-0376-4510-a16b-d7f4879dda7c",
+      "key": "a322cfd6-567f-49f4-bba8-e14d91178fc3",
       "params": {
         "liquidId": "0",
         "labwareId": "fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
@@ -3895,7 +3895,7 @@
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
-      "key": "cf1d34cd-0575-485b-8570-d0b71d7d1190",
+      "key": "268aa4aa-b749-45f8-b3ce-db07cb3004d6",
       "params": {
         "moduleId": "ef44ad7f-0fd9-46d6-8bc0-c70785644cc8:temperatureModuleType",
         "celsius": 4
@@ -3903,7 +3903,7 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
-      "key": "b69bab24-d382-4908-bd6b-a2edd4bd788c",
+      "key": "9878763f-f904-4ed6-bd15-78e1f7290c17",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType",
         "celsius": 4
@@ -3911,14 +3911,14 @@
     },
     {
       "commandType": "thermocycler/closeLid",
-      "key": "a9ea1c71-42bc-4f97-b953-a857bc1cdc32",
+      "key": "b610b2ca-6205-47ef-bd4e-2ff825131989",
       "params": {
         "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType"
       }
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
-      "key": "3dc47ef3-3b90-4d0a-ae0b-0be2461fd96b",
+      "key": "7f037ad4-40ae-4c79-9730-d369de6f683f",
       "params": {
         "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType",
         "celsius": 40
@@ -3926,14 +3926,14 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
-      "key": "9b53e6a1-3bc0-4f57-972a-f81b68b6e4ce",
+      "key": "520c5311-725e-4428-b8a5-2b0c7219fdb7",
       "params": {
         "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType"
       }
     },
     {
       "commandType": "thermocycler/runProfile",
-      "key": "4e41ba0b-37c8-410f-908c-cc4d61409095",
+      "key": "4d5131a9-5895-4c30-b840-5d2a1a40942a",
       "params": {
         "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType",
         "profile": [
@@ -3945,28 +3945,28 @@
     },
     {
       "commandType": "thermocycler/deactivateBlock",
-      "key": "c1195719-f142-4890-a49a-40891ac9f4fc",
+      "key": "63d5155b-c8df-4502-8beb-babbf941ba1b",
       "params": {
         "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType"
       }
     },
     {
       "commandType": "thermocycler/deactivateLid",
-      "key": "6f1b66da-c600-4af3-b044-ebad75900977",
+      "key": "11f57871-52ae-4025-a00e-bc5bd03a738b",
       "params": {
         "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType"
       }
     },
     {
       "commandType": "thermocycler/openLid",
-      "key": "397dad91-0305-4299-b841-2257a946ee75",
+      "key": "d729aa20-7c95-4574-9fed-f49a8938fed6",
       "params": {
         "moduleId": "627b7a27-5bb7-46de-a530-67af45652e3b:thermocyclerModuleType"
       }
     },
     {
       "commandType": "pickUpTip",
-      "key": "96504a3a-74c2-4147-83d7-ea2f5c88878d",
+      "key": "e2dab7ec-70d6-4e6b-a711-07a0a5d554f5",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -3975,7 +3975,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bd332dd8-dda6-4980-bb83-7742bcd3e310",
+      "key": "77af6a5a-282c-4a0a-8bdd-5d4cc518d51d",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -3987,7 +3987,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "c1aefcd5-ada4-4a76-b0c7-5e57d59ac19e",
+      "key": "be1e7074-0b96-4bfa-8bd7-56880d3989b0",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -3998,22 +3998,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "9f7ecea1-0f31-4425-bb6f-52f2a8f6d49c",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "d421e35d-ef4f-4347-878f-28269c2e0e0b",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "ac00f670-852b-4426-97dc-871b44ba66a1",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "ba429cf3-5c3a-4e67-96ef-bbae5ad99841",
+      "key": "57a9e3bc-16e5-4dbf-840f-ef209cf856e1",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4022,7 +4018,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "d2d34041-0d12-4168-aee1-a222e414fe9a",
+      "key": "4c3d52f2-a9ea-4464-81a6-47833db3424c",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4034,7 +4030,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "2421ae5f-b371-4c44-83ad-aaad803afdf2",
+      "key": "e5401a5c-58ec-45f8-9523-336440d8715f",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4045,22 +4041,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "36abe345-c365-4aac-8ca7-64fa677911d8",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "6a30187d-016c-4431-8b35-9fd90a3b940d",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "2090ef62-ea92-4b94-bd06-db2b728be791",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "d54d755c-8752-4b3d-9501-1455004566e7",
+      "key": "ec449df4-f566-463b-a456-888539754602",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4069,7 +4061,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "d27b3202-5fed-4274-a3e9-88370b45c267",
+      "key": "2cdddd11-f918-49bf-8968-90d7fdf689b9",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4081,7 +4073,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "2412fd39-17db-435b-bfec-9596937b2f44",
+      "key": "d40bbadd-350e-4712-a2b6-54b5c5e01a4e",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4092,22 +4084,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "a24f87ac-85f4-4d81-91d4-61280c417913",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "11446120-1cd7-4d31-b3ce-cf9c9e164c31",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "bb648909-b03d-4968-8c70-2805f62e25ea",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "904d049a-aab8-48ba-9248-798b690c13d6",
+      "key": "30b832e2-d26d-4a67-8a2f-e016fed5bf5f",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4116,7 +4104,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1c043b52-5c9f-4083-ac53-7a9fb4cab2bc",
+      "key": "a97eaad0-b380-419b-ab4a-2217e1495c9b",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4128,7 +4116,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "9926e7d6-5a87-4f11-992a-d21f7e58a28c",
+      "key": "e6643b1f-2cb1-4dae-9e80-ea10ea30fcd5",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4139,22 +4127,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "cb08407b-f8a6-4762-b3fe-8108434919f1",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "a54271da-153f-4c56-89e5-e75512c2479d",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "976eb63e-6088-4557-8db5-03e7eea31c1e",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "ac4bf02a-ac25-4193-8142-c2a3098c5b61",
+      "key": "a8386c31-d0a7-45f2-aa3a-93ac440bb893",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4163,7 +4147,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4626290b-c3e9-48dd-86a5-9d73c55facd2",
+      "key": "cde8b107-1fb4-4621-be3c-208ba575bb92",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4175,7 +4159,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "903eefdb-c6dc-4a32-809d-347f537d4da5",
+      "key": "ebfa9a2b-d6b2-4b13-95fb-84bc50fde118",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4186,22 +4170,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "677fb23c-2cc4-4487-8c48-4f3e177f9e44",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "03e6c0a5-b0f1-427d-bc58-4fbf6fbd21be",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "f5dd6139-a8ed-4581-bf1b-0be264a64d7d",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "a07d4319-0a53-45b5-99c9-73ac59a85af0",
+      "key": "f6d713e8-89ff-4d3e-aaab-fbe2989dd179",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4210,7 +4190,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "2e889afe-b033-4674-8833-f7d431f80574",
+      "key": "6e22f317-5ae4-4e9f-8605-7465e1422703",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4222,7 +4202,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "f2ec3fbb-730f-4615-9105-2dcb2cb8daf4",
+      "key": "bc10bd3d-4a4b-41a2-82e6-54c0440d32eb",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4233,22 +4213,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "cd7afa3d-f32c-4bda-b6f6-120e552fccac",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "cf645737-94a2-4ad7-b831-5bef7f231c06",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "89b50486-6526-4583-bf14-0e69b1c9e734",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "d609285f-e1cb-4a09-8404-69079ed235ef",
+      "key": "96f89a25-617d-4bea-a1da-8fedf0cbf8f5",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4257,7 +4233,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "f591f11f-a655-4361-8d80-7d3b62c96b3b",
+      "key": "3911c02f-937a-46d6-bf7d-905a32a5be2e",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4269,7 +4245,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "851dc918-1d92-4290-9b0b-ef87080bd040",
+      "key": "6d8cd974-888c-4839-8487-45979ccec2be",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4280,22 +4256,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "b828dceb-0571-4095-8cbc-14758ead5ca8",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "1e2db296-c028-469c-9c53-427802616e07",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "44e645f1-3e34-41d8-beb8-3f372040417f",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "6f1f3e65-bf43-4a2a-bd42-d264c48cfbbe",
+      "key": "faac2fd6-a6c2-4476-855f-050e6de30f50",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4304,7 +4276,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "71ddf173-9435-408e-814c-4d654fbe74c0",
+      "key": "8b84ae00-1522-415a-ae6b-d5ac1d51a88a",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4316,7 +4288,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d3ca9907-8ffe-4cfe-a7dd-a3a5edc1b413",
+      "key": "5e8a967a-e46b-4174-843e-8ceab5f51919",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4327,22 +4299,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "a0c50bfd-3b8f-4afa-86cb-03d5e1776d9b",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "92b2bb2b-79dc-42a0-bdb5-aa0ab9b13e87",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "8e019e03-08fb-4ffa-95f8-2b5772ead81f",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "a0c6edab-6a37-49ed-be80-e83b152c7144",
+      "key": "7e002dcf-65f4-46b0-8809-d6f0316596c6",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4351,7 +4319,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "34f408e9-ae6c-483d-beec-f5a21ee04cca",
+      "key": "5cef4b58-609d-4998-913b-82ba2a4739eb",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4363,7 +4331,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "bab118a9-5ecd-4067-af63-c15263edf9a4",
+      "key": "88c5ce01-4549-4ff8-b091-8b19d2e70b64",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4374,22 +4342,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "448ad11e-bf70-4ac2-a208-210e0864dbc7",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "4cb6cc3d-003f-4c2b-b190-a5ebdbab9459",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "c934ec98-5a28-40ec-88cb-3b1860d8bac7",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "a1dbc567-13e8-4e2b-8431-da7f9ba82059",
+      "key": "bd57a694-9816-47fb-b4aa-c80d2c3a0b2c",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4398,7 +4362,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bcf8096a-9ce2-4e2c-9920-aea224b55b59",
+      "key": "3793e59c-1d6c-43f7-bbbe-73c2baac4793",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4410,7 +4374,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "46b9e8ee-27a4-49df-bb0d-171f6ff70925",
+      "key": "8793518d-aaac-470d-af77-77a43d753675",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4421,22 +4385,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "3a477d39-dba2-44cb-83ed-694671ffb75c",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "77726b6f-424e-4903-a898-bdf01df934f4",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "95585fea-74b8-4d30-bd98-2019c1f024e9",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "f440e6b7-e9ab-4acc-a414-3e369249b515",
+      "key": "df9446b5-d7d2-4bb1-b64b-2cc5a544de96",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4445,7 +4405,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "690f8416-af90-414d-9e00-33f2eccd2a4d",
+      "key": "fa1acf12-67ff-4cd7-9b36-81a4c6fa7942",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4457,7 +4417,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "63961b4c-968b-4730-998f-c75a0450f267",
+      "key": "9a9eeb5d-f5f8-43bb-b0f6-ccbb956d0a2b",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4468,22 +4428,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "5af8e208-2c5e-474c-89c9-bae7ff18beee",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "f6c1a951-4fce-48b5-8990-6cefabb81620",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "479a02e3-e2f5-4c45-96f7-e8517fc17bd4",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "1d32eef6-8c6e-4fb2-9817-68e07dfb330c",
+      "key": "57d8e8c3-64ba-416d-bbed-eb7675ddde76",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4492,7 +4448,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bc5151c0-c191-474b-8cba-844946b43d77",
+      "key": "db03f00e-5aff-4164-a864-f18ca75212e2",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4504,7 +4460,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "0d23f663-62fd-4f8a-ab0f-2d273c94e336",
+      "key": "0d057a50-c927-4f04-8bed-9fb9681423de",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4515,22 +4471,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "0f7b2c7b-5a1a-4378-bcf9-d5949f77a032",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "b69e1555-3b19-444d-afa8-3b464bd4403b",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "2f509f24-3b12-4fee-ad61-9f509021a38f",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "4923e2e4-c0be-4679-ab49-d44686684e57",
+      "key": "b9ecfc6b-e9f3-44ef-81be-b4d8136fcad6",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4539,7 +4491,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b7c45f96-afa5-403b-acd1-e392dc2193ed",
+      "key": "af8c7d1d-f2c6-4871-bfc3-ce5903e8a5a8",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4551,7 +4503,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "186fae96-7563-446e-ae84-753caab4c1ef",
+      "key": "86547661-826e-422d-90fb-5b91915e81ce",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4562,22 +4514,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "c01c8652-e7bc-4072-88e7-1678b0410d88",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "f0e7042f-4bad-4bc5-8259-dd66fe9e8298",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "d90df5ec-8ec5-4d07-84eb-3b223096ad96",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "ce38995d-45ee-4cd4-aec8-0ad6996899c2",
+      "key": "8779a116-4dd8-4e75-bb64-971be73ce999",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4586,7 +4534,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "735e23ba-e9f3-4998-b48d-1ef86e239eb0",
+      "key": "476d628d-0cd3-44f9-b6a3-3ad98688584a",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4598,7 +4546,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "ced27d90-2d86-47cd-a1bd-23745442e61a",
+      "key": "fb2aa4ac-4534-4489-a312-3a48b9c53000",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4609,22 +4557,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "007398d2-502d-4a9a-8f61-c821a8066d89",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "f0b33c82-2628-44de-81dc-bf96c09bf10c",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "825d8d92-b475-4ad1-bab3-59bce3790ad2",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "ab1eaffc-7b7f-4aa9-8364-9b35a7ba56ad",
+      "key": "f5812c27-3bf2-49d6-bcf2-e1d84cd31615",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4633,7 +4577,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "949ad4e6-57cd-4d05-8552-9c8b3c8e93bb",
+      "key": "48efc02b-2950-44cd-bddc-d8567bb2ef0d",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4645,7 +4589,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "9cf0aa50-76f4-45f6-9de2-e0df666d110b",
+      "key": "82c1ca16-ce8d-4144-9f77-2235d3b38a1d",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4656,22 +4600,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "a79763b5-4d1c-401b-bfc3-c0a4fc09c738",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "f904e526-6210-4665-b80f-aaf798998bff",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "a2d3c0d6-eb9c-49e1-b956-714799ad22c4",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "6da21d82-cada-4c18-976d-ed780b86cbfc",
+      "key": "fc43bd31-0414-4eaa-b5c2-f19569955525",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4680,7 +4620,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "621f6337-209d-47d4-90cb-35ef3d283d8c",
+      "key": "e1be24da-66a0-4012-b934-e21ab115fba5",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4692,7 +4632,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "be4ff7ea-e9dc-4405-8a17-f7ebb8b93301",
+      "key": "bd3c42c0-63b0-4b99-9ec2-f763fc74fab2",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "volume": 50,
@@ -4703,22 +4643,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "c4dfd067-166b-47ad-8e56-369d00787f11",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "d1407b93-de54-4cdf-979a-a407c79ac352",
       "params": {
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "4317a410-eceb-4130-b499-f6e717887fee",
-      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
-    },
-    {
       "commandType": "pickUpTip",
-      "key": "cb789542-694f-46b7-a204-33182f2f7b51",
+      "key": "789d33d5-9931-4e3d-b128-8edb6a77c669",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -4727,7 +4663,7 @@
     },
     {
       "commandType": "configureForVolume",
-      "key": "3169824f-775b-43ed-bc53-6743327e6f2a",
+      "key": "54380bee-ed59-4701-a5ff-5a7d62786c3f",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "volume": 10
@@ -4735,7 +4671,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "7c0536d1-a683-4723-bd02-e9e9d35518d9",
+      "key": "f5b8f3b4-e2b2-4d42-8916-9568ed131a61",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "volume": 10,
@@ -4747,7 +4683,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "aceb99cf-9ea4-4624-93ee-cadf31386b1c",
+      "key": "ef25611f-b9d5-4d57-a989-578ea42962c2",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "volume": 10,
@@ -4759,7 +4695,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b4f659ee-7745-48c7-a63d-d3383f67a7ff",
+      "key": "2f000ba7-517f-4f08-8179-33063edd9283",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "volume": 10,
@@ -4771,7 +4707,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "cda8ec14-123e-4e33-a65c-7d3dfa8b21da",
+      "key": "8884b66f-6179-4692-86f9-1ee5809f1b05",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "volume": 10,
@@ -4782,22 +4718,18 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
-      "key": "40e00572-1a82-4f16-84e3-dda9efa04eec",
+      "commandType": "moveToAddressableAreaForDropTip",
+      "key": "094f9abf-d205-4f40-96e6-d92d80c9efca",
       "params": {
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
     {
-      "commandType": "dropTipInPlace",
-      "key": "b7a75837-05f9-4fd5-ae46-d36c67717daf",
-      "params": { "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193" }
-    },
-    {
       "commandType": "moveLabware",
-      "key": "c1b7b516-3c13-4ef8-8fed-b04f22a5d582",
+      "key": "291ca892-3619-4784-8a32-b8c379399ead",
       "params": {
         "labwareId": "fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
         "strategy": "usingGripper",
@@ -4806,12 +4738,12 @@
     },
     {
       "commandType": "waitForDuration",
-      "key": "43f58188-5c9d-46b3-a4ca-606df411c871",
+      "key": "7a21f909-db61-4239-b26e-61af35639ff7",
       "params": { "seconds": 60, "message": "" }
     },
     {
       "commandType": "moveLabware",
-      "key": "d0a6a036-f0ba-42e9-bd34-b44053dc705a",
+      "key": "d7f77df9-9ce5-4a46-8764-6b47814a31f5",
       "params": {
         "labwareId": "fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
         "strategy": "usingGripper",
@@ -4820,21 +4752,21 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
-      "key": "f6a44166-c3d6-4c56-b2b9-8f0d454367a7",
+      "key": "5411a7c9-fd75-48ad-8390-f42c84820d8b",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType"
       }
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
-      "key": "ca10589e-4137-4f4d-93f3-8727686057d8",
+      "key": "4a9a018e-c6d7-4cb6-b400-cdac31c01c9a",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType"
       }
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
-      "key": "126bb297-f848-41c1-8fbb-67d7bc0685ca",
+      "key": "f5382798-ca5f-4052-9444-4ad5bd689286",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType",
         "rpm": 500
@@ -4842,28 +4774,28 @@
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
-      "key": "f97acfff-90ee-4646-89db-20019dc62446",
+      "key": "18be95c2-222b-4575-88df-cfdf6b5b2e29",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType"
       }
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
-      "key": "2c962e5e-e997-49af-b38a-0cfafc1f12b9",
+      "key": "781b4a44-6586-4817-9dcd-e080564f89b4",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType"
       }
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
-      "key": "f9af004a-2218-4e42-b8b0-beaf3954b68d",
+      "key": "f71f0827-5e7e-4833-af6b-e6eb9ca9ec50",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType"
       }
     },
     {
       "commandType": "moveLabware",
-      "key": "4861438d-9f0e-4069-9448-7b7899054065",
+      "key": "6074e2ae-f4a7-408b-b85c-f729124acafd",
       "params": {
         "labwareId": "a793a135-06aa-4ed6-a1d3-c176c7810afa:opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1",
         "strategy": "manualMoveWithPause",
@@ -4872,14 +4804,14 @@
     },
     {
       "commandType": "temperatureModule/deactivate",
-      "key": "ca091b7d-7675-4b90-b2e3-6ebde205f35a",
+      "key": "37c9d0bb-8a50-4f79-9078-2bbf248959d7",
       "params": {
         "moduleId": "ef44ad7f-0fd9-46d6-8bc0-c70785644cc8:temperatureModuleType"
       }
     },
     {
       "commandType": "moveLabware",
-      "key": "9251bbe2-1dad-4328-a64d-fac2ca7ed0a7",
+      "key": "cd6c624a-64dc-459f-b3e4-531829321734",
       "params": {
         "labwareId": "239ceac8-23ec-4900-810a-70aeef880273:opentrons/nest_96_wellplate_200ul_flat/2",
         "strategy": "manualMoveWithPause",
