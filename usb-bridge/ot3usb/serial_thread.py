@@ -22,7 +22,7 @@ def _try_write_all_data(serial: serial.Serial, data: bytes, packet_limit: int) -
         return
     while sent < len(data):
         try:
-            sent += serial.write(data[sent:min(sent+packet_limit, len(data))])
+            sent += serial.write(data[sent : min(sent + packet_limit, len(data))])
         except Exception as e:
             # Any exception means we need to quit
             print(f"Failed to write: {e}")
@@ -39,7 +39,9 @@ def _worker(queue: QUEUE_TYPE, packet_limit: int) -> None:
         _try_write_all_data(ser, data, packet_limit)
 
 
-def create_worker_thread(packet_limit: int = DEFAULT_PACKET_LIMIT) -> Tuple[threading.Thread, QUEUE_TYPE]:
+def create_worker_thread(
+    packet_limit: int = DEFAULT_PACKET_LIMIT,
+) -> Tuple[threading.Thread, QUEUE_TYPE]:
     """Create a serial worker thread. Returns the comms queue.
 
     packet_limit is a maximum size for a single usb packet which is sent no more
@@ -50,7 +52,9 @@ def create_worker_thread(packet_limit: int = DEFAULT_PACKET_LIMIT) -> Tuple[thre
 
     queue: QUEUE_TYPE = Queue(QUEUE_MAX_ITEMS)
     thread = threading.Thread(
-        target=_worker, name="serial worker", kwargs={"queue": queue, "packet_limit": packet_limit}
+        target=_worker,
+        name="serial worker",
+        kwargs={"queue": queue, "packet_limit": packet_limit},
     )
 
     return (thread, queue)
