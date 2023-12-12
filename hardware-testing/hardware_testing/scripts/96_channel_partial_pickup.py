@@ -1,6 +1,5 @@
 """Demo OT3 Gantry Functionality."""
 import argparse
-# import ast
 import asyncio
 import csv
 import time
@@ -52,7 +51,6 @@ test_volume = 200
 def dict_keys_to_line(dict):
     return str.join(",", list(dict.keys())) + "\n"
 
-
 def file_setup(test_data, details):
     today = datetime.date.today()
     test_name = "{}-pick_up-up-test-{}Amps".format(
@@ -69,12 +67,10 @@ def file_setup(test_data, details):
     print("FILE NAME = ", test_file)
     return test_name, test_file
 
-
 def dial_indicator_setup(port):
     gauge = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=port)
     gauge.connect()
     return gauge
-
 
 def getch():
     """
@@ -93,7 +89,6 @@ def getch():
         return ch
 
     return _getch()
-
 
 async def jog(api, position, cp) -> Dict[Axis, float]:
     step_size = [0.01, 0.05, 0.1, 0.5, 1, 10, 20, 50]
@@ -199,7 +194,6 @@ async def jog(api, position, cp) -> Dict[Axis, float]:
         )
         print("\r", end="")
 
-
 async def countdown(count_time: float):
     """
     This function loops through a countdown before checking the leak visually
@@ -211,7 +205,6 @@ async def countdown(count_time: float):
         print(f"Remaining: {count_time-time_suspend} (s)", end="")
         print("\r", end="")
     print("")
-
 
 async def update_pickup_tip_speed(api, mount, speed) -> None:
     """Update drop-tip current."""

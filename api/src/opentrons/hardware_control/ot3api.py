@@ -2336,11 +2336,9 @@ class OT3API(
 
         if not probe_settings:
             probe_settings = self.config.liquid_sense
+        mount_axis = Axis.by_mount(mount)
 
-        pos = await self.gantry_position(mount, refresh=True)
-        probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
-        await self.move_to(mount, probe_start_pos)
-
+        # homes plunger then moves it to bottom of axis
         if probe_settings.aspirate_while_sensing:
             await self._move_to_plunger_bottom(mount, rate=1.0)
         else:
@@ -2355,7 +2353,15 @@ class OT3API(
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
             await self._move(target_pos, speed=speed, acquire_lock=True)
 
+        # if not aspirate_while_sensing, plunger should be at bottom, since
+        #  this expects to be called after pick_up_tip
+
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
+
+        # get position before moving in deck coordinates
+        starting_position = await self.current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
         await self._backend.liquid_probe(
             mount,
             probe_settings.max_z_distance,
@@ -2367,9 +2373,35 @@ class OT3API(
             probe_settings.num_baseline_reads,
             probe=probe if probe else InstrumentProbeType.PRIMARY,
         )
-        end_pos = await self.gantry_position(mount, refresh=True)
-        await self.move_to(mount, probe_start_pos)
-        return end_pos.z
+
+        # get final position in deck coordinates
+        final_position = await self.current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+
+        z_distance_traveled = (
+            starting_position[mount_axis] - final_position[mount_axis]
+        )
+        if z_distance_traveled < probe_settings.min_z_distance:
+            min_z_travel_pos = final_position
+            min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
+            # raise EarlyLiquidSenseTrigger(
+            #     triggered_at=final_position,
+            #     min_z_pos=min_z_travel_pos,
+            # )
+        elif z_distance_traveled >= probe_settings.max_z_distance:
+            max_z_travel_pos = final_position
+            max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
+            raise LiquidNotFound(
+                position=final_position,
+                max_z_pos=max_z_travel_pos,
+            )
+
+        encoder_pos = await self.encoder_current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+
+        return final_position, encoder_pos
 
     async def capacitive_probe(
         self,
