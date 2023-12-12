@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import { useDrag } from '../useDrag'
 import type { ElementPosition } from '../useDrag'
 
@@ -29,13 +29,17 @@ describe('useDrag', () => {
 
   it('When calling enable, isEnabled true', () => {
     const { result } = renderHook(() => useDrag(mockPosition))
-    result.current.enable()
+    act(() => {
+      result.current.enable()
+    })
     expect(result.current.isEnabled).toBe(true)
   })
 
   it('When calling disable, isEnabled false', () => {
     const { result } = renderHook(() => useDrag(mockPosition))
-    result.current.disable()
+    act(() => {
+      result.current.disable()
+    })
     expect(result.current.isEnabled).toBe(false)
   })
 })

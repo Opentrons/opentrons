@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { act, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -94,7 +94,6 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
-    jest.useFakeTimers()
     const { getByText, getByLabelText } = render(props)
     getByLabelText('spinner')
     getByText('Checking for updates...')
@@ -120,11 +119,14 @@ describe('FirmwareUpdateModal', () => {
       } as SubsystemUpdateProgressData,
     } as any)
     jest.useFakeTimers()
-    const { getByText } = render(props)
+    render(props)
     act(() => {
       jest.advanceTimersByTime(3000)
     })
-    getByText('Firmware is up to date.')
+    screen.getByText('Firmware is up to date.')
+    act(() => {
+      jest.advanceTimersByTime(3000)
+    })
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
   it('does not render text or a progress bar until instrument update status is known', () => {
@@ -140,9 +142,9 @@ describe('FirmwareUpdateModal', () => {
       data: undefined,
       refetch,
     } as any)
-    const { queryByText } = render(props)
+    render(props)
     expect(
-      queryByText('A firmware update is required, instrument is updating')
+      screen.queryByText('A firmware update is required, instrument is updating')
     ).not.toBeInTheDocument()
   })
   it('calls update subsystem if update is needed', () => {
@@ -155,17 +157,17 @@ describe('FirmwareUpdateModal', () => {
       } as SubsystemUpdateProgressData,
     } as any)
     jest.useFakeTimers()
-    const { getByText } = render(props)
+    render(props)
     act(() => {
       jest.advanceTimersByTime(3000)
     })
-    getByText('A firmware update is required, instrument is updating')
+    screen.getByText('A firmware update is required, instrument is updating')
     expect(updateSubsystem).toHaveBeenCalled()
   })
   it('calls refetch instruments and then proceed once update is complete', async () => {
     jest.useFakeTimers()
-    const { getByText } = render(props)
-    getByText('A firmware update is required, instrument is updating')
+    render(props)
+    screen.getByText('A firmware update is required, instrument is updating')
     await waitFor(() => expect(refetch).toHaveBeenCalled())
     act(() => {
       jest.advanceTimersByTime(10000)
