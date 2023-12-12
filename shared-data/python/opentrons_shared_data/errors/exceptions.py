@@ -447,6 +447,23 @@ class CalibrationStructureNotFoundError(RoboticsControlError):
         )
 
 
+class FailedGripperPickupError(RoboticsControlError):
+    """Raised when the gripper expects to be holding an object, but the jaw is closed farther than expected."""
+
+    def __init__(
+        self,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FailedGripperPickupError."""
+        super().__init__(
+            ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR,
+            "Expected to grip labware, but none found.",
+            details,
+            wrapping,
+        )
+
+
 class EdgeNotFoundError(RoboticsControlError):
     """An error indicating that a calibration square edge was not able to be found."""
 

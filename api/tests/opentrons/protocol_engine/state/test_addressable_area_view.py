@@ -5,13 +5,15 @@ import pytest
 from decoy import Decoy
 from typing import Dict, Set, Optional, cast
 
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine.errors import (
     AreaNotInDeckConfigurationError,
     IncompatibleAddressableAreaError,
-    # SlotDoesNotExistError,
+    SlotDoesNotExistError,
+    AddressableAreaDoesNotExistError,
 )
 from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons.protocol_engine.state.addressable_areas import (
@@ -21,6 +23,7 @@ from opentrons.protocol_engine.state.addressable_areas import (
 from opentrons.protocol_engine.types import (
     AddressableArea,
     AreaType,
+    DeckConfigurationType,
     PotentialCutoutFixture,
     Dimensions,
     DeckPoint,
@@ -29,8 +32,10 @@ from opentrons.protocol_engine.types import (
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_move_types(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock out move_types.py functions."""
+def patch_mock_deck_configuration_provider(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out deck_configuration_provider.py functions."""
     for name, func in inspect.getmembers(
         deck_configuration_provider, inspect.isfunction
     ):
@@ -43,6 +48,8 @@ def get_addressable_area_view(
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
     deck_definition: Optional[DeckDefinitionV4] = None,
+    deck_configuration: Optional[DeckConfigurationType] = None,
+    robot_type: RobotType = "OT-3 Standard",
     use_simulated_deck_config: bool = False,
 ) -> AddressableAreaView:
     """Get a labware view test subject."""
@@ -51,10 +58,36 @@ def get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
         or {},
         deck_definition=deck_definition or cast(DeckDefinitionV4, {"otId": "fake"}),
+        deck_configuration=deck_configuration or [],
+        robot_type=robot_type,
         use_simulated_deck_config=use_simulated_deck_config,
     )
 
     return AddressableAreaView(state=state)
+
+
+def test_get_all_cutout_fixtures_simulated_deck_config() -> None:
+    """It should return no cutout fixtures when the deck config is simulated."""
+    subject = get_addressable_area_view(
+        deck_configuration=None,
+        use_simulated_deck_config=True,
+    )
+    assert subject.get_all_cutout_fixtures() is None
+
+
+def test_get_all_cutout_fixtures_non_simulated_deck_config() -> None:
+    """It should return the cutout fixtures from the deck config, if it's not simulated."""
+    subject = get_addressable_area_view(
+        deck_configuration=[
+            ("cutout-id-1", "cutout-fixture-id-1"),
+            ("cutout-id-2", "cutout-fixture-id-2"),
+        ],
+        use_simulated_deck_config=False,
+    )
+    assert subject.get_all_cutout_fixtures() == [
+        "cutout-fixture-id-1",
+        "cutout-fixture-id-2",
+    ]
 
 
 def test_get_loaded_addressable_area() -> None:
@@ -67,8 +100,6 @@ def test_get_loaded_addressable_area() -> None:
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
         compatible_module_types=["magneticModuleType"],
-        drop_tip_location=Point(11, 22, 33),
-        drop_labware_location=None,
     )
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={"abc": addressable_area}
@@ -95,8 +126,6 @@ def test_get_addressable_area_for_simulation_already_loaded() -> None:
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
         compatible_module_types=["magneticModuleType"],
-        drop_tip_location=Point(11, 22, 33),
-        drop_labware_location=None,
     )
     subject = get_addressable_area_view(
         loaded_addressable_areas_by_name={"abc": addressable_area},
@@ -111,7 +140,11 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
             "cutoutA1": {
-                PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")
+                PotentialCutoutFixture(
+                    cutout_id="cutoutA1",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
             }
         },
         use_simulated_deck_config=True,
@@ -125,8 +158,6 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
         bounding_box=Dimensions(x=1, y=2, z=3),
         position=AddressableOffsetVector(x=7, y=8, z=9),
         compatible_module_types=["magneticModuleType"],
-        drop_tip_location=Point(11, 22, 33),
-        drop_labware_location=None,
     )
 
     decoy.when(
@@ -136,7 +167,13 @@ def test_get_addressable_area_for_simulation_not_loaded(decoy: Decoy) -> None:
     ).then_return(
         (
             "cutoutA1",
-            {PotentialCutoutFixture(cutout_id="cutoutA1", cutout_fixture_id="blah")},
+            {
+                PotentialCutoutFixture(
+                    cutout_id="cutoutA1",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
         )
     )
 
@@ -162,7 +199,13 @@ def test_get_addressable_area_for_simulation_raises(decoy: Decoy) -> None:
     """It should raise if the requested addressable area is incompatible with loaded ones."""
     subject = get_addressable_area_view(
         potential_cutout_fixtures_by_cutout_id={
-            "123": {PotentialCutoutFixture(cutout_id="789", cutout_fixture_id="bleh")}
+            "123": {
+                PotentialCutoutFixture(
+                    cutout_id="789",
+                    cutout_fixture_id="bleh",
+                    provided_addressable_areas=frozenset(),
+                )
+            }
         },
         use_simulated_deck_config=True,
     )
@@ -172,7 +215,16 @@ def test_get_addressable_area_for_simulation_raises(decoy: Decoy) -> None:
             "abc", subject.state.deck_definition
         )
     ).then_return(
-        ("123", {PotentialCutoutFixture(cutout_id="123", cutout_fixture_id="blah")})
+        (
+            "123",
+            {
+                PotentialCutoutFixture(
+                    cutout_id="123",
+                    cutout_fixture_id="blah",
+                    provided_addressable_areas=frozenset(),
+                )
+            },
+        )
     )
 
     decoy.when(
@@ -197,8 +249,6 @@ def test_get_addressable_area_position() -> None:
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
@@ -219,8 +269,6 @@ def test_get_addressable_area_move_to_location() -> None:
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
@@ -241,14 +289,49 @@ def test_get_addressable_area_center() -> None:
                 bounding_box=Dimensions(x=10, y=20, z=30),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
 
     result = subject.get_addressable_area_center("abc")
     assert result == Point(6, 12, 3)
+
+
+def test_get_fixture_height(decoy: Decoy) -> None:
+    """It should return the height of the requested fixture."""
+    subject = get_addressable_area_view()
+    decoy.when(
+        deck_configuration_provider.get_cutout_fixture(
+            "someShortCutoutFixture", subject.state.deck_definition
+        )
+    ).then_return(
+        {
+            "height": 10,
+            # These values don't matter:
+            "id": "id",
+            "mayMountTo": [],
+            "displayName": "",
+            "providesAddressableAreas": {},
+        }
+    )
+
+    decoy.when(
+        deck_configuration_provider.get_cutout_fixture(
+            "someTallCutoutFixture", subject.state.deck_definition
+        )
+    ).then_return(
+        {
+            "height": 9000.1,
+            # These values don't matter:
+            "id": "id",
+            "mayMountTo": [],
+            "displayName": "",
+            "providesAddressableAreas": {},
+        }
+    )
+
+    assert subject.get_fixture_height("someShortCutoutFixture") == 10
+    assert subject.get_fixture_height("someTallCutoutFixture") == 9000.1
 
 
 def test_get_slot_definition() -> None:
@@ -263,13 +346,11 @@ def test_get_slot_definition() -> None:
                 bounding_box=Dimensions(x=1, y=2, z=3),
                 position=AddressableOffsetVector(x=7, y=8, z=9),
                 compatible_module_types=["magneticModuleType"],
-                drop_tip_location=None,
-                drop_labware_location=None,
             )
         }
     )
 
-    result = subject.get_slot_definition(DeckSlotName.SLOT_6)
+    result = subject.get_slot_definition(DeckSlotName.SLOT_6.id)
 
     assert result == {
         "id": "area",
@@ -284,10 +365,15 @@ def test_get_slot_definition() -> None:
     }
 
 
-# TODO Uncomment once Robot Server deck config and tests is hooked up
-# def test_get_slot_definition_raises_with_bad_slot_name() -> None:
-#     """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-#     subject = get_addressable_area_view()
-#
-#     with pytest.raises(SlotDoesNotExistError):
-#         subject.get_slot_definition(DeckSlotName.SLOT_A1)
+def test_get_slot_definition_raises_with_bad_slot_name(decoy: Decoy) -> None:
+    """It should raise a SlotDoesNotExistError if a bad slot name is given."""
+    subject = get_addressable_area_view()
+
+    decoy.when(
+        deck_configuration_provider.get_potential_cutout_fixtures(
+            "foo", subject.state.deck_definition
+        )
+    ).then_raise(AddressableAreaDoesNotExistError())
+
+    with pytest.raises(SlotDoesNotExistError):
+        subject.get_slot_definition("foo")

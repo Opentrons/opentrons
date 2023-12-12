@@ -96,6 +96,12 @@
       "$ref": "#/definitions/SetStatusBarCreate"
     },
     {
+      "$ref": "#/definitions/VerifyTipPresenceCreate"
+    },
+    {
+      "$ref": "#/definitions/GetTipPresenceCreate"
+    },
+    {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
     },
     {
@@ -2383,6 +2389,106 @@
         },
         "params": {
           "$ref": "#/definitions/SetStatusBarParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "TipPresenceStatus": {
+      "title": "TipPresenceStatus",
+      "description": "Tip presence status reported by a pipette.",
+      "enum": ["present", "absent", "unknown"],
+      "type": "string"
+    },
+    "VerifyTipPresenceParams": {
+      "title": "VerifyTipPresenceParams",
+      "description": "Payload required for a VerifyTipPresence command.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "expectedState": {
+          "description": "The expected tip presence status on the pipette.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
+        }
+      },
+      "required": ["pipetteId", "expectedState"]
+    },
+    "VerifyTipPresenceCreate": {
+      "title": "VerifyTipPresenceCreate",
+      "description": "VerifyTipPresence command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "verifyTipPresence",
+          "enum": ["verifyTipPresence"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/VerifyTipPresenceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "GetTipPresenceParams": {
+      "title": "GetTipPresenceParams",
+      "description": "Payload required for a GetTipPresence command.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["pipetteId"]
+    },
+    "GetTipPresenceCreate": {
+      "title": "GetTipPresenceCreate",
+      "description": "GetTipPresence command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "getTipPresence",
+          "enum": ["getTipPresence"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/GetTipPresenceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

@@ -42,7 +42,6 @@ export interface LabwareTemporalProperties {
 export interface PipetteTemporalProperties {
   mount: Mount
   nozzles?: NozzleConfigurationStyle
-  prevNozzles?: NozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
@@ -498,6 +497,7 @@ export interface RobotState {
 }
 
 export type ErrorType =
+  | 'CANNOT_MOVE_WITH_GRIPPER'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
   | 'EQUIPMENT_DOES_NOT_EXIST'
   | 'GRIPPER_REQUIRED'
@@ -522,8 +522,8 @@ export type ErrorType =
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'PIPETTING_INTO_COLUMN_4'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
-  | 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
+  | 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
 

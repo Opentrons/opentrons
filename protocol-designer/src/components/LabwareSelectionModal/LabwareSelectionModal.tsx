@@ -207,12 +207,16 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
 
   const getIsLabwareFiltered = React.useCallback(
     (labwareDef: LabwareDefinition2) => {
-      const smallXDimension = labwareDef.dimensions.xDimension < 127.75
-      const smallYDimension = labwareDef.dimensions.yDimension < 85.48
-      const irregularSize = smallXDimension && smallYDimension
-      const adapter = labwareDef.metadata.displayCategory === 'adapter'
-      const isAdapter96Channel =
-        labwareDef.parameters.loadName === ADAPTER_96_CHANNEL
+      const { dimensions, parameters } = labwareDef
+      const { xDimension, yDimension } = dimensions
+
+      const isSmallXDimension = xDimension < 127.75
+      const isSmallYDimension = yDimension < 85.48
+      const isIrregularSize = isSmallXDimension && isSmallYDimension
+
+      const isAdapter = labwareDef.allowedRoles?.includes('adapter')
+      const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
+
       return (
         (filterRecommended &&
           !getLabwareIsRecommended(labwareDef, moduleModel)) ||
@@ -222,10 +226,11 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
             MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
           )) ||
         !getLabwareCompatible(labwareDef) ||
-        (adapter &&
-          irregularSize &&
+        (isAdapter &&
+          isIrregularSize &&
           !slot?.includes(HEATERSHAKER_MODULE_TYPE)) ||
-        (isAdapter96Channel && !has96Channel)
+        (isAdapter96Channel && !has96Channel) ||
+        (slot === 'offDeck' && isAdapter)
       )
     },
     [filterRecommended, filterHeight, getLabwareCompatible, moduleType, slot]

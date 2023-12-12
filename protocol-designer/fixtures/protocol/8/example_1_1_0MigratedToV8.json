@@ -3637,7 +3637,7 @@
       "key": "74eea806-cdc8-4f1b-b987-0f71f530ae13",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -3841,7 +3841,7 @@
       "key": "444ea927-757f-46ca-92d1-1bc5829b0f58",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4045,7 +4045,7 @@
       "key": "601fa810-f65e-49a7-9ed5-fc2a4d94a72d",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4249,7 +4249,7 @@
       "key": "04cd26db-2bea-4782-b42c-0d64cd22f36c",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4453,7 +4453,7 @@
       "key": "8c424e40-a61a-4945-9aa3-38b4f83b4230",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4657,7 +4657,7 @@
       "key": "314ea593-149e-456a-bc11-1b1d241eb609",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4861,7 +4861,7 @@
       "key": "f76c6a5c-207e-43c9-9a41-c3c612aac0dc",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -5065,7 +5065,7 @@
       "key": "f97aedb2-422c-45d8-a517-c2d2cb3ca441",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -5269,7 +5269,7 @@
       "key": "7370cef2-4d30-48ac-93fd-c1e111acf0ff",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {

@@ -139,7 +139,7 @@ describe('ProtocolInstrumentMountItem', () => {
     fireEvent.click(button)
     screen.getByText('pipette wizard flow')
   })
-  it('renders the correct information when gripper needs to be atached', () => {
+  it('renders the correct information when gripper needs to be attached', () => {
     props = {
       ...props,
       mount: 'extension',
@@ -166,5 +166,20 @@ describe('ProtocolInstrumentMountItem', () => {
     const button = screen.getByText('Calibrate')
     fireEvent.click(button)
     screen.getByText('gripper wizard flow')
+  })
+  it('renders the correct information when an instrument is attached and calibrated', () => {
+    props = {
+      ...props,
+      mount: LEFT,
+      attachedInstrument: {
+        ...mockLeftPipetteData,
+      } as any,
+    }
+    const { getByText } = render(props)
+    getByText('Left Mount')
+    getByText('Calibrated')
+    const button = getByText('Recalibrate')
+    fireEvent.click(button)
+    getByText('pipette wizard flow')
   })
 })

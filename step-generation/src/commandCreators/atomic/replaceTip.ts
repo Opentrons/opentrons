@@ -14,6 +14,7 @@ import {
   reduceCommandCreators,
   uuid,
   wasteChuteCommandsUtil,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import { dropTip } from './dropTip'
 import type {
@@ -214,11 +215,9 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const wasteChuteAddressableAreaName =
-    pipetteSpec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
-
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
   let commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(dropTip, {
       pipette,
@@ -235,7 +234,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ...wasteChuteCommandsUtil({
         type: 'dropTip',
         pipetteId: pipette,
-        addressableAreaName: wasteChuteAddressableAreaName,
+        addressableAreaName: addressableAreaNameWasteChute,
         prevRobotState,
       }),
       curryCommandCreator(_pickUpTip, {

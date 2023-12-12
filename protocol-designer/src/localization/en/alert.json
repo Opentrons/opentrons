@@ -171,6 +171,10 @@
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
         "title": "Do not use tip rack adapter for partial tip pickup",
         "body": "Partial tip pickup requires a tip rack placed directly on the deck. Remove the adapter, or add a new tip rack without an adapter."
+      },
+      "CANNOT_MOVE_WITH_GRIPPER": {
+        "title": "Cannot move with gripper",
+        "body": "The gripper cannot move aluminum blocks. Edit the step and deselect the 'Use Gripper' checkbox."
       }
     },
     "warning": {

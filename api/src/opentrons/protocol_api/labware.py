@@ -1011,7 +1011,7 @@ def select_tiprack_from_list(
 
     if starting_point and starting_point.parent != first:
         raise TipSelectionError(
-            "The starting tip you selected " f"does not exist in {first}"
+            f"The starting tip you selected does not exist in {first}"
         )
     elif starting_point:
         first_well = starting_point

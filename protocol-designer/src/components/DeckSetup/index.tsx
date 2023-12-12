@@ -550,7 +550,8 @@ export const DeckSetup = (): JSX.Element => {
     aE =>
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea' &&
-      aE.location === WASTE_CHUTE_CUTOUT
+      aE.location === WASTE_CHUTE_CUTOUT &&
+      wasteChuteFixtures.length > 0
   )
 
   const hasWasteChute =

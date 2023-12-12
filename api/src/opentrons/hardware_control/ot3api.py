@@ -121,7 +121,7 @@ from .errors import (
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
-from .protocols import HardwareControlInterface
+from .protocols import FlexHardwareControlInterface
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
@@ -197,7 +197,9 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[OT3Transforms],
+    FlexHardwareControlInterface[
+        OT3Transforms, Union[top_types.Mount, OT3Mount], OT3Config
+    ],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -1312,6 +1314,9 @@ class OT3API(
         except GripperNotPresentError:
             pass
 
+    def gripper_jaw_can_home(self) -> bool:
+        return self._gripper_handler.is_ready_for_jaw_home()
+
     def _build_moves(
         self,
         origin: Dict[Axis, float],
@@ -1995,25 +2000,23 @@ class OT3API(
 
     async def get_tip_presence_status(
         self,
-        mount: OT3Mount,
+        mount: Union[top_types.Mount, OT3Mount],
     ) -> TipStateType:
-        """
-        Check tip presence status. If a high throughput pipette is present,
-        move the tip motors down before checking the sensor status.
-        """
+        real_mount = OT3Mount.from_mount(mount)
         async with contextlib.AsyncExitStack() as stack:
             if (
-                mount == OT3Mount.LEFT
+                real_mount == OT3Mount.LEFT
                 and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
             ):
                 await stack.enter_async_context(self._high_throughput_check_tip())
-            result = await self._backend.get_tip_status(mount)
+            result = await self._backend.get_tip_status(real_mount)
         return result
 
     async def verify_tip_presence(
-        self, mount: OT3Mount, expected: TipStateType
+        self, mount: Union[top_types.Mount, OT3Mount], expected: TipStateType
     ) -> None:
-        status = await self.get_tip_presence_status(mount)
+        real_mount = OT3Mount.from_mount(mount)
+        status = await self.get_tip_presence_status(real_mount)
         if status != expected:
             raise FailedTipStateCheck(expected, status.value)
 
@@ -2254,7 +2257,7 @@ class OT3API(
             self._pipette_handler.reset_instrument(checked_mount)
 
     def get_instrument_offset(
-        self, mount: OT3Mount
+        self, mount: Union[top_types.Mount, OT3Mount]
     ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary, None]:
         """Get instrument calibration data."""
         # TODO (spp, 2023-04-19): We haven't introduced a 'calibration_offset' key in
@@ -2263,11 +2266,13 @@ class OT3API(
         #  to be a part of the dict, this getter can be updated to fetch pipette offset
         #  from the dict, or just remove this getter entirely.
 
-        if mount == OT3Mount.GRIPPER:
+        ot3_mount = OT3Mount.from_mount(mount)
+
+        if ot3_mount == OT3Mount.GRIPPER:
             gripper_dict = self._gripper_handler.get_gripper_dict()
             return gripper_dict["calibration_offset"] if gripper_dict else None
         else:
-            return self._pipette_handler.get_instrument_offset(mount=mount)
+            return self._pipette_handler.get_instrument_offset(mount=ot3_mount)
 
     async def reset_instrument_offset(
         self, mount: Union[top_types.Mount, OT3Mount], to_default: bool = True
@@ -2532,29 +2537,6 @@ class OT3API(
         retract_after: bool = True,
         probe: Optional[InstrumentProbeType] = None,
     ) -> Tuple[float, bool]:
-        """Determine the position of something using the capacitive sensor.
-
-        This function orchestrates detecting the position of a collision between the
-        capacitive probe on the tool on the specified mount, and some fixed element
-        of the robot.
-
-        When calling this function, the mount's probe critical point should already
-        be aligned in the probe axis with the item to be probed.
-
-        It will move the mount's probe critical point to a small distance behind
-        the expected position of the element (which is target_pos, in deck coordinates,
-        in the axis to be probed) while running the tool's capacitive sensor. When the
-        sensor senses contact, the mount stops.
-
-        This function moves away and returns the sensed position.
-
-        This sensed position can be used in several ways, including
-        - To get an absolute position in deck coordinates of whatever was
-        targeted, if something was guaranteed to be physically present.
-        - To detect whether a collision occured at all. If this function
-        returns a value far enough past the anticipated position, then it indicates
-        there was no material there.
-        """
         if moving_axis not in [
             Axis.X,
             Axis.Y,

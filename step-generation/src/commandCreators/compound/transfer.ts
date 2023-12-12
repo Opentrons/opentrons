@@ -18,8 +18,8 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
   aspirate,
@@ -184,10 +184,9 @@ export const transfer: CommandCreator<TransferArgs> = (
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
 
-  const addressableAreaNameWasteChute =
-    pipetteSpec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    pipetteSpec.channels
+  )
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
   // to the action of aspiration of dispensing in a given command, they are actually values bound
@@ -275,11 +274,10 @@ export const transfer: CommandCreator<TransferArgs> = (
             changeTipNow =
               isInitialSubtransfer || destinationWell !== prevDestWell
           }
-          const nozzles = prevRobotState.pipettes[args.pipette].nozzles
-          const prevNozzles = prevRobotState.pipettes[args.pipette].prevNozzles
+          const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
           const configureNozzleLayoutCommand: CurriedCommandCreator[] =
             //  only emit the command if previous nozzle state is different
-            is96Channel && args.nozzles != null && nozzles !== prevNozzles
+            is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
               ? [
                   curryCommandCreator(configureNozzleLayout, {
                     nozzles: args.nozzles,
@@ -287,10 +285,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                   }),
                 ]
               : []
-          const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
-            args.pipette,
-            prevNozzles
-          )
 
           const configureForVolumeCommand: CurriedCommandCreator[] = LOW_VOLUME_PIPETTES.includes(
             invariantContext.pipetteEntities[args.pipette].name
@@ -598,7 +592,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...blowoutCommand,
             ...airGapAfterDispenseCommands,
             ...dropTipAfterDispenseAirGap,
-            ...configureNozzleLayoutCommandReset,
           ]
           // NOTE: side-effecting
           prevSourceWell = sourceWell

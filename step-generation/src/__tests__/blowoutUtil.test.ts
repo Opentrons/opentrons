@@ -1,4 +1,5 @@
 import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 import {
   blowoutUtil,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -94,7 +95,7 @@ describe('blowoutUtil', () => {
     expect(curryCommandCreatorMock).toHaveBeenCalledWith(
       moveToAddressableArea,
       {
-        addressableAreaName: '1and8ChannelWasteChute',
+        addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
         pipetteId: blowoutArgs.pipette,
       }
     )

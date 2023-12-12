@@ -85,7 +85,6 @@ export function ProtocolSetupInstruments({
             mount={loadedPipette.mount}
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
-            mostRecentAnalysis={mostRecentAnalysis}
             instrumentsRefetch={refetch}
           />
         )
