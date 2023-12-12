@@ -1,4 +1,3 @@
-
 from opentrons import protocol_api
 
 metadata = {
@@ -76,11 +75,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     source_reservoir = ctx.load_labware(RESERVOIR_NAME, "D2")
     dest_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "C2")
 
-    tip_rack_1 = ctx.load_labware(
-        TIPRACK_96_NAME, "A2", adapter=TIPRACK_96_ADAPTER_NAME
-    )
+    tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, "A2", adapter=TIPRACK_96_ADAPTER_NAME)
     tip_rack_adapter = tip_rack_1.parent
-    
+
     tip_rack_2 = ctx.load_labware(TIPRACK_96_NAME, "C3")
     tip_rack_3 = ctx.load_labware(TIPRACK_96_NAME, "C4")
 
@@ -121,7 +118,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     def run_moves(labware, move_sequences, reset_location, use_gripper):
         """
         Perform a series of moves for a given labware using specified move sequences.
-        
+
         Will perform 2 versions of the moves:
             1. Moves to each location in the sequence, resetting to the reset location after each move.
             2. Moves to each location in the sequence, resetting to the reset location after all moves.
@@ -167,7 +164,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             move_to_locations(labware, move_sequence, RESET_AFTER_EACH_MOVE, use_gripper, reset_location)
             move_to_locations(labware, move_sequence, not RESET_AFTER_EACH_MOVE, use_gripper, reset_location)
 
-
     def test_gripper_moves():
         """
         Function to test the movement of the gripper in various locations.
@@ -181,6 +177,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         Returns:
             None
         """
+
         def deck_moves(labware, reset_location):
             """
             Function to perform the movement of labware, with the inital position being on the deck.
@@ -304,7 +301,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         def test_full_tip_rack_usage():
             pipette_96_channel.configure_nozzle_layout(style=protocol_api.ALL, start="A1")
             pipette_96_channel.pick_up_tip(tip_rack_1["A1"])
-            
+
             pipette_96_channel.aspirate(5, source_reservoir["A1"])
             pipette_96_channel.touch_tip()
 
@@ -345,11 +342,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     def test_module_usage():
         def test_thermocycler():
             thermocycler.close_lid()
-            
-            thermocycler.set_block_temperature(
-                75.0,
-                hold_time_seconds=5.0
-            )
+
+            thermocycler.set_block_temperature(75.0, hold_time_seconds=5.0)
             thermocycler.set_lid_temperature(80.0)
             thermocycler.deactivate()
 
@@ -377,19 +371,17 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         test_temperature_module()
         test_magnetic_block()
 
-
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
     ###################################################################################################
-    test_pipetting()      
-    test_gripper_moves()  
-    test_module_usage()   
-    test_manual_moves()   
+    test_pipetting()
+    test_gripper_moves()
+    test_module_usage()
+    test_manual_moves()
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
     ###################################################################################################
 
 
 # Cannot test in this protocol
-    #           - Waste Chute w/ Lid
-
+#           - Waste Chute w/ Lid
