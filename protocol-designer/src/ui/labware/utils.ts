@@ -34,28 +34,24 @@ export function getLabwareInColumn4(
   const isStartingInColumn4 = COLUMN_4_SLOTS.includes(
     initialDeckSetup.labware[labwareId]?.slot
   )
-  const isMovedIntoColumn4 =
-    savedStepForms != null
-      ? Object.values(savedStepForms)
-          ?.reverse()
-          .find(
-            form =>
-              form.stepType === 'moveLabware' &&
-              form.labware === labwareId &&
-              COLUMN_4_SLOTS.includes(form.newLocation)
-          ) != null
-      : false
+  //  latest moveLabware step related to labwareId
+  const moveLabwareStep = Object.values(savedStepForms)
+    .filter(
+      state =>
+        state.stepType === 'moveLabware' &&
+        labwareId != null &&
+        labwareId === state.labware
+    )
+    .reverse()[0]
 
-  const isLabwareMoved =
-    savedStepForms != null
-      ? Object.values(savedStepForms)
-          ?.reverse()
-          .some(
-            form =>
-              form.stepType === 'moveLabware' && form.labware === labwareId
-          )
-      : false
-  const labwareStayedInColumn4 = !isLabwareMoved && isStartingInColumn4
-
-  return isMovedIntoColumn4 || labwareStayedInColumn4
+  if (
+    moveLabwareStep?.newLocation != null &&
+    COLUMN_4_SLOTS.includes(moveLabwareStep.newLocation)
+  ) {
+    return true
+  } else if (moveLabwareStep == null && isStartingInColumn4) {
+    return true
+  } else {
+    return false
+  }
 }

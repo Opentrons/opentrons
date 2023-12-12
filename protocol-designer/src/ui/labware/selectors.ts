@@ -106,7 +106,7 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         if (module != null) {
           nickName = `${nicknamesById[labwareId]} in ${module}`
         } else if (isOffDeck) {
-          nickName = `Off-deck - ${nicknamesById[labwareId]}`
+          nickName = `${nicknamesById[labwareId]} off-deck`
         } else if (isLabwareInColumn4) {
           nickName = `${nicknamesById[labwareId]} in staging area slot`
         }
