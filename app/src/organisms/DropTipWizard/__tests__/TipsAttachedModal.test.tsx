@@ -81,7 +81,7 @@ describe('TipsAttachedModal', () => {
   it('renders special text when the pipette is a 96-Channel', () => {
     const ninetySixSpecs = {
       ...MOCK_ACTUAL_PIPETTE,
-      displayName: 'Flex 96-Channel Pipette',
+      channels: 96,
     } as PipetteModelSpecs
 
     const [{ getByTestId, getByText }] = render(ninetySixSpecs)

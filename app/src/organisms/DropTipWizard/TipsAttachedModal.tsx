@@ -51,7 +51,7 @@ const TipsAttachedModal = NiceModal.create(
       iconColor: COLORS.yellow2,
     }
 
-    const is96Channel = instrumentModelSpecs.displayName.includes('96-Channel')
+    const is96Channel = instrumentModelSpecs.channels === 96
     const displayMountText = is96Channel ? '96-Channel' : capitalize(mount)
 
     return (
