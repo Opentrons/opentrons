@@ -92,7 +92,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
             if (instrumentsToUpdate.length <= indexToUpdate) {
               setShowUpdateNeededModal(false)
             } else {
-              setIndexToUpdate(indexToUpdate + 1)
+              setIndexToUpdate(prevIndexToUpdate => prevIndexToUpdate + 1)
             }
           }}
           shouldExit={instrumentsToUpdate.length <= indexToUpdate}

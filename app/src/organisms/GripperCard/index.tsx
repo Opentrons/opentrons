@@ -35,7 +35,7 @@ const INSTRUMENT_CARD_STYLE = css`
   }
 `
 
-const POLL_DURATION = 5000
+const POLL_DURATION_MS = 5000
 
 export function GripperCard({
   attachedGripper,
@@ -71,7 +71,7 @@ export function GripperCard({
     'gripper',
     {
       enabled: pollForSubsystemUpdate,
-      refetchInterval: POLL_DURATION,
+      refetchInterval: POLL_DURATION_MS,
     }
   )
   // we should poll for a subsystem update from the time a bad instrument is
@@ -87,7 +87,7 @@ export function GripperCard({
     ) {
       setTimeout(() => {
         setPollForSubsystemUpdate(false)
-      }, POLL_DURATION)
+      }, POLL_DURATION_MS)
     }
   }, [attachedGripper?.ok, subsystemUpdateData])
 
