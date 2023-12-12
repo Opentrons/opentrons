@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
@@ -19,11 +18,13 @@ import {
   getSimplestDeckConfigForProtocol,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
+
+import { SmallButton } from '../../atoms/buttons'
+import { Chip } from '../../atoms/Chip'
+import { StyledText } from '../../atoms/text'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
-import { StyledText } from '../../atoms/text'
-import { Chip } from '../../atoms/Chip'
 
 import type {
   CompletedProtocolAnalysis,
@@ -122,7 +123,6 @@ function FixtureTableItem({
     compatibleCutoutFixtureIds.includes(cutoutFixtureId)
   const isRequiredSingleSlotMissing = missingLabwareDisplayName != null
   let chipLabel: JSX.Element
-  let handleClick
   if (!isCurrentFixtureCompatible) {
     const isConflictingFixtureConfigured =
       cutoutFixtureId != null && !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
@@ -138,16 +138,23 @@ function FixtureTableItem({
           background={false}
           iconName="connection-status"
         />
-        <Icon name="more" size="3rem" />
+        <SmallButton
+          buttonCategory="rounded"
+          buttonText={
+            isConflictingFixtureConfigured ? t('resolve') : t('configure')
+          }
+          onClick={
+            isConflictingFixtureConfigured
+              ? () => setShowLocationConflictModal(true)
+              : () => {
+                  setCutoutId(cutoutId)
+                  setProvidedFixtureOptions(compatibleCutoutFixtureIds)
+                  setSetupScreen('deck configuration')
+                }
+          }
+        />
       </>
     )
-    handleClick = isConflictingFixtureConfigured
-      ? () => setShowLocationConflictModal(true)
-      : () => {
-          setCutoutId(cutoutId)
-          setProvidedFixtureOptions(compatibleCutoutFixtureIds)
-          setSetupScreen('deck configuration')
-        }
   } else {
     chipLabel = (
       <Chip
@@ -178,7 +185,6 @@ function FixtureTableItem({
         borderRadius={BORDERS.borderRadiusSize3}
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-        onClick={handleClick}
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
