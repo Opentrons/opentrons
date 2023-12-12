@@ -34,7 +34,9 @@ describe('SmallButton', () => {
       buttonType: 'alert',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(`background-color: ${COLORS.red2}`)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red2}`
+    )
   })
   it('renders the secondary button', () => {
     props = {
@@ -52,7 +54,9 @@ describe('SmallButton', () => {
       buttonType: 'tertiaryHighLight',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `color: ${COLORS.darkBlackEnabled}`
+    )
   })
   it('renders the tertiary low light', () => {
     props = {

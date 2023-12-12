@@ -93,7 +93,9 @@ describe('ProtocolCard', () => {
     )
     screen.getByText('Delete protocol')
     fireEvent.click(screen.getByLabelText('closeIcon'))
-    expect(screen.queryByText('Protocol analysis failed')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Protocol analysis failed')
+    ).not.toBeInTheDocument()
   })
 
   it('should display modal after long click', async () => {

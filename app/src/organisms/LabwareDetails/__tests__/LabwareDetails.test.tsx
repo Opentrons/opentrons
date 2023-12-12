@@ -109,7 +109,7 @@ describe('LabwareDetails', () => {
   })
 
   it.todo('when clicking copy icon, should show tooltip as feedback')
-  // NOTE: popper updates internally async so item is not visible, 
+  // NOTE: popper updates internally async so item is not visible,
   // it might be worth mocking it's implementation
   //
   // , async () => {

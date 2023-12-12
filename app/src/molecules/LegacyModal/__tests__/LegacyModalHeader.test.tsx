@@ -48,8 +48,12 @@ describe('LegacyModalHeader', () => {
     expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
       `color: ${COLORS.darkBlackEnabled}`
     )
-    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(`width: 1.25rem`)
-    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(`height: 1.25rem`)
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
+      `width: 1.25rem`
+    )
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
+      `height: 1.25rem`
+    )
     expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
       `margin-right: ${SPACING.spacing8}`
     )

@@ -52,7 +52,7 @@ jest.mock('../Hardware')
 jest.mock('../Labware')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
-const mockCreateRun = jest.fn((id: string) => { })
+const mockCreateRun = jest.fn((id: string) => {})
 const mockHardware = Hardware as jest.MockedFunction<typeof Hardware>
 const mockLabware = Labware as jest.MockedFunction<typeof Labware>
 const mockDeck = Deck as jest.MockedFunction<typeof Deck>

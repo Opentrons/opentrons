@@ -69,7 +69,9 @@ describe('LabwareSelectionModal', () => {
     props.adapterLoadName = ADAPTER_96_CHANNEL
     props.permittedTipracks = mockPermittedTipracks
     render(props)
-    fireEvent.click(screen.getByText(nestedTextMatcher('adapter compatible labware')))
+    fireEvent.click(
+      screen.getByText(nestedTextMatcher('adapter compatible labware'))
+    )
     screen.getByText('Opentrons GEB 1000uL Tiprack')
   })
 })

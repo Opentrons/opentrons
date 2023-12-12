@@ -123,7 +123,9 @@ describe('CreateFileWizard', () => {
     fireEvent.click(next)
     screen.getByText('Step 2 / 6')
     //  select P20 Single-Channel GEN2
-    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_P20 Single-Channel GEN2'))
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_P20 Single-Channel GEN2')
+    )
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
     screen.getByText('Step 3 / 6')
@@ -188,17 +190,23 @@ describe('CreateFileWizard', () => {
     fireEvent.click(next)
     screen.getByText('Step 2 / 7')
     //  select flex pipette
-    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL'))
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL')
+    )
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
     screen.getByText('Step 3 / 7')
     //  select flex 200uL tipracks
-    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_200uL Flex tipracks'))
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_200uL Flex tipracks')
+    )
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
     screen.getByText('Step 4 / 7')
     //  select 2nd pipette
-    fireEvent.click(screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL'))
+    fireEvent.click(
+      screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL')
+    )
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)
     //  select custom tip

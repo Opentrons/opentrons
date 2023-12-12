@@ -116,7 +116,9 @@ describe('CalibrationStatusCard', () => {
 
   it('renders a "See how robot calibration works button"', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'See how robot calibration works' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'See how robot calibration works' })
+    )
     expect(mockSetShowHowCalibrationWorksModal).toBeCalled()
   })
 

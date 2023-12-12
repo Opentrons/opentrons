@@ -137,9 +137,13 @@ describe('RobotSettingsNetworking', () => {
     expect(
       screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(screen.getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
+    expect(
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
     expect(screen.queryByText('Wi-Fi - bar')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })
+    ).toBeNull()
   })
 
   it('should render title and description for OT-3', () => {
@@ -149,8 +153,12 @@ describe('RobotSettingsNetworking', () => {
     screen.getByText('Wi-Fi - foo')
     screen.getByText('Ethernet')
     screen.getByText('USB')
-    expect(screen.queryByText('Learn about connecting to a robot via USB')).toBeNull()
-    expect(screen.queryByText('Looking for USB-to-Ethernet Adapter info?')).toBeNull()
+    expect(
+      screen.queryByText('Learn about connecting to a robot via USB')
+    ).toBeNull()
+    expect(
+      screen.queryByText('Looking for USB-to-Ethernet Adapter info?')
+    ).toBeNull()
     expect(screen.queryByText('Go to Advanced App Settings')).toBeNull()
   })
 
@@ -191,7 +199,9 @@ describe('RobotSettingsNetworking', () => {
     expect(
       screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(screen.getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
+    expect(
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
     expect(
       screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(2)
@@ -230,7 +240,9 @@ describe('RobotSettingsNetworking', () => {
     expect(
       screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(screen.getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
+    expect(
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
     expect(
       screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(1)
@@ -271,7 +283,9 @@ describe('RobotSettingsNetworking', () => {
     expect(
       screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(screen.getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
+    expect(
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
     expect(
       screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(1)
@@ -307,10 +321,12 @@ describe('RobotSettingsNetworking', () => {
       'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
     const usbInternalLink = '/app-settings/advanced'
     render()
-    const externalLink = screen.getByText('Learn about connecting to a robot via USB')
+    const externalLink = screen.getByText(
+      'Learn about connecting to a robot via USB'
+    )
     const internalLink = screen.getByText('Go to Advanced App Settings')
-    expect(externalLink.closest('a')).toHaveAttribute('href', usbExternalLink)
-    expect(internalLink.closest('a')).toHaveAttribute('href', usbInternalLink)
+    expect(externalLink).toHaveAttribute('href', usbExternalLink)
+    expect(internalLink).toHaveAttribute('href', usbInternalLink)
   })
 
   it('should render Disconnect from Wi-Fi button when robot can disconnect and is not busy', () => {
@@ -318,7 +334,9 @@ describe('RobotSettingsNetworking', () => {
     when(mockUseCanDisconnect).calledWith(ROBOT_NAME).mockReturnValue(true)
     render()
     expect(screen.queryByText('mock disconnect modal')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Disconnect from Wi-Fi' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Disconnect from Wi-Fi' })
+    )
     screen.getByText('mock disconnect modal')
   })
 
@@ -328,7 +346,9 @@ describe('RobotSettingsNetworking', () => {
     when(mockUseIsRobotBusy).calledWith({ poll: true }).mockReturnValue(true)
     render()
 
-    expect(screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: 'Disconnect from Wi-Fi' })
+    ).toBeNull()
   })
 
   it('should not render connected check circles when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
@@ -364,7 +384,9 @@ describe('RobotSettingsNetworking', () => {
     expect(
       screen.getByTestId('RobotSettings_Networking_wifi_icon')
     ).toBeInTheDocument()
-    expect(screen.getByTestId('RobotSettings_Networking_usb_icon')).toBeInTheDocument()
+    expect(
+      screen.getByTestId('RobotSettings_Networking_usb_icon')
+    ).toBeInTheDocument()
     expect(
       screen.queryAllByTestId('RobotSettings_Networking_check_circle')
     ).toHaveLength(0)

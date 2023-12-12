@@ -31,7 +31,9 @@ describe('LargeButton', () => {
       buttonType: 'alert',
     }
     render(props)
-    expect(screen.getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red3}`
+    )
   })
   it('renders the secondary button', () => {
     props = {

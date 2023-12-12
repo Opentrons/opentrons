@@ -54,7 +54,9 @@ describe('ReturnTip', () => {
   it('renders correct copy on desktop', () => {
     render(props)
     screen.getByRole('heading', { name: 'Return tip rack to Slot D1' })
-    screen.getByText('Clear all deck slots of labware, leaving modules in place')
+    screen.getByText(
+      'Clear all deck slots of labware, leaving modules in place'
+    )
     screen.getByText(/Mock TipRack Definition/i)
     screen.getByText(/that you used before back into/i)
     screen.getByText('Slot D1')

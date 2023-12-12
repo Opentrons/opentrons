@@ -72,7 +72,9 @@ describe('SetupFixtureList', () => {
 
   it('should render the mock setup instructions modal, when clicking view setup instructions', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'View setup instructions' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'View setup instructions' })
+    )
     screen.getByText('mock DeckFixtureSetupInstructionsModal')
   })
 

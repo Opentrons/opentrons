@@ -60,9 +60,7 @@ describe('MountGripper', () => {
     render()
     const button = screen.getByRole('button', { name: 'Continue' })
     fireEvent.click(button)
-    await waitFor(() =>
-      expect(mockProceed).toHaveBeenCalled()
-    )
+    await waitFor(() => expect(mockProceed).toHaveBeenCalled())
   })
 
   it('clicking confirm shows unable to detect if no gripper attached', async () => {
@@ -73,7 +71,9 @@ describe('MountGripper', () => {
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
-    await waitFor(() => expect(screen.getByText('Unable to detect Gripper')).toBeInTheDocument())
+    expect(
+      await screen.findByText('Unable to detect Gripper')
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     await waitFor(() => expect(mockProceed).not.toHaveBeenCalled())
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))

@@ -191,7 +191,9 @@ describe('Results', () => {
       isFetching: true,
     }
     render(props)
-    expect(screen.getByRole('button', { name: 'Results_errorExit' })).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'Results_errorExit' })
+    ).toBeDisabled()
   })
   it('does not render error exit when is on device', () => {
     props = {
@@ -241,7 +243,9 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    screen.getByText(
+      'Flex 1-Channel 1000 μL successfully attached and calibrated'
+    )
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     screen.getByRole('img', { name: 'Success Icon' })
@@ -256,7 +260,9 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    screen.getByText(
+      'Flex 1-Channel 1000 μL successfully attached and calibrated'
+    )
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     screen.getByRole('img', { name: 'Success Icon' })
@@ -271,7 +277,9 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    screen.getByText(
+      'Flex 1-Channel 1000 μL successfully attached and calibrated'
+    )
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual('icon_success.png')
     screen.getByRole('img', { name: 'Success Icon' })

@@ -2,7 +2,13 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent, renderHook, screen } from '@testing-library/react'
+import {
+  act,
+  fireEvent,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
@@ -168,10 +174,14 @@ describe('useLaunchLPC hook', () => {
       () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
       { wrapper }
     )
-    await result.current.launchLPC()
-    await expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
-      maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
-      labwareDef: mockLabwareDef,
+    act(() => {
+      result.current.launchLPC()
+    })
+    await waitFor(() => {
+      expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
+        maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
+        labwareDef: mockLabwareDef,
+      })
     })
     expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
       labwareOffsets: mockCurrentOffsets.map(
@@ -183,9 +193,7 @@ describe('useLaunchLPC hook', () => {
       ),
     })
     expect(result.current.LPCWizard).not.toBeNull()
-    renderWithProviders(
-      result.current.LPCWizard ?? <></>
-    )[0]
+    renderWithProviders(result.current.LPCWizard ?? <></>)
     fireEvent.click(screen.getByText('exit'))
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(
       MOCK_MAINTENANCE_RUN_ID,

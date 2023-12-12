@@ -86,9 +86,13 @@ describe('InstrumentInfo', () => {
     screen.getByText('12')
     screen.getByText('serial number')
     screen.getByText('123')
-    fireEvent.click(screen.getByRole('button', { name: 'MediumButton_secondary' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'MediumButton_secondary' })
+    )
     screen.getByText('mock GripperWizardFlows')
-    fireEvent.click(screen.getByRole('button', { name: 'MediumButton_primary' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'MediumButton_primary' })
+    )
     screen.getByText('mock GripperWizardFlows')
   })
 
@@ -103,9 +107,13 @@ describe('InstrumentInfo', () => {
     screen.getByText('12')
     screen.getByText('serial number')
     screen.getByText('123')
-    fireEvent.click(screen.getByRole('button', { name: 'MediumButton_secondary' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'MediumButton_secondary' })
+    )
     screen.getByText('mock GripperWizardFlows')
-    fireEvent.click(screen.getByRole('button', { name: 'MediumButton_primary' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'MediumButton_primary' })
+    )
     screen.getByText('mock GripperWizardFlows')
   })
 
@@ -118,7 +126,9 @@ describe('InstrumentInfo', () => {
     screen.getByText('8/25/20 20:25 UTC')
     screen.getByText('serial number')
     screen.getByText('abc')
-    fireEvent.click(screen.getByRole('button', { name: 'MediumButton_secondary' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'MediumButton_secondary' })
+    )
     screen.getByText('mock PipetteWizardFlows')
     expect(screen.queryByText('Calibrate')).not.toBeInTheDocument()
   })

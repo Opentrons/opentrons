@@ -13,16 +13,12 @@ describe('useLongPress', () => {
   it('when callling disable, isEnabled true', () => {
     const { result } = renderHook(() => useLongPress())
     act(() => result.current.enable())
-    waitFor(() => (
-      expect(result.current.isEnabled).toBe(true)
-    ))
+    waitFor(() => expect(result.current.isEnabled).toBe(true))
   })
 
   it('when callling disable, isEnabled false', () => {
     const { result } = renderHook(() => useLongPress())
     act(() => result.current.disable())
-    waitFor(() => (
-      expect(result.current.isEnabled).toBe(false)
-    ))
+    waitFor(() => expect(result.current.isEnabled).toBe(false))
   })
 })

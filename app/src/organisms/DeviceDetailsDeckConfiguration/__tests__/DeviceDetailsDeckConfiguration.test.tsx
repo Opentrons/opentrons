@@ -111,7 +111,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
       .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
     render(props)
-    screen.getByText('Deck configuration is not available when run is in progress')
+    screen.getByText(
+      'Deck configuration is not available when run is in progress'
+    )
     screen.getByText('disabled mock DeckConfigurator')
   })
 
@@ -123,7 +125,9 @@ describe('DeviceDetailsDeckConfiguration', () => {
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
       .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
     render(props)
-    screen.getByText('Deck configuration is not available when the robot is busy')
+    screen.getByText(
+      'Deck configuration is not available when the robot is busy'
+    )
     screen.getByText('disabled mock DeckConfigurator')
   })
 

@@ -362,9 +362,7 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch cancel modal when click close button', () => {
-    render(
-      `/runs/${RUN_ID}/setup/`
-    )
+    render(`/runs/${RUN_ID}/setup/`)
     expect(screen.queryByText('Mock ConfirmCancelRunModal')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'close' }))
     screen.getByText('Mock ConfirmCancelRunModal')

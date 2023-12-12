@@ -35,10 +35,9 @@ describe('useConfirmCrashRecovery', () => {
           sendCommands: mockSendCommands,
         }),
       {
-        wrapper:
-          ({ children }) => (
-            <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
-          )
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
       }
     )
     const [link, confirmation] = result.current
@@ -60,10 +59,9 @@ describe('useConfirmCrashRecovery', () => {
           sendCommands: mockSendCommands,
         }),
       {
-        wrapper:
-          ({ children }) => (
-            <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
-          )
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
       }
     )
 

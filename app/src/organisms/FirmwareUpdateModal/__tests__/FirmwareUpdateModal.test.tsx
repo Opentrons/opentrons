@@ -144,7 +144,9 @@ describe('FirmwareUpdateModal', () => {
     } as any)
     render(props)
     expect(
-      screen.queryByText('A firmware update is required, instrument is updating')
+      screen.queryByText(
+        'A firmware update is required, instrument is updating'
+      )
     ).not.toBeInTheDocument()
   })
   it('calls update subsystem if update is needed', () => {

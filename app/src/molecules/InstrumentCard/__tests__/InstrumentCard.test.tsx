@@ -41,7 +41,9 @@ describe('InstrumentCard', () => {
     renderInstrumentCard()
     fireEvent.click(screen.getByRole('button'))
     const activeMenuItem = screen.getByRole('button', { name: 'menu option 1' })
-    const disabledMenuItem = screen.getByRole('button', { name: 'menu option 2' })
+    const disabledMenuItem = screen.getByRole('button', {
+      name: 'menu option 2',
+    })
     expect(activeMenuItem).not.toBeDisabled()
     expect(disabledMenuItem).toBeDisabled()
     fireEvent.click(activeMenuItem)

@@ -62,7 +62,9 @@ describe('BeforeBeginning', () => {
     )
     screen.getByText('Flex Gripper')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Move gantry to front' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Move gantry to front' })
+    )
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {
@@ -94,7 +96,9 @@ describe('BeforeBeginning', () => {
     )
     // screen.getByText('mock need help link')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Move gantry to front' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Move gantry to front' })
+    )
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         { commandType: 'home', params: {} },
@@ -124,7 +128,9 @@ describe('BeforeBeginning', () => {
     screen.getByText('Flex Gripper')
     // screen.getByText('mock need help link')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Move gantry to front' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Move gantry to front' })
+    )
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {

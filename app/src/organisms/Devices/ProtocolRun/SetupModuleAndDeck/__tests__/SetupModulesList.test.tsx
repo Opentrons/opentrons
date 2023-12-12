@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
@@ -155,10 +155,10 @@ describe('SetupModulesList', () => {
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith(RUN_ID)
       .mockReturnValue({})
-    const { getByText } = render(props)
-    getByText('Module')
-    getByText('Location')
-    getByText('Status')
+    render(props)
+    screen.getByText('Module')
+    screen.getByText('Location')
+    screen.getByText('Status')
   })
 
   it('should render a magnetic module that is connected', () => {
@@ -180,10 +180,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText } = render(props)
-    getByText('Magnetic Module')
-    getByText('1')
-    getByText('Connected')
+    render(props)
+    screen.getByText('Magnetic Module')
+    screen.getByText('1')
+    screen.getByText('Connected')
   })
 
   it('should render a magnetic module that is NOT connected', () => {
@@ -202,10 +202,10 @@ describe('SetupModulesList', () => {
       },
     } as any)
 
-    const { getByText } = render(props)
-    getByText('Magnetic Module')
-    getByText('1')
-    getByText('Not connected')
+    render(props)
+    screen.getByText('Magnetic Module')
+    screen.getByText('1')
+    screen.getByText('Not connected')
   })
 
   it('should render a thermocycler module that is connected, OT2', () => {
@@ -234,10 +234,10 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(false)
 
-    const { getByText } = render(props)
-    getByText('Thermocycler Module')
-    getByText('7,8,10,11')
-    getByText('Connected')
+    render(props)
+    screen.getByText('Thermocycler Module')
+    screen.getByText('7,8,10,11')
+    screen.getByText('Connected')
   })
 
   it('should render a thermocycler module that is connected but not calibrated, OT3', async () => {
@@ -263,12 +263,12 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(true)
 
-    const { getByText, getByRole } = render(props)
-    getByText('Thermocycler Module')
-    getByText('A1+B1')
-    getByRole('button', { name: 'Calibrate now' }).click()
+    render(props)
+    screen.getByText('Thermocycler Module')
+    screen.getByText('A1+B1')
+    fireEvent.click(screen.getByRole('button', { name: 'Calibrate now' }))
     await waitFor(() => {
-      getByText('mock ModuleWizardFlows')
+      screen.getByText('mock ModuleWizardFlows')
     })
   })
 
@@ -301,8 +301,8 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(true)
 
-    const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button', { name: 'Calibrate now' })).toBeDisabled()
   })
 
   it('should render a thermocycler module that is connected, OT3', () => {
@@ -331,10 +331,10 @@ describe('SetupModulesList', () => {
     } as any)
     mockUseIsFlex.mockReturnValue(true)
 
-    const { getByText } = render(props)
-    getByText('Thermocycler Module')
-    getByText('A1+B1')
-    getByText('Connected')
+    render(props)
+    screen.getByText('Thermocycler Module')
+    screen.getByText('A1+B1')
+    screen.getByText('Connected')
   })
 
   it('should render the MoaM component when Moam is attached', () => {
@@ -388,10 +388,10 @@ describe('SetupModulesList', () => {
           slotName: '3',
         },
       })
-    const { getByText, getByTestId } = render(props)
-    const help = getByTestId('Banner_close-button')
+    render(props)
+    const help = screen.getByTestId('Banner_close-button')
     fireEvent.click(help)
-    getByText('mock Moam modal')
+    screen.getByText('mock Moam modal')
   })
   it('should render the module unmatching banner', () => {
     when(mockUseUnmatchedModulesForProtocol)
@@ -400,8 +400,8 @@ describe('SetupModulesList', () => {
         missingModuleIds: ['moduleId'],
         remainingAttachedModules: [mockHeaterShaker],
       })
-    const { getByText } = render(props)
-    getByText('mock unmatched module Banner')
+    render(props)
+    screen.getByText('mock unmatched module Banner')
   })
   it('should render the heater shaker text when hs is attached', () => {
     mockUseModuleRenderInfoForProtocolById.mockReturnValue({
@@ -438,10 +438,10 @@ describe('SetupModulesList', () => {
         attachedModuleMatch: null,
       },
     } as any)
-    const { getByText } = render(props)
-    const moduleSetup = getByText('View setup instructions')
+    render(props)
+    const moduleSetup = screen.getByText('View setup instructions')
     fireEvent.click(moduleSetup)
-    getByText('mockModuleSetupModal')
+    screen.getByText('mockModuleSetupModal')
   })
   it('should render a magnetic block with a conflicted fixture', () => {
     when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
@@ -468,11 +468,11 @@ describe('SetupModulesList', () => {
         },
       },
     } as any)
-    const { getByText, getByRole } = render(props)
-    getByText('No USB connection required')
-    getByText('Location conflict')
-    getByText('Magnetic Block GEN1')
-    getByRole('button', { name: 'Update deck' }).click()
-    getByText('mock location conflict modal')
+    render(props)
+    screen.getByText('No USB connection required')
+    screen.getByText('Location conflict')
+    screen.getByText('Magnetic Block GEN1')
+    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    screen.getByText('mock location conflict modal')
   })
 })

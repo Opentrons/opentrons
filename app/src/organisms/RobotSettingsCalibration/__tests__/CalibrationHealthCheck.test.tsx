@@ -153,7 +153,11 @@ describe('CalibrationHealthCheck', () => {
     const button = screen.getByRole('button', { name: 'Check health' })
     user.hover(button)
     await waitFor(() => {
-      expect(screen.getByText('Fully calibrate your robot before checking calibration health')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'Fully calibrate your robot before checking calibration health'
+        )
+      ).toBeInTheDocument()
     })
   })
 

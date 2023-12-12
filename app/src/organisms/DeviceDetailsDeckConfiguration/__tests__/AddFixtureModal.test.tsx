@@ -99,7 +99,9 @@ describe('Desktop AddFixtureModal', () => {
     screen.getByText('Trash bin')
     screen.getByText('Waste chute')
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
-    expect(screen.getAllByRole('button', { name: 'Select options' }).length).toBe(1)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
   })
 
   it('should render text and buttons slot A1', () => {
@@ -154,6 +156,8 @@ describe('Desktop AddFixtureModal', () => {
     screen.getByText('Trash bin')
     screen.getByText('Waste chute')
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
-    expect(screen.getAllByRole('button', { name: 'Select options' }).length).toBe(1)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
   })
 })

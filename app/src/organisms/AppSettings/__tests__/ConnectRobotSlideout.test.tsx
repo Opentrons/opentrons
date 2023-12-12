@@ -132,7 +132,9 @@ describe('ConnectRobotSlideout', () => {
     screen.queryByText('Available')
   })
 
-  it.todo('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label')
+  it.todo(
+    'Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label'
+  )
   // NOTE: consider mocking formik here?
   // , async () => {
   //   mockGetConfig.mockReturnValue({ discovery: { candidates: ['1.1.1.2'] } } as any)

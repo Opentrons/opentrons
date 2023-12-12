@@ -128,7 +128,9 @@ describe('Navigation', () => {
   })
   it('should render the overflow btn and clicking on it renders the menu', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'overflow menu button' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'overflow menu button' })
+    )
     screen.getByText('mock NavigationMenu')
   })
   it('should call the setNavMenuIsOpened prop when you click on the overflow menu button', () => {
@@ -137,7 +139,9 @@ describe('Navigation', () => {
       setNavMenuIsOpened: jest.fn(),
     }
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'overflow menu button' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'overflow menu button' })
+    )
     screen.getByText('mock NavigationMenu')
     expect(props.setNavMenuIsOpened).toHaveBeenCalled()
   })
@@ -147,6 +151,8 @@ describe('Navigation', () => {
       longPressModalIsOpened: true,
     }
     render(props)
-    expect(screen.getByLabelText('Navigation_container')).toHaveStyle({ zIndex: 0 })
+    expect(screen.getByLabelText('Navigation_container')).toHaveStyle({
+      zIndex: 0,
+    })
   })
 })

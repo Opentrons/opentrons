@@ -459,7 +459,9 @@ describe('ProtocolRunHeader', () => {
   it('links to a protocol details page', () => {
     render()
 
-    const protocolNameLink = screen.getByRole('link', { name: 'A Protocol for Otie' })
+    const protocolNameLink = screen.getByRole('link', {
+      name: 'A Protocol for Otie',
+    })
     expect(protocolNameLink.getAttribute('href')).toBe(
       `/protocols/${PROTOCOL_DETAILS.protocolKey}`
     )
@@ -471,7 +473,9 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue({ ...PROTOCOL_DETAILS, protocolKey: null })
     render()
 
-    expect(screen.queryByRole('link', { name: 'A Protocol for Otie' })).toBeNull()
+    expect(
+      screen.queryByRole('link', { name: 'A Protocol for Otie' })
+    ).toBeNull()
   })
 
   it('renders a disabled "Analyzing on robot" button if robot-side analysis is not complete', () => {
@@ -496,7 +500,7 @@ describe('ProtocolRunHeader', () => {
     screen.queryByText(formatTimestamp(STARTED_AT))
     screen.queryByText('Protocol start')
     screen.queryByText('Protocol end')
-    screen.getByRole('button', { name: 'Cancel run' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel run' }))
     screen.getByText('Mock ConfirmCancelModal')
     screen.getByText('Mock RunProgressMeter')
   })
@@ -623,7 +627,7 @@ describe('ProtocolRunHeader', () => {
 
     expect(screen.queryByText('Mock ConfirmCancelModal')).toBeFalsy()
     const cancelButton = screen.getByText('Cancel run')
-    cancelButton.click()
+    fireEvent.click(cancelButton)
     screen.getByText('Mock ConfirmCancelModal')
   })
 
@@ -829,7 +833,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
     render()
 
-    screen.getByText('View error').click()
+    fireEvent.click(screen.getByText('View error'))
     expect(mockCloseCurrentRun).toBeCalled()
     screen.getByText('mock RunFailedModal')
   })
@@ -856,7 +860,7 @@ describe('ProtocolRunHeader', () => {
     render()
 
     screen.getByText('Run completed.')
-    screen.getByTestId('Banner_close-button').click()
+    fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(mockCloseCurrentRun).toBeCalled()
   })
 
@@ -1044,7 +1048,9 @@ describe('ProtocolRunHeader', () => {
 
     render()
     await waitFor(() => {
-      expect(screen.queryByText('Tips may be attached.')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Tips may be attached.')
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -1066,7 +1072,9 @@ describe('ProtocolRunHeader', () => {
 
     render()
     await waitFor(() => {
-      expect(screen.queryByText('Tips may be attached.')).not.toBeInTheDocument()
+      expect(
+        screen.queryByText('Tips may be attached.')
+      ).not.toBeInTheDocument()
     })
   })
 })

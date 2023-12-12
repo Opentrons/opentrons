@@ -69,7 +69,9 @@ describe('NameRobot', () => {
   it('should render text, button and keyboard', () => {
     render()
     screen.getByText('Name your robot')
-    screen.getByText('Don’t worry, you can always change this in your settings.')
+    screen.getByText(
+      'Don’t worry, you can always change this in your settings.'
+    )
     screen.getByText('Enter up to 17 characters (letters and numbers only)')
     screen.getByRole('textbox')
     screen.getByText('Confirm')
@@ -141,7 +143,9 @@ describe('NameRobot', () => {
     render()
     screen.getByText('Rename robot')
     expect(
-      screen.queryByText('Don’t worry, you can always change this in your settings.')
+      screen.queryByText(
+        'Don’t worry, you can always change this in your settings.'
+      )
     ).not.toBeInTheDocument()
     screen.getByText('Enter up to 17 characters (letters and numbers only)')
     screen.getByText('Confirm')
