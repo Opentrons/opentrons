@@ -232,7 +232,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         ctx.move_labware(source_reservoir, "D4", use_gripper=not USING_GRIPPER)
 
     def test_pipetting():
-
         def test_partial_tip_pickup_usage():
             pipette_96_channel.configure_nozzle_layout(style=protocol_api.COLUMN, start="A12")
             for i in range(1, 13):
@@ -288,10 +287,53 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
         test_partial_tip_pickup_usage()
         test_full_tip_rack_usage()
-    
-    test_manual_moves()
-    test_pipetting()
-    test_gripper_moves()
+
+    def test_module_usage():
+        def test_thermocycler():
+            thermocycler.close_lid()
+            
+            thermocycler.set_block_temperature(
+                75.0,
+                hold_time_seconds=5.0
+            )
+            thermocycler.set_lid_temperature(80.0)
+            thermocycler.deactivate()
+
+        def test_heater_shaker():
+            heater_shaker.open_labware_latch()
+            heater_shaker.close_labware_latch()
+
+            heater_shaker.set_target_temperature(75.0)
+            heater_shaker.set_and_wait_for_shake_speed(1000)
+            heater_shaker.wait_for_temperature()
+
+            heater_shaker.deactivate_heater()
+            heater_shaker.deactivate_shaker()
+
+        def test_temperature_module():
+            temperature_module.set_temperature(80)
+            temperature_module.set_temperature(10)
+            temperature_module.deactivate()
+
+        def test_magnetic_block():
+            pass
+
+        test_thermocycler()
+        test_heater_shaker()
+        test_temperature_module()
+        test_magnetic_block()
+
+
+    ###################################################################################################
+    ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
+    ###################################################################################################
+    test_pipetting()      
+    test_gripper_moves()  
+    test_module_usage()   
+    test_manual_moves()   
+    ###################################################################################################
+    ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
+    ###################################################################################################
 
 
 # Cannot test in this protocol
