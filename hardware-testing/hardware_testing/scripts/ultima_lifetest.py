@@ -10,6 +10,10 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_ACCELERATIONS,
 )
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
+from opentrons_shared_data.labware import load_definition
+
+from hardware_testing.gravimetric.config import _get_liquid_probe_settings
+from opentrons.hardware_control.types import InstrumentProbeType
 
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -32,6 +36,7 @@ DEFAULT_TRIALS = 10
 
 TIP_RACK_LABWARE = f"opentrons_flex_96_tiprack_1000ul"
 TIP_RACK_SLOT = 6
+TIP_VOLUME = 1000
 
 RESERVOIR_LABWARE = "nest_1_reservoir_195ml"
 RESERVOIR_SLOT = 5
@@ -143,7 +148,8 @@ async def test_cycle(
         await move_twin_plunger_absolute_ot3(api, positions[1], speed=speed)
         starting_cycle += 1
 
-async def _main(is_simulating: bool, trials: int, flow: float, continue_after_stall: bool) -> None:
+async def _main(is_simulating: bool, trials: int, flow: float,
+                liquid_probe: bool, continue_after_stall: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
         pipette_left="p1000_multi_v3.4",
@@ -166,9 +172,8 @@ async def _main(is_simulating: bool, trials: int, flow: float, continue_after_st
     dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
-
     # Pick up tips
-    tip_len = helpers_ot3.get_default_tip_length(1000)
+    tip_len = helpers_ot3.get_default_tip_length(TIP_VOLUME)
     left_tips = get_tiprack_nominal()
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, left_tips)
     input("Pick up tip? Press Enter" )
@@ -187,6 +192,56 @@ async def _main(is_simulating: bool, trials: int, flow: float, continue_after_st
     await helpers_ot3.move_to_arched_ot3(
         api, OT3Mount.LEFT, reservoir_a1_home
     )
+
+    mounts = [OT3Mount.LEFT, OT3Mount.RIGHT]
+    pip_top = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[0],
+               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[0]]
+    pip_bot = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[1],
+               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[1]]
+    pip_blow = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[2],
+               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[2]]
+    pip_drop = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[3],
+               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[3]]
+
+    # Liquid probe
+    if liquid_probe:
+        # input("move to pre position...")
+        # await helpers_ot3.move_to_arched_ot3(
+        #     api, OT3Mount.LEFT, reservoir_a1_nominal + Point(z=8)
+        # )
+        probe_settings = api.config.liquid_sense
+        probe_settings.starting_mount_height = (reservoir_a1_nominal + Point(z=8)).z
+        print(probe_settings)
+
+        input("sense liquid left primary...")
+        sensed_z = round(
+            await api.liquid_probe(OT3Mount.LEFT, probe_settings, InstrumentProbeType.PRIMARY), 3
+        )
+        print(f"SENSED LIQUID Z: {sensed_z}")
+
+        await api.blow_out(OT3Mount.LEFT)
+        input("sense liquid left secondary...")
+        sensed_z = round(
+            await api.liquid_probe(OT3Mount.LEFT, probe_settings, InstrumentProbeType.SECONDARY), 3
+        )
+        print(f"SENSED LIQUID Z: {sensed_z}")
+
+        input("sense liquid right primary...")
+        sensed_z = round(
+            await api.liquid_probe(OT3Mount.RIGHT, probe_settings, InstrumentProbeType.PRIMARY), 3
+        )
+        print(f"SENSED LIQUID Z: {sensed_z}")
+
+        await api.blow_out(OT3Mount.RIGHT)
+        input("sense liquid right secondary...")
+        sensed_z = round(
+            await api.liquid_probe(OT3Mount.RIGHT, probe_settings, InstrumentProbeType.SECONDARY), 3
+        )
+        print(f"SENSED LIQUID Z: {sensed_z}")
+
+        await helpers_ot3.move_to_arched_ot3(
+            api, OT3Mount.LEFT, reservoir_a1_home
+        )
 
     # Descend into reservoir
     input("Descend?")
@@ -214,7 +269,7 @@ async def _main(is_simulating: bool, trials: int, flow: float, continue_after_st
 
 
     total_cycles = 0
-    cycles_per_trial = 10
+    cycles_per_trial = 100
     for t in range(trials):
         await test_cycle(api, [pip_top,pip_bot], flow,
                          total_cycles, cycles_per_trial)
@@ -245,6 +300,8 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--trials", type=int, default=DEFAULT_TRIALS)
     parser.add_argument("--flow", type=float, default=DEFAULT_FLOW)
+    parser.add_argument("--probe", action="store_true")
     parser.add_argument("--continue-after-stall", action="store_true")
     args = parser.parse_args()
-    asyncio.run(_main(args.simulate, args.trials, args.flow, args.continue_after_stall))
+    asyncio.run(_main(args.simulate, args.trials, args.flow,
+                      args.probe, args.continue_after_stall))
