@@ -338,6 +338,8 @@ class AddressableAreaView(HasState[AddressableAreaState]):
 
     def get_disposal_addressable_areas(self) -> List[str]:
         """Get a list of all loaded disposal locations by addressable area name."""
+        # TODO: Fixed Trash, Trash and WasteChute addressable areas are only added to
+        # loaded_addressable_areas_by_name when used, we should add them when loaded
         loaded_disposal_locations = []
         for area in self._state.loaded_addressable_areas_by_name:
             if (

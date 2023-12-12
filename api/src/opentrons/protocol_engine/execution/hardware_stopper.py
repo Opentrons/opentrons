@@ -1,6 +1,6 @@
 """Post-protocol hardware stopper."""
 import logging
-from typing import Optional, List
+from typing import Optional
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import PipetteNotAttachedError as HwPipetteNotAttachedError
@@ -15,7 +15,6 @@ from .gantry_mover import HardwareGantryMover
 from .tip_handler import TipHandler, HardwareTipHandler
 from ...hardware_control.types import OT3Mount
 
-from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.protocol_engine.types import AddressableOffsetVector
 
 log = logging.getLogger(__name__)
@@ -51,7 +50,7 @@ class HardwareStopper:
             state_view=state_store,
         )
 
-    async def _drop_tip(self, disposal_addressable_areas: List[str]) -> None:
+    async def _drop_tip(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
@@ -71,34 +70,42 @@ class HardwareStopper:
                 axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
             )
 
-        for pipette_id, tip in attached_tips:
-            try:
-                await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
-                # TODO: Add ability to drop tip onto custom trash as well.
-                # if API is 2.15 and below aka is should_have_fixed_trash
+            # TODO: We will need to instead use get_disposal_addressable_areas to return
+            # a list of trashes, and select one from there  (fixedTrash if it exists takes priority)
+            # currently trashes are not loaded unless they are used, so if the protocl never uses
+            # a trash the addressable area store has no record that it exists.
 
-                addressable_area_name = disposal_addressable_areas[0]
-                if any("fixedTrash" in s for s in disposal_addressable_areas):
-                    addressable_area_name = "fixedTrash"
+            # OT-2 Will only ever use the Fixed Trash Addressable Area
+            if self._state_store.config.robot_type == "OT-2 Standard":
+                for pipette_id, tip in attached_tips:
+                    try:
+                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
+                        # TODO: Add ability to drop tip onto custom trash as well.
+                        # if API is 2.15 and below aka is should_have_fixed_trash
 
-                await self._movement_handler.move_to_addressable_area(
-                    pipette_id=pipette_id,
-                    addressable_area_name=addressable_area_name,
-                    offset=AddressableOffsetVector(x=0, y=0, z=0),
-                    force_direct=False,
-                    speed=None,
-                    minimum_z_height=None,
+                        await self._movement_handler.move_to_addressable_area(
+                            pipette_id=pipette_id,
+                            addressable_area_name="fixedTrash",
+                            offset=AddressableOffsetVector(x=0, y=0, z=0),
+                            force_direct=False,
+                            speed=None,
+                            minimum_z_height=None,
+                        )
+
+                        await self._tip_handler.drop_tip(
+                            pipette_id=pipette_id,
+                            home_after=False,
+                        )
+
+                    except HwPipetteNotAttachedError:
+                        # this will happen normally during protocol analysis, but
+                        # should not happen during an actual run
+                        log.debug(f"Pipette ID {pipette_id} no longer attached.")
+
+            else:
+                log.debug(
+                    "Flex protocols do not support automatic tip dropping at this time."
                 )
-
-                await self._tip_handler.drop_tip(
-                    pipette_id=pipette_id,
-                    home_after=False,
-                )
-
-            except HwPipetteNotAttachedError:
-                # this will happen normally during protocol analysis, but
-                # should not happen during an actual run
-                log.debug(f"Pipette ID {pipette_id} no longer attached.")
 
     async def do_halt(self, disengage_before_stopping: bool = False) -> None:
         """Issue a halt signal to the hardware API.
@@ -120,16 +127,8 @@ class HardwareStopper:
             PostRunHardwareState.HOME_AND_STAY_ENGAGED,
             PostRunHardwareState.HOME_THEN_DISENGAGE,
         )
-
         if drop_tips_after_run:
-            disposal_addressable_areas = (
-                self._state_store.addressable_areas.get_disposal_addressable_areas()
-            )
-            if len(disposal_addressable_areas) == 0:
-                raise NoTrashDefinedError(
-                    "No trash container has been defined in this protocol."
-                )
-            await self._drop_tip(disposal_addressable_areas)
+            await self._drop_tip()
             await self._hardware_api.stop(home_after=home_after_stop)
 
         elif home_after_stop:
