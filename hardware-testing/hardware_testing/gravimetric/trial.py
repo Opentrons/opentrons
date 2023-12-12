@@ -241,11 +241,18 @@ def _finish_test(
         resources.ctx.home()
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
-            trash = resources.pipette.trash_container.wells()[0]
+            trash_container = resources.pipette.trash_container
+            dispense_location = (
+                trash_container.wells()[0].top()
+                if isinstance(trash_container, Labware)
+                else trash_container
+            )
             # FIXME: this should be a blow_out() at max volume,
             #        but that is not available through PyAPI yet
             #        so instead just dispensing.
-            resources.pipette.dispense(resources.pipette.current_volume, trash.top())
+            resources.pipette.dispense(
+                resources.pipette.current_volume, dispense_location
+            )
             resources.pipette.aspirate(10)  # to pull any droplets back up
         ui.print_info("dropping tip")
         helpers._drop_tip(resources.pipette, return_tip)
