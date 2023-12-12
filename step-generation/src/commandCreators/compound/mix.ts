@@ -5,7 +5,6 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
-  getConfigureNozzleLayoutCommandReset,
   getIsTallLabwareWestOf96Channel,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
@@ -179,11 +178,10 @@ export const mix: CommandCreator<MixArgs> = (
       ],
     }
   }
-  const nozzles = prevRobotState.pipettes[pipette].nozzles
-  const prevNozzles = prevRobotState.pipettes[pipette].prevNozzles
+  const stateNozzles = prevRobotState.pipettes[pipette].nozzles
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
-    is96Channel && data.nozzles != null && nozzles !== prevNozzles
+    is96Channel && data.nozzles != null && data.nozzles !== stateNozzles
       ? [
           curryCommandCreator(configureNozzleLayout, {
             nozzles: data.nozzles,
@@ -202,10 +200,6 @@ export const mix: CommandCreator<MixArgs> = (
         }),
       ]
     : []
-  const configureNozzleLayoutCommandReset = getConfigureNozzleLayoutCommandReset(
-    pipette,
-    prevNozzles
-  )
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -264,7 +258,6 @@ export const mix: CommandCreator<MixArgs> = (
         ...mixCommands,
         ...blowoutCommand,
         ...touchTipCommands,
-        ...configureNozzleLayoutCommandReset,
       ]
     }
   )

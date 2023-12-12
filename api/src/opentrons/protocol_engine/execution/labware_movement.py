@@ -135,7 +135,7 @@ class LabwareMovementHandler:
                 post_drop_slide_offset=post_drop_slide_offset,
             )
             labware_grip_force = self._state_store.labware.get_grip_force(labware_id)
-
+            gripper_opened = False
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
                     if waypoint_data.dropping:
@@ -146,12 +146,22 @@ class LabwareMovementHandler:
                         # on the side of a falling tiprack catches the jaw.
                         await ot3api.disengage_axes([Axis.Z_G])
                     await ot3api.ungrip()
+                    gripper_opened = True
                     if waypoint_data.dropping:
                         # We lost the position estimation after disengaging the axis, so
                         # it is necessary to home it next
                         await ot3api.home_z(OT3Mount.GRIPPER)
                 else:
                     await ot3api.grip(force_newtons=labware_grip_force)
+                    # we only want to check position after the gripper has opened and
+                    # should be holding labware
+                    if gripper_opened:
+                        assert ot3api.hardware_gripper
+                        ot3api.hardware_gripper.check_labware_pickup(
+                            labware_width=self._state_store.labware.get_dimensions(
+                                labware_id
+                            ).y
+                        )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position
                 )

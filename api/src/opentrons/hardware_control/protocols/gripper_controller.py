@@ -3,6 +3,7 @@ from typing import Optional
 from typing_extensions import Protocol
 
 from opentrons.hardware_control.dev_types import GripperDict
+from opentrons.hardware_control.instruments.ot3.gripper import Gripper
 
 
 class GripperController(Protocol):
@@ -35,4 +36,9 @@ class GripperController(Protocol):
     @property
     def attached_gripper(self) -> Optional[GripperDict]:
         """Get a dict of all attached grippers."""
+        ...
+
+    @property
+    def hardware_gripper(self) -> Optional[Gripper]:
+        """Get attached gripper, if present."""
         ...
