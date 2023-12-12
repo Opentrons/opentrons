@@ -143,12 +143,6 @@ class PythonAndLegacyRunner(AbstractRunner):
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
-        # self._task_queue.set_post_hardware_run_state(
-        #     post_run_hardware_state=post_run_hardware_state
-        # )
-        # self._task_queue.set_drop_tips_after_run(
-        #     drop_tips_after_run=drop_tips_after_run
-        # )
 
     async def load(
         self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode
@@ -248,12 +242,6 @@ class JsonRunner(AbstractRunner):
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
-        # self._task_queue.set_post_hardware_run_state(
-        #     post_run_hardware_state=post_run_hardware_state
-        # )
-        # self._task_queue.set_drop_tips_after_run(
-        #     drop_tips_after_run=drop_tips_after_run
-        # )
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
 
@@ -343,9 +331,7 @@ class LiveRunner(AbstractRunner):
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
         self._hardware_api = hardware_api
-        self._task_queue = (
-            task_queue or TaskQueue()
-        )  # cleanup_func=protocol_engine.finish)
+        self._task_queue = task_queue or TaskQueue()
         self._task_queue.set_cleanup_func(func=protocol_engine.finish)
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)

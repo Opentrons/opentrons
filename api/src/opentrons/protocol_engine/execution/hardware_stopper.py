@@ -70,11 +70,6 @@ class HardwareStopper:
                 axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
             )
 
-            # TODO: We will need to instead use get_disposal_addressable_areas to return
-            # a list of trashes, and select one from there  (fixedTrash if it exists takes priority)
-            # currently trashes are not loaded unless they are used, so if the protocl never uses
-            # a trash the addressable area store has no record that it exists.
-
             # OT-2 Will only ever use the Fixed Trash Addressable Area
             if self._state_store.config.robot_type == "OT-2 Standard":
                 for pipette_id, tip in attached_tips:

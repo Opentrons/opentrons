@@ -336,21 +336,6 @@ class AddressableAreaView(HasState[AddressableAreaState]):
                 for _, cutout_fixture_id in self._state.deck_configuration
             ]
 
-    def get_disposal_addressable_areas(self) -> List[str]:
-        """Get a list of all loaded disposal locations by addressable area name."""
-        # TODO: Fixed Trash, Trash and WasteChute addressable areas are only added to
-        # loaded_addressable_areas_by_name when used, we should add them when loaded
-        loaded_disposal_locations = []
-        for area in self._state.loaded_addressable_areas_by_name:
-            if (
-                ("fixedTrash" in area)
-                or ("movableTrash" in area)
-                or ("WasteChute" in area)
-            ):
-                # Append any and all instances/configurations of a MovableTrash or a WasteChute from this deck config
-                loaded_disposal_locations.append(area)
-        return loaded_disposal_locations
-
     def _get_loaded_addressable_area(
         self, addressable_area_name: str
     ) -> AddressableArea:

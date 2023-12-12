@@ -94,9 +94,3 @@ class TaskQueue:
 
         if self._cleanup_func is not None:
             await self._cleanup_func(error)
-
-        # await self._cleanup_func(
-        #     error=error,
-        #     drop_tips_after_run=self._drop_tips_after_run,
-        #     post_run_hardware_state=self._post_hardware_run_state,
-        # )

@@ -120,9 +120,6 @@ async def test_hardware_stopping_sequence_without_pipette_tips(
 ) -> None:
     """Don't drop tip when there aren't any tips attached to pipettes."""
     decoy.when(state_store.pipettes.get_all_attached_tips()).then_return([])
-    decoy.when(
-        state_store.addressable_areas.get_disposal_addressable_areas()
-    ).then_return(["fixedTrash"])
 
     await subject.do_stop_and_recover(
         drop_tips_after_run=True,
@@ -184,10 +181,6 @@ async def test_hardware_stopping_sequence_no_pipette(
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
     ).then_raise(HwPipetteNotAttachedError("oh no"))
-
-    decoy.when(
-        state_store.addressable_areas.get_disposal_addressable_areas()
-    ).then_return(["fixedTrash"])
 
     await subject.do_stop_and_recover(
         drop_tips_after_run=True,

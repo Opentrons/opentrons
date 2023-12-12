@@ -186,7 +186,6 @@ class EngineStore:
             deck_configuration=deck_configuration,
         )
 
-        # TODO: Replace this robot type based logic with a settings flag controlled feature to toggle end-state behavior
         post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
         drop_tips_after_run = True
         if self._robot_type == "OT-3 Standard":
