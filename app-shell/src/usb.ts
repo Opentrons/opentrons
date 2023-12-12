@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import axios, { AxiosRequestConfig, AxiosError } from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
 import fs from 'fs'
 import path from 'path'
@@ -65,44 +65,44 @@ async function usbListener(
   _event: IpcMainInvokeEvent,
   config: AxiosRequestConfig
 ): Promise<unknown> {
-    // TODO(bh, 2023-05-03): remove mutation
-    let { data } = config
-    let formHeaders = {}
+  // TODO(bh, 2023-05-03): remove mutation
+  let { data } = config
+  let formHeaders = {}
 
-    // check for formDataProxy
-    if (data?.formDataProxy != null) {
-      // reconstruct FormData
-      const formData = new FormData()
-      const { protocolKey } = data.formDataProxy
+  // check for formDataProxy
+  if (data?.formDataProxy != null) {
+    // reconstruct FormData
+    const formData = new FormData()
+    const { protocolKey } = data.formDataProxy
 
-      const srcFilePaths: string[] = await getProtocolSrcFilePaths(protocolKey)
+    const srcFilePaths: string[] = await getProtocolSrcFilePaths(protocolKey)
 
-      // create readable stream from file
-      srcFilePaths.forEach(srcFilePath => {
-        const readStream = fs.createReadStream(srcFilePath)
-        formData.append('files', readStream, path.basename(srcFilePath))
-      })
+    // create readable stream from file
+    srcFilePaths.forEach(srcFilePath => {
+      const readStream = fs.createReadStream(srcFilePath)
+      formData.append('files', readStream, path.basename(srcFilePath))
+    })
 
-      formData.append('key', protocolKey)
+    formData.append('key', protocolKey)
 
-      formHeaders = formData.getHeaders()
-      data = formData
+    formHeaders = formData.getHeaders()
+    data = formData
+  }
+
+  const usbHttpAgent = getSerialPortHttpAgent()
+  try {
+    const response = await axios.request({
+      httpAgent: usbHttpAgent,
+      ...config,
+      data,
+      headers: { ...config.headers, ...formHeaders },
+    })
+    return {
+      error: false,
+      data: response.data,
+      status: response.status,
+      statusText: response.statusText,
     }
-
-    const usbHttpAgent = getSerialPortHttpAgent()
-    try {
-      const response = await axios.request({
-        httpAgent: usbHttpAgent,
-        ...config,
-        data,
-        headers: { ...config.headers, ...formHeaders },
-      })
-      return {
-        error: false,
-        data: response.data,
-        status: response.status,
-        statusText: response.statusText,
-      }
   } catch (e) {
     console.log(`axios request error ${e?.message ?? 'unknown'}`)
   }
