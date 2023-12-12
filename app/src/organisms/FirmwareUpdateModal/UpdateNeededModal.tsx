@@ -29,6 +29,11 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
   const [updateId, setUpdateId] = React.useState<string | null>(null)
+  // when we move to the next subsystem to update, set updateId back to null
+  React.useEffect(() => {
+    setUpdateId(null)
+  }, [subsystem])
+
   const {
     data: instrumentsData,
     refetch: refetchInstruments,
@@ -91,14 +96,14 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
       </Flex>
     </Modal>
   )
-  if (status === 'updating' || status === 'queued') {
+  if ((status === 'updating' || status === 'queued') && updateId != null) {
     modalContent = (
       <UpdateInProgressModal
         percentComplete={percentComplete}
         subsystem={subsystem}
       />
     )
-  } else if (status === 'done') {
+  } else if (status === 'done' && updateId != null) {
     modalContent = (
       <UpdateResultsModal
         instrument={instrument}
