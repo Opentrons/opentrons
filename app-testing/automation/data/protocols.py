@@ -360,10 +360,10 @@ class Protocols:
         app_analysis_error="ValueError [line 19]: Staging areas not permitted for trash bin.",  # noqa: E501
     )
 
-    OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash: Protocol = Protocol(
-        file_name="OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash",
+    OT3_None_None_TM_2_16_AnalysisError_DropTipsWithNoTrash: Protocol = Protocol(
+        file_name="OT3_None_None_TM_2_16_AnalysisError_DropTipsWithNoTrash",
         file_extension="py",
-        protocol_name="QA Protocol - Analysis Error - Drop Tips With No Trash",
+        protocol_name="QA Protocol - Analysis Error - Drop Tips with no Trash",
         robot="OT-3",
         app_error=True,
         robot_error=False,

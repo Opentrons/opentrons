@@ -41,5 +41,5 @@ names = Literal[
     "OT3_None_None_2_16_AnalysisError_FixtureUsesMiddleColumn",
     "OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3",
     "OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol4",
-    "OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash"
+    "OT3_None_None_TM_2_16_AnalysisError_DropTipsWithNoTrash"
 ]
