@@ -273,7 +273,7 @@ describe('PipetteCard', () => {
     screen.getByText('Right mount')
     screen.getByText('Instrument attached')
     screen.getByText('Firmware update available.')
-    screen.getByText('Update now').click()
+    fireEvent.click(screen.getByText('Update now'))
     expect(props.updatePipette).toHaveBeenCalled()
   })
   it('renders firmware update in progress state if pipette is bad and update in progress', () => {

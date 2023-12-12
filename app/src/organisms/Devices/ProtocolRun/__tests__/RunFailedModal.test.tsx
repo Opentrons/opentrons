@@ -7,6 +7,7 @@ import { useDownloadRunLog } from '../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
 
 import type { RunError } from '@opentrons/api-client'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('../../hooks')
 
@@ -53,32 +54,32 @@ describe('RunFailedModal - DesktopApp', () => {
   })
 
   it('should render text, link and button', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Run failed')
-    getByText('Error 4000: ModuleNotAttachedError')
-    getByText('No available thermocyclerModuleV2 found.')
-    getByText(
+    render(props)
+    screen.getByText('Run failed')
+    screen.getByText('Error 4000: ModuleNotAttachedError')
+    screen.getByText('No available thermocyclerModuleV2 found.')
+    screen.getByText(
       'Download the run log and send it to support@opentrons.com for assistance.'
     )
-    getByText('Download Run Log')
-    getByRole('button', { name: 'Close' })
+    screen.getByText('Download Run Log')
+    screen.getByRole('button', { name: 'Close' })
   })
 
   it('should call a mock function when clicking close button', () => {
-    const [{ getByRole }] = render(props)
-    getByRole('button', { name: 'Close' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(props.setShowRunFailedModal).toHaveBeenCalled()
   })
 
   it('should close the modal when clicking close icon', () => {
-    const [{ getByRole }] = render(props)
-    getByRole('button', { name: '' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: '' }))
     expect(props.setShowRunFailedModal).toHaveBeenCalled()
   })
 
   it('should call a mock function when clicking download run log button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Download Run Log').click()
+    render(props)
+    fireEvent.click(screen.getByText('Download Run Log'))
     expect(mockUseDownloadRunLog).toHaveBeenCalled()
   })
 })

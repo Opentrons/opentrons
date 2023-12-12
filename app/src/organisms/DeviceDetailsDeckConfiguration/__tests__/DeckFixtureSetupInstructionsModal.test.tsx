@@ -5,6 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
 import { DeckFixtureSetupInstructionsModal } from '../DeckFixtureSetupInstructionsModal'
+import { fireEvent } from '@testing-library/react'
 
 const mockFunc = jest.fn()
 const PNG_FILE_NAME = 'deck_fixture_setup_qrcode.png'
@@ -42,7 +43,7 @@ describe('Touchscreen DeckFixtureSetupInstructionsModal', () => {
 
   it('should call a mock function when tapping the close icon', () => {
     const [{ getByLabelText }] = render(props)
-    getByLabelText('closeIcon').click()
+    fireEvent.click(getByLabelText('closeIcon'))
     expect(mockFunc).toHaveBeenCalled()
   })
 })

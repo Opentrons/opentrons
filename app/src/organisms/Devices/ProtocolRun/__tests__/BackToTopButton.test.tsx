@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 
@@ -95,7 +96,7 @@ describe('BackToTopButton', () => {
   it('should track a mixpanel event when clicked', () => {
     const { getByRole } = render()
     const button = getByRole('link', { name: 'Back to top' })
-    button.click()
+    fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'test run button' },
