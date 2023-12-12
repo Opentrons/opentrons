@@ -212,6 +212,9 @@ def check_safe_for_tip_pickup_and_return(
     tiprack_name = engine_state.labware.get_display_name(labware_id)
     tiprack_parent = engine_state.labware.get_location(labware_id)
     if isinstance(tiprack_parent, OnLabwareLocation):  # tiprack is on an adapter
+        is_96_ch_tiprack_adapter = engine_state.labware.get_has_quirk(
+            labware_id=labware_id, quirk="tiprackAdapterFor96Channel"
+        )
         tiprack_height = engine_state.labware.get_dimensions(labware_id).z
         adapter_height = engine_state.labware.get_dimensions(tiprack_parent.labwareId).z
         if is_partial_config and tiprack_height < adapter_height:
@@ -219,7 +222,7 @@ def check_safe_for_tip_pickup_and_return(
                 f"{tiprack_name} cannot be on an adapter taller than the tip rack"
                 f" when picking up fewer than 96 tips."
             )
-        elif not is_partial_config and tiprack_height > adapter_height:
+        elif not is_partial_config and not is_96_ch_tiprack_adapter:
             raise UnsuitableTiprackForPipetteMotion(
                 f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
                 f" in order to pick up or return all 96 tips simultaneously."

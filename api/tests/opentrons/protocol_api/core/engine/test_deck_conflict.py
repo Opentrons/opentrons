@@ -1,7 +1,7 @@
 """Unit tests for the deck_conflict module."""
 
 import pytest
-from typing import ContextManager, Any
+from typing import ContextManager, Any, NamedTuple, List
 from decoy import Decoy
 from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -478,65 +478,85 @@ def test_deck_conflict_raises_for_bad_partial_8_channel_move(
         )
 
 
+class PipetteMovementSpec(NamedTuple):
+    """Spec data to test deck_conflict.check_safe_for_tip_pickup_and_return ."""
+
+    tiprack_parent: OnDeckLabwareLocation
+    tiprack_dim: Dimensions
+    is_on_flex_adapter: bool
+    is_partial_config: bool
+    expected_raise: ContextManager[Any]
+
+
+pipette_movement_specs: List[PipetteMovementSpec] = [
+    PipetteMovementSpec(
+        tiprack_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        tiprack_dim=Dimensions(x=0, y=0, z=50),
+        is_on_flex_adapter=False,
+        is_partial_config=False,
+        expected_raise=pytest.raises(
+            deck_conflict.UnsuitableTiprackForPipetteMotion,
+            match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
+        ),
+    ),
+    PipetteMovementSpec(
+        tiprack_parent=OnLabwareLocation(labwareId="adapter-id"),
+        tiprack_dim=Dimensions(x=0, y=0, z=50),
+        is_on_flex_adapter=True,
+        is_partial_config=False,
+        expected_raise=does_not_raise(),
+    ),
+    PipetteMovementSpec(
+        tiprack_parent=OnLabwareLocation(labwareId="adapter-id"),
+        tiprack_dim=Dimensions(x=0, y=0, z=50),
+        is_on_flex_adapter=False,
+        is_partial_config=False,
+        expected_raise=pytest.raises(
+            deck_conflict.UnsuitableTiprackForPipetteMotion,
+            match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
+        ),
+    ),
+    PipetteMovementSpec(
+        tiprack_parent=OnLabwareLocation(labwareId="adapter-id"),
+        tiprack_dim=Dimensions(x=0, y=0, z=50),
+        is_on_flex_adapter=True,
+        is_partial_config=True,
+        expected_raise=pytest.raises(
+            deck_conflict.PartialTipMovementNotAllowedError,
+            match="A cool tiprack cannot be on an adapter taller than the tip rack",
+        ),
+    ),
+    PipetteMovementSpec(
+        tiprack_parent=OnLabwareLocation(labwareId="adapter-id"),
+        tiprack_dim=Dimensions(x=0, y=0, z=101),
+        is_on_flex_adapter=True,
+        is_partial_config=True,
+        expected_raise=does_not_raise(),
+    ),
+    PipetteMovementSpec(
+        tiprack_parent=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        tiprack_dim=Dimensions(x=0, y=0, z=50),
+        is_on_flex_adapter=True,  # will be ignored
+        is_partial_config=True,
+        expected_raise=does_not_raise(),
+    ),
+]
+
+
 @pytest.mark.parametrize(
     ("robot_type", "deck_type"),
     [("OT-3 Standard", DeckType.OT3_STANDARD)],
 )
 @pytest.mark.parametrize(
-    argnames=["tiprack_parent", "tiprack_dim", "is_partial_config", "expected_raise"],
-    argvalues=[
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            Dimensions(x=0, y=0, z=50),
-            False,
-            pytest.raises(
-                deck_conflict.UnsuitableTiprackForPipetteMotion,
-                match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
-            ),
-        ),
-        (
-            OnLabwareLocation(labwareId="adapter-id"),
-            Dimensions(x=0, y=0, z=50),
-            False,
-            does_not_raise(),
-        ),
-        (
-            OnLabwareLocation(labwareId="adapter-id"),
-            Dimensions(x=0, y=0, z=101),
-            False,
-            pytest.raises(
-                deck_conflict.UnsuitableTiprackForPipetteMotion,
-                match="A cool tiprack must be on an Opentrons Flex 96 Tip Rack Adapter",
-            ),
-        ),
-        (
-            OnLabwareLocation(labwareId="adapter-id"),
-            Dimensions(x=0, y=0, z=50),
-            True,
-            pytest.raises(
-                deck_conflict.PartialTipMovementNotAllowedError,
-                match="A cool tiprack cannot be on an adapter taller than the tip rack",
-            ),
-        ),
-        (
-            OnLabwareLocation(labwareId="adapter-id"),
-            Dimensions(x=0, y=0, z=101),
-            True,
-            does_not_raise(),
-        ),
-        (
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-            Dimensions(x=0, y=0, z=50),
-            True,
-            does_not_raise(),
-        ),
-    ],
+    argnames=PipetteMovementSpec._fields,
+    argvalues=pipette_movement_specs,
 )
 def test_valid_96_pipette_movement_for_tiprack_and_adapter(
     decoy: Decoy,
     mock_state_view: StateView,
     tiprack_parent: OnDeckLabwareLocation,
     tiprack_dim: Dimensions,
+    is_on_flex_adapter: bool,
     is_partial_config: bool,
     expected_raise: ContextManager[Any],
 ) -> None:
@@ -557,6 +577,12 @@ def test_valid_96_pipette_movement_for_tiprack_and_adapter(
     decoy.when(mock_state_view.labware.get_dimensions("labware-id")).then_return(
         tiprack_dim
     )
+    decoy.when(
+        mock_state_view.labware.get_has_quirk(
+            labware_id="labware-id", quirk="tiprackAdapterFor96Channel"
+        )
+    ).then_return(is_on_flex_adapter)
+
     with expected_raise:
         deck_conflict.check_safe_for_tip_pickup_and_return(
             engine_state=mock_state_view,
