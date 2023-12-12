@@ -163,7 +163,7 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
     assert subject.state.aspirated_volume_by_id["xyz"] is None
 
 
-def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
+def test_aspirate_adds_volume(subject: PipetteStore) -> None:
     """It should add volume to pipette after an aspirate."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
@@ -225,7 +225,7 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
         ),
     ],
 )
-def test_pipette_volume_subtracts_dispense(
+def test_dispense_subtracts_volume(
     subject: PipetteStore, dispense_command: cmd.Command
 ) -> None:
     """It should subtract volume from pipette after a dispense."""
