@@ -38,7 +38,7 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const { mount, onCloseClick } = props
+    const { mount, onCloseClick, instrumentModelSpecs } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
     const [showWizard, setShowWizard] = React.useState(false)
@@ -51,6 +51,9 @@ const TipsAttachedModal = NiceModal.create(
       iconColor: COLORS.yellow2,
     }
 
+    const is96Channel = instrumentModelSpecs.displayName.includes('96-Channel')
+    const displayMountText = is96Channel ? '96-Channel' : capitalize(mount)
+
     return (
       <>
         <Modal header={tipsAttachedHeader}>
@@ -60,7 +63,7 @@ const TipsAttachedModal = NiceModal.create(
                 t={t}
                 i18nKey="remove_the_tips"
                 values={{
-                  mount: capitalize(mount),
+                  mount: displayMountText,
                 }}
                 components={{
                   mount: <strong />,
