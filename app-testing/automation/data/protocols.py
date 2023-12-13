@@ -360,12 +360,42 @@ class Protocols:
         app_analysis_error="ValueError [line 19]: Staging areas not permitted for trash bin.",  # noqa: E501
     )
 
-    OT3_None_None_TM_2_16_AnalysisError_DropTipsWithNoTrash: Protocol = Protocol(
-        file_name="OT3_None_None_TM_2_16_AnalysisError_DropTipsWithNoTrash",
+    OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash: Protocol = Protocol(
+        file_name="OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash",
         file_extension="py",
         protocol_name="QA Protocol - Analysis Error - Drop Tips with no Trash",
         robot="OT-3",
         app_error=True,
         robot_error=False,
-        app_analysis_error="NoTrashDefinedError [line 24]: Error 4000 GENERAL_ERROR (NoTrashDefinedError): No trash container has been defined in this protocol.",  # noqa: E501
+        app_analysis_error="NoTrashDefinedError [line 23]: Error 4000 GENERAL_ERROR (NoTrashDefinedError): No trash container has been defined in this protocol.",  # noqa: E501
+    )
+
+    OT3_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol3: Protocol = Protocol(
+        file_name="OT3_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol3",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Module In Staging Area Column 3",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="InvalidModuleError [line 19]: Error 4000 GENERAL_ERROR (InvalidModuleError): Cannot use temperature module in C3, not compatible with one or more of the following fixtures: Slot C4",  # noqa: E501
+    )
+
+    OT3_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol4: Protocol = Protocol(
+        file_name="OT3_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol4",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Module In Staging Area Column 4",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="ValueError [line 19]: Cannot load a module onto a staging slot.",  # noqa: E501
+    )
+
+    OT3_None_None_2_16_AnalysisError_ModuleAndWasteChuteConflict: Protocol = Protocol(
+        file_name="OT3_None_None_2_16_AnalysisError_ModuleAndWasteChuteConflict",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Module and Waste Chute Conflict",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="InvalidModuleError [line 18]: Error 4000 GENERAL_ERROR (InvalidModuleError): Cannot use temperature module in C4, not compatible with one or more of the following fixtures: Waste Chute",  # noqa: E501
     )

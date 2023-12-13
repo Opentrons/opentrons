@@ -34,6 +34,10 @@ format:
 test-ci:
 	pipenv run python -m pytest -m "emulated_alpha"
 
+.PHONY: test-protocol-analysis
+test-protocol-analysis:
+	pipenv run python -m pytest tests/protocol_analyze_test.py
+
 .PHONY: setup
 setup:
 	pipenv install
