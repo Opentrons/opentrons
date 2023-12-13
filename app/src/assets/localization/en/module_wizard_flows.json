@@ -25,7 +25,7 @@
   "install_adapter": "Place calibration adapter in {{module}}",
   "install_calibration_adapter": "Install calibration adapter",
   "module_calibrating": "Stand back, {{moduleName}} is calibrating",
-  "module_calibration_failed": "The module calibration could not be completed. Contact customer support for assistance.",
+  "module_calibration_failed": "<block>The module calibration was unsuccessful. Make sure the calibration adapter is fully seated on the module and try again. If you still have trouble, contact Opentrons Support.</block><block>{{error}}</block>",
   "module_calibration": "Module calibration",
   "module_secured": "The module must be fully secured in its caddy and secured in the deck slot.",
   "module_too_hot": "Module is too hot to proceed to module calibration",
