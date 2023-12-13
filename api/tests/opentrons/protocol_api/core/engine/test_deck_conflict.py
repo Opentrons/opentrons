@@ -579,7 +579,7 @@ def test_valid_96_pipette_movement_for_tiprack_and_adapter(
     )
     decoy.when(
         mock_state_view.labware.get_has_quirk(
-            labware_id="labware-id", quirk="tiprackAdapterFor96Channel"
+            labware_id="adapter-id", quirk="tiprackAdapterFor96Channel"
         )
     ).then_return(is_on_flex_adapter)
 

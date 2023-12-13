@@ -213,7 +213,7 @@ def check_safe_for_tip_pickup_and_return(
     tiprack_parent = engine_state.labware.get_location(labware_id)
     if isinstance(tiprack_parent, OnLabwareLocation):  # tiprack is on an adapter
         is_96_ch_tiprack_adapter = engine_state.labware.get_has_quirk(
-            labware_id=labware_id, quirk="tiprackAdapterFor96Channel"
+            labware_id=tiprack_parent.labwareId, quirk="tiprackAdapterFor96Channel"
         )
         tiprack_height = engine_state.labware.get_dimensions(labware_id).z
         adapter_height = engine_state.labware.get_dimensions(tiprack_parent.labwareId).z
