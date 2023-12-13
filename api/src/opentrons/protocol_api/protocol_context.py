@@ -833,7 +833,7 @@ class ProtocolContext(CommandPublisher):
 
         :param str instrument_name: Which instrument you want to load. See :ref:`new-pipette-models`
                                     for the valid values.
-        :param mount: The mount to which this instrument should be attached.
+        :param mount: The mount where this instrument should be attached.
                       This can either be an instance of the enum type
                       :py:class:`.types.Mount` or one of the strings ``"left"``
                       or ``"right"``. If you're loading a Flex 96-Channel Pipette
