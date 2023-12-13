@@ -1,8 +1,8 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
-  | AspirateRunTimeCommand
   | AspirateInPlaceRunTimeCommand
+  | AspirateRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
   | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
@@ -10,10 +10,11 @@ export type PipettingRunTimeCommand =
   | DispenseRunTimeCommand
   | DropTipInPlaceRunTimeCommand
   | DropTipRunTimeCommand
+  | GetTipPresenceRunTimeCommand
+  | MoveToAddressableAreaForDropTipRunTimeCommand
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
   | TouchTipRunTimeCommand
-  | GetTipPresenceRunTimeCommand
   | VerifyTipPresenceRunTimeCommand
 
 export type PipettingCreateCommand =
@@ -26,10 +27,11 @@ export type PipettingCreateCommand =
   | DispenseInPlaceCreateCommand
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
+  | GetTipPresenceCreateCommand
+  | MoveToAddressableAreaForDropTipCreateCommand
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
   | TouchTipCreateCommand
-  | GetTipPresenceCreateCommand
   | VerifyTipPresenceCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
@@ -144,6 +146,17 @@ export interface DropTipInPlaceRunTimeCommand
   result?: any
 }
 
+export interface MoveToAddressableAreaForDropTipCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'moveToAddressableAreaForDropTip'
+  params: MoveToAddressableAreaForDropTipParams
+}
+export interface MoveToAddressableAreaForDropTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveToAddressableAreaForDropTipCreateCommand {
+  result?: any
+}
+
 export interface PrepareToAspirateCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'prepareToAspirate'
@@ -199,8 +212,24 @@ export type DropTipParams = PipetteAccessParams & {
   }
 }
 export type PickUpTipParams = TouchTipParams
+
+interface AddressableOffsetVector {
+  x: number
+  y: number
+  z: number
+}
 export interface DropTipInPlaceParams {
   pipetteId: string
+}
+
+export interface MoveToAddressableAreaForDropTipParams {
+  pipetteId: string
+  addressableAreaName: string
+  offset?: AddressableOffsetVector
+  alternateDropLocation?: boolean
+  speed?: number
+  minimumZHeight?: number
+  forceDirect?: boolean
 }
 export interface BlowoutInPlaceParams {
   pipetteId: string

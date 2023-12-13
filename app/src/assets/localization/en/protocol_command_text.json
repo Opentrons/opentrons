@@ -37,6 +37,7 @@
   "move_to_slot": "Moving to Slot {{slot_name}}",
   "move_to_well": "Moving to well {{well_name}} of {{labware}} in {{labware_location}}",
   "move_to_addressable_area": "Moving to {{addressable_area}}",
+  "move_to_addressable_area_drop_tip": "Dropping tip into {{addressable_area}}",
   "notes": "notes",
   "off_deck": "off deck",
   "offdeck": "offdeck",

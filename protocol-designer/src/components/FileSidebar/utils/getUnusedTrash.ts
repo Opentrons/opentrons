@@ -24,11 +24,12 @@ export const getUnusedTrash = (
     trashBin != null
       ? commands?.some(
           command =>
-            command.commandType === 'moveToAddressableArea' &&
-            (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-              command.params.addressableAreaName as AddressableAreaName
-            ) ||
-              command.params.addressableAreaName === FIXED_TRASH_ID)
+            (command.commandType === 'moveToAddressableArea' &&
+              (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+                command.params.addressableAreaName as AddressableAreaName
+              ) ||
+                command.params.addressableAreaName === FIXED_TRASH_ID)) ||
+            command.commandType === 'moveToAddressableAreaForDropTip'
         )
       : null
   const wasteChute = Object.values(additionalEquipment).find(

@@ -31,17 +31,15 @@ describe('getUnusedTrash', () => {
         location: 'cutoutA3',
       },
     } as AdditionalEquipment
-    const mockCommand = ([
+    const mockCommand = [
       {
-        labwareId: {
-          commandType: 'moveToAddressableArea',
-          params: { adressableAreaName: 'cutoutA3' },
-        },
+        commandType: 'moveToAddressableArea',
+        params: { addressableAreaName: 'movableTrashA3' },
       },
-    ] as unknown) as CreateCommand[]
+    ] as CreateCommand[]
 
     expect(getUnusedTrash(mockTrash, mockCommand)).toEqual({
-      trashBinUnused: true,
+      trashBinUnused: false,
       wasteChuteUnused: false,
     })
   })
@@ -68,20 +66,18 @@ describe('getUnusedTrash', () => {
         location: 'cutoutD3',
       },
     } as AdditionalEquipment
-    const mockCommand = ([
+    const mockCommand = [
       {
-        labwareId: {
-          commandType: 'moveToAddressableArea',
-          params: {
-            pipetteId: 'mockId',
-            addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-          },
+        commandType: 'moveToAddressableArea',
+        params: {
+          pipetteId: 'mockId',
+          addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
         },
       },
-    ] as unknown) as CreateCommand[]
+    ] as CreateCommand[]
     expect(getUnusedTrash(mockAdditionalEquipment, mockCommand)).toEqual({
       trashBinUnused: false,
-      wasteChuteUnused: true,
+      wasteChuteUnused: false,
     })
   })
   it('returns false for unused waste chute with 8-channel', () => {
@@ -93,20 +89,39 @@ describe('getUnusedTrash', () => {
         location: 'cutoutD3',
       },
     } as AdditionalEquipment
-    const mockCommand = ([
+    const mockCommand = [
       {
-        labwareId: {
-          commandType: 'moveToAddressableArea',
-          params: {
-            pipetteId: 'mockId',
-            addressableAreaName: EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-          },
+        commandType: 'moveToAddressableArea',
+        params: {
+          pipetteId: 'mockId',
+          addressableAreaName: EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
         },
       },
-    ] as unknown) as CreateCommand[]
+    ] as CreateCommand[]
     expect(getUnusedTrash(mockAdditionalEquipment, mockCommand)).toEqual({
       trashBinUnused: false,
-      wasteChuteUnused: true,
+      wasteChuteUnused: false,
+    })
+  })
+  it('returns false for unused trash bin with moveToAddressableAreaForDropTip command', () => {
+    const mockTrashId = 'mockTrashId'
+    const mockTrash = {
+      [mockTrashId]: {
+        name: 'trashBin',
+        id: mockTrashId,
+        location: 'cutoutA3',
+      },
+    } as AdditionalEquipment
+    const mockCommand = [
+      {
+        commandType: 'moveToAddressableAreaForDropTip',
+        params: { addressableAreaName: 'movableTrashA3', pipetteId: 'mockPip' },
+      },
+    ] as CreateCommand[]
+
+    expect(getUnusedTrash(mockTrash, mockCommand)).toEqual({
+      trashBinUnused: false,
+      wasteChuteUnused: false,
     })
   })
 })
