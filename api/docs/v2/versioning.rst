@@ -131,7 +131,7 @@ This version introduces new features for Flex and adds and improves methods for 
 
 - New features
 
-  - Use :py:meth:`.configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See :ref:`partial-tip-pickup <Partial Tip Pickup>`.
+  - Use :py:meth:`.configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See :ref:`Partial Tip Pickup <partial-tip-pickup>`.
   - Specify the trash containers attached to your Flex with :py:meth:`.load_waste_chute` and :py:meth:`.load_trash_bin`.
   - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling :py:meth:`.move_labware` with ``use_gripper=True``.
   - Perform actions in staging area slots by referencing slots A4 through D4. See :ref:`deck-slots`.
