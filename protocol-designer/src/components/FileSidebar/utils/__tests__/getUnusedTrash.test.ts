@@ -22,7 +22,7 @@ describe('getUnusedTrash', () => {
       wasteChuteUnused: false,
     })
   })
-  it('returns true for unused trash bin', () => {
+  it('returns false for unused trash bin', () => {
     const mockTrashId = 'mockTrashId'
     const mockTrash = {
       [mockTrashId]: {
@@ -35,7 +35,7 @@ describe('getUnusedTrash', () => {
       {
         labwareId: {
           commandType: 'moveToAddressableArea',
-          params: { addressableAreaName: 'cutoutA3' },
+          params: { adressableAreaName: 'cutoutA3' },
         },
       },
     ] as unknown) as CreateCommand[]
