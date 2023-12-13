@@ -1494,9 +1494,8 @@ class InstrumentContext(publisher.CommandPublisher):
     def type(self) -> str:
         """``'single'`` if this is a 1-channel pipette, or ``'multi'`` otherwise.
 
-        .. deprecated:: 2.16
-           Use :py:obj:`.channels` instead, which can distinguish between 8-channel and 96-channel
-           pipettes.
+        See also :py:obj:`.channels`, which can distinguish between 8-channel and 96-channel
+        pipettes.
         """
         if self.channels == 1:
             return "single"
@@ -1632,7 +1631,10 @@ class InstrumentContext(publisher.CommandPublisher):
     def channels(self) -> int:
         """The number of channels on the pipette.
 
-        Possible values are 1, 8, or 96."""
+        Possible values are 1, 8, or 96.
+
+        See also :py:obj:`.type`.
+        """
         return self._core.get_channels()
 
     @property  # type: ignore
