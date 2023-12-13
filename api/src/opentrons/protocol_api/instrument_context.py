@@ -330,7 +330,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :type rate: float
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                          leaves the tip. Measured in µL. The default value is ``None``.
-                         
+
                          See :ref:`push-out-dispense` for details.
         :type push_out: float
 
