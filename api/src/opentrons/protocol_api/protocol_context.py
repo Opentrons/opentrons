@@ -1052,12 +1052,20 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def fixed_trash(self) -> Union[Labware, TrashBin]:
-        """The trash fixed to slot 12 of the robot deck.
+        """The immovable and irreplacable trash bin in the back-right corner of the deck.
 
-        In API Versions prior to 2.16 it has one well and should be accessed like labware in your protocol.
-        e.g. ``protocol.fixed_trash['A1']``
+        On OT-2 robots, this is always present because the trash has a reserved place on the OT-2's
+        deck.
 
-        In API Version 2.16 and above it returns a Trash fixture for OT-2 Protocols.
+        On Flex robots, this is only present in API version 2.15. Newer API versions on the Flex
+        let you put the trash wherever you want (see :ref:`configure-trash-bin`), so there is no
+        fixed trash, and accessing this property will raise an exception.
+
+        :return: In API versions 2.15 and below, a special :py:obj:`Labware` with one well, e.g.
+            ``protocol.fixed_trash["A1"]``.
+            In API versions 2.16 and above, a :py:obj:`TrashBin`.
+
+        :raises Exception: If there is no fixed trash.
         """
         if self._api_version >= APIVersion(2, 16):
             if self._core.robot_type == "OT-3 Standard":
