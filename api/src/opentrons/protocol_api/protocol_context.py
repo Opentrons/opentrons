@@ -851,18 +851,11 @@ class ProtocolContext(CommandPublisher):
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        # Always validate the input mount, even if we're loading a 96-channel and the mount doesn't
-        # matter.
-        checked_mount = validation.ensure_mount(mount)
+        checked_mount = validation.ensure_mount_for_pipette(
+            mount, checked_instrument_name
+        )
 
         is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
-        if is_96_channel:
-            checked_mount = Mount.LEFT
-        else:
-            if checked_mount is None:
-                raise ValueError(
-                    f"You must specify a mount to load {repr(instrument_name)}."
-                )
 
         tip_racks = tip_racks or []
 

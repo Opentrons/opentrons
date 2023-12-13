@@ -150,11 +150,15 @@ def test_load_instrument(
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
     mock_tip_racks = [decoy.mock(cls=Labware), decoy.mock(cls=Labware)]
 
-    decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(Mount.LEFT)
     decoy.when(mock_validation.ensure_lowercase_name("Gandalf")).then_return("gandalf")
     decoy.when(mock_validation.ensure_pipette_name("gandalf")).then_return(
         PipetteNameType.P300_SINGLE
     )
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette(
+            "shadowfax", PipetteNameType.P300_SINGLE
+        )
+    ).then_return(Mount.LEFT)
 
     decoy.when(
         mock_core.load_instrument(
@@ -191,15 +195,6 @@ def test_load_instrument(
     )
 
 
-def test_load_instrument_usually_requires_mount(
-    decoy: Decoy, subject: ProtocolContext
-) -> None:
-    """For pipettes other than 96-channels, it should require a mount."""
-    decoy.when(mock_validation.ensure_mount("some_mount")).then_return(None)
-    with pytest.raises(ValueError, match="You must specify a mount"):
-        subject.load_instrument("some_instrument", "some_mount")
-
-
 def test_load_instrument_replace(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
@@ -207,9 +202,9 @@ def test_load_instrument_replace(
     mock_instrument_core = decoy.mock(cls=InstrumentCore)
 
     decoy.when(mock_validation.ensure_lowercase_name("ada")).then_return("ada")
-    decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
-        Mount.RIGHT
-    )
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette("ada", matchers.IsA(Mount))
+    ).then_return(Mount.RIGHT)
     decoy.when(mock_validation.ensure_pipette_name(matchers.IsA(str))).then_return(
         PipetteNameType.P300_SINGLE
     )
@@ -236,39 +231,6 @@ def test_load_instrument_replace(
         subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
 
 
-def test_96_channel_pipette_always_loads_on_the_left_mount(
-    decoy: Decoy,
-    mock_core: ProtocolCore,
-    subject: ProtocolContext,
-) -> None:
-    """It should always load a 96-channel pipette on left mount, regardless of the mount arg specified."""
-    mock_instrument_core = decoy.mock(cls=InstrumentCore)
-
-    decoy.when(mock_validation.ensure_lowercase_name("A 96 Channel Name")).then_return(
-        "a 96 channel name"
-    )
-    decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
-        PipetteNameType.P1000_96
-    )
-    decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(
-        Mount.RIGHT
-    )  # Should be ignored.
-    decoy.when(
-        mock_core.load_instrument(
-            instrument_name=PipetteNameType.P1000_96,
-            mount=Mount.LEFT,
-        )
-    ).then_return(mock_instrument_core)
-    decoy.when(mock_core.get_disposal_locations()).then_raise(
-        NoTrashDefinedError("No trash!")
-    )
-
-    result = subject.load_instrument(
-        instrument_name="A 96 Channel Name", mount="shadowfax"
-    )
-    assert result == subject.loaded_instruments["left"]
-
-
 def test_96_channel_pipette_raises_if_another_pipette_attached(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -281,9 +243,9 @@ def test_96_channel_pipette_raises_if_another_pipette_attached(
     decoy.when(mock_validation.ensure_pipette_name("ada")).then_return(
         PipetteNameType.P300_SINGLE
     )
-    decoy.when(mock_validation.ensure_mount(matchers.IsA(Mount))).then_return(
-        Mount.RIGHT
-    )
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette("ada", matchers.IsA(Mount))
+    ).then_return(Mount.RIGHT)
 
     decoy.when(
         mock_core.load_instrument(
@@ -307,7 +269,9 @@ def test_96_channel_pipette_raises_if_another_pipette_attached(
     decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
         PipetteNameType.P1000_96
     )
-    decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(None)
+    decoy.when(
+        mock_validation.ensure_mount_for_pipette("shadowfax", matchers.IsA(Mount))
+    ).then_return(Mount.LEFT)
     decoy.when(
         mock_core.load_instrument(
             instrument_name=PipetteNameType.P1000_96,

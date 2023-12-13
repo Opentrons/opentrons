@@ -88,11 +88,28 @@ class InvalidTrashBinLocationError(ValueError):
     """An error raised when attempting to load trash bins in invalid slots."""
 
 
-def ensure_mount(mount: Union[str, Mount, None]) -> Optional[Mount]:
-    """Ensure that an input value represents a valid Mount."""
-    if mount is None:
-        return None
+def ensure_mount_for_pipette(
+    mount: Union[str, Mount, None], pipette: PipetteNameType
+) -> Mount:
+    """Ensure that an input value represents a valid mount, and is valid for the given pipette."""
+    if pipette == PipetteNameType.P1000_96:
+        # Always validate the raw mount input, even if the pipette is a 96-channel and we're not going
+        # to use the mount value.
+        if mount is not None:
+            _ensure_mount(mount)
+        # Internal layers treat the 96-channel as being on the left mount.
+        return Mount.LEFT
+    else:
+        if mount is None:
+            raise InvalidPipetteMountError(
+                f"You must specify a left or right mount to load {pipette.value}."
+            )
+        else:
+            return _ensure_mount(mount)
 
+
+def _ensure_mount(mount: Union[str, Mount]) -> Mount:
+    """Ensure that an input value represents a valid Mount."""
     if mount in [Mount.EXTENSION, "extension"]:
         # This would cause existing protocols that might be iterating over mount types
         # for loading pipettes to raise an error because Mount now includes Extension mount.
