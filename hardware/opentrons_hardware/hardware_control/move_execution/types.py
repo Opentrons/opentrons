@@ -10,12 +10,27 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
     TipActionResponse,
 )
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    UInt32Field,
+    Int32Field,
+)
+from opentrons_hardware.firmware_bindings.constants import (
+    MoveStopCondition,
+    MoveAckId,
+)
 
 SchedulableMoves = Union[AddLinearMoveRequest, HomeRequest, GripperGripRequest, GripperHomeRequest, AddBrushedLinearMoveRequest, TipActionRequest]
 AcceptableMoveResponses = Union[MoveCompleted, TipActionResponse]
 CompletionPacket = Tuple[ArbitrationId, AcceptableMoveResponses]
 Completions = List[CompletionPacket]
 
+
+STRICT_CONDITIONS = [
+    MoveStopCondition.limit_switch,
+    MoveStopCondition.encoder_position,
+    MoveStopCondition.limit_switch_backoff,
+]
 
 @dataclass(order=True)
 class ScheduledMove:
@@ -27,11 +42,15 @@ class ScheduledMove:
     stop_condition: MoveStopCondition
     duration: float
 
-    def __post_init__(self) -> None:
-        self.acceptable_acks = MoveStopCondition.acceptable_ack(self.stop_condition)
-
     def accept_ack(self, ack: MoveAckId) -> bool:
-        return True if ack in self.acceptable_acks else False
+        """Whether or not the ACK is acceptable for the move's stop condition."""
+        if self.stop_condition in STRICT_CONDITIONS:
+            return ack == MoveAckId.stopped_by_condition
+        
+        return ack in [
+            MoveAckId.complete_without_condition,
+            MoveAckId.stopped_by_condition
+        ]
 
 
 
@@ -45,11 +64,15 @@ class ScheduledTipActionMove(ScheduledMove):
 
 
 @dataclass
-class ScheduledGroupInfo:
+class ScheduledGroup:
 
-    moves: Dict[int, SchedulableMoves]
-    awaiting: List[int] = field(init=False)
-    duration: float = field(init=False)        
+    moves: Dict[int, ScheduledMove]
+    awaiting: List[UInt32Field] = field(init=False)
+    duration: float = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.awaiting = list(m.message_index for m in self.moves.values())
+        self.duration = sum(m.duration for m in self.moves.values())
 
     def moves_completed(self) -> bool:
         return not self.awaiting
