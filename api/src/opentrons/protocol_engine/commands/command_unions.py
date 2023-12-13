@@ -162,6 +162,14 @@ from .move_to_addressable_area import (
     MoveToAddressableAreaCommandType,
 )
 
+from .move_to_addressable_area_for_drop_tip import (
+    MoveToAddressableAreaForDropTip,
+    MoveToAddressableAreaForDropTipParams,
+    MoveToAddressableAreaForDropTipCreate,
+    MoveToAddressableAreaForDropTipResult,
+    MoveToAddressableAreaForDropTipCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -300,6 +308,7 @@ Command = Union[
     MoveToCoordinates,
     MoveToWell,
     MoveToAddressableArea,
+    MoveToAddressableAreaForDropTip,
     PrepareToAspirate,
     WaitForResume,
     WaitForDuration,
@@ -361,6 +370,7 @@ CommandParams = Union[
     MoveToCoordinatesParams,
     MoveToWellParams,
     MoveToAddressableAreaParams,
+    MoveToAddressableAreaForDropTipParams,
     PrepareToAspirateParams,
     WaitForResumeParams,
     WaitForDurationParams,
@@ -423,6 +433,7 @@ CommandType = Union[
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
     MoveToAddressableAreaCommandType,
+    MoveToAddressableAreaForDropTipCommandType,
     PrepareToAspirateCommandType,
     WaitForResumeCommandType,
     WaitForDurationCommandType,
@@ -484,6 +495,7 @@ CommandCreate = Union[
     MoveToCoordinatesCreate,
     MoveToWellCreate,
     MoveToAddressableAreaCreate,
+    MoveToAddressableAreaForDropTipCreate,
     PrepareToAspirateCreate,
     WaitForResumeCreate,
     WaitForDurationCreate,
@@ -545,6 +557,7 @@ CommandResult = Union[
     MoveToCoordinatesResult,
     MoveToWellResult,
     MoveToAddressableAreaResult,
+    MoveToAddressableAreaForDropTipResult,
     PrepareToAspirateResult,
     WaitForResumeResult,
     WaitForDurationResult,

@@ -185,6 +185,14 @@ from .move_to_addressable_area import (
     MoveToAddressableAreaCommandType,
 )
 
+from .move_to_addressable_area_for_drop_tip import (
+    MoveToAddressableAreaForDropTip,
+    MoveToAddressableAreaForDropTipParams,
+    MoveToAddressableAreaForDropTipCreate,
+    MoveToAddressableAreaForDropTipResult,
+    MoveToAddressableAreaForDropTipCommandType,
+)
+
 from .wait_for_resume import (
     WaitForResume,
     WaitForResumeParams,
@@ -435,6 +443,12 @@ __all__ = [
     "MoveToAddressableAreaCreate",
     "MoveToAddressableAreaResult",
     "MoveToAddressableAreaCommandType",
+    # move to addressable area for drop tip command models
+    "MoveToAddressableAreaForDropTip",
+    "MoveToAddressableAreaForDropTipParams",
+    "MoveToAddressableAreaForDropTipCreate",
+    "MoveToAddressableAreaForDropTipResult",
+    "MoveToAddressableAreaForDropTipCommandType",
     # wait for resume command models
     "WaitForResume",
     "WaitForResumeParams",

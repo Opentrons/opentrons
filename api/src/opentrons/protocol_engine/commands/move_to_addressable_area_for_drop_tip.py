@@ -1,4 +1,4 @@
-"""Move to addressable area command request, result, and implementation models."""
+"""Move to addressable area for drop tip command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
@@ -18,10 +18,10 @@ if TYPE_CHECKING:
     from ..execution import MovementHandler
     from ..state import StateView
 
-MoveToAddressableAreaCommandType = Literal["moveToAddressableArea"]
+MoveToAddressableAreaForDropTipCommandType = Literal["moveToAddressableAreaForDropTip"]
 
 
-class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
+class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
     """Payload required to move a pipette to a specific addressable area.
 
     An *addressable area* is a space in the robot that may or may not be usable depending on how
@@ -54,18 +54,30 @@ class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
         AddressableOffsetVector(x=0, y=0, z=0),
         description="Relative offset of addressable area to move pipette's critical point.",
     )
+    alternateDropLocation: Optional[bool] = Field(
+        False,
+        description=(
+            "Whether to alternate location where tip is dropped within the addressable area."
+            " If True, this command will ignore the offset provided and alternate"
+            " between dropping tips at two predetermined locations inside the specified"
+            " labware well."
+            " If False, the tip will be dropped at the top center of the area."
+        ),
+    )
 
 
-class MoveToAddressableAreaResult(DestinationPositionResult):
-    """Result data from the execution of a MoveToAddressableArea command."""
+class MoveToAddressableAreaForDropTipResult(DestinationPositionResult):
+    """Result data from the execution of a MoveToAddressableAreaForDropTip command."""
 
     pass
 
 
-class MoveToAddressableAreaImplementation(
-    AbstractCommandImpl[MoveToAddressableAreaParams, MoveToAddressableAreaResult]
+class MoveToAddressableAreaForDropTipImplementation(
+    AbstractCommandImpl[
+        MoveToAddressableAreaForDropTipParams, MoveToAddressableAreaForDropTipResult
+    ]
 ):
-    """Move to addressable area command implementation."""
+    """Move to addressable area for drop tip command implementation."""
 
     def __init__(
         self, movement: MovementHandler, state_view: StateView, **kwargs: object
@@ -74,9 +86,9 @@ class MoveToAddressableAreaImplementation(
         self._state_view = state_view
 
     async def execute(
-        self, params: MoveToAddressableAreaParams
-    ) -> MoveToAddressableAreaResult:
-        """Move the requested pipette to the requested addressable area."""
+        self, params: MoveToAddressableAreaForDropTipParams
+    ) -> MoveToAddressableAreaForDropTipResult:
+        """Move the requested pipette to the requested addressable area in preperation of a drop tip."""
         self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
             params.addressableAreaName
         )
@@ -86,36 +98,52 @@ class MoveToAddressableAreaImplementation(
                 f"Cannot move pipette to staging slot {params.addressableAreaName}"
             )
 
+        if params.alternateDropLocation:
+            offset = self._state_view.geometry.get_next_tip_drop_location_for_addressable_area(
+                addressable_area_name=params.addressableAreaName,
+                pipette_id=params.pipetteId,
+            )
+        else:
+            offset = params.offset
+
         x, y, z = await self._movement.move_to_addressable_area(
             pipette_id=params.pipetteId,
             addressable_area_name=params.addressableAreaName,
-            offset=params.offset,
+            offset=offset,
             force_direct=params.forceDirect,
             minimum_z_height=params.minimumZHeight,
             speed=params.speed,
         )
 
-        return MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z))
+        return MoveToAddressableAreaForDropTipResult(position=DeckPoint(x=x, y=y, z=z))
 
 
-class MoveToAddressableArea(
-    BaseCommand[MoveToAddressableAreaParams, MoveToAddressableAreaResult]
+class MoveToAddressableAreaForDropTip(
+    BaseCommand[
+        MoveToAddressableAreaForDropTipParams, MoveToAddressableAreaForDropTipResult
+    ]
 ):
-    """Move to addressable area command model."""
+    """Move to addressable area for drop tip command model."""
 
-    commandType: MoveToAddressableAreaCommandType = "moveToAddressableArea"
-    params: MoveToAddressableAreaParams
-    result: Optional[MoveToAddressableAreaResult]
+    commandType: MoveToAddressableAreaForDropTipCommandType = (
+        "moveToAddressableAreaForDropTip"
+    )
+    params: MoveToAddressableAreaForDropTipParams
+    result: Optional[MoveToAddressableAreaForDropTipResult]
 
     _ImplementationCls: Type[
-        MoveToAddressableAreaImplementation
-    ] = MoveToAddressableAreaImplementation
+        MoveToAddressableAreaForDropTipImplementation
+    ] = MoveToAddressableAreaForDropTipImplementation
 
 
-class MoveToAddressableAreaCreate(BaseCommandCreate[MoveToAddressableAreaParams]):
-    """Move to addressable area command creation request model."""
+class MoveToAddressableAreaForDropTipCreate(
+    BaseCommandCreate[MoveToAddressableAreaForDropTipParams]
+):
+    """Move to addressable area for drop tip command creation request model."""
 
-    commandType: MoveToAddressableAreaCommandType = "moveToAddressableArea"
-    params: MoveToAddressableAreaParams
+    commandType: MoveToAddressableAreaForDropTipCommandType = (
+        "moveToAddressableAreaForDropTip"
+    )
+    params: MoveToAddressableAreaForDropTipParams
 
-    _CommandCls: Type[MoveToAddressableArea] = MoveToAddressableArea
+    _CommandCls: Type[MoveToAddressableAreaForDropTip] = MoveToAddressableAreaForDropTip
