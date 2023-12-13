@@ -123,6 +123,38 @@ def test_api_version(api_version: APIVersion, subject: InstrumentContext) -> Non
     assert subject.api_version == api_version
 
 
+@pytest.mark.parametrize("channels_from_core", [1, 8, 96])
+def test_channels(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+) -> None:
+    """It should return the number of channels, as returned by the core."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.channels == channels_from_core
+
+
+@pytest.mark.parametrize(
+    ("channels_from_core", "expected_type"),
+    [
+        (1, "single"),
+        (8, "multi"),
+        (96, "multi"),
+    ],
+)
+def test_type(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+    expected_type: str,
+) -> None:
+    """It should map the number of channels from the core into the string "single" or "multi"."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.type == expected_type
+
+
 def test_trash_container(
     decoy: Decoy,
     mock_trash: Labware,

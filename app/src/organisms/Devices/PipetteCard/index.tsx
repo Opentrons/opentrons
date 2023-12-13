@@ -78,7 +78,7 @@ const INSTRUMENT_CARD_STYLE = css`
   }
 `
 
-const SUBSYSTEM_UPDATE_POLL_MS = 5000
+const POLL_DURATION_MS = 5000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t, i18n } = useTranslation(['device_details', 'protocol_setup'])
@@ -116,16 +116,36 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
+  const [pollForSubsystemUpdate, setPollForSubsystemUpdate] = React.useState(
+    false
+  )
   const { data: subsystemUpdateData } = useCurrentSubsystemUpdateQuery(
     subsystem,
     {
-      enabled: isFlex && pipetteIsBad,
-      refetchInterval: SUBSYSTEM_UPDATE_POLL_MS,
+      enabled: pollForSubsystemUpdate,
+      refetchInterval: POLL_DURATION_MS,
     }
   )
+  // we should poll for a subsystem update from the time a bad instrument is
+  // detected until the update has been done for 5 seconds
+  // this gives the instruments endpoint time to start reporting
+  // a good instrument
+  React.useEffect(() => {
+    if (pipetteIsBad && isFlex) {
+      setPollForSubsystemUpdate(true)
+    } else if (
+      subsystemUpdateData != null &&
+      subsystemUpdateData.data.updateStatus === 'done'
+    ) {
+      setTimeout(() => {
+        setPollForSubsystemUpdate(false)
+      }, POLL_DURATION_MS)
+    }
+  }, [pipetteIsBad, subsystemUpdateData, isFlex])
+
   const settings =
     usePipetteSettingsQuery({
-      refetchInterval: 5000,
+      refetchInterval: POLL_DURATION_MS,
       enabled: pipetteId != null,
     })?.data?.[pipetteId ?? '']?.fields ?? null
 
@@ -307,7 +327,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           </Box>
         </>
       )}
-      {(pipetteIsBad || subsystemUpdateData != null) && (
+      {(pipetteIsBad ||
+        (subsystemUpdateData != null && pollForSubsystemUpdate)) && (
         <InstrumentCard
           label={i18n.format(t('mount', { side: mount }), 'capitalize')}
           css={INSTRUMENT_CARD_STYLE}

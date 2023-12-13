@@ -1492,14 +1492,15 @@ class InstrumentContext(publisher.CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def type(self) -> str:
-        """One of ``'single'`` or ``'multi'``."""
-        model = self.name
-        if "single" in model:
+        """``'single'`` if this is a 1-channel pipette, or ``'multi'`` otherwise.
+
+        See also :py:obj:`.channels`, which can distinguish between 8-channel and 96-channel
+        pipettes.
+        """
+        if self.channels == 1:
             return "single"
-        elif "multi" in model:
-            return "multi"
         else:
-            raise RuntimeError("Bad pipette name: {}".format(model))
+            return "multi"
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1630,7 +1631,10 @@ class InstrumentContext(publisher.CommandPublisher):
     def channels(self) -> int:
         """The number of channels on the pipette.
 
-        Possible values are 1, 8, or 96."""
+        Possible values are 1, 8, or 96.
+
+        See also :py:obj:`.type`.
+        """
         return self._core.get_channels()
 
     @property  # type: ignore
