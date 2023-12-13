@@ -1,11 +1,10 @@
-When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The :py:meth:`.ProtocolContext.load_instrument` function provides this information and returns an :py:class:`.InstrumentContext` object.
-
-For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
-
 .. _new-create-pipette:
+.. _loading-pipettes:
 
 Loading Pipettes
 ================
+
+When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The :py:meth:`.ProtocolContext.load_instrument` function provides this information and returns an :py:class:`.InstrumentContext` object.
 
 As noted above, you call the :py:meth:`~.ProtocolContext.load_instrument` method to load a pipette. This method also requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
 

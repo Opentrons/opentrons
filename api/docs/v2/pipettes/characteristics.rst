@@ -1,3 +1,5 @@
+.. _pipette-characteristics:
+
 #######################
 Pipette Characteristics
 #######################

@@ -1,3 +1,5 @@
+.. _configuring-pipette-modes:
+
 #########################
 Configuring Pipette Modes
 #########################
