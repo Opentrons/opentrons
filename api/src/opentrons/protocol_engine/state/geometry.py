@@ -858,7 +858,7 @@ class GeometryView:
             ):
                 # Pipette might not reach the default left spot so use a different left spot
                 x_well_offset = (
-                    well_x_dim / 2 - SLOT_WIDTH + drop_location_margin_from_labware_edge
+                    -well_x_dim / 2 + drop_location_margin_from_labware_edge * 2
                 )
             else:
                 x_well_offset = -well_x_dim / 2 + drop_location_margin_from_labware_edge
