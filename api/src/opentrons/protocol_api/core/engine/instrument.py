@@ -471,6 +471,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             disposal_location,
             force_direct=False,
             speed=None,
+            alternate_tip_drop=True,
         )
         self._drop_tip_in_place(home_after=home_after)
         self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -480,6 +481,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         disposal_location: Union[TrashBin, WasteChute],
         force_direct: bool,
         speed: Optional[float],
+        alternate_tip_drop: bool = False,
     ) -> None:
         # TODO (nd, 2023-11-30): give appropriate offset when finalized
         # https://opentrons.atlassian.net/browse/RSS-391
@@ -494,7 +496,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 force_direct=force_direct,
                 speed=speed,
                 minimum_z_height=None,
-                alternate_drop_location=True,
+                alternate_drop_location=alternate_tip_drop,
             )
 
         if isinstance(disposal_location, WasteChute):
