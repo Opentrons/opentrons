@@ -127,12 +127,12 @@ Changes in API Versions
 Version 2.16
 ------------
 
-This version introduces new features for Flex and adds and improves methods for aspirating and dispensing.
+This version introduces new features for Flex and adds and improves methods for aspirating and dispensing. Note that when updating Flex protocols to version 2.16, you *must* load a trash container before dropping tips.
 
 - New features
 
   - Use :py:meth:`.configure_nozzle_layout` to pick up a single column of tips with the 96-channel pipette. See :ref:`partial-tip-pickup <Partial Tip Pickup>`.
-  - Specify the deck configuration of your Flex with :py:meth:`.load_waste_chute` and :py:meth:`.load_trash_bin`.
+  - Specify the trash containers attached to your Flex with :py:meth:`.load_waste_chute` and :py:meth:`.load_trash_bin`.
   - Dispense, blow out, drop tips, and dispose labware in the waste chute. Disposing labware requires the gripper and calling :py:meth:`.move_labware` with ``use_gripper=True``.
   - Perform actions in staging area slots by referencing slots A4 through D4. See :ref:`deck-slots`.
   - Explicitly command a pipette to :py:meth:`.prepare_to_aspirate`. The API usually prepares pipettes to aspirate automatically, but this is useful for certain applications, like pre-wetting routines.
