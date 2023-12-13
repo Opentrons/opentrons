@@ -50,6 +50,8 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
 
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
+  const ongoingUpdateId = updateData?.data.id
+
   React.useEffect(() => {
     if (status === 'done') {
       setInitiatedSubsystemUpdate(null)
@@ -96,14 +98,17 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
       </Flex>
     </Modal>
   )
-  if ((status === 'updating' || status === 'queued') && updateId != null) {
+  if (
+    (status === 'updating' || status === 'queued') &&
+    ongoingUpdateId != null
+  ) {
     modalContent = (
       <UpdateInProgressModal
         percentComplete={percentComplete}
         subsystem={subsystem}
       />
     )
-  } else if (status === 'done' && updateId != null) {
+  } else if (status === 'done' && ongoingUpdateId != null) {
     modalContent = (
       <UpdateResultsModal
         instrument={instrument}
