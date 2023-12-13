@@ -945,7 +945,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See :ref:`pipette-drop-tip` for examples.
 
         If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop
-        the attached tip into its default :py:attr:`trash_container`.
+        the attached tip into its :py:attr:`trash_container`.
 
         Starting with API version 2.15, if the trash container is the default fixed
         trash, the API will instruct the pipette to drop tips in different locations
@@ -1524,12 +1524,14 @@ class InstrumentContext(publisher.CommandPublisher):
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        On a Flex running a protocol with API version 2.16 or higher, ``trash_container`` is
-        the first ``TrashBin`` or ``WasteChute`` object loaded in the protocol.
-        On a Flex running a protocol with API version 2.15, ``trash_container`` is
-        a single-well fixed trash labware in slot D3.
-        On a an OT-2, ``trash_container`` is always a single-well fixed trash labware
-        in slot 12.
+        The default value depends on the robot type and API version:
+
+        - On a Flex running a protocol with API version 2.16 and later, the first
+          ``TrashBin`` or ``WasteChute`` object loaded in the protocol.
+        - On a Flex running a protocol with API version 2.15, a single-well fixed trash
+          ``Labware`` in slot D3.
+        - On an OT-2, it is always in slot 12. It is a ``Labware`` in API version 2.15
+          or earlier, or a ``TrashBin`` in API version 2.16 and later.
 
         .. versionchanged:: 2.16
             Added support for ``TrashBin`` and ``WasteChute`` objects.
