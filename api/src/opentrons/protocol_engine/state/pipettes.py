@@ -35,6 +35,7 @@ from ..commands import (
     MoveToWellResult,
     MoveRelativeResult,
     MoveToAddressableAreaResult,
+    MoveToAddressableAreaForDropTipResult,
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
@@ -266,7 +267,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 well_name=command.params.wellName,
             )
 
-        elif isinstance(command.result, MoveToAddressableAreaResult):
+        elif isinstance(
+            command.result,
+            (MoveToAddressableAreaResult, MoveToAddressableAreaForDropTipResult),
+        ):
             self._state.current_location = CurrentAddressableArea(
                 pipette_id=command.params.pipetteId,
                 addressable_area_name=command.params.addressableAreaName,
@@ -326,6 +330,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 MoveToCoordinatesResult,
                 MoveRelativeResult,
                 MoveToAddressableAreaResult,
+                MoveToAddressableAreaForDropTipResult,
                 PickUpTipResult,
                 DropTipResult,
                 AspirateResult,
