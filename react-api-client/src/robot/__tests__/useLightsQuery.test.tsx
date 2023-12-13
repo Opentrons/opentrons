@@ -43,7 +43,7 @@ describe('useLights hook', () => {
   it('should return no data if no host', () => {
     when(useHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(useLightsQuery, { wrapper })
+    const { result } = renderHook(() => useLightsQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -52,7 +52,7 @@ describe('useLights hook', () => {
     when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(getLights).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useLightsQuery, { wrapper })
+    const { result } = renderHook(() => useLightsQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -63,7 +63,7 @@ describe('useLights hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: LIGHTS_RESPONSE } as Response<Lights>)
 
-    const { result } = renderHook(useLightsQuery, { wrapper })
+    const { result } = renderHook(() => useLightsQuery(), { wrapper })
 
     await waitFor(() => {
       expect(result.current?.data).toEqual(LIGHTS_RESPONSE)

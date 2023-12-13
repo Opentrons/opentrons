@@ -50,7 +50,7 @@ describe('useEstopQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(useEstopQuery, { wrapper })
+    const { result } = renderHook(() => useEstopQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -59,7 +59,7 @@ describe('useEstopQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetEstopStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useEstopQuery, { wrapper })
+    const { result } = renderHook(() => useEstopQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -72,7 +72,7 @@ describe('useEstopQuery hook', () => {
         data: ESTOP_STATE_RESPONSE,
       } as Response<EstopStatus>)
 
-    const { result } = renderHook(useEstopQuery, { wrapper })
+    const { result } = renderHook(() => useEstopQuery(), { wrapper })
 
     await waitFor(() => {
       expect(result.current?.data).toEqual(ESTOP_STATE_RESPONSE)

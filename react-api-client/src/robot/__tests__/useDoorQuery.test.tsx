@@ -46,7 +46,7 @@ describe('useDoorQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(useDoorQuery, { wrapper })
+    const { result } = renderHook(() => useDoorQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -55,7 +55,7 @@ describe('useDoorQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetDoorStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useDoorQuery, { wrapper })
+    const { result } = renderHook(() => useDoorQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -66,7 +66,7 @@ describe('useDoorQuery hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: DOOR_RESPONSE } as Response<DoorStatus>)
 
-    const { result } = renderHook(useDoorQuery, { wrapper })
+    const { result } = renderHook(() => useDoorQuery(), { wrapper })
 
     await waitFor(() => {
       expect(result.current?.data).toEqual(DOOR_RESPONSE)
