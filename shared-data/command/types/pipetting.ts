@@ -225,8 +225,11 @@ export interface DropTipInPlaceParams {
 export interface MoveToAddressableAreaForDropTipParams {
   pipetteId: string
   addressableAreaName: string
-  offset: AddressableOffsetVector
-  alternateDropLocation: boolean
+  offset?: AddressableOffsetVector
+  alternateDropLocation?: boolean
+  speed?: number
+  minimumZHeight?: number
+  forceDirect?: boolean
 }
 export interface BlowoutInPlaceParams {
   pipetteId: string
