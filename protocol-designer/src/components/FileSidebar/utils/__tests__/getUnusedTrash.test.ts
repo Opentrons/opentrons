@@ -22,7 +22,7 @@ describe('getUnusedTrash', () => {
       wasteChuteUnused: false,
     })
   })
-  it('returns false for unused trash bin', () => {
+  it('returns true for unused trash bin', () => {
     const mockTrashId = 'mockTrashId'
     const mockTrash = {
       [mockTrashId]: {
@@ -35,7 +35,7 @@ describe('getUnusedTrash', () => {
       {
         labwareId: {
           commandType: 'moveToAddressableArea',
-          params: { adressableAreaName: 'cutoutA3' },
+          params: { addressableAreaName: 'cutoutA3' },
         },
       },
     ] as unknown) as CreateCommand[]
@@ -107,6 +107,27 @@ describe('getUnusedTrash', () => {
     expect(getUnusedTrash(mockAdditionalEquipment, mockCommand)).toEqual({
       trashBinUnused: false,
       wasteChuteUnused: true,
+    })
+  })
+  it('returns false for unused trash bin with moveToAddressableAreaForDropTip command', () => {
+    const mockTrashId = 'mockTrashId'
+    const mockTrash = {
+      [mockTrashId]: {
+        name: 'trashBin',
+        id: mockTrashId,
+        location: 'cutoutA3',
+      },
+    } as AdditionalEquipment
+    const mockCommand = [
+      {
+        commandType: 'moveToAddressableAreaForDropTip',
+        params: { addressableAreaName: 'movableTrashA3', pipetteId: 'mockPip' },
+      },
+    ] as CreateCommand[]
+
+    expect(getUnusedTrash(mockTrash, mockCommand)).toEqual({
+      trashBinUnused: false,
+      wasteChuteUnused: false,
     })
   })
 })
