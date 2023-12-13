@@ -821,7 +821,7 @@ class ProtocolContext(CommandPublisher):
     def load_instrument(
         self,
         instrument_name: str,
-        mount: Union[Mount, str, None],
+        mount: Union[Mount, str, None] = None,
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
