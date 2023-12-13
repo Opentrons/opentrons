@@ -851,6 +851,8 @@ class ProtocolContext(CommandPublisher):
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+        # Always validate the input mount, even if we're loading a 96-channel and the mount doesn't
+        # matter.
         checked_mount = validation.ensure_mount(mount)
 
         is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
