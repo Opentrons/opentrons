@@ -248,7 +248,9 @@ function PrepareToRun({
     setIsPollingForCompletedAnalysis,
   ] = React.useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
 
-  const { data: mostRecentAnalysis = null} = useProtocolAnalysisAsDocumentQuery(
+  const {
+    data: mostRecentAnalysis = null,
+  } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
     {
