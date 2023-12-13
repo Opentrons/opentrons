@@ -304,7 +304,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )[0]
-    getByText('Moving to Trash Bin in D3 to drop tip')
+    getByText('Dropping tip into Trash Bin in D3')
   })
   it('renders correct text for moveToAddressableArea for slots', () => {
     const { getByText } = renderWithProviders(
