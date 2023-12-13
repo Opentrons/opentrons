@@ -43,11 +43,22 @@ const render = (props: React.ComponentProps<typeof UpdateNeededModal>) => {
 describe('UpdateNeededModal', () => {
   let props: React.ComponentProps<typeof UpdateNeededModal>
   const refetch = jest.fn(() => Promise.resolve())
-  const updateSubsystem = jest.fn(() => Promise.resolve())
+  const updateSubsystem = jest.fn(() =>
+    Promise.resolve({
+      data: {
+        data: {
+          id: 'update id',
+          updateStatus: 'updating',
+          updateProgress: 20,
+        } as any,
+      },
+    })
+  )
   beforeEach(() => {
     props = {
-      setShowUpdateModal: jest.fn(),
+      onClose: jest.fn(),
       subsystem: 'pipette_left',
+      shouldExit: true,
       setInitiatedSubsystemUpdate: jest.fn(),
     }
     mockUseInstrumentQuery.mockReturnValue({
@@ -70,13 +81,6 @@ describe('UpdateNeededModal', () => {
       } as SubsystemUpdateProgressData,
     } as any)
     mockUseUpdateSubsystemMutation.mockReturnValue({
-      data: {
-        data: {
-          id: 'update id',
-          updateStatus: 'updating',
-          updateProgress: 20,
-        } as any,
-      } as SubsystemUpdateProgressData,
       updateSubsystem,
     } as any)
     mockUpdateInProgressModal.mockReturnValue(
@@ -94,7 +98,7 @@ describe('UpdateNeededModal', () => {
       )
     )
     getByText('Update firmware').click()
-    expect(mockUseUpdateSubsystemMutation).toHaveBeenCalled()
+    expect(updateSubsystem).toHaveBeenCalled()
   })
   it('renders the update in progress modal when update is pending', () => {
     const { getByText } = render(props)
@@ -108,16 +112,6 @@ describe('UpdateNeededModal', () => {
           updateStatus: 'done',
         } as any,
       } as SubsystemUpdateProgressData,
-    } as any)
-    mockUseUpdateSubsystemMutation.mockReturnValue({
-      data: {
-        data: {
-          id: 'update id',
-          updateStatus: 'done',
-          updateProgress: 100,
-        } as any,
-      } as SubsystemUpdateProgressData,
-      updateSubsystem,
     } as any)
     const { getByText } = render(props)
     getByText('Mock Update Results Modal')
