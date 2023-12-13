@@ -1,6 +1,6 @@
 // client entry point and application manifest
 import React from 'react'
-import ReactDom from 'react-dom'
+import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
 
 import { ConnectedRouter } from 'connected-react-router'
@@ -28,9 +28,9 @@ store.dispatch(uiInitialized())
 log.info('Rendering app UI')
 
 const container = document.getElementById('root')
+if (container == null) throw new Error('Failed to find the root element')
 
 const root = ReactDom.createRoot(container)
-
 root.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>

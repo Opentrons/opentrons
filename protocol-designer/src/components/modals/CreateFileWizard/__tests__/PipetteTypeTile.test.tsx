@@ -5,7 +5,6 @@ import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { PipetteTypeTile } from '../PipetteTypeTile'
 import { EquipmentOption } from '../EquipmentOption'
-import { getAllow96Channel } from '../../../../feature-flags/selectors'
 
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'

@@ -82,7 +82,6 @@ export const StepEditFormComponent = (props: Props): JSX.Element => {
       {showMoreOptionsModal && (
         <MoreOptionsModal formData={formData} close={toggleMoreOptionsModal} />
       )}
-      {/* @ts-expect-error(ce, 2021-06-22) getting into the weeds of `connect` and props and not sure what is going on */}
       <FormAlerts focusedField={focusedField} dirtyFields={dirtyFields} />
       <div className={cx(formStyles.form, styles[formData.stepType])}>
         <FormComponent {...{ formData, propsForFields, focusHandlers }} />

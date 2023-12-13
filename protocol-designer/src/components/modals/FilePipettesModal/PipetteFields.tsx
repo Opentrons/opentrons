@@ -29,6 +29,8 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../../types'
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
@@ -87,7 +89,7 @@ export function PipetteFields(props: Props): JSX.Element {
   } = props
 
   const allowAllTipracks = useSelector(getAllowAllTipracks)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const allLabware = useSelector(getLabwareDefsByURI)
   const initialTabIndex = props.initialTabIndex || 1
 

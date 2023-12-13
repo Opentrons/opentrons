@@ -35,6 +35,8 @@ import { HandleEnter } from './HandleEnter'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../../types'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -147,7 +149,7 @@ interface PipetteTipsFieldProps extends FormikProps<FormState> {
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const { mount, values, setFieldValue } = props
   const allowAllTipracks = useSelector(getAllowAllTipracks)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
     false
   )

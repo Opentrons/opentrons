@@ -170,11 +170,10 @@ export function EditModulesCard(props: Props): JSX.Element {
               trashBinId={trashBin?.id}
             />
             <AdditionalItemsRow
-              handleAttachment={() =>
-                dispatch(
-                  wasteChute != null ? deleteDeckFixture(wasteChute.id) : null
-                )
-              }
+              handleAttachment={() => {
+                if (wasteChute != null)
+                  dispatch(deleteDeckFixture(wasteChute.id))
+              }}
               isEquipmentAdded={wasteChute != null}
               name="wasteChute"
               hasWasteChute={wasteChute != null}

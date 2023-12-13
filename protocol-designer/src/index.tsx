@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 
@@ -17,7 +17,7 @@ initialize(store)
 initializeMixpanel(store.getState())
 
 const container = document.getElementById('root')
-
+if (container == null) throw new Error('Failed to find the root element')
 const root = ReactDOM.createRoot(container)
 
 const render = (Component: any): void => {

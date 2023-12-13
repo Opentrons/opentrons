@@ -147,11 +147,10 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('Health check button shows Tooltip when pipette are not set', async () => {
-    const user = userEvent.setup()
     mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
     render()
     const button = screen.getByRole('button', { name: 'Check health' })
-    user.hover(button)
+    await userEvent.hover(button)
     await waitFor(() => {
       expect(
         screen.getByText(

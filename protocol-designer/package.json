@@ -41,7 +41,7 @@
     "react-dnd": "6.0.0",
     "react-dnd-mouse-backend": "0.1.2",
     "react-dom": "18.2.0",
-    "react-i18next": "13.0.1",
+    "react-i18next": "13.5.0",
     "react-redux": "8.1.2",
     "redux": "4.0.5",
     "redux-actions": "2.2.1",
