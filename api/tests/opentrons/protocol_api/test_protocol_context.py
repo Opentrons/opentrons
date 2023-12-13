@@ -191,6 +191,15 @@ def test_load_instrument(
     )
 
 
+def test_load_instrument_usually_requires_mount(
+    decoy: Decoy, subject: ProtocolContext
+) -> None:
+    """For pipettes other than 96-channels, it should require a mount."""
+    decoy.when(mock_validation.ensure_mount("some_mount")).then_return(None)
+    with pytest.raises(ValueError, match="You must specify a mount"):
+        subject.load_instrument("some_instrument", "some_mount")
+
+
 def test_load_instrument_replace(
     decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
@@ -241,6 +250,9 @@ def test_96_channel_pipette_always_loads_on_the_left_mount(
     decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
         PipetteNameType.P1000_96
     )
+    decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(
+        Mount.RIGHT
+    )  # Should be ignored.
     decoy.when(
         mock_core.load_instrument(
             instrument_name=PipetteNameType.P1000_96,
@@ -295,6 +307,7 @@ def test_96_channel_pipette_raises_if_another_pipette_attached(
     decoy.when(mock_validation.ensure_pipette_name("a 96 channel name")).then_return(
         PipetteNameType.P1000_96
     )
+    decoy.when(mock_validation.ensure_mount("shadowfax")).then_return(None)
     decoy.when(
         mock_core.load_instrument(
             instrument_name=PipetteNameType.P1000_96,

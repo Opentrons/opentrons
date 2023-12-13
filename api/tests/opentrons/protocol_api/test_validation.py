@@ -35,6 +35,7 @@ from opentrons.protocol_api import validation as subject, Well, Labware
         ("LeFt", Mount.LEFT),
         (Mount.LEFT, Mount.LEFT),
         (Mount.RIGHT, Mount.RIGHT),
+        (None, None),
     ],
 )
 def test_ensure_mount(input_value: Union[str, Mount], expected: Mount) -> None:

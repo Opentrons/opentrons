@@ -88,8 +88,11 @@ class InvalidTrashBinLocationError(ValueError):
     """An error raised when attempting to load trash bins in invalid slots."""
 
 
-def ensure_mount(mount: Union[str, Mount]) -> Mount:
+def ensure_mount(mount: Union[str, Mount, None]) -> Optional[Mount]:
     """Ensure that an input value represents a valid Mount."""
+    if mount is None:
+        return None
+
     if mount in [Mount.EXTENSION, "extension"]:
         # This would cause existing protocols that might be iterating over mount types
         # for loading pipettes to raise an error because Mount now includes Extension mount.
@@ -274,7 +277,6 @@ def ensure_module_model(load_name: str) -> ModuleModel:
 def ensure_and_convert_trash_bin_location(
     deck_slot: Union[int, str], api_version: APIVersion, robot_type: RobotType
 ) -> str:
-
     """Ensure trash bin load location is valid.
 
     Also, convert the deck slot to a valid trash bin addressable area.

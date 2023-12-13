@@ -48,13 +48,13 @@ If you're writing a protocol that uses the Flex Gripper, you might think that th
 Loading a Flex 96-Channel Pipette
 ---------------------------------
 
-This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. To load the 96-Channel Pipette, specify its position as ``mount='left'`` as shown here:
+This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. To load the 96-Channel Pipette, omit the ``mount`` argument from ``load_instrument()`` as shown here:
 
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        left = protocol.load_instrument(
-            instrument_name='flex_96channel_1000', mount='left')
+        pipette = protocol.load_instrument(
+            instrument_name='flex_96channel_1000')
 
 .. versionadded:: 2.15
 
