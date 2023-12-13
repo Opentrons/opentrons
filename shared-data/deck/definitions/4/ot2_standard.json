@@ -215,11 +215,11 @@
       {
         "id": "fixedTrash",
         "areaType": "fixedTrash",
-        "offsetFromCutoutFixture": [82.84, 80, 82],
+        "offsetFromCutoutFixture": [29.285, -2.835, 0],
         "boundingBox": {
-          "xDimension": 0,
-          "yDimension": 0,
-          "zDimension": 0
+          "xDimension": 107.11,
+          "yDimension": 165.67,
+          "zDimension": 82
         },
         "displayName": "Slot 12/Fixed Trash",
         "ableToDropTips": true
