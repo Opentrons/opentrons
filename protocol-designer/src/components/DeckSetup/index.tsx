@@ -78,7 +78,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
-import styles from './DeckSetup.css'
+import styles from './DeckSetup.module.css'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',

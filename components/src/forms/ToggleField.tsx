@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 
-import styles from './forms.css'
+import styles from './forms.module.css'
 
 export interface ToggleFieldProps {
   /** change handler */

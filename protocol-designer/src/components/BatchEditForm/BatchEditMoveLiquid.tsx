@@ -26,9 +26,9 @@ import { FormColumn } from './FormColumn'
 import { FieldPropsByName } from '../StepEditForm/types'
 import { WellOrderOption } from '../../form-types'
 // TODO(IL, 2021-03-01): refactor these fragmented style rules (see #7402)
-import formStyles from '../forms/forms.css'
-import styles from '../StepEditForm/StepEditForm.css'
-import buttonStyles from '../StepEditForm/ButtonRow/styles.css'
+import formStyles from '../forms/forms.module.css'
+import styles from '../StepEditForm/StepEditForm.module.css'
+import buttonStyles from '../StepEditForm/ButtonRow/styles.module.css'
 
 const SourceDestBatchEditMoveLiquidFields = (props: {
   prefix: 'aspirate' | 'dispense'

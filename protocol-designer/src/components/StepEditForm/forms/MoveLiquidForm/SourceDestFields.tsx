@@ -17,7 +17,7 @@ import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
 } from '../../utils'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 import type { FormData } from '../../../../form-types'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'

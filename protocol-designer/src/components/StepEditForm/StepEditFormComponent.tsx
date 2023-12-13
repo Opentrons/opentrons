@@ -15,8 +15,8 @@ import {
 } from './forms'
 import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
-import formStyles from '../forms/forms.css'
-import styles from './StepEditForm.css'
+import formStyles from '../forms/forms.module.css'
+import styles from './StepEditForm.module.css'
 import { FormData, StepType } from '../../form-types'
 import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 

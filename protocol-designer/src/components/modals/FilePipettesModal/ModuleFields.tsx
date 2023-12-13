@@ -11,7 +11,7 @@ import {
 } from '../../../constants'
 import { FormModulesByType } from '../../../step-forms'
 import { ModuleDiagram } from '../../modules'
-import styles from './FilePipettesModal.css'
+import styles from './FilePipettesModal.module.css'
 import { MAGNETIC_BLOCK_TYPE, ModuleType } from '@opentrons/shared-data'
 
 export interface ModuleFieldsProps {

@@ -25,7 +25,7 @@ import { Portal } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { Cutout } from '@opentrons/shared-data'
 

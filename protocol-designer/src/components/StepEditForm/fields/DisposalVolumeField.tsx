@@ -19,7 +19,7 @@ import { FieldProps, FieldPropsByName } from '../types'
 import { PathOption, StepType } from '../../../form-types'
 import { BaseState } from '../../../types'
 
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 interface DropdownFormFieldProps extends FieldProps {
   className?: string

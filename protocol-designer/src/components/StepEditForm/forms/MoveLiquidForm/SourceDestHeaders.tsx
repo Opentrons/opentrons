@@ -9,7 +9,7 @@ import { AspDispSection } from '../AspDispSection'
 import type { FormData } from '../../../../form-types'
 import type { FieldPropsByName } from '../../types'
 
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 interface Props {
   className?: string | null

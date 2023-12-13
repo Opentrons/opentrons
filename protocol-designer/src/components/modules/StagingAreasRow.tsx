@@ -19,7 +19,7 @@ import { Portal } from '../portals/TopPortal'
 import { StagingAreasModal } from './StagingAreasModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 import type { Cutout } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 

@@ -17,7 +17,7 @@ import { getHasWasteChute } from '../labware'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
 interface MoveLabwareHeaderProps {
   sourceLabwareNickname?: string | null

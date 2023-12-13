@@ -3,7 +3,7 @@ import { i18n } from '../../../localization'
 import { TextField } from './TextField'
 import { CheckboxRowField } from './CheckboxRowField'
 import { TipPositionField } from './TipPositionField'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 import { FieldPropsByName } from '../types'
 import { StepFieldName } from '../../../form-types'
 

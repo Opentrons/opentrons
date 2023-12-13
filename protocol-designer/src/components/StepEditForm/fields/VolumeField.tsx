@@ -11,7 +11,7 @@ import { getFieldDefaultTooltip } from '../utils'
 import { TextField } from './TextField'
 import { StepType } from '../../../form-types'
 import { FieldProps } from '../types'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 type Props = FieldProps & {
   stepType: StepType

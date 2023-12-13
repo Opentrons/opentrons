@@ -6,7 +6,7 @@ import {
   StrokedWells,
   StaticLabware,
 } from './labwareInternals'
-import styles from './LabwareRender.css'
+import styles from './LabwareRender.module.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {

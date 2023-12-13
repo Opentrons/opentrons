@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import styles from './TitleBar.css'
+import styles from './TitleBar.module.css'
 import { i18n } from '../localization'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'

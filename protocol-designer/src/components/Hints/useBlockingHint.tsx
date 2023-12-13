@@ -7,7 +7,7 @@ import { actions, selectors, HintKey } from '../../tutorial'
 import { ContinueModal, DeprecatedCheckboxField } from '@opentrons/components'
 import { Portal } from '../portals/MainPageModalPortal'
 import { i18n } from '../../localization'
-import styles from './hints.css'
+import styles from './hints.module.css'
 
 export interface HintProps {
   hintKey: HintKey

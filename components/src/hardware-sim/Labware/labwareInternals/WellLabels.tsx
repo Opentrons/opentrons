@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { C_BLACK, C_BLUE } from '../../../styles/colors'
 import { RobotCoordsText } from '../../Deck'
 import { WellLabelOption, WELL_LABEL_OPTIONS } from '../LabwareRender'
-import styles from './WellLabels.css'
+import styles from './WellLabels.module.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HighlightedWellLabels } from './types'
 

@@ -28,7 +28,7 @@ import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import { StagingAreasRow } from './StagingAreasRow'
 

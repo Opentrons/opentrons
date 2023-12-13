@@ -12,8 +12,8 @@ import {
 import type { LabwareDefinition1, WellDefinition } from '@opentrons/shared-data'
 import { SELECTABLE_WELL_CLASS } from '../constants'
 
-import labwareStyles from './Labware.css'
-import wellStyles from './Well.css'
+import labwareStyles from './Labware.module.css'
+import wellStyles from './Well.module.css'
 
 import { LabwareOutline, RobotCoordsForeignDiv } from '../hardware-sim'
 

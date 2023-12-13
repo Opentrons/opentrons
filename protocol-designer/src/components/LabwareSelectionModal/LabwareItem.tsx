@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { i18n } from '../../localization'
 import { Icon, IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,

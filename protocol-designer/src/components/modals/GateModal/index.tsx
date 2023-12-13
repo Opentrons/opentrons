@@ -8,8 +8,8 @@ import {
   selectors as analyticsSelectors,
 } from '../../../analytics'
 import { BaseState, ThunkDispatch } from '../../../types'
-import settingsStyles from '../../SettingsPage/SettingsPage.css'
-import modalStyles from '../modal.css'
+import settingsStyles from '../../SettingsPage/SettingsPage.module.css'
+import modalStyles from '../modal.module.css'
 interface Props {
   hasOptedIn: boolean | null
   optIn: () => unknown

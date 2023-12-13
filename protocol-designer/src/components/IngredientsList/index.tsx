@@ -11,7 +11,7 @@ import { TitledListNotes } from '../TitledListNotes'
 import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
-import styles from './IngredientsList.css'
+import styles from './IngredientsList.module.css'
 
 type RemoveWellsContents = (args: {
   liquidGroupId: string

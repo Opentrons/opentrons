@@ -17,8 +17,8 @@ import { ContentsByWell } from '../../labware-ingred/types'
 import { WellIngredientNames } from '../../steplist/types'
 import { LabwareDefinition2 } from '@opentrons/shared-data'
 
-import modalStyles from '../modals/modal.css'
-import styles from './labware.css'
+import modalStyles from '../modals/modal.module.css'
+import styles from './labware.module.css'
 
 interface SP {
   definition?: LabwareDefinition2 | null

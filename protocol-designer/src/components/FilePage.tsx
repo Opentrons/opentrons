@@ -18,9 +18,9 @@ import { EditPipettesModal } from './modals/EditPipettesModal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
 
-import styles from './FilePage.css'
-import modalStyles from '../components/modals/modal.css'
-import formStyles from '../components/forms/forms.css'
+import styles from './FilePage.module.css'
+import modalStyles from '../components/modals/modal.module.css'
+import formStyles from '../components/forms/forms.module.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'

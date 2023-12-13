@@ -3,7 +3,7 @@ import { Icon, SPACING_3 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import collisionImage from '../../images/modules/module_pipette_collision_warning.png'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface Props {
   showDiagram?: boolean

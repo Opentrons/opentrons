@@ -4,7 +4,7 @@ import { DropdownField, DropdownOption, FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getAdditionalEquipmentEntities } from '../../../../step-forms/selectors'
 import { StepFormDropdown } from '../StepFormDropdownField'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 export function DropTipField(
   props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'>

@@ -1,7 +1,7 @@
 import assert from 'assert'
 import * as React from 'react'
 import cx from 'classnames'
-import styles from './Well.css'
+import styles from './Well.module.css'
 
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'

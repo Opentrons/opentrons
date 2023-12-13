@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useField } from 'formik'
 import { SlotMap } from '@opentrons/components'
 import { RobotType } from '@opentrons/shared-data'
-import styles from './EditModules.css'
+import styles from './EditModules.module.css'
 
 interface ConnectedSlotMapProps {
   fieldName: string

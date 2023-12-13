@@ -29,7 +29,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 interface DNDP {
   isOver: boolean

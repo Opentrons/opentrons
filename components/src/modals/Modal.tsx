@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { RemoveScroll } from 'react-remove-scroll'
 
 import { Overlay } from './Overlay'
-import styles from './modals.css'
+import styles from './modals.module.css'
 
 export interface ModalProps {
   /** handler to close the modal (attached to `Overlay` onClick) */

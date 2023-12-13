@@ -9,7 +9,7 @@ import {
 import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 import { ModuleType } from '@opentrons/shared-data'
 
 export interface ModuleStepItemRowProps {

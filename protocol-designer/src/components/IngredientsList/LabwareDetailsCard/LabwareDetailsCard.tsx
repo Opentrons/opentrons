@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { i18n } from '../../../localization'
 import { PDTitledList, PDListItem } from '../../lists'
 import { EditableTextField } from '../../EditableTextField'
-import styles from './labwareDetailsCard.css'
+import styles from './labwareDetailsCard.module.css'
 
 export interface Props {
   labwareDefDisplayName: string

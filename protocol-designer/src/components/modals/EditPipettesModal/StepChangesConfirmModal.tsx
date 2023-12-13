@@ -3,8 +3,8 @@ import * as React from 'react'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../../localization'
 
-import styles from './StepChangesConfirmModal.css'
-import modalStyles from '../modal.css'
+import styles from './StepChangesConfirmModal.module.css'
+import modalStyles from '../modal.module.css'
 
 interface Props {
   onCancel: () => void

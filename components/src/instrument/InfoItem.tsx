@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import styles from './instrument.css'
+import styles from './instrument.module.css'
 
 export interface InfoItemProps {
   title: string

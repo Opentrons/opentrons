@@ -7,7 +7,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import styles from './AnnouncementModal.css'
+import styles from './AnnouncementModal.module.css'
 
 export interface Announcement {
   announcementKey: string

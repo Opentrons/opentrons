@@ -17,8 +17,8 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { selectors } from '../../labware-ingred/selectors'
-import styles from './LiquidEditForm.css'
-import formStyles from '../forms/forms.css'
+import styles from './LiquidEditForm.module.css'
+import formStyles from '../forms/forms.module.css'
 
 import { LiquidGroup } from '../../labware-ingred/types'
 import { ColorPicker } from '../ColorPicker'

@@ -16,7 +16,7 @@ import {
 } from './constants'
 import { DECK_LAYER_BLOCKLIST } from './index'
 
-import styles from './DeckSetup.css'
+import styles from './DeckSetup.module.css'
 
 export const NullDeckState = (): JSX.Element => {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])

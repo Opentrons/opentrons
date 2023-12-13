@@ -25,7 +25,7 @@ import { DropTipField } from '../fields/DropTipField'
 
 import { StepFormProps } from '../types'
 
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)

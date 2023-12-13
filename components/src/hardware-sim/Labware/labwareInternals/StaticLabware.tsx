@@ -5,7 +5,7 @@ import flatMap from 'lodash/flatMap'
 
 import { LabwareOutline } from './LabwareOutline'
 import { Well } from './Well'
-import styles from './StaticLabware.css'
+import styles from './StaticLabware.module.css'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'

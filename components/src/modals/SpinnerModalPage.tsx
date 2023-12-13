@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { TitleBar } from '../structure'
 import { SpinnerModal } from './SpinnerModal'
-import styles from './modals.css'
+import styles from './modals.module.css'
 
 import type { TitleBarProps } from '../structure'
 

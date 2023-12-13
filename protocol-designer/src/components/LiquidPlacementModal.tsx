@@ -17,7 +17,7 @@ import * as wellContentsSelectors from '../top-selectors/well-contents'
 import { getSelectedWells } from '../well-selection/selectors'
 import { selectWells, deselectWells } from '../well-selection/actions'
 
-import styles from './LiquidPlacementModal.css'
+import styles from './LiquidPlacementModal.module.css'
 
 import { Dispatch } from 'redux'
 import { LabwareDefinition2 } from '@opentrons/shared-data'

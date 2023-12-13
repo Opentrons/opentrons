@@ -12,10 +12,10 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
+import modalStyles from '../../../modals/modal.module.css'
 import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
-import styles from './TipPositionInput.css'
+import styles from './TipPositionInput.module.css'
 import * as utils from './utils'
 import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
 

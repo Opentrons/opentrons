@@ -4,7 +4,7 @@ import { ThunkDispatch } from '../../../types'
 import { actions as stepsActions } from '../../../ui/steps'
 import { TerminalItemId } from '../../../steplist'
 import { i18n } from '../../../localization'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface OP {
   terminalId: TerminalItemId

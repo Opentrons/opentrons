@@ -12,8 +12,8 @@ import { actions as steplistActions } from '../../steplist'
 import { StepFieldName } from '../../steplist/fieldLevel'
 import { FormData } from '../../form-types'
 import { ThunkDispatch } from '../../types'
-import modalStyles from './modal.css'
-import styles from './MoreOptionsModal.css'
+import modalStyles from './modal.module.css'
+import styles from './MoreOptionsModal.module.css'
 
 interface OP {
   close: (event?: React.MouseEvent) => unknown

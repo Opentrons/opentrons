@@ -18,7 +18,7 @@ import {
 } from '../../../constants'
 import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
 import { getSingleSelectDisabledTooltip } from '../utils'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 import { StepFormProps } from '../types'
 

@@ -22,7 +22,7 @@ import { stepIconsByType, StepIdType, StepType } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { BaseState } from '../../types'
 import { ContextMenu } from './ContextMenu'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
 type DragDropStepItemProps = React.ComponentProps<typeof ConnectedStepItem> & {
   connectDragSource: (val: unknown) => React.ReactElement<any>

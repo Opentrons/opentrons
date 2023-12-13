@@ -5,7 +5,7 @@ import { selectors } from '../../labware-ingred/selectors'
 import { AIR } from '@opentrons/step-generation'
 import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { WellIngredientVolumeData, WellIngredientNames } from '../../steplist'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
 interface Props {
   ingreds: WellIngredientVolumeData

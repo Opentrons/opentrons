@@ -14,8 +14,6 @@ import { fileUploadMessage } from './load-file/actions'
 import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
 import { BaseState, Action } from './types'
 const timelineMiddleware = makeTimelineMiddleware()
-const ReselectTools =
-  process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
 
 function getRootReducer(): Reducer<BaseState, Action> {
   const rootReducer = combineReducers<BaseState>({
@@ -80,8 +78,6 @@ export function configureStore(): StoreType {
       applyMiddleware(trackEventMiddleware, timelineMiddleware, thunk)
     )
   )
-  // give reselect tools access to state if in dev env
-  if (ReselectTools) ReselectTools.getStateWith(() => store.getState())
   // initial rehydration, and persistence subscriber
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))

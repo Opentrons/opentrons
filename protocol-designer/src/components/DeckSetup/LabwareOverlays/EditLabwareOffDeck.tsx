@@ -20,7 +20,7 @@ import {
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { NameThisLabware } from './NameThisLabware'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { BaseState, ThunkDispatch } from '../../../types'

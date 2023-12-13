@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
 interface LabwareTooltipContentsProps {
   labwareNickname?: string | null

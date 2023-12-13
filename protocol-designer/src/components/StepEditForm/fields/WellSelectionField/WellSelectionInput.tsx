@@ -9,7 +9,7 @@ import {
   getSelectedStepId,
   getWellSelectionLabwareKey,
 } from '../../../../ui/steps'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 import { Dispatch } from 'redux'
 import { StepIdType } from '../../../../form-types'

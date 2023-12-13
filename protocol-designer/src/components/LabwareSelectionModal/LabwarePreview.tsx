@@ -12,7 +12,7 @@ import {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface Props {
   labwareDef?: LabwareDefinition2 | null

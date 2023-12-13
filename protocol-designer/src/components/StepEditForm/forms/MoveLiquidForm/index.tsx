@@ -9,7 +9,7 @@ import {
   PathField,
 } from '../../fields'
 import { DropTipField } from '../../fields/DropTipField'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 import { SourceDestFields } from './SourceDestFields'
 import { SourceDestHeaders } from './SourceDestHeaders'
 import type { StepFormProps } from '../../types'

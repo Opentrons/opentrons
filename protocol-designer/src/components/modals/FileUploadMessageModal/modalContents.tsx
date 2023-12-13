@@ -1,6 +1,6 @@
 import * as React from 'react'
 import assert from 'assert'
-import styles from './modalContents.css'
+import styles from './modalContents.module.css'
 import { ModalContents } from './types'
 import { FileUploadMessage } from '../../../load-file'
 

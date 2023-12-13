@@ -8,7 +8,7 @@ import { selectors as stepFormSelectors } from '../../../step-forms'
 import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
 import { TextField, RadioGroupField } from '../fields'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 import { StepFormProps } from '../types'
 

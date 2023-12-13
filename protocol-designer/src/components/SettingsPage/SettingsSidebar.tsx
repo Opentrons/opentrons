@@ -6,7 +6,7 @@ import { BaseState, ThunkDispatch } from '../../types'
 import { actions, selectors, Page } from '../../navigation'
 import { i18n } from '../../localization'
 import { PDTitledList } from '../lists'
-import styles from './SettingsPage.css'
+import styles from './SettingsPage.module.css'
 
 interface SP {
   currentPage: Page

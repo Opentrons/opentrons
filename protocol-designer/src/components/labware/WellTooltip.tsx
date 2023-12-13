@@ -4,7 +4,7 @@ import { Popper, Reference, Manager } from 'react-popper'
 import cx from 'classnames'
 import { Portal } from '../portals/TopPortal'
 import { PillTooltipContents } from '../steplist/SubstepRow'
-import styles from './labware.css'
+import styles from './labware.module.css'
 import { LocationLiquidState } from '@opentrons/step-generation'
 import { WellIngredientNames } from '../../steplist/types'
 

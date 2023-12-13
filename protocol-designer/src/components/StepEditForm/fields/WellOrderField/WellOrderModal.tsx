@@ -9,12 +9,12 @@ import {
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
-import modalStyles from '../../../modals/modal.css'
+import modalStyles from '../../../modals/modal.module.css'
 import { WellOrderOption } from '../../../../form-types'
 
 import { WellOrderViz } from './WellOrderViz'
-import styles from './WellOrderInput.css'
-import stepEditStyles from '../../StepEditForm.css'
+import styles from './WellOrderInput.module.css'
+import stepEditStyles from '../../StepEditForm.module.css'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'

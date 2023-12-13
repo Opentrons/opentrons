@@ -3,7 +3,7 @@ import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import classnames from 'classnames'
 
-import styles from './lists.css'
+import styles from './lists.module.css'
 import { Icon } from '../icons'
 import type { IconName } from '../icons'
 

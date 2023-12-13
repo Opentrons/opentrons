@@ -45,9 +45,9 @@ import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirm
 import { ModuleFields } from './ModuleFields'
 import { PipetteFields } from './PipetteFields'
 import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
-import modalStyles from '../modal.css'
+import styles from './FilePipettesModal.module.css'
+import formStyles from '../../forms/forms.module.css'
+import modalStyles from '../modal.module.css'
 import { DeckSlot } from '../../../types'
 import { NewProtocolFields } from '../../../load-file'
 

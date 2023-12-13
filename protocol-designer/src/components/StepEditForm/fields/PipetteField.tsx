@@ -4,7 +4,7 @@ import { FormGroup, DropdownField, Options } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { BaseState } from '../../../types'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 import { FieldProps } from '../types'
 
 type OP = FieldProps

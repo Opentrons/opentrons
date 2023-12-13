@@ -3,7 +3,7 @@ import cx from 'classnames'
 import find from 'lodash/find'
 
 import { Select } from './Select'
-import styles from './SelectField.css'
+import styles from './SelectField.module.css'
 
 import type { SelectProps } from './Select'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'

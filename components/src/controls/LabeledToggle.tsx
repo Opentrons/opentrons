@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { LabeledControl } from './LabeledControl'
 import { ToggleButton } from './ToggleButton'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 export interface LabeledToggleProps {
   label: string

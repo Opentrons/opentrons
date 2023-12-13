@@ -20,11 +20,6 @@ import type {
   PipetteEntities,
 } from '@opentrons/step-generation'
 
-export const registerSelectors: (arg0: any) => void =
-  process.env.NODE_ENV === 'development'
-    ? // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require('reselect-tools').registerSelectors
-    : (a: any) => {}
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
 export const rectCollision = (

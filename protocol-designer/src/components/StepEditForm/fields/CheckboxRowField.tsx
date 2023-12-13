@@ -6,7 +6,7 @@ import {
   TOOLTIP_TOP,
 } from '@opentrons/components'
 import cx from 'classnames'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 import { FieldProps } from '../types'
 import type { Placement } from '@opentrons/components'
 

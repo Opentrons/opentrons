@@ -2,7 +2,7 @@ import { i18n } from '../../../localization'
 import * as React from 'react'
 import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
-import modalStyles from '../modal.css'
+import modalStyles from '../modal.module.css'
 import { getModalContents } from './modalContents'
 import { FileUploadMessage } from '../../../load-file'
 

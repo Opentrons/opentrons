@@ -24,7 +24,7 @@ import {
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { BaseState, DeckSlot, ThunkDispatch } from '../../../types'
 import { LabwareOnDeck } from '../../../step-forms'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 interface OP {
   labwareOnDeck: LabwareOnDeck

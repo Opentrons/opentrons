@@ -16,8 +16,8 @@ import {
   getUnusedTrash,
   getUnusedStagingAreas,
 } from './utils'
-import modalStyles from '../modals/modal.css'
-import styles from './FileSidebar.css'
+import modalStyles from '../modals/modal.module.css'
+import styles from './FileSidebar.module.css'
 
 import type { HintKey } from '../../tutorial'
 import type {

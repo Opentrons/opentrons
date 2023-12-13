@@ -62,7 +62,7 @@ import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
 import { ConnectedSlotMap } from './ConnectedSlotMap'
 import { useResetSlotOnModelChange } from './form-state'
-import styles from './EditModules.css'
+import styles from './EditModules.module.css'
 
 import type { ModuleOnDeck } from '../../../step-forms/types'
 import type { ModelModuleInfo } from '../../EditModules'

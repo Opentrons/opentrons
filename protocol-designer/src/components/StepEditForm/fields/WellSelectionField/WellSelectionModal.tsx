@@ -27,8 +27,8 @@ import { ContentsByWell } from '../../../../labware-ingred/types'
 import { WellIngredientNames } from '../../../../steplist/types'
 import { StepFieldName } from '../../../../form-types'
 
-import styles from './WellSelectionModal.css'
-import modalStyles from '../../../modals/modal.css'
+import styles from './WellSelectionModal.module.css'
+import modalStyles from '../../../modals/modal.module.css'
 
 interface WellSelectionModalProps {
   isOpen: boolean

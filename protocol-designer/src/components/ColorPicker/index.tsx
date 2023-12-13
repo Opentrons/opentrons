@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { ColorResult, TwitterPicker } from 'react-color'
 import { COLORS } from '@opentrons/components'
 
-import styles from './ColorPicker.css'
+import styles from './ColorPicker.module.css'
 
 interface ColorPickerProps {
   value: string

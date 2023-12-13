@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { FLEX_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
 import { Icon } from '../icons'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 // TODO(bc, 2021-03-29): this component is only used in PD
 // reconsider whether it belongs in components library

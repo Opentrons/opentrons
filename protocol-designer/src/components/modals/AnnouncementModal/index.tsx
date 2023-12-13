@@ -7,9 +7,9 @@ import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
 } from '../../../persist'
-import modalStyles from '../modal.css'
+import modalStyles from '../modal.module.css'
 import { announcements } from './announcements'
-import styles from './AnnouncementModal.css'
+import styles from './AnnouncementModal.module.css'
 
 export const AnnouncementModal = (): JSX.Element => {
   const { announcementKey, message, heading, image } = announcements[

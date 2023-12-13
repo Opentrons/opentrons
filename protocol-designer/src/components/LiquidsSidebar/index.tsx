@@ -8,14 +8,14 @@ import {
 } from '@opentrons/components'
 import { PDTitledList } from '../lists'
 import { swatchColors } from '../swatchColors'
-import listButtonStyles from '../listButtons.css'
+import listButtonStyles from '../listButtons.module.css'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { BaseState, ThunkDispatch } from '../../types'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface SP {
   liquids: OrderedLiquids

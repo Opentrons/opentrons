@@ -4,7 +4,7 @@ import { LabwareOnDeck } from '../LabwareOnDeck'
 import { DND_TYPES } from '../../../constants'
 import { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
 import { RobotWorkSpaceRenderProps } from '@opentrons/components'
-import styles from './DragPreview.css'
+import styles from './DragPreview.module.css'
 
 interface DragPreviewProps {
   isDragging: boolean

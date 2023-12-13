@@ -2,7 +2,7 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { Portal } from '../portals/MainPageModalPortal'
-import modalStyles from './modal.css'
+import modalStyles from './modal.module.css'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
 export const CLOSE_STEP_FORM_WITH_CHANGES: 'closeStepFormWithChanges' =

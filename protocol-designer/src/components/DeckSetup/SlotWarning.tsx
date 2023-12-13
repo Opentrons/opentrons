@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { i18n } from '../../localization'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import styles from './SlotWarning.css'
+import styles from './SlotWarning.module.css'
 import type { ModuleOrientation } from '@opentrons/shared-data'
 
 interface Props {

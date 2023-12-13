@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { Select } from './Select'
-import styles from './Select.css'
+import styles from './Select.module.css'
 
 import type { Story, Meta } from '@storybook/react'
 

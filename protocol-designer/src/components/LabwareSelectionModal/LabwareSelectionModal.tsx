@@ -37,7 +37,7 @@ import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { DeckSlot } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'

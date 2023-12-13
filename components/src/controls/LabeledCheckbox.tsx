@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { DeprecatedCheckboxField } from '../forms'
 import { LabeledControl } from './LabeledControl'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 export interface LabeledCheckboxProps {
   label: string

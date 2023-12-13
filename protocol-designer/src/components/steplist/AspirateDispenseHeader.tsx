@@ -7,7 +7,7 @@ import {
   TOOLTIP_FIXED,
 } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
 interface AspirateDispenseHeaderProps {

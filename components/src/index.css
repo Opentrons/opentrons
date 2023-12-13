@@ -1,10 +1,10 @@
 /* opentrons style library */
 
-@import './styles/colors.css';
-@import './styles/typography.css';
-@import './styles/borders.css';
-@import './styles/cursors.css';
-@import './styles/positioning.css';
+@import './styles/colors.module.css';
+@import './styles/typography.module.css';
+@import './styles/borders.module.css';
+@import './styles/cursors.module.css';
+@import './styles/positioning.module.css';
 
 :global(*) {
   box-sizing: border-box;

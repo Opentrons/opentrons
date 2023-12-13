@@ -4,7 +4,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { FlatButton } from '../buttons'
-import styles from './structure.css'
+import styles from './structure.module.css'
 
 import type { ButtonProps } from '../buttons'
 

@@ -14,8 +14,8 @@ import {
 } from '../../../../form-types'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './TipPositionInput.css'
+import stepFormStyles from '../../StepEditForm.module.css'
+import styles from './TipPositionInput.module.css'
 import { TipPositionModal } from './TipPositionModal'
 
 import { getDefaultMmFromBottom } from './utils'

@@ -5,7 +5,7 @@ import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
 
 import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 import { StepFormProps } from '../types'
 
 export const TemperatureForm = (props: StepFormProps): JSX.Element => {

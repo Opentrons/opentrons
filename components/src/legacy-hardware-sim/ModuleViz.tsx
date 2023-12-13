@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './ModuleViz.css'
+import styles from './ModuleViz.module.css'
 import { getModuleVizDims, ModuleType } from '@opentrons/shared-data'
 
 interface Props {

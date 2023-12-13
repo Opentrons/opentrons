@@ -1,6 +1,6 @@
 import { i18n } from '../localization'
 import * as React from 'react'
-import styles from './TitledListNotes.css'
+import styles from './TitledListNotes.module.css'
 import { truncateString } from '@opentrons/components'
 
 interface Props {

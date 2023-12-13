@@ -3,7 +3,7 @@ import cx from 'classnames'
 import * as React from 'react'
 import { AlertModal, OutlineButton, ButtonProps } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import modalStyles from '../modal.css'
+import modalStyles from '../modal.module.css'
 import { LabwareUploadMessage } from '../../../labware-defs'
 
 const MessageBody = (props: {

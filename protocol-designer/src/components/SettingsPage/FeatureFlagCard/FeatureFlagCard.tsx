@@ -4,8 +4,8 @@ import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { resetScrollElements } from '../../../ui/steps/utils'
 import { Portal } from '../../portals/MainPageModalPortal'
-import styles from '../SettingsPage.css'
-import modalStyles from '../../modals/modal.css'
+import styles from '../SettingsPage.module.css'
+import modalStyles from '../../modals/modal.module.css'
 import { userFacingFlags, Flags, FlagTypes } from '../../../feature-flags'
 
 export interface Props {

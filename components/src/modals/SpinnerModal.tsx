@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { Overlay } from './Overlay'
 import { Icon } from '../icons'
 
-import styles from './modals.css'
+import styles from './modals.module.css'
 
 export interface SpinnerModalProps {
   /** Additional/Override style */

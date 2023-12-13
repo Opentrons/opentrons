@@ -17,7 +17,7 @@ import {
 } from './constants'
 import { EmanatingNozzle } from './EmanatingNozzle'
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 interface PipetteRenderProps {
   labwareDef: LabwareDefinition2

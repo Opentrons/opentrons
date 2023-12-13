@@ -17,7 +17,7 @@ import {
   CheckboxRowField,
   StepFormDropdown,
 } from '../../fields'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 import type { StepFormProps } from '../../types'
 

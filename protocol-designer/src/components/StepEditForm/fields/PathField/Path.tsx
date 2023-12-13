@@ -8,7 +8,7 @@ import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
 import { PathOption } from '../../../../form-types'
 import { FieldProps } from '../../types'
 import { DisabledPathMap, ValuesForPath } from './getDisabledPathMap'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 const PATH_ANIMATION_IMAGES = {
   single: require('../../../../images/path_single.gif'),

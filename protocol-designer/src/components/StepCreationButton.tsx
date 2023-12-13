@@ -26,7 +26,7 @@ import {
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
-import styles from './listButtons.css'
+import styles from './listButtons.module.css'
 
 interface StepButtonComponentProps {
   children: React.ReactNode

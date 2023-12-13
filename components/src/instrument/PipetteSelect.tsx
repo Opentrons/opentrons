@@ -9,7 +9,7 @@ import {
 } from '@opentrons/shared-data'
 import { Flex } from '../primitives'
 import { Select, CONTEXT_VALUE } from '../forms'
-import styles from './PipetteSelect.css'
+import styles from './PipetteSelect.module.css'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
 import type { SelectOption } from '../forms'

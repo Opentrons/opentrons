@@ -28,8 +28,8 @@ import {
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
 
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
+import styles from './FilePipettesModal.module.css'
+import formStyles from '../../forms/forms.module.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
 export interface Props {

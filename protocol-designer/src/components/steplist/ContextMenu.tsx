@@ -9,7 +9,7 @@ import { i18n } from '../../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 import { StepIdType } from '../../form-types'
 import { getSavedStepForms } from '../../step-forms/selectors'
 

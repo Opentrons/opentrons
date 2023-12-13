@@ -15,7 +15,7 @@ import { FileUploadMessageModal } from './modals/FileUploadMessageModal'
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
-import styles from './ProtocolEditor.css'
+import styles from './ProtocolEditor.module.css'
 import { CreateFileWizard } from './modals/CreateFileWizard'
 
 const showGateModal =

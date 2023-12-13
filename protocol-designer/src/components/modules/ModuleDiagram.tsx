@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
