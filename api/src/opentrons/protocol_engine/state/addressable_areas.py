@@ -13,6 +13,7 @@ from ..commands import (
     LoadModuleResult,
     MoveLabwareResult,
     MoveToAddressableAreaResult,
+    MoveToAddressableAreaForDropTipResult,
 )
 from ..errors import (
     IncompatibleAddressableAreaError,
@@ -203,7 +204,10 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         elif isinstance(command.result, LoadModuleResult):
             self._check_location_is_addressable_area(command.params.location)
 
-        elif isinstance(command.result, MoveToAddressableAreaResult):
+        elif isinstance(
+            command.result,
+            (MoveToAddressableAreaResult, MoveToAddressableAreaForDropTipResult),
+        ):
             addressable_area_name = command.params.addressableAreaName
             self._check_location_is_addressable_area(addressable_area_name)
 

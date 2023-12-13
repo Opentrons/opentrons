@@ -256,10 +256,10 @@
       {
         "id": "movableTrashD1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in D1",
@@ -268,10 +268,10 @@
       {
         "id": "movableTrashC1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in C1",
@@ -280,10 +280,10 @@
       {
         "id": "movableTrashB1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in B1",
@@ -292,10 +292,10 @@
       {
         "id": "movableTrashA1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in A1",
@@ -304,10 +304,10 @@
       {
         "id": "movableTrashD3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in D3",
@@ -316,10 +316,10 @@
       {
         "id": "movableTrashC3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in C3",
@@ -328,10 +328,10 @@
       {
         "id": "movableTrashB3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in B3",
@@ -340,10 +340,10 @@
       {
         "id": "movableTrashA3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
         "displayName": "Trash Bin in A3",
