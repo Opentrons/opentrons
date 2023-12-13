@@ -181,7 +181,12 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
 
   React.useEffect(() => {
     if (currentValue === undefined) {
-      setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+      // this timeout avoids an infinite loop caused by Formik and React 18 not playing nice
+      // see https://github.com/downshift-js/downshift/issues/1511
+      // TODO: migrate away from formik
+      setTimeout(() => {
+        setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+      })
     }
   }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
 
