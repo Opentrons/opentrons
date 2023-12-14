@@ -1,3 +1,4 @@
+import 'jest-styled-components'
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders, COLORS, SIZE_2 } from '@opentrons/components'

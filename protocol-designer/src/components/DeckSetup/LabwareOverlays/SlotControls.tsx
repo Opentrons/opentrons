@@ -191,6 +191,7 @@ const collectSlotTarget = (
   connect: DropTargetConnector,
   monitor: DropTargetMonitor
 ): React.ReactNode => ({
+  // @ts-expect-error(BC, 12-13-2023): react dnd needs to be updated or removed to include proper type
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedItem: monitor.getItem(),

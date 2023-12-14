@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { FLOWS } from '../constants'
@@ -23,13 +23,13 @@ describe('ExitModal', () => {
     }
   })
   it('returns the correct information for exit modal for calibration flow', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Pipette Calibration progress will be lost')
-    getByText(
+    render(props)
+    screen.getByText('Pipette Calibration progress will be lost')
+    screen.getByText(
       'Are you sure you want to exit before completing Pipette Calibration?'
     )
-    const back = getByRole('button', { name: 'Go back' })
-    const exit = getByRole('button', { name: 'exit' })
+    const back = screen.getByRole('button', { name: 'Go back' })
+    const exit = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(back)
     expect(props.goBack).toHaveBeenCalled()
     fireEvent.click(exit)
@@ -41,13 +41,13 @@ describe('ExitModal', () => {
       ...props,
       flowType: FLOWS.ATTACH,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Attaching Pipette progress will be lost')
-    getByText(
+    render(props)
+    screen.getByText('Attaching Pipette progress will be lost')
+    screen.getByText(
       'Are you sure you want to exit before completing Attaching Pipette?'
     )
-    const back = getByRole('button', { name: 'Go back' })
-    const exit = getByRole('button', { name: 'exit' })
+    const back = screen.getByRole('button', { name: 'Go back' })
+    const exit = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(back)
     expect(props.goBack).toHaveBeenCalled()
     fireEvent.click(exit)
@@ -59,13 +59,13 @@ describe('ExitModal', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Detaching Pipette progress will be lost')
-    getByText(
+    render(props)
+    screen.getByText('Detaching Pipette progress will be lost')
+    screen.getByText(
       'Are you sure you want to exit before completing Detaching Pipette?'
     )
-    const back = getByRole('button', { name: 'Go back' })
-    const exit = getByRole('button', { name: 'exit' })
+    const back = screen.getByRole('button', { name: 'Go back' })
+    const exit = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(back)
     expect(props.goBack).toHaveBeenCalled()
     fireEvent.click(exit)
@@ -76,14 +76,14 @@ describe('ExitModal', () => {
       ...props,
       isOnDevice: true,
     }
-    const { getByText, getByLabelText } = render(props)
-    getByText('Pipette Calibration progress will be lost')
-    getByText(
+    render(props)
+    screen.getByText('Pipette Calibration progress will be lost')
+    screen.getByText(
       'Are you sure you want to exit before completing Pipette Calibration?'
     )
-    getByLabelText('SmallButton_primary').click()
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(props.goBack).toHaveBeenCalled()
-    getByLabelText('SmallButton_alert').click()
+    fireEvent.click(screen.getByRole('button', { name: 'Exit' }))
     expect(props.proceed).toHaveBeenCalled()
   })
 })

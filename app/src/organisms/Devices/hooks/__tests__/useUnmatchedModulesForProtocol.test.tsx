@@ -1,5 +1,5 @@
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { mockTemperatureModule } from '../../../../redux/modules/__fixtures__'

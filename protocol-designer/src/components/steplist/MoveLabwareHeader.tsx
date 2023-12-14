@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import {
@@ -8,6 +7,7 @@ import {
   getModuleDisplayName,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { i18n } from '../../localization'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -27,7 +27,6 @@ interface MoveLabwareHeaderProps {
 
 export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   const { sourceLabwareNickname, destinationSlot, useGripper } = props
-  const { i18n } = useTranslation()
   const moduleEntities = useSelector(getModuleEntities)
   const labwareEntities = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(

@@ -289,6 +289,7 @@ function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
     <Flex
       onClick={onClick}
       css={isSelected ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
+      role="radio"
       {...styleProps}
     >
       {children}

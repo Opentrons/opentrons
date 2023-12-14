@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createLiveCommand } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateLiveCommandMutation } from '../useCreateLiveCommandMutation'
@@ -21,11 +21,13 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useCreateLiveCommandMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -40,12 +42,9 @@ describe('useCreateLiveCommandMutation hook', () => {
       .calledWith(HOST_CONFIG, mockAnonLoadCommand, {})
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
-      () => useCreateLiveCommandMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCreateLiveCommandMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     act(() => {
@@ -54,9 +53,8 @@ describe('useCreateLiveCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
   it('should pass waitUntilComplete and timeout through if given command', async () => {
     const waitUntilComplete = true
@@ -69,12 +67,9 @@ describe('useCreateLiveCommandMutation hook', () => {
       })
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(
-      () => useCreateLiveCommandMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCreateLiveCommandMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     act(() => {
@@ -85,8 +80,7 @@ describe('useCreateLiveCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
 })

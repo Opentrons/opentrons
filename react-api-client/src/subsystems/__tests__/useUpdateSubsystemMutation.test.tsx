@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { updateSubsystem } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useUpdateSubsystemMutation } from '..'
@@ -34,11 +34,13 @@ const SUBSYSTEM_UPDATE_RESPONSE = {
 } as SubsystemUpdateProgressData
 
 describe('useUpdateSubsystemMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -77,13 +79,13 @@ describe('useUpdateSubsystemMutation hook', () => {
         data: SUBSYSTEM_UPDATE_RESPONSE,
       } as Response<SubsystemUpdateProgressData>)
 
-    const { result, waitFor } = renderHook(() => useUpdateSubsystemMutation(), {
+    const { result } = renderHook(() => useUpdateSubsystemMutation(), {
       wrapper,
     })
     act(() => result.current.updateSubsystem(SUBSYSTEM))
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(SUBSYSTEM_UPDATE_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(SUBSYSTEM_UPDATE_RESPONSE)
+    })
   })
 })

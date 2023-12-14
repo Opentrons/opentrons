@@ -13,12 +13,12 @@ import type {
   CompletedProtocolAnalysis,
   RobotType,
 } from '@opentrons/shared-data/'
-import type { TFunction } from 'react-i18next'
+import type { TFunction } from 'i18next'
 
 export function getLabwareDisplayLocation(
   robotSideAnalysis: CompletedProtocolAnalysis,
   location: LabwareLocation,
-  t: TFunction<'protocol_command_text'>,
+  t: TFunction,
   robotType: RobotType,
   isOnDevice?: boolean
 ): string {

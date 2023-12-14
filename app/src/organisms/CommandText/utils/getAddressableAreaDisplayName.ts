@@ -2,12 +2,12 @@ import type {
   CompletedProtocolAnalysis,
   MoveToAddressableAreaParams,
 } from '@opentrons/shared-data'
-import type { TFunction } from 'react-i18next'
+import type { TFunction } from 'i18next'
 
 export function getAddressableAreaDisplayName(
   analysis: CompletedProtocolAnalysis,
   commandId: string,
-  t: TFunction<'protocol_command_text'>
+  t: TFunction
 ): string {
   const addressableAreaCommand = (analysis?.commands ?? []).find(
     command => command.id === commandId
