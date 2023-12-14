@@ -81,9 +81,9 @@ def get_api_context(
             loop=loop,
             stall_detection_enable=stall_detection_enable,
         )
-
+    papi: protocol_api.ProtocolContext
     if is_simulating:
-        return simulate.get_protocol_api(
+        papi = simulate.get_protocol_api(
             version=APIVersion.from_string(api_level),
             extra_labware=extra_labware,
             hardware_simulator=ThreadManager(_thread_manager_build_hw_api),
@@ -91,9 +91,12 @@ def get_api_context(
             use_virtual_hardware=False,
         )
     else:
-        return execute.get_protocol_api(
+        papi = execute.get_protocol_api(
             version=APIVersion.from_string(api_level), extra_labware=extra_labware
         )
+
+    papi.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
+    return papi
 
 
 def well_is_reservoir(well: protocol_api.labware.Well) -> bool:
