@@ -170,9 +170,16 @@ export const JogToPosition = (
     showPositionConfirmation,
     setShowPositionConfirmation,
   ] = React.useState(false)
+  // Includes special case homing only present in this step.
+  const [isRobotInMotion, setIsRobotInMotion] = React.useState(isRobotMoving)
+
+  const onGoBack = (): void => {
+    setIsRobotInMotion(() => true)
+    handleGoBack()
+  }
 
   if (showPositionConfirmation) {
-    return isRobotMoving ? (
+    return isRobotInMotion ? (
       <InProgressModal
         alternativeSpinner={null}
         description={
@@ -183,12 +190,20 @@ export const JogToPosition = (
       />
     ) : (
       <ConfirmPosition
-        handlePipetteAction={handleProceed}
+        handlePipetteAction={() => {
+          setIsRobotInMotion(true)
+          handleProceed()
+        }}
         handleGoBack={() => setShowPositionConfirmation(false)}
         isOnDevice={isOnDevice}
         currentStep={currentStep}
       />
     )
+  }
+
+  // Moving due to "Exit" or "Go back" click.
+  if (isRobotInMotion) {
+    return <InProgressModal description={t('stand_back_exiting')} />
   }
 
   if (isOnDevice) {
@@ -206,7 +221,7 @@ export const JogToPosition = (
             <SmallButton
               buttonType="tertiaryLowLight"
               buttonText={t('shared:go_back')}
-              onClick={handleGoBack}
+              onClick={onGoBack}
             />
           </Flex>
           <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
@@ -254,7 +269,7 @@ export const JogToPosition = (
           >
             {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
             <Flex gridGap={SPACING.spacing8}>
-              <SecondaryButton onClick={handleGoBack}>
+              <SecondaryButton onClick={onGoBack}>
                 {t('shared:go_back')}
               </SecondaryButton>
               <PrimaryButton onClick={() => setShowPositionConfirmation(true)}>

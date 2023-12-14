@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   SPACING,
@@ -19,34 +20,23 @@ import {
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../CalibrationPanels'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
-
-import type { UseMutateFunction } from 'react-query'
-import type { AxiosError } from 'axios'
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-} from '@opentrons/api-client'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
   setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
   createdMaintenanceRunId: string | null
-  isCreateLoading: boolean
   isOnDevice: boolean
+  isRobotMoving: boolean
 }
 
 export const BeforeBeginning = (
@@ -54,10 +44,9 @@ export const BeforeBeginning = (
 ): JSX.Element | null => {
   const {
     setShouldDispenseLiquid,
-    createMaintenanceRun,
     createdMaintenanceRunId,
-    isCreateLoading,
     isOnDevice,
+    isRobotMoving,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
@@ -68,11 +57,9 @@ export const BeforeBeginning = (
     setShouldDispenseLiquid(flowType === 'liquid_and_tips')
   }
 
-  React.useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+  if (isRobotMoving || createdMaintenanceRunId == null) {
+    return <InProgressModal description={t('stand_back_exiting')} />
+  }
 
   if (isOnDevice) {
     return (
@@ -118,7 +105,7 @@ export const BeforeBeginning = (
           <SmallButton
             buttonText={i18n.format(t('shared:continue'), 'capitalize')}
             onClick={handleProceed}
-            disabled={isCreateLoading || flowType == null}
+            disabled={flowType == null}
           />
         </Flex>
       </Flex>
@@ -180,10 +167,7 @@ export const BeforeBeginning = (
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          <PrimaryButton
-            disabled={isCreateLoading || flowType == null}
-            onClick={handleProceed}
-          >
+          <PrimaryButton disabled={flowType == null} onClick={handleProceed}>
             {i18n.format(t('shared:continue'), 'capitalize')}
           </PrimaryButton>
         </Flex>
