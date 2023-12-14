@@ -38,7 +38,6 @@ import {
   forBlowOutInPlace,
   forDispenseInPlace,
   forDropTipInPlace,
-  forMoveToAddressableAreaForDropTip,
 } from './inPlaceCommandUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
@@ -112,14 +111,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'moveToAddressableAreaForDropTip':
-      forMoveToAddressableAreaForDropTip(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
-      break
-
     case 'blowOutInPlace':
       forBlowOutInPlace(command.params, invariantContext, robotStateAndWarnings)
       break
@@ -147,6 +138,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'delay':
     case 'configureForVolume':
     case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
       // these commands don't have any effects on the state
       break
 

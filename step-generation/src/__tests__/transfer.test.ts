@@ -2413,6 +2413,14 @@ describe('advanced options', () => {
           },
         },
         {
+          commandType: 'dropTipInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+
+        {
           commandType: 'pickUpTip',
           key: expect.any(String),
           params: {
@@ -3091,6 +3099,13 @@ describe('advanced options', () => {
           },
         },
         {
+          commandType: 'dropTipInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
           commandType: 'pickUpTip',
           key: expect.any(String),
           params: {
@@ -3463,6 +3478,13 @@ describe('advanced options', () => {
             addressableAreaName: 'movableTrashA3',
             offset: { x: 0, y: 0, z: 0 },
             alternateDropLocation: true,
+          },
+        },
+        {
+          commandType: 'dropTipInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
           },
         },
         {

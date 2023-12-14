@@ -3651,6 +3651,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "0164aa78-bccf-4a2f-99b7-cdfe57f40010",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "4eaeeb54-5696-4266-b6e0-0d1ea4e26871",
       "params": {
@@ -3849,6 +3854,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "0e5e034f-293c-4261-af84-2a1df0c4a8fc",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
@@ -4051,6 +4061,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "df138c35-ce81-4ecb-a034-0363e2ecaa06",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "c75fef6e-72d6-4736-ad4c-7c327996dab3",
       "params": {
@@ -4249,6 +4264,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "3b9ba522-a0a1-4313-b5e4-4b8177042416",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
@@ -4451,6 +4471,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "56cab34a-a9e5-4226-b443-74d0ee8e0aa6",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "cee54c07-b439-40e2-ac71-79792b48945d",
       "params": {
@@ -4649,6 +4674,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "abd37ed7-c6d8-46ac-93c1-0f6b8b0bbe7f",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
@@ -4851,6 +4881,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "abd37ed7-c6d8-46ac-93c1-0f6b8b0bbe7f",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "b7f37a99-be1d-4da9-bce2-d2b686240fab",
       "params": {
@@ -5049,6 +5084,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "09827fd5-e988-45a6-874c-95a35eec10e6",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "pickUpTip",
@@ -5251,6 +5291,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "322a1d13-dde1-4d05-8562-f152bbf78f27",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "d976581b-71a5-460f-b2e0-799777d6ea94",
       "params": {
@@ -5361,6 +5406,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "b4edbf18-d092-4668-b18a-99e13e7c7ce2",
+      "params": { "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e" }
     },
     {
       "commandType": "waitForDuration",
