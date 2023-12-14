@@ -1,4 +1,5 @@
 import * as React from 'react'
+import last from 'lodash/last'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
@@ -28,6 +29,7 @@ import {
   useRunQuery,
   useInstrumentsQuery,
   useDoorQuery,
+  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import {
   getDeckDefFromRobotType,
@@ -51,7 +53,6 @@ import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
 } from '../../Protocols/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
@@ -202,6 +203,7 @@ export function ProtocolSetupStep({
   )
 }
 
+const ANALYSIS_POLL_MS = 5000
 interface PrepareToRunProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
@@ -242,7 +244,31 @@ function PrepareToRun({
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name ??
     ''
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+
+  const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
+  const [
+    isPollingForCompletedAnalysis,
+    setIsPollingForCompletedAnalysis,
+  ] = React.useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+
+  const {
+    data: mostRecentAnalysis = null,
+  } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+    {
+      enabled: protocolRecord != null && isPollingForCompletedAnalysis,
+      refetchInterval: ANALYSIS_POLL_MS,
+    }
+  )
+
+  React.useEffect(() => {
+    if (mostRecentAnalysis?.status === 'completed') {
+      setIsPollingForCompletedAnalysis(false)
+    } else {
+      setIsPollingForCompletedAnalysis(true)
+    }
+  }, [mostRecentAnalysis?.status])
 
   const robotType = useRobotType(robotName)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId, robotType, protocolName)
