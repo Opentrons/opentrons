@@ -529,3 +529,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     ) -> None:
         """This will never be called because it was added in API 2.15."""
         pass
+
+    def _retract(self) -> None:
+        """Retract this instrument to the top of the gantry."""
+        self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]

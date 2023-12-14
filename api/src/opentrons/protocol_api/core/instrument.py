@@ -263,5 +263,9 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         """
         ...
 
+    def _retract(self) -> None:
+        """Retract this instrument to the top of the gantry."""
+        ...
+
 
 InstrumentCoreType = TypeVar("InstrumentCoreType", bound=AbstractInstrument[Any])
