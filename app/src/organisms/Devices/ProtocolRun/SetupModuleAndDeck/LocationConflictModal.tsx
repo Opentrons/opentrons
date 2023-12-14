@@ -44,6 +44,7 @@ import type {
 interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
+  missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
   isOnDevice?: boolean
@@ -55,6 +56,7 @@ export const LocationConflictModal = (
   const {
     onCloseClick,
     cutoutId,
+    missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
     isOnDevice = false,
@@ -94,6 +96,15 @@ export const LocationConflictModal = (
       updateDeckConfiguration(newSingleSlotDeckConfig)
     }
     onCloseClick()
+  }
+
+  let protocolSpecifiesDisplayName = ''
+  if (missingLabwareDisplayName != null) {
+    protocolSpecifiesDisplayName = missingLabwareDisplayName
+  } else if (requiredFixtureId != null) {
+    protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
+  } else if (requiredModule != null) {
+    protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
   return (
@@ -149,12 +160,7 @@ export const LocationConflictModal = (
                     {t('protocol_specifies')}
                   </StyledText>
 
-                  <StyledText as="p">
-                    {requiredFixtureId != null &&
-                      getFixtureDisplayName(requiredFixtureId)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
-                  </StyledText>
+                  <StyledText as="p">{protocolSpecifiesDisplayName}</StyledText>
                 </Flex>
                 <Flex
                   padding={SPACING.spacing24}
@@ -248,10 +254,7 @@ export const LocationConflictModal = (
                     </StyledText>
                   </Box>
                   <StyledText as="label">
-                    {requiredFixtureId != null &&
-                      getFixtureDisplayName(requiredFixtureId)}
-                    {requiredModule != null &&
-                      getModuleDisplayName(requiredModule)}
+                    {protocolSpecifiesDisplayName}
                   </StyledText>
                 </Flex>
                 <Flex

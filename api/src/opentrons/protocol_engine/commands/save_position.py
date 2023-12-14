@@ -26,6 +26,9 @@ class SavePositionParams(BaseModel):
         description="An optional ID to assign to this command instance. "
         "Auto-assigned if not defined.",
     )
+    failOnNotHomed: Optional[bool] = Field(
+        True, descrption="Require all axes to be homed before saving position."
+    )
 
 
 class SavePositionResult(BaseModel):
@@ -58,8 +61,11 @@ class SavePositionImplementation(
     async def execute(self, params: SavePositionParams) -> SavePositionResult:
         """Check the requested pipette's current position."""
         position_id = self._model_utils.ensure_id(params.positionId)
+        fail_on_not_homed = (
+            params.failOnNotHomed if params.failOnNotHomed is not None else True
+        )
         x, y, z = await self._gantry_mover.get_position(
-            pipette_id=params.pipetteId, fail_on_not_homed=True
+            pipette_id=params.pipetteId, fail_on_not_homed=fail_on_not_homed
         )
 
         return SavePositionResult(

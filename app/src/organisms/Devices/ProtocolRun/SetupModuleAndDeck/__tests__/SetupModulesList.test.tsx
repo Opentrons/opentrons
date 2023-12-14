@@ -472,7 +472,7 @@ describe('SetupModulesList', () => {
     screen.getByText('No USB connection required')
     screen.getByText('Location conflict')
     screen.getByText('Magnetic Block GEN1')
-    fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
     screen.getByText('mock location conflict modal')
   })
 })

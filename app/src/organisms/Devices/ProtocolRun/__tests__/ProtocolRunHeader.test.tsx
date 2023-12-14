@@ -585,6 +585,7 @@ describe('ProtocolRunHeader', () => {
         compatibleCutoutFixtureIds: [
           STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
         ],
+        missingLabwareDisplayName: null,
       },
     ])
     when(mockGetIsFixtureMismatch).mockReturnValue(true)
@@ -834,7 +835,7 @@ describe('ProtocolRunHeader', () => {
     render()
 
     fireEvent.click(screen.getByText('View error'))
-    expect(mockCloseCurrentRun).toBeCalled()
+    expect(mockCloseCurrentRun).not.toBeCalled()
     screen.getByText('mock RunFailedModal')
   })
 

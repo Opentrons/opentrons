@@ -443,7 +443,7 @@ export function ModulesListItem({
                   onClick={() => setShowLocationConflictModal(true)}
                 >
                   <StyledText as="label" cursor="pointer">
-                    {t('update_deck')}
+                    {t('resolve')}
                   </StyledText>
                 </TertiaryButton>
               </Flex>

@@ -89,7 +89,7 @@ describe('DeviceReset', () => {
     getByText('Clears information about past runs of all protocols.')
     getByText('Clear all stored data')
     getByText(
-      'Resets all settings. You’ll have to redo initial setup before using the robot again.'
+      'Clears calibrations, protocols, and all settings except robot name and network settings.'
     )
     expect(queryByText('Clear the ssh authorized keys')).not.toBeInTheDocument()
     expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
@@ -128,6 +128,7 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: true,
       onDeviceDisplay: true,
+      deckConfiguration: true,
     }
 
     const [{ getByText }] = render(props)
@@ -149,6 +150,7 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: true,
       onDeviceDisplay: true,
+      deckConfiguration: true,
     }
 
     const [{ getByText }] = render(props)
@@ -173,6 +175,7 @@ describe('DeviceReset', () => {
       gripperOffsetCalibrations: true,
       authorizedKeys: false,
       onDeviceDisplay: false,
+      deckConfiguration: false,
     }
 
     const [{ getByText }] = render(props)

@@ -363,7 +363,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
     ])
     render()
     screen.getByText('mock FixtureTable')
-    fireEvent.click(screen.getByText('Location conflict'))
+    fireEvent.click(screen.getByText('Resolve'))
     screen.getByText('mock location conflict modal')
   })
 

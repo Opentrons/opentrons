@@ -38,6 +38,7 @@ import {
   forBlowOutInPlace,
   forDispenseInPlace,
   forDropTipInPlace,
+  forMoveToAddressableAreaForDropTip,
 } from './inPlaceCommandUpdates'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
@@ -109,6 +110,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'dropTipInPlace':
       forDropTipInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'moveToAddressableAreaForDropTip':
+      forMoveToAddressableAreaForDropTip(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'blowOutInPlace':

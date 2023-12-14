@@ -2773,18 +2773,14 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
+      "commandType": "moveToAddressableAreaForDropTip",
       "key": "60e642d1-d985-4411-beca-0e5e28628a27",
       "params": {
         "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
         "addressableAreaName": "fixedTrash",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "key": "814036fd-ea55-40d0-932b-d13f6113a77f",
-      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
     },
     {
       "commandType": "waitForResume",
@@ -2900,19 +2896,16 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
+      "commandType": "moveToAddressableAreaForDropTip",
       "key": "2a4ddf23-7272-4d1c-8dbc-f4db9a931715",
       "params": {
         "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
         "addressableAreaName": "fixedTrash",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
     },
-    {
-      "commandType": "dropTipInPlace",
-      "key": "c55edd6b-b323-4d72-81d3-39e08ec71a88",
-      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
-    },
+
     {
       "commandType": "pickUpTip",
       "key": "d83c457e-4183-4bac-a9cc-f58ece48e808",
@@ -3022,18 +3015,14 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
+      "commandType": "moveToAddressableAreaForDropTip",
       "key": "5cc616a3-8b57-446a-a1d6-df13e1a9e4fe",
       "params": {
         "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
         "addressableAreaName": "fixedTrash",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "key": "3bd0eb5c-3115-4953-aad4-a530dfb962fb",
-      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
     }
   ],
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",

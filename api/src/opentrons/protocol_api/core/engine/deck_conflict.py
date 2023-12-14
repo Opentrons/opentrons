@@ -36,6 +36,15 @@ class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
         )
 
 
+class UnsuitableTiprackForPipetteMotion(MotionPlanningFailureError):
+    """Error raised when trying to perform a pipette movement to a tip rack, based on adapter status."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            message=message,
+        )
+
+
 _log = logging.getLogger(__name__)
 
 # TODO (spp, 2023-12-06): move this to a location like motion planning where we can
@@ -171,6 +180,60 @@ def check_safe_for_pipette_movement(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+        )
+
+
+def check_safe_for_tip_pickup_and_return(
+    engine_state: StateView,
+    pipette_id: str,
+    labware_id: str,
+) -> None:
+    """Check if the presence or absence of a tiprack adapter might cause any pipette movement issues.
+
+    A 96 channel pipette will pick up tips using cam action when it's configured
+    to use ALL nozzles. For this, the tiprack needs to be on the Flex 96 channel tiprack adapter
+    or similar or the tips will not be picked up.
+
+    On the other hand, if the pipette is configured with partial nozzle configuration,
+    it uses the usual pipette presses to pick the tips up, in which case, having the tiprack
+    on the Flex 96 channel tiprack adapter (or similar) will cause the pipette to
+    crash against the adapter posts.
+
+    In order to check if the 96-channel can move and pickup/drop tips safely, this method
+    checks for the height attribute of the tiprack adapter rather than checking for the
+    specific official adapter since users might create custom labware &/or definitions
+    compatible with the official adapter.
+    """
+    if not engine_state.pipettes.get_channels(pipette_id) == 96:
+        # Adapters only matter to 96 ch.
+        return
+
+    is_partial_config = engine_state.pipettes.get_is_partially_configured(pipette_id)
+    tiprack_name = engine_state.labware.get_display_name(labware_id)
+    tiprack_parent = engine_state.labware.get_location(labware_id)
+    if isinstance(tiprack_parent, OnLabwareLocation):  # tiprack is on an adapter
+        is_96_ch_tiprack_adapter = engine_state.labware.get_has_quirk(
+            labware_id=tiprack_parent.labwareId, quirk="tiprackAdapterFor96Channel"
+        )
+        tiprack_height = engine_state.labware.get_dimensions(labware_id).z
+        adapter_height = engine_state.labware.get_dimensions(tiprack_parent.labwareId).z
+        if is_partial_config and tiprack_height < adapter_height:
+            raise PartialTipMovementNotAllowedError(
+                f"{tiprack_name} cannot be on an adapter taller than the tip rack"
+                f" when picking up fewer than 96 tips."
+            )
+        elif not is_partial_config and not is_96_ch_tiprack_adapter:
+            raise UnsuitableTiprackForPipetteMotion(
+                f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+                f" in order to pick up or return all 96 tips simultaneously."
+            )
+
+    elif (
+        not is_partial_config
+    ):  # tiprack is not on adapter and pipette is in full config
+        raise UnsuitableTiprackForPipetteMotion(
+            f"{tiprack_name} must be on an Opentrons Flex 96 Tip Rack Adapter"
+            f" in order to pick up or return all 96 tips simultaneously."
         )
 
 

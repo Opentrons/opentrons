@@ -1,20 +1,17 @@
 import { FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS } from '@opentrons/shared-data'
 
-import type {
-  CutoutConfigProtocolSpec,
-  CutoutFixtureId,
-} from '@opentrons/shared-data'
+import type { CutoutFixtureId } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from './hooks'
 
-export function getRequiredDeckConfig<T extends CutoutConfigProtocolSpec>(
-  deckConfigProtocolSpec: T[]
-): T[] {
+export function getRequiredDeckConfig(
+  deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
+): CutoutConfigAndCompatibility[] {
   const nonSingleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
-    ({ requiredAddressableAreas }) =>
-      // required AA list includes a non-single-slot AA
+    ({ missingLabwareDisplayName, requiredAddressableAreas }) =>
+      // required AA list includes a non-single-slot AA or a missing labware display name
       !requiredAddressableAreas.every(aa =>
         FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
-      )
+      ) || missingLabwareDisplayName != null
   )
   // fixture includes at least 1 required AA
   const requiredDeckConfigProtocolSpec = nonSingleSlotDeckConfigCompatibility.filter(
@@ -22,25 +19,6 @@ export function getRequiredDeckConfig<T extends CutoutConfigProtocolSpec>(
   )
 
   return requiredDeckConfigProtocolSpec
-}
-
-export function getUnmatchedSingleSlotFixtures(
-  deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
-): CutoutConfigAndCompatibility[] {
-  const singleSlotDeckConfigCompatibility = deckConfigProtocolSpec.filter(
-    ({ requiredAddressableAreas }) =>
-      // required AA list includes only single-slot AA
-      requiredAddressableAreas.every(aa =>
-        FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS.includes(aa)
-      )
-  )
-  // fixture includes at least 1 required AA
-  const unmatchedSingleSlotDeckConfigCompatibility = singleSlotDeckConfigCompatibility.filter(
-    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
-      !isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
-  )
-
-  return unmatchedSingleSlotDeckConfigCompatibility
 }
 
 export function getIsFixtureMismatch(

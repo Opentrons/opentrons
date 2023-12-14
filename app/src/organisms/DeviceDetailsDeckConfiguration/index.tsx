@@ -38,6 +38,7 @@ import { useRunStatuses } from '../Devices/hooks'
 
 import type { CutoutId } from '@opentrons/shared-data'
 
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
 
 interface DeviceDetailsDeckConfigurationProps {
@@ -59,7 +60,9 @@ export function DeviceDetailsDeckConfiguration({
     null
   )
 
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig =
+    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
+      .data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({

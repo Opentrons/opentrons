@@ -2403,19 +2403,13 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         // get fresh tip b/c it's per source
         {
-          commandType: 'moveToAddressableArea',
+          commandType: 'moveToAddressableAreaForDropTip',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             addressableAreaName: 'movableTrashA3',
             offset: { x: 0, y: 0, z: 0 },
-          },
-        },
-        {
-          commandType: 'dropTipInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
+            alternateDropLocation: true,
           },
         },
         {
@@ -3087,19 +3081,13 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         // get fresh tip b/c it's per source
         {
-          commandType: 'moveToAddressableArea',
+          commandType: 'moveToAddressableAreaForDropTip',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             addressableAreaName: 'movableTrashA3',
             offset: { x: 0, y: 0, z: 0 },
-          },
-        },
-        {
-          commandType: 'dropTipInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
+            alternateDropLocation: true,
           },
         },
         {
@@ -3468,19 +3456,13 @@ describe('advanced options', () => {
         },
         // we're not re-using the tip, so instead of dispenseAirGap we'll change the tip
         {
-          commandType: 'moveToAddressableArea',
+          commandType: 'moveToAddressableAreaForDropTip',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             addressableAreaName: 'movableTrashA3',
             offset: { x: 0, y: 0, z: 0 },
-          },
-        },
-        {
-          commandType: 'dropTipInPlace',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
+            alternateDropLocation: true,
           },
         },
         {

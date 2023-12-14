@@ -3,6 +3,7 @@ import { UseQueryResult } from 'react-query'
 import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
+  SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
@@ -51,6 +52,9 @@ describe('LocationConflictModal', () => {
       updateDeckConfiguration: mockUpdate,
     } as any)
   })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   it('should render the modal information for a fixture conflict', () => {
     render(props)
     screen.getByText('Deck location conflict')
@@ -77,6 +81,33 @@ describe('LocationConflictModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    expect(mockUpdate).toHaveBeenCalled()
+  })
+  it('should render the modal information for a single slot fixture conflict', () => {
+    mockUseDeckConfigurationQuery.mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutB1',
+          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+        },
+      ],
+    } as UseQueryResult<DeckConfiguration>)
+    props = {
+      onCloseClick: jest.fn(),
+      cutoutId: 'cutoutB1',
+      requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+      missingLabwareDisplayName: 'a tiprack',
+    }
+    const { getByText, getAllByText, getByRole } = render(props)
+    getByText('Deck location conflict')
+    getByText('Slot B1')
+    getByText('Protocol specifies')
+    getByText('Currently configured')
+    getAllByText('Trash bin')
+    getByText('a tiprack')
+    getByRole('button', { name: 'Cancel' }).click()
+    expect(props.onCloseClick).toHaveBeenCalled()
+    getByRole('button', { name: 'Update deck' }).click()
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render correct info for a odd', () => {

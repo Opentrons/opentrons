@@ -20,6 +20,7 @@ import type {
   ConfigV18,
   ConfigV19,
   ConfigV20,
+  ConfigV21,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -261,4 +262,9 @@ export const MOCK_CONFIG_V20: ConfigV20 = {
         'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
     },
   },
+}
+
+export const MOCK_CONFIG_V21: ConfigV21 = {
+  ...MOCK_CONFIG_V20,
+  version: 21,
 }

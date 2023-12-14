@@ -7,8 +7,8 @@ import {
   aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
-  dropTipInPlace,
   moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
 } from '../commandCreators/atomic'
 import { curryCommandCreator } from './curryCommandCreator'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
@@ -103,12 +103,9 @@ export const movableTrashCommandsUtil = (
         prevRobotState != null && !prevRobotState.tipState.pipettes[pipetteId]
           ? []
           : [
-              curryCommandCreator(moveToAddressableArea, {
+              curryCommandCreator(moveToAddressableAreaForDropTip, {
                 pipetteId,
                 addressableAreaName,
-              }),
-              curryCommandCreator(dropTipInPlace, {
-                pipetteId,
               }),
             ]
 

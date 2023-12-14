@@ -14,6 +14,7 @@ import { dropTipInPlace } from './dropTipInPlace'
 import { engageMagnet } from './engageMagnet'
 import { moveLabware } from './moveLabware'
 import { moveToAddressableArea } from './moveToAddressableArea'
+import { moveToAddressableAreaForDropTip } from './moveToAddressableAreaForDropTip'
 import { moveToWell } from './moveToWell'
 import { replaceTip } from './replaceTip'
 import { setTemperature } from './setTemperature'
@@ -36,6 +37,7 @@ export {
   engageMagnet,
   moveLabware,
   moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
   moveToWell,
   replaceTip,
   setTemperature,

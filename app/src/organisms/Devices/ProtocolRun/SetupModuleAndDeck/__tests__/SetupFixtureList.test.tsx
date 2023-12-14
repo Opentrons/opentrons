@@ -35,6 +35,7 @@ const mockDeckConfigCompatibility: CutoutConfigAndCompatibility[] = [
     compatibleCutoutFixtureIds: [
       STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
     ],
+    missingLabwareDisplayName: null,
   },
 ]
 

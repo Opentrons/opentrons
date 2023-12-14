@@ -33,6 +33,7 @@ export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2Cutout } = {
   9: 'cutout9',
   10: 'cutout10',
   11: 'cutout11',
+  fixedTrash: 'cutout12',
 }
 
 // mapping of Flex deck slots to cutouts
