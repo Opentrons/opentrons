@@ -57,7 +57,6 @@ export const BeforeBeginning = (
     setShouldDispenseLiquid(flowType === 'liquid_and_tips')
   }
 
-  //
   if (isRobotMoving || createdMaintenanceRunId == null) {
     return <InProgressModal description={t('stand_back_exiting')} />
   }
@@ -168,10 +167,7 @@ export const BeforeBeginning = (
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
           {/* <NeedHelpLink href={NEED_HELP_URL} /> */}
-          <PrimaryButton
-            disabled={createdMaintenanceRunId == null || flowType == null}
-            onClick={handleProceed}
-          >
+          <PrimaryButton disabled={flowType == null} onClick={handleProceed}>
             {i18n.format(t('shared:continue'), 'capitalize')}
           </PrimaryButton>
         </Flex>

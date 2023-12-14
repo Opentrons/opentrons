@@ -140,12 +140,8 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => {
-      closeFlow()
-    },
-    onError: () => {
-      closeFlow()
-    },
+    onSuccess: () => closeFlow(),
+    onError: () => closeFlow(),
   })
 
   const handleCleanUpAndClose = (): void => {
