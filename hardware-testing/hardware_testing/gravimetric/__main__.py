@@ -49,8 +49,7 @@ from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
-# FIXME: bump to v2.15 to utilize protocol engine
-API_LEVEL = "2.15"
+API_LEVEL = "2.16"
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
