@@ -1188,7 +1188,7 @@
       "groups": [{ "metadata": {}, "wells": [] }],
       "parameters": {
         "format": "96Standard",
-        "quirks": [],
+        "quirks": ["tiprackAdapterFor96Channel"],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
         "loadName": "opentrons_flex_96_tiprack_adapter"
@@ -2343,18 +2343,14 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
+      "commandType": "moveToAddressableAreaForDropTip",
       "key": "1a094b33-5bef-4371-8968-182f83838f77",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "key": "fafbc2d4-6675-48c7-aff0-04aa4a5f4dcf",
-      "params": { "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9" }
     },
     {
       "commandType": "configureNozzleLayout",
@@ -2404,18 +2400,14 @@
       }
     },
     {
-      "commandType": "moveToAddressableArea",
+      "commandType": "moveToAddressableAreaForDropTip",
       "key": "56906667-0837-4b36-b13f-08903b7a4d8c",
       "params": {
         "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9",
         "addressableAreaName": "movableTrashA3",
-        "offset": { "x": 0, "y": 0, "z": 0 }
+        "offset": { "x": 0, "y": 0, "z": 0 },
+        "alternateDropLocation": true
       }
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "key": "2b6cf6b5-73e6-46db-a52d-be7c1e09f281",
-      "params": { "pipetteId": "de7da440-95ec-43e8-8723-851321fbd6f9" }
     }
   ],
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
