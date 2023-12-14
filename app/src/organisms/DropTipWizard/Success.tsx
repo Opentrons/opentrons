@@ -15,28 +15,19 @@ interface SuccessProps {
   message: string
   proceedText: string
   handleProceed: () => void
-  isRobotMoving: boolean
   isExiting: boolean
   isOnDevice: boolean
 }
 export const Success = (props: SuccessProps): JSX.Element => {
-  const {
-    message,
-    proceedText,
-    handleProceed,
-    isRobotMoving,
-    isExiting,
-    isOnDevice,
-  } = props
+  const { message, proceedText, handleProceed, isExiting, isOnDevice } = props
 
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
 
-  return isRobotMoving && !isExiting ? (
-    <InProgressModal
-      alternativeSpinner={null}
-      description={t('stand_back_exiting')}
-    />
-  ) : (
+  if (isExiting) {
+    return <InProgressModal description={t('stand_back_exiting')} />
+  }
+
+  return (
     <SimpleWizardBody
       iconColor={COLORS.successEnabled}
       header={i18n.format(message, 'capitalize')}

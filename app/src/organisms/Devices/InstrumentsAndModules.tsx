@@ -71,6 +71,10 @@ export function InstrumentsAndModules({
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
+  console.log(
+    '🚀 ~ file: InstrumentsAndModules.tsx:74 ~ attachedInstruments:',
+    attachedInstruments
+  )
 
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
