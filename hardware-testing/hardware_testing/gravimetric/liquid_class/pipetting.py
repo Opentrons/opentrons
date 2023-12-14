@@ -8,6 +8,7 @@ from opentrons.protocol_api.labware import Well
 
 from hardware_testing.opentrons_api.types import OT3AxisKind
 from hardware_testing.gravimetric import config
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
 from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
@@ -131,7 +132,7 @@ def _retract(
     z_discontinuity: float,
 ) -> None:
     # change discontinuity per the liquid-class settings
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     if pipette.channels == 96:
         hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
             OT3AxisKind.Z
@@ -177,7 +178,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     # FIXME: stop using hwapi, and get those functions into core software
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(mix, aspirate, dispense)

@@ -52,6 +52,7 @@ from .tips import MULTI_CHANNEL_TEST_ORDER
 import glob
 
 from opentrons.hardware_control.types import StatusBarState
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -88,7 +89,7 @@ def _generate_callbacks_for_trial(
     if blank_measurement:
         volume = None
 
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     pip_ax = Axis.of_main_tool_actuator(hw_mount)
     estimate_bottom: float = -1
@@ -547,7 +548,7 @@ def _get_liquid_height(
         if not resources.ctx.is_simulating() and not cfg.same_tip:
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
-                resources.ctx._core.get_hardware(),
+                get_sync_hw_api(resources.ctx),
             )
         _tip_counter[0] = 0
     if cfg.jog:
@@ -597,7 +598,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     recorder._recording = GravimetricRecording()
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
-    hw_api = resources.ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(resources.ctx)
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()

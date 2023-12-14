@@ -13,8 +13,9 @@ from hardware_testing.gravimetric.measurement.record import (
 )
 from hardware_testing.gravimetric.config import GANTRY_MAX_SPEED
 from hardware_testing.gravimetric.measurement.scale import Scale  # type: ignore[import]
-from hardware_testing.gravimetric import helpers, workarounds
+from hardware_testing.gravimetric import helpers
 from hardware_testing.gravimetric.__main__ import API_LEVEL
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
 TEST_NAME = "gravimetric-daily-setup"
 
@@ -253,7 +254,7 @@ if __name__ == "__main__":
         API_LEVEL,  # type: ignore[attr-defined]
         is_simulating=args.simulate,
     )
-    _hw = workarounds.get_sync_hw_api(_ctx)
+    _hw = get_sync_hw_api(_ctx)
     _hw.set_status_bar_state(COLOR_STATES["idle"])
     _rec = GravimetricRecorder(
         GravimetricRecorderConfig(
