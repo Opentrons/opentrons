@@ -17,9 +17,11 @@ import {
 import { maskField, StepFieldName } from '../../steplist/fieldLevel'
 import { BatchEditMoveLiquid } from './BatchEditMoveLiquid'
 import { BatchEditMix } from './BatchEditMix'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../types'
 
 export const BatchEditForm = (): JSX.Element => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const fieldValues = useSelector(getMultiSelectFieldValues)
   const stepTypes = useSelector(getBatchEditSelectedStepTypes)
   const disabledFields = useSelector(getMultiSelectDisabledFields)

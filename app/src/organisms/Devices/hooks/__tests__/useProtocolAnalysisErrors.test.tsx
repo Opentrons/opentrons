@@ -1,6 +1,6 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import {
   useProtocolAnalysisAsDocumentQuery,

@@ -9,6 +9,7 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('../../../pages/OnDeviceDisplay/hooks/useNetworkConnection')
 jest.mock('../../../redux/discovery')
@@ -100,19 +101,19 @@ describe('Navigation', () => {
     })
   })
   it('should render text and they have attribute', () => {
-    const { getByRole, queryByLabelText, queryByText } = render(props)
-    getByRole('link', { name: '123456789012...' }) // because of the truncate function
-    const allProtocols = getByRole('link', { name: 'All Protocols' })
+    render(props)
+    screen.getByRole('link', { name: '123456789012...' }) // because of the truncate function
+    const allProtocols = screen.getByRole('link', { name: 'All Protocols' })
     expect(allProtocols).toHaveAttribute('href', '/protocols')
 
-    const instruments = getByRole('link', { name: 'Instruments' })
+    const instruments = screen.getByRole('link', { name: 'Instruments' })
     expect(instruments).toHaveAttribute('href', '/instruments')
 
-    const settings = getByRole('link', { name: 'Settings' })
+    const settings = screen.getByRole('link', { name: 'Settings' })
     expect(settings).toHaveAttribute('href', '/robot-settings')
 
-    expect(queryByText('Get started')).not.toBeInTheDocument()
-    expect(queryByLabelText('network icon')).not.toBeInTheDocument()
+    expect(screen.queryByText('Get started')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('network icon')).not.toBeInTheDocument()
   })
   it('should render a network icon', () => {
     mockUseNetworkConnection.mockReturnValue({
@@ -122,22 +123,26 @@ describe('Navigation', () => {
       connectionStatus: 'Not connected',
       icon: 'wifi',
     })
-    const { getByLabelText } = render(props)
-    expect(getByLabelText('network icon')).toBeInTheDocument()
+    render(props)
+    expect(screen.getByLabelText('network icon')).toBeInTheDocument()
   })
   it('should render the overflow btn and clicking on it renders the menu', () => {
-    const { getByRole, getByText } = render(props)
-    getByRole('button', { name: 'overflow menu button' }).click()
-    getByText('mock NavigationMenu')
+    render(props)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'overflow menu button' })
+    )
+    screen.getByText('mock NavigationMenu')
   })
   it('should call the setNavMenuIsOpened prop when you click on the overflow menu button', () => {
     props = {
       ...props,
       setNavMenuIsOpened: jest.fn(),
     }
-    const { getByRole, getByText } = render(props)
-    getByRole('button', { name: 'overflow menu button' }).click()
-    getByText('mock NavigationMenu')
+    render(props)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'overflow menu button' })
+    )
+    screen.getByText('mock NavigationMenu')
     expect(props.setNavMenuIsOpened).toHaveBeenCalled()
   })
   it('should change z index of nav bar when longPressModalIsOpened is defined and true', () => {
@@ -145,7 +150,9 @@ describe('Navigation', () => {
       ...props,
       longPressModalIsOpened: true,
     }
-    const { getByLabelText } = render(props)
-    expect(getByLabelText('Navigation_container')).toHaveStyle({ zIndex: 0 })
+    render(props)
+    expect(screen.getByLabelText('Navigation_container')).toHaveStyle({
+      zIndex: 0,
+    })
   })
 })

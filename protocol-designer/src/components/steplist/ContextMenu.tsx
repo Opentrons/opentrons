@@ -12,6 +12,8 @@ import { Portal } from '../portals/TopPortal'
 import styles from './StepItem.css'
 import { StepIdType } from '../../form-types'
 import { getSavedStepForms } from '../../step-forms/selectors'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../types'
 
 const MENU_OFFSET_PX = 5
 
@@ -29,7 +31,7 @@ interface Position {
 }
 
 export const ContextMenu = (props: Props): JSX.Element => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const deleteStep = (
     stepId: StepIdType
   ): ReturnType<typeof steplistActions.deleteStep> =>

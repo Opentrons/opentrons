@@ -222,9 +222,8 @@ export function ChooseRobotSlideout(
             const isSelected =
               selectedRobot != null && selectedRobot.ip === robot.ip
             return (
-              <>
+              <React.Fragment key={robot.ip}>
                 <AvailableRobotOption
-                  key={robot.ip}
                   robot={robot}
                   // TODO: generalize to a disabled/reset prop
                   onClick={() => {
@@ -271,7 +270,7 @@ export function ChooseRobotSlideout(
                     )}
                   </StyledText>
                 )}
-              </>
+              </React.Fragment>
             )
           })
         )}

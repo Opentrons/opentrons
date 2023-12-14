@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -80,18 +81,18 @@ describe('SelectAuthenticationType', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText }] = render(props)
-    getByText('WPA2 Personal')
-    getByText('Most labs use this method')
-    getByText('None')
-    getByText('Not recommended')
-    getByText('Your MAC Address is WI:FI:00:00:00:00')
-    getByText('Need another security type?')
+    render(props)
+    screen.getByText('WPA2 Personal')
+    screen.getByText('Most labs use this method')
+    screen.getByText('None')
+    screen.getByText('Not recommended')
+    screen.getByText('Your MAC Address is WI:FI:00:00:00:00')
+    screen.getByText('Need another security type?')
   })
 
   it('should render AlternativeSecurityTypeModal when tapping need another security type? button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Need another security type?').click()
-    getByText('mock AlternativeSecurityTypeModal')
+    render(props)
+    fireEvent.click(screen.getByText('Need another security type?'))
+    screen.getByText('mock AlternativeSecurityTypeModal')
   })
 })

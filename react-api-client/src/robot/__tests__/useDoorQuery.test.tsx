@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 
 import { getDoorStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useDoorQuery } from '..'
 
 import type { HostConfig, Response, DoorStatus } from '@opentrons/api-client'
+import type { UseDoorQueryOptions } from '../useDoorQuery'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
@@ -23,11 +24,15 @@ const DOOR_RESPONSE: DoorStatus = {
 } as DoorStatus
 
 describe('useDoorQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<
+    { children: React.ReactNode } & UseDoorQueryOptions
+  >
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<
+      { children: React.ReactNode } & UseDoorQueryOptions
+    > = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -41,7 +46,7 @@ describe('useDoorQuery hook', () => {
   it('should return no data if no host', () => {
     when(mockUseHost).calledWith().mockReturnValue(null)
 
-    const { result } = renderHook(useDoorQuery, { wrapper })
+    const { result } = renderHook(() => useDoorQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -50,7 +55,7 @@ describe('useDoorQuery hook', () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockGetDoorStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
-    const { result } = renderHook(useDoorQuery, { wrapper })
+    const { result } = renderHook(() => useDoorQuery(), { wrapper })
 
     expect(result.current?.data).toBeUndefined()
   })
@@ -61,10 +66,10 @@ describe('useDoorQuery hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: DOOR_RESPONSE } as Response<DoorStatus>)
 
-    const { result, waitFor } = renderHook(useDoorQuery, { wrapper })
+    const { result } = renderHook(() => useDoorQuery(), { wrapper })
 
-    await waitFor(() => result.current?.data != null)
-
-    expect(result.current?.data).toEqual(DOOR_RESPONSE)
+    await waitFor(() => {
+      expect(result.current?.data).toEqual(DOOR_RESPONSE)
+    })
   })
 })

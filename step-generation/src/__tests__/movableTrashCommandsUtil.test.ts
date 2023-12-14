@@ -5,6 +5,7 @@ import {
   aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
+  dropTipInPlace,
   moveToAddressableArea,
   moveToAddressableAreaForDropTip,
 } from '../commandCreators/atomic'
@@ -92,6 +93,9 @@ describe('movableTrashCommandsUtil', () => {
       moveToAddressableAreaForDropTip,
       mockMoveToAddressableAreaParams
     )
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dropTipInPlace, {
+      pipetteId: mockId,
+    })
   })
   it('returns correct commands for aspirate in place (air gap)', () => {
     movableTrashCommandsUtil({

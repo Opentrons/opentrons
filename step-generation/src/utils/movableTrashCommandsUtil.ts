@@ -7,6 +7,7 @@ import {
   aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
+  dropTipInPlace,
   moveToAddressableArea,
   moveToAddressableAreaForDropTip,
 } from '../commandCreators/atomic'
@@ -106,6 +107,9 @@ export const movableTrashCommandsUtil = (
               curryCommandCreator(moveToAddressableAreaForDropTip, {
                 pipetteId,
                 addressableAreaName,
+              }),
+              curryCommandCreator(dropTipInPlace, {
+                pipetteId,
               }),
             ]
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getCommand } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCommandQuery } from '..'
@@ -23,11 +23,13 @@ const COMMAND_RESPONSE = {
 } as CommandDetail
 
 describe('useCommandQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -65,15 +67,12 @@ describe('useCommandQuery hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID, COMMAND_ID)
       .mockResolvedValue({ data: COMMAND_RESPONSE } as Response<CommandDetail>)
 
-    const { result, waitFor } = renderHook(
-      () => useCommandQuery(RUN_ID, COMMAND_ID),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useCommandQuery(RUN_ID, COMMAND_ID), {
+      wrapper,
+    })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(COMMAND_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(COMMAND_RESPONSE)
+    })
   })
 })

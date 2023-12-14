@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 import { StaticRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
@@ -160,25 +161,23 @@ describe('SendProtocolToOT3Slideout', () => {
   })
 
   it('renders slideout title and button', () => {
-    const [{ getByRole, getByText }] = render({
+    render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    getByText('Send protocol to Opentrons Flex')
-    getByRole('button', { name: 'Send' })
+    screen.getByText('Send protocol to Opentrons Flex')
+    screen.getByRole('button', { name: 'Send' })
   })
 
   it('renders an available robot option for every connectable OT-3, and link for other robots', () => {
-    const [{ queryByText }] = render({
+    render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
-    expect(
-      queryByText('2 unavailable or busy robots are not listed.')
-    ).toBeInTheDocument()
+    screen.getByText('opentrons-robot-name')
+    screen.getByText('2 unavailable or busy robots are not listed.')
   })
   it('does not render a robot option for a busy OT-3', () => {
     when(mockUseAllRunsQuery)
@@ -191,12 +190,12 @@ describe('SendProtocolToOT3Slideout', () => {
           links: { current: { href: 'a current run' } },
         })
       )
-    const [{ queryByText }] = render({
+    render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    expect(queryByText('opentrons-robot-name')).not.toBeInTheDocument()
+    expect(screen.queryByText('opentrons-robot-name')).not.toBeInTheDocument()
   })
   it('does not render an available robot option for a connectable OT-2', () => {
     mockGetConnectableRobots.mockReturnValue([
@@ -207,32 +206,33 @@ describe('SendProtocolToOT3Slideout', () => {
         robotModel: ROBOT_MODEL_OT2,
       },
     ])
-    const [{ queryByText }] = render({
+    render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    expect(queryByText('ot-2-robot-name')).not.toBeInTheDocument()
+    expect(screen.queryByText('ot-2-robot-name')).not.toBeInTheDocument()
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
     mockGetScanning.mockReturnValue(true)
-    const [{ queryByText }] = render({
+    render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
+    screen.getByText('opentrons-robot-name')
     expect(
-      queryByText('2 unavailable or busy robots are not listed.')
+      screen.queryByText('2 unavailable or busy robots are not listed.')
     ).not.toBeInTheDocument()
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
-    const [{ getByRole }, { dispatch }] = render({
+    const { dispatch } = render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
-    })
-    getByRole('button', { name: 'refresh' }).click()
+    })[1]
+    const refresh = screen.getByRole('button', { name: 'refresh' })
+    fireEvent.click(refresh)
     expect(mockStartDiscovery).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
@@ -241,20 +241,20 @@ describe('SendProtocolToOT3Slideout', () => {
       { ...mockConnectableOT3, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableOT3,
     ])
-    const [{ getByRole, getByText }] = render({
+    render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const proceedButton = getByRole('button', { name: 'Send' })
+    const proceedButton = screen.getByRole('button', { name: 'Send' })
     expect(proceedButton).not.toBeDisabled()
-    const otherRobot = getByText('otherRobot')
-    otherRobot.click() // unselect default robot
+    const otherRobot = screen.getByText('otherRobot')
+    fireEvent.click(otherRobot) // unselect default robot
     expect(proceedButton).not.toBeDisabled()
-    const mockRobot = getByText('opentrons-robot-name')
-    mockRobot.click()
+    const mockRobot = screen.getByText('opentrons-robot-name')
+    fireEvent.click(mockRobot)
     expect(proceedButton).not.toBeDisabled()
-    proceedButton.click()
+    fireEvent.click(proceedButton)
     expect(mockMutateAsync).toBeCalledWith({
       files: [expect.any(Object), mockCustomLabwareFile],
       protocolKey: 'protocolKeyStub',
@@ -268,19 +268,19 @@ describe('SendProtocolToOT3Slideout', () => {
         autoUpdateDisabledReason: null,
         updateFromFileDisabledReason: null,
       })
-    const [{ getByRole, getByText }] = render({
+    render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    const proceedButton = getByRole('button', { name: 'Send' })
+    const proceedButton = screen.getByRole('button', { name: 'Send' })
     expect(proceedButton).toBeDisabled()
     expect(
-      getByText(
+      screen.getByText(
         'A robot software update is required to run protocols with this version of the Opentrons App.'
       )
     ).toBeInTheDocument()
-    const linkToRobotDetails = getByText('Go to Robot')
-    linkToRobotDetails.click()
+    const linkToRobotDetails = screen.getByText('Go to Robot')
+    fireEvent.click(linkToRobotDetails)
   })
 })
