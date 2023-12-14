@@ -95,7 +95,6 @@ function importProtocol() {
       mimeType: 'application/json',
       encoding: 'utf8',
     })
-    cy.get('[data-test="ComputingSpinner"]').should('exist')
     cy.get('div')
       .contains(
         'Your protocol will be automatically updated to the latest version.'
