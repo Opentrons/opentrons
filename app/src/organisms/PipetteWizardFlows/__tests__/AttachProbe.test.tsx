@@ -72,6 +72,8 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
@@ -198,6 +200,8 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
           {
