@@ -12,6 +12,8 @@ from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_north_slot,
     get_west_slot,
+    get_east_slot,
+    get_south_slot,
 )
 from opentrons.protocol_engine import (
     StateView,
@@ -52,6 +54,10 @@ _log = logging.getLogger(__name__)
 # Bounding box measurements
 A12_column_front_left_bound = Point(x=-1.8, y=2)
 A12_column_back_right_bound = Point(x=592, y=506.2)
+
+A1_column_front_left_bound = Point(x=-100.8, y=2)
+A1_column_back_right_bound = Point(x=493, y=506.2)
+
 
 # Arbitrary safety margin in z-direction
 Z_SAFETY_MARGIN = 10
@@ -248,7 +254,6 @@ def _check_deck_conflict_for_96_channel(
     if not (
         engine_state.pipettes.get_nozzle_layout_type(pipette_id)
         == NozzleConfigurationType.COLUMN
-        and engine_state.pipettes.get_primary_nozzle(pipette_id) == "A12"
     ):
         # Checking deck conflicts only for 12th column config
         return
@@ -275,32 +280,42 @@ def _check_deck_conflict_for_96_channel(
         )
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-    west_slot_number = get_west_slot(
-        _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
-    )
-    if west_slot_number is None:
-        return
 
-    west_slot = DeckSlotName.from_primitive(
-        west_slot_number
-    ).to_equivalent_for_robot_type(engine_state.config.robot_type)
+    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
+    destination_slot_num = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
+    adjacent_slot_num = None
+    if primary_nozzle == "A12":
+        adjacent_slot_num = get_west_slot(destination_slot_num)
+    elif primary_nozzle == "A1":
+        adjacent_slot_num = get_east_slot(destination_slot_num)
 
-    west_slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-        DeckSlotLocation(slotName=west_slot)
-    )
-
-    pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
-    tip_length = pipette_tip.length if pipette_tip else 0.0
-
-    if (
-        west_slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length
-    ):  # a safe margin magic number
-        raise PartialTipMovementNotAllowedError(
-            f"Moving to {engine_state.labware.get_load_name(labware_id)} in slot {labware_slot}"
-            f" with a Column nozzle configuration will result in collision with"
-            f" items in deck slot {west_slot}."
+    def _check_conflict_with_slot_item(
+            adjacent_slot: DeckSlotName,
+    ) -> None:
+        """Raises error if the pipette is ecpected to collide with adjacent slot items."""
+        slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
+            DeckSlotLocation(slotName=adjacent_slot)
         )
 
+        pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
+        tip_length = pipette_tip.length if pipette_tip else 0.0
+
+        if (
+                slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length
+        ):
+            raise PartialTipMovementNotAllowedError(
+                f"Moving to {engine_state.labware.get_load_name(labware_id)} in slot {labware_slot}"
+                f" with a Column nozzle configuration will result in collision with"
+                f" items in deck slot {adjacent_slot}."
+            )
+
+    if adjacent_slot_num is None:
+        return
+    _check_conflict_with_slot_item(
+        adjacent_slot=DeckSlotName.from_primitive(
+                        adjacent_slot_num
+                ).to_equivalent_for_robot_type(engine_state.config.robot_type)
+    )
 
 def _check_deck_conflict_for_8_channel(
     engine_state: StateView,
@@ -313,7 +328,6 @@ def _check_deck_conflict_for_8_channel(
     if not (
         engine_state.pipettes.get_nozzle_layout_type(pipette_id)
         == NozzleConfigurationType.SINGLE
-        and engine_state.pipettes.get_primary_nozzle(pipette_id) == "H1"
     ):
         # Checking deck conflicts only for H1 single tip config
         return
@@ -342,29 +356,35 @@ def _check_deck_conflict_for_8_channel(
         )
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-    north_slot_number = get_north_slot(
-        _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
-    )
-    if north_slot_number is None:
-        return
+    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
+    destination_slot = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
+    adjacent_slot_num = None
+    if primary_nozzle == "H1":
+        adjacent_slot_num = get_north_slot(destination_slot)
+    elif primary_nozzle == "A1":
+        adjacent_slot_num = get_south_slot(destination_slot)
 
-    north_slot = DeckSlotName.from_primitive(
-        north_slot_number
-    ).to_equivalent_for_robot_type(engine_state.config.robot_type)
-
-    north_slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-        DeckSlotLocation(slotName=north_slot)
-    )
-
-    pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
-    tip_length = pipette_tip.length if pipette_tip else 0.0
-
-    if north_slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length:
-        raise PartialTipMovementNotAllowedError(
-            f"Moving to {engine_state.labware.get_load_name(labware_id)} in slot {labware_slot}"
-            f" with a Single nozzle configuration will result in collision with"
-            f" items in deck slot {north_slot}."
+    def _check_conflict_with_slot_item(adjacent_slot: DeckSlotName) -> None:
+        slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
+            DeckSlotLocation(slotName=adjacent_slot)
         )
+
+        pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
+        tip_length = pipette_tip.length if pipette_tip else 0.0
+
+        if slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length:
+            raise PartialTipMovementNotAllowedError(
+                f"Moving to {engine_state.labware.get_load_name(labware_id)} in slot {labware_slot}"
+                f" with a Single nozzle configuration will result in collision with"
+                f" items in deck slot {adjacent_slot}.")
+
+    if adjacent_slot_num is None:
+        return
+    _check_conflict_with_slot_item(
+        adjacent_slot=DeckSlotName.from_primitive(
+            adjacent_slot_num
+        ).to_equivalent_for_robot_type(engine_state.config.robot_type)
+    )
 
 
 def _is_within_pipette_extents(
@@ -381,17 +401,22 @@ def _is_within_pipette_extents(
         if (
             pipette_channels == 96
             and nozzle_config == NozzleConfigurationType.COLUMN
-            and primary_nozzle == "A12"
         ):
-            return (
-                A12_column_front_left_bound.x
-                < location.x
-                < A12_column_back_right_bound.x
-                and A12_column_front_left_bound.y
-                < location.y
-                < A12_column_back_right_bound.y
-            )
-    # TODO (spp, 2023-11-07): check for 8-channel nozzle H1 extents on Flex & OT2
+            if primary_nozzle == "A12":
+                return (
+                    A12_column_front_left_bound.x
+                    < location.x
+                    < A12_column_back_right_bound.x
+                    and A12_column_front_left_bound.y
+                    < location.y
+                    < A12_column_back_right_bound.y
+                )
+            elif primary_nozzle == "A1":
+                return (
+                    A1_column_front_left_bound.x < location.x < A1_column_back_right_bound.x
+                    and A1_column_front_left_bound.y < location.y < A1_column_back_right_bound.y
+                )
+    # TODO (spp, 2023-11-07): check for 8-channel nozzle A1 & H1 extents on Flex & OT2
     return True
 
 
