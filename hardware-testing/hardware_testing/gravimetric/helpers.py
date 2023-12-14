@@ -81,6 +81,7 @@ def get_api_context(
             loop=loop,
             stall_detection_enable=stall_detection_enable,
         )
+
     papi: protocol_api.ProtocolContext
     if is_simulating:
         papi = simulate.get_protocol_api(
