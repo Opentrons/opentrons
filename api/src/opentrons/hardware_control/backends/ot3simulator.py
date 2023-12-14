@@ -476,9 +476,7 @@ class OT3Simulator:
                     ),
                     "id": None,
                 }
-        if (found_model and expected_instr or found_model) and init_instr[
-            "id"
-        ] is not None:
+        if found_model and init_instr["id"] is not None:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
