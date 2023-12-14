@@ -1,5 +1,10 @@
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
+import type {
+  RobotMassStorageDeviceAdded,
+  RobotMassStorageDeviceEnumerated,
+  RobotMassStorageDeviceRemoved,
+} from './mass-storage-device/types'
 
 export interface Remote {
   ipcRenderer: {
@@ -30,6 +35,10 @@ export interface ShellUpdateState {
   info: UpdateInfo | null | undefined
 }
 
+export interface ConnectedMassStorageState {
+  rootPaths: Set<string>
+}
+
 export type ShellUpdateAction =
   | { type: 'shell:CHECK_UPDATE'; meta: { shell: true } }
   | {
@@ -44,6 +53,7 @@ export type ShellUpdateAction =
 export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
+  connectedMassStorage: ConnectedMassStorageState
 }
 
 export interface UiInitializedAction {
@@ -75,31 +85,6 @@ export interface UpdateBrightnessAction {
   type: 'shell:UPDATE_BRIGHTNESS'
   payload: {
     message: string
-  }
-  meta: { shell: true }
-}
-
-export interface RobotMassStorageDeviceAdded {
-  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED'
-  payload: {
-    rootPath: string
-  }
-  meta: { shell: true }
-}
-
-export interface RobotMassStorageDeviceEnumerated {
-  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
-  payload: {
-    rootPath: string
-    filePaths: string[]
-  }
-  meta: { shell: true }
-}
-
-export interface RobotMassStorageDeviceRemoved {
-  type: 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED'
-  payload: {
-    rootPath: string
   }
   meta: { shell: true }
 }

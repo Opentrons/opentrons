@@ -43,6 +43,7 @@ import type { Dispatch, State } from '../../../redux/types'
 export type SettingOption =
   | 'NetworkSettings'
   | 'RobotName'
+  | 'DownloadLogsOverUsb'
   | 'RobotSystemVersion'
   | 'TouchscreenSleep'
   | 'TouchscreenBrightness'
@@ -164,6 +165,9 @@ export function RobotSettingsDashboard(): JSX.Element {
           setCurrentOption={setCurrentOption}
         />
       )
+    case 'DownloadLogsOverUsb':
+      return <div> omfg </div>
+      
     case 'UpdateChannel':
       return <UpdateChannel handleBackPress={() => setCurrentOption(null)} />
 

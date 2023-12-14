@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 
 import { robotSystemReducer } from './is-ready/reducer'
+import { massStorageDeviceReducer } from './mass-storage-device/reducer'
 
 import type { Action } from '../types'
 import type { ShellState, ShellUpdateState } from './types'
@@ -55,4 +56,5 @@ export function shellUpdateReducer(
 export const shellReducer = combineReducers<ShellState, Action>({
   update: shellUpdateReducer,
   isReady: robotSystemReducer,
+  connectedMassStorage: massStorageDeviceReducer,
 })

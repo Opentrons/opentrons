@@ -31,6 +31,8 @@
   "connect_ip_link": "Learn more about connecting a robot manually",
   "discovery_timeout": "Discovery timed out.",
   "download_update": "Downloading update...",
+  "download_logs_over_usb": "Download robot logs over usb",
+  "download_logs_over_usb_description": "Download robot logs over connected usb storage device",
   "enable_dev_tools": "Developer Tools",
   "enable_dev_tools_description": "Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.",
   "error_boundary_description": "You need to restart the touchscreen. Then download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.",

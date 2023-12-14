@@ -43,6 +43,7 @@ import { RobotSettingButton } from './RobotSettingButton'
 
 import type { Dispatch, State } from '../../../redux/types'
 import type { SetSettingOption } from './'
+import { getIsMassStorageDeviceConnected } from '../../../redux/shell/mass-storage-device/selectors'
 
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {
@@ -77,6 +78,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const isMassStorageDeviceConnected = useSelector(
+    getIsMassStorageDeviceConnected
+  )
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
@@ -189,6 +193,15 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           rightElement={<OnOffToggle isOn={devToolsOn} />}
           onClick={() => dispatch(toggleDevtools())}
         />
+        {isMassStorageDeviceConnected && (
+          <RobotSettingButton
+            settingName={t('app_settings:download_logs_over_usb')}
+            dataTestId="RobotSettingButton_enable_dev_tools"
+            settingInfo={t('app_settings:download_logs_over_usb_description')}
+            iconName="usb"
+            onClick={() => setCurrentOption('DownloadLogsOverUsb')}
+          />
+        )}
         {devToolsOn ? <FeatureFlags /> : null}
       </Flex>
     </Flex>
