@@ -18,6 +18,7 @@ Welcome to the v7.1.0 release of the Opentrons robot software! This release incl
 
 ### Improved Features
 
+- The Ethernet port on Flex now supports direct connection to a computer.
 - Improves aspirate, dispense, and mix behavior with volumes set to zero.
 - The `opentrons_simulate` command-line tool now works with all Python API versions.
 
