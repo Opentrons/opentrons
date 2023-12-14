@@ -161,11 +161,11 @@ export const getSlotIsEmpty = (
 
   return (
     [
-      ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>
-        slot.includes(moduleOnDeck.slot)
+      ...values(initialDeckSetup.modules).filter(
+        (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.slot === slot
       ),
-      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
-        slot.includes(labware.slot)
+      ...values(initialDeckSetup.labware).filter(
+        (labware: LabwareOnDeckType) => labware.slot === slot
       ),
       ...filteredAdditionalEquipmentOnDeck,
     ].length === 0
