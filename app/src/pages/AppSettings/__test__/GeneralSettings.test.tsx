@@ -69,7 +69,7 @@ describe('GeneralSettings', () => {
     expect(
       getByRole('link', {
         name:
-          'Learn more about keeping the Opentrons app and robot software in sync',
+          'Learn more about keeping the Opentrons App and robot software in sync',
       })
     ).toHaveAttribute('href', 'https://support.opentrons.com/s/')
   })

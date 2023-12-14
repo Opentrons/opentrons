@@ -1,7 +1,15 @@
 import takeWhile from 'lodash/takeWhile'
+import {
+  getWasteChuteAddressableAreaNamePip,
+  movableTrashCommandsUtil,
+} from '@opentrons/step-generation'
 import * as StepGeneration from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import type { StepArgsAndErrorsById } from '../steplist/types'
+import {
+  dropTipInPlace,
+  moveToAddressableArea,
+} from '@opentrons/step-generation/src/commandCreators/atomic'
 
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
@@ -78,44 +86,40 @@ export const generateRobotStateTimeline = (
             'trashBin'
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-        const addressableAreaName =
-          pipetteSpec.channels === 96
-            ? '96ChannelWasteChute'
-            : '1and8ChannelWasteChute'
-
-        let dropTipCommands = StepGeneration.curryCommandCreator(
-          StepGeneration.dropTip,
-          {
-            pipette: pipetteId,
-            dropTipLocation,
-          }
+        const addressableAreaName = getWasteChuteAddressableAreaNamePip(
+          pipetteSpec.channels
         )
 
+        let dropTipCommands = [
+          StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
+            pipette: pipetteId,
+            dropTipLocation,
+          }),
+        ]
         if (isWasteChute) {
-          dropTipCommands = StepGeneration.curryCommandCreator(
-            StepGeneration.wasteChuteCommandsUtil,
-            {
-              type: 'dropTip',
-              pipetteId: pipetteId,
+          dropTipCommands = [
+            StepGeneration.curryCommandCreator(moveToAddressableArea, {
+              pipetteId,
               addressableAreaName,
-            }
-          )
+            }),
+            StepGeneration.curryCommandCreator(dropTipInPlace, {
+              pipetteId,
+            }),
+          ]
         }
         if (isTrashBin) {
-          dropTipCommands = StepGeneration.curryCommandCreator(
-            StepGeneration.movableTrashCommandsUtil,
-            {
-              type: 'dropTip',
-              pipetteId: pipetteId,
-            }
-          )
+          dropTipCommands = movableTrashCommandsUtil({
+            type: 'dropTip',
+            pipetteId,
+            invariantContext,
+          })
         }
         if (!willReuseTip) {
           return [
             ...acc,
             (_invariantContext, _prevRobotState) =>
               StepGeneration.reduceCommandCreators(
-                [curriedCommandCreator, dropTipCommands],
+                [curriedCommandCreator, ...dropTipCommands],
                 _invariantContext,
                 _prevRobotState
               ),

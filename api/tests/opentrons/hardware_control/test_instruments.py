@@ -11,9 +11,9 @@ except (OSError, ModuleNotFoundError):
     aionotify = None  # type: ignore
 
 
-from opentrons import types, config
+from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
 
@@ -191,7 +191,10 @@ async def test_cache_instruments_hc(
     is_robot,
     cntrlr_mock_connect,
 ):
-    hw_api_cntrlr = await API.build_hardware_controller(loop=asyncio.get_running_loop())
+    hw_api_cntrlr = await API.build_hardware_controller(
+        loop=asyncio.get_running_loop(),
+        feature_flags=HardwareFeatureFlags.build_from_ff(),
+    )
 
     async def mock_driver_model(mount):
         attached_pipette = {"left": LEFT_PIPETTE_MODEL, "right": None}
@@ -350,7 +353,9 @@ async def test_prep_aspirate(sim_and_instr):
 
 async def test_aspirate_new(dummy_instruments):
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0],
+        loop=asyncio.get_running_loop(),
+        feature_flags=HardwareFeatureFlags(use_old_aspiration_functions=False),
     )
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -367,11 +372,12 @@ async def test_aspirate_new(dummy_instruments):
     assert pos[Axis.B] == pytest.approx(new_plunger_pos)
 
 
-async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instruments):
-    decoy.when(config.feature_flags.use_old_aspiration_functions()).then_return(True)
+async def test_aspirate_old(decoy: Decoy, dummy_instruments):
 
     hw_api = await API.build_hardware_simulator(
-        attached_instruments=dummy_instruments[0], loop=asyncio.get_running_loop()
+        attached_instruments=dummy_instruments[0],
+        loop=asyncio.get_running_loop(),
+        feature_flags=HardwareFeatureFlags(use_old_aspiration_functions=True),
     )
     await hw_api.home()
     await hw_api.cache_instruments()

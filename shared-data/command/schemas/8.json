@@ -96,6 +96,12 @@
       "$ref": "#/definitions/SetStatusBarCreate"
     },
     {
+      "$ref": "#/definitions/VerifyTipPresenceCreate"
+    },
+    {
+      "$ref": "#/definitions/GetTipPresenceCreate"
+    },
+    {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
     },
     {
@@ -469,14 +475,14 @@
           "enum": ["SINGLE"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         }
       },
-      "required": ["primary_nozzle"]
+      "required": ["primaryNozzle"]
     },
     "RowNozzleLayoutConfiguration": {
       "title": "RowNozzleLayoutConfiguration",
@@ -489,14 +495,14 @@
           "enum": ["ROW"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         }
       },
-      "required": ["primary_nozzle"]
+      "required": ["primaryNozzle"]
     },
     "ColumnNozzleLayoutConfiguration": {
       "title": "ColumnNozzleLayoutConfiguration",
@@ -509,14 +515,14 @@
           "enum": ["COLUMN"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         }
       },
-      "required": ["primary_nozzle"]
+      "required": ["primaryNozzle"]
     },
     "QuadrantNozzleLayoutConfiguration": {
       "title": "QuadrantNozzleLayoutConfiguration",
@@ -529,20 +535,20 @@
           "enum": ["QUADRANT"],
           "type": "string"
         },
-        "primary_nozzle": {
-          "title": "Primary Nozzle",
+        "primaryNozzle": {
+          "title": "Primarynozzle",
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
           "enum": ["A1", "H1", "A12", "H12"],
           "type": "string"
         },
-        "front_right_nozzle": {
-          "title": "Front Right Nozzle",
+        "frontRightNozzle": {
+          "title": "Frontrightnozzle",
           "description": "The front right nozzle in your configuration.",
           "pattern": "[A-Z][0-100]",
           "type": "string"
         }
       },
-      "required": ["primary_nozzle", "front_right_nozzle"]
+      "required": ["primaryNozzle", "frontRightNozzle"]
     },
     "ConfigureNozzleLayoutParams": {
       "title": "ConfigureNozzleLayoutParams",
@@ -554,8 +560,8 @@
           "description": "Identifier of pipette to use for liquid handling.",
           "type": "string"
         },
-        "configuration_params": {
-          "title": "Configuration Params",
+        "configurationParams": {
+          "title": "Configurationparams",
           "anyOf": [
             {
               "$ref": "#/definitions/AllNozzleLayoutConfiguration"
@@ -575,7 +581,7 @@
           ]
         }
       },
-      "required": ["pipetteId", "configuration_params"]
+      "required": ["pipetteId", "configurationParams"]
     },
     "ConfigureNozzleLayoutCreate": {
       "title": "ConfigureNozzleLayoutCreate",
@@ -2383,6 +2389,106 @@
         },
         "params": {
           "$ref": "#/definitions/SetStatusBarParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "TipPresenceStatus": {
+      "title": "TipPresenceStatus",
+      "description": "Tip presence status reported by a pipette.",
+      "enum": ["present", "absent", "unknown"],
+      "type": "string"
+    },
+    "VerifyTipPresenceParams": {
+      "title": "VerifyTipPresenceParams",
+      "description": "Payload required for a VerifyTipPresence command.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        },
+        "expectedState": {
+          "description": "The expected tip presence status on the pipette.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
+        }
+      },
+      "required": ["pipetteId", "expectedState"]
+    },
+    "VerifyTipPresenceCreate": {
+      "title": "VerifyTipPresenceCreate",
+      "description": "VerifyTipPresence command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "verifyTipPresence",
+          "enum": ["verifyTipPresence"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/VerifyTipPresenceParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "GetTipPresenceParams": {
+      "title": "GetTipPresenceParams",
+      "description": "Payload required for a GetTipPresence command.",
+      "type": "object",
+      "properties": {
+        "pipetteId": {
+          "title": "Pipetteid",
+          "description": "Identifier of pipette to use for liquid handling.",
+          "type": "string"
+        }
+      },
+      "required": ["pipetteId"]
+    },
+    "GetTipPresenceCreate": {
+      "title": "GetTipPresenceCreate",
+      "description": "GetTipPresence command creation request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "getTipPresence",
+          "enum": ["getTipPresence"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/GetTipPresenceParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

@@ -92,7 +92,7 @@ describe('LocationConflictModal', () => {
     getByText('Trash bin')
     getByText('Cancel').click()
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByText('Confirm removal').click()
+    getByText('Update deck').click()
     expect(mockUpdate).toHaveBeenCalled()
   })
 })

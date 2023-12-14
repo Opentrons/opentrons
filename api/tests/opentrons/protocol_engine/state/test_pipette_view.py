@@ -1,4 +1,6 @@
 """Tests for pipette state accessors in the protocol_engine state store."""
+from collections import OrderedDict
+
 import pytest
 from typing import cast, Dict, List, Optional
 
@@ -6,7 +8,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
-from opentrons.types import MountType, Mount as HwMount
+from opentrons.types import MountType, Mount as HwMount, Point
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -24,7 +26,7 @@ from opentrons.protocol_engine.state.pipettes import (
     HardwarePipette,
     StaticPipetteConfig,
 )
-from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.nozzle_manager import NozzleMap, NozzleConfigurationType
 from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
 
 
@@ -512,3 +514,19 @@ def test_get_motor_axes(
 
     assert subject.get_z_axis("pipette-id") == expected_z_axis
     assert subject.get_plunger_axis("pipette-id") == expected_plunger_axis
+
+
+def test_nozzle_configuration_getters() -> None:
+    """Test that pipette view returns correct nozzle configuration data."""
+    nozzle_map = NozzleMap.build(
+        physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+        physical_rows=OrderedDict({"A": ["A1"]}),
+        physical_columns=OrderedDict({"1": ["A1"]}),
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="A1",
+    )
+    subject = get_pipette_view(nozzle_layout_by_id={"pipette-id": nozzle_map})
+    assert subject.get_nozzle_layout_type("pipette-id") == NozzleConfigurationType.FULL
+    assert subject.get_is_partially_configured("pipette-id") is False
+    assert subject.get_primary_nozzle("pipette-id") == "A1"

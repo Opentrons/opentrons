@@ -45,7 +45,6 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
-import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
@@ -100,8 +99,6 @@ export function CreateFileWizard(): JSX.Element | null {
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-  const enableDeckModification = useSelector(getEnableDeckModification)
-
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
     WIZARD_STEPS
@@ -209,11 +206,7 @@ export function CreateFileWizard(): JSX.Element | null {
       )
 
       //  add trash
-      if (
-        (enableDeckModification &&
-          values.additionalEquipment.includes('trashBin')) ||
-        !enableDeckModification
-      ) {
+      if (values.additionalEquipment.includes('trashBin')) {
         // defaulting trash to appropriate locations
         dispatch(
           createDeckFixture(
@@ -226,17 +219,14 @@ export function CreateFileWizard(): JSX.Element | null {
       }
 
       // add waste chute
-      if (
-        enableDeckModification &&
-        values.additionalEquipment.includes('wasteChute')
-      ) {
+      if (values.additionalEquipment.includes('wasteChute')) {
         dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
       }
       //  add staging areas
       const stagingAreas = values.additionalEquipment.filter(equipment =>
         equipment.includes('stagingArea')
       )
-      if (enableDeckModification && stagingAreas.length > 0) {
+      if (stagingAreas.length > 0) {
         stagingAreas.forEach(stagingArea => {
           const [, location] = stagingArea.split('_')
           dispatch(createDeckFixture('stagingArea', location))

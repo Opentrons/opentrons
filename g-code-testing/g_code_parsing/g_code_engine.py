@@ -27,6 +27,7 @@ from opentrons.hardware_control.emulation.module_server.helpers import (
 )
 from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
 from opentrons.hardware_control import API, ThreadManager
+from opentrons.hardware_control.types import HardwareFeatureFlags
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
@@ -98,6 +99,7 @@ class GCodeEngine:
             API.build_hardware_controller,
             conf,
             GCodeEngine.URI_TEMPLATE % self._config.smoothie.port,
+            feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
         # Wait for modules to be present
         while len(emulator.attached_modules) != len(modules):

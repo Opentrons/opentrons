@@ -168,20 +168,12 @@
                 }
               },
               "ableToDropTips": {
-                "description": "Whether tips are allowed to be dropped into this area.",
+                "description": "Whether tips are allowed to be dropped into this area. If `true`, the top-center of the `boundingBox` should be a good location for the bottom-center of all the tips when they're dropped.",
                 "type": "boolean"
               },
               "ableToDropLabware": {
-                "description": "Whether labware is allowed to be dropped (different then being placed) into this area.",
+                "description": "Whether labware is allowed to be dropped (different from being placed) into this area. If `true`, the top-center of the `boundingBox` should be a good location for the bottom-center of the labware when it's dropped.",
                 "type": "boolean"
-              },
-              "dropTipsOffset": {
-                "description": "Relative positional offset of where the pipette should drop tips from.",
-                "$ref": "#/definitions/xyzArray"
-              },
-              "dropLabwareOffset": {
-                "description": "Relative positional offset of where the gripper should drop labware from.",
-                "$ref": "#/definitions/xyzArray"
               }
             }
           }
@@ -265,7 +257,8 @@
           "id",
           "mayMountTo",
           "displayName",
-          "providesAddressableAreas"
+          "providesAddressableAreas",
+          "height"
         ],
         "properties": {
           "id": {
@@ -292,6 +285,10 @@
                 "type": "string"
               }
             }
+          },
+          "height": {
+            "description": "The vertical distance (mm) from the cutout fixture's origin to its tallest physical feature that an instrument could collide with.",
+            "type": "number"
           }
         }
       }

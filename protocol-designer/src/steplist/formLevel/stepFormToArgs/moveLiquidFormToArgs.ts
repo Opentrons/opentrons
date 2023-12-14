@@ -77,6 +77,7 @@ export const moveLiquidFormToArgs = (
     dispense_wells: destWellsUnordered,
     dropTip_location: dropTipLocation,
     path,
+    nozzles,
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
@@ -85,8 +86,9 @@ export const moveLiquidFormToArgs = (
     fields.aspirate_wellOrder_second
   )
 
-  const dispenseInWasteChute =
-    'name' in destLabware && destLabware.name === 'wasteChute'
+  const isDispensingIntoDisposalLocation =
+    'name' in destLabware &&
+    (destLabware.name === 'wasteChute' || destLabware.name === 'trashBin')
 
   let def: LabwareDefinition2 | null = null
   let dispWells: string[] = []
@@ -96,7 +98,7 @@ export const moveLiquidFormToArgs = (
     dispWells = destWellsUnordered
   }
   let destWells =
-    !dispenseInWasteChute && def != null
+    !isDispensingIntoDisposalLocation && def != null
       ? getOrderedWells(
           dispWells,
           def,
@@ -106,8 +108,8 @@ export const moveLiquidFormToArgs = (
       : null
 
   // 1:many with single path: spread well array of length 1 to match other well array
-  // distribute 1:many can not happen into the waste chute
-  if (destWells != null && !dispenseInWasteChute) {
+  // distribute 1:many can not happen into the waste chute or trash bin
+  if (destWells != null && !isDispensingIntoDisposalLocation) {
     if (path === 'single' && sourceWells.length !== destWells.length) {
       if (sourceWells.length === 1) {
         sourceWells = Array(destWells.length).fill(sourceWells[0])
@@ -184,7 +186,7 @@ export const moveLiquidFormToArgs = (
     dispenseOffsetFromBottomMm:
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+      fields.dispense_flowRate || pipetteSpec.defaultBlowOutFlowRate.value,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),
@@ -199,6 +201,7 @@ export const moveLiquidFormToArgs = (
     description: hydratedFormData.description,
     name: hydratedFormData.stepName,
     dropTipLocation,
+    nozzles,
   }
   assert(
     sourceWellsUnordered.length > 0,
@@ -212,7 +215,7 @@ export const moveLiquidFormToArgs = (
     'blowout location for multiDispense cannot be destination well'
   )
 
-  if (!dispenseInWasteChute && dispWells.length === 0) {
+  if (!isDispensingIntoDisposalLocation && dispWells.length === 0) {
     console.error('expected to have destWells.length > 0 but got none')
   }
 

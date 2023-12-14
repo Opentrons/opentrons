@@ -45,6 +45,7 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
+import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -116,6 +117,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'dispenseInPlace':
       forDispenseInPlace(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
+    case 'configureNozzleLayout':
+      forConfigureNozzleLayout(
         command.params,
         invariantContext,
         robotStateAndWarnings

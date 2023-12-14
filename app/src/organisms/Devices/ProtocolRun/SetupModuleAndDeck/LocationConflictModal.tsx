@@ -185,7 +185,7 @@ export const LocationConflictModal = (
               />
               <SmallButton
                 onClick={handleUpdateDeck}
-                buttonText={i18n.format(t('confirm_removal'), 'capitalize')}
+                buttonText={i18n.format(t('update_deck'), 'capitalize')}
                 width="100%"
               />
             </Flex>

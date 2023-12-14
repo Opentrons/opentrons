@@ -1,6 +1,8 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 import { i18n } from '../../../../localization'
+import { getPipetteEntities } from '../../../../step-forms/selectors'
 import {
   VolumeField,
   PipetteField,
@@ -8,6 +10,7 @@ import {
   DisposalVolumeField,
   PathField,
 } from '../../fields'
+import { Configure96ChannelField } from '../../fields/Configure96ChannelField'
 import { DropTipField } from '../../fields/DropTipField'
 import styles from '../../StepEditForm.css'
 import { SourceDestFields } from './SourceDestFields'
@@ -19,11 +22,15 @@ import type { StepFormProps } from '../../types'
 
 export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
+  const pipettes = useSelector(getPipetteEntities)
 
   const toggleCollapsed = (): void => _setCollapsed(!collapsed)
 
   const { propsForFields, formData } = props
   const { stepType, path } = formData
+  const is96Channel =
+    propsForFields.pipette.value != null &&
+    pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
 
   return (
     <div className={styles.form_wrapper}>
@@ -34,6 +41,9 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
+        {is96Channel ? (
+          <Configure96ChannelField {...propsForFields.nozzles} />
+        ) : null}
         <VolumeField
           {...propsForFields.volume}
           label={i18n.t('form.step_edit_form.field.volume.label')}

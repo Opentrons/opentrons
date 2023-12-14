@@ -30,6 +30,7 @@ import {
   RoundTab,
   TYPOGRAPHY,
   PrimaryButton,
+  ProtocolDeck,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -38,12 +39,14 @@ import {
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
-import { getGripperDisplayName } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  getSimplestDeckConfigForProtocol,
+} from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
-import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
@@ -54,7 +57,6 @@ import {
   analyzeProtocol,
 } from '../../redux/protocol-storage'
 import { useFeatureFlag } from '../../redux/config'
-import { getSimplestDeckConfigForProtocolCommands } from '../../resources/deck_configuration/utils'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToOT3Slideout } from '../SendProtocolToOT3Slideout'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
@@ -230,8 +232,8 @@ export function ProtocolDetails(
       ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
       : []
 
-  const requiredFixtureDetails = getSimplestDeckConfigForProtocolCommands(
-    mostRecentAnalysis?.commands ?? []
+  const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
+    mostRecentAnalysis
   )
 
   const requiredLabwareDetails =
@@ -322,7 +324,7 @@ export function ProtocolDetails(
     ) : null,
   }
 
-  const deckThumbnail = <DeckThumbnail protocolAnalysis={mostRecentAnalysis} />
+  const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
     missing: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
@@ -330,7 +332,7 @@ export function ProtocolDetails(
     error: <Box size="14rem" backgroundColor={COLORS.medGreyEnabled} />,
     complete: (
       <Box size="14rem" height="auto">
-        {deckThumbnail}
+        {deckMap}
       </Box>
     ),
   }
@@ -362,7 +364,7 @@ export function ProtocolDetails(
             title={t('deck_view')}
             onClose={() => setShowDeckViewModal(false)}
           >
-            {deckThumbnail}
+            {deckMap}
           </LegacyModal>
         ) : null}
       </Portal>
@@ -527,6 +529,7 @@ export function ProtocolDetails(
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
+            marginBottom={SPACING.spacing16}
           >
             <Flex
               flex={`0 0 ${String(SIZE_5)}`}
