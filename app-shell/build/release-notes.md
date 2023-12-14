@@ -17,6 +17,10 @@ Welcome to the v7.1.0 release of the Opentrons App! This release includes new de
 - Run protocols that use the Flex 96-Channel Pipette, including partial tip pickup.
 - Choose where to dispense liquid and drop tips held by a pipette when a protocol is canceled.
 
+### Improved features
+
+- Labware Position Check on Flex uses the pipette calibration probe, instead of a tip, for greater accuracy.
+
 ### Bug Fixes
 
 - Labware Position Check no longer tries to check the same labware in the same position twice, which was leading to errors.
