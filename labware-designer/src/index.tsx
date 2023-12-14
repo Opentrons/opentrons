@@ -1,35 +1,18 @@
 import * as sharedData from '@opentrons/shared-data'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { AppContainer } from 'react-hot-loader'
+import ReactDOM from 'react-dom/client'
 import { App } from './App'
 
-// TODO
 window.sharedData = sharedData
 console.log('Functions are available under global "sharedData":', sharedData)
 
-const $root = document.getElementById('root')
+const container = document.getElementById('root')
 
-if (!$root) {
-  throw new Error('fatal: #root not found')
+if (!container) {
+  throw new Error('fatal: #root element not found')
 }
 
-ReactDOM.render(
-  <AppContainer>
-    <App />
-  </AppContainer>,
-  $root
-)
+const root = ReactDOM.createRoot(container)
 
-// Hot Module Replacement API
-if (module.hot) {
-  module.hot.accept('./App', () => {
-    ReactDOM.render(
-      <AppContainer>
-        <App />
-      </AppContainer>,
-      $root
-    )
-  })
-}
+root.render(<App />)

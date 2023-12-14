@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { deleteMaintenanceRun } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { MAINTENANCE_RUN_ID } from '../__fixtures__'
@@ -20,11 +20,13 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useDeleteMaintenanceRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -40,20 +42,15 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
       .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
-      () => useDeleteMaintenanceRunMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID)
     await waitFor(() => {
-      console.log(result.current.status)
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
-    expect(result.current.data).toBeUndefined()
   })
 
   it('should delete a maintenance run when calling the deleteMaintenanceRun callback with basic run args', async () => {
@@ -62,16 +59,13 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
       .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID)
       .mockResolvedValue({ data: { data: null } } as Response<EmptyResponse>)
 
-    const { result, waitFor } = renderHook(
-      () => useDeleteMaintenanceRunMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
+      wrapper,
+    })
     act(() => result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID))
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual({ data: null })
+    await waitFor(() => {
+      expect(result.current.data).toEqual({ data: null })
+    })
   })
 })

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -344,29 +345,27 @@ describe('ProtocolSetup', () => {
   })
 
   it('should render text, image, and buttons', () => {
-    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
-    getByText('Prepare to run')
-    getByText('Instruments')
-    getByText('Modules & deck')
-    getByText('Labware')
-    getByText('Labware Position Check')
-    getByText('Liquids')
+    render(`/runs/${RUN_ID}/setup/`)
+    screen.getByText('Prepare to run')
+    screen.getByText('Instruments')
+    screen.getByText('Modules & deck')
+    screen.getByText('Labware')
+    screen.getByText('Labware Position Check')
+    screen.getByText('Liquids')
   })
 
   it('should play protocol when click play button', () => {
-    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
+    render(`/runs/${RUN_ID}/setup/`)
     expect(mockPlay).toBeCalledTimes(0)
-    getByRole('button', { name: 'play' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(mockPlay).toBeCalledTimes(1)
   })
 
   it('should launch cancel modal when click close button', () => {
-    const [{ getByRole, getByText, queryByText }] = render(
-      `/runs/${RUN_ID}/setup/`
-    )
-    expect(queryByText('Mock ConfirmCancelRunModal')).toBeNull()
-    getByRole('button', { name: 'close' }).click()
-    getByText('Mock ConfirmCancelRunModal')
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(screen.queryByText('Mock ConfirmCancelRunModal')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'close' }))
+    screen.getByText('Mock ConfirmCancelRunModal')
   })
 
   it('should launch protocol setup modules screen when click modules', () => {
@@ -379,10 +378,10 @@ describe('ProtocolSetup', () => {
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith([], mockProtocolModuleInfo)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(queryByText('Mock ProtocolSetupModulesAndDeck')).toBeNull()
-    queryByText('Modules & deck')?.click()
-    getByText('Mock ProtocolSetupModulesAndDeck')
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(screen.queryByText('Mock ProtocolSetupModulesAndDeck')).toBeNull()
+    fireEvent.click(screen.getByText('Modules & deck'))
+    screen.getByText('Mock ProtocolSetupModulesAndDeck')
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
@@ -398,35 +397,35 @@ describe('ProtocolSetup', () => {
     when(mockGetUnmatchedModulesForProtocol)
       .calledWith([], mockProtocolModuleInfo)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
-    getByText('1 initial liquid')
-    getByText('Liquids').click()
-    getByText('Mock ProtocolSetupLiquids')
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(screen.queryByText('Mock ProtocolSetupLiquids')).toBeNull()
+    screen.getByText('1 initial liquid')
+    fireEvent.click(screen.getByText('Liquids'))
+    screen.getByText('Mock ProtocolSetupLiquids')
   })
 
   it('should launch LPC when clicked', () => {
     mockUseLPCDisabledReason.mockReturnValue(null)
-    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
-    getByText(/Recommended/)
-    getByText(/1 offset applied/)
-    getByText('Labware Position Check').click()
+    render(`/runs/${RUN_ID}/setup/`)
+    screen.getByText(/Recommended/)
+    screen.getByText(/1 offset applied/)
+    fireEvent.click(screen.getByText('Labware Position Check'))
     expect(mockLaunchLPC).toHaveBeenCalled()
-    getByText('mock LPC Wizard')
+    screen.getByText('mock LPC Wizard')
   })
 
   it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
-    getByRole('button', { name: 'play' }).click()
-    getByText('mock ConfirmAttachedModal')
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
+    screen.getByText('mock ConfirmAttachedModal')
   })
   it('should render a loading skeleton while awaiting a response from the server', () => {
     mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
       data: null,
     } as any)
-    const [{ getAllByTestId }] = render(`/runs/${RUN_ID}/setup/`)
-    expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+    render(`/runs/${RUN_ID}/setup/`)
+    expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
   })
 
   it('should render toast and make a button disabled when a robot door is open', () => {
@@ -437,8 +436,8 @@ describe('ProtocolSetup', () => {
       },
     }
     mockUseDoorQuery.mockReturnValue({ data: mockOpenDoorStatus } as any)
-    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
-    getByRole('button', { name: 'play' }).click()
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
       'Close the robot door before starting the run.'
     )

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -261,89 +261,89 @@ describe('ModuleCard', () => {
   })
 
   it('renders information for a magnetic module with mocked status', () => {
-    const { getByText, getByAltText } = render(props)
-    getByText('Magnetic Module GEN1')
-    getByText('Mock Magnetic Module Data')
-    getByText('usb-1')
-    getByAltText('magneticModuleV1')
+    render(props)
+    screen.getByText('Magnetic Module GEN1')
+    screen.getByText('Mock Magnetic Module Data')
+    screen.getByText('usb-1')
+    screen.getByAltText('magneticModuleV1')
   })
   it('renders information for a temperature module with mocked status', () => {
     mockTemperatureModuleData.mockReturnValue(
       <div>Mock Temperature Module Data</div>
     )
 
-    const { getByText, getByAltText } = render({
+    render({
       ...props,
       module: mockTemperatureModuleGen2,
     })
-    getByText('Temperature Module GEN2')
-    getByText('Mock Temperature Module Data')
-    getByText('usb-1')
-    getByAltText('temperatureModuleV2')
+    screen.getByText('Temperature Module GEN2')
+    screen.getByText('Mock Temperature Module Data')
+    screen.getByText('usb-1')
+    screen.getByAltText('temperatureModuleV2')
   })
 
   it('renders information for a thermocycler module with mocked status', () => {
-    const { getByText, getByAltText } = render({
+    render({
       ...props,
       module: mockThermocycler,
     })
 
-    getByText('Thermocycler Module GEN1')
-    getByText('Mock Thermocycler Module Data')
-    getByText('usb-1')
-    getByAltText('thermocyclerModuleV1')
+    screen.getByText('Thermocycler Module GEN1')
+    screen.getByText('Mock Thermocycler Module Data')
+    screen.getByText('usb-1')
+    screen.getByAltText('thermocyclerModuleV1')
   })
 
   it('renders information for a heater shaker module with mocked status', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
-    const { getByText, getByAltText } = render({
+    render({
       ...props,
       module: mockHeaterShaker,
     })
 
-    getByText('Heater-Shaker Module GEN1')
-    getByText('Mock Heater Shaker Module Data')
-    getByText('usb-1')
-    getByAltText('heaterShakerModuleV1')
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Mock Heater Shaker Module Data')
+    screen.getByText('usb-1')
+    screen.getByAltText('heaterShakerModuleV1')
   })
 
   it('renders kebab icon, opens and closes overflow menu on click', () => {
-    const { getByRole, getByText, queryByText } = render({
+    render({
       ...props,
       module: mockMagneticModule,
     })
-    const overflowButton = getByRole('button', {
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    getByText('Magnetic Module GEN1')
+    screen.getByText('Magnetic Module GEN1')
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
-    const overflowMenu = getByText('mock module overflow menu')
-    overflowMenu.click()
-    expect(queryByText('mock module overflow menu')).toBeNull()
+    const overflowMenu = screen.getByText('mock module overflow menu')
+    fireEvent.click(overflowMenu)
+    expect(screen.queryByText('mock module overflow menu')).toBeNull()
   })
 
   it('renders kebab icon and it is disabled when run is in progress', () => {
     when(mockUseCurrentRunStatus)
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_RUNNING)
-    const { getByRole, getByText } = render({
+    render({
       ...props,
       module: mockMagneticModule,
     })
-    const overflowButton = getByRole('button', {
+    const overflowButton = screen.getByRole('button', {
       name: /overflow/i,
     })
-    getByText('Magnetic Module GEN1')
+    screen.getByText('Magnetic Module GEN1')
     expect(overflowButton).toBeDisabled()
   })
 
   it('renders information for a heater shaker module when it is hot, showing the too hot banner', () => {
-    const { getByText } = render({
+    render({
       ...props,
       module: mockHotHeaterShaker,
     })
-    getByText(nestedTextMatcher('Module is hot to the touch'))
+    screen.getByText(nestedTextMatcher('Module is hot to the touch'))
   })
   it('renders information success toast when update has completed', () => {
     mockGetRequestById.mockReturnValue({
@@ -362,19 +362,19 @@ describe('ModuleCard', () => {
     expect(mockMakeToast).toBeCalled()
   })
   it('renders information when calibration is required so calibration update banner renders', () => {
-    const { getByText } = render({
+    render({
       ...props,
       module: mockMagneticModuleHub,
     })
-    getByText('Module calibration required.')
+    screen.getByText('Module calibration required.')
   })
   it('renders information when a firmware update is available so firmware update banner renders', () => {
-    const { getByText } = render({
+    render({
       ...props,
       module: mockHotThermo,
     })
-    getByText('Firmware update available.')
-    const button = getByText('Update now')
+    screen.getByText('Firmware update available.')
+    const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(mockGetRequestById).toHaveBeenCalled()
   })
@@ -389,56 +389,56 @@ describe('ModuleCard', () => {
       },
       error: { message: 'ruh roh' },
     })
-    const { getByText } = render({
+    render({
       ...props,
       module: mockHotThermo,
     })
-    getByText('Firmware update available.')
-    const button = getByText('Update now')
+    screen.getByText('Firmware update available.')
+    const button = screen.getByText('Update now')
     fireEvent.click(button)
     expect(mockGetRequestById).toHaveBeenCalled()
-    expect(getByText('mock firmware update failed modal')).toBeVisible()
+    expect(screen.getByText('mock firmware update failed modal')).toBeVisible()
   })
   it('renders information for update available and updating now text shows up when update is in progress', () => {
     mockGetRequestById.mockReturnValue({
       status: RobotApi.PENDING,
     })
-    const { getByText, getByLabelText } = render({
+    render({
       ...props,
       module: mockMagneticModuleHub,
     })
-    expect(getByText('Updating firmware...')).toBeVisible()
-    expect(getByLabelText('ot-spinner')).toBeVisible()
+    expect(screen.getByText('Updating firmware...')).toBeVisible()
+    expect(screen.getByLabelText('ot-spinner')).toBeVisible()
   })
 
   it('renders information for a thermocycler module gen 2 when it is hot, showing the too hot banner', () => {
-    const { getByText, getByAltText } = render({
+    render({
       ...props,
       module: mockHotThermoGen2,
     })
-    getByText(nestedTextMatcher('Module is hot to the touch'))
-    getByAltText('thermocyclerModuleV2')
+    screen.getByText(nestedTextMatcher('Module is hot to the touch'))
+    screen.getByAltText('thermocyclerModuleV2')
   })
 
   it('renders information for a thermocycler module gen 1 when it is hot, showing the too hot banner', () => {
-    const { getByText, getByAltText } = render({
+    render({
       ...props,
       module: mockHotThermo,
     })
-    getByText(nestedTextMatcher('Module is hot to the touch'))
-    getByAltText('thermocyclerModuleV1')
+    screen.getByText(nestedTextMatcher('Module is hot to the touch'))
+    screen.getByAltText('thermocyclerModuleV1')
   })
 
   it('renders information for a heater shaker module with an error', () => {
     mockErrorInfo.mockReturnValue(<div>mock heater shaker error</div>)
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
-    const { getByText } = render({
+    render({
       ...props,
       module: mockHeaterShaker,
     })
 
-    getByText('Heater-Shaker Module GEN1')
-    getByText('Mock Heater Shaker Module Data')
-    getByText('mock heater shaker error')
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Mock Heater Shaker Module Data')
+    screen.getByText('mock heater shaker error')
   })
 })

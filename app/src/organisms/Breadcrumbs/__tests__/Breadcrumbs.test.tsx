@@ -3,6 +3,7 @@ import { MemoryRouter, Route, Switch } from 'react-router-dom'
 import { when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { i18n } from '../../../i18n'
 import {
@@ -90,43 +91,33 @@ describe('Breadcrumbs', () => {
       .mockReturnValue(PROTOCOL_NAME)
   })
   it('renders an array of device breadcrumbs', () => {
-    const [{ getByText }] = render(
-      `/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`
-    )
-
-    getByText('Devices')
-    getByText('otie')
-    getByText(CREATED_AT)
+    render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)
+    screen.getByText('Devices')
+    screen.getByText('otie')
+    screen.getByText(CREATED_AT)
   })
 
   it('renders an array of protocol breadcrumbs', () => {
-    const [{ getByText }] = render(`/protocols/${PROTOCOL_KEY}`)
-
-    getByText('Protocols')
-    getByText(PROTOCOL_NAME)
+    render(`/protocols/${PROTOCOL_KEY}`)
+    screen.getByText('Protocols')
+    screen.getByText(PROTOCOL_NAME)
   })
 
   it('does not render devices breadcrumb when in on device mode', () => {
     when(mockGetIsOnDevice)
       .calledWith({} as State)
       .mockReturnValue(true)
-    const [{ getByText, queryByText }] = render(
-      `/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`
-    )
-
-    expect(queryByText('Devices')).toBeNull()
-    getByText('otie')
-    getByText(CREATED_AT)
+    render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)
+    expect(screen.queryByText('Devices')).toBeNull()
+    screen.getByText('otie')
+    screen.getByText(CREATED_AT)
   })
 
   it('goes to the correct path when an inactive breadcrumb is clicked', () => {
-    const [{ getByText }] = render(
-      `/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`
-    )
-
-    getByText('protocol run details path matched')
-    const otieBreadcrumb = getByText('otie')
-    otieBreadcrumb.click()
-    getByText('device details path matched')
+    render(`/devices/${ROBOT_NAME}/protocol-runs/${RUN_ID}`)
+    screen.getByText('protocol run details path matched')
+    const otieBreadcrumb = screen.getByText('otie')
+    fireEvent.click(otieBreadcrumb)
+    screen.getByText('device details path matched')
   })
 })

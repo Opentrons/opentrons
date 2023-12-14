@@ -1,9 +1,12 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { resetAllWhenMocks, when } from 'jest-when'
+import {
+  partialComponentPropsMatcher,
+  renderWithProviders,
+} from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
@@ -50,11 +53,11 @@ const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as j
 const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
   typeof getValidCustomLabwareFiles
 >
-const mockChooseRobotToRunProtocolSlideout = ChooseRobotToRunProtocolSlideout as jest.MockedFunction<
-  typeof ChooseRobotToRunProtocolSlideout
->
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+const mockChooseRobotToRunProtocolSlideout = ChooseRobotToRunProtocolSlideout as jest.MockedFunction<
+  typeof ChooseRobotToRunProtocolSlideout
 >
 
 const render = (
@@ -88,10 +91,13 @@ describe('ProtocolDetails', () => {
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     mockGetScanning.mockReturnValue(false)
-    mockChooseRobotToRunProtocolSlideout.mockImplementation(
-      ({ showSlideout }) =>
-        showSlideout ? <div>mock Choose Robot Slideout</div> : null
-    )
+
+    when(mockChooseRobotToRunProtocolSlideout)
+      .calledWith(partialComponentPropsMatcher({ showSlideout: true }))
+      .mockReturnValue(<div>open Slideout</div>)
+    when(mockChooseRobotToRunProtocolSlideout)
+      .calledWith(partialComponentPropsMatcher({ showSlideout: false }))
+      .mockReturnValue(<div>close Slideout</div>)
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
   })
@@ -138,7 +144,7 @@ describe('ProtocolDetails', () => {
     expect(getByText('fakeSrcFileName')).toBeInTheDocument()
   })
   it('renders deck view section', () => {
-    const { getByRole } = render({
+    const { getByRole, getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -153,9 +159,10 @@ describe('ProtocolDetails', () => {
       },
     })
     expect(getByRole('heading', { name: 'Deck View' })).toBeInTheDocument()
+    getByText('close Slideout')
   })
-  it('opens choose robot slideout when Start setup button is clicked', () => {
-    const { getByRole, getByText, queryByText } = render({
+  it('opens choose robot slideout when Start setup button is clicked', async () => {
+    const { getByRole, getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -170,13 +177,14 @@ describe('ProtocolDetails', () => {
       },
     })
     const runProtocolButton = getByRole('button', { name: 'Start setup' })
-    expect(queryByText('mock Choose Robot Slideout')).toBeNull()
-    fireEvent.click(runProtocolButton)
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'ProtocolsDetail' },
+    runProtocolButton.click()
+    await waitFor(() => {
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+        properties: { sourceLocation: 'ProtocolsDetail' },
+      })
     })
-    expect(getByText('mock Choose Robot Slideout')).toBeVisible()
+    getByText('open Slideout')
   })
   it('renders the protocol creation method', () => {
     const { getByRole, getByText } = render({

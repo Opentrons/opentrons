@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs, PipetteModelSpecs } from '@opentrons/shared-data'
 import { useAttachedPipettes } from '../useAttachedPipettes'
@@ -22,7 +22,7 @@ const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
 >
 
 describe('useAttachedPipettes hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     mockGetPipetteModelSpecs.mockReturnValue({
       name: 'mockName',

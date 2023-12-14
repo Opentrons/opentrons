@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getSessions } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useSessionsByTypeQuery } from '..'
@@ -23,11 +23,13 @@ const SESSIONS_RESPONSE = {
 } as Sessions
 
 describe('useSessionsByTypeQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -74,13 +76,13 @@ describe('useSessionsByTypeQuery hook', () => {
       .calledWith(HOST_CONFIG, { session_type: 'tipLengthCalibration' })
       .mockResolvedValue({ data: tipLengthCalSessions } as Response<Sessions>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useSessionsByTypeQuery({ sessionType: 'tipLengthCalibration' }),
       { wrapper }
     )
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(tipLengthCalSessions)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(tipLengthCalSessions)
+    })
   })
 })

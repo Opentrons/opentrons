@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
+import { fireEvent, renderHook } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { Numpad } from '..'
 
@@ -9,16 +8,12 @@ const render = (props: React.ComponentProps<typeof Numpad>) => {
 }
 
 describe('Numpad', () => {
-  let props: React.ComponentProps<typeof Numpad>
-
-  beforeEach(() => {
+  it('should render the numpad keys', () => {
     const { result } = renderHook(() => React.useRef(null))
-    props = {
+    const props = {
       onChange: jest.fn(),
       keyboardRef: result.current,
     }
-  })
-  it('should render the numpad keys', () => {
     const { getAllByRole } = render(props)
     const buttons = getAllByRole('button')
     const expectedButtonNames = [
@@ -43,6 +38,11 @@ describe('Numpad', () => {
   })
 
   it('should call mock function when clicking num key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: jest.fn(),
+      keyboardRef: result.current,
+    }
     const { getByRole } = render(props)
     const numKey = getByRole('button', { name: '1' })
     fireEvent.click(numKey)

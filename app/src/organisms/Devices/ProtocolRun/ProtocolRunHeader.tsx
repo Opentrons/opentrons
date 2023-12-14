@@ -25,7 +25,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   getPipetteModelSpecs,
-  HEATERSHAKER_MODULE_TYPE,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -635,15 +634,14 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const activeHeaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module.moduleType === 'heaterShakerModuleType' &&
       module?.data != null &&
       module.data.speedStatus !== 'idle'
   )
   const isHeaterShakerShaking = attachedModules
-    .filter(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    )
+    .filter((module): module is HeaterShakerModule => {
+      return module.moduleType === 'heaterShakerModuleType'
+    })
     .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   let buttonText: string = ''

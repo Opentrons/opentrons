@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import {
@@ -89,18 +90,18 @@ describe('DeviceDetailsDeckConfiguration', () => {
   })
 
   it('should render text and button', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('otie deck configuration')
-    getByRole('button', { name: 'Setup Instructions' })
-    getByText('Location')
-    getByText('Fixture')
-    getByText('mock DeckConfigurator')
+    render(props)
+    screen.getByText('otie deck configuration')
+    screen.getByRole('button', { name: 'Setup Instructions' })
+    screen.getByText('Location')
+    screen.getByText('Fixture')
+    screen.getByText('mock DeckConfigurator')
   })
 
   it('should render DeckFixtureSetupInstructionsModal when clicking text button', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByRole('button', { name: 'Setup Instructions' }).click()
-    getByText('mock DeckFixtureSetupInstructionsModal')
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Setup Instructions' }))
+    screen.getByText('mock DeckFixtureSetupInstructionsModal')
   })
 
   it('should render banner and make deck configurator disabled when running', () => {
@@ -109,9 +110,11 @@ describe('DeviceDetailsDeckConfiguration', () => {
     when(mockDeckConfigurator)
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
       .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
-    const [{ getByText }] = render(props)
-    getByText('Deck configuration is not available when run is in progress')
-    getByText('disabled mock DeckConfigurator')
+    render(props)
+    screen.getByText(
+      'Deck configuration is not available when run is in progress'
+    )
+    screen.getByText('disabled mock DeckConfigurator')
   })
 
   it('should render banner and make deck configurator disabled when a maintenance run exists', () => {
@@ -121,16 +124,18 @@ describe('DeviceDetailsDeckConfiguration', () => {
     when(mockDeckConfigurator)
       .calledWith(partialComponentPropsMatcher({ readOnly: true }))
       .mockReturnValue(<div>disabled mock DeckConfigurator</div>)
-    const [{ getByText }] = render(props)
-    getByText('Deck configuration is not available when the robot is busy')
-    getByText('disabled mock DeckConfigurator')
+    render(props)
+    screen.getByText(
+      'Deck configuration is not available when the robot is busy'
+    )
+    screen.getByText('disabled mock DeckConfigurator')
   })
 
   it('should render no deck fixtures, if deck configs are not set', () => {
     when(mockUseDeckConfigurationQuery)
       .calledWith()
       .mockReturnValue([] as any)
-    const [{ getByText }] = render(props)
-    getByText('No deck fixtures')
+    render(props)
+    screen.getByText('No deck fixtures')
   })
 })

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
@@ -142,38 +143,38 @@ describe('ODDProtocolDetails', () => {
   })
 
   it('renders protocol truncated name that expands when clicked', () => {
-    const [{ getByText }] = render()
-    const name = getByText(
+    render()
+    const name = screen.getByText(
       'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment...Amplify Libraries'
     )
-    name.click()
-    getByText(
+    fireEvent.click(name)
+    screen.getByText(
       'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries'
     )
   })
   it('renders the start setup button', () => {
-    const [{ getByText }] = render()
-    getByText('Start setup')
+    render()
+    screen.getByText('Start setup')
   })
   it('renders the protocol author', () => {
-    const [{ getByText }] = render()
-    getByText('engineering testing division')
+    render()
+    screen.getByText('engineering testing division')
   })
   it('renders the protocol description', () => {
-    const [{ getByText }] = render()
-    getByText('A short mock protocol')
+    render()
+    screen.getByText('A short mock protocol')
   })
   it('renders the protocol date added', () => {
-    const [{ getByText }] = render()
-    getByText(
+    render()
+    screen.getByText(
       `Date Added: ${formatTimeWithUtcLabel(
         '2022-05-03T21:36:12.494778+00:00'
       )}`
     )
   })
   it('renders the pin protocol button', () => {
-    const [{ getByText }] = render()
-    getByText('Pin protocol')
+    render()
+    screen.getByText('Pin protocol')
   })
   it('renders the delete protocol button', async () => {
     when(mockGetProtocol)
@@ -181,46 +182,50 @@ describe('ODDProtocolDetails', () => {
       .mockResolvedValue({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
       } as any)
-    const [{ getByText }] = render()
-    const deleteButton = getByText('Delete protocol').closest('button')
-    deleteButton?.click()
-    const confirmDeleteButton = getByText('Delete')
-    confirmDeleteButton.click()
-    // flush promises and then make assertions
-    await new Promise(setImmediate)
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
-    expect(mockDeleteProtocol).toHaveBeenCalledWith(
-      MOCK_HOST_CONFIG,
-      'fakeProtocolId'
+    render()
+    const deleteButton = screen.getByRole('button', { name: 'Delete protocol' })
+    fireEvent.click(deleteButton)
+    const confirmDeleteButton = screen.getByText('Delete')
+    fireEvent.click(confirmDeleteButton)
+    await waitFor(() =>
+      expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
+    )
+    await waitFor(() =>
+      expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+    )
+    await waitFor(() =>
+      expect(mockDeleteProtocol).toHaveBeenCalledWith(
+        MOCK_HOST_CONFIG,
+        'fakeProtocolId'
+      )
     )
   })
   it('renders the navigation buttons', () => {
     mockHardware.mockReturnValue(<div>Mock Hardware</div>)
     mockLabware.mockReturnValue(<div>Mock Labware</div>)
     mockDeck.mockReturnValue(<div>Mock Initial Deck Layout</div>)
-    const [{ getByRole, getByText }] = render()
-    const hardwareButton = getByRole('button', { name: 'Hardware' })
-    hardwareButton.click()
-    getByText('Mock Hardware')
-    const labwareButton = getByRole('button', { name: 'Labware' })
-    labwareButton.click()
-    getByText('Mock Labware')
+    render()
+    const hardwareButton = screen.getByRole('button', { name: 'Hardware' })
+    fireEvent.click(hardwareButton)
+    screen.getByText('Mock Hardware')
+    const labwareButton = screen.getByRole('button', { name: 'Labware' })
+    fireEvent.click(labwareButton)
+    screen.getByText('Mock Labware')
     // Can't test this until liquids section exists
-    getByRole('button', { name: 'Liquids' })
-    const deckButton = getByRole('button', { name: 'Deck' })
-    deckButton.click()
-    getByText('Mock Initial Deck Layout')
-    const summaryButton = getByRole('button', { name: 'Summary' })
-    summaryButton.click()
-    getByText('A short mock protocol')
+    screen.getByRole('button', { name: 'Liquids' })
+    const deckButton = screen.getByRole('button', { name: 'Deck' })
+    fireEvent.click(deckButton)
+    screen.getByText('Mock Initial Deck Layout')
+    const summaryButton = screen.getByRole('button', { name: 'Summary' })
+    fireEvent.click(summaryButton)
+    screen.getByText('A short mock protocol')
   })
   it('should render a loading skeleton while awaiting a response from the server', () => {
     mockUseProtocolQuery.mockReturnValue({
       data: MOCK_DATA,
       isLoading: true,
     } as any)
-    const [{ getAllByTestId }] = render()
-    expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+    render()
+    expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
   })
 })

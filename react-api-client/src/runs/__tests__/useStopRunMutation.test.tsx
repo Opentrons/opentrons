@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createRunAction, RUN_ACTION_TYPE_STOP } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useStopRunMutation } from '..'
@@ -21,12 +21,14 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useStopRunMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   const createStopRunActionData = { actionType: RUN_ACTION_TYPE_STOP }
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -41,16 +43,15 @@ describe('useStopRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createStopRunActionData)
       .mockRejectedValue('oops')
 
-    const { result, waitFor } = renderHook(() => useStopRunMutation(), {
+    const { result } = renderHook(() => useStopRunMutation(), {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
     result.current.stopRun(RUN_ID_1)
     await waitFor(() => {
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
-    expect(result.current.data).toBeUndefined()
   })
 
   it('should create a stop run action when calling the stopRun callback', async () => {
@@ -59,13 +60,13 @@ describe('useStopRunMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, createStopRunActionData)
       .mockResolvedValue({ data: mockStopRunAction } as Response<RunAction>)
 
-    const { result, waitFor } = renderHook(() => useStopRunMutation(), {
+    const { result } = renderHook(() => useStopRunMutation(), {
       wrapper,
     })
     act(() => result.current.stopRun(RUN_ID_1))
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(mockStopRunAction)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockStopRunAction)
+    })
   })
 })

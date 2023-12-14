@@ -1,6 +1,6 @@
 import * as React from 'react'
 import i18n from 'i18next'
-import { waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
 
@@ -50,20 +50,20 @@ describe('TrashModal ', () => {
     mockGetSlotIsEmpty.mockReturnValue(true)
   })
   it('renders buttons, position and slot dropdown', async () => {
-    const { getByRole, getByText } = render(props)
-    getByText('Trash Bin')
-    getByText('Position')
-    getByText('Slot A1')
-    getByText('Slot A3')
-    getByText('Slot B1')
-    getByText('Slot B3')
-    getByText('Slot C1')
-    getByText('Slot C3')
-    getByText('Slot D1')
-    getByText('Slot D3')
-    getByRole('button', { name: 'cancel' }).click()
+    render(props)
+    screen.getByText('Trash Bin')
+    screen.getByText('Position')
+    screen.getByText('Slot A1')
+    screen.getByText('Slot A3')
+    screen.getByText('Slot B1')
+    screen.getByText('Slot B3')
+    screen.getByText('Slot C1')
+    screen.getByText('Slot C3')
+    screen.getByText('Slot D1')
+    screen.getByText('Slot D3')
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'save' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
     await waitFor(() => {
       expect(mockCreateDeckFixture).toHaveBeenCalledWith('trashBin', 'cutoutA3')
     })
@@ -74,29 +74,31 @@ describe('TrashModal ', () => {
       ...props,
       trashBinId: mockId,
     }
-    const { getByRole, getByText } = render(props)
-    getByText('Trash Bin')
-    getByRole('button', { name: 'save' }).click()
+    render(props)
+    screen.getByText('Trash Bin')
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
     await waitFor(() => {
       expect(mockDeleteDeckFixture).toHaveBeenCalledWith(mockId)
+    })
+    await waitFor(() => {
       expect(mockCreateDeckFixture).toHaveBeenCalledWith('trashBin', 'cutoutA3')
     })
   })
   it('renders the button as disabled when the slot is full for trash bin', () => {
     mockGetSlotIsEmpty.mockReturnValue(false)
-    const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'save' })).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button', { name: 'save' })).toBeDisabled()
   })
   it('renders buttons for waste chute', async () => {
     props = {
       ...props,
       trashName: 'wasteChute',
     }
-    const { getByRole, getByText } = render(props)
-    getByText('Waste Chute')
-    getByRole('button', { name: 'cancel' }).click()
+    render(props)
+    screen.getByText('Waste Chute')
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
-    getByRole('button', { name: 'save' }).click()
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
     await waitFor(() => {
       expect(mockCreateDeckFixture).toHaveBeenCalledWith(
         'wasteChute',
@@ -110,7 +112,7 @@ describe('TrashModal ', () => {
       trashName: 'wasteChute',
     }
     mockGetSlotIsEmpty.mockReturnValue(false)
-    const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'save' })).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button', { name: 'save' })).toBeDisabled()
   })
 })

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { LabwareOffsetTabs } from '..'
+import { fireEvent, screen } from '@testing-library/react'
 
 const mockTableComponent = <div>Table Component</div>
 const mockJupyterComponent = <div>Jupyter Component</div>
@@ -22,19 +23,19 @@ const render = () => {
 
 describe('LabwareOffsetTabs', () => {
   it('renders the TableComponent by default', () => {
-    const { getByText } = render()
-    expect(getByText('Table Component')).toBeVisible()
+    render()
+    expect(screen.getByText('Table Component')).toBeVisible()
   })
 
   it('renders the JupyterComponent when Juypter Notebook tab is clicked', () => {
-    const { getByText } = render()
-    getByText('Jupyter Notebook').click()
-    expect(getByText('Jupyter Component')).toBeVisible()
+    render()
+    fireEvent.click(screen.getByText('Jupyter Notebook'))
+    expect(screen.getByText('Jupyter Component')).toBeVisible()
   })
 
   it('renders the CommandLineComponent when Command Line Interface tab is clicked', () => {
-    const { getByText } = render()
-    getByText('Command Line Interface (SSH)').click()
-    expect(getByText('CLI Component')).toBeVisible()
+    render()
+    fireEvent.click(screen.getByText('Command Line Interface (SSH)'))
+    expect(screen.getByText('CLI Component')).toBeVisible()
   })
 })

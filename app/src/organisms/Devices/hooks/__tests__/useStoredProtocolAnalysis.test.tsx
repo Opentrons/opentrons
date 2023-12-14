@@ -3,7 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider, UseQueryResult } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import {
   parseRequiredModulesEntity,
@@ -64,7 +64,7 @@ const PROTOCOL_ID = 'the_protocol_id'
 const PROTOCOL_KEY = 'the_protocol_key'
 
 describe('useStoredProtocolAnalysis hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
