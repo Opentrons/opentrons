@@ -135,12 +135,14 @@ describe('generateRobotStateTimeline', () => {
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
         Array [
           "pickUpTip",
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
         Array [
           "pickUpTip",
@@ -149,12 +151,14 @@ describe('generateRobotStateTimeline', () => {
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
       ]
     `)
