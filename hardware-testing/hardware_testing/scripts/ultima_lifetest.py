@@ -47,6 +47,10 @@ RESERVOIR_SLOT = 5
 
 OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 
+TEMP_DECK_LABWARE = "nest_12_reservoir_15ml"
+TEMP_DECK_SLOT = 1
+OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-15)
+
 NUM_PRESSURE_READINGS = 10
 SECONDS_BETWEEN_READINGS = 0.25
 
@@ -90,6 +94,15 @@ def get_reservoir_nominal() -> Point:
     )
     # center the 96ch of the 1-well labware
     reservoir_a1_nominal += OFFSET_FOR_1_WELL_LABWARE
+    return reservoir_a1_nominal
+
+def get_temp_reservoir_nominal() -> Point:
+    """Get nominal reservoir position."""
+    reservoir_a1_nominal = helpers_ot3.get_theoretical_a1_position(
+        TEMP_DECK_SLOT, TEMP_DECK_LABWARE
+    )
+    # center the 96ch of the 1-well labware
+    reservoir_a1_nominal += OFFSET_FOR_TEMP_DECK
     return reservoir_a1_nominal
 
 
@@ -204,6 +217,10 @@ async def _main(is_simulating: bool, trials: int, flow: float,
     report = _build_csv_report(flow=flow, trials=trial_list)
     dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
     helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+    sn = helpers_ot3.get_pipette_serial_ot3(api.hardware_pipettes[OT3Mount.LEFT.to_mount()])
+    print(f"Serial Left: {sn}")
+    sn = helpers_ot3.get_pipette_serial_ot3(api.hardware_pipettes[OT3Mount.RIGHT.to_mount()])
+    print(f"Serial Right: {sn}")
 
     # Pick up tips
     tip_len = helpers_ot3.get_default_tip_length(TIP_VOLUME)
@@ -220,11 +237,7 @@ async def _main(is_simulating: bool, trials: int, flow: float,
     # Move to reservoir
     await api.home([Axis.Z_L, Axis.Z_R])
     z_home = await api.gantry_position(OT3Mount.LEFT)
-    reservoir_a1_nominal = get_reservoir_nominal()
-    reservoir_a1_home = reservoir_a1_nominal._replace(z=z_home.z)
-    await helpers_ot3.move_to_arched_ot3(
-        api, OT3Mount.LEFT, reservoir_a1_home
-    )
+
 
     mounts = [OT3Mount.LEFT, OT3Mount.RIGHT]
     pip_top = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[0],
@@ -238,10 +251,18 @@ async def _main(is_simulating: bool, trials: int, flow: float,
 
     # Liquid probe
     if liquid_probe:
+        reservoir_a1_nominal = get_reservoir_nominal()
+        reservoir_a1_home = reservoir_a1_nominal._replace(z=z_home.z)
+        await helpers_ot3.move_to_arched_ot3(
+            api, OT3Mount.LEFT, reservoir_a1_home
+        )
+
         for m in mounts:
             for _probe in InstrumentProbeType:
                 sensor_id = sensor_id_for_instrument(_probe)
                 print(f"Mount: {m}")
+                sn = helpers_ot3.get_pipette_serial_ot3(api.hardware_pipettes[m.to_mount()])
+                print(f"Serial: {sn}")
                 print(f"Sensor: {_probe}")
                 open_pa = 0.0
                 try:
@@ -258,53 +279,50 @@ async def _main(is_simulating: bool, trials: int, flow: float,
         probe_settings.starting_mount_height = (reservoir_a1_nominal + Point(z=8)).z
         print(probe_settings)
 
-        input("sense liquid left primary...")
-        sensed_z = round(
-            await api.liquid_probe(OT3Mount.LEFT, probe_settings, InstrumentProbeType.PRIMARY), 3
-        )
-        print(f"SENSED LIQUID Z: {sensed_z}")
+        select = input("Primary (p) or Secondary (s): p/s")
+        if select == 'p':
+            print("sense liquid left primary...")
+            sensed_z = round(
+                await api.liquid_probe(OT3Mount.LEFT, probe_settings, InstrumentProbeType.PRIMARY), 3
+            )
+            print(f"SENSED LIQUID Z: {sensed_z}")
 
-        await api.blow_out(OT3Mount.LEFT)
-        input("sense liquid left secondary...")
-        sensed_z = round(
-            await api.liquid_probe(OT3Mount.LEFT, probe_settings, InstrumentProbeType.SECONDARY), 3
-        )
-        print(f"SENSED LIQUID Z: {sensed_z}")
+            print("sense liquid right primary...")
+            sensed_z = round(
+                await api.liquid_probe(OT3Mount.RIGHT, probe_settings, InstrumentProbeType.PRIMARY), 3
+            )
+            print(f"SENSED LIQUID Z: {sensed_z}")
+        else:
+            print("sense liquid left secondary...")
+            sensed_z = round(
+                await api.liquid_probe(OT3Mount.LEFT, probe_settings, InstrumentProbeType.SECONDARY), 3
+            )
+            print(f"SENSED LIQUID Z: {sensed_z}")
 
-        input("sense liquid right primary...")
-        sensed_z = round(
-            await api.liquid_probe(OT3Mount.RIGHT, probe_settings, InstrumentProbeType.PRIMARY), 3
-        )
-        print(f"SENSED LIQUID Z: {sensed_z}")
-
-        await api.blow_out(OT3Mount.RIGHT)
-        input("sense liquid right secondary...")
-        sensed_z = round(
-            await api.liquid_probe(OT3Mount.RIGHT, probe_settings, InstrumentProbeType.SECONDARY), 3
-        )
-        print(f"SENSED LIQUID Z: {sensed_z}")
+            print("sense liquid right secondary...")
+            sensed_z = round(
+                await api.liquid_probe(OT3Mount.RIGHT, probe_settings, InstrumentProbeType.SECONDARY), 3
+            )
+            print(f"SENSED LIQUID Z: {sensed_z}")
 
         await helpers_ot3.move_to_arched_ot3(
             api, OT3Mount.LEFT, reservoir_a1_home
         )
 
-    # Descend into reservoir
+    # Descend into temp deck reservoir
+    temp_reservoir_a1_nominal = get_temp_reservoir_nominal()
+    temp_reservoir_a1_nominal_home = temp_reservoir_a1_nominal + Point(z=30)
+    await helpers_ot3.move_to_arched_ot3(
+        api, OT3Mount.LEFT, temp_reservoir_a1_nominal_home
+    )
+
     input("Descend?")
-    mounts = [OT3Mount.LEFT, OT3Mount.RIGHT]
-    pip_top = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[0],
-               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[0]]
-    pip_bot = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[1],
-               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[1]]
-    pip_blow = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[2],
-               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[2]]
-    pip_drop = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[3],
-               helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[3]]
 
     await api.home([Axis.P_L, Axis.P_R])
     await move_twin_plunger_absolute_ot3(api, pip_bot)
 
     await helpers_ot3.move_to_arched_ot3(
-        api, OT3Mount.LEFT, reservoir_a1_nominal
+        api, OT3Mount.LEFT, temp_reservoir_a1_nominal
     )
 
     gantry_z = await api.gantry_position(OT3Mount.LEFT)
