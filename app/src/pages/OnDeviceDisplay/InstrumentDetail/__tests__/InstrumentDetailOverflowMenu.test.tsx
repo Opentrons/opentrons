@@ -1,6 +1,6 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, queryAllByText } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -157,12 +157,12 @@ describe('UpdateBuildroot', () => {
   })
 
   it('renders the drop tip wizard  when Drop tips is clicked', () => {
-    const [{ getByTestId, getByText }] = render(MOCK_PIPETTE)
+    const [{ getByTestId, getByText, getAllByText }] = render(MOCK_PIPETTE)
     const btn = getByTestId('testButton')
     fireEvent.click(btn)
     fireEvent.click(getByText('Drop tips'))
 
-    getByText('Before you begin, do you need to preserve aspirated liquid?')
+    expect(getAllByText('Drop tips')).toHaveLength(2)
   })
 
   it('renders the gripper calibration wizard when recalibrate is clicked', () => {
