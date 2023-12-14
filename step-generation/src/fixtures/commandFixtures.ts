@@ -308,6 +308,13 @@ export const dropTipHelper = (pipette?: string): CreateCommand[] => [
       alternateDropLocation: true,
     },
   },
+  {
+    commandType: 'dropTipInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+    },
+  },
 ]
 export const dropTipIntoWasteChuteHelper = (
   pipette?: string
