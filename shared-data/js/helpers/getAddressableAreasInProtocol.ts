@@ -75,6 +75,14 @@ export function getAddressableAreasInProtocol(
           ...acc,
           command.params.addressableAreaName as AddressableAreaName,
         ]
+      } else if (
+        command.commandType === 'moveToAddressableAreaForDropTip' &&
+        !acc.includes(command.params.addressableAreaName as AddressableAreaName)
+      ) {
+        return [
+          ...acc,
+          command.params.addressableAreaName as AddressableAreaName,
+        ]
       } else {
         return acc
       }
