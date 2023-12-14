@@ -12,6 +12,7 @@ import {
   useDoorQuery,
   useModulesQuery,
   useDeckConfigurationQuery,
+  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
@@ -33,7 +34,6 @@ import {
   useRobotType,
 } from '../../../../organisms/Devices/hooks'
 import { getLocalRobot } from '../../../../redux/discovery'
-import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModulesAndDeck } from '../../../../organisms/ProtocolSetupModulesAndDeck'
@@ -117,9 +117,6 @@ const mockUseRunControls = useRunControls as jest.MockedFunction<
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
 const mockProtocolSetupLiquids = ProtocolSetupLiquids as jest.MockedFunction<
   typeof ProtocolSetupLiquids
 >
@@ -153,6 +150,9 @@ const mockUseDoorQuery = useDoorQuery as jest.MockedFunction<
 >
 const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
   typeof useModulesQuery
+>
+const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
+  typeof useProtocolAnalysisAsDocumentQuery
 >
 const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
   typeof useDeckConfigurationQuery
@@ -273,9 +273,9 @@ describe('ProtocolSetup', () => {
         isResetRunLoading: false,
       })
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
-    when(mockUseMostRecentCompletedAnalysis)
-      .calledWith(RUN_ID)
-      .mockReturnValue(mockEmptyAnalysis)
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: mockEmptyAnalysis,
+    } as any)
     when(mockUseRunCreatedAtTimestamp)
       .calledWith(RUN_ID)
       .mockReturnValue(CREATED_AT)
@@ -370,9 +370,9 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch protocol setup modules screen when click modules', () => {
-    when(mockUseMostRecentCompletedAnalysis)
-      .calledWith(RUN_ID)
-      .mockReturnValue(mockRobotSideAnalysis)
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: mockRobotSideAnalysis,
+    } as any)
     when(mockGetProtocolModulesInfo)
       .calledWith(mockRobotSideAnalysis, ot3StandardDeckDef as any)
       .mockReturnValue(mockProtocolModuleInfo)
@@ -386,9 +386,9 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
-    when(mockUseMostRecentCompletedAnalysis)
-      .calledWith(RUN_ID)
-      .mockReturnValue({ ...mockRobotSideAnalysis, liquids: mockLiquids })
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: { ...mockRobotSideAnalysis, liquids: mockLiquids },
+    } as any)
     when(mockGetProtocolModulesInfo)
       .calledWith(
         { ...mockRobotSideAnalysis, liquids: mockLiquids },
@@ -422,7 +422,9 @@ describe('ProtocolSetup', () => {
     getByText('mock ConfirmAttachedModal')
   })
   it('should render a loading skeleton while awaiting a response from the server', () => {
-    mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
+    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+      data: null,
+    } as any)
     const [{ getAllByTestId }] = render(`/runs/${RUN_ID}/setup/`)
     expect(getAllByTestId('Skeleton').length).toBeGreaterThan(0)
   })
