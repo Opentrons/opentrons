@@ -295,8 +295,6 @@ def _pick_up_tip(
         f"from slot #{location.labware.parent.parent}"
     )
     pipette.pick_up_tip(location)
-    if pipette.channels == 96:
-        get_sync_hw_api(ctx).retract(OT3Mount.LEFT)
     # NOTE: the accuracy-adjust function gets set on the Pipette
     #       each time we pick-up a new tip.
     if cfg.increment:

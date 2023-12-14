@@ -608,8 +608,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
-        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-        resources.ctx._core.get_hardware().retract(mnt)
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         _liquid_height = _get_liquid_height(resources, cfg, well)
