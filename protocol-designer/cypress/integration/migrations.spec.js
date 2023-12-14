@@ -92,7 +92,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
             mimeType: 'application/json',
             encoding: 'utf8',
           })
-          cy.get('[data-test="ComputingSpinner"]').should('exist')
+          cy.get('[data-test="ComputingSpinner"]'),
+            { timeout: 5000 }.should('exist')
           // wait until computation is done before proceeding, with generous timeout
           cy.get('[data-test="ComputingSpinner"]', { timeout: 30000 }).should(
             'not.exist'
