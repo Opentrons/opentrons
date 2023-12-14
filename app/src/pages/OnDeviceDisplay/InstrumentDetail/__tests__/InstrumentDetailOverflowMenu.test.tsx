@@ -1,6 +1,6 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
-import { fireEvent, queryAllByText } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
