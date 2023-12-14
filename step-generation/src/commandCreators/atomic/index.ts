@@ -2,6 +2,8 @@ import { aspirate } from './aspirate'
 import { aspirateInPlace } from './aspirateInPlace'
 import { blowout } from './blowout'
 import { blowOutInPlace } from './blowOutInPlace'
+import { configureForVolume } from './configureForVolume'
+import { configureNozzleLayout } from './configureNozzleLayout'
 import { deactivateTemperature } from './deactivateTemperature'
 import { delay } from './delay'
 import { disengageMagnet } from './disengageMagnet'
@@ -23,6 +25,8 @@ export {
   aspirateInPlace,
   blowout,
   blowOutInPlace,
+  configureForVolume,
+  configureNozzleLayout,
   deactivateTemperature,
   delay,
   disengageMagnet,

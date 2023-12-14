@@ -1,5 +1,6 @@
 import {
   HEATERSHAKER_MODULE_TYPE,
+  LabwareDefinition2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
@@ -124,6 +125,41 @@ describe('moveLabware', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'LABWARE_OFF_DECK',
+    })
+  })
+  it('should return an error for trying to move an aluminum block with a gripper', () => {
+    const aluminumBlockDef = ({
+      metadata: { displayCategory: 'aluminumBlock' },
+    } as any) as LabwareDefinition2
+
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        mockGripperId: {
+          name: 'gripper',
+          id: mockGripperId,
+        },
+      },
+      labwareEntities: {
+        [SOURCE_LABWARE]: {
+          id: 'labwareid',
+          labwareDefURI: 'mockDefUri',
+          def: aluminumBlockDef,
+        },
+      },
+    }
+
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { slotName: 'A1' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'CANNOT_MOVE_WITH_GRIPPER',
     })
   })
   it('should return an error when trying to move labware to the thermocycler when lid is closed', () => {

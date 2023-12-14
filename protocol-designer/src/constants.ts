@@ -156,6 +156,3 @@ export const DND_TYPES = {
 // Values for TC fields
 export const THERMOCYCLER_STATE: 'thermocyclerState' = 'thermocyclerState'
 export const THERMOCYCLER_PROFILE: 'thermocyclerProfile' = 'thermocyclerProfile'
-
-export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
-export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'

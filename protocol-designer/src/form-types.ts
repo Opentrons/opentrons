@@ -3,9 +3,12 @@ import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
 } from './constants'
-import { IconName } from '@opentrons/components'
-import { LabwareLocation } from '@opentrons/shared-data'
-import {
+import type { IconName } from '@opentrons/components'
+import type {
+  LabwareLocation,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
+import type {
   AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,
@@ -217,6 +220,7 @@ export interface HydratedMoveLiquidFormData {
     blowout_checkbox: boolean
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
     dropTip_location: string
+    nozzles: NozzleConfigurationStyle | null
   }
 }
 
@@ -256,6 +260,7 @@ export interface HydratedMixFormDataLegacy {
   dispense_delay_checkbox: boolean
   dispense_delay_seconds: number | null | undefined
   dropTip_location: string
+  nozzles: NozzleConfigurationStyle | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

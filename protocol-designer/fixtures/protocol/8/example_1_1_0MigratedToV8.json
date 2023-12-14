@@ -125,7 +125,8 @@
           "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
           "stepType": "moveLiquid",
           "stepName": "transfer things",
-          "stepDetails": "yeah notes"
+          "stepDetails": "yeah notes",
+          "nozzles": null
         },
         "18113c80-92a6-11e9-ac62-1b173f839d9e": {
           "times": 3,
@@ -151,7 +152,8 @@
           "id": "18113c80-92a6-11e9-ac62-1b173f839d9e",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "2e622080-92a6-11e9-ac62-1b173f839d9e": {
           "pauseAction": "untilTime",
@@ -3635,7 +3637,7 @@
       "key": "c28746a8-655a-44c4-81ed-6b2f08f16dfb",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -3835,7 +3837,7 @@
       "key": "00d2c247-580b-4057-a7e8-8b6003bc0573",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4035,7 +4037,7 @@
       "key": "b95637fc-ea1e-4672-baad-0634cf051fea",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4235,7 +4237,7 @@
       "key": "f3e31686-b015-45fe-a3b2-07e1e843c191",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4435,7 +4437,7 @@
       "key": "9488a452-ed46-4c22-b547-15fd9ccaa8fb",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4635,7 +4637,7 @@
       "key": "8f2fe539-a9c9-466e-97be-99a6e356f112",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -4835,7 +4837,7 @@
       "key": "1dc029a7-7df6-4d63-9961-5ce081b5d8d0",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -5035,7 +5037,7 @@
       "key": "6622c244-4cd4-44de-ab39-77997b69b467",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {
@@ -5235,7 +5237,7 @@
       "key": "a2729301-e561-41a2-abd7-68b73c6e735d",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "flowRate": 10
+        "flowRate": 1000
       }
     },
     {

@@ -39,6 +39,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { SPAN7_8_10_11_SLOT } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
@@ -190,16 +191,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     <>
       {/* all modules */}
       {allModules.map(moduleOnDeck => {
-        // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
-        // const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
-        // const slot = moduleParentSlots.find(
-        //   slot => slot.id === moduleOnDeck.slot
-        // )
-        const slotPosition = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
+        const slotId =
+          moduleOnDeck.slot === SPAN7_8_10_11_SLOT ? '7' : moduleOnDeck.slot
+
+        const slotPosition = getPositionFromSlotId(slotId, deckDef)
         if (slotPosition == null) {
-          console.warn(
-            `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
-          )
+          console.warn(`no slot ${slotId} for module ${moduleOnDeck.id}`)
           return null
         }
         const moduleDef = getModuleDef2(moduleOnDeck.model)
@@ -257,7 +254,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             def={moduleDef}
             orientation={inferModuleOrientationFromXCoordinate(slotPosition[0])}
             innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
-            targetSlotId={moduleOnDeck.slot}
+            targetSlotId={slotId}
             targetDeckId={deckDef.otId}
           >
             {labwareLoadedOnModule != null && !shouldHideChildren ? (
@@ -550,7 +547,8 @@ export const DeckSetup = (): JSX.Element => {
     aE =>
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea' &&
-      aE.location === WASTE_CHUTE_CUTOUT
+      aE.location === WASTE_CHUTE_CUTOUT &&
+      wasteChuteFixtures.length > 0
   )
 
   const hasWasteChute =

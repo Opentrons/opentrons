@@ -149,7 +149,8 @@
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
           "stepType": "moveLiquid",
           "stepName": "transfer",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "4f4057e0-75c7-11ea-b42f-4b64e50f43e5": {
           "moduleId": "0b419310-75c7-11ea-b42f-4b64e50f43e5:magneticModuleType",

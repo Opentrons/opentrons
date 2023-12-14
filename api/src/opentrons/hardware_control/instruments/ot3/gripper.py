@@ -22,7 +22,10 @@ from .instrument_calibration import (
 )
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    FailedGripperPickupError,
+)
 
 from opentrons_shared_data.gripper import (
     GripperDefinition,
@@ -100,6 +103,10 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def remove_probe(self) -> None:
         assert self.attached_probe
         self._attached_probe = None
+
+    @property
+    def max_allowed_grip_error(self) -> float:
+        return self._geometry.max_allowed_grip_error
 
     @property
     def jaw_width(self) -> float:
@@ -193,6 +200,23 @@ class Gripper(AbstractInstrument[GripperDefinition]):
                 detail={
                     "probe": str(self._attached_probe),
                     "jaw_state": str(self.state),
+                },
+            )
+
+    def check_labware_pickup(self, labware_width: float) -> None:
+        """Ensure that a gripper pickup succeeded."""
+        # check if the gripper is at an acceptable position after attempting to
+        #  pick up labware
+        expected_gripper_position = labware_width
+        current_gripper_position = self.jaw_width
+        if (
+            abs(current_gripper_position - expected_gripper_position)
+            > self.max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                details={
+                    "expected jaw width": expected_gripper_position,
+                    "actual jaw width": current_gripper_position,
                 },
             )
 

@@ -1,21 +1,21 @@
-from typing import Union, Dict, Any
+from typing import Dict, Any
 from typing_extensions import Protocol
 
-from opentrons.config.types import RobotConfig, OT3Config
+from .types import ConfigType
 from opentrons.hardware_control.types import HardwareFeatureFlags
 
 
-class Configurable(Protocol):
+class Configurable(Protocol[ConfigType]):
     """Protocol specifying hardware control configuration."""
 
-    def get_config(self) -> Union[RobotConfig, OT3Config]:
+    def get_config(self) -> ConfigType:
         """Get the robot's configuration object.
 
         :returns .RobotConfig: The object.
         """
         ...
 
-    def set_config(self, config: Union[RobotConfig, OT3Config]) -> None:
+    def set_config(self, config: ConfigType) -> None:
         """Replace the currently-loaded config"""
         ...
 
@@ -29,11 +29,11 @@ class Configurable(Protocol):
         ...
 
     @property
-    def config(self) -> Union[RobotConfig, OT3Config]:
+    def config(self) -> ConfigType:
         ...
 
     @config.setter
-    def config(self, config: Union[RobotConfig, OT3Config]) -> None:
+    def config(self, config: ConfigType) -> None:
         ...
 
     async def update_config(self, **kwargs: Dict[str, Any]) -> None:
