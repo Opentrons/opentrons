@@ -17,7 +17,7 @@ import itertools
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from hardware_testing.opentrons_api.types import (
     OT3Mount,
-    OT3Axis,
+    Axis,
     Point,
     CriticalPoint,
 )
@@ -77,7 +77,7 @@ def getch():
     return _getch()
 
 
-async def jog(api, position, cp) -> Dict[OT3Axis, float]:
+async def jog(api, position, cp) -> Dict[Axis, float]:
     step_size = [0.01, 0.05, 0.1, 0.5, 1, 10, 20, 50]
     step_length_index = 3
     step = step_size[step_length_index]
@@ -170,11 +170,11 @@ async def jog(api, position, cp) -> Dict[OT3Axis, float]:
 
         print(
             "Coordinates: ",
-            round(position[OT3Axis.X], 2),
+            round(position[Axis.X], 2),
             ",",
-            round(position[OT3Axis.Y], 2),
+            round(position[Axis.Y], 2),
             ",",
-            round(position[OT3Axis.by_mount(mount)], 2),
+            round(position[Axis.by_mount(mount)], 2),
             " Motor Step: ",
             step_size[step_length_index],
             end="",
@@ -185,8 +185,8 @@ async def move_to_point(api, mount, point, cp):
     home_pos = api.get_instrument_max_height(mount, cp)
     pos = await api.current_position_ot3(mount, refresh=True, critical_point = cp)
     await api.move_to(mount,
-                    Point(pos[OT3Axis.X],
-                        pos[OT3Axis.Y],
+                    Point(pos[Axis.X],
+                        pos[Axis.Y],
                         home_pos))
     await api.move_to(mount,
                     Point(point.x,
@@ -232,7 +232,7 @@ async def _main() -> None:
         is_simulating=args.simulate, use_defaults=True
     )
     tip_overlap = 10.5
-    tip_length = {"T1K": 95.6-tip_overlap, "T200": 58.35-tip_overlap, "T50": 57.9-tip_overlap}
+    tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
     dial_data = {
                 "Pipette id": None,
                 "Noz_Height(mm)": None,
@@ -265,22 +265,22 @@ async def _main() -> None:
         print("Moved to Dial Indicator")
         current_position = await hw_api.current_position_ot3(mount)
         nozzle_dial_loc = await jog(hw_api, current_position, cp)
-        nozzle_dial_point = Point(nozzle_dial_loc[OT3Axis.X],
-                            nozzle_dial_loc[OT3Axis.Y],
-                            nozzle_dial_loc[OT3Axis.by_mount(mount)])
+        nozzle_dial_point = Point(nozzle_dial_loc[Axis.X],
+                            nozzle_dial_loc[Axis.Y],
+                            nozzle_dial_loc[Axis.by_mount(mount)])
         y_offset = 0
         for noz in range(1, nozzles + 1):
             y_offset -= 9
             await asyncio.sleep(1)
             noz_loc = await hw_api.encoder_current_position_ot3(mount = mount, critical_point = cp)
-            noz_loc = noz_loc[OT3Axis.by_mount(mount)]
+            noz_loc = noz_loc[Axis.by_mount(mount)]
             await asyncio.sleep(2)
             nozzle_measurement = gauge.read()
             await asyncio.sleep(1)
             nozzle_measurements.append((nozzle_measurement, noz_loc))
-            nozzle_dial_point = Point(nozzle_dial_loc[OT3Axis.X] + x_offset,
-                                nozzle_dial_loc[OT3Axis.Y] + y_offset,
-                                nozzle_dial_loc[OT3Axis.by_mount(mount)])
+            nozzle_dial_point = Point(nozzle_dial_loc[Axis.X] + x_offset,
+                                nozzle_dial_loc[Axis.Y] + y_offset,
+                                nozzle_dial_loc[Axis.by_mount(mount)])
             await move_to_point(hw_api, mount, nozzle_dial_point, cp)
         print(nozzle_measurements)
         y_offset = 0
@@ -303,22 +303,22 @@ async def _main() -> None:
         cp = CriticalPoint.TIP
         tip_measurements = []
         tiprack_loc = Point(
-                        tiprack_loc[OT3Axis.X],
-                        tiprack_loc[OT3Axis.Y],
-                        tiprack_loc[OT3Axis.by_mount(mount)])
+                        tiprack_loc[Axis.X],
+                        tiprack_loc[Axis.Y],
+                        tiprack_loc[Axis.by_mount(mount)])
         y_offset = 0
         for noz in range(1, nozzles + 1):
             y_offset -= 9
             await asyncio.sleep(2)
             tip_loc = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
-            tip_loc = tip_loc[OT3Axis.by_mount(mount)]
+            tip_loc = tip_loc[Axis.by_mount(mount)]
             await asyncio.sleep(2)
             tip_measurement = gauge.read()
             await asyncio.sleep(1)
             tip_measurements.append((tip_measurement, tip_loc))
-            tip_dial_point = Point(nozzle_dial_loc[OT3Axis.X] + x_offset,
-                                nozzle_dial_loc[OT3Axis.Y] + y_offset,
-                                nozzle_dial_loc[OT3Axis.by_mount(mount)])
+            tip_dial_point = Point(nozzle_dial_loc[Axis.X] + x_offset,
+                                nozzle_dial_loc[Axis.Y] + y_offset,
+                                nozzle_dial_loc[Axis.by_mount(mount)])
             await move_to_point(hw_api, mount, tip_dial_point, cp)
         print(tip_measurements)
         y_offset = 0
@@ -328,7 +328,7 @@ async def _main() -> None:
         # await asyncio.sleep(3)
         # tip_measurement = gauge.read()
         # await asyncio.sleep(1)
-        measured_tip_overlap = (tip_length[args.tip_size]+tip_overlap) - (tip_loc - noz_loc) # tiplength - tip overlap.
+        measured_tip_overlap = (tip_length[args.tip_size]) - (tip_loc - noz_loc) # tiplength - tip overlap.
         tip_attached = nozzle_measurement - tip_measurement
         measured_tip_overlap = tip_attached + measured_tip_overlap
         print(f"Tip_Overlap: {measured_tip_overlap}")
@@ -355,7 +355,7 @@ async def _main() -> None:
             cp = CriticalPoint.NOZZLE
             await move_to_point(hw_api, mount, nozzle_dial_point, cp)
             noz_loc = await hw_api.encoder_current_position_ot3(mount, cp)
-            noz_loc = noz_loc[OT3Axis.by_mount(mount)]
+            noz_loc = noz_loc[Axis.by_mount(mount)]
             await asyncio.sleep(3)
             nozzle_measurement = gauge.read()
             await asyncio.sleep(1)
@@ -377,12 +377,14 @@ async def _main() -> None:
             await asyncio.sleep(1)
             tip_loc = await hw_api.encoder_current_position_ot3(mount = mount,
                                             critical_point = CriticalPoint.NOZZLE)
-            tip_loc = tip_loc[OT3Axis.by_mount(mount)]
+            tip_loc = tip_loc[Axis.by_mount(mount)]
             measured_tip_overlap = (tip_length[args.tip_size]+tip_overlap) - (tip_loc - noz_loc) # tiplength - tip overlap.
             tip_attached = (nozzle_measurement - tip_measurement)
             measured_tip_overlap = tip_attached + measured_tip_overlap
             print(f"Tip_Overlap: {measured_tip_overlap}")
-            d_str = f"{pipette_id}, {noz_loc},{tip_loc}, {measured_tip_overlap}, {nozzle_measurement}, {tip_measurement}, {tip_attached}, {tip_count}, {tip_length[args.tip_size] + tip_overlap}, Nozzle \n"
+            d_str = f"{pipette_id}, {noz_loc},{tip_loc}, {measured_tip_overlap}, \
+            {nozzle_measurement}, {tip_measurement}, {tip_attached}, {tip_count}, \
+            {tip_length[args.tip_size] + tip_overlap}, Nozzle \n"
             data.append_data_to_file(test_n, test_f, d_str)
             # --------------------Drop Tip--------------------------------------
             current_position = await hw_api.current_position_ot3(
@@ -392,11 +394,11 @@ async def _main() -> None:
             await hw_api.drop_tip(mount)
             tip_count += 8
 
-        await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     except KeyboardInterrupt:
-        await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     finally:
-        await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await hw_api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
         await hw_api.clean_up()
 
 if __name__ == "__main__":
@@ -421,8 +423,8 @@ if __name__ == "__main__":
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
     parser.add_argument("--dial_indicator", action="store_true")
-    parser.add_argument("--tip_size", type=str, default="T200", help="Tip Size")
-    parser.add_argument("--tips_to_use", type=int, default=40)
+    parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
+    parser.add_argument("--tips_to_use", type=int, default=96)
     args = parser.parse_args()
     if args.mount == "left":
         mount = OT3Mount.LEFT
