@@ -7,6 +7,9 @@ from opentrons.protocol_api import COLUMN, ALL
 from opentrons.protocol_api.core.engine.deck_conflict import PartialTipMovementNotAllowedError
 
 
+def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
+    """It should raise errors for the expected deck conflicts."""
+
 def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     """It should raise errors for expected deck conflicts."""
     protocol = simulate.get_protocol_api(version="2.16", robot_type="Flex")
@@ -17,13 +20,13 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     instrument.trash_container = trash_labware
 
     badly_placed_tiprack = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C2")
-    well_placed_tiprack = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C1")
+    well_placed_tiprack = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "A1")
     tiprack_on_adapter = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "C3", adapter="opentrons_flex_96_tiprack_adapter")
 
     #############  SHORT LABWARE  ################
     # These labware should be to the east of tall labware to avoid any partial tip deck conflicts
-    badly_placed_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', "B3")
-    well_placed_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', "B1")
+    badly_placed_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', "B1")
+    well_placed_plate = protocol.load_labware('nest_96_wellplate_200ul_flat', "B3")
 
     ############# TALL LABWARE ###############
     my_tuberack = protocol.load_labware(
