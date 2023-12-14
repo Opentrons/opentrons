@@ -821,7 +821,7 @@ class ProtocolContext(CommandPublisher):
     def load_instrument(
         self,
         instrument_name: str,
-        mount: Union[Mount, str],
+        mount: Union[Mount, str, None] = None,
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
@@ -831,15 +831,16 @@ class ProtocolContext(CommandPublisher):
         ensure that the correct instrument is attached in the specified
         location.
 
-        :param str instrument_name: The name of the instrument model, or a
-                                    prefix. For instance, 'p10_single' may be
-                                    used to request a P10 single regardless of
-                                    the version.
-        :param mount: The mount in which this instrument should be attached.
+        :param str instrument_name: Which instrument you want to load. See :ref:`new-pipette-models`
+                                    for the valid values.
+        :param mount: The mount where this instrument should be attached.
                       This can either be an instance of the enum type
-                      :py:class:`.types.Mount` or one of the strings `'left'`
-                      and `'right'`.
-        :type mount: types.Mount or str
+                      :py:class:`.types.Mount` or one of the strings ``"left"``
+                      or ``"right"``. If you're loading a Flex 96-Channel Pipette
+                      (``instrument_name="flex_96channel_1000"``), you can leave this unspecified,
+                      since it always occupies both mounts; if you do specify a value, it will be
+                      ignored.
+        :type mount: types.Mount or str or ``None``
         :param tip_racks: A list of tip racks from which to pick tips if
                           :py:meth:`.InstrumentContext.pick_up_tip` is called
                           without arguments.
@@ -850,9 +851,11 @@ class ProtocolContext(CommandPublisher):
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
+        checked_mount = validation.ensure_mount_for_pipette(
+            mount, checked_instrument_name
+        )
 
-        checked_mount = Mount.LEFT if is_96_channel else validation.ensure_mount(mount)
+        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
 
         tip_racks = tip_racks or []
 
