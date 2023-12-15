@@ -26,7 +26,6 @@ import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
-import { DISENGAGED } from './constants'
 
 import type {
   ModalHeaderBaseProps,
