@@ -106,6 +106,7 @@ import { RunProgressMeter } from '../../RunProgressMeter'
 import { getIsFixtureMismatch } from '../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -161,6 +162,7 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
@@ -373,7 +375,9 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
-        {isRunCurrent && showDropTipBanner && pipettesWithTip.length !== 0 ? (
+        {mostRecentRunId === runId &&
+        showDropTipBanner &&
+        pipettesWithTip.length !== 0 ? (
           <ProtocolDropTipBanner
             onLaunchWizardClick={setShowDropTipWizard}
             onCloseClick={() => {
