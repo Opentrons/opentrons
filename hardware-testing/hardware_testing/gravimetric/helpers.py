@@ -106,6 +106,7 @@ def get_api_context(
             version=APIVersion.from_string(api_level), extra_labware=extra_labware
         )
 
+    papi.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
     return papi
 
 
