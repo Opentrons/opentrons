@@ -61,7 +61,28 @@ def analyze_protocols() -> None:
     else:
         generate_analyses_from_test(tag=target, protocols=tests)
 
-
+def sort_all_lists(d, sort_key=None):
+    """ Recursively sorts lists in a nested dictionary.
+    
+    :param d: The dictionary or list to sort.
+    :param sort_key: The key to sort dictionaries on if they are in a list.
+    """
+    if isinstance(d, dict):
+        return {k: sort_all_lists(v, sort_key) for k, v in d.items()}
+    elif isinstance(d, list):
+        # Sort each item in the list
+        sorted_list = [sort_all_lists(x, sort_key) for x in d]
+        # Try to sort the list if it contains comparable items
+        try:
+            if sort_key and all(isinstance(x, dict) and sort_key in x for x in sorted_list):
+                return sorted(sorted_list, key=lambda x: x[sort_key])
+            else:
+                return sorted(sorted_list)
+        except TypeError:
+            # If items are not comparable, return the list as is
+            return sorted_list
+    else:
+        return d
 # Read in what protocols to test from the environment variable
 # APP_ANALYSIS_TEST_PROTOCOLS
 # Generate all the analyses for the target version of the Opentrons repository
@@ -86,6 +107,7 @@ def test_analysis_snapshot(analyze_protocols: None, snapshot_json: SerializableD
         with open(analysis, "r") as f:
             data = json.load(f)
             print(f"Test name: {protocol.file_name}")
+            data = sort_all_lists(data)
         assert snapshot_json(name=protocol.file_name) == data
     else:
         raise AssertionError(f"Analysis file not found: {analysis}")
