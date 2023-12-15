@@ -28,9 +28,8 @@ clean: clean-py
 .PHONY: lib-js
 lib-js: export NODE_ENV := production
 lib-js:
+	yarn tsc --build
 	yarn webpack
-
-
 
 # Python targets
 
