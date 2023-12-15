@@ -61,7 +61,7 @@ install-pipenv:
 
 .PHONY: snapshot-test
 snapshot-test:
-	python -m pipenv run pytest -k analyses_snapshot_test
+	python -m pipenv run pytest -k analyses_snapshot_test -vv
 
 .PHONY: snapshot-test-update
 snapshot-test-update:

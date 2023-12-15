@@ -1,4 +1,4 @@
-name: Automated Testing Workflow
+name: Analyses Snapshot Test
 
 on:
   push:
