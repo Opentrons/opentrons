@@ -14,8 +14,19 @@ import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
+  useDeckConfigurationQuery,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
+import {
+  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_ROBOT_TYPE,
+  getCutoutIdForAddressableArea,
+  getDeckDefFromRobotType,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+} from '@opentrons/shared-data'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -50,6 +61,8 @@ import type {
   RobotType,
   SavePositionRunTimeCommand,
   CreateCommand,
+  DeckConfiguration,
+  AddressableAreaName,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 
@@ -70,6 +83,8 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     isCommandMutationLoading: isChainCommandMutationLoading,
   } = useChainMaintenanceCommands()
   const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
+
+  const deckConfig = useDeckConfigurationQuery().data ?? []
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
@@ -187,6 +202,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}
+      deckConfig={deckConfig}
     />
   )
 }
@@ -208,6 +224,7 @@ interface DropTipWizardProps {
     typeof useCreateMaintenanceCommandMutation
   >['createMaintenanceCommand']
   instrumentModelSpecs: PipetteModelSpecs
+  deckConfig: DeckConfiguration
   maintenanceRunId?: string
 }
 
@@ -227,6 +244,7 @@ export const DropTipWizardComponent = (
     isExiting,
     createdMaintenanceRunId,
     instrumentModelSpecs,
+    deckConfig,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation('drop_tip_wizard')
@@ -338,7 +356,7 @@ export const DropTipWizardComponent = (
   }
 
   const moveToAddressableArea = (
-    addressableArea: string
+    addressableArea: AddressableAreaName
   ): Promise<CommandData | null> => {
     if (createdMaintenanceRunId == null)
       return Promise.reject(
@@ -347,14 +365,82 @@ export const DropTipWizardComponent = (
 
     return retractAllAxesAndSavePosition()
       .then(currentPosition => {
-        if (currentPosition != null) {
+        let addressableAreaFromConfig: AddressableAreaName | null = null
+
+        const deckDef = getDeckDefFromRobotType(robotType)
+
+        // match the cutout id to aa
+        const cutoutIdForAddressableArea = getCutoutIdForAddressableArea(
+          addressableArea,
+          deckDef.cutoutFixtures
+        )
+
+        // get addressable areas provided by current deck config
+        const configuredCutoutFixture =
+          deckConfig.find(
+            fixture => fixture.cutoutId === cutoutIdForAddressableArea
+          )?.cutoutFixtureId ?? null
+
+        const providedAddressableAreas =
+          cutoutIdForAddressableArea != null
+            ? deckDef.cutoutFixtures.find(
+                fixture => fixture.id === configuredCutoutFixture
+              )?.providesAddressableAreas[cutoutIdForAddressableArea] ?? []
+            : []
+
+        // check if configured cutout fixture id provides target addressableArea
+        if (providedAddressableAreas.includes(addressableArea)) {
+          addressableAreaFromConfig = addressableArea
+        } else if (
+          // if no, check if provides a movable trash
+          providedAddressableAreas.some(aa =>
+            MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa)
+          )
+        ) {
+          addressableAreaFromConfig = providedAddressableAreas[0]
+        } else if (
+          // if no, check if provides waste chute
+          providedAddressableAreas.some(aa =>
+            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aa)
+          )
+        ) {
+          // match number of channels to provided waste chute addressable area
+          if (
+            instrumentModelSpecs.channels === 1 &&
+            providedAddressableAreas.includes(
+              ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+            )
+          ) {
+            addressableAreaFromConfig = ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+          } else if (
+            instrumentModelSpecs.channels === 8 &&
+            providedAddressableAreas.includes(
+              EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+            )
+          ) {
+            addressableAreaFromConfig = EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+          } else if (
+            instrumentModelSpecs.channels === 96 &&
+            providedAddressableAreas.includes(
+              NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+            )
+          ) {
+            addressableAreaFromConfig = NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+          }
+        }
+
+        if (
+          currentPosition != null &&
+          (robotType !== FLEX_ROBOT_TYPE || addressableAreaFromConfig != null)
+        ) {
           return createRunCommand({
             maintenanceRunId: createdMaintenanceRunId,
             command: {
               commandType: 'moveToAddressableArea',
               params: {
                 pipetteId: MANAGED_PIPETTE_ID,
-                addressableAreaName: addressableArea,
+                addressableAreaName:
+                  addressableAreaFromConfig ?? addressableArea,
                 offset: { x: 0, y: 0, z: currentPosition.z - 10 },
               },
             },
