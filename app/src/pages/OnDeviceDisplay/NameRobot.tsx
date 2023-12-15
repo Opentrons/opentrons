@@ -81,8 +81,6 @@ export function NameRobot(): JSX.Element {
     getUnreachableRobots(state)
   )
 
-  console.log('robot.ip', ipAddress)
-
   const formik = useFormik({
     initialValues: {
       newRobotName: '',
