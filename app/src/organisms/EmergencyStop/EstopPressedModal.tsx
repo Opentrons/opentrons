@@ -133,10 +133,7 @@ function DesktopModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
-  const {
-    acknowledgeEstopDisengage,
-    data,
-  } = useAcknowledgeEstopDisengageMutation()
+  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
 
   const handleCloseModal = (): void => {
     if (setIsDismissedModal != null) {
@@ -155,20 +152,17 @@ function DesktopModal({
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
+    e.preventDefault()
     setIsResuming(true)
     acknowledgeEstopDisengage({
-      onSuccess: () => {},
+      onSuccess: () => {
+        closeModal()
+      },
       onError: () => {
         setIsResuming(false)
       },
     })
   }
-
-  React.useEffect(() => {
-    if (data?.data.status === DISENGAGED) {
-      closeModal()
-    }
-  }, [data?.data.status, closeModal])
 
   return (
     <LegacyModal {...modalProps}>
