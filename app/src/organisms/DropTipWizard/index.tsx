@@ -507,12 +507,7 @@ export const DropTipWizardComponent = (
               ],
               true
             )
-              .then(commandData => {
-                const error = commandData[0].data.error
-                if (error != null) {
-                  setErrorMessage(`error moving to position: ${error.detail}`)
-                } else proceed()
-              })
+              .then(() => proceed())
               .catch(e =>
                 setErrorMessage(
                   `Error issuing ${
