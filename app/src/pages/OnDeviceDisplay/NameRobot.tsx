@@ -81,6 +81,8 @@ export function NameRobot(): JSX.Element {
     getUnreachableRobots(state)
   )
 
+  console.log('robot.ip', ipAddress)
+
   const formik = useFormik({
     initialValues: {
       newRobotName: '',
@@ -88,7 +90,7 @@ export function NameRobot(): JSX.Element {
     onSubmit: (values, { resetForm }) => {
       const newName = values.newRobotName.concat(name)
       const sameNameRobotInUnavailable = unreachableRobots.find(
-        robot => robot.name === newName && robot.ip === ipAddress
+        robot => robot.name === newName
       )
       if (sameNameRobotInUnavailable != null) {
         dispatch(removeRobot(sameNameRobotInUnavailable.name))
@@ -106,7 +108,7 @@ export function NameRobot(): JSX.Element {
       }
       if (
         [...connectableRobots, ...reachableRobots].some(
-          robot => newName === robot.name
+          robot => newName === robot.name && robot.ip !== ipAddress
         )
       ) {
         errors.newRobotName = t('name_rule_error_exist')
