@@ -80,8 +80,12 @@ def test_analyses(
         assert error_link is not None, "No analysis error but was expecting one."
         protocol_landing.base.click_webelement(error_link)
         error_details = protocol_landing.get_popout_error().text
-        assert error_details == protocol.app_analysis_error
-        protocol_landing.click_popout_close()
+        try:
+            assert error_details == protocol.app_analysis_error
+        except AssertionError:
+            raise
+        finally:
+            protocol_landing.click_popout_close()
     else:
         error_link = protocol_landing.get_error_details_safe()
 
