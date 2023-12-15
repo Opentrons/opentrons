@@ -22,6 +22,7 @@ import {
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
+  useDismissCurrentRunMutation,
   useEstopQuery,
   useDoorQuery,
   useInstrumentsQuery,
@@ -91,6 +92,7 @@ import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWi
 import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -139,6 +141,7 @@ jest.mock('../../../DropTipWizard/getPipettesWithTipAttached')
 jest.mock('../../../../resources/deck_configuration/utils')
 jest.mock('../../../../resources/deck_configuration/hooks')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+jest.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -188,6 +191,9 @@ const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
 >
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
+>
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
 >
 const mockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
@@ -241,6 +247,9 @@ const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility 
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
+>
+const mockUseMostRecentRunId = useMostRecentRunId as jest.MockedFunction<
+  typeof useMostRecentRunId
 >
 
 const ROBOT_NAME = 'otie'
@@ -398,6 +407,11 @@ describe('ProtocolRunHeader', () => {
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
+    when(mockUseDismissCurrentRunMutation)
+      .calledWith()
+      .mockReturnValue({
+        dismissCurrentRun: jest.fn(),
+      } as any)
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
@@ -429,6 +443,7 @@ describe('ProtocolRunHeader', () => {
       } as any)
     mockUseDeckConfigurationCompatibility.mockReturnValue([])
     when(mockGetIsFixtureMismatch).mockReturnValue(false)
+    when(mockUseMostRecentRunId).mockReturnValue(RUN_ID)
   })
 
   afterEach(() => {
@@ -518,7 +533,7 @@ describe('ProtocolRunHeader', () => {
         data: { data: { ...mockIdleUnstartedRun, current: true } },
       } as UseQueryResult<Run>)
     render()
-    expect(mockCloseCurrentRun).not.toBeCalled()
+    expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_FINISH,
@@ -825,9 +840,9 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
     render()
 
-    fireEvent.click(screen.getByText('View error'))
-    expect(mockCloseCurrentRun).not.toBeCalled()
-    screen.getByText('mock RunFailedModal')
+    getByText('View error').click()
+    expect(mockCloseCurrentRun).toBeCalled()
+    getByText('mock RunFailedModal')
   })
 
   it('renders a clear protocol banner when run has been canceled', () => {

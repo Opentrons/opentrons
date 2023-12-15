@@ -105,6 +105,7 @@ import { RunProgressMeter } from '../../RunProgressMeter'
 import { getIsFixtureMismatch } from '../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { Run, RunError } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
@@ -160,6 +161,7 @@ export function ProtocolRunHeader({
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { data: attachedInstruments } = useInstrumentsQuery()
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
+  const mostRecentRunId = useMostRecentRunId()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState(false)
@@ -248,8 +250,9 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
+      closeCurrentRun()
     }
-  }, [runStatus, isRunCurrent, runId])
+  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -371,7 +374,9 @@ export function ProtocolRunHeader({
             }}
           />
         ) : null}
-        {isRunCurrent && showDropTipBanner && pipettesWithTip.length !== 0 ? (
+        {mostRecentRunId === runId &&
+        showDropTipBanner &&
+        pipettesWithTip.length !== 0 ? (
           <ProtocolDropTipBanner
             onLaunchWizardClick={setShowDropTipWizard}
             onCloseClick={() => {
@@ -784,6 +789,11 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   } = props
   const { t } = useTranslation('run_details')
 
+  const handleClick = (): void => {
+    handleClearClick()
+    setShowRunFailedModal(true)
+  }
+
   if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
     return (
       <>
@@ -808,7 +818,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
               </StyledText>
 
               <LinkButton
-                onClick={() => setShowRunFailedModal(true)}
+                onClick={handleClick}
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
               >
                 {t('view_error')}
