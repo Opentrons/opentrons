@@ -21,6 +21,7 @@ pygithub = "==2.1.1"
 ruff = "==0.1.6"
 docker = "==6.1.3"
 syrupy = "*"
+pytest-html = "*"
 
 [requires]
 python_version = "3.12"
