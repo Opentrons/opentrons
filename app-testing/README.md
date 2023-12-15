@@ -19,8 +19,8 @@ Slices of the tests will be selected as candidates for automation and then perfo
          1. `make -C app-shell dist-osx`
 3. Install Chromedriver
    1. in the app-testing directory
-   2. `sudo ./ci-tools/{YOUR_OS}_get_chromedriver.sh 21.3.1` passing the version of electron in the repository root [package.json](`/opentrons/package.json`) for electron
-   3. windows example using sudo (scoop install sudo): `sudo .\ci-tools\windows_get_chromedriver.ps1 21.3.1`
+   2. `sudo ./citools/{YOUR_OS}_get_chromedriver.sh 21.3.1` passing the version of electron in the repository root [package.json](`/opentrons/package.json`) for electron
+   3. windows example using sudo (scoop install sudo): `sudo .\citools\windows_get_chromedriver.ps1 21.3.1`
    4. run `chromedriver --version` to verify
 4. Create .env from example.env `cp example.env .env`
    1. Fill in values (if there are secrets)

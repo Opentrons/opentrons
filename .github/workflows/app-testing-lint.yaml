@@ -22,17 +22,15 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v3'
+        uses: 'actions/checkout@v4'
 
       - name: Setup Python
-        uses: 'actions/setup-python@v4'
+        uses: 'actions/setup-python@v5'
         with:
           python-version: '3.12'
           cache: 'pipenv'
           cache-dependency-path: app-testing/Pipfile.lock
-      - name: Install Pipenv
-        run: pip install -U pipenv
-      - name: Pipenv Install
+      - name: Setup
         id: install
         working-directory: ./app-testing
         run: make setup
