@@ -1,0 +1,50 @@
+name: Automated Testing Workflow
+
+on:
+  push:
+    branches:
+      - 7.1-analyses-battery
+  workflow_dispatch:
+    inputs:
+      TARGET:
+        description: 'Target branch or tag'
+        required: true
+        default: 'edge'
+      TEST_SOURCE:
+        description: 'Target for the test code'
+        required: true
+        default: 'edge'
+  schedule:
+    - cron:  '0 7-8 * * *' # Random time between 2-3 AM EST (7-8 AM UTC)
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: ${{ github.event.inputs.TARGET || 'v7.1.0-alpha.9' }}
+      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || '7.1-analyses-battery' }}
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.TEST_SOURCE }}
+
+    - name: Docker Build
+      working-directory: app-testing
+      run: make build-opentrons-analysis
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pipenv'
+        cache-dependency-path: app-testing/Pipfile.lock
+
+    - name: Setup Python Dependencies
+      working-directory: app-testing
+      run: make setup
+
+    - name: Run Test
+      working-directory: app-testing
+      run: make snapshot-test
