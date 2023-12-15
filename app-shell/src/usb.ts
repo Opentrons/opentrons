@@ -164,7 +164,7 @@ function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
       }
       if (usbHttpAgent == null) {
         createSerialPortHttpAgent(ot3UsbSerialPort.path, (err, agent?) => {
-          if (err) {
+          if (err != null) {
             const message = err?.message ?? err
             usbLog.error(`Failed to create serial port: ${message}`)
           }
