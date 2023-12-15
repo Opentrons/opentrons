@@ -527,7 +527,7 @@ describe('ProtocolRunHeader', () => {
         data: { data: { ...mockIdleUnstartedRun, current: true } },
       } as UseQueryResult<Run>)
     render()
-    expect(mockCloseCurrentRun).toBeCalled()
+    expect(mockCloseCurrentRun).not.toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_FINISH,
@@ -1012,7 +1012,7 @@ describe('ProtocolRunHeader', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('renders the drop tip banner when the run is over and a pipette has a tip attached', async () => {
+  it('renders the drop tip banner when the run is over and a pipette has a tip attached and is a flex', async () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
