@@ -387,9 +387,8 @@ class LabwareView(HasState[LabwareState]):
         This is true for labware that have wells spanning entire columns.
         """
         has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
-        return (
-            has_quirk
-            and len(self.get_definition(labware_id).wells) > 1
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) > 1
             and len(self.get_definition(labware_id).wells) < 96
         )
 
@@ -399,9 +398,8 @@ class LabwareView(HasState[LabwareState]):
         This is true for 1-well reservoirs no matter the pipette, and for large plates.
         """
         has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
-        return (
-            has_quirk
-            and len(self.get_definition(labware_id).wells) == 1
+        return has_quirk and (
+            len(self.get_definition(labware_id).wells) == 1
             or len(self.get_definition(labware_id).wells) >= 96
         )
 
