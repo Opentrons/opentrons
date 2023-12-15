@@ -22,7 +22,6 @@ import {
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
-  useDismissCurrentRunMutation,
   useEstopQuery,
   useDoorQuery,
   useInstrumentsQuery,
@@ -186,9 +185,6 @@ const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
 >
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
->
-const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
-  typeof useDismissCurrentRunMutation
 >
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
@@ -396,11 +392,6 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue({
         data: { data: mockIdleUnstartedRun },
       } as UseQueryResult<Run>)
-    when(mockUseDismissCurrentRunMutation)
-      .calledWith()
-      .mockReturnValue({
-        dismissCurrentRun: jest.fn(),
-      } as any)
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
