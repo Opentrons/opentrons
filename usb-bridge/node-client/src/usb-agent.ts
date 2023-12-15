@@ -1,7 +1,6 @@
 import * as http from 'http'
 import agent from 'agent-base'
 import { Duplex } from 'stream'
-import type { Timeout } from 'timers'
 
 import { SerialPort } from 'serialport'
 
@@ -156,19 +155,19 @@ function socketEmulatorFromPort(port: SerialPort): Socket {
 
   // since this socket is independent from the port, we can do stuff like "have an activity timeout"
   // without worrying that it will kill the socket
-  let currentTimeout: Timeout | null = null
-  const refreshTimeout = (): void => currentTimeout && currentTimeout.refresh()
+  let currentTimeout: NodeJS.Timeout | null = null
+  const refreshTimeout = (): void => { currentTimeout?.refresh() }
   socket.on('data', refreshTimeout)
   socket.setTimeout = (timeout, callable?) => {
-    clearTimeout(currentTimeout)
-    if (timeout === 0 && currentTimeout) {
+    currentTimeout !== null && clearTimeout(currentTimeout)
+    if (timeout === 0 && (currentTimeout !== null)) {
       currentTimeout = null
     } else if (timeout !== 0) {
       currentTimeout = setTimeout(() => {
         console.log('socket timed out')
         socket.emit('timeout')
       }, timeout)
-      if (callable) {
+      if (callable != null) {
         socket.once('timeout', callable)
       }
     }
