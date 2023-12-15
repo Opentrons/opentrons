@@ -69,16 +69,19 @@ class MotionView:
         critical_point = None
 
         # if the pipette was last used to move to a labware that requires
-        # centering, set the critical point to XY_CENTER
+        # centering, set the critical point to the appropriate center
         if (
             isinstance(current_location, CurrentWell)
             and current_location.pipette_id == pipette_id
-            and self._labware.get_has_quirk(
-                current_location.labware_id,
-                "centerMultichannelOnWells",
-            )
         ):
-            critical_point = CriticalPoint.XY_CENTER
+            if self._labware.get_should_center_column_on_target_well(
+                current_location.labware_id
+            ):
+                critical_point = CriticalPoint.Y_CENTER
+            elif self._labware.get_should_center_pipette_on_target_well(
+                current_location.labware_id
+            ):
+                critical_point = CriticalPoint.XY_CENTER
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
     def get_movement_waypoints_to_well(
@@ -97,17 +100,17 @@ class MotionView:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
 
-        center_destination = self._labware.get_has_quirk(
-            labware_id,
-            "centerMultichannelOnWells",
-        )
+        destination_cp: Optional[CriticalPoint] = None
+        if self._labware.get_should_center_column_on_target_well(labware_id):
+            destination_cp = CriticalPoint.Y_CENTER
+        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
+            destination_cp = CriticalPoint.XY_CENTER
 
         destination = self._geometry.get_well_position(
             labware_id,
             well_name,
             well_location,
         )
-        destination_cp = CriticalPoint.XY_CENTER if center_destination else None
 
         move_type = move_types.get_move_type_to_well(
             pipette_id, labware_id, well_name, location, force_direct
@@ -306,12 +309,12 @@ class MotionView:
         positions = move_types.get_edge_point_list(
             center_point, x_offset, y_offset, edge_path_type
         )
+        critical_point: Optional[CriticalPoint] = None
 
-        critical_point = (
-            CriticalPoint.XY_CENTER
-            if self._labware.get_has_quirk(labware_id, "centerMultichannelOnWells")
-            else None
-        )
+        if self._labware.get_should_center_column_on_target_well(labware_id):
+            critical_point = CriticalPoint.Y_CENTER
+        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
+            critical_point = CriticalPoint.XY_CENTER
 
         return [
             motion_planning.Waypoint(position=p, critical_point=critical_point)

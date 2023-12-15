@@ -381,6 +381,30 @@ class LabwareView(HasState[LabwareState]):
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
 
+    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column on the target.
+
+        This is true for labware that have wells spanning entire columns.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return (
+            has_quirk
+            and len(self.get_definition(labware_id).wells) > 1
+            and len(self.get_definition(labware_id).wells) < 96
+        )
+
+    def get_should_center_pipette_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to a well of this labware should center its body on the target.
+
+        This is true for 1-well reservoirs no matter the pipette, and for large plates.
+        """
+        has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
+        return (
+            has_quirk
+            and len(self.get_definition(labware_id).wells) == 1
+            or len(self.get_definition(labware_id).wells) >= 96
+        )
+
     def get_well_definition(
         self,
         labware_id: str,
