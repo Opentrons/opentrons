@@ -203,33 +203,35 @@ export function ProtocolRunHeader({
   }
 
   React.useEffect(() => {
-    // Reset drop tip state when a new run occurs.
-    if (runStatus === RUN_STATUS_IDLE) {
-      setShowDropTipBanner(true)
-      setPipettesWithTip([])
-    } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
-      getPipettesWithTipAttached({
-        host,
-        runId,
-        runRecord,
-        attachedInstruments,
-        isFlex,
-      })
-        .then(pipettesWithTipAttached => {
-          const newPipettesWithTipAttached = pipettesWithTipAttached.map(
-            pipette => {
-              const specs = getPipetteModelSpecs(pipette.instrumentModel)
-              return {
-                specs,
-                mount: pipette.mount,
+    if (isFlex) {
+      // Reset drop tip state when a new run occurs.
+      if (runStatus === RUN_STATUS_IDLE) {
+        setShowDropTipBanner(true)
+        setPipettesWithTip([])
+      } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
+        getPipettesWithTipAttached({
+          host,
+          runId,
+          runRecord,
+          attachedInstruments,
+          isFlex,
+        })
+          .then(pipettesWithTipAttached => {
+            const newPipettesWithTipAttached = pipettesWithTipAttached.map(
+              pipette => {
+                const specs = getPipetteModelSpecs(pipette.instrumentModel)
+                return {
+                  specs,
+                  mount: pipette.mount,
+                }
               }
-            }
-          )
-          setPipettesWithTip(() => newPipettesWithTipAttached)
-        })
-        .catch(e => {
-          console.log(`Error checking pipette tip attachement state: ${e}`)
-        })
+            )
+            setPipettesWithTip(() => newPipettesWithTipAttached)
+          })
+          .catch(e => {
+            console.log(`Error checking pipette tip attachement state: ${e}`)
+          })
+      }
     }
   }, [runStatus, attachedInstruments, host, runId, runRecord, isFlex])
 

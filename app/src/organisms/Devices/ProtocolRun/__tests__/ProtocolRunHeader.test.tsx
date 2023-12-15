@@ -1007,7 +1007,7 @@ describe('ProtocolRunHeader', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('renders the drop tip banner when the run is over and a pipette has a tip attached', async () => {
+  it('renders the drop tip banner when the run is over and a pipette has a tip attached and is a flex', async () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
