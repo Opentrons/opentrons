@@ -840,9 +840,9 @@ describe('ProtocolRunHeader', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_FAILED)
     render()
 
-    fireEvent.click(screen.getByText('View error'))
-    expect(mockCloseCurrentRun).not.toBeCalled()
-    screen.getByText('mock RunFailedModal')
+    getByText('View error').click()
+    expect(mockCloseCurrentRun).toBeCalled()
+    getByText('mock RunFailedModal')
   })
 
   it('renders a clear protocol banner when run has been canceled', () => {
