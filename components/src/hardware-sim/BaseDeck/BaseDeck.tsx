@@ -71,6 +71,7 @@ interface BaseDeckProps {
   deckLayerBlocklist?: string[]
   showExpansion?: boolean
   lightFill?: string
+  mediumFill?: string
   darkFill?: string
   children?: React.ReactNode
   showSlotLabels?: boolean
@@ -86,7 +87,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     modulesOnDeck = [],
     labwareOnDeck = [],
     lightFill = COLORS.light1,
-    darkFill = COLORS.darkGreyEnabled,
+    mediumFill = COLORS.grey2,
+    darkFill = COLORS.darkBlack70,
     deckLayerBlocklist = [],
     deckConfig,
     showExpansion = true,
@@ -137,7 +139,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {showSlotLabels ? (
             <SlotLabels
               robotType={robotType}
-              color={darkFill}
+              color={COLORS.darkBlackEnabled}
               show4thColumn={
                 stagingAreaFixtures.length > 0 ||
                 wasteChuteStagingAreaFixtures.length > 0
@@ -177,7 +179,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 trashIconColor={lightFill}
                 // TODO(bh, 2023-10-09): typeguard fixture location
                 trashCutoutId={fixture.cutoutId as TrashCutoutId}
-                backgroundColor={darkFill}
+                backgroundColor={mediumFill}
               />
             </React.Fragment>
           ))}
@@ -187,8 +189,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.cutoutId as typeof WASTE_CHUTE_CUTOUT}
               deckDefinition={deckDef}
-              slotClipColor={darkFill}
               fixtureBaseColor={lightFill}
+              wasteChuteColor={mediumFill}
             />
           ))}
           {wasteChuteStagingAreaFixtures.map(fixture => (
@@ -199,6 +201,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               deckDefinition={deckDef}
               slotClipColor={darkFill}
               fixtureBaseColor={lightFill}
+              wasteChuteColor={mediumFill}
             />
           ))}
         </>

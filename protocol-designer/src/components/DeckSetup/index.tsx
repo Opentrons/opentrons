@@ -113,7 +113,7 @@ interface ContentsProps {
 }
 
 const lightFill = COLORS.light1
-const darkFill = COLORS.darkGreyEnabled
+const darkFill = COLORS.darkBlack70
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
@@ -629,7 +629,6 @@ export const DeckSetup = (): JSX.Element => {
                       key={fixture.id}
                       cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
                       deckDefinition={deckDef}
-                      slotClipColor={darkFill}
                       fixtureBaseColor={lightFill}
                     />
                   ))}
