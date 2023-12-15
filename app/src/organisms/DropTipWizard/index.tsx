@@ -17,7 +17,6 @@ import {
   useDeckConfigurationQuery,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -364,19 +363,20 @@ export const DropTipWizardComponent = (
           robotType
         )
 
-        if (
-          currentPosition != null &&
-          (robotType !== FLEX_ROBOT_TYPE || addressableAreaFromConfig != null)
-        ) {
+        const zOffset =
+          addressableAreaFromConfig === addressableArea
+            ? (currentPosition as Coordinates).z - 10
+            : 0
+
+        if (currentPosition != null && addressableAreaFromConfig != null) {
           return createRunCommand({
             maintenanceRunId: createdMaintenanceRunId,
             command: {
               commandType: 'moveToAddressableArea',
               params: {
                 pipetteId: MANAGED_PIPETTE_ID,
-                addressableAreaName:
-                  addressableAreaFromConfig ?? addressableArea,
-                offset: { x: 0, y: 0, z: currentPosition.z - 10 },
+                addressableAreaName: addressableAreaFromConfig,
+                offset: { x: 0, y: 0, z: zOffset },
               },
             },
             waitUntilComplete: true,
