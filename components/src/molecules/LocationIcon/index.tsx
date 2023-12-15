@@ -4,13 +4,7 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER } from '../../styles'
-import {
-  BORDERS,
-  COLORS,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '../../ui-style-constants'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
@@ -40,19 +34,13 @@ const LOCATION_ICON_STYLE = css<{
   border: 2px solid ${props => props.color ?? COLORS.darkBlack100};
   border-radius: ${BORDERS.borderRadiusSize3};
   height: ${props => props.height ?? SPACING.spacing32};
-  padding: ${SPACING.spacing2} 0.375rem;
   width: ${props => props.width ?? 'max-content'};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    padding: ${SPACING.spacing4}
-      ${props => (props.slotName != null ? SPACING.spacing8 : SPACING.spacing6)};
-  }
+  padding: ${SPACING.spacing4}
+    ${props => (props.slotName != null ? SPACING.spacing8 : SPACING.spacing6)};
 `
 
 const SLOT_NAME_TEXT_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.smallBodyTextBold}
-  }
+  ${TYPOGRAPHY.smallBodyTextBold}
 `
 
 export function LocationIcon({
