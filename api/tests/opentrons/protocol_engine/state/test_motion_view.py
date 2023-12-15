@@ -299,12 +299,12 @@ def test_get_movement_waypoints_to_well_for_y_center(
 
     decoy.when(
         labware_view.get_should_center_column_on_target_well(
-            "reservoir-id",
+            "labware-id",
         )
     ).then_return(True)
     decoy.when(
         labware_view.get_should_center_pipette_on_target_well(
-            "reservoir-id",
+            "labware-id",
         )
     ).then_return(False)
 
@@ -381,12 +381,12 @@ def test_get_movement_waypoints_to_well_for_xy_center(
 
     decoy.when(
         labware_view.get_should_center_column_on_target_well(
-            "reservoir-id",
+            "labware-id",
         )
     ).then_return(False)
     decoy.when(
         labware_view.get_should_center_pipette_on_target_well(
-            "reservoir-id",
+            "labware-id",
         )
     ).then_return(True)
 
@@ -761,8 +761,11 @@ def test_get_touch_tip_waypoints(
     center_point = Point(1, 2, 3)
 
     decoy.when(
-        labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
+        labware_view.get_should_center_pipette_on_target_well("labware-id")
     ).then_return(True)
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well("labware-id")
+    ).then_return(False)
 
     decoy.when(pipette_view.get_mount("pipette-id")).then_return(MountType.LEFT)
 
