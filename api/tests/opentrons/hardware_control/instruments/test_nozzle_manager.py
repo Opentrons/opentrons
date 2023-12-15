@@ -104,6 +104,7 @@ def test_single_pipette_map_geometry(
 
     def test_map_geometry(nozzlemap: nozzle_manager.NozzleMap) -> None:
         assert nozzlemap.xy_center_offset == Point(*config.nozzle_map["A1"])
+        assert nozzlemap.y_center_offset == Point(*config.nozzle_map["A1"])
         assert nozzlemap.front_nozzle_offset == Point(*config.nozzle_map["A1"])
         assert nozzlemap.starting_nozzle_offset == Point(*config.nozzle_map["A1"])
 
@@ -228,6 +229,22 @@ def test_multi_config_map_entries(
     test_map_entries(subject.current_configuration, ["C1", "D1", "E1", "F1"])
 
 
+def assert_offset_in_center_of(
+    offset: Point, between: Union[Tuple[str, str], str], config: PipetteConfigurations
+) -> None:
+    if isinstance(between, str):
+        assert offset == Point(*config.nozzle_map[between])
+    else:
+        assert (
+            offset
+            == (
+                Point(*config.nozzle_map[between[0]])
+                + Point(*config.nozzle_map[between[1]])
+            )
+            * 0.5
+        )
+
+
 @pytest.mark.parametrize(
     "pipette_details",
     [
@@ -251,40 +268,42 @@ def test_multi_config_geometry(
         front_nozzle: str,
         starting_nozzle: str,
         xy_center_in_center_of: Union[Tuple[str, str], str],
+        y_center_in_center_of: Union[Tuple[str, str], str],
     ) -> None:
-        if isinstance(xy_center_in_center_of, str):
-            assert nozzlemap.xy_center_offset == Point(
-                *config.nozzle_map[xy_center_in_center_of]
-            )
-        else:
-            assert nozzlemap.xy_center_offset == (
-                (
-                    Point(*config.nozzle_map[xy_center_in_center_of[0]])
-                    + Point(*config.nozzle_map[xy_center_in_center_of[1]])
-                )
-                * 0.5
-            )
+        assert_offset_in_center_of(
+            nozzlemap.xy_center_offset, xy_center_in_center_of, config
+        )
+        assert_offset_in_center_of(
+            nozzlemap.y_center_offset, y_center_in_center_of, config
+        )
+
         assert nozzlemap.front_nozzle_offset == Point(*config.nozzle_map[front_nozzle])
         assert nozzlemap.starting_nozzle_offset == Point(
             *config.nozzle_map[starting_nozzle]
         )
 
-    test_map_geometry(subject.current_configuration, "H1", "A1", ("A1", "H1"))
+    test_map_geometry(
+        subject.current_configuration, "H1", "A1", ("A1", "H1"), ("A1", "H1")
+    )
 
     subject.update_nozzle_configuration("A1", "A1", "A1")
-    test_map_geometry(subject.current_configuration, "A1", "A1", "A1")
+    test_map_geometry(subject.current_configuration, "A1", "A1", "A1", "A1")
 
     subject.update_nozzle_configuration("D1", "D1", "D1")
-    test_map_geometry(subject.current_configuration, "D1", "D1", "D1")
+    test_map_geometry(subject.current_configuration, "D1", "D1", "D1", "D1")
 
     subject.update_nozzle_configuration("C1", "G1", "C1")
-    test_map_geometry(subject.current_configuration, "G1", "C1", "E1")
+    test_map_geometry(subject.current_configuration, "G1", "C1", "E1", "E1")
 
     subject.update_nozzle_configuration("E1", "H1", "E1")
-    test_map_geometry(subject.current_configuration, "H1", "E1", ("E1", "H1"))
+    test_map_geometry(
+        subject.current_configuration, "H1", "E1", ("E1", "H1"), ("E1", "H1")
+    )
 
     subject.reset_to_default_configuration()
-    test_map_geometry(subject.current_configuration, "H1", "A1", ("A1", "H1"))
+    test_map_geometry(
+        subject.current_configuration, "H1", "A1", ("A1", "H1"), ("A1", "H1")
+    )
 
 
 @pytest.mark.parametrize(
@@ -790,48 +809,59 @@ def test_96_config_geometry(
         nozzlemap: nozzle_manager.NozzleMap,
         starting_nozzle: str,
         front_nozzle: str,
-        center_between: Union[str, Tuple[str, str]],
+        xy_center_between: Union[str, Tuple[str, str]],
+        y_center_between: Union[str, Tuple[str, str]],
     ) -> None:
-        if isinstance(center_between, str):
-            assert nozzlemap.xy_center_offset == Point(
-                *config.nozzle_map[center_between]
-            )
-        else:
-            assert (
-                nozzlemap.xy_center_offset
-                == (
-                    Point(*config.nozzle_map[center_between[0]])
-                    + Point(*config.nozzle_map[center_between[1]])
-                )
-                * 0.5
-            )
+        assert_offset_in_center_of(
+            nozzlemap.xy_center_offset, xy_center_between, config
+        )
+        assert_offset_in_center_of(nozzlemap.y_center_offset, y_center_between, config)
 
         assert nozzlemap.front_nozzle_offset == Point(*config.nozzle_map[front_nozzle])
         assert nozzlemap.starting_nozzle_offset == Point(
             *config.nozzle_map[starting_nozzle]
         )
 
-    test_map_geometry(config, subject.current_configuration, "A1", "H1", ("A1", "H12"))
+    test_map_geometry(
+        config, subject.current_configuration, "A1", "H1", ("A1", "H12"), ("A1", "H1")
+    )
 
     subject.update_nozzle_configuration("A1", "H1")
-    test_map_geometry(config, subject.current_configuration, "A1", "H1", ("A1", "H1"))
+    test_map_geometry(
+        config, subject.current_configuration, "A1", "H1", ("A1", "H1"), ("A1", "H1")
+    )
 
     subject.update_nozzle_configuration("A12", "H12")
     test_map_geometry(
-        config, subject.current_configuration, "A12", "H12", ("A12", "H12")
+        config,
+        subject.current_configuration,
+        "A12",
+        "H12",
+        ("A12", "H12"),
+        ("A12", "H12"),
     )
 
     subject.update_nozzle_configuration("A1", "A12")
-    test_map_geometry(config, subject.current_configuration, "A1", "A1", ("A1", "A12"))
+    test_map_geometry(
+        config, subject.current_configuration, "A1", "A1", ("A1", "A12"), "A1"
+    )
 
     subject.update_nozzle_configuration("H1", "H12")
-    test_map_geometry(config, subject.current_configuration, "H1", "H1", ("H1", "H12"))
+    test_map_geometry(
+        config, subject.current_configuration, "H1", "H1", ("H1", "H12"), "H1"
+    )
 
     subject.update_nozzle_configuration("A1", "D6")
-    test_map_geometry(config, subject.current_configuration, "A1", "D1", ("A1", "D6"))
+    test_map_geometry(
+        config, subject.current_configuration, "A1", "D1", ("A1", "D6"), ("A1", "D1")
+    )
 
     subject.update_nozzle_configuration("E7", "H12")
-    test_map_geometry(config, subject.current_configuration, "E7", "H7", ("E7", "H12"))
+    test_map_geometry(
+        config, subject.current_configuration, "E7", "H7", ("E7", "H12"), ("E7", "H7")
+    )
 
     subject.update_nozzle_configuration("C4", "D5")
-    test_map_geometry(config, subject.current_configuration, "C4", "D4", ("C4", "D5"))
+    test_map_geometry(
+        config, subject.current_configuration, "C4", "D4", ("C4", "D5"), ("C4", "D4")
+    )
