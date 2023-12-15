@@ -241,11 +241,6 @@ export function ProtocolRunHeader({
     }
   }, [protocolData, isRobotViewable, history])
 
-  console.log(
-    '🚀 ~ file: ProtocolRunHeader.tsx:246 ~ React.useEffect ~ RUN_STATUS_STOPPED:',
-    RUN_STATUS_STOPPED
-  )
-
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
