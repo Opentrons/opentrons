@@ -992,7 +992,6 @@ def test_configure_nozzle_layout(
         subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
 
 
-
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_dispense_0_volume_means_dispense_everything(
     decoy: Decoy,
@@ -1005,7 +1004,6 @@ def test_dispense_0_volume_means_dispense_everything(
     bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
     input_location = Location(point=Point(2, 2, 2), labware=None)
 
-
     subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
 
     decoy.verify(
@@ -1013,13 +1011,14 @@ def test_dispense_0_volume_means_dispense_everything(
             location=bottom_location,
             well_core=mock_well._core,
             in_place=False,
-            volume=mock_instrument_core.get_availabe_volume(),
+            volume=mock_instrument_core.get_available_volume(),
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
         ),
         times=1,
     )
+
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
 def test_dispense_0_volume_means_dispense_nothing(
@@ -1032,7 +1031,6 @@ def test_dispense_0_volume_means_dispense_nothing(
     mock_well = decoy.mock(cls=Well)
     bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
     input_location = Location(point=Point(2, 2, 2), labware=None)
-
 
     subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
 
@@ -1048,6 +1046,7 @@ def test_dispense_0_volume_means_dispense_nothing(
         ),
         times=1,
     )
+
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_aspirate_0_volume_means_aspirate_everything(
@@ -1066,6 +1065,13 @@ def test_aspirate_0_volume_means_aspirate_everything(
         last_location
     )
 
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+
     subject.aspirate(volume=0, location=input_location, rate=1.23)
 
     decoy.verify(
@@ -1079,6 +1085,7 @@ def test_aspirate_0_volume_means_aspirate_everything(
         ),
         times=1,
     )
+
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
 def test_aspirate_0_volume_means_aspirate_nothing(
@@ -1096,6 +1103,13 @@ def test_aspirate_0_volume_means_aspirate_nothing(
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
+
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
 
     subject.aspirate(volume=0, location=input_location, rate=1.23)
 
