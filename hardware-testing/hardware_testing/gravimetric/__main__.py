@@ -49,8 +49,7 @@ from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
-# FIXME: bump to v2.15 to utilize protocol engine
-API_LEVEL = "2.15"
+API_LEVEL = "2.16"
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -314,7 +313,7 @@ class RunArgs:
                 trials=trials,
                 name=name,
                 robot_serial=robot_serial,
-                fw_version=_ctx._core.get_hardware().fw_version,
+                fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
         else:
             if args.increment:
@@ -347,7 +346,7 @@ class RunArgs:
                 name=name,
                 environment_sensor=environment_sensor,
                 trials=trials,
-                fw_version=_ctx._core.get_hardware().fw_version,
+                fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
 
         return RunArgs(
@@ -591,7 +590,7 @@ if __name__ == "__main__":
             shell=True,
         )
         sleep(1)
-    hw = run_args.ctx._core.get_hardware()
+    hw = workarounds.get_sync_hw_api(run_args.ctx)
     try:
         if not run_args.ctx.is_simulating() and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")

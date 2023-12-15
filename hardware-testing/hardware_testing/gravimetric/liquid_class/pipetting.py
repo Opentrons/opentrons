@@ -8,6 +8,7 @@ from opentrons.protocol_api.labware import Well
 
 from hardware_testing.opentrons_api.types import OT3AxisKind
 from hardware_testing.gravimetric import config
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
 from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
@@ -131,7 +132,7 @@ def _retract(
     z_discontinuity: float,
 ) -> None:
     # change discontinuity per the liquid-class settings
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     if pipette.channels == 96:
         hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
             OT3AxisKind.Z
@@ -177,7 +178,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     # FIXME: stop using hwapi, and get those functions into core software
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     hw_pipette = hw_api.hardware_pipettes[hw_mount.to_mount()]
     _check_aspirate_dispense_args(mix, aspirate, dispense)
@@ -223,16 +224,17 @@ def _pipette_with_liquid_settings(  # noqa: C901
                 "WARNING: removing trailing air-gap from pipette, "
                 "this should only happen during blank trials"
             )
-            hw_api.dispense(hw_mount)
+            pipette.dispense(volume=pipette.current_volume)
         if mode:
             # NOTE: increment test requires the plunger's "bottom" position
             #       does not change during the entire test run
             hw_api.set_liquid_class(hw_mount, mode)
         else:
-            hw_api.configure_for_volume(hw_mount, aspirate if aspirate else dispense)
+            cfg_volume: float = aspirate if aspirate else dispense  # type: ignore[assignment]
+            pipette.configure_for_volume(cfg_volume)
         if clear_accuracy_function:
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
-        hw_api.prepare_for_aspirate(hw_mount)
+        pipette.prepare_to_aspirate()
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
@@ -257,7 +259,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
             ctx, pipette, well, channel_offset, approach_mm, retract_speed, _z_disc
         )
         pipette.blow_out()
-        hw_api.prepare_for_aspirate(hw_mount)
+        pipette.prepare_to_aspirate()
         assert pipette.current_volume == 0
 
     def _aspirate_on_submerge() -> None:
