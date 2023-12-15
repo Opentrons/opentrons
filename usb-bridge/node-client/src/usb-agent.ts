@@ -156,11 +156,13 @@ function socketEmulatorFromPort(port: SerialPort): Socket {
   // since this socket is independent from the port, we can do stuff like "have an activity timeout"
   // without worrying that it will kill the socket
   let currentTimeout: NodeJS.Timeout | null = null
-  const refreshTimeout = (): void => { currentTimeout?.refresh() }
+  const refreshTimeout = (): void => {
+    currentTimeout?.refresh()
+  }
   socket.on('data', refreshTimeout)
   socket.setTimeout = (timeout, callable?) => {
     currentTimeout !== null && clearTimeout(currentTimeout)
-    if (timeout === 0 && (currentTimeout !== null)) {
+    if (timeout === 0 && currentTimeout !== null) {
       currentTimeout = null
     } else if (timeout !== 0) {
       currentTimeout = setTimeout(() => {
