@@ -17,16 +17,7 @@ import {
   useDeckConfigurationQuery,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
-import {
-  EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  FLEX_ROBOT_TYPE,
-  getCutoutIdForAddressableArea,
-  getDeckDefFromRobotType,
-  MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -40,6 +31,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Jog } from '../../molecules/JogControls'
 import { ExitConfirmation } from './ExitConfirmation'
+import { getAddressableAreaFromConfig } from './getAddressableAreaFromConfig'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
 import {
   BLOWOUT_SUCCESS,
@@ -365,69 +357,12 @@ export const DropTipWizardComponent = (
 
     return retractAllAxesAndSavePosition()
       .then(currentPosition => {
-        let addressableAreaFromConfig: AddressableAreaName | null = null
-
-        const deckDef = getDeckDefFromRobotType(robotType)
-
-        // match the cutout id to aa
-        const cutoutIdForAddressableArea = getCutoutIdForAddressableArea(
+        const addressableAreaFromConfig = getAddressableAreaFromConfig(
           addressableArea,
-          deckDef.cutoutFixtures
+          deckConfig,
+          instrumentModelSpecs.channels,
+          robotType
         )
-
-        // get addressable areas provided by current deck config
-        const configuredCutoutFixture =
-          deckConfig.find(
-            fixture => fixture.cutoutId === cutoutIdForAddressableArea
-          )?.cutoutFixtureId ?? null
-
-        const providedAddressableAreas =
-          cutoutIdForAddressableArea != null
-            ? deckDef.cutoutFixtures.find(
-                fixture => fixture.id === configuredCutoutFixture
-              )?.providesAddressableAreas[cutoutIdForAddressableArea] ?? []
-            : []
-
-        // check if configured cutout fixture id provides target addressableArea
-        if (providedAddressableAreas.includes(addressableArea)) {
-          addressableAreaFromConfig = addressableArea
-        } else if (
-          // if no, check if provides a movable trash
-          providedAddressableAreas.some(aa =>
-            MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa)
-          )
-        ) {
-          addressableAreaFromConfig = providedAddressableAreas[0]
-        } else if (
-          // if no, check if provides waste chute
-          providedAddressableAreas.some(aa =>
-            WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aa)
-          )
-        ) {
-          // match number of channels to provided waste chute addressable area
-          if (
-            instrumentModelSpecs.channels === 1 &&
-            providedAddressableAreas.includes(
-              ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
-            )
-          ) {
-            addressableAreaFromConfig = ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
-          } else if (
-            instrumentModelSpecs.channels === 8 &&
-            providedAddressableAreas.includes(
-              EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
-            )
-          ) {
-            addressableAreaFromConfig = EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
-          } else if (
-            instrumentModelSpecs.channels === 96 &&
-            providedAddressableAreas.includes(
-              NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
-            )
-          ) {
-            addressableAreaFromConfig = NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
-          }
-        }
 
         if (
           currentPosition != null &&
