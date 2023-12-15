@@ -68,7 +68,6 @@ export function ConfirmCancelRunModal({
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
-      dismissCurrentRun(runId)
       if (!isActiveRun) {
         if (protocolId != null) {
           history.push(`/protocols/${protocolId}`)
