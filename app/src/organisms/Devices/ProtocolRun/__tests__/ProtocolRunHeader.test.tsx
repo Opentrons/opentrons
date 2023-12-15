@@ -22,6 +22,7 @@ import {
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
+  useDismissCurrentRunMutation,
   useEstopQuery,
   useDoorQuery,
   useInstrumentsQuery,
@@ -188,6 +189,9 @@ const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
 >
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
+>
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
 >
 const mockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
@@ -398,6 +402,11 @@ describe('ProtocolRunHeader', () => {
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
+    when(mockUseDismissCurrentRunMutation)
+      .calledWith()
+      .mockReturnValue({
+        dismissCurrentRun: jest.fn(),
+      } as any)
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
@@ -514,7 +523,7 @@ describe('ProtocolRunHeader', () => {
         data: { data: { ...mockIdleUnstartedRun, current: true } },
       } as UseQueryResult<Run>)
     render()
-    expect(mockCloseCurrentRun).not.toBeCalled()
+    expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_FINISH,
@@ -822,7 +831,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
 
     getByText('View error').click()
-    expect(mockCloseCurrentRun).not.toHaveBeenCalled()
+    expect(mockCloseCurrentRun).toBeCalled()
     getByText('mock RunFailedModal')
   })
 

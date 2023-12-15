@@ -249,8 +249,9 @@ export function ProtocolRunHeader({
           ...robotAnalyticsData,
         },
       })
+      closeCurrentRun()
     }
-  }, [runStatus, isRunCurrent, runId])
+  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -786,6 +787,11 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
   } = props
   const { t } = useTranslation('run_details')
 
+  const handleClick = (): void => {
+    handleClearClick()
+    setShowRunFailedModal(true)
+  }
+
   if (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED) {
     return (
       <>
@@ -810,7 +816,7 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
               </StyledText>
 
               <LinkButton
-                onClick={() => setShowRunFailedModal(true)}
+                onClick={handleClick}
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
               >
                 {t('view_error')}
