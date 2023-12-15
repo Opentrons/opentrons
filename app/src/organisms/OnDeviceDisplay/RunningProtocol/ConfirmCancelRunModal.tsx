@@ -40,10 +40,7 @@ export function ConfirmCancelRunModal({
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
-  const {
-    dismissCurrentRun,
-    isLoading: isDismissing,
-  } = useDismissCurrentRunMutation()
+  const { isLoading: isDismissing } = useDismissCurrentRunMutation()
   const runStatus = useRunStatus(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const history = useHistory()
