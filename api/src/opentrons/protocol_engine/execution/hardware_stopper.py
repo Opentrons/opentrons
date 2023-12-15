@@ -50,25 +50,29 @@ class HardwareStopper:
             state_view=state_store,
         )
 
+    async def _home_everything_except_plungers(self) -> None:
+        # TODO: Update this once gripper MotorAxis is available in engine.
+        try:
+            ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+            if (
+                not self._state_store.config.use_virtual_gripper
+                and ot3api.has_gripper()
+            ):
+                await ot3api.home_z(mount=OT3Mount.GRIPPER)
+        except HardwareNotSupportedError:
+            pass
+        await self._movement_handler.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        )
+
     async def _drop_tip(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
         if attached_tips:
             await self._hardware_api.stop(home_after=False)
-            # TODO: Update this once gripper MotorAxis is available in engine.
-            try:
-                ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
-                if (
-                    not self._state_store.config.use_virtual_gripper
-                    and ot3api.has_gripper()
-                ):
-                    await ot3api.home_z(mount=OT3Mount.GRIPPER)
-            except HardwareNotSupportedError:
-                pass
-            await self._movement_handler.home(
-                axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
-            )
+
+            await self._home_everything_except_plungers()
 
             # OT-2 Will only ever use the Fixed Trash Addressable Area
             if self._state_store.config.robot_type == "OT-2 Standard":
@@ -125,28 +129,7 @@ class HardwareStopper:
         if drop_tips_after_run:
             await self._drop_tip()
             await self._hardware_api.stop(home_after=home_after_stop)
-
-        elif home_after_stop:
-            if len(self._state_store.pipettes.get_all_attached_tips()) == 0:
-                await self._hardware_api.stop(home_after=home_after_stop)
-            else:
-                try:
-                    ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
-                    if (
-                        not self._state_store.config.use_virtual_gripper
-                        and ot3api.has_gripper()
-                    ):
-                        await ot3api.home_z(mount=OT3Mount.GRIPPER)
-                except HardwareNotSupportedError:
-                    pass
-
-                await self._movement_handler.home(
-                    axes=[
-                        MotorAxis.X,
-                        MotorAxis.Y,
-                        MotorAxis.LEFT_Z,
-                        MotorAxis.RIGHT_Z,
-                    ]
-                )
         else:
-            await self._hardware_api.stop(home_after=home_after_stop)
+            await self._hardware_api.stop(home_after=False)
+            if home_after_stop:
+                await self._home_everything_except_plungers()
