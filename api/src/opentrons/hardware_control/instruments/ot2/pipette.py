@@ -510,7 +510,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         Remove the tip from the pipette (effectively updates the pipette's
         critical point)
         """
-        assert self.has_tip
         self._has_tip = False
         self._current_tip_length = 0.0
 
