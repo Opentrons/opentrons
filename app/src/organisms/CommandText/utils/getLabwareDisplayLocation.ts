@@ -76,6 +76,11 @@ export function getLabwareDisplayLocation(
         adapter: adapterDisplayName,
         slot: adapter.location.slotName,
       })
+    } else if ('addressableAreaName' in adapter.location) {
+      return t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot: adapter.location.addressableAreaName,
+      })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId
       const moduleModel = robotSideAnalysis.modules.find(
