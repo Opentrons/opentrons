@@ -92,6 +92,7 @@ import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWi
 import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -140,6 +141,7 @@ jest.mock('../../../DropTipWizard/getPipettesWithTipAttached')
 jest.mock('../../../../resources/deck_configuration/utils')
 jest.mock('../../../../resources/deck_configuration/hooks')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+jest.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -245,6 +247,9 @@ const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility 
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
+>
+const mockUseMostRecentRunId = useMostRecentRunId as jest.MockedFunction<
+  typeof useMostRecentRunId
 >
 
 const ROBOT_NAME = 'otie'
@@ -438,6 +443,7 @@ describe('ProtocolRunHeader', () => {
       } as any)
     mockUseDeckConfigurationCompatibility.mockReturnValue([])
     when(mockGetIsFixtureMismatch).mockReturnValue(false)
+    when(mockUseMostRecentRunId).mockReturnValue(RUN_ID)
   })
 
   afterEach(() => {
