@@ -27,6 +27,7 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
 import type { RobotType } from '@opentrons/shared-data'
+import type { CommandData } from '@opentrons/api-client'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
@@ -37,7 +38,9 @@ interface ChooseLocationProps {
   title: string
   body: string | JSX.Element
   robotType: RobotType
-  moveToAddressableArea: (addressableArea: string) => Error | null
+  moveToAddressableArea: (
+    addressableArea: string
+  ) => Promise<CommandData | null>
   isRobotMoving: boolean
   isOnDevice: boolean
   setErrorMessage: (arg0: string) => void

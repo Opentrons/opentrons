@@ -43,7 +43,7 @@ import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
-import type { PipetteData } from '@opentrons/api-client'
+import type { PipetteData, CommandData } from '@opentrons/api-client'
 import type {
   Coordinates,
   PipetteModelSpecs,
@@ -337,12 +337,16 @@ export const DropTipWizardComponent = (
       })
   }
 
-  const moveToAddressableArea = (addressableArea: string): Error | null => {
+  const moveToAddressableArea = (
+    addressableArea: string
+  ): Promise<CommandData | null> => {
     if (createdMaintenanceRunId == null) {
-      return new Error('no maintenance run present to send move commands to')
+      return Promise.reject(
+        new Error('no maintenance run present to send move commands to')
+      )
     }
 
-    retractAllAxesAndSavePosition()
+    return retractAllAxesAndSavePosition()
       .then(currentPosition => {
         if (currentPosition != null) {
           return createRunCommand({
@@ -361,15 +365,17 @@ export const DropTipWizardComponent = (
             if (error != null) {
               setErrorMessage(`error moving to position: ${error.detail}`)
             }
+            return null
           })
         } else {
           setErrorMessage(`error moving to position: invalid addressable area.`)
+          return null
         }
       })
       .catch(e => {
         setErrorMessage(`error moving to position: ${e.message}`)
+        return null
       })
-    return null
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
