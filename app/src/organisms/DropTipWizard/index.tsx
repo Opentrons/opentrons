@@ -371,19 +371,21 @@ export const DropTipWizardComponent = (
             : 0
 
         if (currentPosition != null && addressableAreaFromConfig != null) {
-          return createRunCommand({
-            maintenanceRunId: createdMaintenanceRunId,
-            command: {
-              commandType: 'moveToAddressableArea',
-              params: {
-                pipetteId: MANAGED_PIPETTE_ID,
-                addressableAreaName: addressableAreaFromConfig,
-                offset: { x: 0, y: 0, z: zOffset },
+          return chainRunCommands(
+            createdMaintenanceRunId,
+            [
+              {
+                commandType: 'moveToAddressableArea',
+                params: {
+                  pipetteId: MANAGED_PIPETTE_ID,
+                  addressableAreaName: addressableAreaFromConfig,
+                  offset: { x: 0, y: 0, z: zOffset },
+                },
               },
-            },
-            waitUntilComplete: true,
-          }).then(response => {
-            const error = response.data.error
+            ],
+            true
+          ).then(commandData => {
+            const error = commandData[0].data.error
             if (error != null) {
               setErrorMessage(`error moving to position: ${error.detail}`)
             }
