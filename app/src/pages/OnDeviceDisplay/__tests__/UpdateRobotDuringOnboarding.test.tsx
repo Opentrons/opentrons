@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { act, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
@@ -87,28 +87,31 @@ describe('UpdateRobotDuringOnboarding', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.UPGRADE)
-    when(mockGetLocalRobot).calledWith(MOCK_STATE).mockReturnValue(mockRobot)
+    mockGetLocalRobot.mockReturnValue(mockRobot)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
-    resetAllWhenMocks()
   })
 
   it('should render CheckUpdates if it does not already have an upgrade', () => {
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
-    const [{ getByText }] = render()
-    getByText('Checking for updates')
+    render()
+    screen.getByText('Checking for updates')
   })
 
-  it('should stop rendering CheckUpdates should after 10 sec', () => {
+  it('should stop rendering CheckUpdates should after 10 sec', async () => {
+    jest.useFakeTimers()
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
-    const [{ getByText }] = render()
-    const checkUpdates = getByText('Checking for updates')
-    jest.advanceTimersByTime(1000)
-    expect(checkUpdates).toBeInTheDocument()
-    jest.advanceTimersByTime(11000)
-    expect(checkUpdates).not.toBeInTheDocument()
+    render()
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+    expect(screen.getByText('Checking for updates')).toBeInTheDocument()
+    act(() => {
+      jest.advanceTimersByTime(11000)
+    })
+    expect(screen.queryByText('Checking for updates')).not.toBeInTheDocument()
   })
 
   it('should never render CheckUpdates if it already has an upgrade', () => {
@@ -123,22 +126,28 @@ describe('UpdateRobotDuringOnboarding', () => {
       step: RobotUpdate.RESTART,
     }
     mockGetRobotUpdateSession.mockReturnValue(mockDownloadSession)
-    const [{ getByText }] = render()
-    getByText('Downloading software...')
+    render()
+    screen.getByText('Downloading software...')
   })
 
   it('should render NoUpdate found when there is no upgrade - reinstall', () => {
+    jest.useFakeTimers()
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('Your software is already up to date!')
+    render()
+    act(() => {
+      jest.advanceTimersByTime(11000)
+    })
+    screen.getByText('Your software is already up to date!')
   })
 
   it('should render NoUpdate found when there is no upgrade - downgrade', () => {
+    jest.useFakeTimers()
     mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.DOWNGRADE)
-    const [{ getByText }] = render()
-    jest.advanceTimersByTime(11000)
-    getByText('Your software is already up to date!')
+    render()
+    act(() => {
+      jest.advanceTimersByTime(11000)
+    })
+    screen.getByText('Your software is already up to date!')
   })
 
   it('should render ErrorUpdateSoftware when an error occurs', () => {
@@ -147,12 +156,12 @@ describe('UpdateRobotDuringOnboarding', () => {
       error: 'oh no!',
     }
     mockGetRobotUpdateSession.mockReturnValue(mockErrorSession)
-    const [{ getByText }] = render()
+    render()
 
-    getByText('Software update error')
-    getByText('oh no!')
-    getByText('Try again')
-    getByText('Proceed without update')
+    screen.getByText('Software update error')
+    screen.getByText('oh no!')
+    screen.getByText('Try again')
+    screen.getByText('Proceed without update')
   })
 
   it.todo('add test for targetPath in a following PR')

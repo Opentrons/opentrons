@@ -29,12 +29,12 @@ import { getRobotTypeDisplayName } from '../ProtocolsLanding/utils'
 import { getSlotsForThermocycler } from './utils'
 
 import type {
+  CutoutConfigProtocolSpec,
   LoadModuleRunTimeCommand,
   PipetteName,
   RobotType,
   SingleSlotCutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { CutoutConfigProtocolSpec } from '../../resources/deck_configuration/utils'
 
 interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
@@ -67,25 +67,7 @@ export const RobotConfigurationDetails = (
     </StyledText>
   )
 
-  // TODO(bh, 2022-10-18): insert 96-channel display name
-  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
-  const leftAndRightMountsPipetteDisplayName = null
-  const leftAndRightMountsItem =
-    leftAndRightMountsPipetteDisplayName != null ? (
-      <RobotConfigurationDetailsItem
-        label={t('left_and_right_mounts')}
-        item={
-          isLoading ? (
-            loadingText
-          ) : (
-            <InstrumentContainer
-              displayName={leftAndRightMountsPipetteDisplayName}
-            />
-          )
-        }
-      />
-    ) : null
-
+  const is96PipetteUsed = leftMountPipetteName === 'p1000_96'
   const leftMountPipetteDisplayName =
     getPipetteNameSpecs(leftMountPipetteName as PipetteName)?.displayName ??
     null
@@ -134,12 +116,12 @@ export const RobotConfigurationDetails = (
         }
       />
       <Divider marginY={SPACING.spacing12} width="100%" />
-      {leftAndRightMountsItem ?? (
+      <RobotConfigurationDetailsItem
+        label={is96PipetteUsed ? t('both_mounts') : t('left_mount')}
+        item={isLoading ? loadingText : leftMountItem}
+      />
+      {!is96PipetteUsed && (
         <>
-          <RobotConfigurationDetailsItem
-            label={t('left_mount')}
-            item={isLoading ? loadingText : leftMountItem}
-          />
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
             label={t('right_mount')}

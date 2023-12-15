@@ -26,7 +26,7 @@ import { useRequiredProtocolHardware } from '../../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
 import type { ProtocolHardware } from '../../Protocols/hooks'
-import type { TFunction } from 'react-i18next'
+import type { TFunction } from 'i18next'
 
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
@@ -62,7 +62,7 @@ const TableDatum = styled('td')`
 
 const getHardwareLocation = (
   protocolHardware: ProtocolHardware,
-  translator: TFunction<'protocol_details'>
+  translator: TFunction
 ): string => {
   if (protocolHardware.hardwareType === 'gripper') {
     return translator(`extension_mount`)

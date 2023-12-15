@@ -45,6 +45,12 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           String(propsForFields.dispense_labware.value)
         ]?.name === 'wasteChute'
       : false
+  const isTrashBinSelected =
+    propsForFields.dispense_labware?.value != null
+      ? additionalEquipmentEntities[
+          String(propsForFields.dispense_labware.value)
+        ]?.name === 'trashBin'
+      : false
 
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const getDelayFields = (): JSX.Element => (
@@ -62,6 +68,9 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
       }
     />
   )
+
+  const hideWellOrderField =
+    prefix === 'dispense' && (isWasteChuteSelected || isTrashBinSelected)
 
   const getMixFields = (): JSX.Element => (
     <MixFields
@@ -91,7 +100,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
             ]
           }
         />
-        {prefix === 'dispense' && isWasteChuteSelected ? null : (
+        {hideWellOrderField ? null : (
           <WellOrderField
             prefix={prefix}
             label={i18n.t('form.step_edit_form.field.well_order.label')}

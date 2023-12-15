@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
@@ -14,6 +14,7 @@ import {
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
+import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
@@ -246,10 +247,14 @@ export const ModuleWizardFlows = (
           prepCommandErrorMessage != null ? (
             prepCommandErrorMessage
           ) : (
-            <>
-              {t('module_calibration_failed')}
-              {errorMessage}
-            </>
+            <Trans
+              t={t}
+              i18nKey={'module_calibration_failed'}
+              values={{ error: errorMessage }}
+              components={{
+                block: <StyledText as="p" />,
+              }}
+            />
           )
         }
       />

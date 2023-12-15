@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -75,28 +76,28 @@ describe('WifiConnectionDetails', () => {
   })
 
   it('should render text and button with icon when connected to a network', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('Connected Network')
-    getByLabelText('mock wifi ssid_wifi_icon')
-    getByLabelText('mock wifi ssid_info_icon')
-    getByText('mock wifi ssid')
-    getByText('View details')
-    getByText('Other Networks')
+    render(props)
+    screen.getByText('Connected Network')
+    screen.getByLabelText('mock wifi ssid_wifi_icon')
+    screen.getByLabelText('mock wifi ssid_info_icon')
+    screen.getByText('mock wifi ssid')
+    screen.getByText('View details')
+    screen.getByText('Other Networks')
   })
 
   it('should show the modal when tapping connected wifi button', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('mock wifi ssid')
-    button.click()
-    getByText('mock NetworkDetailsModal')
+    render(props)
+    const button = screen.getByText('mock wifi ssid')
+    fireEvent.click(button)
+    screen.getByText('mock NetworkDetailsModal')
   })
 
   it('should not render text and button when not connected to a network', () => {
     props.activeSsid = undefined
-    const [{ queryByText }] = render(props)
-    expect(queryByText('Connected Network')).not.toBeInTheDocument()
-    expect(queryByText('mock wifi ssid')).not.toBeInTheDocument()
-    expect(queryByText('Other Networks')).not.toBeInTheDocument()
+    render(props)
+    expect(screen.queryByText('Connected Network')).not.toBeInTheDocument()
+    expect(screen.queryByText('mock wifi ssid')).not.toBeInTheDocument()
+    expect(screen.queryByText('Other Networks')).not.toBeInTheDocument()
   })
 
   it.todo('should render the wifi list')

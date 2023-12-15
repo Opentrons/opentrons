@@ -437,7 +437,7 @@ def test_get_module_labware_highest_z(
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
 
 
-def test_get_all_labware_highest_z_no_equipment(
+def test_get_all_obstacle_highest_z_no_equipment(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -449,12 +449,12 @@ def test_get_all_labware_highest_z_no_equipment(
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(addressable_area_view.get_all()).then_return([])
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 0
 
 
-def test_get_all_labware_highest_z(
+def test_get_all_obstacle_highest_z(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
@@ -524,13 +524,13 @@ def test_get_all_labware_highest_z(
 
     plate_z = subject.get_labware_highest_z("plate-id")
     reservoir_z = subject.get_labware_highest_z("reservoir-id")
-    all_z = subject.get_all_labware_highest_z()
+    all_z = subject.get_all_obstacle_highest_z()
 
     # Should exclude the off-deck plate.
     assert all_z == max(plate_z, reservoir_z)
 
 
-def test_get_all_labware_highest_z_with_staging_area(
+def test_get_all_obstacle_highest_z_with_staging_area(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     falcon_tuberack_def: LabwareDefinition,
@@ -585,13 +585,12 @@ def test_get_all_labware_highest_z_with_staging_area(
     )
 
     staging_z = subject.get_labware_highest_z("staging-id")
-    all_z = subject.get_all_labware_highest_z()
+    all_z = subject.get_all_obstacle_highest_z()
 
-    # Should exclude the off-deck plate.
     assert all_z == staging_z
 
 
-def test_get_all_labware_highest_z_with_modules(
+def test_get_all_obstacle_highest_z_with_modules(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
@@ -609,33 +608,300 @@ def test_get_all_labware_highest_z_with_modules(
     decoy.when(module_view.get_overall_height("module-id-1")).then_return(42.0)
     decoy.when(module_view.get_overall_height("module-id-2")).then_return(1337.0)
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 1337.0
 
 
-def test_get_all_labware_highest_z_with_addressable_area(
+def test_get_all_obstacle_highest_z_with_fixtures(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
     subject: GeometryView,
 ) -> None:
-    """It should get the highest Z including addressable areas."""
+    """It should get the highest Z including fixtures."""
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(module_view.get_all()).then_return([])
 
-    decoy.when(addressable_area_view.get_all()).then_return(["abc", "xyz"])
-    decoy.when(addressable_area_view.get_addressable_area_height("abc")).then_return(
-        42.0
+    decoy.when(addressable_area_view.get_all_cutout_fixtures()).then_return(
+        ["abc", "xyz"]
     )
-    decoy.when(addressable_area_view.get_addressable_area_height("xyz")).then_return(
-        1337.0
-    )
+    decoy.when(addressable_area_view.get_fixture_height("abc")).then_return(42.0)
+    decoy.when(addressable_area_view.get_fixture_height("xyz")).then_return(1337.0)
 
-    result = subject.get_all_labware_highest_z()
+    result = subject.get_all_obstacle_highest_z()
 
     assert result == 1337.0
+
+
+def test_get_highest_z_in_slot_with_single_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should get the highest Z in slot with just a single labware."""
+    # Case: Slot has a labware that doesn't have any other labware on it. Highest z is equal to labware height.
+    labware_in_slot = LoadedLabware(
+        id="just-labware-id",
+        loadName="just-labware-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="offset-id",
+    )
+    slot_pos = Point(1, 2, 3)
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(
+        labware_in_slot
+    )
+    decoy.when(labware_view.get_id_by_labware("just-labware-id")).then_raise(
+        errors.LabwareNotLoadedOnLabwareError("no more labware")
+    )
+    decoy.when(labware_view.get("just-labware-id")).then_return(labware_in_slot)
+    decoy.when(labware_view.get_definition("just-labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(labware_view.get_labware_offset_vector("just-labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(slot_pos)
+
+    expected_highest_z = well_plate_def.dimensions.zDimension + 3 + 3
+    assert (
+        subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
+        == expected_highest_z
+    )
+
+
+def test_get_highest_z_in_slot_with_single_module(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+    ot2_standard_deck_def: DeckDefinitionV4,
+) -> None:
+    """It should get the highest Z in slot with just a single module."""
+    # Case: Slot has a module that doesn't have any labware on it. Highest z is equal to module height.
+    module_in_slot = LoadedModule.construct(
+        id="only-module",
+        model=ModuleModel.THERMOCYCLER_MODULE_V2,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+    )
+
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(module_in_slot)
+    decoy.when(labware_view.get_id_by_module("only-module")).then_raise(
+        errors.LabwareNotLoadedOnModuleError("only module")
+    )
+    decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
+    decoy.when(
+        module_view.get_module_highest_z(
+            module_id="only-module", deck_type=DeckType("ot2_standard")
+        )
+    ).then_return(12345)
+
+    assert (
+        subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
+        == 12345
+    )
+
+
+# TODO (spp, 2023-12-05): this is mocking out too many things and is hard to follow.
+#  Create an integration test that loads labware and modules and tests the geometry
+#  in an easier-to-understand manner.
+def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should get the highest z in slot of the topmost labware in stack.
+
+    Tests both `get_highest_z_in_slot` and `get_highest_z_of_labware_stack`.
+    """
+    labware_in_slot = LoadedLabware(
+        id="bottom-labware-id",
+        loadName="bottom-labware-name",
+        definitionUri="bottom-definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId="offset-id",
+    )
+    middle_labware = LoadedLabware(
+        id="middle-labware-id",
+        loadName="middle-labware-name",
+        definitionUri="middle-definition-uri",
+        location=OnLabwareLocation(labwareId="bottom-labware-id"),
+        offsetId="offset-id",
+    )
+    top_labware = LoadedLabware(
+        id="top-labware-id",
+        loadName="top-labware-name",
+        definitionUri="top-definition-uri",
+        location=OnLabwareLocation(labwareId="middle-labware-id"),
+        offsetId="offset-id",
+    )
+    slot_pos = Point(11, 22, 33)
+    top_lw_lpc_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(
+        labware_in_slot
+    )
+
+    decoy.when(labware_view.get_id_by_labware("bottom-labware-id")).then_return(
+        "middle-labware-id"
+    )
+    decoy.when(labware_view.get_id_by_labware("middle-labware-id")).then_return(
+        "top-labware-id"
+    )
+    decoy.when(labware_view.get_id_by_labware("top-labware-id")).then_raise(
+        errors.LabwareNotLoadedOnLabwareError("top labware")
+    )
+
+    decoy.when(labware_view.get("bottom-labware-id")).then_return(labware_in_slot)
+    decoy.when(labware_view.get("middle-labware-id")).then_return(middle_labware)
+    decoy.when(labware_view.get("top-labware-id")).then_return(top_labware)
+
+    decoy.when(labware_view.get_definition("top-labware-id")).then_return(
+        well_plate_def
+    )
+    decoy.when(labware_view.get_labware_offset_vector("top-labware-id")).then_return(
+        top_lw_lpc_offset
+    )
+    decoy.when(labware_view.get_dimensions("middle-labware-id")).then_return(
+        Dimensions(x=10, y=20, z=30)
+    )
+    decoy.when(labware_view.get_dimensions("bottom-labware-id")).then_return(
+        Dimensions(x=11, y=12, z=13)
+    )
+
+    decoy.when(
+        labware_view.get_labware_overlap_offsets(
+            "top-labware-id", below_labware_name="middle-labware-name"
+        )
+    ).then_return(OverlapOffset(x=4, y=5, z=6))
+    decoy.when(
+        labware_view.get_labware_overlap_offsets(
+            "middle-labware-id", below_labware_name="bottom-labware-name"
+        )
+    ).then_return(OverlapOffset(x=7, y=8, z=9))
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(slot_pos)
+
+    expected_highest_z = (
+        slot_pos.z + well_plate_def.dimensions.zDimension - 6 + 30 - 9 + 13 + 3
+    )
+    assert (
+        subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
+        == expected_highest_z
+    )
+
+
+# TODO (spp, 2023-12-05): this is mocking out too many things and is hard to follow.
+#  Create an integration test that loads labware and modules and tests the geometry
+#  in an easier-to-understand manner.
+def test_get_highest_z_in_slot_with_labware_stack_on_module(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    addressable_area_view: AddressableAreaView,
+    subject: GeometryView,
+    well_plate_def: LabwareDefinition,
+    ot2_standard_deck_def: DeckDefinitionV4,
+) -> None:
+    """It should get the highest z in slot of labware on module.
+
+    Tests both `get_highest_z_in_slot` and `get_highest_z_of_labware_stack`.
+    """
+    top_labware = LoadedLabware(
+        id="top-labware-id",
+        loadName="top-labware-name",
+        definitionUri="top-labware-uri",
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        offsetId="offset-id1",
+    )
+    adapter = LoadedLabware(
+        id="adapter-id",
+        loadName="adapter-name",
+        definitionUri="adapter-uri",
+        location=ModuleLocation(moduleId="module-id"),
+        offsetId="offset-id2",
+    )
+    module_on_slot = LoadedModule.construct(
+        id="module-id",
+        model=ModuleModel.THERMOCYCLER_MODULE_V2,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+    )
+
+    slot_pos = Point(11, 22, 33)
+    top_lw_lpc_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(module_view.get("module-id")).then_return(module_on_slot)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(module_on_slot)
+
+    decoy.when(labware_view.get_id_by_module("module-id")).then_return("adapter-id")
+    decoy.when(labware_view.get_id_by_labware("adapter-id")).then_return(
+        "top-labware-id"
+    )
+    decoy.when(labware_view.get_id_by_labware("top-labware-id")).then_raise(
+        errors.LabwareNotLoadedOnLabwareError("top labware")
+    )
+
+    decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
+    decoy.when(labware_view.get_definition("top-labware-id")).then_return(
+        well_plate_def
+    )
+
+    decoy.when(labware_view.get("adapter-id")).then_return(adapter)
+    decoy.when(labware_view.get("top-labware-id")).then_return(top_labware)
+    decoy.when(labware_view.get_labware_offset_vector("top-labware-id")).then_return(
+        top_lw_lpc_offset
+    )
+    decoy.when(labware_view.get_dimensions("adapter-id")).then_return(
+        Dimensions(x=10, y=20, z=30)
+    )
+    decoy.when(
+        labware_view.get_labware_overlap_offsets(
+            labware_id="top-labware-id", below_labware_name="adapter-name"
+        )
+    ).then_return(OverlapOffset(x=4, y=5, z=6))
+
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(
+        module_view.get_nominal_module_offset(
+            module_id="module-id", deck_type=DeckType("ot2_standard")
+        )
+    ).then_return(LabwareOffsetVector(x=40, y=50, z=60))
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.TEMPERATURE_MODULE_V2
+    )
+
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "adapter-id", ModuleModel.TEMPERATURE_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=1.1, y=2.2, z=3.3))
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
+    ).then_return(slot_pos)
+
+    expected_highest_z = (
+        slot_pos.z + 60 + 30 - 3.3 + well_plate_def.dimensions.zDimension - 6 + 3
+    )
+    assert (
+        subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
+        == expected_highest_z
+    )
 
 
 @pytest.mark.parametrize(

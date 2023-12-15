@@ -1,9 +1,7 @@
 from typing_extensions import Protocol
-from typing import TypeVar
+from .types import CalibrationType
 
 from ..util import DeckTransformState
-
-CalibrationType = TypeVar("CalibrationType")
 
 
 class Calibratable(Protocol[CalibrationType]):

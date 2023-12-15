@@ -2,6 +2,8 @@
 
 from typing import Optional, List
 
+from opentrons.types import StagingSlotName
+
 
 def get_north_slot(slot: int) -> Optional[int]:
     """Get slot north of the given slot."""
@@ -33,6 +35,19 @@ def get_west_slot(slot: int) -> Optional[int]:
         return None
     else:
         return slot - 1
+
+
+_WEST_OF_STAGING_SLOT_MAP = {
+    StagingSlotName.SLOT_A4: "A3",
+    StagingSlotName.SLOT_B4: "B3",
+    StagingSlotName.SLOT_C4: "C3",
+    StagingSlotName.SLOT_D4: "D3",
+}
+
+
+def get_west_of_staging_slot(staging_slot: StagingSlotName) -> str:
+    """Get slot west of a staging slot."""
+    return _WEST_OF_STAGING_SLOT_MAP[staging_slot]
 
 
 def get_east_west_slots(slot: int) -> List[int]:

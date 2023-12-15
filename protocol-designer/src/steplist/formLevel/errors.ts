@@ -148,6 +148,7 @@ export const incompatibleLabware = (
 ): FormError | null => {
   const { labware, pipette } = fields
   if (!labware || !pipette) return null
+  //  trashBin and wasteChute cannot mix into a labware
   return !canPipetteUseLabware(pipette.spec, labware.def)
     ? INCOMPATIBLE_LABWARE
     : null
@@ -157,7 +158,11 @@ export const incompatibleDispenseLabware = (
 ): FormError | null => {
   const { dispense_labware, pipette } = fields
   if (!dispense_labware || !pipette) return null
-  return !canPipetteUseLabware(pipette.spec, dispense_labware.def)
+  return !canPipetteUseLabware(
+    pipette.spec,
+    'def' in dispense_labware ? dispense_labware.def : undefined,
+    'name' in dispense_labware ? dispense_labware.name : undefined
+  )
     ? INCOMPATIBLE_DISPENSE_LABWARE
     : null
 }
@@ -166,6 +171,7 @@ export const incompatibleAspirateLabware = (
 ): FormError | null => {
   const { aspirate_labware, pipette } = fields
   if (!aspirate_labware || !pipette) return null
+  //  trashBin and wasteChute cannot aspirate into a labware
   return !canPipetteUseLabware(pipette.spec, aspirate_labware.def)
     ? INCOMPATIBLE_ASPIRATE_LABWARE
     : null
@@ -215,19 +221,17 @@ export const wellRatioMoveLiquid = (
 ): FormError | null => {
   const { aspirate_wells, dispense_wells, dispense_labware } = fields
   const dispenseLabware = dispense_labware?.name ?? null
-  const isDispensingIntoWasteChute =
-    dispenseLabware != null ? dispenseLabware === 'wasteChute' : false
-  if (!aspirate_wells || (!isDispensingIntoWasteChute && !dispense_wells))
+  const isDispensingIntoTrash =
+    dispenseLabware != null
+      ? dispenseLabware === 'wasteChute' || dispenseLabware === 'trashBin'
+      : false
+  if (!aspirate_wells || (!isDispensingIntoTrash && !dispense_wells))
     return null
-  const wellRatioFormError = isDispensingIntoWasteChute
+  const wellRatioFormError = isDispensingIntoTrash
     ? WELL_RATIO_MOVE_LIQUID_INTO_WASTE_CHUTE
     : WELL_RATIO_MOVE_LIQUID
 
-  return getWellRatio(
-    aspirate_wells,
-    dispense_wells,
-    isDispensingIntoWasteChute
-  )
+  return getWellRatio(aspirate_wells, dispense_wells, isDispensingIntoTrash)
     ? null
     : wellRatioFormError
 }

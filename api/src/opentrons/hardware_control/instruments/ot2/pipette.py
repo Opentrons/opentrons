@@ -29,7 +29,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 
 from opentrons.types import Point, Mount
-from opentrons.config import robot_configs, feature_flags as ff
+from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig
 from opentrons.drivers.types import MoveSplit
 from ..instrument_abc import AbstractInstrument
@@ -83,6 +83,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         config: PipetteConfigurations,
         pipette_offset_cal: PipetteOffsetByPipetteMount,
         pipette_id: Optional[str] = None,
+        use_old_aspiration_functions: bool = False,
     ) -> None:
         self._config = config
         self._config_as_dict = config.dict()
@@ -146,7 +147,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
         self._tip_overlap_lookup = self._liquid_class.tip_overlap_dictionary
 
-        if ff.use_old_aspiration_functions():
+        if use_old_aspiration_functions:
             self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
         else:
             self._pipetting_function_version = PIPETTING_FUNCTION_LATEST_VERSION
@@ -591,6 +592,7 @@ def _reload_and_check_skip(
     new_config: PipetteConfigurations,
     attached_instr: Pipette,
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Pipette, bool]:
     # Once we have determined that the new and attached pipettes
     # are similar enough that we might skip, see if the configs
@@ -611,7 +613,12 @@ def _reload_and_check_skip(
                 changed.add(k)
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
-            p = Pipette(new_config, pipette_offset, attached_instr._pipette_id)
+            p = Pipette(
+                new_config,
+                pipette_offset,
+                attached_instr._pipette_id,
+                use_old_aspiration_functions,
+            )
             p.act_as(attached_instr.acting_as)
             return p, False
     # Good to skip
@@ -624,6 +631,7 @@ def load_from_config_and_check_skip(
     requested: Optional[PipetteName],
     serial: Optional[str],
     pipette_offset: PipetteOffsetByPipetteMount,
+    use_old_aspiration_functions: bool,
 ) -> Tuple[Optional[Pipette], bool]:
     """
     Given the pipette config for an attached pipette (if any) freshly read
@@ -651,16 +659,23 @@ def load_from_config_and_check_skip(
                 # configured to the request
                 if requested == str(attached.acting_as):
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached, pipette_offset)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset, use_old_aspiration_functions
+                    )
             else:
                 # if there is no request, make sure that the old pipette
                 # did not have backcompat applied
                 if str(attached.acting_as) == attached.name:
                     # similar enough to check
-                    return _reload_and_check_skip(config, attached, pipette_offset)
+                    return _reload_and_check_skip(
+                        config, attached, pipette_offset, use_old_aspiration_functions
+                    )
 
     if config:
-        return Pipette(config, pipette_offset, serial), False
+        return (
+            Pipette(config, pipette_offset, serial, use_old_aspiration_functions),
+            False,
+        )
     else:
         return None, False
 

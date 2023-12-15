@@ -60,6 +60,7 @@ from opentrons.hardware_control.types import (
     SubSystemState,
     TipStateType,
     GripperJawState,
+    HardwareFeatureFlags,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -98,6 +99,7 @@ class OT3Simulator:
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> OT3Simulator:
         """Create the OT3Simulator instance.
 
@@ -113,6 +115,7 @@ class OT3Simulator:
             config,
             loop,
             strict_attached_instruments,
+            feature_flags,
         )
 
     def __init__(
@@ -122,6 +125,7 @@ class OT3Simulator:
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
+        feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> None:
         """Construct.
 
@@ -138,6 +142,7 @@ class OT3Simulator:
         self._lights = {"button": False, "rails": False}
         self._estop_state_machine = EstopStateMachine(detector=None)
         self._gear_motor_position: Dict[NodeId, float] = {}
+        self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -236,6 +241,10 @@ class OT3Simulator:
         self._current_settings = get_current_settings(
             self._configuration.current_settings, gantry_load
         )
+
+    def update_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
+        """Update the hardware feature flags used by the hardware controller."""
+        self._feature_flags = feature_flags
 
     def _handle_motor_status_update(self, response: Dict[NodeId, float]) -> None:
         self._position.update(response)

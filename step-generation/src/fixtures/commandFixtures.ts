@@ -1,9 +1,9 @@
-import { FIXED_TRASH_ID } from '../constants'
 import { tiprackWellNamesFlat } from './data'
-import type {
+import {
   AspDispAirgapParams,
   BlowoutParams,
   CreateCommand,
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   TouchTipParams,
 } from '@opentrons/shared-data'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'
@@ -36,7 +36,7 @@ export function getErrorResult(
   return result
 }
 export const replaceTipCommands = (tip: number | string): CreateCommand[] => [
-  dropTipHelper('A1'),
+  ...dropTipHelper(),
   pickUpTipHelper(tip),
 ]
 // NOTE: make sure none of these numbers match each other!
@@ -156,14 +156,14 @@ export const makeAirGapHelper: MakeAirGapHelper<AspDispAirgapParams> = bakedPara
   },
 })
 export const blowoutHelper = (
-  labware?: string | null | undefined,
+  labware: string,
   params?: Partial<BlowoutParams>
 ): CreateCommand => ({
   commandType: 'blowout',
   key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
-    labwareId: labware || FIXED_TRASH_ID,
+    labwareId: labware,
     wellName: DEFAULT_BLOWOUT_WELL,
     wellLocation: {
       origin: 'bottom',
@@ -176,6 +176,25 @@ export const blowoutHelper = (
     ...params,
   },
 })
+export const blowoutInPlaceHelper = (): CreateCommand[] => [
+  {
+    commandType: 'moveToAddressableArea',
+    key: expect.any(String),
+    params: {
+      pipetteId: 'p300SingleId',
+      addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
+    },
+  },
+  {
+    commandType: 'blowOutInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: 'p300SingleId',
+      flowRate: 2.3,
+    },
+  },
+]
 const _defaultDispenseParams = {
   pipetteId: DEFAULT_PIPETTE,
   labwareId: DEST_LABWARE,
@@ -278,23 +297,45 @@ export const delayWithOffset = (
   },
 ]
 // =================
-export const dropTipHelper = (
-  wellName: string,
-  params?: {
-    pipetteId?: string
-    labwareId?: string
-  }
-): CreateCommand => ({
-  commandType: 'dropTip',
-  key: expect.any(String),
-  params: {
-    pipetteId: DEFAULT_PIPETTE,
-    labwareId: FIXED_TRASH_ID,
-    wellName:
-      typeof wellName === 'string' ? wellName : tiprackWellNamesFlat[wellName],
-    ...params,
+export const dropTipHelper = (pipette?: string): CreateCommand[] => [
+  {
+    commandType: 'moveToAddressableAreaForDropTip',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+      addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
+      alternateDropLocation: true,
+    },
   },
-})
+  {
+    commandType: 'dropTipInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+    },
+  },
+]
+export const dropTipIntoWasteChuteHelper = (
+  pipette?: string
+): CreateCommand[] => [
+  {
+    commandType: 'moveToAddressableArea',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+      addressableAreaName: 'movableTrashA3',
+      offset: { x: 0, y: 0, z: 0 },
+    },
+  },
+  {
+    commandType: 'dropTipInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+    },
+  },
+]
 export const pickUpTipHelper = (
   tip: number | string,
   params?: {
@@ -329,7 +370,8 @@ export const moveToAddressableAreaHelper = (params?: {
   key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
-    addressableAreaName: '1and8ChannelWasteChute',
+    addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+    offset: { x: 0, y: 0, z: 0 },
     ...params,
   },
 })

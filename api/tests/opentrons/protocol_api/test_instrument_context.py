@@ -123,6 +123,38 @@ def test_api_version(api_version: APIVersion, subject: InstrumentContext) -> Non
     assert subject.api_version == api_version
 
 
+@pytest.mark.parametrize("channels_from_core", [1, 8, 96])
+def test_channels(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+) -> None:
+    """It should return the number of channels, as returned by the core."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.channels == channels_from_core
+
+
+@pytest.mark.parametrize(
+    ("channels_from_core", "expected_type"),
+    [
+        (1, "single"),
+        (8, "multi"),
+        (96, "multi"),
+    ],
+)
+def test_type(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+    expected_type: str,
+) -> None:
+    """It should map the number of channels from the core into the string "single" or "multi"."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.type == expected_type
+
+
 def test_trash_container(
     decoy: Decoy,
     mock_trash: Labware,
@@ -480,7 +512,7 @@ def test_pick_up_tip_from_labware(
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
@@ -534,7 +566,7 @@ def test_pick_up_tip_from_labware_location(
     location = Location(point=Point(1, 2, 3), labware=mock_tip_rack)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
@@ -568,7 +600,7 @@ def test_pick_up_from_associated_tip_racks(
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
             starting_tip=mock_starting_tip,

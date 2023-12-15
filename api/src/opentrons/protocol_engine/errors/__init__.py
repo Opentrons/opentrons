@@ -5,6 +5,8 @@ from .exceptions import (
     UnexpectedProtocolError,
     FailedToLoadPipetteError,
     PipetteNotAttachedError,
+    InvalidSpecificationForRobotTypeError,
+    InvalidLoadPipetteSpecsError,
     TipNotAttachedError,
     TipAttachedError,
     CommandDoesNotExistError,
@@ -73,6 +75,8 @@ __all__ = [
     "UnexpectedProtocolError",
     "FailedToLoadPipetteError",
     "PipetteNotAttachedError",
+    "InvalidSpecificationForRobotTypeError",
+    "InvalidLoadPipetteSpecsError",
     "TipNotAttachedError",
     "TipAttachedError",
     "CommandDoesNotExistError",
@@ -134,4 +138,5 @@ __all__ = [
     "NotSupportedOnRobotType",
     # error occurrence models
     "ErrorOccurrence",
+    "FailedGripperPickupError",
 ]

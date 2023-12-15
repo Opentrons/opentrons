@@ -112,7 +112,6 @@ export const getOnDeviceDisplaySettings: (
       brightness: config?.onDeviceDisplaySettings?.brightness ?? 4,
       textSize: config?.onDeviceDisplaySettings?.textSize ?? 1,
       unfinishedUnboxingFlowRoute:
-        config?.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ??
-        '/welcome',
+        config?.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ?? null,
     }
 )

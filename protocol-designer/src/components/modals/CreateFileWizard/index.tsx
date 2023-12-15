@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -45,7 +44,6 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
-import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
@@ -61,6 +59,9 @@ import { getTrashSlot } from './utils'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
+import { i18n } from '../../../localization'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../../types'
 
 type WizardStep =
   | 'robotType'
@@ -94,14 +95,11 @@ export const adapter96ChannelDefUri =
   'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 export function CreateFileWizard(): JSX.Element | null {
-  const { t } = useTranslation()
   const showWizard = useSelector(getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-  const enableDeckModification = useSelector(getEnableDeckModification)
-
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [wizardSteps, setWizardSteps] = React.useState<WizardStep[]>(
     WIZARD_STEPS
@@ -114,7 +112,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
   }, [showWizard])
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const handleCancel = (): void => {
     dispatch(navigationActions.toggleNewProtocolModal(false))
@@ -167,7 +165,7 @@ export function CreateFileWizard(): JSX.Element | null {
 
     if (
       !hasUnsavedChanges ||
-      window.confirm(t('alert.window.confirm_create_new'))
+      window.confirm(i18n.t('alert.window.confirm_create_new'))
     ) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
@@ -209,11 +207,7 @@ export function CreateFileWizard(): JSX.Element | null {
       )
 
       //  add trash
-      if (
-        (enableDeckModification &&
-          values.additionalEquipment.includes('trashBin')) ||
-        !enableDeckModification
-      ) {
+      if (values.additionalEquipment.includes('trashBin')) {
         // defaulting trash to appropriate locations
         dispatch(
           createDeckFixture(
@@ -226,17 +220,14 @@ export function CreateFileWizard(): JSX.Element | null {
       }
 
       // add waste chute
-      if (
-        enableDeckModification &&
-        values.additionalEquipment.includes('wasteChute')
-      ) {
+      if (values.additionalEquipment.includes('wasteChute')) {
         dispatch(createDeckFixture('wasteChute', WASTE_CHUTE_CUTOUT))
       }
       //  add staging areas
       const stagingAreas = values.additionalEquipment.filter(equipment =>
         equipment.includes('stagingArea')
       )
-      if (enableDeckModification && stagingAreas.length > 0) {
+      if (stagingAreas.length > 0) {
         stagingAreas.forEach(stagingArea => {
           const [, location] = stagingArea.split('_')
           dispatch(createDeckFixture('stagingArea', location))
@@ -276,7 +267,7 @@ export function CreateFileWizard(): JSX.Element | null {
   }
   const wizardHeader = (
     <WizardHeader
-      title={t('modal.create_file_wizard.create_new_protocol')}
+      title={i18n.t('modal.create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
       totalSteps={wizardSteps.length - 1}
       onExit={handleCancel}

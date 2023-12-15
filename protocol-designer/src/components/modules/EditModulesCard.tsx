@@ -17,7 +17,6 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
-import { getEnableDeckModification } from '../../feature-flags/selectors'
 import { getAdditionalEquipment } from '../../step-forms/selectors'
 import {
   deleteDeckFixture,
@@ -39,7 +38,6 @@ export interface Props {
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
-  const enableDeckModification = useSelector(getEnableDeckModification)
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
@@ -153,7 +151,7 @@ export function EditModulesCard(props: Props): JSX.Element {
             )
           }
         })}
-        {enableDeckModification && isFlex ? (
+        {isFlex ? (
           <>
             <StagingAreasRow
               handleAttachment={handleDeleteStagingAreas}
@@ -172,11 +170,10 @@ export function EditModulesCard(props: Props): JSX.Element {
               trashBinId={trashBin?.id}
             />
             <AdditionalItemsRow
-              handleAttachment={() =>
-                dispatch(
-                  wasteChute != null ? deleteDeckFixture(wasteChute.id) : null
-                )
-              }
+              handleAttachment={() => {
+                if (wasteChute != null)
+                  dispatch(deleteDeckFixture(wasteChute.id))
+              }}
               isEquipmentAdded={wasteChute != null}
               name="wasteChute"
               hasWasteChute={wasteChute != null}

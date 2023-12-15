@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { parseAllRequiredModuleModels } from '@opentrons/api-client'
+import {
+  parseAllRequiredModuleModels,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -21,7 +24,6 @@ import { InfoMessage } from '../../../molecules/InfoMessage'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,
-  getSimplestDeckConfigForProtocolCommands,
 } from '../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import {
@@ -89,7 +91,7 @@ export function ProtocolRunSetup({
   const robotType = isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
-    protocolAnalysis?.commands ?? []
+    protocolAnalysis
   )
 
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
@@ -130,17 +132,24 @@ export function ProtocolRunSetup({
   })
 
   if (robot == null) return null
-  const hasLiquids =
-    protocolAnalysis != null && protocolAnalysis.liquids?.length > 0
+
+  const liquids = protocolAnalysis?.liquids ?? []
+
+  const liquidsInLoadOrder =
+    protocolAnalysis != null
+      ? parseLiquidsInLoadOrder(liquids, protocolAnalysis.commands)
+      : []
+
+  const hasLiquids = liquidsInLoadOrder.length > 0
+
   const hasModules = protocolAnalysis != null && modules.length > 0
 
-  const protocolDeckConfig = getSimplestDeckConfigForProtocolCommands(
-    protocolAnalysis?.commands ?? []
+  // need config compatibility (including check for single slot conflicts)
+  const requiredDeckConfigCompatibility = getRequiredDeckConfig(
+    deckConfigCompatibility
   )
 
-  const requiredDeckConfig = getRequiredDeckConfig(protocolDeckConfig)
-
-  const hasFixtures = requiredDeckConfig.length > 0
+  const hasFixtures = requiredDeckConfigCompatibility.length > 0
 
   let moduleDescription: string = t(`${MODULE_SETUP_KEY}_description`, {
     count: modules.length,
@@ -185,7 +194,7 @@ export function ProtocolRunSetup({
           robotName={robotName}
           runId={runId}
           hasModules={hasModules}
-          commands={protocolAnalysis?.commands ?? []}
+          protocolAnalysis={protocolAnalysis}
         />
       ),
       description: moduleDescription,

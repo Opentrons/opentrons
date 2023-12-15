@@ -12,6 +12,7 @@ from typing import (
     Tuple,
     NamedTuple,
     cast,
+    Union,
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
@@ -19,7 +20,7 @@ from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, StagingSlotName, MountType
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -285,7 +286,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_by_slot(
         self,
-        slot_name: DeckSlotName,
+        slot_name: Union[DeckSlotName, StagingSlotName],
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
         loaded_labware = list(self._state.labware_by_id.values())
@@ -293,7 +294,10 @@ class LabwareView(HasState[LabwareState]):
         for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)
-                and labware.location.slotName == slot_name
+                and labware.location.slotName.id == slot_name.id
+            ) or (
+                isinstance(labware.location, AddressableAreaLocation)
+                and labware.location.addressableAreaName == slot_name.id
             ):
                 return labware
 
@@ -305,9 +309,20 @@ class LabwareView(HasState[LabwareState]):
             LabwareUri(self.get(labware_id).definitionUri)
         )
 
-    def get_display_name(self, labware_id: str) -> Optional[str]:
+    def get_user_specified_display_name(self, labware_id: str) -> Optional[str]:
         """Get the labware's user-specified display name, if set."""
         return self.get(labware_id).displayName
+
+    def get_display_name(self, labware_id: str) -> str:
+        """Get the labware's display name.
+
+        If a user-specified display name exists, will return that, else will return
+        display name from the definition.
+        """
+        return (
+            self.get_user_specified_display_name(labware_id)
+            or self.get_definition(labware_id).metadata.displayName
+        )
 
     def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the current deck definition."""
@@ -651,7 +666,6 @@ class LabwareView(HasState[LabwareState]):
                 DeckSlotName.SLOT_A3,
             }:
                 return labware.id
-
         return None
 
     def is_fixed_trash(self, labware_id: str) -> bool:

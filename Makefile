@@ -61,7 +61,6 @@ setup-js:
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
-	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 

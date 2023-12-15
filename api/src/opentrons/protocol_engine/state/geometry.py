@@ -1,12 +1,13 @@
 """Geometry state getters."""
 import enum
 from numpy import array, dot
-from typing import Optional, List, Tuple, Union, cast, TypeVar
+from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict
 
-from opentrons.types import Point, DeckSlotName, MountType
+from opentrons.types import Point, DeckSlotName, StagingSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
+from ..errors import LabwareNotLoadedOnLabwareError, LabwareNotLoadedOnModuleError
 from ..resources import fixture_validation
 from ..types import (
     OFF_DECK_LOCATION,
@@ -31,6 +32,7 @@ from ..types import (
     LabwareMovementOffsetData,
     OnDeckLabwareLocation,
     AddressableAreaLocation,
+    AddressableOffsetVector,
 )
 from .config import Config
 from .labware import LabwareView
@@ -81,7 +83,7 @@ class GeometryView:
         self._modules = module_view
         self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
-        self._last_drop_tip_location_spot: Optional[_TipDropSection] = None
+        self._last_drop_tip_location_spot: Dict[str, _TipDropSection] = {}
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
@@ -89,9 +91,8 @@ class GeometryView:
 
         return self._get_highest_z_from_labware_data(labware_data)
 
-    # TODO(mc, 2022-06-24): rename this method
-    def get_all_labware_highest_z(self) -> float:
-        """Get the highest Z-point across all labware."""
+    def get_all_obstacle_highest_z(self) -> float:
+        """Get the highest Z-point across all obstacles that the instruments need to fly over."""
         highest_labware_z = max(
             (
                 self._get_highest_z_from_labware_data(lw_data)
@@ -101,6 +102,8 @@ class GeometryView:
             default=0.0,
         )
 
+        # Fixme (spp, 2023-12-04): the overall height is not the true highest z of modules
+        #  on a Flex.
         highest_module_z = max(
             (
                 self._modules.get_overall_height(module.id)
@@ -109,15 +112,65 @@ class GeometryView:
             default=0.0,
         )
 
-        highest_addressable_area_z = max(
-            (
-                self._addressable_areas.get_addressable_area_height(area_name)
-                for area_name in self._addressable_areas.get_all()
-            ),
-            default=0.0,
+        cutout_fixture_names = self._addressable_areas.get_all_cutout_fixtures()
+        if cutout_fixture_names is None:
+            # We're using a simulated deck config (see `Config.use_simulated_deck_config`).
+            # We only know the addressable areas referenced by the protocol, not the fixtures
+            # providing them. And there is more than one possible configuration of fixtures
+            # to provide them. So, we can't know what the highest fixture is. Default to 0.
+            #
+            # Defaulting to 0 may not be the right thing to do here.
+            # For example, suppose a protocol references an addressable area that implies a tall
+            # fixture must be on the deck, and then it uses long tips that wouldn't be able to
+            # clear the top of that fixture. We should perhaps raise an analysis error for that,
+            # but defaulting to 0 here means we won't.
+            highest_fixture_z = 0.0
+        else:
+            highest_fixture_z = max(
+                (
+                    self._addressable_areas.get_fixture_height(cutout_fixture_name)
+                    for cutout_fixture_name in cutout_fixture_names
+                ),
+                default=0.0,
+            )
+
+        return max(
+            highest_labware_z,
+            highest_module_z,
+            highest_fixture_z,
         )
 
-        return max(highest_labware_z, highest_module_z, highest_addressable_area_z)
+    def get_highest_z_in_slot(self, slot: DeckSlotLocation) -> float:
+        """Get the highest Z-point of all items stacked in the given deck slot."""
+        slot_item = self.get_slot_item(slot.slotName)
+        if isinstance(slot_item, LoadedModule):
+            # get height of module + all labware on it
+            module_id = slot_item.id
+            try:
+                labware_id = self._labware.get_id_by_module(module_id=module_id)
+            except LabwareNotLoadedOnModuleError:
+                deck_type = DeckType(self._labware.get_deck_definition()["otId"])
+                return self._modules.get_module_highest_z(
+                    module_id=module_id, deck_type=deck_type
+                )
+            else:
+                return self.get_highest_z_of_labware_stack(labware_id)
+        elif isinstance(slot_item, LoadedLabware):
+            # get stacked heights of all labware in the slot
+            return self.get_highest_z_of_labware_stack(slot_item.id)
+        else:
+            return 0
+
+    def get_highest_z_of_labware_stack(self, labware_id: str) -> float:
+        """Get the highest Z-point of the topmost labware in the stack of labware on the given labware.
+
+        If there is no labware on the given labware, returns highest z of the given labware.
+        """
+        try:
+            stacked_labware_id = self._labware.get_id_by_labware(labware_id)
+        except LabwareNotLoadedOnLabwareError:
+            return self.get_labware_highest_z(labware_id)
+        return self.get_highest_z_of_labware_stack(stacked_labware_id)
 
     def get_min_travel_z(
         self,
@@ -134,7 +187,7 @@ class GeometryView:
         ):
             min_travel_z = self.get_labware_highest_z(labware_id)
         else:
-            min_travel_z = self.get_all_labware_highest_z()
+            min_travel_z = self.get_all_obstacle_highest_z()
         if minimum_z_height:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z
@@ -361,6 +414,13 @@ class GeometryView:
         z_dim = definition.dimensions.zDimension
         height_over_labware: float = 0
         if isinstance(lw_data.location, ModuleLocation):
+            # Note: when calculating highest z of stacked labware, height-over-labware
+            # gets accounted for only if the top labware is directly on the module.
+            # So if there's a labware on an adapter on a module, then this
+            # over-module-height gets ignored. We currently do not have any modules
+            # that use an adapter and has height over labware so this doesn't cause
+            # any issues yet. But if we add one in the future then this calculation
+            # should be updated.
             module_id = lw_data.location.moduleId
             height_over_labware = self._modules.get_height_over_labware(module_id)
         return labware_pos.z + z_dim + height_over_labware
@@ -558,14 +618,11 @@ class GeometryView:
         elif isinstance(location, AddressableAreaLocation):
             location_name = location.addressableAreaName
             if fixture_validation.is_gripper_waste_chute(location_name):
-                gripper_waste_chute = self._addressable_areas.get_addressable_area(
-                    location_name
-                )
-                drop_labware_location = gripper_waste_chute.drop_labware_location
-                if drop_labware_location is None:
-                    raise ValueError(
-                        f"{location_name} does not have a drop labware location associated with it"
+                drop_labware_location = (
+                    self._addressable_areas.get_addressable_area_move_to_location(
+                        location_name
                     )
+                )
                 return drop_labware_location + Point(z=grip_height_from_labware_bottom)
             # Location should have been pre-validated so this will be a deck/staging area slot
             else:
@@ -621,16 +678,20 @@ class GeometryView:
         return []
 
     def get_slot_item(
-        self,
-        slot_name: DeckSlotName,
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LoadedLabware, LoadedModule, None]:
         """Get the item present in a deck slot, if any."""
         maybe_labware = self._labware.get_by_slot(
             slot_name=slot_name,
         )
-        maybe_module = self._modules.get_by_slot(
-            slot_name=slot_name,
-        )
+
+        if isinstance(slot_name, DeckSlotName):
+            maybe_module = self._modules.get_by_slot(
+                slot_name=slot_name,
+            )
+        else:
+            # Modules can't be loaded on staging slots
+            maybe_module = None
 
         return maybe_labware or maybe_module or None
 
@@ -693,7 +754,7 @@ class GeometryView:
             slot_name=self.get_ancestor_slot_name(labware_id)
         )
 
-        if self._last_drop_tip_location_spot == _TipDropSection.RIGHT:
+        if self._last_drop_tip_location_spot.get(labware_id) == _TipDropSection.RIGHT:
             # Drop tip in LEFT section
             x_offset = self._get_drop_tip_well_x_offset(
                 tip_drop_section=_TipDropSection.LEFT,
@@ -702,7 +763,7 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot = _TipDropSection.LEFT
+            self._last_drop_tip_location_spot[labware_id] = _TipDropSection.LEFT
         else:
             # Drop tip in RIGHT section
             x_offset = self._get_drop_tip_well_x_offset(
@@ -712,7 +773,7 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot = _TipDropSection.RIGHT
+            self._last_drop_tip_location_spot[labware_id] = _TipDropSection.RIGHT
 
         return DropTipWellLocation(
             origin=DropTipWellOrigin.TOP,
@@ -722,6 +783,59 @@ class GeometryView:
                 z=0,
             ),
         )
+
+    # TODO find way to combine this with above
+    def get_next_tip_drop_location_for_addressable_area(
+        self,
+        addressable_area_name: str,
+        pipette_id: str,
+    ) -> AddressableOffsetVector:
+        """Get the next location within the specified well to drop the tip into.
+
+        See the doc-string for `get_next_tip_drop_location` for more info on execution.
+        """
+        area_x_dim = self._addressable_areas.get_addressable_area(
+            addressable_area_name
+        ).bounding_box.x
+
+        pipette_channels = self._pipettes.get_config(pipette_id).channels
+        pipette_mount = self._pipettes.get_mount(pipette_id)
+
+        labware_slot_column = self.get_slot_column(
+            slot_name=self._addressable_areas.get_addressable_area_base_slot(
+                addressable_area_name
+            )
+        )
+
+        if (
+            self._last_drop_tip_location_spot.get(addressable_area_name)
+            == _TipDropSection.RIGHT
+        ):
+            # Drop tip in LEFT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.LEFT,
+                well_x_dim=area_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot[
+                addressable_area_name
+            ] = _TipDropSection.LEFT
+        else:
+            # Drop tip in RIGHT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.RIGHT,
+                well_x_dim=area_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot[
+                addressable_area_name
+            ] = _TipDropSection.RIGHT
+
+        return AddressableOffsetVector(x=x_offset, y=0, z=0)
 
     @staticmethod
     def _get_drop_tip_well_x_offset(
@@ -744,7 +858,7 @@ class GeometryView:
             ):
                 # Pipette might not reach the default left spot so use a different left spot
                 x_well_offset = (
-                    well_x_dim / 2 - SLOT_WIDTH + drop_location_margin_from_labware_edge
+                    -well_x_dim / 2 + drop_location_margin_from_labware_edge * 2
                 )
             else:
                 x_well_offset = -well_x_dim / 2 + drop_location_margin_from_labware_edge

@@ -205,6 +205,32 @@ class SyncClient:
 
         return cast(commands.MoveToAddressableAreaResult, result)
 
+    def move_to_addressable_area_for_drop_tip(
+        self,
+        pipette_id: str,
+        addressable_area_name: str,
+        offset: AddressableOffsetVector,
+        minimum_z_height: Optional[float],
+        force_direct: bool,
+        speed: Optional[float],
+        alternate_drop_location: Optional[bool],
+    ) -> commands.MoveToAddressableAreaForDropTipResult:
+        """Execute a MoveToAddressableArea command and return the result."""
+        request = commands.MoveToAddressableAreaForDropTipCreate(
+            params=commands.MoveToAddressableAreaForDropTipParams(
+                pipetteId=pipette_id,
+                addressableAreaName=addressable_area_name,
+                offset=offset,
+                forceDirect=force_direct,
+                minimumZHeight=minimum_z_height,
+                speed=speed,
+                alternateDropLocation=alternate_drop_location,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.MoveToAddressableAreaForDropTipResult, result)
+
     def move_to_coordinates(
         self,
         pipette_id: str,
@@ -326,7 +352,7 @@ class SyncClient:
         """Execute a ConfigureForVolume command."""
         request = commands.ConfigureNozzleLayoutCreate(
             params=commands.ConfigureNozzleLayoutParams(
-                pipetteId=pipette_id, configuration_params=configuration_params
+                pipetteId=pipette_id, configurationParams=configuration_params
             )
         )
         result = self._transport.execute_command(request=request)

@@ -1,12 +1,12 @@
 import {
   checkModuleCompatibility,
   FLEX_ROBOT_TYPE,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
-import { getCutoutIdForSlotName } from '../../../resources/deck_configuration/utils'
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from './useAttachedModules'
@@ -25,11 +25,15 @@ export interface ModuleRenderInfoById {
   [moduleId: string]: ModuleRenderInfoForProtocol
 }
 
+const DECK_CONFIG_REFETCH_INTERVAL = 5000
+
 export function useModuleRenderInfoForProtocolById(
   runId: string
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig } = useDeckConfigurationQuery()
+  const { data: deckConfig } = useDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+  })
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
   const attachedModules = useAttachedModules()

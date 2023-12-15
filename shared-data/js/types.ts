@@ -266,9 +266,15 @@ export interface CutoutFixture {
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  height: number
 }
 
-type AreaType = 'slot' | 'movableTrash' | 'wasteChute' | 'fixedTrash'
+type AreaType =
+  | 'slot'
+  | 'movableTrash'
+  | 'wasteChute'
+  | 'fixedTrash'
+  | 'stagingSlot'
 
 export interface AddressableArea {
   id: AddressableAreaName
@@ -279,8 +285,6 @@ export interface AddressableArea {
   compatibleModuleTypes: ModuleType[]
   ableToDropLabware?: boolean
   ableToDropTips?: boolean
-  dropLabwareOffset?: CoordinateTuple
-  dropTipsOffset?: CoordinateTuple
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 
@@ -534,6 +538,7 @@ export interface GripperDefinition {
     pinOneOffsetFromBase: [number, number, number]
     pinTwoOffsetFromBase: [number, number, number]
     jawWidth: { min: number; max: number }
+    maxAllowedGripError: number
   }
 }
 

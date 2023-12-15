@@ -702,6 +702,41 @@ class ModuleView(HasState[ModuleState]):
         """Get the height of module parts above module labware base."""
         return self.get_dimensions(module_id).overLabwareHeight
 
+    def get_module_highest_z(self, module_id: str, deck_type: DeckType) -> float:
+        """Get the highest z point of the module, as placed on the robot.
+
+        The highest Z of a module, unlike the bare overall height, depends on
+        the robot it is on. We will calculate this value using the info we already have
+        about the transformation of the module's placement, based on the deck it is on.
+
+        This value is calculated as:
+        highest_z = ( nominal_robot_transformed_labware_offset_z
+                      + z_difference_between_default_labware_offset_point_and_overall_height
+                      + module_calibration_offset_z
+        )
+
+        For OT2, the default_labware_offset point is the same as nominal_robot_transformed_labware_offset_z
+        and hence the highest z will equal to the overall height of the module.
+
+        For Flex, since those two offsets are not the same, the final highest z will be
+        transformed the same amount as the labware offset point is.
+
+        Note: For thermocycler, the lid height is not taken into account.
+        """
+        module_height = self.get_overall_height(module_id)
+        default_lw_offset_point = self.get_definition(module_id).labwareOffset.z
+        z_difference = module_height - default_lw_offset_point
+
+        nominal_transformed_lw_offset_z = self.get_nominal_module_offset(
+            module_id=module_id, deck_type=deck_type
+        ).z
+        calibration_offset = self.get_module_calibration_offset(module_id)
+        return (
+            nominal_transformed_lw_offset_z
+            + z_difference
+            + (calibration_offset.moduleOffsetVector.z if calibration_offset else 0)
+        )
+
     # TODO(mc, 2022-01-19): this method is missing unit test coverage and
     # is also unused. Remove or add tests.
     def get_lid_height(self, module_id: str) -> float:

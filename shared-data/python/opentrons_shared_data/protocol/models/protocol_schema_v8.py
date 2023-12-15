@@ -13,6 +13,7 @@ from .shared_models import (
     Metadata,
     DesignerApplication,
     Robot,
+    NozzleConfigurationParams,
 )
 
 
@@ -67,6 +68,7 @@ class Params(BaseModel):
     dropOffset: Optional[OffsetVector]
     # schema v8 add-ons
     addressableAreaName: Optional[str]
+    configurationParams: Optional[NozzleConfigurationParams]
 
 
 class Command(BaseModel):
