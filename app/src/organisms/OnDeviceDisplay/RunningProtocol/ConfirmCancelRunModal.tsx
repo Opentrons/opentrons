@@ -10,10 +10,7 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import {
-  useStopRunMutation,
-  useDismissCurrentRunMutation,
-} from '@opentrons/react-api-client'
+import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
@@ -40,7 +37,6 @@ export function ConfirmCancelRunModal({
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
-  const { isLoading: isDismissing } = useDismissCurrentRunMutation()
   const runStatus = useRunStatus(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const history = useHistory()
@@ -75,7 +71,7 @@ export function ConfirmCancelRunModal({
     }
   }, [runStatus])
 
-  return isCanceling || isDismissing ? (
+  return isCanceling ? (
     <CancelingRunModal />
   ) : (
     <Modal
