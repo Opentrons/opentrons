@@ -14,6 +14,7 @@ import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
+  useDeckConfigurationQuery,
   CreateMaintenanceRunType,
 } from '@opentrons/react-api-client'
 
@@ -29,6 +30,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Jog } from '../../molecules/JogControls'
 import { ExitConfirmation } from './ExitConfirmation'
+import { getAddressableAreaFromConfig } from './getAddressableAreaFromConfig'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
 import {
   BLOWOUT_SUCCESS,
@@ -50,6 +52,8 @@ import type {
   RobotType,
   SavePositionRunTimeCommand,
   CreateCommand,
+  DeckConfiguration,
+  AddressableAreaName,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 
@@ -70,6 +74,8 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     isCommandMutationLoading: isChainCommandMutationLoading,
   } = useChainMaintenanceCommands()
   const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
+
+  const deckConfig = useDeckConfigurationQuery().data ?? []
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null
@@ -187,6 +193,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}
+      deckConfig={deckConfig}
     />
   )
 }
@@ -208,6 +215,7 @@ interface DropTipWizardProps {
     typeof useCreateMaintenanceCommandMutation
   >['createMaintenanceCommand']
   instrumentModelSpecs: PipetteModelSpecs
+  deckConfig: DeckConfiguration
   maintenanceRunId?: string
 }
 
@@ -227,6 +235,7 @@ export const DropTipWizardComponent = (
     isExiting,
     createdMaintenanceRunId,
     instrumentModelSpecs,
+    deckConfig,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation('drop_tip_wizard')
@@ -338,7 +347,7 @@ export const DropTipWizardComponent = (
   }
 
   const moveToAddressableArea = (
-    addressableArea: string
+    addressableArea: AddressableAreaName
   ): Promise<CommandData | null> => {
     if (createdMaintenanceRunId == null) {
       return Promise.reject(
@@ -348,15 +357,27 @@ export const DropTipWizardComponent = (
 
     return retractAllAxesAndSavePosition()
       .then(currentPosition => {
-        if (currentPosition != null) {
+        const addressableAreaFromConfig = getAddressableAreaFromConfig(
+          addressableArea,
+          deckConfig,
+          instrumentModelSpecs.channels,
+          robotType
+        )
+
+        const zOffset =
+          addressableAreaFromConfig === addressableArea
+            ? (currentPosition as Coordinates).z - 10
+            : 0
+
+        if (currentPosition != null && addressableAreaFromConfig != null) {
           return createRunCommand({
             maintenanceRunId: createdMaintenanceRunId,
             command: {
               commandType: 'moveToAddressableArea',
               params: {
                 pipetteId: MANAGED_PIPETTE_ID,
-                addressableAreaName: addressableArea,
-                offset: { x: 0, y: 0, z: currentPosition.z - 10 },
+                addressableAreaName: addressableAreaFromConfig,
+                offset: { x: 0, y: 0, z: zOffset },
               },
             },
             waitUntilComplete: true,
