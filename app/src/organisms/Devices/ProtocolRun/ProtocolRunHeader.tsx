@@ -250,7 +250,7 @@ export function ProtocolRunHeader({
         },
       })
     }
-  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
+  }, [runStatus, isRunCurrent, runId])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP

@@ -365,7 +365,8 @@ export const DropTipWizardComponent = (
         )
 
         const zOffset =
-          addressableAreaFromConfig === addressableArea
+          addressableAreaFromConfig === addressableArea &&
+          addressableAreaFromConfig !== 'fixedTrash'
             ? (currentPosition as Coordinates).z - 10
             : 0
 
