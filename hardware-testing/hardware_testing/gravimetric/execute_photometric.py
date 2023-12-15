@@ -5,7 +5,7 @@ from math import ceil
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api.types import Point, OT3Mount
+from hardware_testing.opentrons_api.types import Point
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -215,7 +215,7 @@ def _run_trial(trial: PhotometricTrial) -> None:
             touch_tip=trial.cfg.touch_tip,
         )
         _record_measurement_and_store(MeasurementType.DISPENSE)
-        trial.ctx._core.get_hardware().retract(OT3Mount.LEFT)
+        trial.pipette._retract()  # retract to top of gantry
         if (i + 1) == num_dispenses:
             if not trial.cfg.same_tip:
                 _drop_tip(trial.pipette, trial.cfg.return_tip)

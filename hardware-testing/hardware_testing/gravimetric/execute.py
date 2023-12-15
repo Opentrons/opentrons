@@ -52,6 +52,7 @@ from .tips import MULTI_CHANNEL_TEST_ORDER
 import glob
 
 from opentrons.hardware_control.types import StatusBarState
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -88,7 +89,7 @@ def _generate_callbacks_for_trial(
     if blank_measurement:
         volume = None
 
-    hw_api = ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(ctx)
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     pip_ax = Axis.of_main_tool_actuator(hw_mount)
     estimate_bottom: float = -1
@@ -329,8 +330,7 @@ def _run_trial(
     else:
         # center channel over well
         trial.pipette.move_to(trial.well.top(50).move(trial.channel_offset))
-    mnt = OT3Mount.RIGHT if trial.pipette.mount == "right" else OT3Mount.LEFT
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    trial.pipette._retract()  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
@@ -359,7 +359,7 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.increment,
     )
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    trial.pipette._retract()  # retract to top of gantry
 
     _take_photos(trial, "aspirate")
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -381,7 +381,7 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.increment,
     )
-    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
+    trial.pipette._retract()  # retract to top of gantry
     _take_photos(trial, "dispense")
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
@@ -502,8 +502,7 @@ def _calculate_evaporation(
         resources.env_sensor,
     )
     ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
-    mnt = OT3Mount.RIGHT if resources.pipette.mount == "right" else OT3Mount.LEFT
-    resources.ctx._core.get_hardware().retract(mnt)
+    resources.pipette._retract()
     for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
         ui.print_info(
             f"wait for scale to stabilize "
@@ -547,7 +546,7 @@ def _get_liquid_height(
         if not resources.ctx.is_simulating() and not cfg.same_tip:
             ui.alert_user_ready(
                 f"Please replace the {cfg.tip_volume}ul tips in slot 2",
-                resources.ctx._core.get_hardware(),
+                get_sync_hw_api(resources.ctx),
             )
         _tip_counter[0] = 0
     if cfg.jog:
@@ -597,7 +596,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     recorder._recording = GravimetricRecording()
     report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
-    hw_api = resources.ctx._core.get_hardware()
+    hw_api = get_sync_hw_api(resources.ctx)
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
@@ -607,8 +606,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
-        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-        resources.ctx._core.get_hardware().retract(mnt)
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         _liquid_height = _get_liquid_height(resources, cfg, well)
@@ -696,12 +693,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             cfg,
                             location=next_tip_location,
                         )
-                        mnt = (
-                            OT3Mount.LEFT
-                            if cfg.pipette_mount == "left"
-                            else OT3Mount.RIGHT
-                        )
-                        resources.ctx._core.get_hardware().retract(mnt)
+                        resources.pipette._retract()  # retract to top of gantry
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -744,12 +736,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     )
                     ui.print_info("dropping tip")
                     if not cfg.same_tip:
-                        mnt = (
-                            OT3Mount.LEFT
-                            if cfg.pipette_mount == "left"
-                            else OT3Mount.RIGHT
-                        )
-                        resources.ctx._core.get_hardware().retract(mnt)
+                        resources.pipette._retract()  # retract to top of gantry
                         _drop_tip(
                             resources.pipette, cfg.return_tip, _minimum_z_height(cfg)
                         )

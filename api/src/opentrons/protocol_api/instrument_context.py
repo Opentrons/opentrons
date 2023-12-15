@@ -1479,7 +1479,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @property
+    @requires_version(2, 0)
+    def _retract(
+        self,
+    ) -> None:
+        self._core._retract()
+
+    @property  # type: ignore
     @requires_version(2, 0)
     def mount(self) -> str:
         """
