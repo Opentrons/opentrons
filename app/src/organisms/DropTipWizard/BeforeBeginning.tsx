@@ -58,7 +58,15 @@ export const BeforeBeginning = (
   }
 
   if (isRobotMoving || createdMaintenanceRunId == null) {
-    return <InProgressModal description={t('stand_back_exiting')} />
+    return (
+      <InProgressModal
+        description={
+          createdMaintenanceRunId == null
+            ? t('getting_ready')
+            : t('stand_back_exiting')
+        }
+      />
+    )
   }
 
   if (isOnDevice) {
