@@ -523,7 +523,7 @@ describe('ProtocolRunHeader', () => {
         data: { data: { ...mockIdleUnstartedRun, current: true } },
       } as UseQueryResult<Run>)
     render()
-    expect(mockCloseCurrentRun).toBeCalled()
+    expect(mockCloseCurrentRun).not.toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
       name: ANALYTICS_PROTOCOL_RUN_FINISH,
