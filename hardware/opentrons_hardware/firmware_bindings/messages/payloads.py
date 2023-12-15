@@ -531,7 +531,7 @@ class GripperJawStatePayload(EmptyPayload):
 class GripperJawHoldoffPayload(EmptyPayload):
     """A respones carrying info about the jaw holdoff value of a gripper."""
 
-    ticks: utils.UInt32Field
+    holdoff_ms: utils.UInt32Field
 
 
 @dataclass(eq=False)

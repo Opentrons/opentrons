@@ -105,16 +105,14 @@ async def set_error_tolerance(
 
 async def set_jaw_holdoff(
     can_messenger: CanMessenger,
-    holdoff_ms: int,
+    holdoff_ms: float,
 ) -> None:
     """Set the idle holdoff value for gripper jaw."""
     error = await can_messenger.ensure_send(
         node_id=NodeId.gripper_g,
         message=SetGripperJawHoldoffRequest(
             payload=payloads.GripperJawHoldoffPayload(
-                ticks=UInt32Field(
-                    int(1 / holdoff_ms * brushed_motor_interrupts_per_sec)
-                )
+                holdoff_ms=UInt32Field(int(holdoff_ms * (2**16)))
             )
         ),
         expected_nodes=[NodeId.gripper_g],
@@ -125,21 +123,17 @@ async def set_jaw_holdoff(
         )
 
 
-async def get_jaw_holdoff_ms(can_messenger: CanMessenger) -> int:
+async def get_jaw_holdoff_ms(can_messenger: CanMessenger) -> float:
     """Get the idle holdoff value for gripper jaw."""
 
     def _filter(arbitration_id: ArbitrationId) -> bool:
         return NodeId(arbitration_id.parts.originating_node_id) == NodeId.gripper_g
 
-    async def _wait_for_response(reader: WaitableCallback) -> int:
+    async def _wait_for_response(reader: WaitableCallback) -> float:
         """Listener for receiving messages back."""
         async for response, _ in reader:
             if isinstance(response, GripperJawHoldoffResponse):
-                return int(
-                    response.payload.ticks.value
-                    / brushed_motor_interrupts_per_sec
-                    * 1000
-                )
+                return float(response.payload.holdoff_ms.value / (2**16))
         raise StopAsyncIteration
 
     with WaitableCallback(can_messenger, _filter) as reader:
