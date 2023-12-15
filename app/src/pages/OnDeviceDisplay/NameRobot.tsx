@@ -59,6 +59,7 @@ export function NameRobot(): JSX.Element {
   const history = useHistory()
   const trackEvent = useTrackEvent()
   const localRobot = useSelector(getLocalRobot)
+  const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
   const [name, setName] = React.useState<string>('')
   const [newName, setNewName] = React.useState<string>('')
@@ -87,7 +88,7 @@ export function NameRobot(): JSX.Element {
     onSubmit: (values, { resetForm }) => {
       const newName = values.newRobotName.concat(name)
       const sameNameRobotInUnavailable = unreachableRobots.find(
-        robot => robot.name === newName
+        robot => robot.name === newName && robot.ip === ipAddress
       )
       if (sameNameRobotInUnavailable != null) {
         dispatch(removeRobot(sameNameRobotInUnavailable.name))
