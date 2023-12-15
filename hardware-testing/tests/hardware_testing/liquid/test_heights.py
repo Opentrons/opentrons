@@ -17,7 +17,7 @@ CUSTOM_LABWARE_DEFINITION_DIR = (
 
 
 def _create_context() -> ProtocolContext:
-    return get_api_context(api_level="2.15", is_simulating=True)
+    return get_api_context(api_level="2.16", is_simulating=True)
 
 
 def _load_labware(ctx: ProtocolContext) -> Tuple[Labware, Labware, Labware, Labware]:
