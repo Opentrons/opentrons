@@ -99,13 +99,13 @@ def test_get_pipette_location_with_no_current_location(
     assert result == PipetteLocationData(mount=MountType.LEFT, critical_point=None)
 
 
-def test_get_pipette_location_with_current_location_with_quirks(
+def test_get_pipette_location_with_current_location_with_y_center(
     decoy: Decoy,
     labware_view: LabwareView,
     pipette_view: PipetteView,
     subject: MotionView,
 ) -> None:
-    """It should return cp=XY_CENTER if location labware has center quirk."""
+    """It should return cp=Y_CENTER if location labware requests."""
     decoy.when(pipette_view.get_current_location()).then_return(
         CurrentWell(pipette_id="pipette-id", labware_id="reservoir-id", well_name="A1")
     )
@@ -119,9 +119,41 @@ def test_get_pipette_location_with_current_location_with_quirks(
     )
 
     decoy.when(
-        labware_view.get_has_quirk(
+        labware_view.get_should_center_column_on_target_well(
             "reservoir-id",
-            "centerMultichannelOnWells",
+        )
+    ).then_return(True)
+
+    result = subject.get_pipette_location("pipette-id")
+
+    assert result == PipetteLocationData(
+        mount=MountType.RIGHT,
+        critical_point=CriticalPoint.Y_CENTER,
+    )
+
+
+def test_get_pipette_location_with_current_location_with_xy_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
+) -> None:
+    """It should return cp=XY_CENTER if location labware requests."""
+    decoy.when(pipette_view.get_current_location()).then_return(
+        CurrentWell(pipette_id="pipette-id", labware_id="reservoir-id", well_name="A1")
+    )
+
+    decoy.when(pipette_view.get("pipette-id")).then_return(
+        LoadedPipette(
+            id="pipette-id",
+            mount=MountType.RIGHT,
+            pipetteName=PipetteNameType.P300_SINGLE,
+        )
+    )
+
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "reservoir-id",
         )
     ).then_return(True)
 
@@ -157,9 +189,14 @@ def test_get_pipette_location_with_current_location_different_pipette(
     )
 
     decoy.when(
-        labware_view.get_has_quirk(
+        labware_view.get_should_center_column_on_target_well(
             "reservoir-id",
-            "centerMultichannelOnWells",
+        )
+    ).then_return(False)
+
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "reservoir-id",
         )
     ).then_return(False)
 
@@ -171,13 +208,13 @@ def test_get_pipette_location_with_current_location_different_pipette(
     )
 
 
-def test_get_pipette_location_override_current_location(
+def test_get_pipette_location_override_current_location_xy_center(
     decoy: Decoy,
     labware_view: LabwareView,
     pipette_view: PipetteView,
     subject: MotionView,
 ) -> None:
-    """It should calculate pipette location from a passed in deck location."""
+    """It should calculate pipette location from a passed in deck location with xy override."""
     current_well = CurrentWell(
         pipette_id="pipette-id",
         labware_id="reservoir-id",
@@ -193,9 +230,8 @@ def test_get_pipette_location_override_current_location(
     )
 
     decoy.when(
-        labware_view.get_has_quirk(
+        labware_view.get_should_center_pipette_on_target_well(
             "reservoir-id",
-            "centerMultichannelOnWells",
         )
     ).then_return(True)
 
@@ -210,7 +246,45 @@ def test_get_pipette_location_override_current_location(
     )
 
 
-def test_get_movement_waypoints_to_well(
+def test_get_pipette_location_override_current_location_y_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
+) -> None:
+    """It should calculate pipette location from a passed in deck location with xy override."""
+    current_well = CurrentWell(
+        pipette_id="pipette-id",
+        labware_id="reservoir-id",
+        well_name="A1",
+    )
+
+    decoy.when(pipette_view.get("pipette-id")).then_return(
+        LoadedPipette(
+            id="pipette-id",
+            mount=MountType.RIGHT,
+            pipetteName=PipetteNameType.P300_SINGLE,
+        )
+    )
+
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well(
+            "reservoir-id",
+        )
+    ).then_return(True)
+
+    result = subject.get_pipette_location(
+        pipette_id="pipette-id",
+        current_location=current_well,
+    )
+
+    assert result == PipetteLocationData(
+        mount=MountType.RIGHT,
+        critical_point=CriticalPoint.Y_CENTER,
+    )
+
+
+def test_get_movement_waypoints_to_well_for_y_center(
     decoy: Decoy,
     labware_view: LabwareView,
     pipette_view: PipetteView,
@@ -222,8 +296,98 @@ def test_get_movement_waypoints_to_well(
     location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
 
     decoy.when(pipette_view.get_current_location()).then_return(location)
+
     decoy.when(
-        labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
+        labware_view.get_should_center_column_on_target_well(
+            "labware-id",
+        )
+    ).then_return(True)
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "labware-id",
+        )
+    ).then_return(False)
+
+    decoy.when(
+        geometry_view.get_well_position("labware-id", "well-name", WellLocation())
+    ).then_return(Point(x=4, y=5, z=6))
+
+    decoy.when(
+        move_types.get_move_type_to_well(
+            "pipette-id", "labware-id", "well-name", location, True
+        )
+    ).then_return(motion_planning.MoveType.GENERAL_ARC)
+    decoy.when(
+        geometry_view.get_min_travel_z("pipette-id", "labware-id", location, 123)
+    ).then_return(42.0)
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_2
+    )
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_2)
+    ).then_return([(456, 789)])
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.Y_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
+        ),
+    ]
+
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=motion_planning.MoveType.GENERAL_ARC,
+            origin=Point(x=1, y=2, z=3),
+            origin_cp=CriticalPoint.MOUNT,
+            max_travel_z=1337,
+            min_travel_z=42,
+            dest=Point(x=4, y=5, z=6),
+            dest_cp=CriticalPoint.Y_CENTER,
+            xy_waypoints=[(456, 789)],
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_well(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+        well_location=WellLocation(),
+        origin=Point(x=1, y=2, z=3),
+        origin_cp=CriticalPoint.MOUNT,
+        max_travel_z=1337,
+        force_direct=True,
+        minimum_z_height=123,
+    )
+
+    assert result == waypoints
+
+
+def test_get_movement_waypoints_to_well_for_xy_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    geometry_view: GeometryView,
+    mock_module_view: ModuleView,
+    subject: MotionView,
+) -> None:
+    """It should call get_waypoints() with the correct args to move to a well."""
+    location = CurrentWell(pipette_id="123", labware_id="456", well_name="abc")
+
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well(
+            "labware-id",
+        )
+    ).then_return(False)
+    decoy.when(
+        labware_view.get_should_center_pipette_on_target_well(
+            "labware-id",
+        )
     ).then_return(True)
 
     decoy.when(
@@ -597,8 +761,11 @@ def test_get_touch_tip_waypoints(
     center_point = Point(1, 2, 3)
 
     decoy.when(
-        labware_view.get_has_quirk("labware-id", "centerMultichannelOnWells")
+        labware_view.get_should_center_pipette_on_target_well("labware-id")
     ).then_return(True)
+    decoy.when(
+        labware_view.get_should_center_column_on_target_well("labware-id")
+    ).then_return(False)
 
     decoy.when(pipette_view.get_mount("pipette-id")).then_return(MountType.LEFT)
 
