@@ -24,11 +24,10 @@ traceback.install(console=_console)
 # This is important for CI
 if find_dotenv():
     load_dotenv(find_dotenv(), override=False)
-elif find_dotenv(filename="example.env"): # example.env has our defaults
+elif find_dotenv(filename="example.env"):  # example.env has our defaults
     load_dotenv(find_dotenv(filename="example.env"), override=False)
 else:
     raise AssertionError("No .env or example.env file found.")
-
 
 
 def pytest_collection_modifyitems(items):  # type: ignore # noqa: ANN201,ANN001
