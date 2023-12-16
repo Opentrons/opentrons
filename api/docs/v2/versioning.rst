@@ -145,6 +145,10 @@ This version introduces new features for Flex and adds and improves methods for 
 - Other changes
 
   - :py:obj:`.ProtocolContext.fixed_trash` and :py:obj:`.InstrumentContext.trash_container` now return :py:class:`.TrashBin` objects instead of :py:class:`.Labware` objects.
+  
+- Known issues
+
+  - It's possible to load a Thermocycler and then load another item in slot A1. Don't do this, as it could lead to unexpected pipetting behavior and crashes.
 
 Version 2.15
 ------------
