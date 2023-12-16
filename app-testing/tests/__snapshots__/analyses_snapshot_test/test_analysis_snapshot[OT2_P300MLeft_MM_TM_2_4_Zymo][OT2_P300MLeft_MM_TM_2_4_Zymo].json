@@ -68269,11 +68269,11 @@
       "role": "main"
     },
     {
-      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "name": "cpx_4_tuberack_100ul.json",
       "role": "labware"
     },
     {
-      "name": "sample_labware.json",
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
       "role": "labware"
     },
     {
@@ -68281,11 +68281,11 @@
       "role": "labware"
     },
     {
-      "name": "cpx_4_tuberack_100ul.json",
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
       "role": "labware"
     },
     {
-      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "name": "sample_labware.json",
       "role": "labware"
     }
   ],
