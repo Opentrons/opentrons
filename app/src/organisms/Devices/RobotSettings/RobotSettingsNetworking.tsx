@@ -34,6 +34,7 @@ import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
 import { useIsFlex, useIsRobotBusy } from '../hooks'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '../../../redux/types'
 import { Portal } from '../../../App/portal'
@@ -73,6 +74,7 @@ export function RobotSettingsNetworking({
   const addresses = useSelector((state: State) =>
     getRobotAddressesByName(state, robotName)
   )
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const wifiAddress = addresses.find(addr => addr.ip === wifi?.ipAddress)
   const isFlexConnectedViaWifi =
@@ -138,10 +140,14 @@ export function RobotSettingsNetworking({
                   <SelectNetwork
                     robotName={robotName}
                     isRobotBusy={isRobotBusy}
+                    isEstopNotDisengaged={isEstopNotDisengaged}
                   />
                 </Flex>
                 {canDisconnect && !isRobotBusy ? (
-                  <SecondaryButton onClick={() => setShowDisconnectModal(true)}>
+                  <SecondaryButton
+                    onClick={() => setShowDisconnectModal(true)}
+                    disabled={isEstopNotDisengaged}
+                  >
                     {t('disconnect_from_wifi')}
                   </SecondaryButton>
                 ) : null}

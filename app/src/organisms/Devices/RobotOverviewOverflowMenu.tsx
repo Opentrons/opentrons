@@ -30,10 +30,11 @@ import { checkShellUpdate } from '../../redux/shell'
 import { restartRobot } from '../../redux/robot-admin'
 import { home, ROBOT } from '../../redux/robot-controls'
 import { useIsRobotBusy } from './hooks'
+import { useCanDisconnect } from '../../resources/networking/hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
-import { useCanDisconnect } from '../../resources/networking/hooks'
 
 interface RobotOverviewOverflowMenuProps {
   robot: DiscoveredRobot
@@ -54,6 +55,7 @@ export const RobotOverviewOverflowMenu = (
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robot.name)
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -137,7 +139,11 @@ export const RobotOverviewOverflowMenu = (
               <MenuItem
                 {...targetProps}
                 onClick={handleClickRun}
-                disabled={isRobotOnWrongVersionOfSoftware || isRobotBusy}
+                disabled={
+                  isRobotOnWrongVersionOfSoftware ||
+                  isRobotBusy ||
+                  isEstopNotDisengaged
+                }
                 data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
               >
                 {t('run_a_protocol')}
@@ -150,7 +156,7 @@ export const RobotOverviewOverflowMenu = (
             </>
           ) : null}
           <MenuItem
-            disabled={isRobotUnavailable}
+            disabled={isRobotUnavailable || isEstopNotDisengaged}
             onClick={handleClickHomeGantry}
             data-testid={`RobotOverviewOverflowMenu_homeGantry_${String(
               robot.name
@@ -160,7 +166,7 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
           {robot.status === CONNECTABLE ? (
             <MenuItem
-              disabled={isRobotBusy || !canDisconnect}
+              disabled={isRobotBusy || !canDisconnect || isEstopNotDisengaged}
               onClick={handleClickDisconnect}
             >
               {t('disconnect_from_network')}

@@ -21,11 +21,13 @@ import type {
 interface TempSelectNetworkProps {
   robotName: string
   isRobotBusy: boolean
+  isEstopNotDisengaged: boolean
 }
 
 export const SelectNetwork = ({
   robotName,
   isRobotBusy,
+  isEstopNotDisengaged,
 }: TempSelectNetworkProps): JSX.Element => {
   const list = useWifiList(robotName)
   const keys = useSelector((state: State) =>
@@ -96,7 +98,7 @@ export const SelectNetwork = ({
         value={activeNetwork?.ssid ?? null}
         onConnect={handleSelectConnect}
         onJoinOther={handleSelectJoinOther}
-        isRobotBusy={isRobotBusy}
+        isRobotBusy={isRobotBusy || isEstopNotDisengaged}
       />
       {changeState.type != null && (
         <Portal>

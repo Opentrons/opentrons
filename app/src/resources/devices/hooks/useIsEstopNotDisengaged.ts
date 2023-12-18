@@ -15,9 +15,9 @@ import { DISENGAGED } from '../../../organisms/EmergencyStop'
 
 export const useIsEstopNotDisengaged = (robotName: string): boolean => {
   const isFlex = useIsFlex(robotName)
-  const { data: estopStatus } = useEstopQuery({
+  const { data: estopStatus, error: estopError } = useEstopQuery({
     enabled: isFlex,
   })
 
-  return estopStatus?.data.status !== DISENGAGED
+  return estopStatus?.data.status !== DISENGAGED || estopError !== null
 }

@@ -36,6 +36,7 @@ import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
 
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
@@ -46,7 +47,7 @@ export interface HistoricalProtocolRunOverflowMenuProps {
 export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
-  const { runId } = props
+  const { runId, robotName } = props
   const {
     menuOverlay,
     handleOverflowClick,
@@ -57,9 +58,10 @@ export function HistoricalProtocolRunOverflowMenu(
     onClickOutside: () => setShowOverflowMenu(false),
   })
   const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
-    props.robotName,
+    robotName,
     runId
   )
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   return (
     <Flex
@@ -67,7 +69,11 @@ export function HistoricalProtocolRunOverflowMenu(
       position={POSITION_RELATIVE}
       data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
     >
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      <OverflowBtn
+        alignSelf={ALIGN_FLEX_END}
+        onClick={handleOverflowClick}
+        disabled={isEstopNotDisengaged}
+      />
       {showOverflowMenu ? (
         <>
           <Box
