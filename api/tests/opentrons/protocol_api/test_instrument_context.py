@@ -990,3 +990,140 @@ def test_configure_nozzle_layout(
     """The correct model is passed to the engine client."""
     with exception:
         subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+def test_dispense_0_volume_means_dispense_everything(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense all liquid to a well."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(100)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=None,
+            in_place=False,
+            volume=100,
+            rate=1.23,
+            flow_rate=5.67,
+            push_out=None,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
+def test_dispense_0_volume_means_dispense_nothing(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense no liquid to a well."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=None,
+            in_place=False,
+            volume=0,
+            rate=1.23,
+            flow_rate=5.67,
+            push_out=None,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+def test_aspirate_0_volume_means_aspirate_everything(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_available_volume()).then_return(200)
+    subject.aspirate(volume=0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=200,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
+def test_aspirate_0_volume_means_aspirate_nothing(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+
+    subject.aspirate(volume=0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
