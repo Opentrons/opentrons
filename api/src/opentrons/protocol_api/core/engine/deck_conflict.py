@@ -284,6 +284,8 @@ def _check_deck_conflict_for_96_channel(
 
     destination_slot_num = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
     adjacent_slot_num = None
+    # TODO (spp, 2023-12-18): change this eventually to "column 1"/"column 12"
+    #  via the column mappings in the pipette geometry definitions.
     if primary_nozzle == "A12":
         adjacent_slot_num = get_west_slot(destination_slot_num)
     elif primary_nozzle == "A1":
@@ -358,6 +360,8 @@ def _check_deck_conflict_for_8_channel(
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
     destination_slot = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
     adjacent_slot_num = None
+    # TODO (spp, 2023-12-18): change this eventually to use nozzles from mappings in
+    #  the pipette geometry definitions.
     if primary_nozzle == "H1":
         adjacent_slot_num = get_north_slot(destination_slot)
     elif primary_nozzle == "A1":
@@ -399,6 +403,8 @@ def _is_within_pipette_extents(
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
     if robot_type == "OT-3 Standard":
         if pipette_channels == 96 and nozzle_config == NozzleConfigurationType.COLUMN:
+            # TODO (spp, 2023-12-18): change this eventually to use column mappings in
+            #  the pipette geometry definitions.
             if primary_nozzle == "A12":
                 return (
                     A12_column_front_left_bound.x

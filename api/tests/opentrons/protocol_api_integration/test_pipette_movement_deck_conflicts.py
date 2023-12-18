@@ -7,6 +7,7 @@ from opentrons.protocol_api import COLUMN, ALL
 from opentrons.protocol_api.core.engine.deck_conflict import (
     PartialTipMovementNotAllowedError,
 )
+from opentrons.types import Point
 
 
 @pytest.mark.ot3_only
@@ -139,6 +140,13 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
         PartialTipMovementNotAllowedError, match="collision with items in deck slot"
     ):
         instrument.aspirate(25, badly_placed_plate.wells_by_name()["A1"])
+
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="outside of robot bounds"
+    ):
+        instrument.aspirate(
+            25, well_placed_plate.wells_by_name()["A12"].center().move(Point(70, 0, 0))
+        )
 
     # No error cuz no taller labware on the right
     instrument.aspirate(10, my_tuberack.wells_by_name()["A1"])
