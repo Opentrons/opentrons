@@ -23,6 +23,7 @@ interface UpdateBannerProps {
   serialNumber: string
   isTooHot?: boolean
   attachPipetteRequired?: boolean
+  calibratePipetteRequired?: boolean
   updatePipetteFWRequired?: boolean
 }
 
@@ -33,6 +34,7 @@ export const UpdateBanner = ({
   setShowBanner,
   handleUpdateClick,
   attachPipetteRequired,
+  calibratePipetteRequired,
   updatePipetteFWRequired,
   isTooHot,
 }: UpdateBannerProps): JSX.Element | null => {
@@ -48,6 +50,8 @@ export const UpdateBanner = ({
     closeButtonRendered = false
     if (attachPipetteRequired)
       bannerMessage = t('module_calibration_required_no_pipette_attached')
+    else if (calibratePipetteRequired)
+      bannerMessage = t('module_calibration_required_no_pipette_calibrated')
     else if (updatePipetteFWRequired)
       bannerMessage = t('module_calibration_required_update_pipette_FW')
     else bannerMessage = t('module_calibration_required')

@@ -227,6 +227,7 @@ describe('ModuleCard', () => {
       robotName: mockRobot.name,
       isLoadedInRun: false,
       attachPipetteRequired: false,
+      calibratePipetteRequired: false,
       updatePipetteFWRequired: false,
     }
 
