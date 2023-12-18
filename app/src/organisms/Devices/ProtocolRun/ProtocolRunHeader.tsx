@@ -364,7 +364,7 @@ export function ProtocolRunHeader({
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
-        {isRunCurrent ? (
+        {mostRecentRunId === runId ? (
           <TerminalRunBanner
             {...{
               runStatus,
@@ -455,7 +455,7 @@ export function ProtocolRunHeader({
         ) : null}
         {showDropTipWizard &&
         pipettesWithTip[0]?.specs != null &&
-        isRunCurrent ? (
+        mostRecentRunId === runId ? (
           <DropTipWizard
             robotType={isFlex ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE}
             mount={pipettesWithTip[0].mount}
