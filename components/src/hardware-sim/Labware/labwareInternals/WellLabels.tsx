@@ -6,6 +6,7 @@ import { WellLabelOption, WELL_LABEL_OPTIONS } from '../LabwareRender'
 import styles from './WellLabels.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HighlightedWellLabels } from './types'
+import { COLORS } from '../../../ui-style-constants'
 
 // magic layout numbers to make the letters close to the edges of the labware
 const LETTER_COLUMN_X_INSIDE = 4
@@ -54,23 +55,26 @@ const Labels = (props: {
                 ? 'WellsLabels_show_inside'
                 : 'WellsLabels_show_outside'
             }
-            x={props.isLetterColumn ? LETTER_COLUMN_X : well.x}
+            x={props.isLetterColumn === true ? LETTER_COLUMN_X : well.x}
             y={
-              props.isLetterColumn
+              props.isLetterColumn === true
                 ? well.y
                 : props.definition.dimensions.yDimension -
                   NUMBER_COLUMN_Y_FROM_TOP
             }
-            className={cx(styles.label_text, {
-              [styles.letter_column]: props.isLetterColumn,
-            })}
+            style={{
+              color: COLORS.darkGrey, // LEGACY --c-font-dark
+              fontSize: '0.2rem', // LEGACY --fs-micro 
+              textAnchor: 'middle',
+              dominantBaseline: props.isLetterColumn === true ? 'middle' : 'auto'
+            }}
             fill={
-              highlightedWellLabels?.wells.includes(wellName)
+              highlightedWellLabels?.wells.includes(wellName) ?? false
                 ? highlightColor
                 : fillColor
             }
           >
-            {(props.isLetterColumn ? /[A-Z]+/g : /\d+/g).exec(wellName)}
+            {(props.isLetterColumn === true ? /[A-Z]+/g : /\d+/g).exec(wellName)}
           </RobotCoordsText>
         )
       })}
@@ -86,8 +90,7 @@ export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
     wellLabelColor,
   } = props
   const letterColumn = definition.ordering[0] ?? []
-  // TODO(bc, 2021-03-08): replace types here with real ones once shared data is in TS
-  const numberRow = definition.ordering.map((wellCol: any[]) => wellCol[0])
+  const numberRow = definition.ordering.map((wellCol) => wellCol[0])
 
   return (
     <g>

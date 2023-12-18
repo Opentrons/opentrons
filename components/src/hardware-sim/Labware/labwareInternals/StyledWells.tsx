@@ -17,7 +17,7 @@ export interface StyledWellProps {
   wells: WellGroup
 }
 
-const STYLE_BY_WELL_CONTENTS: {
+export const STYLE_BY_WELL_CONTENTS: {
   [wellContents in WellContents]: {
     stroke: React.CSSProperties['stroke']
     fill: React.CSSProperties['fill']
@@ -40,7 +40,7 @@ const STYLE_BY_WELL_CONTENTS: {
   },
   tipMissing: {
     stroke: '#A4A4A4', // LEGACY --c-near-black
-    fill: '#E5E2E2',
+    fill: '#E5E2E2', // LEFACY --c-light-gray
     strokeWidth: 0.6,
   },
   tipPresent: {
@@ -50,7 +50,7 @@ const STYLE_BY_WELL_CONTENTS: {
   },
   defaultWell: {
     fill: COLORS.white,
-    stroke: '#A4A4A4', // LEGACY --c-near-black
+    stroke: COLORS.black,
     strokeWidth: 0.6,
   }
 }

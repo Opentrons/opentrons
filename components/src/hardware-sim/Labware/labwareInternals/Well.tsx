@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import { COLORS } from '../../../ui-style-constants'
-
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 import type { StyleProps } from '../../../primitives'
@@ -32,20 +30,6 @@ export function WellComponent(props: WellProps): JSX.Element {
     onMouseLeaveWell,
   } = props
   const { x, y } = well
-
-  // const mouseInteractionProps = {
-  //   className: cx(baseClassName, props.selectableWellClass),
-  //   'data-wellname': wellName,
-  // }
-  // const noMouseProps = {
-  //   className: props.className ?? styles.default_well,
-  //   style: { pointerEvents: 'none' },
-  // }
-  // // exclude all mouse interactivity props if no event handler props provided
-  // const commonProps =
-  //   onMouseEnterWell != null || onMouseLeaveWell != null
-  //     ? mouseInteractionProps
-  //     : noMouseProps
 
   const isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null 
   const pointerEvents: React.CSSProperties['pointerEvents'] = isInteractive ? 'auto' : 'none' 

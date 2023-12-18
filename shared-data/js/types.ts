@@ -129,16 +129,21 @@ export interface LabwareBrand {
   links?: string[]
 }
 
+export interface CircularWellShapeProperties {
+  shape: 'circular'
+  diameter: number
+}
+export interface RectangularWellShapeProperties {
+  shape: 'rectangular'
+  xDimension: number
+  yDimension: number
+}
+
+
+
 export type LabwareWellShapeProperties =
-  | {
-      shape: 'circular'
-      diameter: number
-    }
-  | {
-      shape: 'rectangular'
-      xDimension: number
-      yDimension: number
-    }
+  | CircularWellShapeProperties 
+  | RectangularWellShapeProperties
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {

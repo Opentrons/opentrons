@@ -3,6 +3,7 @@ import map from 'lodash/map'
 import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CSSProperties } from 'styled-components'
+import { COLORS } from '../../../ui-style-constants'
 
 export interface StrokedWellProps {
   definition: LabwareDefinition2
@@ -22,6 +23,8 @@ export function StrokedWellsComponent(props: StrokedWellProps): JSX.Element {
               wellName={wellName}
               well={definition.wells[wellName]}
               stroke={color}
+              fill={COLORS.white}
+              strokeWidth='0.6'
             />
           )
         }
