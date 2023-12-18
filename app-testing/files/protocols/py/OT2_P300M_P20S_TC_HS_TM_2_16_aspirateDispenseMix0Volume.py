@@ -50,7 +50,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         label="dye container",
     )
 
-
     # >= 2.14 define_liquid and load_liquid
     water = ctx.define_liquid(
         name="water", description="H₂O", display_color="#42AB2D"
@@ -59,7 +58,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     dye_container.wells_by_name()["A1"].load_liquid(liquid=water, volume=20)
 
     pipette_right.pick_up_tip()
-    
+
     # >= 2.15: Aspirate everything, then dispense everything
     # < 2.15: Aspirate nothing, then dispense everything(Which in this case means nothing)
     # pipette_right.aspirate(volume=0, location=dye_container.wells_by_name()["A1"])
@@ -70,4 +69,3 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_right.aspirate(volume=20, location=dye_container.wells_by_name()["A1"])
     pipette_right.dispense(volume=0, location=dye_container.wells_by_name()["A1"])
     pipette_right.mix(volume=0, location=dye_container.wells_by_name()["A1"])
- 
