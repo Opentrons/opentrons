@@ -33,4 +33,13 @@ describe('useMostRecentRunId hook', () => {
 
     expect(result.current).toBeNull()
   })
+  it('should return null if no run data exists', async () => {
+    when(mockUseAllRunsQuery)
+      .calledWith()
+      .mockReturnValue({ data: { data: null } } as any)
+
+    const { result } = renderHook(useMostRecentRunId)
+
+    expect(result.current).toBeNull()
+  })
 })
