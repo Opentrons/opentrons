@@ -239,9 +239,9 @@ export function RunningProtocol(): JSX.Element {
                     );
                   `}
                   position={POSITION_ABSOLUTE}
-                  height="324px"
-                  width="944px"
-                  marginTop="148px"
+                  height="20.25rem"
+                  width="59rem"
+                  marginTop="9.25rem"
                   alignSelf={ALIGN_FLEX_END}
                 />
               </>
