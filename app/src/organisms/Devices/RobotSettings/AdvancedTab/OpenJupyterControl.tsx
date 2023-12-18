@@ -32,8 +32,13 @@ export function OpenJupyterControl({
   isEstopNotDisengaged,
 }: OpenJupyterControlProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const href = `http://${robotIp}:48888`
+  const targetURL = `http://${robotIp}:48888`
   const trackEvent = useTrackEvent()
+
+  const handleClick = (): void => {
+    trackEvent(EVENT_JUPYTER_OPEN)
+    window.open(targetURL, '_blank')
+  }
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -54,10 +59,8 @@ export function OpenJupyterControl({
       </Box>
       <TertiaryButton
         disabled={isEstopNotDisengaged}
-        onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
-        href={href}
+        onClick={handleClick}
         marginLeft={SPACING.spacing32}
-        external
       >
         {t('launch_jupyter_notebook')}
       </TertiaryButton>

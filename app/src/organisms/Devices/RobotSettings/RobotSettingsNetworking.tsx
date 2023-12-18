@@ -139,8 +139,7 @@ export function RobotSettingsNetworking({
                 <Flex marginRight={SPACING.spacing8}>
                   <SelectNetwork
                     robotName={robotName}
-                    isRobotBusy={isRobotBusy}
-                    isEstopNotDisengaged={isEstopNotDisengaged}
+                    isRobotBusy={isRobotBusy || isEstopNotDisengaged}
                   />
                 </Flex>
                 {canDisconnect && !isRobotBusy ? (

@@ -17,6 +17,10 @@ const mockIpAddress = '1.1.1.1'
 const mockLink = `http://${mockIpAddress}:48888`
 const trackEvent = jest.fn()
 
+global.window = Object.create(window)
+Object.defineProperty(window, 'open', { writable: true, configurable: true })
+window.open = jest.fn()
+
 const render = (props: React.ComponentProps<typeof OpenJupyterControl>) => {
   return renderWithProviders(
     <MemoryRouter>
@@ -55,9 +59,9 @@ describe('RobotSettings OpenJupyterControl', () => {
 
   it('should render jupyter notebook link', () => {
     const [{ getByRole }] = render(props)
-    const link = getByRole('button', { name: 'Launch Jupyter Notebook' })
-    console.log(link)
-    expect(link).toHaveAttribute('href', mockLink)
+    const button = getByRole('button', { name: 'Launch Jupyter Notebook' })
+    fireEvent.click(button)
+    expect(window.open).toHaveBeenCalledWith(mockLink, '_blank')
   })
 
   it('should send and analytics event on link click', () => {

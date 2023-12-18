@@ -102,11 +102,7 @@ describe('SelectNetwork', () => {
 
     render = () => {
       return mount(
-        <SelectNetwork
-          robotName={mockRobotName}
-          isRobotBusy={false}
-          isEstopNotDisengaged={false}
-        />,
+        <SelectNetwork robotName={mockRobotName} isRobotBusy={false} />,
         {
           wrappingComponent: Provider,
           wrappingComponentProps: { store: mockStore },
