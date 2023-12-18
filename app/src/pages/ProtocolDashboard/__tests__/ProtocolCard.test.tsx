@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
 import { useProtocolAnalysisAsDocumentQuery } from '@opentrons/react-api-client'
@@ -134,10 +134,9 @@ describe('ProtocolCard', () => {
     screen.getByText('Delete protocol')
   })
 
-  it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing - undefined case', async () => {
-    jest.useFakeTimers()
+  it('should display a loading spinner when analysis is pending', async () => {
     mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
-      data: undefined as any,
+      data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
     const name = screen.getByText('yay mock protocol')
@@ -146,13 +145,7 @@ describe('ProtocolCard', () => {
       jest.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
-    screen.getByLabelText('failedAnalysis_icon')
-    screen.getByText('Failed analysis')
-    fireEvent.click(screen.getByText('yay mock protocol'))
-    screen.getByText('Protocol analysis failed')
-    screen.getByText(
-      'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
-    )
-    screen.getByText('Delete protocol')
+    screen.getByLabelText('Protocol is loading')
+    screen.getByText('yay mock protocol').click()
   })
 })
