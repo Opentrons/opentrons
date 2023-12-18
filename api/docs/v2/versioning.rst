@@ -148,7 +148,7 @@ This version introduces new features for Flex and adds and improves methods for 
   
 - Known issues
 
-  - It's possible to load a Thermocycler and then load another item in slot A1. Don't do this, as it could lead to unexpected pipetting behavior and crashes.
+  - It's possible to load a Thermocycler and then load another item in slot A1. It's also possible to load any labware or adapter on in the same slot as a trash bin. Don't do either of these things, as it could lead to unexpected pipetting behavior and crashes.
 
 Version 2.15
 ------------
