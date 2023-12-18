@@ -149,6 +149,7 @@ class MotionView:
         max_travel_z: float,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
+        stay_at_max_travel_z: bool = False,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as an addressable area."""
         location = self._pipettes.get_current_location()
@@ -158,7 +159,22 @@ class MotionView:
                 addressable_area_name
             )
         )
-        destination = base_destination + Point(x=offset.x, y=offset.y, z=offset.z)
+        if stay_at_max_travel_z:
+            base_destination_at_max_z = Point(
+                base_destination.x,
+                base_destination.y,
+                # HACK(mm, 2023-12-18): We want to travel exactly at max_travel_z, but
+                # motion_planning.get_waypoints() won't let us--the highest we can go is this margin
+                # beneath max_travel_z. Investigate why motion_planning.get_waypoints() does not
+                # let us travel at max_travel_z, and whether it's safe to make it do that.
+                # Possibly related: https://github.com/Opentrons/opentrons/pull/6882#discussion_r514248062
+                max_travel_z - motion_planning.waypoints.MINIMUM_Z_MARGIN,
+            )
+            destination = base_destination_at_max_z + Point(
+                offset.x, offset.y, offset.z
+            )
+        else:
+            destination = base_destination + Point(offset.x, offset.y, offset.z)
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
         destination_cp = CriticalPoint.XY_CENTER

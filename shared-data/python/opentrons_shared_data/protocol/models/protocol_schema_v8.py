@@ -69,6 +69,7 @@ class Params(BaseModel):
     # schema v8 add-ons
     addressableAreaName: Optional[str]
     configurationParams: Optional[NozzleConfigurationParams]
+    stayAtHighestPossibleZ: Optional[bool]
 
 
 class Command(BaseModel):
