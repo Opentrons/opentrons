@@ -1,8 +1,8 @@
 .. _configuring-pipette-modes:
 
-#########################
+*************************
 Configuring Pipette Modes
-#########################
+*************************
 
 TK configuring intro
 

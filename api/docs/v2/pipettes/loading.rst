@@ -1,8 +1,9 @@
 .. _new-create-pipette:
 .. _loading-pipettes:
 
+****************
 Loading Pipettes
-================
+****************
 
 When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The :py:meth:`.ProtocolContext.load_instrument` function provides this information and returns an :py:class:`.InstrumentContext` object.
 
@@ -11,7 +12,7 @@ As noted above, you call the :py:meth:`~.ProtocolContext.load_instrument` method
 .. _new-pipette-models:
 
 API Load Names
---------------
+==============
 
 The pipette's API load name (``instrument_name``) is the first parameter of the ``load_instrument()`` method. It tells your robot which attached pipette you're going to use in a protocol. The tables below list the API load names for the currently available Flex and OT-2 pipettes.
 
@@ -52,7 +53,7 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
         See the OT-2 Pipette Generations section below if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-chanel model.
 
 Loading Flex 1- and 8-Channel Pipettes
---------------------------------------
+======================================
 
 This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-Channel Pipette in the right mount. Both pipettes are 1000 µL. Each pipette uses its own 1000 µL tip rack.  
 
@@ -80,7 +81,7 @@ This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-C
 If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your gripper requires a protocol is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
 
 Loading a Flex 96-Channel Pipette
----------------------------------
+=================================
 
 This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. To load the 96-Channel Pipette, specify its position as ``mount='left'`` as shown here:
 
@@ -93,7 +94,7 @@ This code sample loads the Flex 96-Channel Pipette. Because of its size, the Fle
 .. versionadded:: 2.15
 
 Loading OT-2 Pipettes
----------------------
+=====================
 
 This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and a P300 Single-Channel GEN2 pipette in the right mount. Each pipette uses its own 1000 µL tip rack. 
 
@@ -123,7 +124,7 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 .. _pipette-tip-racks:
 
 Adding Tip Racks
-----------------
+================
 
 The ``load_instrument()`` method includes the optional argument ``tip_racks``. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. The advantage of using ``tip_racks`` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the :py:meth:`.InstrumentContext.pick_up_tip` method. For example, let's start by loading loading some labware and instruments like this::
         

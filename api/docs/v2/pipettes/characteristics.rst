@@ -1,8 +1,8 @@
 .. _pipette-characteristics:
 
-#######################
+***********************
 Pipette Characteristics
-#######################
+***********************
 
 .. _new-multichannel-pipettes:
 
