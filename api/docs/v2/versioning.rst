@@ -140,7 +140,6 @@ This version introduces new features for Flex and adds and improves methods for 
 - Improved features
 
   - :py:meth:`.aspirate`, :py:meth:`.dispense`, and :py:meth:`.mix` will not move any liquid when called with ``volume=0``.
-  - ``opentrons_simulate`` now works for all API versions.
 
 - Other changes
 
