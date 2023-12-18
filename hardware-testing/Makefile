@@ -155,6 +155,14 @@ test-examples:
 test-scripts:
 	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
 
+.PHONY: test-liquid-sense
+test-liquid-sense:
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 1000 --channels 1
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 50 --channels 1
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 1000 --channels 8
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 50 --channels 8
+	$(python) -m hardware_testing.liquid_sense --simulate --pipette 1000 --channels 96
+
 .PHONY: test-integration
 test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
