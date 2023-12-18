@@ -600,6 +600,7 @@ def test_pick_up_from_associated_tip_racks(
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
+    decoy.when(mock_instrument_core.is_tip_tracking_available()).then_return(True)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
     decoy.when(
         labware.next_available_tip(
@@ -624,6 +625,22 @@ def test_pick_up_from_associated_tip_racks(
         ),
         times=1,
     )
+
+
+def test_pick_up_fails_when_tip_tracking_unavailable(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should raise an error if automatic tip tracking is not available.."""
+    mock_tip_rack_1 = decoy.mock(cls=Labware)
+
+    decoy.when(mock_instrument_core.is_tip_tracking_available()).then_return(False)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+
+    subject.tip_racks = [mock_tip_rack_1]
+    with pytest.raises(
+        CommandPreconditionViolated, match="Automatic tip tracking is not available"
+    ):
+        subject.pick_up_tip()
 
 
 def test_drop_tip_to_well(

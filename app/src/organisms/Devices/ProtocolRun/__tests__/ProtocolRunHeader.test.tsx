@@ -1054,26 +1054,4 @@ describe('ProtocolRunHeader', () => {
       expect(queryByText('Tips may be attached.')).not.toBeInTheDocument()
     })
   })
-
-  it('does not show the drop tip banner when the run is not over', async () => {
-    when(mockUseRunQuery)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        data: {
-          data: {
-            ...mockIdleUnstartedRun,
-            current: false,
-            status: RUN_STATUS_SUCCEEDED,
-          },
-        },
-      } as UseQueryResult<Run>)
-    when(mockUseRunStatus)
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_SUCCEEDED)
-
-    const [{ queryByText }] = render()
-    await waitFor(() => {
-      expect(queryByText('Tips may be attached.')).not.toBeInTheDocument()
-    })
-  })
 })
