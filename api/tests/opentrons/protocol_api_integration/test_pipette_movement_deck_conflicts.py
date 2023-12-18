@@ -9,6 +9,7 @@ from opentrons.protocol_api.core.engine.deck_conflict import (
 )
 
 
+@pytest.mark.ot3_only
 def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     """It should raise errors for the expected deck conflicts."""
     protocol_context = simulate.get_protocol_api(version="2.16", robot_type="Flex")
@@ -92,6 +93,7 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     instrument.dispense(50, partially_accessible_plate.wells_by_name()["A1"])
 
 
+@pytest.mark.ot3_only
 def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     """It should raise errors for expected deck conflicts."""
     protocol = simulate.get_protocol_api(version="2.16", robot_type="Flex")
