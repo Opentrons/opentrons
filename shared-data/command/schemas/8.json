@@ -1965,6 +1965,12 @@
               "$ref": "#/definitions/AddressableOffsetVector"
             }
           ]
+        },
+        "stayAtHighestPossibleZ": {
+          "title": "Stayathighestpossiblez",
+          "description": "If `true`, the pipette will retract to its highest possible height and stay there instead of descending to the destination. `minimumZHeight` will be ignored.",
+          "default": false,
+          "type": "boolean"
         }
       },
       "required": ["pipetteId", "addressableAreaName"]
