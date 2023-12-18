@@ -6,6 +6,7 @@ from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    UnexpectedTipRemovalError,
 )
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -26,7 +27,6 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -860,6 +860,14 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         if location is None:
+            if not self._core.is_tip_tracking_available():
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available for the current pipette"
+                    " nozzle configuration. We suggest switching to a configuration"
+                    " that supports automatic tip tracking or specifying the exact tip"
+                    " to pick up."
+                )
+
             tip_rack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
