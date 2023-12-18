@@ -259,7 +259,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
+          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
         },
@@ -320,7 +320,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
+          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
         },
@@ -412,7 +412,7 @@
       "properties": {
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
+          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
         },
@@ -684,7 +684,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
+          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
         },
@@ -744,7 +744,7 @@
         },
         "volume": {
           "title": "Volume",
-          "description": "Amount of liquid in uL. Must be greater than 0 and less than a pipette-specific maximum volume.",
+          "description": "Amount of liquid in uL. Must be at least 0 and no greater than a pipette-specific maximum volume.",
           "minimum": 0,
           "type": "number"
         },

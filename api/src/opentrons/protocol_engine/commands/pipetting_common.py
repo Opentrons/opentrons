@@ -19,7 +19,7 @@ class VolumeMixin(BaseModel):
 
     volume: float = Field(
         ...,
-        description="Amount of liquid in uL. Must be greater than 0 and less "
+        description="Amount of liquid in uL. Must be at least 0 and no greater "
         "than a pipette-specific maximum volume.",
         ge=0,
     )
