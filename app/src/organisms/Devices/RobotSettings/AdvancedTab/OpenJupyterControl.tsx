@@ -1,12 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Link,
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {

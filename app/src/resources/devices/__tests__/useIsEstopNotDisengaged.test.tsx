@@ -1,6 +1,4 @@
-import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
 
 import { useIsFlex } from '../../../organisms/Devices/hooks'
 import { useEstopQuery } from '@opentrons/react-api-client'
