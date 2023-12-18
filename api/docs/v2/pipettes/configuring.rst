@@ -4,12 +4,35 @@
 Configuring Pipette Modes
 *************************
 
-TK configuring intro
+The API provides methods to configure certain pipettes to operate in a specific mode. These configuration methods change the default behavior of the pipette on an ongoing basis, until you call them again with different values. 
+
+This page covers the currently available modes.
+
+- :ref:`partial-tip-pickup`: The 96-channel pipette can be configured to use 8 or 96 nozzles for pipetting.
+- :ref:`pipette-volume-modes`: The Flex 50 µL pipettes can be configured to handle liquid differently for low or high volumes.
+
+There are no mode configurations for OT-2 pipettes.
+
+
+.. _partial-tip-pickup:
 
 Partial Tip Pickup
 ==================
 
-TKTKTK
+The 96-channel pipette occupies both pipette mounts on Flex, so it's not possible to attach another pipette at the same time. Partial tip pickup lets you perform some of the same actions that you would be able to perform with a second pipette. As of version 2.16 of the API, you can configure the 96-channel pipette pick up a single column of tips, similar to the behavior of an 8-channel pipette.
+
+Nozzle Layout
+-------------
+
+Use the :py:meth:`.configure_nozzle_layout` method to choose how many tips the 96-channel pipette will pick up
+
+
+Tip Rack Adapters
+-----------------
+
+
+Tip Pickup and Return Behavior
+------------------------------
 
 .. _pipette-volume-modes:
 
