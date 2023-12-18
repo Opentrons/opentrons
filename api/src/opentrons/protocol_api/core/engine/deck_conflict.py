@@ -270,18 +270,18 @@ def _check_deck_conflict_for_96_channel(
     well_location_point = engine_state.geometry.get_well_position(
         labware_id=labware_id, well_name=well_name, well_location=well_location
     )
+    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
     if not _is_within_pipette_extents(
         engine_state=engine_state, pipette_id=pipette_id, location=well_location_point
     ):
         raise PartialTipMovementNotAllowedError(
-            "Requested motion with A12 nozzle column configuration"
-            " is outside of robot bounds for the 96-channel."
+            f"Requested motion with the {primary_nozzle} nozzle column configuration"
+            f" is outside of robot bounds for the 96-channel."
         )
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
 
-    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
     destination_slot_num = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
     adjacent_slot_num = None
     if primary_nozzle == "A12":
@@ -290,7 +290,7 @@ def _check_deck_conflict_for_96_channel(
         adjacent_slot_num = get_east_slot(destination_slot_num)
 
     def _check_conflict_with_slot_item(
-            adjacent_slot: DeckSlotName,
+        adjacent_slot: DeckSlotName,
     ) -> None:
         """Raises error if the pipette is ecpected to collide with adjacent slot items."""
         slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
@@ -300,22 +300,21 @@ def _check_deck_conflict_for_96_channel(
         pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
         tip_length = pipette_tip.length if pipette_tip else 0.0
 
-        if (
-                slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length
-        ):
+        if slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length:
             raise PartialTipMovementNotAllowedError(
-                f"Moving to {engine_state.labware.get_load_name(labware_id)} in slot {labware_slot}"
-                f" with a Column nozzle configuration will result in collision with"
-                f" items in deck slot {adjacent_slot}."
+                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+                f" {labware_slot} with pipette column {primary_nozzle} nozzle configuration"
+                f" will result in collision with items in deck slot {adjacent_slot}."
             )
 
     if adjacent_slot_num is None:
         return
     _check_conflict_with_slot_item(
         adjacent_slot=DeckSlotName.from_primitive(
-                        adjacent_slot_num
-                ).to_equivalent_for_robot_type(engine_state.config.robot_type)
+            adjacent_slot_num
+        ).to_equivalent_for_robot_type(engine_state.config.robot_type)
     )
+
 
 def _check_deck_conflict_for_8_channel(
     engine_state: StateView,
@@ -344,6 +343,7 @@ def _check_deck_conflict_for_8_channel(
     well_location_point = engine_state.geometry.get_well_position(
         labware_id=labware_id, well_name=well_name, well_location=well_location
     )
+    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
     if not _is_within_pipette_extents(
         engine_state=engine_state, pipette_id=pipette_id, location=well_location_point
@@ -351,12 +351,11 @@ def _check_deck_conflict_for_8_channel(
         # WARNING: (spp, 2023-11-30: this needs to be wired up to check for
         # 8-channel pipette extents on both OT2 & Flex!!)
         raise PartialTipMovementNotAllowedError(
-            "Requested motion with single H1 nozzle configuration"
-            " is outside of robot bounds for the 8-channel."
+            f"Requested motion with single {primary_nozzle} nozzle configuration"
+            f" is outside of robot bounds for the 8-channel."
         )
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
     destination_slot = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
     adjacent_slot_num = None
     if primary_nozzle == "H1":
@@ -374,9 +373,10 @@ def _check_deck_conflict_for_8_channel(
 
         if slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length:
             raise PartialTipMovementNotAllowedError(
-                f"Moving to {engine_state.labware.get_load_name(labware_id)} in slot {labware_slot}"
-                f" with a Single nozzle configuration will result in collision with"
-                f" items in deck slot {adjacent_slot}.")
+                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+                f" {labware_slot} with pipette nozzle {primary_nozzle} configuration"
+                f" will result in collision with items in deck slot {adjacent_slot}."
+            )
 
     if adjacent_slot_num is None:
         return
@@ -398,10 +398,7 @@ def _is_within_pipette_extents(
     nozzle_config = engine_state.pipettes.get_nozzle_layout_type(pipette_id)
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
     if robot_type == "OT-3 Standard":
-        if (
-            pipette_channels == 96
-            and nozzle_config == NozzleConfigurationType.COLUMN
-        ):
+        if pipette_channels == 96 and nozzle_config == NozzleConfigurationType.COLUMN:
             if primary_nozzle == "A12":
                 return (
                     A12_column_front_left_bound.x
@@ -413,8 +410,12 @@ def _is_within_pipette_extents(
                 )
             elif primary_nozzle == "A1":
                 return (
-                    A1_column_front_left_bound.x < location.x < A1_column_back_right_bound.x
-                    and A1_column_front_left_bound.y < location.y < A1_column_back_right_bound.y
+                    A1_column_front_left_bound.x
+                    < location.x
+                    < A1_column_back_right_bound.x
+                    and A1_column_front_left_bound.y
+                    < location.y
+                    < A1_column_back_right_bound.y
                 )
     # TODO (spp, 2023-11-07): check for 8-channel nozzle A1 & H1 extents on Flex & OT2
     return True
