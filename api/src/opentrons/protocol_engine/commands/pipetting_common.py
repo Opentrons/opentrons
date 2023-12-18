@@ -21,7 +21,7 @@ class VolumeMixin(BaseModel):
         ...,
         description="Amount of liquid in uL. Must be greater than 0 and less "
         "than a pipette-specific maximum volume.",
-        gt=0,
+        ge=0,
     )
 
 

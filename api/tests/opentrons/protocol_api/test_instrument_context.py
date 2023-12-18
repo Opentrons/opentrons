@@ -1000,18 +1000,20 @@ def test_dispense_0_volume_means_dispense_everything(
     mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should dispense all liquid to a well."""
-    mock_well = decoy.mock(cls=Well)
-    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
     input_location = Location(point=Point(2, 2, 2), labware=None)
-
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(100)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
     subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=bottom_location,
-            well_core=mock_well._core,
+            location=input_location,
+            well_core=None,
             in_place=False,
-            volume=mock_instrument_core.get_available_volume(),
+            volume=100,
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
@@ -1028,16 +1030,17 @@ def test_dispense_0_volume_means_dispense_nothing(
     mock_protocol_core: ProtocolCore,
 ) -> None:
     """It should dispense no liquid to a well."""
-    mock_well = decoy.mock(cls=Well)
-    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
     input_location = Location(point=Point(2, 2, 2), labware=None)
-
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
     subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
 
     decoy.verify(
         mock_instrument_core.dispense(
-            location=bottom_location,
-            well_core=mock_well._core,
+            location=input_location,
+            well_core=None,
             in_place=False,
             volume=0,
             rate=1.23,
@@ -1071,7 +1074,7 @@ def test_aspirate_0_volume_means_aspirate_everything(
         )
     ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
-
+    decoy.when(mock_instrument_core.get_available_volume()).then_return(200)
     subject.aspirate(volume=0, location=input_location, rate=1.23)
 
     decoy.verify(
@@ -1079,7 +1082,7 @@ def test_aspirate_0_volume_means_aspirate_everything(
             location=input_location,
             well_core=mock_well._core,
             in_place=False,
-            volume=mock_instrument_core.get_available_volume(),
+            volume=200,
             rate=1.23,
             flow_rate=5.67,
         ),
