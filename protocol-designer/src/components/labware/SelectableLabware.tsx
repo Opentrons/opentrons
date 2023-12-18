@@ -1,10 +1,7 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import {
-  WellMouseEvent,
-  WellGroup,
-} from '@opentrons/components'
+import { WellMouseEvent, WellGroup } from '@opentrons/components'
 import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,

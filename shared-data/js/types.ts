@@ -139,10 +139,8 @@ export interface RectangularWellShapeProperties {
   yDimension: number
 }
 
-
-
 export type LabwareWellShapeProperties =
-  | CircularWellShapeProperties 
+  | CircularWellShapeProperties
   | RectangularWellShapeProperties
 
 // well without x,y,z

@@ -22,7 +22,8 @@ export const STYLE_BY_WELL_CONTENTS: {
     stroke: React.CSSProperties['stroke']
     fill: React.CSSProperties['fill']
     strokeWidth: React.CSSProperties['strokeWidth']
-  } } = {
+  }
+} = {
   highlightedWell: {
     stroke: COLORS.blueEnabled,
     fill: `${COLORS.blueEnabled}33`, // 20% opacity
@@ -30,7 +31,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
   disabledWell: {
     stroke: '#C6C6C6', // LEGACY --light-grey-hover
-    fill: '#EDEDEDCC', // LEGACY --lightest-gray + 80% opacity 
+    fill: '#EDEDEDCC', // LEGACY --lightest-gray + 80% opacity
     strokeWidth: 0.6,
   },
   selectedWell: {
@@ -52,7 +53,7 @@ export const STYLE_BY_WELL_CONTENTS: {
     fill: COLORS.white,
     stroke: COLORS.black,
     strokeWidth: 0.6,
-  }
+  },
 }
 
 function StyledWellsComponent(props: StyledWellProps): JSX.Element {

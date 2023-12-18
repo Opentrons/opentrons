@@ -24,8 +24,8 @@ import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/components/src/hardw
 export const registerSelectors: (arg0: any) => void =
   process.env.NODE_ENV === 'development'
     ? // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('reselect-tools').registerSelectors
-    : (a: any) => { }
+      require('reselect-tools').registerSelectors
+    : (a: any) => {}
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
 export const rectCollision = (
@@ -44,9 +44,7 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
     height: rect.height,
   }
 }
-export const getCollidingWells = (
-  rectPositions: GenericRect,
-): WellGroup => {
+export const getCollidingWells = (rectPositions: GenericRect): WellGroup => {
   // Returns set of selected wells under a collision rect
   const { x0, y0, x1, y1 } = rectPositions
   const selectionBoundingRect = {
@@ -57,7 +55,9 @@ export const getCollidingWells = (
   }
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
   const selectableElems: HTMLElement[] = [
-    ...document.querySelectorAll<HTMLElement>(`[${INTERACTIVE_WELL_DATA_ATTRIBUTE}]`),
+    ...document.querySelectorAll<HTMLElement>(
+      `[${INTERACTIVE_WELL_DATA_ATTRIBUTE}]`
+    ),
   ]
   const collidedElems = selectableElems.filter((selectableElem, i) =>
     rectCollision(
@@ -117,8 +117,8 @@ export const makeTimerText = (
   targetMinutes === null && targetSeconds === null
     ? null
     : `${targetMinutes}  ${i18n.t(
-      'application.units.minutes'
-    )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
+        'application.units.minutes'
+      )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
 
 export const getIsAdapter = (
   labwareId: string,

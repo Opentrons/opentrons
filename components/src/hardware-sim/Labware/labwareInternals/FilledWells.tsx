@@ -24,7 +24,7 @@ function FilledWellsComponent(props: FilledWellsProps): JSX.Element {
               well={definition.wells[wellName]}
               fill={color}
               stroke={COLORS.black}
-              strokeWidth='0.6'
+              strokeWidth="0.6"
             />
           )
         }

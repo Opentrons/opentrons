@@ -62,9 +62,10 @@ const Labels = (props: {
             }
             style={{
               color: COLORS.darkGrey, // LEGACY --c-font-dark
-              fontSize: '0.2rem', // LEGACY --fs-micro 
+              fontSize: '0.2rem', // LEGACY --fs-micro
               textAnchor: 'middle',
-              dominantBaseline: props.isLetterColumn === true ? 'middle' : 'auto'
+              dominantBaseline:
+                props.isLetterColumn === true ? 'middle' : 'auto',
             }}
             fill={
               highlightedWellLabels?.wells.includes(wellName) ?? false
@@ -72,7 +73,9 @@ const Labels = (props: {
                 : fillColor
             }
           >
-            {(props.isLetterColumn === true ? /[A-Z]+/g : /\d+/g).exec(wellName)}
+            {(props.isLetterColumn === true ? /[A-Z]+/g : /\d+/g).exec(
+              wellName
+            )}
           </RobotCoordsText>
         )
       })}
@@ -88,7 +91,7 @@ export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
     wellLabelColor,
   } = props
   const letterColumn = definition.ordering[0] ?? []
-  const numberRow = definition.ordering.map((wellCol) => wellCol[0])
+  const numberRow = definition.ordering.map(wellCol => wellCol[0])
 
   return (
     <g>

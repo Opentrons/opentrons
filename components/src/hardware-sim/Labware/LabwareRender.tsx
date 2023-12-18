@@ -87,7 +87,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         ? props.disabledWells.map((well, index) => (
             <StyledWells
               key={index}
-              wellContents='disabledWell'
+              wellContents="disabledWell"
               definition={props.definition}
               wells={well}
             />
@@ -95,21 +95,21 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         : null}
       {props.highlightedWells != null ? (
         <StyledWells
-          wellContents='highlightedWell'
+          wellContents="highlightedWell"
           definition={props.definition}
           wells={props.highlightedWells}
         />
       ) : null}
       {props.selectedWells != null ? (
         <StyledWells
-          wellContents='selectedWell'
+          wellContents="selectedWell"
           definition={props.definition}
           wells={props.selectedWells}
         />
       ) : null}
       {props.missingTips != null ? (
         <StyledWells
-          wellContents='tipMissing'
+          wellContents="tipMissing"
           definition={props.definition}
           wells={props.missingTips}
         />

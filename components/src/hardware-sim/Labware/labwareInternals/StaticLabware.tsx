@@ -35,7 +35,8 @@ const TipDecoration = React.memo(function TipDecoration(props: {
         {...STYLE_BY_WELL_CONTENTS.tipPresent}
         cx={well.x}
         cy={well.y}
-        r={radius - 1} />
+        r={radius - 1}
+      />
     )
   }
   return null
@@ -69,7 +70,9 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                     well={props.definition.wells[wellName]}
                     onMouseEnterWell={props.onMouseEnterWell}
                     onMouseLeaveWell={props.onMouseLeaveWell}
-                    {...(isTiprack ? STYLE_BY_WELL_CONTENTS.tipPresent : STYLE_BY_WELL_CONTENTS.defaultWell)}
+                    {...(isTiprack
+                      ? STYLE_BY_WELL_CONTENTS.tipPresent
+                      : STYLE_BY_WELL_CONTENTS.defaultWell)}
                   />
 
                   {isTiprack ? (

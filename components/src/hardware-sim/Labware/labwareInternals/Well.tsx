@@ -31,26 +31,27 @@ export function WellComponent(props: WellProps): JSX.Element {
   } = props
   const { x, y } = well
 
-  const isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null 
-  const pointerEvents: React.CSSProperties['pointerEvents'] = isInteractive ? 'auto' : 'none' 
+  const isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null
+  const pointerEvents: React.CSSProperties['pointerEvents'] = isInteractive
+    ? 'auto'
+    : 'none'
   const commonProps = {
     [INTERACTIVE_WELL_DATA_ATTRIBUTE]: isInteractive ? wellName : undefined,
-    onMouseEnter: onMouseEnterWell != null ? (event: React.MouseEvent) => onMouseEnterWell({ wellName, event }) : undefined,
-    onMouseLeave: onMouseLeaveWell != null ? (event: React.MouseEvent) => onMouseLeaveWell({ wellName, event }) : undefined,
-    style: { pointerEvents, stroke, strokeWidth, fill }
+    onMouseEnter:
+      onMouseEnterWell != null
+        ? (event: React.MouseEvent) => onMouseEnterWell({ wellName, event })
+        : undefined,
+    onMouseLeave:
+      onMouseLeaveWell != null
+        ? (event: React.MouseEvent) => onMouseLeaveWell({ wellName, event })
+        : undefined,
+    style: { pointerEvents, stroke, strokeWidth, fill },
   }
-
 
   if (well.shape === 'circular') {
     const { diameter } = well
     const radius = diameter / 2
-    return (
-      <circle
-        {...commonProps}
-        cx={x}
-        cy={y}
-        r={radius} />
-    )
+    return <circle {...commonProps} cx={x} cy={y} r={radius} />
   }
 
   const { xDimension, yDimension } = well
