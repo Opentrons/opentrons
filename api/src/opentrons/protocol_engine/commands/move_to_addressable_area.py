@@ -54,6 +54,14 @@ class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
         AddressableOffsetVector(x=0, y=0, z=0),
         description="Relative offset of addressable area to move pipette's critical point.",
     )
+    stayAtHighestPossibleZ: bool = Field(
+        False,
+        description=(
+            "If `true`, the pipette will retract to its highest possible height"
+            " and stay there instead of descending to the destination."
+            " `minimumZHeight` and the z-coordinate of `offset` will be ignored."
+        ),
+    )
 
 
 class MoveToAddressableAreaResult(DestinationPositionResult):
@@ -93,6 +101,7 @@ class MoveToAddressableAreaImplementation(
             force_direct=params.forceDirect,
             minimum_z_height=params.minimumZHeight,
             speed=params.speed,
+            stay_at_highest_possible_z=params.stayAtHighestPossibleZ,
         )
 
         return MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z))

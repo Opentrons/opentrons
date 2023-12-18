@@ -378,6 +378,7 @@ export const DropTipWizardComponent = (
                 commandType: 'moveToAddressableArea',
                 params: {
                   pipetteId: MANAGED_PIPETTE_ID,
+                  stayAtHighestPossibleZ: true,
                   addressableAreaName: addressableAreaFromConfig,
                   offset: { x: 0, y: 0, z: zOffset },
                 },

@@ -28,6 +28,10 @@ from .modules import ModuleView
 from .module_substates import HeaterShakerModuleId
 
 
+_STAY_AT_MAX_TRAVEL_Z_MARGIN = 10
+assert _STAY_AT_MAX_TRAVEL_Z_MARGIN > motion_planning.waypoints.MINIMUM_Z_MARGIN
+
+
 @dataclass(frozen=True)
 class PipetteLocationData:
     """Pipette data used to determine the current gantry position."""
@@ -149,6 +153,7 @@ class MotionView:
         max_travel_z: float,
         force_direct: bool = False,
         minimum_z_height: Optional[float] = None,
+        stay_at_max_travel_z: bool = False,
     ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as an addressable area."""
         location = self._pipettes.get_current_location()
@@ -159,6 +164,14 @@ class MotionView:
             )
         )
         destination = base_destination + Point(x=offset.x, y=offset.y, z=offset.z)
+        if stay_at_max_travel_z:
+            destination = Point(
+                destination.x,
+                destination.y,
+                # FIX BEFORE MERGE: Explain this hack.
+                # Possibly related: https://github.com/Opentrons/opentrons/pull/6882#discussion_r514248062
+                max_travel_z - _STAY_AT_MAX_TRAVEL_Z_MARGIN,
+            )
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
         destination_cp = CriticalPoint.XY_CENTER
