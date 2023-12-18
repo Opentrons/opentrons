@@ -27,19 +27,19 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p1000_96,
 )
 
-API_LEVEL = "2.16"
+API_LEVEL = "2.13"
 
 LABWARE_OFFSETS: List[dict] = []
 
 LIQUID_SENSE_CFG = {
     50: {
-        1: {liquid_sense_ot3_p50_single},
-        8: {liquid_sense_ot3_p50_multi},
+        1: liquid_sense_ot3_p50_single,
+        8: liquid_sense_ot3_p50_multi,
     },
     1000: {
-        1: {liquid_sense_ot3_p1000_single},
-        8: {liquid_sense_ot3_p1000_multi},
-        96: {liquid_sense_ot3_p1000_96},
+        1: liquid_sense_ot3_p1000_single,
+        8: liquid_sense_ot3_p1000_multi,
+        96: liquid_sense_ot3_p1000_96,
     },
 }
 
@@ -168,9 +168,9 @@ if __name__ == "__main__":
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--pre-heat", action="store_true")
-    parser.add_argument("--liquid", type=str, choices["water", "glycerol", "alchohol"], default="water")
+    parser.add_argument("--liquid", type=str, choices=["water", "glycerol", "alchohol"], default="water")
     parser.add_argument("--z-speed", type=float, default=0)
-    parser.add_argument("--plunger-direction", type=str, choices["aspirate", "dispense"], default="aspirate")
+    parser.add_argument("--plunger-direction", type=str, choices=["aspirate", "dispense"], default="aspirate")
     parser.add_argument("--labware-type", type=str, default = "nest_1_reservoir_195ml")
     parser.add_argument("--plunger-speed", type=float, default=-1.0)
     parser.add_argument("--isolate-plungers", action="store_true")
