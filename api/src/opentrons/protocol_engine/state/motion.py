@@ -28,10 +28,6 @@ from .modules import ModuleView
 from .module_substates import HeaterShakerModuleId
 
 
-_STAY_AT_MAX_TRAVEL_Z_MARGIN = 10
-assert _STAY_AT_MAX_TRAVEL_Z_MARGIN > motion_planning.waypoints.MINIMUM_Z_MARGIN
-
-
 @dataclass(frozen=True)
 class PipetteLocationData:
     """Pipette data used to determine the current gantry position."""
@@ -167,9 +163,12 @@ class MotionView:
             base_destination_at_max_z = Point(
                 base_destination.x,
                 base_destination.y,
-                # FIX BEFORE MERGE: Explain this hack.
+                # HACK(mm, 2023-12-18): We want to travel exactly at max_travel_z, but
+                # motion_planning.get_waypoints() won't let us--the highest we can go is this margin
+                # beneath max_travel_z. Investigate why motion_planning.get_waypoints() does not
+                # let us travel at max_travel_z, and whether it's safe to make it do that.
                 # Possibly related: https://github.com/Opentrons/opentrons/pull/6882#discussion_r514248062
-                max_travel_z - _STAY_AT_MAX_TRAVEL_Z_MARGIN,
+                max_travel_z - motion_planning.waypoints.MINIMUM_Z_MARGIN,
             )
             destination = base_destination_at_max_z + Point(
                 offset.x, offset.y, offset.z
