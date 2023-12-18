@@ -168,6 +168,14 @@ if __name__ == "__main__":
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
     parser.add_argument("--pre-heat", action="store_true")
+    parser.add_argument("--liquid", type=str, choices["water", "glycerol", "alchohol"], default="water")
+    parser.add_argument("--z-speed", type=float, default=0)
+    parser.add_argument("--plunger-direction", type=str, choices["aspirate", "dispense"], default="aspirate")
+    parser.add_argument("--labware-type", type=str, default = "nest_1_reservoir_195ml")
+    parser.add_argument("--plunger-speed", type=float, default=-1.0)
+    parser.add_argument("--isolate-plungers", action="store_true")
+    parser.add_argument("--start-height-offset", type=float, default=0)
+
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():
