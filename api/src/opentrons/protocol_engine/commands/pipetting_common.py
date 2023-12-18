@@ -88,7 +88,7 @@ class BaseLiquidHandlingResult(BaseModel):
     volume: float = Field(
         ...,
         description="Amount of liquid in uL handled in the operation.",
-        gt=0,
+        ge=0,
     )
 
 
