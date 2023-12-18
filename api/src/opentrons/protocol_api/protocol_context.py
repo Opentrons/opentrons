@@ -1058,7 +1058,7 @@ class ProtocolContext(CommandPublisher):
 
         In API version 2.15 only, Flex protocols have a fixed trash in slot A3.
 
-        In API version 2.16 and later, the fixed trash only exists in OT-2 protocols. It is a :py:class:`.TrashBin` object, which doesn't have any wells. Trying to access ``fixed_trash`` in a Flex protocol will raise an error.
+        In API version 2.16 and later, the fixed trash only exists in OT-2 protocols. It is a :py:class:`.TrashBin` object, which doesn't have any wells. Trying to access ``fixed_trash`` in a Flex protocol will raise an error. See :ref:`configure-trash-bin` for details on using the movable trash in Flex protocols.
 
         .. versionchanged:: 2.16
             Returns a :py:class:`.TrashBin` object.
