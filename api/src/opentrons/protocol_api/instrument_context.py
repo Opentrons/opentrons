@@ -1524,6 +1524,8 @@ class InstrumentContext(publisher.CommandPublisher):
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
+        You can set this to a :py:obj:`Labware`, :py:obj:`TrashBin`, or :py:obj:`WasteChute`.
+
         The default value depends on the robot type and API version:
 
         - On a Flex running a protocol with API version 2.16 and later, the first
