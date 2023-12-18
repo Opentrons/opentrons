@@ -24,10 +24,12 @@ const JUPYTER_NOTEBOOK_LINK =
 
 export interface OpenJupyterControlProps {
   robotIp: string
+  isEstopNotDisengaged: boolean
 }
 
 export function OpenJupyterControl({
   robotIp,
+  isEstopNotDisengaged,
 }: OpenJupyterControlProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const href = `http://${robotIp}:48888`
@@ -51,8 +53,8 @@ export function OpenJupyterControl({
         </ExternalLink>
       </Box>
       <TertiaryButton
+        disabled={isEstopNotDisengaged}
         onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
-        as={Link}
         href={href}
         marginLeft={SPACING.spacing32}
         external

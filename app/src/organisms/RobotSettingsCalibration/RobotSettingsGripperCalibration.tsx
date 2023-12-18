@@ -47,7 +47,7 @@ const BODY_STYLE = css`
   border-radius: 3px;
 `
 
-export interface RobotSettingsGripperCalibrationProps {
+interface RobotSettingsGripperCalibrationProps {
   gripper: GripperData | null
   robotName: string
 }

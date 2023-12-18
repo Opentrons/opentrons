@@ -26,6 +26,7 @@ describe('EnableStatusLight', () => {
   beforeEach(() => {
     props = {
       robotName: ROBOT_NAME,
+      isEstopNotDisengaged: false,
     }
     mockUseLEDLights.mockReturnValue({
       lightsEnabled: false,
@@ -46,5 +47,14 @@ describe('EnableStatusLight', () => {
     const [{ getByLabelText }] = render(props)
     getByLabelText('enable_status_light').click()
     expect(mockToggleLights).toHaveBeenCalled()
+  })
+
+  it('shoud make toggle button disabled when e-stop is pressed', () => {
+    props = {
+      ...props,
+      isEstopNotDisengaged: true,
+    }
+    const [{ getByLabelText }] = render(props)
+    expect(getByLabelText('enable_status_light')).toBeDisabled()
   })
 })

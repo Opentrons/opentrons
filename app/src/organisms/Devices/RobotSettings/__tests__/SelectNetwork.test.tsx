@@ -68,7 +68,7 @@ const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
 >
 
-describe('<TemporarySelectNetwork />', () => {
+describe('SelectNetwork', () => {
   let dispatch: any
   let mockStore: any
 
@@ -102,7 +102,11 @@ describe('<TemporarySelectNetwork />', () => {
 
     render = () => {
       return mount(
-        <SelectNetwork robotName={mockRobotName} isRobotBusy={false} />,
+        <SelectNetwork
+          robotName={mockRobotName}
+          isRobotBusy={false}
+          isEstopNotDisengaged={false}
+        />,
         {
           wrappingComponent: Provider,
           wrappingComponentProps: { store: mockStore },
