@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useSelector } from 'react-redux'
 
 import {
@@ -12,6 +12,8 @@ import {
   JUSTIFY_CENTER,
   OVERFLOW_HIDDEN,
   POSITION_RELATIVE,
+  POSITION_ABSOLUTE,
+  ALIGN_FLEX_END,
   SPACING,
   useSwipe,
 } from '@opentrons/components'
@@ -216,18 +218,33 @@ export function RunningProtocol(): JSX.Element {
                 }
               />
             ) : (
-              <RunningProtocolCommandList
-                protocolName={protocolName}
-                runStatus={runStatus}
-                robotType={robotType}
-                playRun={playRun}
-                pauseRun={pauseRun}
-                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-                trackProtocolRunEvent={trackProtocolRunEvent}
-                robotAnalyticsData={robotAnalyticsData}
-                currentRunCommandIndex={currentRunCommandIndex}
-                robotSideAnalysis={robotSideAnalysis}
-              />
+              <>
+                <RunningProtocolCommandList
+                  protocolName={protocolName}
+                  runStatus={runStatus}
+                  robotType={robotType}
+                  playRun={playRun}
+                  pauseRun={pauseRun}
+                  setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+                  trackProtocolRunEvent={trackProtocolRunEvent}
+                  robotAnalyticsData={robotAnalyticsData}
+                  currentRunCommandIndex={currentRunCommandIndex}
+                  robotSideAnalysis={robotSideAnalysis}
+                />
+                <Flex
+                  css={css`
+                    background: linear-gradient(
+                      rgba(255, 0, 0, 0) 85%,
+                      #ffffff
+                    );
+                  `}
+                  position={POSITION_ABSOLUTE}
+                  height="324px"
+                  width="944px"
+                  marginTop="148px"
+                  alignSelf={ALIGN_FLEX_END}
+                />
+              </>
             )
           ) : (
             <RunningProtocolSkeleton currentOption={currentOption} />
