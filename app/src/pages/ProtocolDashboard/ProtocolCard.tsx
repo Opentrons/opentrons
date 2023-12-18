@@ -166,6 +166,7 @@ export function ProtocolCard(props: {
       {isPendingAnalysis ? (
         <Icon
           name="ot-spinner"
+          aria-label="Protocol is loading"
           spin
           size={SIZE_2}
           marginY={'-1.5rem'}
