@@ -1,5 +1,5 @@
 import { useAllRunsQuery } from '@opentrons/react-api-client'
-import { last } from 'lodash'
+import last from 'lodash/last'
 
 export function useMostRecentRunId(): string | null {
   const { data: allRuns } = useAllRunsQuery()
