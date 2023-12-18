@@ -20,8 +20,8 @@ pydantic = "==2.5.2"
 pygithub = "==2.1.1"
 ruff = "==0.1.6"
 docker = "==6.1.3"
-syrupy = "*"
-pytest-html = "*"
+syrupy = "==4.6.0"
+pytest-html = "==4.1.1"
 
 [requires]
 python_version = "3.12"
