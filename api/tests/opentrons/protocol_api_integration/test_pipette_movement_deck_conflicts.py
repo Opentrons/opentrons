@@ -50,6 +50,7 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
         "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical", "D1"
     )
 
+    # ########### Use Partial Nozzles #############
     instrument.configure_nozzle_layout(style=COLUMN, start="A12")
 
     with pytest.raises(
