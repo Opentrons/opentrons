@@ -311,6 +311,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
             pipette_96_channel.blow_out(waste_chute)
 
+            pipette_96_channel.aspirate(5, source_reservoir["A1"])
+            pipette_96_channel.touch_tip()
+
+            pipette_96_channel.air_gap(height=30)
+            pipette_96_channel.blow_out(trash_bin)
+
             pipette_96_channel.aspirate(10, source_reservoir["A1"])
             pipette_96_channel.touch_tip()
 
