@@ -56,7 +56,10 @@ export const UpdateBanner = ({
       bannerMessage = t('module_calibration_required_update_pipette_FW')
     else bannerMessage = t('module_calibration_required')
     hyperlinkText =
-      !attachPipetteRequired && !updatePipetteFWRequired && !isTooHot
+      !attachPipetteRequired &&
+      !updatePipetteFWRequired &&
+      !isTooHot &&
+      !calibratePipetteRequired
         ? t('calibrate_now')
         : ''
   } else {
