@@ -340,8 +340,8 @@ class Protocols:
         app_analysis_error="InvalidTrashBinLocationError [line 15]: Invalid location for trash bin: C2. Valid slots: Any slot in column 1 or 3.",  # noqa: E501
     )
 
-    OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3: Protocol = Protocol(
-        file_name="OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3",
+    OT3_P1000_96_None_2_16_AnalysisError_TrashBinInStagingAreaCol3: Protocol = Protocol(
+        file_name="OT3_P1000_96_None_2_16_AnalysisError_TrashBinInStagingAreaCol3",
         file_extension="py",
         protocol_name="QA Protocol - Analysis Error - Trash Bin Staging Area Column 3",
         robot="OT-3",
@@ -360,8 +360,8 @@ class Protocols:
         app_analysis_error="ValueError [line 19]: Staging areas not permitted for trash bin.",  # noqa: E501
     )
 
-    OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash: Protocol = Protocol(
-        file_name="OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash",
+    OT3_P1000_96_2_16_AnalysisError_DropTipsWithNoTrash: Protocol = Protocol(
+        file_name="OT3_P1000_96_2_16_AnalysisError_DropTipsWithNoTrash",
         file_extension="py",
         protocol_name="QA Protocol - Analysis Error - Drop Tips with no Trash",
         robot="OT-3",
@@ -390,12 +390,32 @@ class Protocols:
         app_analysis_error="ValueError [line 19]: Cannot load a module onto a staging slot.",  # noqa: E501
     )
 
-    OT3_None_None_2_16_AnalysisError_ModuleAndWasteChuteConflict: Protocol = Protocol(
-        file_name="OT3_None_None_2_16_AnalysisError_ModuleAndWasteChuteConflict",
+    OT3_P1000_96_TM_2_16_AnalysisError_ModuleAndWasteChuteConflict: Protocol = Protocol(
+        file_name="OT3_P1000_96_TM_2_16_AnalysisError_ModuleAndWasteChuteConflict",
         file_extension="py",
         protocol_name="QA Protocol - Analysis Error - Module and Waste Chute Conflict",
         robot="OT-3",
         app_error=True,
         robot_error=False,
-        app_analysis_error="InvalidModuleError [line 18]: Error 4000 GENERAL_ERROR (InvalidModuleError): Cannot use temperature module in C4, not compatible with one or more of the following fixtures: Waste Chute",  # noqa: E501
+        app_analysis_error="ProtocolCommandFailedError [line 24]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleAddressableAreaError: Cannot use Waste Chute, not compatible with one or more of the following fixtures: Slot D3",  # noqa: E501
+    )
+
+    OT3_None_None_2_16_AnalysisError_AccessToFixedTrashProp: Protocol = Protocol(
+        file_name="OT3_None_None_2_16_AnalysisError_AccessToFixedTrashProp",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Access to Fixed Trash Property",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="APIVersionError [line 15]: Fixed Trash is not supported on Flex protocols in API Version 2.16 and above.",  # noqa: E501
+    )
+
+    OT3_P1000_96_GRIPPER_2_16_AnalysisError_DropLabwareIntoTrashBin: Protocol = Protocol(
+        file_name="OT3_P1000_96_GRIPPER_2_16_AnalysisError_DropLabwareIntoTrashBin",
+        file_extension="py",
+        protocol_name="QA Protocol - Analysis Error - Drop Labware in Trash Bin",
+        robot="OT-3",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="ProtocolCommandFailedError [line 19]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleAddressableAreaError: Cannot use Slot C3, not compatible with one or more of the following fixtures: Trash Bin in C3",  # noqa: E501
     )

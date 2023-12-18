@@ -12,13 +12,19 @@ from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 
-def _what_protocols() -> list[(Protocol)]:
+def _what_protocols() -> list[Protocol]:
     """Use the environment variable to select which protocols are used in the test."""
     protocols: Protocols = Protocols()
     protocols_to_test: str = os.getenv("APP_ANALYSIS_TEST_PROTOCOLS", "upload_protocol")
-    tests: list[(Protocol)] = []
+    tests: list[Protocol] = []
     for protocol_name in [x.strip() for x in protocols_to_test.split(",")]:
-        tests.append((getattr(protocols, protocol_name)))
+        protocol = getattr(protocols, protocol_name)
+        tests.append(
+                pytest.param(
+                    protocol,
+                    id=protocol.protocol_name,
+                )
+            )
     return tests
 
 

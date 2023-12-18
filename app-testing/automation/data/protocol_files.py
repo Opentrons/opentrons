@@ -28,13 +28,14 @@ names = Literal[
     "OT2_P300SLeft_MM_TM_TM_5_2_6_MOAMTemps",
     "OT2_P300SLeft_MM1_MM_2_2_EngageMagHeightFromBase",
     "OT2_P300SLeft_MM1_MM_TM_2_3_Mix",
+    "OT3_None_None_2_16_AnalysisError_AccessToFixedTrashProp",
     "OT3_None_None_2_16_AnalysisError_FixtureUsesMiddleColumn",
-    "OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol3",
+    "OT3_P1000_96_None_2_16_AnalysisError_TrashBinInStagingAreaCol3",
     "OT3_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol4",
-    "OT3_None_None_2_16_AnalysisError_DropTipsWithNoTrash",
+    "OT3_P1000_96_2_16_AnalysisError_DropTipsWithNoTrash",
     "OT3_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol3",
     "OT3_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol4",
-    "OT3_None_None_2_16_AnalysisError_ModuleAndWasteChuteConflict",
+    "OT3_P1000_96_TM_2_16_AnalysisError_ModuleAndWasteChuteConflict",
     "OT3_P100_96_HS_TM_2_15_Quick_Zymo_RNA_Bacteria",
     "OT3_P1000_96_HS_TM_MM_2_15_ABR5_6_HDQ_Bacteria_ParkTips_96_channel",
     "OT3_P1000_96_HS_TM_MM_2_15_MagMaxRNACells96Ch",
@@ -45,4 +46,5 @@ names = Literal[
     "OT3_P1000MLeft_P50MRight_HS_TM_MM_TC_2_15_ABR4_Illumina_DNA_Prep_24x",
     "OT3_P1000SRight_None_2_15_ABR_Simple_Normalize_Long_Right",
     "OT3_P50MLeft_P1000MRight_None_2_15_ABRKAPALibraryQuantLongv2",
+    "OT3_P1000_96_GRIPPER_2_16_AnalysisError_DropLabwareIntoTrashBin"
 ]
