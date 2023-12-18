@@ -79,3 +79,8 @@ This allows us to run one or many.
 1. add the protocol stem to `protocol_files.py`
 1. add the protocol data as a property to `protocols.py`
 1. run `make print-protocols`
+
+### Analyses Snapshot Test
+
+- run the Workflow Dispatch job
+  - `gh workflow run 'Analyses Snapshot Test' --ref 7.1-analyses-battery -f TARGET=v7.1.0-alpha.10 -f TEST_SOURCE=7.1-analyses-battery`
