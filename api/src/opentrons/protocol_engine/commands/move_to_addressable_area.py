@@ -59,7 +59,7 @@ class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
         description=(
             "If `true`, the pipette will retract to its highest possible height"
             " and stay there instead of descending to the destination."
-            " `minimumZHeight` and the z-coordinate of `offset` will be ignored."
+            " `minimumZHeight` will be ignored."
         ),
     )
 

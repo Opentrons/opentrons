@@ -163,15 +163,19 @@ class MotionView:
                 addressable_area_name
             )
         )
-        destination = base_destination + Point(x=offset.x, y=offset.y, z=offset.z)
         if stay_at_max_travel_z:
-            destination = Point(
-                destination.x,
-                destination.y,
+            base_destination_at_max_z = Point(
+                base_destination.x,
+                base_destination.y,
                 # FIX BEFORE MERGE: Explain this hack.
                 # Possibly related: https://github.com/Opentrons/opentrons/pull/6882#discussion_r514248062
                 max_travel_z - _STAY_AT_MAX_TRAVEL_Z_MARGIN,
             )
+            destination = base_destination_at_max_z + Point(
+                offset.x, offset.y, offset.z
+            )
+        else:
+            destination = base_destination + Point(offset.x, offset.y, offset.z)
 
         # TODO(jbl 11-28-2023) This may need to change for partial tip configurations on a 96
         destination_cp = CriticalPoint.XY_CENTER
