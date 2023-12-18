@@ -378,6 +378,7 @@ export function ProtocolDetails(
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
+            showOT3Only={robotType === 'OT-3 Standard'}
           />
           <SendProtocolToOT3Slideout
             isExpanded={showSendProtocolToOT3Slideout}

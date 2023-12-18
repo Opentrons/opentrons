@@ -31,13 +31,19 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   showSlideout: boolean
+  showOT3Only?: boolean
 }
 
 export function ChooseRobotToRunProtocolSlideoutComponent(
   props: ChooseRobotToRunProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
-  const { storedProtocolData, showSlideout, onCloseClick } = props
+  const {
+    storedProtocolData,
+    showSlideout,
+    onCloseClick,
+    showOT3Only = false,
+  } = props
   const history = useHistory()
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState<boolean>(
     true
@@ -171,6 +177,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
+      showOT3Only={showOT3Only}
       isCreatingRun={isCreatingRun}
       reset={resetCreateRun}
       runCreationError={runCreationError}
