@@ -18,7 +18,7 @@ import type {
   NetworkChangeState,
 } from './ConnectNetwork/types'
 
-interface TempSelectNetworkProps {
+interface SelectNetworkProps {
   robotName: string
   isRobotBusy: boolean
   isEstopNotDisengaged: boolean
@@ -28,7 +28,7 @@ export const SelectNetwork = ({
   robotName,
   isRobotBusy,
   isEstopNotDisengaged,
-}: TempSelectNetworkProps): JSX.Element => {
+}: SelectNetworkProps): JSX.Element => {
   const list = useWifiList(robotName)
   const keys = useSelector((state: State) =>
     Networking.getWifiKeys(state, robotName)
