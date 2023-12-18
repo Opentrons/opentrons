@@ -335,25 +335,25 @@ class ReadMotorDriverResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class MotorDriverErrorEncountered(BaseMessage):  # noqa: D101
+class ReadMotorDriverErrorStatusRequest(BaseMessage):  # noqa: D101
     payload: payloads.EmptyPayload
     payload_type: Type[
         payloads.EmptyPayload
     ] = payloads.EmptyPayload
     message_id: Literal[
-        MessageId.motor_driver_error_encountered
-    ] = MessageId.motor_driver_error_encountered
+        MessageId.read_motor_driver_error_status_request
+    ] = MessageId.read_motor_driver_error_status_request
 
 
 @dataclass
-class ResetMotorDriverErrorHandling(BaseMessage):  # noqa: D101
-    payload: payloads.EmptyPayload
+class ReadMotorDriverErrorStatusResponse(BaseMessage):  # noqa: D101
+    payload: payloads.ReadMotorDriverErrorStatusResponsePayload
     payload_type: Type[
-        payloads.EmptyPayload
-    ] = payloads.EmptyPayload
+        payloads.ReadMotorDriverErrorStatusResponsePayload
+    ] = payloads.ReadMotorDriverErrorStatusResponsePayload
     message_id: Literal[
-        MessageId.reset_motor_driver_error_handling
-    ] = MessageId.reset_motor_driver_error_handling
+        MessageId.read_motor_driver_error_status_response
+    ] = MessageId.read_motor_driver_error_status_response
 
 
 @dataclass
@@ -365,28 +365,6 @@ class MotorDriverInErrorState(BaseMessage):  # noqa: D101
     message_id: Literal[
         MessageId.motor_driver_in_error_state
     ] = MessageId.motor_driver_in_error_state
-
-
-@dataclass
-class ReadMotorDriverErrorRequest(BaseMessage):  # noqa: D101
-    payload: payloads.EmptyPayload
-    payload_type: Type[
-        payloads.EmptyPayload
-    ] = payloads.EmptyPayload
-    message_id: Literal[
-        MessageId.read_motor_driver_error_register_request
-    ] = MessageId.read_motor_driver_error_register_request
-
-
-@dataclass
-class ReadMotorDriverErrorResponse(BaseMessage):  # noqa: D101
-    payload: payloads.ReadMotorDriverErrorRegisterResponsePayload
-    payload_type: Type[
-        payloads.ReadMotorDriverErrorRegisterResponsePayload
-    ] = payloads.ReadMotorDriverErrorRegisterResponsePayload
-    message_id: Literal[
-        MessageId.read_motor_driver_error_register_response
-    ] = MessageId.read_motor_driver_error_register_response
 
 
 @dataclass

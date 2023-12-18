@@ -143,11 +143,9 @@ class MessageId(int, Enum):
     write_motor_current_request = 0x33
     read_motor_current_request = 0x34
     read_motor_current_response = 0x35
-    motor_driver_error_encountered = 0x36
-    read_motor_driver_error_register_request = 0x37
-    read_motor_driver_error_register_response = 0x38
-    reset_motor_driver_error_handling = 0x39
-    motor_driver_in_error_state = 0x3b
+    read_motor_driver_error_status_request = 0x36
+    read_motor_driver_error_status_response = 0x37
+    motor_driver_in_error_state = 0x38
 
     set_brushed_motor_vref_request = 0x40
     set_brushed_motor_pwm_request = 0x41
