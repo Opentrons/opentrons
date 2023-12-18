@@ -8,7 +8,6 @@ import type {
   LoadedLabware,
   LoadedModule,
   LoadedPipette,
-  LoadFixtureRunTimeCommand,
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
   LoadModuleRunTimeCommand,
@@ -224,26 +223,6 @@ export function parseInitialLoadedModulesBySlot(
       'slotName' in command.params.location
         ? { ...acc, [command.params.location.slotName]: command }
         : acc,
-    {}
-  )
-}
-
-export interface LoadedFixturesBySlot {
-  [slotName: string]: LoadFixtureRunTimeCommand
-}
-// TODO(bh, 2023-11-09): remove this util, there will be no loadFixture command
-export function parseInitialLoadedFixturesByCutout(
-  commands: RunTimeCommand[]
-): LoadedFixturesBySlot {
-  const loadFixtureCommandsReversed = commands
-    .filter(
-      (command): command is LoadFixtureRunTimeCommand =>
-        command.commandType === 'loadFixture'
-    )
-    .reverse()
-  return reduce<LoadFixtureRunTimeCommand, LoadedFixturesBySlot>(
-    loadFixtureCommandsReversed,
-    (acc, command) => ({ ...acc, [command.params.location.cutout]: command }),
     {}
   )
 }
