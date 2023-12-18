@@ -8,12 +8,12 @@ import { BORDERS, COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { FIXTURE_HEIGHT, SINGLE_SLOT_FIXTURE_WIDTH } from './constants'
 
-import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface EmptyConfigFixtureProps {
   deckDefinition: DeckDefinition
-  fixtureLocation: Cutout
-  handleClickAdd: (fixtureLocation: Cutout) => void
+  fixtureLocation: CutoutId
+  handleClickAdd: (fixtureLocation: CutoutId) => void
 }
 
 export function EmptyConfigFixture(

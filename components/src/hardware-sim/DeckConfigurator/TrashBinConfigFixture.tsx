@@ -12,12 +12,12 @@ import {
   TRASH_BIN_DISPLAY_NAME,
 } from './constants'
 
-import type { Cutout, DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface TrashBinConfigFixtureProps {
   deckDefinition: DeckDefinition
-  fixtureLocation: Cutout
-  handleClickRemove?: (fixtureLocation: Cutout) => void
+  fixtureLocation: CutoutId
+  handleClickRemove?: (fixtureLocation: CutoutId) => void
 }
 
 export function TrashBinConfigFixture(
