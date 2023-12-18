@@ -93,6 +93,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     pipette_96_channel = ctx.load_instrument(PIPETTE_96_CHANNEL_NAME, mount="left", tip_racks=tip_racks)
 
+    assert isinstance(pipette_96_channel.trash_container, protocol_api.TrashBin)
+
     ########################
     ### LOAD SOME LIQUID ###
     ########################
@@ -305,8 +307,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             pipette_96_channel.aspirate(5, source_reservoir["A1"])
             pipette_96_channel.touch_tip()
 
-            # Waiting for https://opentrons.atlassian.net/browse/RQA-2056
-            # pipette_96_channel.air_gap(height=30)
+            pipette_96_channel.air_gap(height=30)
 
             pipette_96_channel.blow_out(waste_chute)
 
@@ -378,6 +379,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     test_gripper_moves()
     test_module_usage()
     test_manual_moves()
+
     ###################################################################################################
     ### THE ORDER OF THESE FUNCTION CALLS MATTER. CHANGING THEM WILL CAUSE THE PROTOCOL NOT TO WORK ###
     ###################################################################################################
