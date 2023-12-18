@@ -26,7 +26,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   highlightedWell: {
     stroke: COLORS.blueEnabled,
     fill: `${COLORS.blueEnabled}33`, // 20% opacity
-    strokeWidth: 0.6,
+    strokeWidth: 1,
   },
   disabledWell: {
     stroke: '#C6C6C6', // LEGACY --light-grey-hover
@@ -36,11 +36,11 @@ export const STYLE_BY_WELL_CONTENTS: {
   selectedWell: {
     stroke: COLORS.blueEnabled,
     fill: COLORS.transparent,
-    strokeWidth: 0.6,
+    strokeWidth: 1,
   },
   tipMissing: {
     stroke: '#A4A4A4', // LEGACY --c-near-black
-    fill: '#E5E2E2', // LEFACY --c-light-gray
+    fill: '#E5E2E2', // LEGACY --c-light-gray
     strokeWidth: 0.6,
   },
   tipPresent: {

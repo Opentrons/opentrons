@@ -22,8 +22,6 @@ export interface StaticLabwareProps {
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback to be executed when mouse leaves a well element */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
-  /** [legacy] css class to be added to well component if it is selectable */
-  selectableWellClass?: string
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {

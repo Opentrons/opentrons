@@ -3,7 +3,9 @@ import * as React from 'react'
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 import type { StyleProps } from '../../../primitives'
+import { COLORS } from '../../../ui-style-constants'
 
+export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 export interface WellProps extends StyleProps {
   /** Well Name (eg 'A1') */
   wellName: string
@@ -17,15 +19,13 @@ export interface WellProps extends StyleProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
 }
 
-
-
 export function WellComponent(props: WellProps): JSX.Element {
   const {
     well,
     wellName,
-    stroke,
-    strokeWidth,
-    fill,
+    stroke = COLORS.black,
+    strokeWidth = 1,
+    fill = COLORS.white,
     onMouseEnterWell,
     onMouseLeaveWell,
   } = props
@@ -34,7 +34,7 @@ export function WellComponent(props: WellProps): JSX.Element {
   const isInteractive = onMouseEnterWell != null || onMouseLeaveWell != null 
   const pointerEvents: React.CSSProperties['pointerEvents'] = isInteractive ? 'auto' : 'none' 
   const commonProps = {
-    'data-wellname': isInteractive ? wellName : undefined,
+    [INTERACTIVE_WELL_DATA_ATTRIBUTE]: isInteractive ? wellName : undefined,
     onMouseEnter: onMouseEnterWell != null ? (event: React.MouseEvent) => onMouseEnterWell({ wellName, event }) : undefined,
     onMouseLeave: onMouseLeaveWell != null ? (event: React.MouseEvent) => onMouseLeaveWell({ wellName, event }) : undefined,
     style: { pointerEvents, stroke, strokeWidth, fill }

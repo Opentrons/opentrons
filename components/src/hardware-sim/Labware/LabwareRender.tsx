@@ -51,9 +51,6 @@ export interface LabwareRenderProps {
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   /** Optional callback, called with WellMouseEvent args onMouseLeave */
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
-  /** Special class which, together with 'data-wellname' on the well elements,
-    allows drag-to-select behavior */
-  selectableWellClass?: string
   gRef?: React.RefObject<SVGGElement>
   onLabwareClick?: () => void
 }
@@ -71,7 +68,6 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
-        selectableWellClass={props.selectableWellClass}
         onLabwareClick={props.onLabwareClick}
         highlight={props.highlight}
       />
