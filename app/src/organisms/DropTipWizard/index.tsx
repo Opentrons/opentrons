@@ -45,13 +45,10 @@ import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
-import type { PipetteData, CommandData } from '@opentrons/api-client'
+import type { PipetteData } from '@opentrons/api-client'
 import type {
-  Coordinates,
   PipetteModelSpecs,
   RobotType,
-  SavePositionRunTimeCommand,
-  CreateCommand,
   DeckConfiguration,
   AddressableAreaName,
 } from '@opentrons/shared-data'
@@ -227,7 +224,6 @@ export const DropTipWizardComponent = (
     createMaintenanceRun,
     handleCleanUpAndClose,
     chainRunCommands,
-    // attachedInstrument,
     isRobotMoving,
     createRunCommand,
     setErrorMessage,
@@ -261,15 +257,7 @@ export const DropTipWizardComponent = (
 
   const goBack = (): void => {
     if (createdMaintenanceRunId != null) {
-      retractAllAxesAndSavePosition()
-        .then(() =>
-          setCurrentStepIndex(
-            isFinalStep ? currentStepIndex : currentStepIndex - 1
-          )
-        )
-        .catch((e: Error) =>
-          setErrorMessage(`Error issuing jog command: ${e.message}`)
-        )
+      setCurrentStepIndex(isFinalStep ? currentStepIndex : currentStepIndex - 1)
     }
   }
 
@@ -303,103 +291,48 @@ export const DropTipWizardComponent = (
     cancel: cancelExit,
   } = useConditionalConfirm(handleCleanUpAndClose, true)
 
-  const retractAllAxesAndSavePosition = (): Promise<Coordinates | null> => {
-    if (createdMaintenanceRunId == null)
-      return Promise.reject<Coordinates>(
-        new Error('no maintenance run present to send move commands to')
-      )
-    const commands: CreateCommand[] = [
-      {
-        commandType: 'home' as const,
-        params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
-      },
-      {
-        commandType: 'savePosition' as const,
-        params: {
-          pipetteId: MANAGED_PIPETTE_ID,
-          failOnNotHomed: false,
-        },
-      },
-    ]
-    return chainRunCommands(createdMaintenanceRunId, commands, false)
-      .then(responses => {
-        if (responses.length !== commands.length) {
-          return Promise.reject(
-            new Error('Not all commands executed successfully')
-          )
-        }
-        const currentPosition = (responses[responses.length - 1]
-          .data as SavePositionRunTimeCommand).result?.position
-        if (currentPosition != null) {
-          return Promise.resolve(currentPosition)
-        } else {
-          return Promise.reject(
-            new Error('Current position could not be saved')
-          )
-        }
-      })
-      .catch(e => {
-        setErrorMessage(
-          `Error retracting x and y axes or saving position: ${e.message}`
-        )
-        return null
-      })
-  }
-
   const moveToAddressableArea = (
     addressableArea: AddressableAreaName
-  ): Promise<CommandData | null> => {
+  ): Promise<null> => {
     if (createdMaintenanceRunId == null) {
       return Promise.reject(
         new Error('no maintenance run present to send move commands to')
       )
     }
 
-    return retractAllAxesAndSavePosition()
-      .then(currentPosition => {
-        const addressableAreaFromConfig = getAddressableAreaFromConfig(
-          addressableArea,
-          deckConfig,
-          instrumentModelSpecs.channels,
-          robotType
-        )
+    const addressableAreaFromConfig = getAddressableAreaFromConfig(
+      addressableArea,
+      deckConfig,
+      instrumentModelSpecs.channels,
+      robotType
+    )
 
-        const zOffset =
-          addressableAreaFromConfig === addressableArea &&
-          addressableAreaFromConfig !== 'fixedTrash'
-            ? (currentPosition as Coordinates).z - 10
-            : 0
-
-        if (currentPosition != null && addressableAreaFromConfig != null) {
-          return chainRunCommands(
-            createdMaintenanceRunId,
-            [
-              {
-                commandType: 'moveToAddressableArea',
-                params: {
-                  pipetteId: MANAGED_PIPETTE_ID,
-                  addressableAreaName: addressableAreaFromConfig,
-                  offset: { x: 0, y: 0, z: zOffset },
-                },
-              },
-            ],
-            true
-          ).then(commandData => {
-            const error = commandData[0].data.error
-            if (error != null) {
-              setErrorMessage(`error moving to position: ${error.detail}`)
-            }
-            return null
-          })
-        } else {
-          setErrorMessage(`error moving to position: invalid addressable area.`)
-          return null
+    if (addressableAreaFromConfig != null) {
+      return chainRunCommands(
+        createdMaintenanceRunId,
+        [
+          {
+            commandType: 'moveToAddressableArea',
+            params: {
+              pipetteId: MANAGED_PIPETTE_ID,
+              stayAtHighestPossibleZ: true,
+              addressableAreaName: addressableAreaFromConfig,
+              offset: { x: 0, y: 0, z: 0 },
+            },
+          },
+        ],
+        true
+      ).then(commandData => {
+        const error = commandData[0].data.error
+        if (error != null) {
+          setErrorMessage(`error moving to position: ${error.detail}`)
         }
-      })
-      .catch(e => {
-        setErrorMessage(`error moving to position: ${e.message}`)
         return null
       })
+    } else {
+      setErrorMessage(`error moving to position: invalid addressable area.`)
+      return Promise.resolve(null)
+    }
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
