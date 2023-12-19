@@ -301,5 +301,5 @@ def _serialize_completed_analysis_to_json(completed_analysis: CompletedAnalysis)
         # FastAPI + Pydantic + our customizations serialize these objects
         # over the `GET /protocols/:id/analyses/:id` endpoint.
         by_alias=True,
-        exclude_none=True,
+        exclude_none=False,
     )
