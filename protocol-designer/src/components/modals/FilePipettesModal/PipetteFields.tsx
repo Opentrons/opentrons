@@ -117,14 +117,14 @@ export function PipetteFields(props: Props): JSX.Element {
         pipetteName={pipetteName != null ? pipetteName : null}
         onPipetteChange={pipetteName => {
           const nameAccessor = `pipettesByMount.${mount}.pipetteName`
-          const value = pipetteName
+          const nameAccessorValue = pipetteName
           const targetToClear = `pipettesByMount.${mount}.tiprackDefURI`
           // this select does not return an event so we have to manually set the field val
-          onSetFieldValue(nameAccessor, value)
+          onSetFieldValue(nameAccessor, nameAccessorValue)
           onSetFieldValue(targetToClear, null)
           onSetFieldTouched(targetToClear, false)
         }}
-        disabled={mount === RIGHT && values.left.pipetteName === 'p1000_96'}
+        disabled={mount === RIGHT && has96Channel}
         id={`PipetteSelect_${mount}`}
         className={styles.pipette_select}
       />
