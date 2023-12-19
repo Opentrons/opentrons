@@ -48,7 +48,10 @@ const mockNotPresentStatus = {
 describe('useIsEstopNotDisengaged', () => {
   beforeEach(() => {
     when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
-    mockUseEstopQuery.mockReturnValue({ data: mockEstopStatus } as any)
+    mockUseEstopQuery.mockReturnValue({
+      data: mockEstopStatus,
+      error: null,
+    } as any)
   })
 
   afterAll(() => {
