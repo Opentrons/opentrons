@@ -102,7 +102,9 @@
     "left_pipette": "Left Pipette",
     "right_pipette": "Right Pipette",
     "left_tiprack": "Left Tiprack*",
-    "right_tiprack": "Right Tiprack*"
+    "right_tiprack": "Right Tiprack*",
+    "pipette": "Pipette",
+    "tiprack": "Tiprack*"
   },
   "edit_pipettes": {
     "title": "Change Pipette Selection",
