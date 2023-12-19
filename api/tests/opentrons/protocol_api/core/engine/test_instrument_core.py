@@ -1,5 +1,5 @@
 """Test for the ProtocolEngine-based instrument API core."""
-from typing import cast, Optional
+from typing import cast, Optional, Union
 
 import pytest
 from decoy import Decoy
@@ -8,6 +8,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.protocol_engine import (
     DeckPoint,
     LoadedPipette,
@@ -1011,3 +1012,42 @@ def test_configure_nozzle_layout(
     decoy.verify(
         mock_engine_client.configure_nozzle_layout(subject._pipette_id, expected_model)
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["pipette_channels", "nozzle_layout", "primary_nozzle", "expected_result"],
+    argvalues=[
+        (96, NozzleConfigurationType.FULL, "A1", True),
+        (96, NozzleConfigurationType.FULL, None, True),
+        (96, NozzleConfigurationType.ROW, "A1", False),
+        (96, NozzleConfigurationType.COLUMN, "A1", False),
+        (96, NozzleConfigurationType.COLUMN, "A12", True),
+        (96, NozzleConfigurationType.SINGLE, "H12", False),
+        (96, NozzleConfigurationType.SINGLE, "A1", False),
+        (8, NozzleConfigurationType.FULL, "A1", True),
+        (8, NozzleConfigurationType.FULL, None, True),
+        (8, NozzleConfigurationType.SINGLE, "H1", True),
+        (8, NozzleConfigurationType.SINGLE, "A1", False),
+        (1, NozzleConfigurationType.FULL, None, True),
+    ],
+)
+def test_is_tip_tracking_available(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+    pipette_channels: int,
+    nozzle_layout: NozzleConfigurationType,
+    primary_nozzle: Union[str, None],
+    expected_result: bool,
+) -> None:
+    """It should return whether tip tracking is available based on nozzle configuration."""
+    decoy.when(
+        mock_engine_client.state.tips.get_pipette_channels(subject.pipette_id)
+    ).then_return(pipette_channels)
+    decoy.when(
+        mock_engine_client.state.pipettes.get_nozzle_layout_type(subject.pipette_id)
+    ).then_return(nozzle_layout)
+    decoy.when(
+        mock_engine_client.state.pipettes.get_primary_nozzle(subject.pipette_id)
+    ).then_return(primary_nozzle)
+    assert subject.is_tip_tracking_available() == expected_result

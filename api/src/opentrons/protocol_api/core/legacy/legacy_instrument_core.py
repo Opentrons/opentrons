@@ -547,3 +547,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def get_active_channels(self) -> int:
         """This will never be called because it was added in API 2.16."""
         assert False, "get_active_channels only supported in API 2.16 & later"
+
+    def is_tip_tracking_available(self) -> bool:
+        # Tip tracking is always available in legacy context
+        return True
