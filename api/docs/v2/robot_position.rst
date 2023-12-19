@@ -116,6 +116,8 @@ All positions relative to labware are adjusted automatically based on labware of
 
 You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See :ref:`using_lpc` in the Advanced Control article for information.
 
+.. _protocol-api-deck-coords:
+
 Position Relative to the Deck
 =============================
 

@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'

@@ -74,14 +74,23 @@ class HardwareStopper:
 
             await self._home_everything_except_plungers()
 
-            # OT-2 Will only ever use the Fixed Trash Addressable Area
-            if self._state_store.config.robot_type == "OT-2 Standard":
-                for pipette_id, tip in attached_tips:
-                    try:
+            for pipette_id, tip in attached_tips:
+                try:
+                    if self._state_store.labware.get_fixed_trash_id() == FIXED_TRASH_ID:
+                        # OT-2 and Flex 2.15 protocols will default to the Fixed Trash Labware
                         await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
-                        # TODO: Add ability to drop tip onto custom trash as well.
-                        # if API is 2.15 and below aka is should_have_fixed_trash
-
+                        await self._movement_handler.move_to_well(
+                            pipette_id=pipette_id,
+                            labware_id=FIXED_TRASH_ID,
+                            well_name="A1",
+                        )
+                        await self._tip_handler.drop_tip(
+                            pipette_id=pipette_id,
+                            home_after=False,
+                        )
+                    elif self._state_store.config.robot_type == "OT-2 Standard":
+                        # API 2.16 and above OT2 protocols use addressable areas
+                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
                         await self._movement_handler.move_to_addressable_area(
                             pipette_id=pipette_id,
                             addressable_area_name="fixedTrash",
@@ -90,21 +99,19 @@ class HardwareStopper:
                             speed=None,
                             minimum_z_height=None,
                         )
-
                         await self._tip_handler.drop_tip(
                             pipette_id=pipette_id,
                             home_after=False,
                         )
+                    else:
+                        log.debug(
+                            "Flex Protocols API Version 2.16 and beyond do not support automatic tip dropping at this time."
+                        )
 
-                    except HwPipetteNotAttachedError:
-                        # this will happen normally during protocol analysis, but
-                        # should not happen during an actual run
-                        log.debug(f"Pipette ID {pipette_id} no longer attached.")
-
-            else:
-                log.debug(
-                    "Flex protocols do not support automatic tip dropping at this time."
-                )
+                except HwPipetteNotAttachedError:
+                    # this will happen normally during protocol analysis, but
+                    # should not happen during an actual run
+                    log.debug(f"Pipette ID {pipette_id} no longer attached.")
 
     async def do_halt(self, disengage_before_stopping: bool = False) -> None:
         """Issue a halt signal to the hardware API.

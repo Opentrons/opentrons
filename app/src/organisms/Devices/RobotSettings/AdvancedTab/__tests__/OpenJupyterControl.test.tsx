@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import {
@@ -45,26 +45,28 @@ describe('RobotSettings OpenJupyterControl', () => {
   })
 
   it('should render title, description and button', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Jupyter Notebook')
-    getByText(
+    render(props)
+    screen.getByText('Jupyter Notebook')
+    screen.getByText(
       'Open the Jupyter Notebook running on this robot in the web browser. This is an experimental feature.'
     )
-    getByText('Learn more about using Jupyter notebook')
-    getByText('Launch Jupyter Notebook')
+    screen.getByText('Learn more about using Jupyter notebook')
+    screen.getByText('Launch Jupyter Notebook')
     expect(
-      getByRole('button', { name: 'Launch Jupyter Notebook' })
+      screen.getByRole('button', { name: 'Launch Jupyter Notebook' })
     ).toBeInTheDocument()
   })
 
-  it('should render jupyter notebook link', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Launch Jupyter Notebook' })
+  it('should render jupyter notebook button', () => {
+    render(props)
+    const button = screen.getByRole('button', {
+      name: 'Launch Jupyter Notebook',
+    })
     fireEvent.click(button)
     expect(window.open).toHaveBeenCalledWith(mockLink, '_blank')
   })
 
-  it('should send and analytics event on link click', () => {
+  it('should send and analytics event on button click', () => {
     const [{ getByRole }] = render(props)
     const button = getByRole('button', { name: 'Launch Jupyter Notebook' })
     fireEvent.click(button)

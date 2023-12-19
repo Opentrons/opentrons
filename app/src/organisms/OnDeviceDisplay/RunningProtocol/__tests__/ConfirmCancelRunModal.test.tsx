@@ -118,6 +118,15 @@ describe('ConfirmCancelRunModal', () => {
     getByText('Cancel run')
   })
 
+  it('shoudler render the canceling run modal when run is dismissing', () => {
+    mockUseDismissCurrentRunMutation.mockReturnValue({
+      dismissCurrentRun: mockDismissCurrentRun,
+      isLoading: true,
+    } as any)
+    const [{ getByText }] = render(props)
+    getByText('mock CancelingRunModal')
+  })
+
   it('when tapping go back, the mock function is called', () => {
     const [{ getByText }] = render(props)
     const button = getByText('Go back')
@@ -138,7 +147,7 @@ describe('ConfirmCancelRunModal', () => {
       .mockReturnValue(RUN_STATUS_STOPPED)
     render(props)
 
-    expect(mockDismissCurrentRun).not.toHaveBeenCalled()
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
 
@@ -152,7 +161,7 @@ describe('ConfirmCancelRunModal', () => {
       .mockReturnValue(RUN_STATUS_STOPPED)
     render(props)
 
-    expect(mockDismissCurrentRun).not.toHaveBeenCalled()
+    expect(mockDismissCurrentRun).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     expect(mockPush).toHaveBeenCalledWith('/protocols')
   })

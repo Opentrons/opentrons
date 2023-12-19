@@ -127,6 +127,7 @@ describe('createPresavedStepForm', () => {
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       pipette: 'leftPipetteId',
+      nozzles: null,
       stepType: 'moveLiquid',
       // default fields
       dropTip_location: null,
@@ -184,6 +185,7 @@ describe('createPresavedStepForm', () => {
         stepType: 'mix',
         // default fields
         labware: null,
+        nozzles: null,
         dropTip_location: null,
         wells: [],
         aspirate_delay_checkbox: false,

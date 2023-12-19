@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { getIsHidden } from '../../formSelectors'
 import {
   IRREGULAR_LABWARE_ERROR,
@@ -37,9 +37,9 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const warning = container.querySelector('[class="alert warning"]')
-    expect(warning?.textContent).toBe('some warning')
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent('some warning')
   })
   it('should render an incompatible labware error when the labware is not compatible with labware creator', () => {
     when(getIsHiddenMock)
@@ -59,9 +59,9 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is not compatible with the Labware Creator. Please fill out this form to request a custom labware definition.'
     )
   })
@@ -83,9 +83,9 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'If your tip does not fit when placed by hand then it is not a good candidate for this pipette on the OT-2.'
     )
   })
@@ -107,9 +107,9 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is too small to fit in a slot properly. Please fill out this form to request an adapter.'
     )
   })
@@ -131,9 +131,9 @@ describe('FormAlerts', () => {
       },
     }
 
-    const { container } = render(<FormAlerts {...props} />)
-    const error = container.querySelector('[class="alert error"]')
-    expect(error?.textContent).toBe(
+    render(<FormAlerts {...props} />)
+    const alertItem = screen.getByTestId('alert_item_title')
+    expect(alertItem).toHaveTextContent(
       'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
     )
   })

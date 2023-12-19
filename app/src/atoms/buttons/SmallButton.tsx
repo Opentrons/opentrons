@@ -138,7 +138,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
   return (
     <Btn
       css={SMALL_BUTTON_STYLE}
-      aria-label={`SmallButton_${buttonType}`}
       disabled={disabled}
       padding={
         iconPlacement != null
@@ -153,7 +152,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         {iconPlacement === 'startIcon' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionStart`}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginRight={SPACING.spacing8}
@@ -171,7 +174,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
           {buttonText}
         </StyledText>
         {iconPlacement === 'endIcon' && iconName != null ? (
-          <Flex aria-label={`SmallButton_${iconName}_positionEnd`}>
+          <Flex
+            aria-label={
+              iconName === 'ot-spinner' ? 'loading indicator' : iconName
+            }
+          >
             <Icon
               size="1.75rem"
               marginLeft={SPACING.spacing8}

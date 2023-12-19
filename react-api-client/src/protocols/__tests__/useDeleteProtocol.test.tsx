@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { deleteProtocol } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useDeleteProtocolMutation } from '..'
@@ -21,12 +21,14 @@ const DELETE_PROTOCOL_RESPONSE = {
 } as EmptyResponse
 
 describe('useDeleteProtocolMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   const protocolId = '123'
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -42,20 +44,15 @@ describe('useDeleteProtocolMutation hook', () => {
       .calledWith(HOST_CONFIG, protocolId)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
-      () => useDeleteProtocolMutation(protocolId),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
     result.current.deleteProtocol()
     await waitFor(() => {
-      console.log(result.current.status)
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
-    expect(result.current.data).toBeUndefined()
   })
 
   it('should delete a protocol when calling the deleteProtocol callback', async () => {
@@ -66,16 +63,13 @@ describe('useDeleteProtocolMutation hook', () => {
         data: DELETE_PROTOCOL_RESPONSE,
       } as Response<EmptyResponse>)
 
-    const { result, waitFor } = renderHook(
-      () => useDeleteProtocolMutation(protocolId),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteProtocolMutation(protocolId), {
+      wrapper,
+    })
     act(() => result.current.deleteProtocol())
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(DELETE_PROTOCOL_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(DELETE_PROTOCOL_RESPONSE)
+    })
   })
 })

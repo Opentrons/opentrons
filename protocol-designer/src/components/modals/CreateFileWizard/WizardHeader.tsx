@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   Box,
@@ -14,6 +13,7 @@ import {
   Text,
   StepMeter,
 } from '@opentrons/components'
+import { i18n } from '../../../localization'
 
 interface WizardHeaderProps {
   title: string
@@ -64,7 +64,6 @@ const STEP_TEXT_STYLE = css`
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const { totalSteps, currentStep, title, onExit, exitDisabled } = props
-  const { t } = useTranslation()
 
   return (
     <Box backgroundColor={COLORS.white}>
@@ -76,13 +75,13 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
             <Text css={STEP_TEXT_STYLE} color={COLORS.darkGreyEnabled}>
-              {t('shared.step', { current: currentStep, max: totalSteps })}
+              {i18n.t('shared.step', { current: currentStep, max: totalSteps })}
             </Text>
           ) : null}
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
-            <Text css={EXIT_BUTTON_STYLE}>{t('shared.exit')}</Text>
+            <Text css={EXIT_BUTTON_STYLE}>{i18n.t('shared.exit')}</Text>
           </Btn>
         ) : null}
       </Flex>

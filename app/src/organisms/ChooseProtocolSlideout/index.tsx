@@ -205,11 +205,8 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
           selectedProtocol != null &&
           storedProtocol.protocolKey === selectedProtocol.protocolKey
         return (
-          <>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              key={storedProtocol.protocolKey}
-            >
+          <React.Fragment key={storedProtocol.protocolKey}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
@@ -282,7 +279,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 )}
               </StyledText>
             ) : null}
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>

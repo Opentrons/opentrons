@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { when, resetAllWhenMocks } from 'jest-when'
 
@@ -146,24 +146,24 @@ describe('ModuleCalibrationOverflowMenu', () => {
   })
 
   it('should render overflow menu buttons - not calibrated', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    getByText('Calibrate module')
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    screen.getByText('Calibrate module')
   })
 
   it('should render overflow menu buttons - calibrated', () => {
     props = { ...props, isCalibrated: true }
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    getByText('Recalibrate module')
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    screen.getByText('Recalibrate module')
   })
 
   it('should call a mock function when clicking calibrate button', async () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    getByText('Calibrate module').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    fireEvent.click(screen.getByText('Calibrate module'))
     await waitFor(() => {
-      getByText('module wizard flows')
+      screen.getByText('module wizard flows')
     })
   })
 
@@ -172,9 +172,9 @@ describe('ModuleCalibrationOverflowMenu', () => {
       ...props,
       attachedModule: mockHotHeaterShaker,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    expect(getByText('Calibrate module')).toBeDisabled()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    expect(screen.getByText('Calibrate module')).toBeDisabled()
   })
 
   it('should call a mock function when clicking calibrate button for moving heater-shaker calling stop shaking and open latch command', async () => {
@@ -182,9 +182,9 @@ describe('ModuleCalibrationOverflowMenu', () => {
       ...props,
       attachedModule: mockMovingHeaterShaker,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    getByText('Calibrate module').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    fireEvent.click(screen.getByText('Calibrate module'))
     await waitFor(() => {
       expect(mockChainLiveCommands).toHaveBeenCalledWith(
         [
@@ -216,7 +216,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
         false
       )
     })
-    getByText('module wizard flows')
+    screen.getByText('module wizard flows')
   })
 
   it('should call a mock function when clicking calibrate button for heated temp module', async () => {
@@ -224,9 +224,9 @@ describe('ModuleCalibrationOverflowMenu', () => {
       ...props,
       attachedModule: mockTemperatureModuleHeating,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    getByText('Calibrate module').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    fireEvent.click(screen.getByText('Calibrate module'))
     await waitFor(() => {
       expect(mockChainLiveCommands).toHaveBeenCalledWith(
         [
@@ -240,7 +240,7 @@ describe('ModuleCalibrationOverflowMenu', () => {
         false
       )
     })
-    getByText('module wizard flows')
+    screen.getByText('module wizard flows')
   })
 
   it('should call a mock function when clicking calibrate button for heated TC module with lid closed', async () => {
@@ -248,9 +248,9 @@ describe('ModuleCalibrationOverflowMenu', () => {
       ...props,
       attachedModule: mockTCHeating,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    getByText('Calibrate module').click()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    fireEvent.click(screen.getByText('Calibrate module'))
     await waitFor(() => {
       expect(mockChainLiveCommands).toHaveBeenCalledWith(
         [
@@ -276,22 +276,22 @@ describe('ModuleCalibrationOverflowMenu', () => {
         false
       )
     })
-    getByText('module wizard flows')
+    screen.getByText('module wizard flows')
   })
 
   it('should be disabled when not calibrated module and pipette is not attached', () => {
     props.formattedPipetteOffsetCalibrations = [] as any
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    expect(getByText('Calibrate module')).toBeDisabled()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    expect(screen.getByText('Calibrate module')).toBeDisabled()
   })
 
   it('should be disabled when not calibrated module and pipette is not calibrated', () => {
     props.formattedPipetteOffsetCalibrations[0].lastCalibrated = undefined
     props.formattedPipetteOffsetCalibrations[1].lastCalibrated = undefined
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    expect(getByText('Calibrate module')).toBeDisabled()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    expect(screen.getByText('Calibrate module')).toBeDisabled()
   })
 
   it('should be disabled when running', () => {
@@ -301,9 +301,9 @@ describe('ModuleCalibrationOverflowMenu', () => {
       isRunIdle: false,
       isRunTerminal: false,
     })
-    const [{ getByText, getByLabelText }] = render(props)
-    getByLabelText('ModuleCalibrationOverflowMenu').click()
-    expect(getByText('Calibrate module')).toBeDisabled()
+    render(props)
+    fireEvent.click(screen.getByLabelText('ModuleCalibrationOverflowMenu'))
+    expect(screen.getByText('Calibrate module')).toBeDisabled()
   })
 
   it('should be disabled when e-stop button is pressed', () => {

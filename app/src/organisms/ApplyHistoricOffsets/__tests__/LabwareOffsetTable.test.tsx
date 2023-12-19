@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
 import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
 import fixture_96_wellplate from '@opentrons/shared-data/labware/definitions/2/opentrons_96_wellplate_200ul_pcr_full_skirt/1.json'
 import { i18n } from '../../../i18n'
@@ -51,70 +52,63 @@ const mockFourthCandidate: OffsetCandidate = {
   createdAt: '2022-05-12T13:34:51.012179+00:00',
   runCreatedAt: '2022-05-12T13:33:51.012179+00:00',
 }
+const render = () =>
+  renderWithProviders<React.ComponentProps<typeof LabwareOffsetTable>>(
+    <LabwareOffsetTable
+      labwareDefinitions={[mockLabwareDef, mockAdapterDef]}
+      offsetCandidates={[
+        mockFirstCandidate,
+        mockSecondCandidate,
+        mockThirdCandidate,
+        mockFourthCandidate,
+      ]}
+    />,
+    { i18nInstance: i18n }
+  )
 
 describe('LabwareOffsetTable', () => {
-  let render: (
-    props?: Partial<React.ComponentProps<typeof LabwareOffsetTable>>
-  ) => ReturnType<typeof renderWithProviders>
-
-  beforeEach(() => {
-    render = () =>
-      renderWithProviders<React.ComponentProps<typeof LabwareOffsetTable>>(
-        <LabwareOffsetTable
-          labwareDefinitions={[mockLabwareDef, mockAdapterDef]}
-          offsetCandidates={[
-            mockFirstCandidate,
-            mockSecondCandidate,
-            mockThirdCandidate,
-            mockFourthCandidate,
-          ]}
-        />,
-        { i18nInstance: i18n }
-      )
-  })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it('renders headers text and values for each candidate', () => {
-    const [{ getByText, queryAllByText }] = render()
+    render()
     // headers
-    getByText('location')
-    getByText('Run')
-    getByText('labware')
-    getByText('labware offset data')
-    expect(queryAllByText('X')).toHaveLength(4)
-    expect(queryAllByText('Y')).toHaveLength(4)
-    expect(queryAllByText('Z')).toHaveLength(4)
+    screen.getByText('location')
+    screen.getByText('Run')
+    screen.getByText('labware')
+    screen.getByText('labware offset data')
+    expect(screen.queryAllByText('X')).toHaveLength(4)
+    expect(screen.queryAllByText('Y')).toHaveLength(4)
+    expect(screen.queryAllByText('Z')).toHaveLength(4)
     // first candidate
-    getByText('Slot 1')
-    getByText(/7\/11\/2022/i)
-    getByText('First Fake Labware Display Name')
-    getByText('1.00')
-    getByText('2.00')
-    getByText('3.00')
+    screen.getByText('Slot 1')
+    screen.getByText(/7\/11\/2022/i)
+    screen.getByText('First Fake Labware Display Name')
+    screen.getByText('1.00')
+    screen.getByText('2.00')
+    screen.getByText('3.00')
     // second candidate
-    getByText('Slot 2')
-    getByText(/6\/11\/2022/i)
-    getByText('Second Fake Labware Display Name')
-    getByText('4.00')
-    getByText('5.00')
-    getByText('6.00')
+    screen.getByText('Slot 2')
+    screen.getByText(/6\/11\/2022/i)
+    screen.getByText('Second Fake Labware Display Name')
+    screen.getByText('4.00')
+    screen.getByText('5.00')
+    screen.getByText('6.00')
     // third candidate is adapter on module
-    getByText('Heater-Shaker Module GEN1 in Slot 3')
-    getByText(/5\/11\/2022/i)
-    getByText('Third Fake Labware Display Name')
-    getByText('7.00')
-    getByText('8.00')
-    getByText('9.00')
+    screen.getByText('Heater-Shaker Module GEN1 in Slot 3')
+    screen.getByText(/5\/11\/2022/i)
+    screen.getByText('Third Fake Labware Display Name')
+    screen.getByText('7.00')
+    screen.getByText('8.00')
+    screen.getByText('9.00')
     //  fourth candidate is labware on adapter on module
-    getByText(
+    screen.getByText(
       'Opentrons 96 PCR Heater-Shaker Adapter in Heater-Shaker Module GEN1 in Slot 3'
     )
-    getByText('Fourth Fake Labware Display Name')
-    getByText('7.20')
-    getByText('8.10')
-    getByText('7.10')
+    screen.getByText('Fourth Fake Labware Display Name')
+    screen.getByText('7.20')
+    screen.getByText('8.10')
+    screen.getByText('7.10')
   })
 })

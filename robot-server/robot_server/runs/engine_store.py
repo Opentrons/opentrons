@@ -188,9 +188,6 @@ class EngineStore:
 
         post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
         drop_tips_after_run = True
-        if self._robot_type == "OT-3 Standard":
-            post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
-            drop_tips_after_run = False
 
         runner = create_protocol_runner(
             protocol_engine=engine,

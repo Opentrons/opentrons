@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createProtocol } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateProtocolMutation } from '..'
@@ -43,12 +43,14 @@ const PROTOCOL_RESPONSE = {
 } as Protocol
 
 describe('useCreateProtocolMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   const createProtocolData = [jsonFile]
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -63,16 +65,15 @@ describe('useCreateProtocolMutation hook', () => {
       .calledWith(HOST_CONFIG, createProtocolData)
       .mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(() => useCreateProtocolMutation(), {
+    const { result } = renderHook(() => useCreateProtocolMutation(), {
       wrapper,
     })
 
     expect(result.current.data).toBeUndefined()
     result.current.createProtocol({ files: createProtocolData })
     await waitFor(() => {
-      return result.current.status !== 'loading'
+      expect(result.current.data).toBeUndefined()
     })
-    expect(result.current.data).toBeUndefined()
   })
 
   it('should create a protocol when calling the createProtocol callback', async () => {
@@ -81,14 +82,14 @@ describe('useCreateProtocolMutation hook', () => {
       .calledWith(HOST_CONFIG, createProtocolData, undefined)
       .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
 
-    const { result, waitFor } = renderHook(() => useCreateProtocolMutation(), {
+    const { result } = renderHook(() => useCreateProtocolMutation(), {
       wrapper,
     })
     act(() => result.current.createProtocol({ files: createProtocolData }))
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(PROTOCOL_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(PROTOCOL_RESPONSE)
+    })
   })
 
   it('should create a protocol with a protocolKey if included', async () => {
@@ -97,7 +98,7 @@ describe('useCreateProtocolMutation hook', () => {
       .calledWith(HOST_CONFIG, createProtocolData, 'fakeProtocolKey')
       .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
 
-    const { result, waitFor } = renderHook(() => useCreateProtocolMutation(), {
+    const { result } = renderHook(() => useCreateProtocolMutation(), {
       wrapper,
     })
     act(() =>
@@ -107,8 +108,8 @@ describe('useCreateProtocolMutation hook', () => {
       })
     )
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(PROTOCOL_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(PROTOCOL_RESPONSE)
+    })
   })
 })

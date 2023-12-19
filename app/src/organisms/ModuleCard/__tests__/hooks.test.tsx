@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { act } from 'react-test-renderer'
 import { Provider } from 'react-redux'
 import { when } from 'jest-when'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
-import { renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
@@ -201,7 +200,9 @@ describe('useLatchControls', () => {
   })
 
   it('should return latch is open and handle latch function and command to close latch', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -223,7 +224,9 @@ describe('useLatchControls', () => {
     })
   })
   it('should return if latch is closed and handle latch function opens latch', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -272,7 +275,9 @@ describe('useModuleOverflowMenu', () => {
     jest.restoreAllMocks()
   })
   it('should return everything for menuItemsByModuleType and create deactive heater command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -311,7 +316,9 @@ describe('useModuleOverflowMenu', () => {
     const mockAboutClick = jest.fn()
     const mockTestShakeClick = jest.fn()
     const mockHandleWizard = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -341,7 +348,9 @@ describe('useModuleOverflowMenu', () => {
 
   it('should return only 1 menu button when module is a magnetic module and calls handleClick when module is disengaged', () => {
     const mockHandleClick = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -369,7 +378,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render magnetic module and create disengage command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -405,7 +416,9 @@ describe('useModuleOverflowMenu', () => {
 
   it('should render temperature module and call handleClick when module is idle', () => {
     const mockHandleClick = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -432,7 +445,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render temp module and create deactivate temp command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -467,7 +482,9 @@ describe('useModuleOverflowMenu', () => {
 
   it('should render TC module and call handleClick when module is idle', () => {
     const mockHandleClick = jest.fn()
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -494,7 +511,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module and create open lid command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -530,7 +549,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module and create deactivate lid command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -566,7 +587,9 @@ describe('useModuleOverflowMenu', () => {
   })
 
   it('should render TC module gen 2 and create a close lid command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
       </I18nextProvider>
@@ -639,9 +662,9 @@ describe('useIsHeaterShakerInProtocol', () => {
   })
 
   it('should return true when a heater shaker is in the protocol', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
     const isHeaterShakerInProtocol = result.current
 
@@ -663,9 +686,9 @@ describe('useIsHeaterShakerInProtocol', () => {
           })
         ),
       } as any)
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    )
+    const wrapper: React.FunctionComponent<{ children: React.ReactNode }> = ({
+      children,
+    }) => <Provider store={store}>{children}</Provider>
     const { result } = renderHook(useIsHeaterShakerInProtocol, { wrapper })
     const isHeaterShakerInProtocol = result.current
 

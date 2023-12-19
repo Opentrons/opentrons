@@ -105,7 +105,6 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     <Btn
       display={DISPLAY_FLEX}
       css={LARGE_BUTTON_STYLE}
-      aria-label={`LargeButton_${buttonType}`}
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       disabled={disabled}
@@ -120,7 +119,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       </StyledText>
       <Icon
         name={iconName}
-        aria-label={`LargeButton_${iconName}`}
+        aria-label={`${iconName} icon`}
         color={
           disabled
             ? COLORS.darkBlack60

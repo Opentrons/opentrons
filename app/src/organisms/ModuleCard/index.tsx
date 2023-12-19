@@ -80,6 +80,7 @@ interface ModuleCardProps {
   robotName: string
   isLoadedInRun: boolean
   attachPipetteRequired: boolean
+  calibratePipetteRequired: boolean
   updatePipetteFWRequired: boolean
   runId?: string
   slotName?: string
@@ -94,6 +95,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     runId,
     slotName,
     attachPipetteRequired,
+    calibratePipetteRequired,
     updatePipetteFWRequired,
   } = props
   const dispatch = useDispatch<Dispatch>()
@@ -126,7 +128,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   })
   const requireModuleCalibration = module.moduleOffset?.last_modified == null
   const isPipetteReady =
-    (!attachPipetteRequired ?? false) && (!updatePipetteFWRequired ?? false)
+    (!attachPipetteRequired ?? false) &&
+    (!calibratePipetteRequired ?? false) &&
+    (!updatePipetteFWRequired ?? false)
   const latestRequestId = last(requestIds)
   const latestRequest = useSelector<State, RequestState | null>(state =>
     latestRequestId ? getRequestById(state, latestRequestId) : null
@@ -305,6 +309,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               />
             )}
             {attachPipetteRequired != null &&
+            calibratePipetteRequired != null &&
             updatePipetteFWRequired != null &&
             requireModuleCalibration &&
             !isPending ? (
@@ -315,6 +320,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 setShowBanner={() => null}
                 handleUpdateClick={handleCalibrateClick}
                 attachPipetteRequired={attachPipetteRequired}
+                calibratePipetteRequired={calibratePipetteRequired}
                 updatePipetteFWRequired={updatePipetteFWRequired}
                 isTooHot={isTooHot}
               />

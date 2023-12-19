@@ -228,7 +228,6 @@ const mergeProps = (
 
 export const EditPipettesModal = connect(
   mapSTP,
-  // @ts-expect-error(sa, 2021-6-22): TODO: refactor to use hooks api
   null,
   mergeProps
 )(FilePipettesModal)

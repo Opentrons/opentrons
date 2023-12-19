@@ -110,9 +110,13 @@ describe('RobotSettings RenameRobotSlideout', () => {
 
     await waitFor(() => {
       expect(input).toHaveValue('mockInput')
-      const renameButton = getByRole('button', { name: 'Rename robot' })
+    })
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    await waitFor(() => {
       expect(renameButton).not.toBeDisabled()
-      fireEvent.click(renameButton)
+    })
+    fireEvent.click(renameButton)
+    await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: ANALYTICS_RENAME_ROBOT,
         properties: { newRobotName: 'mockInput', previousRobotName: 'otie' },
@@ -131,6 +135,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -148,6 +154,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -165,6 +173,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -182,6 +192,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -199,6 +211,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })
@@ -215,6 +229,8 @@ describe('RobotSettings RenameRobotSlideout', () => {
     )
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
+    })
+    await waitFor(() => {
       expect(error).toBeInTheDocument()
     })
   })

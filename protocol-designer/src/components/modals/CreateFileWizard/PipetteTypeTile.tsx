@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useSelector } from 'react-redux'
 import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
@@ -23,7 +22,6 @@ import {
   getAllPipetteNames,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
-import { getAllow96Channel } from '../../../feature-flags/selectors'
 
 import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
@@ -39,13 +37,12 @@ export function FirstPipetteTypeTile(
   >
 ): JSX.Element {
   const mount = LEFT
-  const allow96Channel = useSelector(getAllow96Channel)
   return (
     <PipetteTypeTile
       {...props}
       mount={mount}
       allowNoPipette={false}
-      display96Channel={allow96Channel}
+      display96Channel={true}
       tileHeader={i18n.t('modal.create_file_wizard.choose_left_pipette')}
     />
   )
@@ -136,7 +133,6 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
     display96Channel,
   } = props
   const robotType = values.fields.robotType
-  const allow96Channel = useSelector(getAllow96Channel)
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
@@ -149,7 +145,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         name: getPipetteNameSpecs(name)?.displayName ?? '',
       }))
     const noneOption = allowNoPipette ? [{ name: 'None', value: '' }] : []
-    return allow96Channel && display96Channel
+    return display96Channel
       ? [...allPipetteOptions, ...noneOption]
       : [
           ...allPipetteOptions.filter(o => o.value !== 'p1000_96'),
@@ -165,13 +161,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
       )
     }
-  }, [
-    currentValue,
-    setFieldValue,
-    nameAccessor,
-    allowNoPipette,
-    pipetteOptions,
-  ])
+  }, [])
 
   return (
     <Flex
