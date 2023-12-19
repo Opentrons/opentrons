@@ -47,7 +47,7 @@ export function ProtocolOverflowMenu(
     handleRunProtocol,
     handleSendProtocolToOT3,
   } = props
-  const { protocolKey } = storedProtocolData
+  const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
@@ -65,6 +65,11 @@ export function ProtocolOverflowMenu(
     dispatch(removeProtocol(protocolKey))
     trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
   }, true)
+
+  const robotType =
+    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+      ? mostRecentAnalysis?.robotType ?? null
+      : null
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -135,14 +140,16 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
-          <MenuItem
-            onClick={handleClickSendToOT3}
-            data-testid="ProtocolOverflowMenu_sendToOT3"
-          >
-            {t('protocol_list:send_to_robot_overflow', {
-              robot_display_name: FLEX_DISPLAY_NAME,
-            })}
-          </MenuItem>
+          {robotType !== 'OT-2 Standard' ? (
+            <MenuItem
+              onClick={handleClickSendToOT3}
+              data-testid="ProtocolOverflowMenu_sendToOT3"
+            >
+              {t('protocol_list:send_to_robot_overflow', {
+                robot_display_name: FLEX_DISPLAY_NAME,
+              })}
+            </MenuItem>
+          ) : null}
           <MenuItem
             onClick={handleClickShowInFolder}
             data-testid="ProtocolOverflowMenu_showInFolder"

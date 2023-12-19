@@ -176,10 +176,16 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
+    mockGetUnreachableRobots.mockReturnValue([
+      { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
+    ])
+    mockGetReachableRobots.mockReturnValue([
+      { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
+    ])
     screen.getByText('opentrons-robot-name')
-    screen.getByText('2 unavailable or busy robots are not listed.')
+    screen.getByText('2 unavailable robots are not listed.')
   })
-  it('does not render a robot option for a busy OT-3', () => {
+  it('does render a robot option for a busy OT-3', () => {
     when(mockUseAllRunsQuery)
       .calledWith(expect.any(Object), expect.any(Object), {
         hostname: mockConnectableOT3.ip,
@@ -195,7 +201,7 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    expect(screen.queryByText('opentrons-robot-name')).not.toBeInTheDocument()
+    expect(screen.queryByText('opentrons-robot-name')).toBeInTheDocument()
   })
   it('does not render an available robot option for a connectable OT-2', () => {
     mockGetConnectableRobots.mockReturnValue([

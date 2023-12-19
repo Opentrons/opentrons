@@ -16,7 +16,7 @@ import {
 } from '../../organisms/ProtocolsLanding/utils'
 import { useToaster } from '../../organisms/ToasterOven'
 import { appShellRequestor } from '../../redux/shell/remote'
-import { OPENTRONS_USB } from '../../redux/discovery'
+import { OPENTRONS_USB, ROBOT_MODEL_OT3 } from '../../redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 
 import type { AxiosError } from 'axios'
@@ -167,7 +167,7 @@ export function SendProtocolToOT3Slideout(
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
-      showOT3Only
+      robotType={ROBOT_MODEL_OT3}
       isAnalysisError={isAnalysisError}
     />
   )

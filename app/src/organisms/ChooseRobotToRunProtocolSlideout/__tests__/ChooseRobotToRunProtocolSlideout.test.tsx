@@ -187,8 +187,14 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
+    mockGetUnreachableRobots.mockReturnValue([
+      { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
+    ])
+    mockGetReachableRobots.mockReturnValue([
+      { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
+    ])
     screen.getByText('opentrons-robot-name')
-    screen.getByText('2 unavailable robots are not listed.')
+    screen.getByText('2 unavailable or busy robots are not listed.')
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
     mockGetScanning.mockReturnValue(true)

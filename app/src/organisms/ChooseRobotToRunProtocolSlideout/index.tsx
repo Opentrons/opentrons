@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { OPENTRONS_USB } from '../../redux/discovery'
+import { OPENTRONS_USB, ROBOT_MODEL_OT2 } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
@@ -135,6 +135,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     first(srcFileNames) ??
     protocolKey
 
+  // intentionally show both robot types if analysis has any error
+  const robotType =
+    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+      ? mostRecentAnalysis?.robotType ?? null
+      : null
+
   return (
     <ChooseRobotSlideout
       isExpanded={showSlideout}
@@ -171,10 +177,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
+      robotType={robotType}
       isCreatingRun={isCreatingRun}
       reset={resetCreateRun}
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
+      showIdleOnly={true}
     />
   )
 }
