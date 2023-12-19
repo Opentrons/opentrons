@@ -183,14 +183,21 @@ describe('useLaunchLPC hook', () => {
         labwareDef: mockLabwareDef,
       })
     })
-    expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
-      labwareOffsets: mockCurrentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
+
+    await waitFor(() => {
+      expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
+        labwareOffsets: mockCurrentOffsets.map(
+          ({ vector, location, definitionUri }) => ({
+            vector,
+            location,
+            definitionUri,
+          })
+        ),
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.LPCWizard).not.toBeNull()
     })
     expect(result.current.LPCWizard).not.toBeNull()
     renderWithProviders(result.current.LPCWizard ?? <></>)
