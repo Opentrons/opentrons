@@ -118,7 +118,7 @@ class CalcTypeLookup(CalcType):
                 continue
             pv, ph = self.lookup[i - 1]
             if ph <= height <= h:
-                h_perc = (height - ph) / (h - pv)
+                h_perc = (height - ph) / (h - ph)
                 return pv + ((v - pv) * h_perc)
         raise ValueError(f"Unable to find height ({height}) in lookup table")
 
@@ -363,7 +363,5 @@ def initialize_liquid_from_deck(ctx: ProtocolContext, lt: LiquidTracker) -> None
         if lw.is_tiprack or "trash" in lw.name.lower():
             continue
         lookup = LIQUID_LEVEL_LOOKUP.get(lw.load_name)
-        print("\n\n\nHERERERERE")
-        print(lookup)
         for w in lw.wells():
             lt.init_well_liquid_height(w, lookup_table=lookup)
