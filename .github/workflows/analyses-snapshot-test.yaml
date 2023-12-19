@@ -46,6 +46,7 @@ jobs:
       run: make setup
 
     - name: Run Test
+      id: run_test
       working-directory: app-testing
       run: make snapshot-test
 
@@ -55,3 +56,19 @@ jobs:
       with:
         name: test-report
         path: app-testing/results/
+
+    - name: Handle Test Failure
+      if: steps.run_test.outcome == 'failure'
+      working-directory: app-testing
+      run: make snapshot-test-update
+
+    - name: Create Snapshot update Request
+      if: steps.run_test.outcome == 'failure'
+      uses: peter-evans/create-pull-request@v5
+      with:
+          commit-message: 'fix(app-testing): snapshot failure capture'
+          title: 'Evaluate Analyses Snapshot Update ${{ env.TARGET }}'
+          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
+          branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
+          base: ${{ env.TARGET }}
+
