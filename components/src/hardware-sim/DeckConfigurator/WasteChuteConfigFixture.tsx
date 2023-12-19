@@ -32,11 +32,17 @@ export function WasteChuteConfigFixture(
     hasStagingAreas = false,
   } = props
 
-  const wasteChuteSlot = deckDefinition.locations.cutouts.find(
-    slot => slot.id === fixtureLocation
+  const wasteChuteCutout = deckDefinition.locations.cutouts.find(
+    cutout => cutout.id === fixtureLocation
   )
-  const [xSlotPosition = 0, ySlotPosition = 0] = wasteChuteSlot?.position ?? []
-  // TODO: remove adjustment when reading from fixture position
+
+  /**
+   * deck definition cutout position is the position of the single slot located within that cutout
+   * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   */
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    wasteChuteCutout?.position ?? []
+
   const xAdjustment = -17
   const x = xSlotPosition + xAdjustment
   const yAdjustment = -10

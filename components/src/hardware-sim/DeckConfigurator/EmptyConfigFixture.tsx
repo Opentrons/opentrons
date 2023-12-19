@@ -21,14 +21,18 @@ export function EmptyConfigFixture(
 ): JSX.Element {
   const { deckDefinition, handleClickAdd, fixtureLocation } = props
 
-  // TODO: migrate to fixture location for v4
-  const standardSlot = deckDefinition.locations.cutouts.find(
-    slot => slot.id === fixtureLocation
+  const standardSlotCutout = deckDefinition.locations.cutouts.find(
+    cutout => cutout.id === fixtureLocation
   )
-  const [xSlotPosition = 0, ySlotPosition = 0] = standardSlot?.position ?? []
 
-  // TODO: remove adjustment when reading from fixture position
-  // adjust x differently for right side/left side
+  /**
+   * deck definition cutout position is the position of the single slot located within that cutout
+   * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   * the adjustment for x is different for right side/left side
+   */
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    standardSlotCutout?.position ?? []
+
   const isLeftSideofDeck =
     fixtureLocation === 'cutoutA1' ||
     fixtureLocation === 'cutoutB1' ||

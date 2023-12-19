@@ -6,7 +6,9 @@ import {
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
   OT2_ROBOT_TYPE,
+  MOVABLE_TRASH_CUTOUTS,
   SINGLE_SLOT_FIXTURES,
+  STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
@@ -105,10 +107,14 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
   )
   const stagingAreaFixtures = deckConfig.filter(
-    fixture => fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
+    fixture =>
+      fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE &&
+      STAGING_AREA_CUTOUTS.includes(fixture.cutoutId)
   )
   const trashBinFixtures = deckConfig.filter(
-    fixture => fixture.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    fixture =>
+      fixture.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE &&
+      MOVABLE_TRASH_CUTOUTS.includes(fixture.cutoutId)
   )
   const wasteChuteOnlyFixtures = deckConfig.filter(
     fixture =>
@@ -159,7 +165,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           {stagingAreaFixtures.map(fixture => (
             <StagingAreaFixture
               key={fixture.cutoutId}
-              // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.cutoutId as StagingAreaLocation}
               deckDefinition={deckDef}
               slotClipColor={darkFill}
@@ -177,33 +182,42 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               <FlexTrash
                 robotType={robotType}
                 trashIconColor={lightFill}
-                // TODO(bh, 2023-10-09): typeguard fixture location
                 trashCutoutId={fixture.cutoutId as TrashCutoutId}
                 backgroundColor={mediumFill}
               />
             </React.Fragment>
           ))}
-          {wasteChuteOnlyFixtures.map(fixture => (
-            <WasteChuteFixture
-              key={fixture.cutoutId}
-              // TODO(bh, 2023-10-09): typeguard fixture location
-              cutoutId={fixture.cutoutId as typeof WASTE_CHUTE_CUTOUT}
-              deckDefinition={deckDef}
-              fixtureBaseColor={lightFill}
-              wasteChuteColor={mediumFill}
-            />
-          ))}
-          {wasteChuteStagingAreaFixtures.map(fixture => (
-            <WasteChuteStagingAreaFixture
-              key={fixture.cutoutId}
-              // TODO(bh, 2023-10-09): typeguard fixture location
-              cutoutId={fixture.cutoutId as typeof WASTE_CHUTE_CUTOUT}
-              deckDefinition={deckDef}
-              slotClipColor={darkFill}
-              fixtureBaseColor={lightFill}
-              wasteChuteColor={mediumFill}
-            />
-          ))}
+          {wasteChuteOnlyFixtures.map(fixture => {
+            if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+              return (
+                <WasteChuteFixture
+                  key={fixture.cutoutId}
+                  cutoutId={fixture.cutoutId}
+                  deckDefinition={deckDef}
+                  fixtureBaseColor={lightFill}
+                  wasteChuteColor={mediumFill}
+                />
+              )
+            } else {
+              return null
+            }
+          })}
+          {wasteChuteStagingAreaFixtures.map(fixture => {
+            if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
+              return (
+                <WasteChuteStagingAreaFixture
+                  key={fixture.cutoutId}
+                  cutoutId={fixture.cutoutId}
+                  deckDefinition={deckDef}
+                  slotClipColor={darkFill}
+                  fixtureBaseColor={lightFill}
+                  wasteChuteColor={mediumFill}
+                />
+              )
+            } else {
+              return null
+            }
+          })}
         </>
       )}
       <>
