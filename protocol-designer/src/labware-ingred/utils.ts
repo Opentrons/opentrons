@@ -25,13 +25,12 @@ export function getNextAvailableDeckSlot(
       cutoutIds
     )
     const addressableAreaName = stagingAreaAddressableAreaNames.find(
-      aa => aa === slot?.id
+      aa => aa === slot.id
     )
     let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot.id)
     if (addressableAreaName == null && COLUMN_4_SLOTS.includes(slot.id)) {
       isSlotEmpty = false
-    }
-    if (
+    } else if (
       MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slot.id) ||
       WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slot.id) ||
       slot.id === FIXED_TRASH_ID
