@@ -15,7 +15,10 @@ module.exports = async () =>
       filename: 'opentrons-shared-data.js',
       library: '@opentrons/shared-data',
       libraryTarget: 'umd',
+      globalObject: 'this'
     },
     plugins: [],
     module: { rules: [rules.js] },
+    optimization: {},
+    devServer: {}
   })

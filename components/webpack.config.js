@@ -15,6 +15,7 @@ module.exports = async () =>
       filename: 'opentrons-components.js',
       library: '@opentrons/components',
       libraryTarget: 'umd',
+      globalObject: 'this'
     },
     plugins: [],
     module: { rules: [rules.js] },
