@@ -163,9 +163,9 @@ const gridStyles = (props: Types.StyleProps): CSSObject => {
 const layoutStyles = (props: Types.StyleProps): CSSObject => {
   const { size, ...styles } = pick(props, LAYOUT_PROPS) as CSSObject
 
-  if (size != null) {
-    styles.width = styles.width ?? (size as typeof styles.width)
-    styles.height = styles.height ?? (size as typeof styles.height)
+  if (size != null && (typeof size === 'string' || typeof size === 'number')) {
+    styles.width = styles.width ?? size
+    styles.height = styles.height ?? size
   }
 
   return styles

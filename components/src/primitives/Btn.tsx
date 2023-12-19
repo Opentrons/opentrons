@@ -2,9 +2,9 @@ import styled, { css } from 'styled-components'
 
 import * as Styles from '../styles'
 import { styleProps, isntStyleProp } from './style-props'
+import { RESPONSIVENESS } from '../ui-style-constants'
 
 import type { PrimitiveComponent } from './types'
-import { RESPONSIVENESS } from '../ui-style-constants'
 
 export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
 export const BUTTON_TYPE_RESET: 'reset' = 'reset'
