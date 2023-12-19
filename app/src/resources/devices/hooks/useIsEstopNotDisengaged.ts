@@ -19,8 +19,5 @@ export const useIsEstopNotDisengaged = (robotName: string): boolean => {
     enabled: isFlex,
   })
 
-  console.log(estopStatus)
-  console.log(estopError)
-
   return estopStatus?.data.status !== DISENGAGED || estopError !== null
 }
