@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { SmallButton } from '../../../atoms/buttons'
@@ -30,14 +31,14 @@ describe('ChildNavigation', () => {
   })
 
   it('should render text and back button', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('mock header')
-    getByTestId('ChildNavigation_Back_Button')
+    render(props)
+    screen.getByText('mock header')
+    screen.getByTestId('ChildNavigation_Back_Button')
   })
 
   it('should call a mock function when tapping the back button', () => {
-    const [{ getByTestId }] = render(props)
-    getByTestId('ChildNavigation_Back_Button').click()
+    render(props)
+    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(mockOnClickBack).toHaveBeenCalled()
   })
 
@@ -47,11 +48,11 @@ describe('ChildNavigation', () => {
       buttonText: 'mock button',
       onClickButton: mockOnClickButton,
     }
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('mock header')
-    getByTestId('ChildNavigation_Back_Button')
-    const mockButton = getByText('mock button')
-    mockButton.click()
+    render(props)
+    screen.getByText('mock header')
+    screen.getByTestId('ChildNavigation_Back_Button')
+    const mockButton = screen.getByText('mock button')
+    fireEvent.click(mockButton)
     expect(mockOnClickButton).toHaveBeenCalled()
   })
 
@@ -62,12 +63,12 @@ describe('ChildNavigation', () => {
       onClickButton: mockOnClickButton,
       secondaryButtonProps: mockSecondaryButtonProps,
     }
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('mock header')
-    getByTestId('ChildNavigation_Back_Button')
-    getByText('mock button')
-    const secondaryButton = getByText('Setup Instructions')
-    secondaryButton.click()
+    render(props)
+    screen.getByText('mock header')
+    screen.getByTestId('ChildNavigation_Back_Button')
+    screen.getByText('mock button')
+    const secondaryButton = screen.getByText('Setup Instructions')
+    fireEvent.click(secondaryButton)
     expect(mockOnClickSecondaryButton).toHaveBeenCalled()
   })
 })

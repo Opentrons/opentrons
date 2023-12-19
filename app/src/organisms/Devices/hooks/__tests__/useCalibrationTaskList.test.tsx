@@ -3,7 +3,7 @@ import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import {
   useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -56,7 +56,7 @@ const mockTipLengthCalLauncher = jest.fn()
 const mockDeckCalLauncher = jest.fn()
 
 describe('useCalibrationTaskList hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let store: Store<State>
   const mockDeleteCalibration = jest.fn()
 

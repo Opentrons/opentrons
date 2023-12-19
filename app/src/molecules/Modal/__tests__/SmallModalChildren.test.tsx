@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { SmallModalChildren } from '../SmallModalChildren'
 
@@ -14,10 +15,10 @@ const render = () => {
 
 describe('SmallModalChildren', () => {
   it('should have a close button and render other text', () => {
-    const [{ getByText }] = render()
-    getByText('header')
-    getByText('subText')
-    getByText('buttonText').click()
+    render()
+    screen.getByText('header')
+    screen.getByText('subText')
+    fireEvent.click(screen.getByText('buttonText'))
     expect(props.handleCloseMaxPinsAlert).toHaveBeenCalled()
   })
 })

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import without from 'lodash/without'
 import {
   DIRECTION_COLUMN,
@@ -18,7 +17,6 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
-import { getEnableDeckModification } from '../../../feature-flags/selectors'
 import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
 
@@ -28,7 +26,6 @@ import type { WizardTileProps } from './types'
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   const { values, goBack, proceed, setFieldValue } = props
   const isOt2 = values.fields.robotType === OT2_ROBOT_TYPE
-  const deckConfigurationFF = useSelector(getEnableDeckModification)
   const stagingAreaItems = values.additionalEquipment.filter(equipment =>
     // TODO(bc, 11/14/2023): refactor the additional items field to include a cutoutId
     // and a cutoutFixtureId so that we don't have to string parse here to generate them
@@ -73,7 +70,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
     initialSlots
   )
 
-  if (!deckConfigurationFF || isOt2) {
+  if (isOt2) {
     proceed()
     return null
   }
@@ -123,6 +120,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
             deckConfig={updatedSlots}
             handleClickAdd={handleClickAdd}
             handleClickRemove={handleClickRemove}
+            showExpansion={false}
           />
         </Flex>
         <Flex

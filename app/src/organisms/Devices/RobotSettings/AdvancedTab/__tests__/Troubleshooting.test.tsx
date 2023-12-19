@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { act, cleanup, waitFor } from '@testing-library/react'
+import { act, waitFor } from '@testing-library/react'
 import { resetAllWhenMocks, when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -55,7 +55,6 @@ describe('RobotSettings Troubleshooting', () => {
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
-    cleanup()
   })
   it('should render title, description, and button', () => {
     const [{ getByText, getByRole, getByTestId }] = render()

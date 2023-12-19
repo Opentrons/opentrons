@@ -1,5 +1,6 @@
 import * as React from 'react'
 import i18next from 'i18next'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import {
   getIsLabwareAboveHeight,
@@ -9,11 +10,9 @@ import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithAdapter,
 } from '../../../utils/labwareModuleCompatibility'
-import { Portal } from '../../portals/TopPortal'
 import { LabwareSelectionModal } from '../LabwareSelectionModal'
 
 jest.mock('../../../utils/labwareModuleCompatibility')
-jest.mock('../../portals/TopPortal')
 jest.mock('../../Hints/useBlockingHint')
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -26,7 +25,6 @@ jest.mock('@opentrons/shared-data', () => {
 const mockGetIsLabwareAboveHeight = getIsLabwareAboveHeight as jest.MockedFunction<
   typeof getIsLabwareAboveHeight
 >
-const mockPortal = Portal as jest.MockedFunction<typeof Portal>
 const mockGetLabwareCompatibleWithAdapter = getLabwareCompatibleWithAdapter as jest.MockedFunction<
   typeof getLabwareCompatibleWithAdapter
 >
@@ -48,7 +46,6 @@ describe('LabwareSelectionModal', () => {
       isNextToHeaterShaker: false,
       has96Channel: false,
     }
-    mockPortal.mockReturnValue(<div>mock portal</div>)
     mockGetLabwareCompatibleWithAdapter.mockReturnValue([])
   })
   it('should NOT filter out labware above 57 mm when the slot is NOT next to a heater shaker', () => {
@@ -71,8 +68,10 @@ describe('LabwareSelectionModal', () => {
     props.has96Channel = true
     props.adapterLoadName = ADAPTER_96_CHANNEL
     props.permittedTipracks = mockPermittedTipracks
-    const { getByText } = render(props)
-    getByText(nestedTextMatcher('adapter compatible labware')).click()
-    getByText('Opentrons GEB 1000uL Tiprack')
+    render(props)
+    fireEvent.click(
+      screen.getByText(nestedTextMatcher('adapter compatible labware'))
+    )
+    screen.getByText('Opentrons GEB 1000uL Tiprack')
   })
 })

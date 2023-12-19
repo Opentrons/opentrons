@@ -45,6 +45,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12', 'A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
         },
       },
       b: {
@@ -79,6 +80,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
         },
       },
       c: {
@@ -105,6 +107,7 @@ describe('generateRobotStateTimeline', () => {
           blowoutOffsetFromTopMm: 0,
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
+          nozzles: null,
         },
       },
     }
@@ -132,12 +135,14 @@ describe('generateRobotStateTimeline', () => {
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
         Array [
           "pickUpTip",
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
         Array [
           "pickUpTip",
@@ -146,12 +151,14 @@ describe('generateRobotStateTimeline', () => {
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
           "moveToAddressableAreaForDropTip",
+          "dropTipInPlace",
         ],
       ]
     `)

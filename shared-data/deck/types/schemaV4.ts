@@ -40,6 +40,7 @@ export type OT2AddressableAreaName =
   | '9'
   | '10'
   | '11'
+  | '12'
   | 'fixedTrash'
 
 export type AddressableAreaName =

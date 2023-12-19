@@ -156,11 +156,11 @@ interface LoadLiquidResult {
   liquidId: string
 }
 
-const COLUMN = 'COLUMN'
+export const COLUMN = 'COLUMN'
 const SINGLE = 'SINGLE'
 const ROW = 'ROW'
 const QUADRANT = 'QUADRANT'
-const ALL = 'ALL'
+export const ALL = 'ALL'
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
@@ -170,7 +170,7 @@ export type NozzleConfigurationStyle =
   | typeof ALL
 
 interface NozzleConfigurationParams {
-  primaryNozzle: string
+  primaryNozzle?: string
   style: NozzleConfigurationStyle
 }
 

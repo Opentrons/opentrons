@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -22,7 +22,7 @@ const BASE_PROPS_FOR_RUN_SETUP = {
 }
 
 describe('usePipetteFlowWizardHeaderText', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>{children}</I18nextProvider>

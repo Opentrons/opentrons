@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 
 import { getHealth as mockGetHealth } from '@opentrons/api-client'
 import { useHost as mockUseHost } from '../../api'
@@ -20,11 +20,13 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const HEALTH_RESPONSE: Health = { name: 'robot-name' } as Health
 
 describe('useHealth hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
@@ -58,10 +60,8 @@ describe('useHealth hook', () => {
       .calledWith(HOST_CONFIG)
       .mockResolvedValue({ data: HEALTH_RESPONSE } as Response<Health>)
 
-    const { result, waitFor } = renderHook(useHealth, { wrapper })
+    const { result } = renderHook(() => useHealth(), { wrapper })
 
-    await waitFor(() => result.current != null)
-
-    expect(result.current).toEqual(HEALTH_RESPONSE)
+    await waitFor(() => expect(result.current).toEqual(HEALTH_RESPONSE))
   })
 })

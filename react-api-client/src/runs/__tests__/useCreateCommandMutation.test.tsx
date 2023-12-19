@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { createCommand } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useCreateCommandMutation } from '..'
@@ -21,11 +21,13 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useCreateCommandMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     wrapper = clientProvider
@@ -40,7 +42,7 @@ describe('useCreateCommandMutation hook', () => {
       .calledWith(HOST_CONFIG, RUN_ID_1, mockAnonLoadCommand, {})
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(() => useCreateCommandMutation(), {
+    const { result } = renderHook(() => useCreateCommandMutation(), {
       wrapper,
     })
 
@@ -52,9 +54,8 @@ describe('useCreateCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
   it('should pass waitUntilComplete and timeout through if given command', async () => {
     const waitUntilComplete = true
@@ -67,7 +68,7 @@ describe('useCreateCommandMutation hook', () => {
       })
       .mockResolvedValue({ data: 'something' } as any)
 
-    const { result, waitFor } = renderHook(() => useCreateCommandMutation(), {
+    const { result } = renderHook(() => useCreateCommandMutation(), {
       wrapper,
     })
 
@@ -81,8 +82,7 @@ describe('useCreateCommandMutation hook', () => {
       })
     })
     await waitFor(() => {
-      return result.current.data != null
+      expect(result.current.data).toBe('something')
     })
-    expect(result.current.data).toBe('something')
   })
 })

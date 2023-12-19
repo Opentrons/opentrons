@@ -13,30 +13,31 @@ import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
+import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
+import {
+  aspirate,
+  dispense,
+  moveToAddressableArea,
+  moveToWell,
+} from '../commandCreators/atomic'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
+import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
+  AdditionalEquipmentEntities,
+  AdditionalEquipmentEntity,
+  CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
+  LabwareEntities,
   LabwareEntity,
   LocationLiquidState,
   PipetteEntity,
   RobotState,
   SourceAndDest,
 } from '../types'
-import {
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
-  CommandCreator,
-  dispense,
-  LabwareEntities,
-  aspirate,
-} from '..'
-import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
-import { moveToAddressableArea, moveToWell } from '../commandCreators/atomic'
-import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
