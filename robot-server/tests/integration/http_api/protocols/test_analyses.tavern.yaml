@@ -45,6 +45,7 @@ stages:
           createdAt: !anything
           robotType: !anything
           metadata: !anything
+          key: null
         links: !anything
 
   - name: Check that the analysis data is present in /protocols/:id/analyses/:id

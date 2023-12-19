@@ -31,7 +31,9 @@ stages:
       json:
         data:
           id: !anystr
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !anystr
+          completedAt: null
+          startedAt: null
           status: idle
           current: True
           actions: []
@@ -43,6 +45,8 @@ stages:
               loadName: !anystr
               definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
               location: !anydict
+              displayName: null
+              offsetId: null
           labwareOffsets: []
           liquids:
             - id: waterId
@@ -102,41 +106,61 @@ stages:
             key: !anystr
             commandType: home
             createdAt: !anystr
+            completedAt: null
+            startedAt: null
             status: queued
-            params: { }
+            params:
+              axes: null
+              skipIfMountPositionOk: null
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: loadPipette
             createdAt: !anystr
+            completedAt: null
+            startedAt: null
             status: queued
             params:
               pipetteName: p10_single
               mount: left
               pipetteId: pipetteId
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: loadModule
             createdAt: !anystr
+            completedAt: null
+            startedAt: null
             status: queued
             params:
               model: magneticModuleV1
               location:
                 slotName: '3'
               moduleId: magneticModuleId
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: loadModule
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               model: temperatureModuleV2
               location:
                 slotName: '1'
               moduleId: temperatureModuleId
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: loadLabware
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               location:
@@ -146,10 +170,14 @@ stages:
               version: 1
               labwareId: sourcePlateId
               displayName: Source Plate
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: loadLabware
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               location:
@@ -159,10 +187,14 @@ stages:
               version: 1
               labwareId: destPlateId
               displayName: Sample Collection Plate
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: loadLabware
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               location:
@@ -172,8 +204,12 @@ stages:
               version: 1
               labwareId: tipRackId
               displayName: Opentrons 96 Tip Rack 10 µL
+            intent: null
+            error: null
           - id: !anystr
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             commandType: loadLiquid
             key: !anystr
             status: queued
@@ -183,10 +219,14 @@ stages:
               volumeByWell:
                 A1: 100
                 B1: 100
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: pickUpTip
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               pipetteId: pipetteId
@@ -196,12 +236,16 @@ stages:
                 origin: top
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 0
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: aspirate
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               pipetteId: pipetteId
@@ -211,14 +255,18 @@ stages:
                 origin: bottom
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 2
               volume: 5
               flowRate: 3
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: dispense
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               pipetteId: pipetteId
@@ -228,14 +276,19 @@ stages:
                 origin: bottom
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 1
               volume: 4.5
               flowRate: 2.5
+              pushOut: null
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: moveToWell
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               pipetteId: pipetteId
@@ -245,13 +298,19 @@ stages:
                 origin: top
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 0
               forceDirect: false
+              speed: null
+              minimumZHeight: null
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: moveToWell
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               pipetteId: pipetteId
@@ -266,10 +325,14 @@ stages:
               minimumZHeight: 35
               forceDirect: true
               speed: 12.3
+            intent: null
+            error: null
           - id: !anystr
             key: !anystr
             commandType: dropTip
             createdAt: !anystr
+            startedAt: null
+            completedAt: null
             status: queued
             params:
               pipetteId: pipetteId
@@ -282,15 +345,21 @@ stages:
                   y: 0
                   z: 0
               alternateDropLocation: false
+              homeAfter: null
+            intent: null
+            error: null
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
             intent: setup
             commandType: home
+            error: null
             createdAt: '{setup_command_created_at}'
             startedAt: '{setup_command_started_at}'
             completedAt: '{setup_command_completed_at}'
             status: succeeded
-            params: {}
+            params:
+              skipIfMountPositionOk: null
+              axes: null
 
   - name: Play the run
     request:
@@ -305,7 +374,7 @@ stages:
         data:
           id: !anystr
           actionType: play
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !anystr
 
   - name: Wait for the protocol to complete
     max_retries: 10
@@ -339,9 +408,13 @@ stages:
             commandType: home
             key: !anystr
             status: succeeded
-            params: { }
+            params:
+              axes: null
+              skipIfMountPositionOk: null
             startedAt: !anystr
             completedAt: !anystr
+            error: null
+            intent: null
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -349,6 +422,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               pipetteName: p10_single
               mount: left
@@ -360,6 +435,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               model: magneticModuleV1
               location:
@@ -372,6 +449,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               model: temperatureModuleV2
               location:
@@ -384,6 +463,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               location:
                 moduleId: temperatureModuleId
@@ -399,6 +480,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               location:
                 moduleId: magneticModuleId
@@ -414,6 +497,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               location:
                 slotName: '8'
@@ -429,6 +514,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               labwareId: sourcePlateId
               liquidId: waterId
@@ -442,6 +529,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               pipetteId: pipetteId
               labwareId: tipRackId
@@ -450,7 +539,7 @@ stages:
                 origin: top
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 0
           - id: !anystr
             key: !anystr
@@ -459,6 +548,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               pipetteId: pipetteId
               labwareId: sourcePlateId
@@ -467,7 +558,7 @@ stages:
                 origin: bottom
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 2
               volume: 5
               flowRate: 3
@@ -478,6 +569,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -486,10 +579,11 @@ stages:
                 origin: bottom
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 1
               volume: 4.5
               flowRate: 2.5
+              pushOut: null
           - id: !anystr
             key: !anystr
             commandType: moveToWell
@@ -497,6 +591,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -505,9 +601,11 @@ stages:
                 origin: top
                 offset:
                   x: 0
-                  'y': 0
+                  y: 0
                   z: 0
               forceDirect: false
+              speed: null
+              minimumZHeight: null
           - id: !anystr
             key: !anystr
             commandType: moveToWell
@@ -515,6 +613,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -535,6 +635,8 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            error: null
+            intent: null
             params:
               pipetteId: pipetteId
               labwareId: fixedTrash
@@ -546,6 +648,7 @@ stages:
                   y: 0
                   z: 0
               alternateDropLocation: false
+              homeAfter: null
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
             intent: setup
@@ -554,4 +657,7 @@ stages:
             startedAt: '{setup_command_started_at}'
             completedAt: '{setup_command_completed_at}'
             status: succeeded
-            params: {}
+            error: null
+            params:
+              skipIfMountPositionOk: null
+              axes: null
