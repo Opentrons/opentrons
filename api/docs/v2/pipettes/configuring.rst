@@ -41,7 +41,7 @@ Assuming the ``import`` statements from above, here is the start of a protocol t
     requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tip_rack = protocol.load_labware(
+        column_rack = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_1000ul",
             location="D3"
         )
@@ -49,14 +49,14 @@ Assuming the ``import`` statements from above, here is the start of a protocol t
         pipette.configure_nozzle_layout(
             style=COLUMN,
             start="A12",
-            tip_racks=[tip_rack]
+            tip_racks=[column_rack]
         )
 
-.. versionadded: 2.16
+.. versionadded:: 2.16
 
 Let's unpack some of the details of this code.
 
-First, we've given a special name to the tip rack, ``partial_pickup_tips``. You can name your tip racks whatever you like, but if you're performing full pickup and partial pickup in the same protocol, you'll need to keep them separate. See :ref:`partial-tip-rack-adapters` below.
+First, we've given a special name to the tip rack, ``column_rack``. You can name your tip racks whatever you like, but if you're performing full pickup and partial pickup in the same protocol, you'll need to keep them separate. See :ref:`partial-tip-rack-adapters` below.
 
 Next, we load the 96-channel pipette. Note that ``load_instrument()`` only has a single argument. The 96-channel pipette occupies both mounts, so ``mount`` is omissible. The ``tip_racks`` argument is always optional. But it would have no effect to declare it here, because every call to ``configure_nozzle_layout()`` resets the pipette's :py:obj:`.InstrumentContext.tip_racks` property.
 
@@ -64,7 +64,7 @@ Finally, we configure the nozzle layout, with three arguments.
 
     - The ``style`` parameter directly accepts the ``COLUMN`` constant, since we imported it at the top of the protocol.
     - The ``start`` parameter accepts a nozzle name, representing the back-left nozzle in the layout, as a string. ``"A12"`` tells the pipette to use its rightmost column of nozzles for pipetting.
-    - The ``tip_racks`` parameter tells the pipette which racks to use for tip tracking, just like when loading a pipette.
+    - The ``tip_racks`` parameter tells the pipette which racks to use for tip tracking, just like :ref:`adding tip racks <pipette-tip-racks>` when loading a pipette.
 
 In this configuration, pipetting actions will use a single column::
 
@@ -82,7 +82,7 @@ In this configuration, pipetting actions will use a single column::
 Tip Rack Adapters
 -----------------
 
-Partial tip pickup requires a tip rack that is placed directly in a deck slot. When picking up fewer than 96 tips, the 96-channel pipette lowers onto the tip rack in a horizontally offset position. If the tip rack were in the tip rack adapter, the pipette would collide with the adapter's posts, which protrude above the top of the tip rack. If you configure a partial nozzle layout and then call ``pick_up_tip()`` on a tip rack that's in an adapter, the API will raise an error.
+Partial tip pickup requires a tip rack that is placed directly in a deck slot. When picking up fewer than 96 tips, the 96-channel pipette lowers onto the tip rack in a horizontally offset position. If the tip rack were in the tip rack adapter, the pipette would collide with the adapter's posts, which protrude above the top of the tip rack. If you configure a partial nozzle layout and then call ``pick_up_tip()`` on a tip rack that's loaded onto an adapter, the API will raise an error.
 
 On the other hand, full tip pickup requires the tip rack adapter. If the 96-channel pipette is in a full layout, either by default or by configuring ``style=ALL``, and you then call ``pick_up_tip()`` on a tip rack that's not in an adapter, the API will raise an error.
 
@@ -91,17 +91,17 @@ If your protocol switches between full and partial pickup, you may want to organ
 .. code-block:: python
 
     tips_1 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", "D1"
+        "opentrons_flex_96_tiprack_1000ul", "C1"
     )
     tips_2 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", "D2"
+        "opentrons_flex_96_tiprack_1000ul", "D1"
     )
     tips_3 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", "C1",
+        "opentrons_flex_96_tiprack_1000ul", "C3",
         adapter="opentrons_flex_96_tiprack_adapter"
     )
     tips_4 = protocol.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", "C2",
+        "opentrons_flex_96_tiprack_1000ul", "D3",
         adapter="opentrons_flex_96_tiprack_adapter"
     )
 
@@ -126,6 +126,8 @@ Now, when you configure the nozzle layout, you can use the appropriate list as t
 
 Tip Pickup and Conflicts
 ------------------------
+
+The horizontally offset position of the 96-channel pipette during partial tip pickup also places restrictions on where you can put other tall labware on the deck.
 
 .. _pipette-volume-modes:
 
