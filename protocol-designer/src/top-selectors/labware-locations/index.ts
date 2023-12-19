@@ -36,6 +36,7 @@ import {
 import { getIsAdapter } from '../../utils'
 import type { RobotState } from '@opentrons/step-generation'
 import type { Selector } from '../../types'
+import type { AddressableAreaName } from '@opentrons/shared-data'
 
 interface Option {
   name: string
@@ -97,7 +98,7 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSele
 )
 
 //  TODO(jr, 9/20/23): we should test this util since it does a lot.
-export const getUnocuppiedLabwareLocationOptions: Selector<
+export const getUnoccupiedLabwareLocationOptions: Selector<
   Option[] | null
 > = createSelector(
   getRobotStateAtActiveItem,
@@ -114,8 +115,12 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const allSlotIds = deckDef.locations.addressableAreas.map(slot => slot.id)
     const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const allSlotIds = deckDef.locations.addressableAreas.reduce<
+      AddressableAreaName[]
+    >((acc, slot) => {
+      return hasWasteChute && slot.id === 'D3' ? acc : [...acc, slot.id]
+    }, [])
     const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
       .filter(aE => aE.name === 'stagingArea')
       //  TODO(jr, 11/13/23): fix AdditionalEquipment['location'] from type string to CutoutId
@@ -219,8 +224,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
         const isTrashSlot =
           robotType === FLEX_ROBOT_TYPE
             ? MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotId)
-            : slotId === 'fixedTrash'
-
+            : ['fixedTrash', '12'].includes(slotId)
         return (
           !slotIdsOccupiedByModules.includes(slotId) &&
           !Object.values(labware)

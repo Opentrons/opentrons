@@ -9,81 +9,47 @@ import {
   dispenseInPlace,
   dropTipInPlace,
   moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
 } from '../commandCreators/atomic'
-import * as errorCreators from '../errorCreators'
-import { reduceCommandCreators } from './reduceCommandCreators'
 import { curryCommandCreator } from './curryCommandCreator'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type {
-  CommandCreator,
-  CommandCreatorError,
+  RobotState,
+  InvariantContext,
   CurriedCommandCreator,
 } from '../types'
 
 export type MovableTrashCommandsTypes =
   | 'airGap'
-  | 'aspirate'
   | 'blowOut'
   | 'dispense'
   | 'dropTip'
+  | 'moveToWell'
 
 interface MovableTrashCommandArgs {
   type: MovableTrashCommandsTypes
   pipetteId: string
+  invariantContext: InvariantContext
+  prevRobotState?: RobotState
   volume?: number
   flowRate?: number
 }
 /** Helper fn for movable trash commands for dispense, aspirate, air_gap, drop_tip and blow_out commands */
-export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { pipetteId, type, volume, flowRate } = args
-  const errors: CommandCreatorError[] = []
-  const pipetteName = invariantContext.pipetteEntities[pipetteId]?.name
+export const movableTrashCommandsUtil = (
+  args: MovableTrashCommandArgs
+): CurriedCommandCreator[] => {
+  const {
+    pipetteId,
+    type,
+    invariantContext,
+    prevRobotState,
+    volume,
+    flowRate,
+  } = args
   const trash = Object.values(
     invariantContext.additionalEquipmentEntities
   ).find(aE => aE.name === 'trashBin')
-
   const trashLocation = trash != null ? (trash.location as CutoutId) : null
-
-  let actionName: string = ''
-  switch (type) {
-    case 'blowOut':
-      actionName = 'blow out'
-      break
-    case 'dropTip':
-      actionName = 'drop tip'
-      break
-    case 'airGap':
-      actionName = 'air gap'
-      break
-    case 'aspirate':
-      actionName = 'aspirate'
-      break
-    case 'dispense':
-      actionName = 'dispense'
-      break
-    default:
-      break
-  }
-
-  if (pipetteName == null) {
-    errors.push(
-      errorCreators.pipetteDoesNotExist({
-        actionName,
-        pipette: pipetteId,
-      })
-    )
-  }
-  if (trashLocation == null) {
-    errors.push(
-      errorCreators.additionalEquipmentDoesNotExist({
-        additionalEquipment: 'Trash bin',
-      })
-    )
-  }
 
   const deckDef = getDeckDefFromRobotType(
     trashLocation === ('cutout12' as CutoutId)
@@ -113,20 +79,16 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
     )
   }
 
-  const addressableAreaCommand: CurriedCommandCreator[] = [
-    curryCommandCreator(moveToAddressableArea, {
-      pipetteId,
-      addressableAreaName,
-    }),
-  ]
-
   let inPlaceCommands: CurriedCommandCreator[] = []
   switch (type) {
-    case 'airGap':
-    case 'aspirate': {
+    case 'airGap': {
       inPlaceCommands =
         flowRate != null && volume != null
           ? [
+              curryCommandCreator(moveToAddressableArea, {
+                pipetteId,
+                addressableAreaName,
+              }),
               curryCommandCreator(aspirateInPlace, {
                 pipetteId,
                 volume,
@@ -138,13 +100,18 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
       break
     }
     case 'dropTip': {
-      inPlaceCommands = !prevRobotState.tipState.pipettes[pipetteId]
-        ? []
-        : [
-            curryCommandCreator(dropTipInPlace, {
-              pipetteId,
-            }),
-          ]
+      inPlaceCommands =
+        prevRobotState != null && !prevRobotState.tipState.pipettes[pipetteId]
+          ? []
+          : [
+              curryCommandCreator(moveToAddressableAreaForDropTip, {
+                pipetteId,
+                addressableAreaName,
+              }),
+              curryCommandCreator(dropTipInPlace, {
+                pipetteId,
+              }),
+            ]
 
       break
     }
@@ -152,6 +119,10 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
       inPlaceCommands =
         flowRate != null && volume != null
           ? [
+              curryCommandCreator(moveToAddressableArea, {
+                pipetteId,
+                addressableAreaName,
+              }),
               curryCommandCreator(dispenseInPlace, {
                 pipetteId,
                 volume,
@@ -165,6 +136,10 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
       inPlaceCommands =
         flowRate != null
           ? [
+              curryCommandCreator(moveToAddressableArea, {
+                pipetteId,
+                addressableAreaName,
+              }),
               curryCommandCreator(blowOutInPlace, {
                 pipetteId,
                 flowRate,
@@ -173,14 +148,14 @@ export const movableTrashCommandsUtil: CommandCreator<MovableTrashCommandArgs> =
           : []
       break
     }
-  }
-
-  if (errors.length > 0)
-    return {
-      errors,
+    case 'moveToWell': {
+      inPlaceCommands = [
+        curryCommandCreator(moveToAddressableArea, {
+          pipetteId,
+          addressableAreaName,
+        }),
+      ]
     }
-
-  const allCommands = [...addressableAreaCommand, ...inPlaceCommands]
-
-  return reduceCommandCreators(allCommands, invariantContext, prevRobotState)
+  }
+  return inPlaceCommands
 }

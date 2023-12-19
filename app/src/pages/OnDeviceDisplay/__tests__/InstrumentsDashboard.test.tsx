@@ -12,6 +12,7 @@ import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '../InstrumentsDashboard'
 import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
 import { InstrumentDetail } from '../InstrumentDetail'
+import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/GripperWizardFlows')
@@ -126,59 +127,59 @@ describe('InstrumentsDashboard', () => {
     jest.resetAllMocks()
   })
   it('should render mount info for all attached mounts', () => {
-    const [{ getByText }] = render()
-    getByText('left Mount')
-    getByText('Flex 1-Channel 1000 μL')
-    getByText('right Mount')
-    getByText('Flex 1-Channel 50 μL')
-    getByText('extension Mount')
-    getByText('Flex Gripper')
+    render()
+    screen.getByText('left Mount')
+    screen.getByText('Flex 1-Channel 1000 μL')
+    screen.getByText('right Mount')
+    screen.getByText('Flex 1-Channel 50 μL')
+    screen.getByText('extension Mount')
+    screen.getByText('Flex Gripper')
   })
-  it('should route to left mount detail when instrument attached and clicked', async () => {
-    const [{ getByText }] = render()
-    await getByText('left Mount').click()
-    getByText('serial number')
-    getByText(mockLeftPipetteData.serialNumber)
-    getByText(
+  it('should route to left mount detail when instrument attached and clicked', () => {
+    render()
+    fireEvent.click(screen.getByText('left Mount'))
+    screen.getByText('serial number')
+    screen.getByText(mockLeftPipetteData.serialNumber)
+    screen.getByText(
       formatTimeWithUtcLabel(
         mockLeftPipetteData.data.calibratedOffset.last_modified
       )
     )
   })
-  it('should route to right mount detail when instrument attached and clicked', async () => {
-    const [{ getByText }] = render()
-    await getByText('right Mount').click()
-    getByText('serial number')
-    getByText(mockRightPipetteData.serialNumber)
-    getByText(
+  it('should route to right mount detail when instrument attached and clicked', () => {
+    render()
+    fireEvent.click(screen.getByText('right Mount'))
+    screen.getByText('serial number')
+    screen.getByText(mockRightPipetteData.serialNumber)
+    screen.getByText(
       formatTimeWithUtcLabel(
         mockRightPipetteData.data.calibratedOffset.last_modified
       )
     )
   })
-  it('should route to extension mount detail when instrument attached and clicked', async () => {
-    const [{ getByText }] = render()
-    await getByText('extension Mount').click()
-    getByText('serial number')
-    getByText(mockGripperData.serialNumber)
+  it('should route to extension mount detail when instrument attached and clicked', () => {
+    render()
+    fireEvent.click(screen.getByText('extension Mount'))
+    screen.getByText('serial number')
+    screen.getByText(mockGripperData.serialNumber)
   })
-  it('should open choose pipette to attach to left mount when empty and clicked', async () => {
+  it('should open choose pipette to attach to left mount when empty and clicked', () => {
     mockUseInstrumentsQuery.mockReturnValue({ data: { data: [] } } as any)
-    const [{ getByText }] = render()
-    await getByText('left Mount').click()
-    getByText('mock choose pipette')
+    render()
+    fireEvent.click(screen.getByText('left Mount'))
+    screen.getByText('mock choose pipette')
   })
-  it('should open choose pipette to attach to right mount when empty and clicked', async () => {
+  it('should open choose pipette to attach to right mount when empty and clicked', () => {
     mockUseInstrumentsQuery.mockReturnValue({ data: { data: [] } } as any)
-    const [{ getByText }] = render()
-    await getByText('right Mount').click()
-    getByText('mock choose pipette')
+    render()
+    fireEvent.click(screen.getByText('right Mount'))
+    screen.getByText('mock choose pipette')
   })
-  it('should open attach gripper wizard when extension mount item empty and clicked', async () => {
+  it('should open attach gripper wizard when extension mount item empty and clicked', () => {
     mockUseInstrumentsQuery.mockReturnValue({ data: { data: [] } } as any)
-    const [{ getByText }] = render()
-    await getByText('extension Mount').click()
-    getByText('mock gripper wizard flows')
+    render()
+    fireEvent.click(screen.getByText('extension Mount'))
+    screen.getByText('mock gripper wizard flows')
   })
   it('should render the correct info for 96 channel attached', async () => {
     mockUseInstrumentsQuery.mockReturnValue({
@@ -186,8 +187,8 @@ describe('InstrumentsDashboard', () => {
         data: [mock96ChannelData, mockGripperData],
       },
     } as any)
-    const [{ getByText }] = render()
-    getByText('Left+Right Mounts')
-    getByText('extension Mount')
+    render()
+    screen.getByText('Left+Right Mounts')
+    screen.getByText('extension Mount')
   })
 })

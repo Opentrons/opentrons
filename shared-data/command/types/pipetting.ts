@@ -1,8 +1,8 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 export type PipettingRunTimeCommand =
   | AspirateInPlaceRunTimeCommand
-  | AspirateRunTimeCommand
   | AspirateInPlaceRunTimeCommand
+  | AspirateRunTimeCommand
   | BlowoutInPlaceRunTimeCommand
   | BlowoutRunTimeCommand
   | ConfigureForVolumeRunTimeCommand
@@ -10,9 +10,12 @@ export type PipettingRunTimeCommand =
   | DispenseRunTimeCommand
   | DropTipInPlaceRunTimeCommand
   | DropTipRunTimeCommand
+  | GetTipPresenceRunTimeCommand
+  | MoveToAddressableAreaForDropTipRunTimeCommand
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
   | TouchTipRunTimeCommand
+  | VerifyTipPresenceRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -24,9 +27,12 @@ export type PipettingCreateCommand =
   | DispenseInPlaceCreateCommand
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
+  | GetTipPresenceCreateCommand
+  | MoveToAddressableAreaForDropTipCreateCommand
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
   | TouchTipCreateCommand
+  | VerifyTipPresenceCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -140,6 +146,17 @@ export interface DropTipInPlaceRunTimeCommand
   result?: any
 }
 
+export interface MoveToAddressableAreaForDropTipCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'moveToAddressableAreaForDropTip'
+  params: MoveToAddressableAreaForDropTipParams
+}
+export interface MoveToAddressableAreaForDropTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    MoveToAddressableAreaForDropTipCreateCommand {
+  result?: any
+}
+
 export interface PrepareToAspirateCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'prepareToAspirate'
@@ -149,6 +166,29 @@ export interface PrepareToAspirateCreateCommand
 export interface PrepareToAspirateRunTimeCommand
   extends CommonCommandRunTimeInfo,
     PrepareToAspirateCreateCommand {
+  result?: any
+}
+
+export interface GetTipPresenceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'getTipPresence'
+  params: PipetteIdentityParams
+}
+
+export interface GetTipPresenceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    GetTipPresenceCreateCommand {
+  result?: TipPresenceResult
+}
+
+export interface VerifyTipPresenceCreateCommand
+  extends CommonCommandCreateInfo {
+  commandType: 'verifyTipPresence'
+  params: VerifyTipPresenceParams
+}
+
+export interface VerifyTipPresenceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    VerifyTipPresenceCreateCommand {
   result?: any
 }
 
@@ -172,8 +212,24 @@ export type DropTipParams = PipetteAccessParams & {
   }
 }
 export type PickUpTipParams = TouchTipParams
+
+interface AddressableOffsetVector {
+  x: number
+  y: number
+  z: number
+}
 export interface DropTipInPlaceParams {
   pipetteId: string
+}
+
+export interface MoveToAddressableAreaForDropTipParams {
+  pipetteId: string
+  addressableAreaName: string
+  offset?: AddressableOffsetVector
+  alternateDropLocation?: boolean
+  speed?: number
+  minimumZHeight?: number
+  forceDirect?: boolean
 }
 export interface BlowoutInPlaceParams {
   pipetteId: string
@@ -223,6 +279,15 @@ interface WellLocationParam {
   }
 }
 
+interface VerifyTipPresenceParams extends PipetteIdentityParams {
+  expectedState?: 'present' | 'absent'
+}
+
 interface BasicLiquidHandlingResult {
   volume: number // Amount of liquid in uL handled in the operation
+}
+
+interface TipPresenceResult {
+  // ot2 should alwasy return unknown
+  status?: 'present' | 'absent' | 'unknown'
 }

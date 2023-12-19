@@ -1,5 +1,6 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
+from math import isclose
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from contextlib import nullcontext as does_not_raise
@@ -1759,3 +1760,35 @@ def test_get_default_gripper_offsets(
         },
     )
     assert subject.get_default_gripper_offsets("module-1") == expected_offset_data
+
+
+@pytest.mark.parametrize(
+    argnames=["deck_type", "slot_name", "expected_highest_z"],
+    argvalues=[
+        (DeckType.OT2_STANDARD, DeckSlotName.SLOT_1, 84),
+        (DeckType.OT3_STANDARD, DeckSlotName.SLOT_D1, 12.91),
+    ],
+)
+def test_get_module_highest_z(
+    tempdeck_v2_def: ModuleDefinition,
+    deck_type: DeckType,
+    slot_name: DeckSlotName,
+    expected_highest_z: float,
+) -> None:
+    """It should get the highest z point of the module."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": slot_name},
+        requested_model_by_module_id={
+            "module-id": ModuleModel.TEMPERATURE_MODULE_V2,
+        },
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="module-serial",
+                definition=tempdeck_v2_def,
+            )
+        },
+    )
+    assert isclose(
+        subject.get_module_highest_z(module_id="module-id", deck_type=deck_type),
+        expected_highest_z,
+    )

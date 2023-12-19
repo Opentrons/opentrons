@@ -85,42 +85,42 @@ describe('ErrorInfo', () => {
   })
 
   it('returns null if attachedModule is not a TC or HS', () => {
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
+    render(props)
+    expect(screen.queryByText('Module error')).toBeNull()
   })
 
   it('returns null if attachedModule is a HS is not in error', () => {
     props = {
       attachedModule: mockHeaterShaker,
     }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
+    render(props)
+    expect(screen.queryByText('Module error')).toBeNull()
   })
 
   it('returns null if attachedModule is a TC is not in error', () => {
     props = {
       attachedModule: mockThermocycler,
     }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
+    render(props)
+    expect(screen.queryByText('Module error')).toBeNull()
   })
 
   it('returns correct info for a HS in error', () => {
     props = {
       attachedModule: mockErrorHeaterShaker,
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Module error')
-    const btn = getByLabelText('view_error_details')
-    getByText('View')
-    getByText('error details')
+    render(props)
+    screen.getByText('Module error')
+    const btn = screen.getByLabelText('view_error_details')
+    screen.getByText('View')
+    screen.getByText('error details')
     fireEvent.click(btn)
-    getByText('Heater-Shaker Module GEN1 error')
-    getByText('errorDetails')
-    getByText(
+    screen.getByText('Heater-Shaker Module GEN1 error')
+    screen.getByText('errorDetails')
+    screen.getByText(
       'Try powering the module off and on again. If the error persists, contact Opentrons Support.'
     )
-    const close = getByRole('button', { name: 'close' })
+    const close = screen.getByRole('button', { name: 'close' })
     fireEvent.click(close)
     expect(screen.queryByText('Heater-Shaker Module GEN1 error')).toBeNull()
   })
@@ -129,17 +129,17 @@ describe('ErrorInfo', () => {
     props = {
       attachedModule: mockErrorThermocycler,
     }
-    const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('Module error')
-    const btn = getByLabelText('view_error_details')
-    getByText('View')
-    getByText('error details')
+    render(props)
+    screen.getByText('Module error')
+    const btn = screen.getByLabelText('view_error_details')
+    screen.getByText('View')
+    screen.getByText('error details')
     fireEvent.click(btn)
-    getByText('Thermocycler Module GEN1 error')
-    getByText(
+    screen.getByText('Thermocycler Module GEN1 error')
+    screen.getByText(
       'Try powering the module off and on again. If the error persists, contact Opentrons Support.'
     )
-    const close = getByRole('button', { name: 'close' })
+    const close = screen.getByRole('button', { name: 'close' })
     fireEvent.click(close)
     expect(screen.queryByText('Thermocycler Module GEN1 error')).toBeNull()
   })

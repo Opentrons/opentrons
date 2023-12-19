@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import ModuleDefinition
 
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
+from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -34,7 +35,9 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
 @pytest.fixture
 def ot2_hardware_api(decoy: Decoy) -> API:
     """Get a mocked out OT-2 hardware API."""
-    return decoy.mock(cls=API)
+    mock = decoy.mock(cls=API)
+    decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
+    return mock
 
 
 @pytest.mark.ot3_only
@@ -44,7 +47,9 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
-        return decoy.mock(cls=OT3API)
+        mock = decoy.mock(cls=OT3API)
+        decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
+        return mock
     except ImportError:
         # TODO (tz, 9-23-22) Figure out a better way to use this fixture with OT-3 api only.
         return None  # type: ignore[return-value]

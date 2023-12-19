@@ -7,7 +7,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
-from opentrons.types import Point
+from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.errors import (
     FixtureDoesNotExistError,
@@ -17,6 +17,7 @@ from opentrons.protocol_engine.errors import (
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
+    AreaType,
     PotentialCutoutFixture,
     DeckPoint,
     Dimensions,
@@ -182,6 +183,7 @@ def test_get_provided_addressable_area_raises(
                 PotentialCutoutFixture(
                     cutout_id="cutout3",
                     cutout_fixture_id="singleStandardSlot",
+                    provided_addressable_areas=frozenset({"3"}),
                 )
             },
             lazy_fixture("ot2_standard_deck_def"),
@@ -193,6 +195,7 @@ def test_get_provided_addressable_area_raises(
                 PotentialCutoutFixture(
                     cutout_id="cutout3",
                     cutout_fixture_id="singleStandardSlot",
+                    provided_addressable_areas=frozenset({"3"}),
                 )
             },
             lazy_fixture("ot2_short_trash_deck_def"),
@@ -202,10 +205,14 @@ def test_get_provided_addressable_area_raises(
             "cutoutD3",
             {
                 PotentialCutoutFixture(
-                    cutout_id="cutoutD3", cutout_fixture_id="singleRightSlot"
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="singleRightSlot",
+                    provided_addressable_areas=frozenset({"D3"}),
                 ),
                 PotentialCutoutFixture(
-                    cutout_id="cutoutD3", cutout_fixture_id="stagingAreaRightSlot"
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="stagingAreaRightSlot",
+                    provided_addressable_areas=frozenset({"D3", "D4"}),
                 ),
             },
             lazy_fixture("ot3_standard_deck_def"),
@@ -230,7 +237,7 @@ def test_get_potential_cutout_fixtures_raises(
     ot3_standard_deck_def: DeckDefinitionV4,
 ) -> None:
     """It should raise if there is no fixtures that provide the requested area."""
-    with pytest.raises(AssertionError):
+    with pytest.raises(AddressableAreaDoesNotExistError):
         subject.get_potential_cutout_fixtures("theFunArea", ot3_standard_deck_def)
 
 
@@ -242,6 +249,8 @@ def test_get_potential_cutout_fixtures_raises(
             "1",
             AddressableArea(
                 area_name="1",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -250,8 +259,6 @@ def test_get_potential_cutout_fixtures_raises(
                     "temperatureModuleType",
                     "heaterShakerModuleType",
                 ],
-                drop_tip_location=None,
-                drop_labware_location=None,
             ),
             lazy_fixture("ot2_standard_deck_def"),
         ),
@@ -259,6 +266,8 @@ def test_get_potential_cutout_fixtures_raises(
             "1",
             AddressableArea(
                 area_name="1",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -267,8 +276,6 @@ def test_get_potential_cutout_fixtures_raises(
                     "temperatureModuleType",
                     "heaterShakerModuleType",
                 ],
-                drop_tip_location=None,
-                drop_labware_location=None,
             ),
             lazy_fixture("ot2_short_trash_deck_def"),
         ),
@@ -276,6 +283,8 @@ def test_get_potential_cutout_fixtures_raises(
             "D1",
             AddressableArea(
                 area_name="D1",
+                area_type=AreaType.SLOT,
+                base_slot=DeckSlotName.SLOT_A1,
                 display_name="Slot D1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -284,8 +293,6 @@ def test_get_potential_cutout_fixtures_raises(
                     "heaterShakerModuleType",
                     "magneticBlockType",
                 ],
-                drop_tip_location=None,
-                drop_labware_location=None,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -293,12 +300,12 @@ def test_get_potential_cutout_fixtures_raises(
             "movableTrashB3",
             AddressableArea(
                 area_name="movableTrashB3",
-                display_name="Trash Bin",
-                bounding_box=Dimensions(x=246.5, y=91.5, z=40),
-                position=AddressableOffsetVector(x=-16, y=-0.75, z=3),
+                area_type=AreaType.MOVABLE_TRASH,
+                base_slot=DeckSlotName.SLOT_A1,
+                display_name="Trash Bin in B3",
+                bounding_box=Dimensions(x=225, y=78, z=40),
+                position=AddressableOffsetVector(x=-5.25, y=6, z=3),
                 compatible_module_types=[],
-                drop_tip_location=Point(x=124.25, y=47.75, z=43.0),
-                drop_labware_location=None,
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -306,12 +313,12 @@ def test_get_potential_cutout_fixtures_raises(
             "gripperWasteChute",
             AddressableArea(
                 area_name="gripperWasteChute",
-                display_name="Gripper Waste Chute",
-                bounding_box=Dimensions(x=155.0, y=86.0, z=154.0),
-                position=AddressableOffsetVector(x=-12.5, y=2, z=3),
+                area_type=AreaType.WASTE_CHUTE,
+                base_slot=DeckSlotName.SLOT_A1,
+                display_name="Waste Chute",
+                bounding_box=Dimensions(x=0, y=0, z=0),
+                position=AddressableOffsetVector(x=65, y=31, z=139.5),
                 compatible_module_types=[],
-                drop_tip_location=None,
-                drop_labware_location=Point(x=65, y=31, z=139.5),
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -324,7 +331,7 @@ def test_get_addressable_area_from_name(
 ) -> None:
     """It should get the deck position for the requested cutout id."""
     addressable_area = subject.get_addressable_area_from_name(
-        addressable_area_name, DeckPoint(x=1, y=2, z=3), deck_def
+        addressable_area_name, DeckPoint(x=1, y=2, z=3), DeckSlotName.SLOT_A1, deck_def
     )
     assert addressable_area == expected_addressable_area
 
@@ -335,5 +342,8 @@ def test_get_addressable_area_from_name_raises(
     """It should raise if there is no addressable area by that name in the deck."""
     with pytest.raises(AddressableAreaDoesNotExistError):
         subject.get_addressable_area_from_name(
-            "theFunArea", DeckPoint(x=1, y=2, z=3), ot3_standard_deck_def
+            "theFunArea",
+            DeckPoint(x=1, y=2, z=3),
+            DeckSlotName.SLOT_A1,
+            ot3_standard_deck_def,
         )

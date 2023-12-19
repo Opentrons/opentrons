@@ -14,7 +14,11 @@ from opentrons.types import DeckSlotName
 
 @pytest.mark.parametrize(
     "robot_type, slot_name",
-    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
+    [
+        ("OT-2 Standard", DeckSlotName.SLOT_1),
+        ("OT-3 Standard", DeckSlotName.SLOT_A1),
+        ("OT-3 Standard", DeckSlotName.SLOT_A3),
+    ],
 )
 def test_empty_no_conflict(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not raise on empty input."""
@@ -48,124 +52,6 @@ def test_no_multiple_locations(robot_type: RobotType, slot_name: DeckSlotName) -
         deck_conflict.check(
             existing_items={slot_name: item_1},
             new_item=item_2,
-            new_location=slot_name,
-            robot_type=robot_type,
-        )
-
-
-@pytest.mark.parametrize(
-    "slot_name, robot_type",
-    [
-        (DeckSlotName.FIXED_TRASH, "OT-2 Standard"),
-        (DeckSlotName.SLOT_A3, "OT-3 Standard"),
-    ],
-)
-def test_only_trash_in_fixed_slot(
-    slot_name: DeckSlotName, robot_type: RobotType
-) -> None:
-    """It should only allow trash labware in slot 12."""
-    trash_labware = deck_conflict.Labware(
-        uri=LabwareUri("trash_labware_uri"),
-        highest_z=123,
-        is_fixed_trash=True,
-        name_for_errors="trash_labware",
-    )
-    not_trash_labware = deck_conflict.Labware(
-        uri=LabwareUri("not_trash_labware_uri"),
-        highest_z=123,
-        is_fixed_trash=False,
-        name_for_errors="not_trash_labware",
-    )
-    not_trash_module = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="not_trash_module"
-    )
-
-    deck_conflict.check(
-        existing_items={},
-        new_item=trash_labware,
-        new_location=slot_name,
-        robot_type=robot_type,
-    )
-
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=f"Only fixed-trash is allowed in slot {slot_name}",
-    ):
-        deck_conflict.check(
-            existing_items={},
-            new_item=not_trash_labware,
-            new_location=slot_name,
-            robot_type=robot_type,
-        )
-
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=f"Only fixed-trash is allowed in slot {slot_name}",
-    ):
-        deck_conflict.check(
-            existing_items={},
-            new_item=not_trash_module,
-            new_location=slot_name,
-            robot_type=robot_type,
-        )
-
-
-@pytest.mark.parametrize(
-    "slot_name, robot_type",
-    [
-        (DeckSlotName.FIXED_TRASH, "OT-2 Standard"),
-        (DeckSlotName.SLOT_A3, "OT-3 Standard"),
-    ],
-)
-def test_trash_override(slot_name: DeckSlotName, robot_type: RobotType) -> None:
-    """It should allow the trash labware to be replaced with another trash labware."""
-    trash_labware_1 = deck_conflict.Labware(
-        uri=LabwareUri("trash_labware_1_uri"),
-        highest_z=123,
-        is_fixed_trash=True,
-        name_for_errors="trash_labware_1",
-    )
-    trash_labware_2 = deck_conflict.Labware(
-        uri=LabwareUri("trash_labware_2_uri"),
-        highest_z=123,
-        is_fixed_trash=True,
-        name_for_errors="trash_labware_2",
-    )
-    not_trash_labware = deck_conflict.Labware(
-        uri=LabwareUri("not_trash_labware_uri"),
-        highest_z=123,
-        is_fixed_trash=False,
-        name_for_errors="not_trash_labware",
-    )
-    not_trash_module = deck_conflict.OtherModule(
-        highest_z_including_labware=123, name_for_errors="not_trash_module"
-    )
-
-    deck_conflict.check(
-        existing_items={slot_name: trash_labware_1},
-        new_item=trash_labware_2,
-        new_location=slot_name,
-        robot_type=robot_type,
-    )
-
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=f"Only fixed-trash is allowed in slot {slot_name}",
-    ):
-        deck_conflict.check(
-            existing_items={slot_name: trash_labware_1},
-            new_item=not_trash_labware,
-            new_location=slot_name,
-            robot_type=robot_type,
-        )
-
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=f"Only fixed-trash is allowed in slot {slot_name}",
-    ):
-        deck_conflict.check(
-            existing_items={slot_name: trash_labware_1},
-            new_item=not_trash_module,
             new_location=slot_name,
             robot_type=robot_type,
         )

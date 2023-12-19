@@ -54,8 +54,12 @@ export function WasteChuteConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn
-        css={WASTE_CHUTE_CONFIG_STYLE}
-        cursor={handleClickRemove != null ? 'pointer' : 'none'}
+        css={
+          handleClickRemove != null
+            ? WASTE_CHUTE_CONFIG_STYLE_EDITABLE
+            : WASTE_CHUTE_CONFIG_STYLE_READ_ONLY
+        }
+        cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
             ? () => handleClickRemove(fixtureLocation)
@@ -65,13 +69,15 @@ export function WasteChuteConfigFixture(
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
           {WASTE_CHUTE_DISPLAY_NAME}
         </Text>
-        <Icon name="remove" color={COLORS.white} size="2rem" />
+        {handleClickRemove != null ? (
+          <Icon name="remove" color={COLORS.white} size="2rem" />
+        ) : null}
       </Btn>
     </RobotCoordsForeignObject>
   )
 }
 
-const WASTE_CHUTE_CONFIG_STYLE = css`
+const WASTE_CHUTE_CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.grey2};
@@ -80,6 +86,10 @@ const WASTE_CHUTE_CONFIG_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing8};
   width: 100%;
+`
+
+const WASTE_CHUTE_CONFIG_STYLE_EDITABLE = css`
+  ${WASTE_CHUTE_CONFIG_STYLE_READ_ONLY}
 
   &:active {
     background-color: ${COLORS.darkBlack90};

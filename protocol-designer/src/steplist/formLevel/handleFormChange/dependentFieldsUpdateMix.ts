@@ -51,15 +51,38 @@ const updatePatchOnPipetteChannelChange = (
   if (patch.pipette === undefined) return patch
   let update = {}
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
-  const nextChannels =
+  const nChannels =
     typeof patch.pipette === 'string'
       ? getChannels(patch.pipette, pipetteEntities)
       : null
   const appliedPatch = { ...rawForm, ...patch }
+  let previousChannels = prevChannels
+  if (
+    rawForm.stepType === 'moveLiquid' ||
+    (rawForm.stepType === 'mix' && prevChannels === 96)
+  ) {
+    if (rawForm.nozzles === 'full') {
+      previousChannels = 96
+    } else {
+      previousChannels = 8
+    }
+  }
+  let nextChannels = nChannels
+  if (
+    rawForm.stepType === 'moveLiquid' ||
+    (rawForm.stepType === 'mix' && nChannels === 96)
+  ) {
+    if (rawForm.nozzles === 'full') {
+      nextChannels = 96
+    } else {
+      nextChannels = 8
+    }
+  }
+
   const singleToMulti =
-    prevChannels === 1 && (nextChannels === 8 || nextChannels === 96)
+    previousChannels === 1 && (nextChannels === 8 || nextChannels === 96)
   const multiToSingle =
-    (prevChannels === 8 || prevChannels === 96) && nextChannels === 1
+    (previousChannels === 8 || previousChannels === 96) && nextChannels === 1
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
@@ -74,8 +97,15 @@ const updatePatchOnPipetteChannelChange = (
     }
   } else if (multiToSingle) {
     let channels: 8 | 96 = 8
-    if (prevChannels === 96) {
-      channels = 96
+    if (
+      rawForm.stepType === 'moveLiquid' ||
+      (rawForm.stepType === 'mix' && prevChannels === 96)
+    ) {
+      if (rawForm.nozzles === 'full') {
+        channels = 96
+      } else {
+        channels = 8
+      }
     }
     // multi-channel to single-channel: convert primary wells to all wells
     const labwareId = appliedPatch.labware

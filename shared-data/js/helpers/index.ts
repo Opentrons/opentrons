@@ -27,6 +27,8 @@ export * from './getVectorSum'
 export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
+export * from './getAddressableAreasInProtocol'
+export * from './getSimplestFlexDeckConfig'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

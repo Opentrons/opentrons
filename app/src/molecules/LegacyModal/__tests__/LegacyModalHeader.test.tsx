@@ -1,3 +1,5 @@
+import 'jest-styled-components'
+import { screen, fireEvent } from '@testing-library/react'
 import * as React from 'react'
 
 import {
@@ -29,10 +31,10 @@ describe('LegacyModalHeader', () => {
   })
 
   it('should render text and close icon', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    const title = getByText('mock modal header title')
+    render(props)
+    const title = screen.getByText('mock modal header title')
     expect(title).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
-    getByTestId('ModalHeader_icon_close_mock modal header title')
+    screen.getByTestId('ModalHeader_icon_close_mock modal header title')
   })
 
   it('should render text, icon, and close icon', () => {
@@ -42,20 +44,24 @@ describe('LegacyModalHeader', () => {
       size: '1.25rem',
       marginRight: SPACING.spacing8,
     }
-    const [{ getByTestId }] = render(props)
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(
+    render(props)
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
       `color: ${COLORS.darkBlackEnabled}`
     )
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(`width: 1.25rem`)
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(`height: 1.25rem`)
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
+      `width: 1.25rem`
+    )
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
+      `height: 1.25rem`
+    )
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
       `margin-right: ${SPACING.spacing8}`
     )
   })
 
   it('should call a mock function when clicking close icon', () => {
-    const [{ getByTestId }] = render(props)
-    const closeIcon = getByTestId(
+    render(props)
+    const closeIcon = screen.getByTestId(
       'ModalHeader_icon_close_mock modal header title'
     )
     expect(closeIcon).toHaveStyle('width: 1.625rem')
@@ -78,7 +84,7 @@ describe('LegacyModalHeader', () => {
         modifier: ':active',
       }
     )
-    closeIcon.click()
+    fireEvent.click(closeIcon)
     expect(mockClose).toHaveBeenCalled()
   })
 })

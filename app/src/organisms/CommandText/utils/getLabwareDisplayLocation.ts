@@ -13,12 +13,12 @@ import type {
   CompletedProtocolAnalysis,
   RobotType,
 } from '@opentrons/shared-data/'
-import type { TFunction } from 'react-i18next'
+import type { TFunction } from 'i18next'
 
 export function getLabwareDisplayLocation(
   robotSideAnalysis: CompletedProtocolAnalysis,
   location: LabwareLocation,
-  t: TFunction<'protocol_command_text'>,
+  t: TFunction,
   robotType: RobotType,
   isOnDevice?: boolean
 ): string {
@@ -28,6 +28,10 @@ export function getLabwareDisplayLocation(
     return isOnDevice
       ? location.slotName
       : t('slot', { slot_name: location.slotName })
+  } else if ('addressableAreaName' in location) {
+    return isOnDevice
+      ? location.addressableAreaName
+      : t('slot', { slot_name: location.addressableAreaName })
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModel(robotSideAnalysis, location.moduleId)
     if (moduleModel == null) {

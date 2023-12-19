@@ -5,15 +5,8 @@ import {
   dropTipInPlace,
   moveToAddressableArea,
 } from '../commandCreators/atomic'
-import * as errorCreators from '../errorCreators'
-import { getHasWasteChute } from './misc'
-import { reduceCommandCreators } from './reduceCommandCreators'
 import { curryCommandCreator } from './curryCommandCreator'
-import type {
-  CommandCreator,
-  CommandCreatorError,
-  CurriedCommandCreator,
-} from '../types'
+import type { RobotState, CurriedCommandCreator } from '../types'
 
 export type WasteChuteCommandsTypes =
   | 'dispense'
@@ -25,46 +18,22 @@ interface WasteChuteCommandArgs {
   type: WasteChuteCommandsTypes
   pipetteId: string
   addressableAreaName: string
+  prevRobotState: RobotState
   volume?: number
   flowRate?: number
 }
 /** Helper fn for waste chute dispense, drop tip and blow_out commands */
-export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { pipetteId, addressableAreaName, type, volume, flowRate } = args
-  const errors: CommandCreatorError[] = []
-  const pipetteName = invariantContext.pipetteEntities[pipetteId]?.name
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
-  )
-
-  let actionName = 'dispense'
-  if (type === 'blowOut') {
-    actionName = 'blow out'
-  } else if (type === 'dropTip') {
-    actionName = 'drop tip'
-  } else if (type === 'airGap') {
-    actionName = 'air gap'
-  }
-
-  if (pipetteName == null) {
-    errors.push(
-      errorCreators.pipetteDoesNotExist({
-        actionName,
-        pipette: pipetteId,
-      })
-    )
-  }
-  if (!hasWasteChute) {
-    errors.push(
-      errorCreators.additionalEquipmentDoesNotExist({
-        additionalEquipment: 'Waste chute',
-      })
-    )
-  }
+export const wasteChuteCommandsUtil = (
+  args: WasteChuteCommandArgs
+): CurriedCommandCreator[] => {
+  const {
+    pipetteId,
+    addressableAreaName,
+    type,
+    prevRobotState,
+    volume,
+    flowRate,
+  } = args
 
   let commands: CurriedCommandCreator[] = []
   switch (type) {
@@ -135,10 +104,5 @@ export const wasteChuteCommandsUtil: CommandCreator<WasteChuteCommandArgs> = (
     }
   }
 
-  if (errors.length > 0)
-    return {
-      errors,
-    }
-
-  return reduceCommandCreators(commands, invariantContext, prevRobotState)
+  return commands
 }

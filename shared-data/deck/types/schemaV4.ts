@@ -23,7 +23,8 @@ export type FlexAddressableAreaName =
   | 'movableTrashC3'
   | 'movableTrashD1'
   | 'movableTrashD3'
-  | '1and8ChannelWasteChute'
+  | '1ChannelWasteChute'
+  | '8ChannelWasteChute'
   | '96ChannelWasteChute'
   | 'gripperWasteChute'
 
@@ -39,6 +40,7 @@ export type OT2AddressableAreaName =
   | '9'
   | '10'
   | '11'
+  | '12'
   | 'fixedTrash'
 
 export type AddressableAreaName =

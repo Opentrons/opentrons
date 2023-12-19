@@ -203,7 +203,7 @@
       },
       {
         "id": "A4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -216,7 +216,7 @@
       },
       {
         "id": "B4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -229,7 +229,7 @@
       },
       {
         "id": "C4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -242,7 +242,7 @@
       },
       {
         "id": "D4",
-        "areaType": "slot",
+        "areaType": "stagingSlot",
         "offsetFromCutoutFixture": [164.0, 0.0, 14.5],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -256,145 +256,146 @@
       {
         "id": "movableTrashD1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in D1",
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashC1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in C1",
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashB1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in B1",
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashA1",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-101.5, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-90.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in A1",
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashD3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in D3",
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashC3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in C3",
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashB3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in B3",
+        "ableToDropTips": true
       },
       {
         "id": "movableTrashA3",
         "areaType": "movableTrash",
-        "offsetFromCutoutFixture": [-17.0, -2.75, 0.0],
+        "offsetFromCutoutFixture": [-6.25, 4, 0.0],
         "boundingBox": {
-          "xDimension": 246.5,
-          "yDimension": 91.5,
+          "xDimension": 225,
+          "yDimension": 78,
           "zDimension": 40
         },
-        "displayName": "Trash Bin",
-        "ableToDropTips": true,
-        "dropTipsOffset": [123.25, 45.75, 40.0]
+        "displayName": "Trash Bin in A3",
+        "ableToDropTips": true
       },
       {
-        "id": "1and8ChannelWasteChute",
+        "id": "1ChannelWasteChute",
         "areaType": "wasteChute",
-        "offsetFromCutoutFixture": [-13.5, 0, 0],
+        "offsetFromCutoutFixture": [64, 36, 114.5],
         "boundingBox": {
-          "xDimension": 155.0,
-          "yDimension": 86.0,
-          "zDimension": 154.0
+          "xDimension": 0,
+          "yDimension": 0,
+          "zDimension": 0
         },
-        "displayName": "1/8 Channel Waste Chute",
-        "ableToDropTips": true,
-        "dropTipsOffset": [64.0, 21.91, 144.0]
+        "displayName": "Waste Chute",
+        "ableToDropTips": true
+      },
+      {
+        "id": "8ChannelWasteChute",
+        "areaType": "wasteChute",
+        "offsetFromCutoutFixture": [64, -27, 114.5],
+        "boundingBox": {
+          "xDimension": 0,
+          "yDimension": 63,
+          "zDimension": 0
+        },
+        "displayName": "Waste Chute",
+        "ableToDropTips": true
       },
       {
         "id": "96ChannelWasteChute",
         "areaType": "wasteChute",
-        "offsetFromCutoutFixture": [-13.5, 0, 0],
+        "offsetFromCutoutFixture": [14.445, -20.915, 114.5],
         "boundingBox": {
-          "xDimension": 155.0,
-          "yDimension": 86.0,
-          "zDimension": 154.0
+          "xDimension": 99,
+          "yDimension": 63,
+          "zDimension": 0
         },
-        "displayName": "96 Channel Waste Chute",
-        "ableToDropTips": true,
-        "dropTipsOffset": [14.445, 42.085, 115]
+        "displayName": "Waste Chute",
+        "ableToDropTips": true
       },
       {
         "id": "gripperWasteChute",
         "areaType": "wasteChute",
-        "offsetFromCutoutFixture": [-13.5, 0, 0],
+        "offsetFromCutoutFixture": [64, 29, 136.5],
         "boundingBox": {
-          "xDimension": 155.0,
-          "yDimension": 86.0,
-          "zDimension": 154.0
+          "xDimension": 0,
+          "yDimension": 0,
+          "zDimension": 0
         },
-        "displayName": "Gripper Waste Chute",
-        "ableToDropLabware": true,
-        "dropLabwareOffset": [64, 29, 136.5]
+        "displayName": "Waste Chute",
+        "ableToDropLabware": true
       }
     ],
     "cutouts": [
@@ -479,7 +480,8 @@
         "cutoutC1": ["C1"],
         "cutoutB1": ["B1"],
         "cutoutA1": ["A1"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "singleCenterSlot",
@@ -490,7 +492,8 @@
         "cutoutC2": ["C2"],
         "cutoutB2": ["B2"],
         "cutoutA2": ["A2"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "singleRightSlot",
@@ -501,7 +504,8 @@
         "cutoutC3": ["C3"],
         "cutoutB3": ["B3"],
         "cutoutA3": ["A3"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "stagingAreaRightSlot",
@@ -512,7 +516,8 @@
         "cutoutC3": ["C3", "C4"],
         "cutoutB3": ["B3", "B4"],
         "cutoutA3": ["A3", "A4"]
-      }
+      },
+      "height": 0
     },
     {
       "id": "trashBinAdapter",
@@ -536,15 +541,17 @@
         "cutoutC3": ["movableTrashC3"],
         "cutoutB3": ["movableTrashB3"],
         "cutoutA3": ["movableTrashA3"]
-      }
+      },
+      "height": 40
     },
     {
       "id": "wasteChuteRightAdapterCovered",
       "mayMountTo": ["cutoutD3"],
       "displayName": "Waste Chute Adapter for 1 or 8 Channel Pipettes",
       "providesAddressableAreas": {
-        "cutoutD3": ["1and8ChannelWasteChute"]
-      }
+        "cutoutD3": ["1ChannelWasteChute", "8ChannelWasteChute"]
+      },
+      "height": 124.5
     },
     {
       "id": "wasteChuteRightAdapterNoCover",
@@ -552,19 +559,22 @@
       "displayName": "Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
         "cutoutD3": [
-          "1and8ChannelWasteChute",
+          "1ChannelWasteChute",
+          "8ChannelWasteChute",
           "96ChannelWasteChute",
           "gripperWasteChute"
         ]
-      }
+      },
+      "height": 124.5
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterCovered",
       "mayMountTo": ["cutoutD3"],
       "displayName": "Staging Slot With Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "cutoutD3": ["1and8ChannelWasteChute", "D4"]
-      }
+        "cutoutD3": ["1ChannelWasteChute", "8ChannelWasteChute", "D4"]
+      },
+      "height": 124.5
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
@@ -572,12 +582,14 @@
       "displayName": "Staging Slot With Waste Chute Adapter and Staging Area Slot",
       "providesAddressableAreas": {
         "cutoutD3": [
-          "1and8ChannelWasteChute",
+          "1ChannelWasteChute",
+          "8ChannelWasteChute",
           "96ChannelWasteChute",
           "gripperWasteChute",
           "D4"
         ]
-      }
+      },
+      "height": 124.5
     }
   ],
   "gripperOffsets": {

@@ -1,20 +1,21 @@
 import * as React from 'react'
+import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
+import { COLUMN } from '@opentrons/shared-data'
 import { FormGroup, InputField } from '@opentrons/components'
 import { i18n } from '../../../../localization'
-import { WellSelectionModal } from './WellSelectionModal'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   actions as stepsActions,
   getSelectedStepId,
   getWellSelectionLabwareKey,
 } from '../../../../ui/steps'
+import { WellSelectionModal } from './WellSelectionModal'
 import styles from '../../StepEditForm.css'
 
-import { Dispatch } from 'redux'
-import { StepIdType } from '../../../../form-types'
-import { BaseState } from '../../../../types'
-import { FieldProps } from '../../types'
+import type { StepIdType } from '../../../../form-types'
+import type { BaseState, NozzleType } from '../../../../types'
+import type { FieldProps } from '../../types'
 
 export interface SP {
   stepId?: StepIdType | null
@@ -28,7 +29,7 @@ export interface DP {
 
 export type OP = FieldProps & {
   primaryWellCount?: number
-  is8Channel?: boolean | null
+  nozzleType?: NozzleType | null
   pipetteId?: string | null
   labwareId?: string | null
 }
@@ -64,9 +65,10 @@ export class WellSelectionInputComponent extends React.Component<Props> {
 
   render(): JSX.Element {
     const modalKey = this.getModalKey()
-    const label = this.props.is8Channel
-      ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
-      : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
+    const label =
+      this.props.nozzleType === '8-channel' || this.props.nozzleType === COLUMN
+        ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
+        : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
     return (
       <FormGroup
         label={label}
@@ -94,6 +96,7 @@ export class WellSelectionInputComponent extends React.Component<Props> {
             pipetteId={this.props.pipetteId}
             updateValue={this.props.updateValue}
             value={this.props.value}
+            nozzleType={this.props.nozzleType}
           />
         </Portal>
       </FormGroup>

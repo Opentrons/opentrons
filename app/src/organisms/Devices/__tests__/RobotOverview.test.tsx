@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
@@ -379,7 +380,7 @@ describe('RobotOverview', () => {
     getByText('Controls')
     getByText('Lights')
     const toggle = getByRole('switch', { name: 'Lights' })
-    toggle.click()
+    fireEvent.click(toggle)
     expect(mockToggleLights).toBeCalled()
   })
 

@@ -111,9 +111,26 @@ Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-ra
 
     pipette.dispense(200, plate['B1'], rate=2.0)
 
-.. Removing the 2 notes here from the original. Covered by new revisions.
-
 .. versionadded:: 2.0
+
+.. _push-out-dispense:
+
+Push Out After Dispense
+-----------------------
+
+The optional ``push_out`` parameter of ``dispense()`` helps ensure all liquid leaves the tip. Use ``push_out`` for applications that require moving the pipette plunger lower than the default, without performing a full :ref:`blow out <blow-out>`.
+
+For example, this dispense action moves the plunger the equivalent of an additional 5 µL beyond where it would stop if ``push_out`` was set to zero or omitted::
+
+    pipette.pick_up_tip()
+    pipette.aspirate(100, plate['A1'])
+    pipette.dispense(100, plate['B1'], push_out=5)
+    pipette.drop_tip()
+
+.. versionadded:: 2.15
+
+.. note::
+    In version 7.0.2 and earlier of the robot software, you could accomplish a similar result by dispensing a volume greater than what was aspirated into the pipette. In version 7.1.0 and later, the API will return an error. Calculate the difference between the two amounts and use that as the value of ``push_out``.
 
 .. _new-blow-out:
 

@@ -63,10 +63,10 @@
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
-        "aspirate_touchTip_checkbox": "Touch tip is not supported with this labware",
+        "aspirate_touchTip_checkbox": "Touch tip is not supported",
         "blowout_checkbox": "Redundant with disposal volume",
-        "dispense_mix_checkbox": "Unable to mix in a waste chute",
-        "dispense_mmFromBottom": "Tip position adjustment not supported in waste chute",
+        "dispense_mix_checkbox": "Unable to mix in a waste chute or trash bin",
+        "dispense_mmFromBottom": "Tip position adjustment is not supported",
         "dispense_touchTip_checkbox": "Touch tip is not supported"
       }
     },

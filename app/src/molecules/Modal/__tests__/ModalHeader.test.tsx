@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ModalHeader } from '../ModalHeader'
 
@@ -25,11 +26,11 @@ describe('ModalHeader', () => {
       iconColor: COLORS.black,
       onClick: jest.fn(),
     }
-    const { getByLabelText } = render(props)
-    expect(getByLabelText('icon_information')).toHaveStyle(
+    render(props)
+    expect(screen.getByLabelText('icon_information')).toHaveStyle(
       `color: ${COLORS.black}`
     )
-    getByLabelText('closeIcon').click()
+    fireEvent.click(screen.getByLabelText('closeIcon'))
     expect(props.onClick).toHaveBeenCalled()
   })
 })

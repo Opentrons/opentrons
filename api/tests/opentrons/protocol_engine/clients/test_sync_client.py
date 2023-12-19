@@ -31,6 +31,7 @@ from opentrons.protocol_engine.types import (
     Liquid,
     LabwareMovementStrategy,
     LabwareOffsetVector,
+    AddressableOffsetVector,
 )
 
 
@@ -262,6 +263,74 @@ def test_move_to_well(
         force_direct=True,
         minimum_z_height=4.56,
         speed=7.89,
+    )
+
+    assert result == response
+
+
+def test_move_to_addressable_area(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move to addressable area command."""
+    request = commands.MoveToAddressableAreaCreate(
+        params=commands.MoveToAddressableAreaParams(
+            pipetteId="123",
+            addressableAreaName="abc",
+            offset=AddressableOffsetVector(x=3, y=2, z=1),
+            forceDirect=True,
+            minimumZHeight=4.56,
+            speed=7.89,
+        )
+    )
+    response = commands.MoveToAddressableAreaResult(position=DeckPoint(x=4, y=5, z=6))
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_to_addressable_area(
+        pipette_id="123",
+        addressable_area_name="abc",
+        offset=AddressableOffsetVector(x=3, y=2, z=1),
+        force_direct=True,
+        minimum_z_height=4.56,
+        speed=7.89,
+    )
+
+    assert result == response
+
+
+def test_move_to_addressable_area_for_drop_tip(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move to addressable area for drop tip command."""
+    request = commands.MoveToAddressableAreaForDropTipCreate(
+        params=commands.MoveToAddressableAreaForDropTipParams(
+            pipetteId="123",
+            addressableAreaName="abc",
+            offset=AddressableOffsetVector(x=3, y=2, z=1),
+            forceDirect=True,
+            minimumZHeight=4.56,
+            speed=7.89,
+            alternateDropLocation=True,
+        )
+    )
+    response = commands.MoveToAddressableAreaForDropTipResult(
+        position=DeckPoint(x=4, y=5, z=6)
+    )
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_to_addressable_area_for_drop_tip(
+        pipette_id="123",
+        addressable_area_name="abc",
+        offset=AddressableOffsetVector(x=3, y=2, z=1),
+        force_direct=True,
+        minimum_z_height=4.56,
+        speed=7.89,
+        alternate_drop_location=True,
     )
 
     assert result == response

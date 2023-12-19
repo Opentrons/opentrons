@@ -16,14 +16,17 @@ from typing import (
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
-from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
+from opentrons.protocols.api_support.deck_type import (
+    NoTrashDefinedError,
+    should_load_fixed_trash_for_python_protocol,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -31,7 +34,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._types import OffDeckType, StagingSlotName
+from ._types import OffDeckType
 from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
@@ -47,6 +50,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
+from ._trash_bin import TrashBin
 from ._waste_chute import WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
@@ -137,7 +141,26 @@ class ProtocolContext(CommandPublisher):
             mount: None for mount in Mount
         }
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
+
+        # With the addition of Moveable Trashes and Waste Chute support, it is not necessary
+        # to ensure that the list of "disposal locations", essentially the list of trashes,
+        # is initialized correctly on protocols utilizing former API versions prior to 2.16
+        # and also to ensure that any protocols after 2.16 intialize a Fixed Trash for OT-2
+        # protocols so that no load trash bin behavior is required within the protocol itself.
+        # Protocols prior to 2.16 expect the Fixed Trash to exist as a Labware object, while
+        # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
+
         self._load_fixed_trash()
+        if should_load_fixed_trash_for_python_protocol(self._api_version):
+            self._core.append_disposal_location(self.fixed_trash)
+        elif (
+            self._api_version >= APIVersion(2, 16)
+            and self._core.robot_type == "OT-2 Standard"
+        ):
+            _fixed_trash_trashbin = TrashBin(
+                location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
+            )
+            self._core.append_disposal_location(_fixed_trash_trashbin)
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -439,18 +462,52 @@ class ProtocolContext(CommandPublisher):
         )
 
     @requires_version(2, 16)
-    # TODO: Confirm official naming of "waste chute".
+    def load_trash_bin(self, location: DeckLocation) -> TrashBin:
+        """Load a trash bin on the deck of a Flex.
+
+        See :ref:`configure-trash-bin` for details.
+
+        If you try to load a trash bin on an OT-2, the API will raise an error.
+
+        :param location: The :ref:`deck slot <deck-slots>` where the trash bin is. The
+            location can be any unoccupied slot in column 1 or 3.
+
+            If you try to load a trash bin in column 2 or 4, the API will raise an error.
+        """
+        slot_name = validation.ensure_and_convert_deck_slot(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        if not isinstance(slot_name, DeckSlotName):
+            raise ValueError("Staging areas not permitted for trash bin.")
+        addressable_area_name = validation.ensure_and_convert_trash_bin_location(
+            location,
+            api_version=self._api_version,
+            robot_type=self._core.robot_type,
+        )
+        trash_bin = TrashBin(
+            location=slot_name, addressable_area_name=addressable_area_name
+        )
+        self._core.append_disposal_location(trash_bin)
+        return trash_bin
+
+    @requires_version(2, 16)
     def load_waste_chute(
         self,
-        *,
-        # TODO: Confirm official naming of "staging area slot".
-        with_staging_area_slot_d4: bool = False,
     ) -> WasteChute:
-        if with_staging_area_slot_d4:
-            raise NotImplementedError(
-                "The waste chute staging area slot is not currently implemented."
-            )
-        return WasteChute(with_staging_area_slot_d4=with_staging_area_slot_d4)
+        """Load the waste chute on the deck.
+
+        See :ref:`configure-waste-chute` for details, including the deck configuration
+        variants of the waste chute.
+
+        The deck plate adapter for the waste chute can only go in slot D3. If you try to
+        load another item in slot D3 after loading the waste chute, or vice versa, the
+        API will raise an error.
+        """
+        waste_chute = WasteChute()
+        self._core.append_disposal_location(waste_chute)
+        return waste_chute
 
     @requires_version(2, 15)
     def load_adapter(
@@ -791,7 +848,6 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
-        # TODO (spp: 2023-08-30): disallow loading Flex pipettes on OT-2 by checking robotType
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
         is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
@@ -832,10 +888,10 @@ class ProtocolContext(CommandPublisher):
                 log=logger,
             )
 
-        trash: Optional[Labware]
+        trash: Optional[Union[Labware, TrashBin]]
         try:
             trash = self.fixed_trash
-        except NoTrashDefinedError:
+        except (NoTrashDefinedError, APIVersionError):
             trash = None
 
         instrument = InstrumentContext(
@@ -995,17 +1051,33 @@ class ProtocolContext(CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def fixed_trash(self) -> Labware:
+    def fixed_trash(self) -> Union[Labware, TrashBin]:
         """The trash fixed to slot 12 of the robot deck.
 
-        It has one well and should be accessed like labware in your protocol.
+        In API Versions prior to 2.16 it has one well and should be accessed like labware in your protocol.
         e.g. ``protocol.fixed_trash['A1']``
+
+        In API Version 2.16 and above it returns a Trash fixture for OT-2 Protocols.
         """
+        if self._api_version >= APIVersion(2, 16):
+            if self._core.robot_type == "OT-3 Standard":
+                raise APIVersionError(
+                    "Fixed Trash is not supported on Flex protocols in API Version 2.16 and above."
+                )
+            disposal_locations = self._core.get_disposal_locations()
+            if len(disposal_locations) == 0:
+                raise NoTrashDefinedError(
+                    "No trash container has been defined in this protocol."
+                )
+            if isinstance(disposal_locations[0], TrashBin):
+                return disposal_locations[0]
+
         fixed_trash = self._core_map.get(self._core.fixed_trash)
         if fixed_trash is None:
             raise NoTrashDefinedError(
                 "No trash container has been defined in this protocol."
             )
+
         return fixed_trash
 
     def _load_fixed_trash(self) -> None:

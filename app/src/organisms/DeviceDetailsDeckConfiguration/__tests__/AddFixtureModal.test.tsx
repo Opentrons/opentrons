@@ -1,10 +1,14 @@
 import * as React from 'react'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+import {
+  getFixtureDisplayName,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
@@ -49,20 +53,21 @@ describe('Touchscreen AddFixtureModal', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText, getAllByText }] = render(props)
-    getByText('Add to slot D3')
-    getByText(
+    render(props)
+    screen.getByText('Add to slot D3')
+    screen.getByText(
       'Choose a fixture below to add to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Staging area slot')
-    getByText('Trash bin')
-    getByText('Waste chute only')
-    expect(getAllByText('Add').length).toBe(6)
+    screen.getByText('Staging area slot')
+    screen.getByText('Trash bin')
+    screen.getByText('Waste chute')
+    expect(screen.getAllByText('Add').length).toBe(2)
+    expect(screen.getAllByText('Select options').length).toBe(1)
   })
 
   it('should a mock function when tapping app button', () => {
-    const [{ getAllByText }] = render(props)
-    getAllByText('Add')[0].click()
+    render(props)
+    fireEvent.click(screen.getAllByText('Add')[0])
     expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
   })
 })
@@ -85,44 +90,74 @@ describe('Desktop AddFixtureModal', () => {
   })
 
   it('should render text and buttons slot D3', () => {
-    const [{ getByText, getAllByRole }] = render(props)
-    getByText('Add to slot D3')
-    getByText(
+    render(props)
+    screen.getByText('Add to slot D3')
+    screen.getByText(
       'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Staging area slot')
-    getByText('Trash bin')
-    getByText('Waste chute only')
-    expect(getAllByRole('button', { name: 'Add' }).length).toBe(6)
+    screen.getByText('Staging area slot')
+    screen.getByText('Trash bin')
+    screen.getByText('Waste chute')
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
   })
 
   it('should render text and buttons slot A1', () => {
     props = { ...props, cutoutId: 'cutoutA1' }
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Add to slot A1')
-    getByText(
+    render(props)
+    screen.getByText('Add to slot A1')
+    screen.getByText(
       'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Trash bin')
-    getByRole('button', { name: 'Add' })
+    screen.getByText('Trash bin')
+    screen.getByRole('button', { name: 'Add' })
   })
 
   it('should render text and buttons slot B3', () => {
     props = { ...props, cutoutId: 'cutoutB3' }
-    const [{ getByText, getAllByRole }] = render(props)
-    getByText('Add to slot B3')
-    getByText(
+    render(props)
+    screen.getByText('Add to slot B3')
+    screen.getByText(
       'Add this fixture to your deck configuration. It will be referenced during protocol analysis.'
     )
-    getByText('Staging area slot')
-    getByText('Trash bin')
-    expect(getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    screen.getByText('Staging area slot')
+    screen.getByText('Trash bin')
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
   })
 
   it('should call a mock function when clicking add button', () => {
     props = { ...props, cutoutId: 'cutoutA1' }
-    const [{ getByRole }] = render(props)
-    getByRole('button', { name: 'Add' }).click()
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
+  })
+
+  it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Select options' }))
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(
+      WASTE_CHUTE_FIXTURES.length
+    )
+
+    WASTE_CHUTE_FIXTURES.forEach(cutoutId => {
+      const displayText = getFixtureDisplayName(cutoutId)
+      screen.getByText(displayText)
+    })
+  })
+
+  it('should allow a user to exit the Waste Chute submenu by clicking "go back"', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Select options' }))
+
+    fireEvent.click(screen.getByText('Go back'))
+    screen.getByText('Staging area slot')
+    screen.getByText('Trash bin')
+    screen.getByText('Waste chute')
+    expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(2)
+    expect(
+      screen.getAllByRole('button', { name: 'Select options' }).length
+    ).toBe(1)
   })
 })

@@ -9,14 +9,15 @@ async def test_set_run_func(decoy: Decoy) -> None:
     run_func = decoy.mock(is_async=True)
     cleanup_func = decoy.mock(is_async=True)
 
-    subject = TaskQueue(cleanup_func=cleanup_func)
+    subject = TaskQueue()  # cleanup_func=cleanup_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.set_run_func(func=run_func)
     subject.start()
     await subject.join()
 
     decoy.verify(
         await run_func(),
-        await cleanup_func(error=None),
+        await cleanup_func(None),
     )
 
 
@@ -25,7 +26,8 @@ async def test_passes_args(decoy: Decoy) -> None:
     run_func = decoy.mock(is_async=True)
     cleanup_func = decoy.mock(is_async=True)
 
-    subject = TaskQueue(cleanup_func=cleanup_func)
+    subject = TaskQueue()  # cleanup_func=cleanup_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.set_run_func(func=run_func, hello="world")
     subject.start()
     await subject.join()
@@ -41,18 +43,20 @@ async def test_cleanup_gets_run_error(decoy: Decoy) -> None:
 
     decoy.when(await run_func()).then_raise(error)
 
-    subject = TaskQueue(cleanup_func=cleanup_func)
+    subject = TaskQueue()  # cleanup_func=cleanup_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.set_run_func(func=run_func)
     subject.start()
     await subject.join()
 
-    decoy.verify(await cleanup_func(error=error))
+    decoy.verify(await cleanup_func(error))
 
 
 async def test_join_waits_for_start(decoy: Decoy) -> None:
     """It should wait until the queue is started when join is called."""
     cleanup_func = decoy.mock(is_async=True)
-    subject = TaskQueue(cleanup_func=cleanup_func)
+    subject = TaskQueue()  # cleanup_func=cleanup_func)
+    subject.set_cleanup_func(func=cleanup_func)
     join_task = asyncio.create_task(subject.join())
 
     await asyncio.sleep(0)
@@ -67,11 +71,12 @@ async def test_start_runs_stuff_once(decoy: Decoy) -> None:
     run_func = decoy.mock(is_async=True)
     cleanup_func = decoy.mock(is_async=True)
 
-    subject = TaskQueue(cleanup_func=cleanup_func)
+    subject = TaskQueue()  # leanup_func=cleanup_func)
+    subject.set_cleanup_func(func=cleanup_func)
     subject.set_run_func(func=run_func)
     subject.start()
     subject.start()
     await subject.join()
 
     decoy.verify(await run_func(), times=1)
-    decoy.verify(await cleanup_func(error=None), times=1)
+    decoy.verify(await cleanup_func(None), times=1)

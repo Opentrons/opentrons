@@ -103,7 +103,7 @@ def test_get_definition(subject: LabwareCore) -> None:
 def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
     """It should get the labware's user-provided label, if any."""
     decoy.when(
-        mock_engine_client.state.labware.get_display_name("cool-labware")
+        mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("Cool Label")
 
     subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
@@ -149,7 +149,7 @@ def test_get_name_load_name(subject: LabwareCore) -> None:
 def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
     """It should get the user display name when one is defined."""
     decoy.when(
-        mock_engine_client.state.labware.get_display_name("cool-labware")
+        mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("my cool display name")
 
     subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)

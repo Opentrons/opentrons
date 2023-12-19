@@ -1,12 +1,15 @@
 import { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV3'
-import { blowout } from '../commandCreators/atomic/blowout'
-import { InvariantContext } from '../types'
+import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 import {
   blowoutUtil,
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
-  wasteChuteCommandsUtil,
 } from '../utils'
+import {
+  blowOutInPlace,
+  moveToAddressableArea,
+  blowout,
+} from '../commandCreators/atomic'
 import { curryCommandCreator } from '../utils/curryCommandCreator'
 import {
   DEFAULT_PIPETTE,
@@ -16,7 +19,9 @@ import {
   BLOWOUT_FLOW_RATE,
   BLOWOUT_OFFSET_FROM_TOP_MM,
   makeContext,
+  getInitialRobotStateStandard,
 } from '../fixtures'
+import type { RobotState, InvariantContext } from '../types'
 jest.mock('../utils/curryCommandCreator')
 
 const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<
@@ -33,6 +38,7 @@ let blowoutArgs: {
   flowRate: number
   offsetFromTopMm: number
   invariantContext: InvariantContext
+  prevRobotState: RobotState
 }
 describe('blowoutUtil', () => {
   let invariantContext: InvariantContext
@@ -50,6 +56,7 @@ describe('blowoutUtil', () => {
       offsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
       invariantContext,
       blowoutLocation: null,
+      prevRobotState: getInitialRobotStateStandard(invariantContext),
     }
     curryCommandCreatorMock.mockClear()
   })
@@ -74,7 +81,7 @@ describe('blowoutUtil', () => {
         [wasteChuteId]: {
           id: wasteChuteId,
           name: 'wasteChute',
-          location: 'D3',
+          location: 'cutoutD3',
         },
       },
     }
@@ -86,14 +93,16 @@ describe('blowoutUtil', () => {
       blowoutLocation: wasteChuteId,
     })
     expect(curryCommandCreatorMock).toHaveBeenCalledWith(
-      wasteChuteCommandsUtil,
+      moveToAddressableArea,
       {
-        addressableAreaName: '1and8ChannelWasteChute',
-        type: 'blowOut',
+        addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
         pipetteId: blowoutArgs.pipette,
-        flowRate: 2.3,
       }
     )
+    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowOutInPlace, {
+      flowRate: 2.3,
+      pipetteId: blowoutArgs.pipette,
+    })
   })
   it('blowoutUtil curries blowout with dest plate params', () => {
     blowoutUtil({

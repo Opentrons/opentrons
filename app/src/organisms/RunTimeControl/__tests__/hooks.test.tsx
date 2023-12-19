@@ -1,6 +1,6 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import { UseQueryResult } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook } from '@testing-library/react'
 import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
 import {

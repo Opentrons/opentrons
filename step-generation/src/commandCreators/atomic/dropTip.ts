@@ -5,6 +5,10 @@ interface DropTipArgs {
   dropTipLocation: string
 }
 
+//  NOTE(jr, 12/1/23): this atomic command is not in use currently for PD 8.0
+//  since we only support dropping tip into the waste chute or trash bin
+//  which are both addressableAreas (so the commands are moveToAddressableArea
+//  and dropTipInPlace) We will use this again when we add return tip
 /** Drop tip if given pipette has a tip. If it has no tip, do nothing. */
 export const dropTip: CommandCreator<DropTipArgs> = (
   args,
@@ -25,8 +29,6 @@ export const dropTip: CommandCreator<DropTipArgs> = (
       key: uuid(),
       params: {
         pipetteId: pipette,
-        //  TODO(jr, 10/02/23): this param will probably be slightly changed in order to drop tip to waste chute
-        //  since there is no labwareId or wellName for it
         labwareId: dropTipLocation,
         wellName: 'A1',
       },

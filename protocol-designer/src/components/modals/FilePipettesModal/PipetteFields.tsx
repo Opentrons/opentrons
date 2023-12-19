@@ -14,17 +14,14 @@ import {
   OT2_PIPETTES,
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
+  RIGHT,
   RobotType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { FormPipettesByMount } from '../../../step-forms'
-import {
-  getAllowAllTipracks,
-  getAllow96Channel,
-} from '../../../feature-flags/selectors'
-import { RIGHT } from '@opentrons/shared-data/js/constants'
+import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
 
@@ -32,6 +29,8 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
+import { ThunkDispatch } from 'redux-thunk'
+import { BaseState } from '../../../types'
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
@@ -90,8 +89,7 @@ export function PipetteFields(props: Props): JSX.Element {
   } = props
 
   const allowAllTipracks = useSelector(getAllowAllTipracks)
-  const allow96Channel = useSelector(getAllow96Channel)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const allLabware = useSelector(getLabwareDefsByURI)
   const initialTabIndex = props.initialTabIndex || 1
 
@@ -105,7 +103,7 @@ export function PipetteFields(props: Props): JSX.Element {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
 
-    const filter96 = !allow96Channel || mount === RIGHT ? ['p1000_96'] : []
+    const filter96 = mount === RIGHT ? ['p1000_96'] : []
 
     return (
       <Flex width="13.8rem">

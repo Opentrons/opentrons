@@ -3,8 +3,7 @@ import { createStore, Store } from 'redux'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { resetAllWhenMocks, when } from 'jest-when'
-import { waitFor } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
+import { waitFor, renderHook } from '@testing-library/react'
 
 import { STORED_PROTOCOL_ANALYSIS } from '../__fixtures__/storedProtocolAnalysis'
 import { useTrackCreateProtocolRunEvent } from '../useTrackCreateProtocolRunEvent'
@@ -37,7 +36,7 @@ const PROTOCOL_PROPERTIES = { protocolType: 'python' } as ProtocolAnalyticsData
 
 let mockTrackEvent: jest.Mock
 let mockGetProtocolRunAnalyticsData: jest.Mock
-let wrapper: React.FunctionComponent<{}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 let store: Store<any> = createStore(jest.fn(), {})
 
 describe('useTrackCreateProtocolRunEvent hook', () => {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   instrumentsResponseLeftPipetteFixture,
@@ -13,7 +13,7 @@ const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
 describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   it('returns attached pipettes', () => {
     mockUseInstrumentsQuery.mockReturnValue({
       data: {
