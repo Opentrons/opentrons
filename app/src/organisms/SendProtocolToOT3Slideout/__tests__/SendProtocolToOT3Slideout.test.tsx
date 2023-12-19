@@ -180,7 +180,7 @@ describe('SendProtocolToOT3Slideout', () => {
       { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
     ])
     mockGetReachableRobots.mockReturnValue([
-      { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
+      { ...mockReachableRobot, robotModel: 'OT-3 Standard' },
     ])
     screen.getByText('opentrons-robot-name')
     screen.getByText('2 unavailable robots are not listed.')

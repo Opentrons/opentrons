@@ -191,7 +191,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
     ])
     mockGetReachableRobots.mockReturnValue([
-      { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
+      { ...mockReachableRobot, robotModel: 'OT-3 Standard' },
     ])
     screen.getByText('opentrons-robot-name')
     screen.getByText('2 unavailable or busy robots are not listed.')
