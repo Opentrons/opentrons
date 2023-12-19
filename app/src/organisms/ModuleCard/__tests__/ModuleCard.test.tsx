@@ -260,7 +260,9 @@ describe('ModuleCard', () => {
       .calledWith(expect.any(Object))
       .mockReturnValue(RUN_STATUS_IDLE)
     when(mockUseIsFlex).calledWith(props.robotName).mockReturnValue(true)
-    when(mockUseIsEstopNotDisengaged).calledWith(props.robotName).mockReturnValue(false)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(props.robotName)
+      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
