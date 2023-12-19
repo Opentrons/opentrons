@@ -182,6 +182,9 @@ describe('useLaunchLPC hook', () => {
         maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
         labwareDef: mockLabwareDef,
       })
+    })
+
+    await waitFor(() => {
       expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
         labwareOffsets: mockCurrentOffsets.map(
           ({ vector, location, definitionUri }) => ({
@@ -191,6 +194,9 @@ describe('useLaunchLPC hook', () => {
           })
         ),
       })
+    })
+
+    await waitFor(() => {
       expect(result.current.LPCWizard).not.toBeNull()
     })
     renderWithProviders(result.current.LPCWizard ?? <></>)
