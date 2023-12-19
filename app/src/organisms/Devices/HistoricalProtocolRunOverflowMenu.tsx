@@ -33,10 +33,10 @@ import {
 } from '../../redux/analytics'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Run } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
-import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
