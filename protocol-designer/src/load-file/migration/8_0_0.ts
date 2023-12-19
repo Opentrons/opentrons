@@ -67,6 +67,20 @@ export const migrateFile = (
     },
   ]
 
+  const migrateCommands = (
+    v7Commands: ProtocolFileV7<{}>['commands']
+  ): ProtocolFile['commands'] => {
+    return v7Commands.filter(
+      v7Command =>
+        !(
+          v7Command.commandType === 'loadLabware' &&
+          v7Command.params.labwareId === 'fixedTrash'
+        )
+    )
+  }
+
+  const migratedV7Commands = migrateCommands(commands)
+
   const newLabwareLocationUpdate: LabwareLocationUpdate = Object.keys(
     labwareLocationUpdate
   ).reduce((acc: LabwareLocationUpdate, labwareId: string) => {
@@ -178,7 +192,7 @@ export const migrateFile = (
 
   const commandv8Mixin: CommandV8Mixin = {
     commandSchemaId: 'opentronsCommandSchemaV8',
-    commands: [...commands, ...trashMoveToAddressableAreaCommand],
+    commands: [...migratedV7Commands, ...trashMoveToAddressableAreaCommand],
   }
 
   const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {
