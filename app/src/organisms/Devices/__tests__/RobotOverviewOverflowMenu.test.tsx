@@ -18,9 +18,10 @@ import { useCanDisconnect } from '../../../resources/networking/hooks'
 import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { useIsRobotBusy } from '../hooks'
 import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
 import type { State } from '../../../redux/types'
 
@@ -35,6 +36,7 @@ jest.mock(
 jest.mock('../../ChooseProtocolSlideout')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../RobotSettings/UpdateBuildroot')
+jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -60,6 +62,9 @@ const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
 >
 const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
   typeof useCanDisconnect
+>
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
 >
 
 const render = (
@@ -98,6 +103,9 @@ describe('RobotOverviewOverflowMenu', () => {
     when(mockUseCanDisconnect)
       .calledWith(mockConnectableRobot.name)
       .mockReturnValue(true)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -278,5 +286,20 @@ describe('RobotOverviewOverflowMenu', () => {
     const btn = getByRole('button')
     fireEvent.click(btn)
     expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()
+  })
+
+  it('should render disabled menu items except restart robot and robot settings when e-stop is pressed', () => {
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue(true)
+    const { getByRole } = render(props)
+    getByRole('button').click()
+    expect(getByRole('button', { name: 'Run a protocol' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Restart robot' })).toBeEnabled()
+    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(
+      getByRole('button', { name: 'Disconnect from network' })
+    ).toBeDisabled()
+    expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 })
