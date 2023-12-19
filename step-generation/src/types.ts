@@ -1,4 +1,3 @@
-import type { Mount } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -7,6 +6,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   LabwareLocation,
 } from '@opentrons/shared-data'
+import type { Mount } from '@opentrons/components'
 import type {
   CreateCommand,
   LabwareDefinition2,
