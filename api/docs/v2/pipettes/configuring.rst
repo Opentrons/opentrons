@@ -127,7 +127,70 @@ Now, when you configure the nozzle layout, you can use the appropriate list as t
 Tip Pickup and Conflicts
 ------------------------
 
-The horizontally offset position of the 96-channel pipette during partial tip pickup also places restrictions on where you can put other tall labware on the deck.
+The horizontally offset position of the 96-channel pipette during partial tip pickup also places restrictions on where you can put other tall labware on the deck. 
+
+Using Column 12
+^^^^^^^^^^^^^^^
+
+All of the examples in this section will use a 96-channel pipette configured to pick up tips with column 12. This is the *only* partial nozzle configuration for which the API will automatically detect labware placed in locations that could cause collisions, and raise errors to prevent them.
+
+.. code-block:: python
+
+    pipette.configure_nozzle_layout(
+        style=COLUMN,
+        start="A12",
+    )
+
+When using column 12, the pipette overhangs space to the left of wherever it is picking up tips or pipetting. For this reason, it's a good idea to organize tip racks front to back on the deck. If you place them side by side, the rack to the right will be inaccessible. For example, let's load three tip racks in the front left corner of the deck::
+
+    tips_C1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
+    tips_D1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
+    tips_D2 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D2")
+
+Now the pipette will be able to access the racks in column 1 only. ``pick_up_tip(tips_D2["A1"])`` will raise an error due to the tip rack immediately to its left, in slot D1. There a couple of ways to avoid this error:
+
+    - Load the tip rack in a different slot, with no tall labware to its left.
+    - Use all the tips in slot D1 first, and then use :py:meth:`.move_labware` to make space for the pipette before picking up tips from D2.
+
+You would get a similar error trying to aspirate from or dispense into a well plate in slot D3, since there is a tip rack to the left.
+
+.. tip::
+
+    When using column 12 for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
+
+Using Column 1
+^^^^^^^^^^^^^^
+
+If your application can't accommodate a deck layout that works well with column 12, you can configure the 96-channel pipette to pick up tips with column 1::
+
+    pipette.configure_nozzle_layout(
+        style=COLUMN,
+        start="A1",
+    )
+
+This configuration has several drawbacks compared to using column 12.
+
+First, tip tracking is not available with column 1. You must always specify a ``location`` parameter for :py:meth:`.pick_up_tip`. This *requires careful tip tracking* so you don't place the pipette over more than a single column of unused tips at once. You can write some additional code to manage valid tip pickup locations, like this::
+
+    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
+    pipette.configure_nozzle_layout(style=COLUMN, start="A1")
+    row_a = tiprack.rows()[0]
+    pipette.pick_up_tip(row_a.pop())  # pick up A12-H12
+    pipette.drop_tip()
+    pipette.pick_up_tip(row_a.pop())  # pick up A11-H11
+    pipette.drop_tip()
+
+This code first constructs a list of all the wells in row A of the tip rack. Then, when picking up a tip, instead of referencing one of those wells directly, the ``location`` is set to ``row_a.pop()``. This uses the built-in :py:meth:`pop` method to get the last item from the list and remove it from the list. If you keep using this approach to pick up tips, you'll get an error once the tip rack is empty — not from the API, but from Python itself, since you're trying to ``pop`` an item from an empty list.
+
+While you can easily add tip tracking to a column 1 configuration, you will still be operating without the collision detection the API has for column 12. 
+
+.. warning::
+
+    The API *will not* raise errors for potential labware crashes when using a column 1 partial configuration. If you must use one:
+
+    - Plan your deck layout carefully. Make a diagram and visualize everywhere the pipette will travel.
+    - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
+    - Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
 
 .. _pipette-volume-modes:
 
