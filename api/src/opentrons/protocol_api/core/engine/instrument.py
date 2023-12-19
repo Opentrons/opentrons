@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, cast, Union
+from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.types import Location, Mount
 from opentrons.hardware_control import SyncHardwareAPI
@@ -180,6 +181,20 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             in_place: whether this is a in-place command.
             push_out: The amount to push the plunger below bottom position.
         """
+        # TODO: Is this the proper place to put this version check?
+        # Maybe take in a `clamp: bool` param?
+        # TODO: Do we also need to clamp volumes <0? Have negative dispense volumes
+        # worked historically?
+        # TODO: Reference docs
+        if self._protocol_core.api_version < APIVersion(2, 16):
+            # In older API versions, when you try to dispense more than you can,
+            # it gets clamped.
+            volume = max(volume, self.get_current_volume())
+        else:
+            # Newer API versions raise an error if you try to dispense more than
+            # you can. Let the error come from Protocol Engine's validation.
+            pass
+
         if well_core is None:
             if not in_place:
                 if isinstance(location, (TrashBin, WasteChute)):
@@ -733,7 +748,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         primary_nozzle: Optional[str],
         front_right_nozzle: Optional[str],
     ) -> None:
-
         if style == NozzleLayout.COLUMN:
             configuration_model: NozzleLayoutConfigurationType = (
                 ColumnNozzleLayoutConfiguration(
