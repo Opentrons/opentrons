@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -40,8 +41,9 @@ export function UpdateResultsModal(
   if (instrument?.ok) {
     instrumentName =
       instrument?.instrumentType === 'pipette'
-        ? instrument?.instrumentName
-        : instrument.instrumentType
+        ? getPipetteModelSpecs(instrument.instrumentModel)?.displayName ??
+          'pipette'
+        : 'Flex Gripper'
   }
   return (
     <>
