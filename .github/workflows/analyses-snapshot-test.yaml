@@ -1,9 +1,6 @@
 name: Analyses Snapshot Test
 
 on:
-  push:
-    branches:
-      - 7.1-analyses-battery
   workflow_dispatch:
     inputs:
       TARGET:
@@ -70,5 +67,5 @@ jobs:
           title: 'Evaluate Analyses Snapshot Update ${{ env.TARGET }}'
           body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
           branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
-          base: ${{ env.TARGET }}
+          base: ${{ env.TEST_SOURCE}}
 
