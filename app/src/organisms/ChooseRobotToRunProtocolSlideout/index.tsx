@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { OPENTRONS_USB, ROBOT_MODEL_OT2 } from '../../redux/discovery'
+import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'

@@ -201,7 +201,7 @@ describe('SendProtocolToOT3Slideout', () => {
       onCloseClick: jest.fn(),
       isExpanded: true,
     })
-    expect(screen.queryByText('opentrons-robot-name')).toBeInTheDocument()
+    expect(screen.getByText('opentrons-robot-name')).toBeInTheDocument()
   })
   it('does not render an available robot option for a connectable OT-2', () => {
     mockGetConnectableRobots.mockReturnValue([
