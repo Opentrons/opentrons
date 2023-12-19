@@ -41,7 +41,7 @@ Assuming the ``import`` statements from above, here is the start of a protocol t
     requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
-        partial_pickup_tips = protocol.load_labware(
+        tip_rack = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_1000ul",
             location="D3"
         )
@@ -49,7 +49,7 @@ Assuming the ``import`` statements from above, here is the start of a protocol t
         pipette.configure_nozzle_layout(
             style=COLUMN,
             start="A12",
-            tip_racks=[partial_pickup_tips]
+            tip_racks=[tip_rack]
         )
 
 .. versionadded: 2.16
@@ -66,7 +66,7 @@ Finally, we configure the nozzle layout, with three arguments.
     - The ``start`` parameter accepts a nozzle name, representing the back-left nozzle in the layout, as a string. ``"A12"`` tells the pipette to use its rightmost column of nozzles for pipetting.
     - The ``tip_racks`` parameter tells the pipette which racks to use for tip tracking, just like when loading a pipette.
 
-Now that the pipette is configured in column mode, pipetting actions will use a single column::
+In this configuration, pipetting actions will use a single column::
 
     # configured in COLUMN mode
     pipette.pick_up_tip()  # picks up A1-H1 from tip rack
@@ -82,9 +82,50 @@ Now that the pipette is configured in column mode, pipetting actions will use a 
 Tip Rack Adapters
 -----------------
 
+Partial tip pickup requires a tip rack that is placed directly in a deck slot. When picking up fewer than 96 tips, the 96-channel pipette lowers onto the tip rack in a horizontally offset position. If the tip rack were in the tip rack adapter, the pipette would collide with the adapter's posts, which protrude above the top of the tip rack. If you configure a partial nozzle layout and then call ``pick_up_tip()`` on a tip rack that's in an adapter, the API will raise an error.
 
-Tip Pickup and Return Behavior
-------------------------------
+On the other hand, full tip pickup requires the tip rack adapter. If the 96-channel pipette is in a full layout, either by default or by configuring ``style=ALL``, and you then call ``pick_up_tip()`` on a tip rack that's not in an adapter, the API will raise an error.
+
+If your protocol switches between full and partial pickup, you may want to organize your tip racks into lists, depending on whether they're loaded on adapters or not.
+
+.. code-block:: python
+
+    tips_1 = protocol.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "D1"
+    )
+    tips_2 = protocol.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "D2"
+    )
+    tips_3 = protocol.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "C1",
+        adapter="opentrons_flex_96_tiprack_adapter"
+    )
+    tips_4 = protocol.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "C2",
+        adapter="opentrons_flex_96_tiprack_adapter"
+    )
+
+    partial_tip_racks = [tips_1, tips_2]
+    full_tip_racks = [tips_3, tips_4]
+
+Now, when you configure the nozzle layout, you can use the appropriate list as the value of ``tip_racks``::
+
+    pipette.configure_nozzle_layout(
+        style=COLUMN,
+        start="A12",
+        tip_racks=partial_tip_racks
+    )
+    # partial pipetting commands go here
+
+    pipette.configure_nozzle_layout(
+        style=ALL,
+        tip_racks=full_tip_racks
+    )
+    pipette.pick_up_tip()  # picks up full rack in C1
+
+
+Tip Pickup and Conflicts
+------------------------
 
 .. _pipette-volume-modes:
 
