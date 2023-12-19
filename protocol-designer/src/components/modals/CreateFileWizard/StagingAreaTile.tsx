@@ -120,6 +120,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
             deckConfig={updatedSlots}
             handleClickAdd={handleClickAdd}
             handleClickRemove={handleClickRemove}
+            showExpansion={false}
           />
         </Flex>
         <Flex
