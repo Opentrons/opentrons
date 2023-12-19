@@ -63,6 +63,7 @@ import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -79,6 +80,7 @@ export function RunSummary(): JSX.Element {
   const host = useHost()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const isRunCurrent = Boolean(runRecord?.data?.current)
+  const mostRecentRunId = useMostRecentRunId()
   const { data: attachedInstruments } = useInstrumentsQuery()
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
@@ -130,7 +132,11 @@ export function RunSummary(): JSX.Element {
 
   const handleReturnToDash = (): void => {
     const { mount, specs } = pipettesWithTip[0] || {}
-    if (isRunCurrent && pipettesWithTip.length !== 0 && specs != null) {
+    if (
+      mostRecentRunId === runId &&
+      pipettesWithTip.length !== 0 &&
+      specs != null
+    ) {
       handleTipsAttachedModal(
         mount,
         specs,

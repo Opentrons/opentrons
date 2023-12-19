@@ -6,6 +6,7 @@ from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    UnexpectedTipRemovalError,
 )
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -26,7 +27,6 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons_shared_data.errors.exceptions import UnexpectedTipRemovalError
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -860,6 +860,14 @@ class InstrumentContext(publisher.CommandPublisher):
         )
 
         if location is None:
+            if not self._core.is_tip_tracking_available():
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available for the current pipette"
+                    " nozzle configuration. We suggest switching to a configuration"
+                    " that supports automatic tip tracking or specifying the exact tip"
+                    " to pick up."
+                )
+
             tip_rack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
@@ -950,7 +958,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See :ref:`pipette-drop-tip` for examples.
 
         If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop
-        the attached tip into its default :py:attr:`trash_container`.
+        the attached tip into its :py:attr:`trash_container`.
 
         Starting with API version 2.15, if the trash container is the default fixed
         trash, the API will instruct the pipette to drop tips in different locations
@@ -1530,12 +1538,14 @@ class InstrumentContext(publisher.CommandPublisher):
         This is the property used to determine where to drop tips and blow out liquids
         when calling :py:meth:`drop_tip` or :py:meth:`blow_out` without arguments.
 
-        On a Flex running a protocol with API version 2.16 or higher, ``trash_container`` is
-        the first ``TrashBin`` or ``WasteChute`` object loaded in the protocol.
-        On a Flex running a protocol with API version 2.15, ``trash_container`` is
-        a single-well fixed trash labware in slot D3.
-        On a an OT-2, ``trash_container`` is always a single-well fixed trash labware
-        in slot 12.
+        You can set this to a :py:obj:`Labware`, :py:obj:`TrashBin`, or :py:obj:`WasteChute`.
+
+        The default value depends on the robot type and API version:
+
+        - :py:obj:`ProtocolContext.fixed_trash`, if it exists.
+        - Otherwise, the first item previously loaded with
+          :py:obj:`ProtocolContext.load_trash_bin()` or
+          :py:obj:`ProtocolContext.load_waste_chute()`.
 
         .. versionchanged:: 2.16
             Added support for ``TrashBin`` and ``WasteChute`` objects.

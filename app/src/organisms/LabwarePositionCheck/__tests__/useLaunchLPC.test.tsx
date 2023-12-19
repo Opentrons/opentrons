@@ -182,17 +182,17 @@ describe('useLaunchLPC hook', () => {
         maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
         labwareDef: mockLabwareDef,
       })
+      expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
+        labwareOffsets: mockCurrentOffsets.map(
+          ({ vector, location, definitionUri }) => ({
+            vector,
+            location,
+            definitionUri,
+          })
+        ),
+      })
+      expect(result.current.LPCWizard).not.toBeNull()
     })
-    expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
-      labwareOffsets: mockCurrentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
-    })
-    expect(result.current.LPCWizard).not.toBeNull()
     renderWithProviders(result.current.LPCWizard ?? <></>)
     fireEvent.click(screen.getByText('exit'))
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(

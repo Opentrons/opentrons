@@ -107,6 +107,45 @@ describe('InterventionModal', () => {
     queryAllByText('D3')
   })
 
+  it('renders a move labware intervention modal given a move labware command - between staging area slots', () => {
+    props = {
+      ...props,
+      command: {
+        id: 'mockMoveLabwareCommandId',
+        key: 'mockMoveLabwareCommandKey',
+        commandType: 'moveLabware',
+        params: {
+          labwareId: 'mockLabwareId',
+          newLocation: {
+            addressableAreaName: 'C4',
+          },
+          strategy: 'manualMoveWithPause',
+        },
+        startedAt: 'fake_timestamp',
+        completedAt: 'fake_timestamp',
+        createdAt: 'fake_timestamp',
+        status: 'succeeded',
+      },
+      run: {
+        labware: [
+          {
+            id: 'mockLabwareId',
+            displayName: 'mockLabwareInStagingArea',
+            location: { slotName: 'B4' },
+            definitionUri: getLabwareDefURI(mockTipRackDefinition),
+          },
+        ],
+        modules: [],
+      } as any,
+    }
+    const { getByText, queryAllByText } = render(props)
+    getByText('Move labware on Otie')
+    getByText('Labware name')
+    getByText('mockLabwareInStagingArea')
+    queryAllByText('B4')
+    queryAllByText('C4')
+  })
+
   it('renders a move labware intervention modal given a move labware command - module starting point', () => {
     props = {
       ...props,

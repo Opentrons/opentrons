@@ -59,6 +59,7 @@ export function NameRobot(): JSX.Element {
   const history = useHistory()
   const trackEvent = useTrackEvent()
   const localRobot = useSelector(getLocalRobot)
+  const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
   const [name, setName] = React.useState<string>('')
   const [newName, setNewName] = React.useState<string>('')
@@ -105,7 +106,7 @@ export function NameRobot(): JSX.Element {
       }
       if (
         [...connectableRobots, ...reachableRobots].some(
-          robot => newName === robot.name
+          robot => newName === robot.name && robot.ip !== ipAddress
         )
       ) {
         errors.newRobotName = t('name_rule_error_exist')

@@ -180,4 +180,5 @@ export interface MoveToAddressableAreaParams {
   speed?: number
   minimumZHeight?: number
   forceDirect?: boolean
+  stayAtHighestPossibleZ?: boolean
 }
