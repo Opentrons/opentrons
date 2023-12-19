@@ -14,6 +14,7 @@ import type {
 import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
+  CreateCommand as CreateCommandV8,
   LabwareV2Mixin,
   LiquidV1Mixin,
   LoadPipetteCreateCommand,
@@ -22,6 +23,7 @@ import type {
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV8'
+import type { CreateCommand as CreateCommandV7 } from '@opentrons/shared-data/protocol/types/schemaV7'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration is to schema v8 and updates fixed trash by
@@ -68,8 +70,8 @@ export const migrateFile = (
   ]
 
   const migrateCommands = (
-    v7Commands: ProtocolFileV7<{}>['commands']
-  ): ProtocolFile['commands'] => {
+    v7Commands: CreateCommandV7[]
+  ): CreateCommandV8[] => {
     return v7Commands.filter(
       v7Command =>
         !(
