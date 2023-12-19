@@ -101,7 +101,7 @@ export function UpdateResultsModal(
                   t={t}
                   i18nKey="ready_to_use"
                   values={{
-                    instrument: capitalize(instrumentName),
+                    instrument: instrumentName,
                   }}
                   components={{
                     bold: <strong />,
