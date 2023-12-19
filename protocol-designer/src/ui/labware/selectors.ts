@@ -137,7 +137,6 @@ export const getLabwareOptions: Selector<Options> = createSelector(
       },
       []
     )
-
     return _sortLabwareDropdownOptions(labwareOptions)
   }
 )
