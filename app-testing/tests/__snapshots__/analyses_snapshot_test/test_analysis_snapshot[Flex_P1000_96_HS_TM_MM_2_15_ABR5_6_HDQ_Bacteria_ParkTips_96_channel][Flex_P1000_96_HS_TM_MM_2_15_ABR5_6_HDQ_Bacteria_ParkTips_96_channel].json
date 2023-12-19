@@ -252,6 +252,34 @@
                   ]
                 ]
               },
+              "A3": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
               "B1": {
                 "labwareOffset": [
                   [
@@ -3205,6 +3233,34 @@
                   ]
                 ]
               },
+              "A3": {
+                "labwareOffset": [
+                  [
+                    -71.09,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.15,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    1,
+                    1.45
+                  ]
+                ]
+              },
               "B1": {
                 "labwareOffset": [
                   [
@@ -3410,7 +3466,7 @@
             "yDimension": 85.48,
             "zDimension": 16.0
           },
-          "gripForce": 9.0,
+          "gripForce": 15.0,
           "gripHeightFromLabwareBottom": 10.0,
           "gripperOffsets": {},
           "groups": [
