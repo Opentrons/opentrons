@@ -124,7 +124,9 @@ export const RobotOverviewOverflowMenu = (
             setShowOverflowMenu(false)
           }}
         >
-          {isRobotOnWrongVersionOfSoftware && !isRobotUnavailable ? (
+          {isRobotOnWrongVersionOfSoftware &&
+          !isRobotUnavailable &&
+          !isEstopNotDisengaged ? (
             <MenuItem
               onClick={() => handleUpdateBuildroot(robot)}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(
