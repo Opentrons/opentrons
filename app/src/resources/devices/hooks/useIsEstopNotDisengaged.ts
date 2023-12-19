@@ -8,6 +8,7 @@ import { DISENGAGED } from '../../../organisms/EmergencyStop'
  * @param {string} robotName - The name of the robot.
  * @returns {boolean} Returns true if the emergency stop is not disengaged, false otherwise.
  * not disengaged cases are physically engaged, logically engaged, and not present(unplugged)
+ * For OT-2, the return is always false
  *
  * @example
  * const isNotDisengaged = useIsEstopNotDisengaged('Robot1');
@@ -19,5 +20,7 @@ export const useIsEstopNotDisengaged = (robotName: string): boolean => {
     enabled: isFlex,
   })
 
-  return estopStatus?.data.status !== DISENGAGED || estopError !== null
+  return isFlex
+    ? estopStatus?.data.status !== DISENGAGED || estopError !== null
+    : false
 }

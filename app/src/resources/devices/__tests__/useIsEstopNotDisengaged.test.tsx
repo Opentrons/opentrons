@@ -84,4 +84,12 @@ describe('useIsEstopNotDisengaged', () => {
     const isEstopNotDisengaged = useIsEstopNotDisengaged(ROBOT_NAME)
     expect(isEstopNotDisengaged).toBe(true)
   })
+  it('should return false when a robot is OT-2', () => {
+    when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(false)
+    mockUseEstopQuery.mockReturnValue({
+      data: mockPhysicallyEngagedStatus,
+    } as any)
+    const isEstopNotDisengaged = useIsEstopNotDisengaged(ROBOT_NAME)
+    expect(isEstopNotDisengaged).toBe(false)
+  })
 })
