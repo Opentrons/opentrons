@@ -122,7 +122,7 @@ const StagingAreasModalComponent = (
 
   return (
     <Form>
-      <Flex height="20rem" flexDirection={DIRECTION_COLUMN}>
+      <Flex height="23rem" flexDirection={DIRECTION_COLUMN}>
         <Flex
           justifyContent={JUSTIFY_END}
           alignItems={ALIGN_CENTER}
@@ -145,12 +145,12 @@ const StagingAreasModalComponent = (
           deckConfig={updatedSlots}
           handleClickAdd={handleClickAdd}
           handleClickRemove={handleClickRemove}
+          showExpansion={false}
         />
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_FLEX_END}
-        paddingTop="4rem"
         paddingRight={SPACING.spacing32}
         paddingBottom={SPACING.spacing32}
         gridGap={SPACING.spacing8}
