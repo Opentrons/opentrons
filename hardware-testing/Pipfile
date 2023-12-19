@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-opentrons = {editable = true, path = "./../api"}
+opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
 opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
-opentrons-hardware = {editable = true, path = "./../hardware"}
+opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 hardware-testing = { editable = true, path = "." }
 pyserial = "==3.5"
 
