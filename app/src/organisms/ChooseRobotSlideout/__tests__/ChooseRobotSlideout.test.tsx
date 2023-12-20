@@ -82,6 +82,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     screen.getByText('choose robot slideout title')
   })
@@ -93,6 +94,7 @@ describe('ChooseRobotSlideout', () => {
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
       isAnalysisError: true,
+      robotType: 'OT-2 Standard',
     })
     screen.getByText(
       'This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.'
@@ -105,6 +107,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     screen.getByText('opentrons-robot-name')
     screen.getByText('2 unavailable robots are not listed.')
@@ -117,6 +120,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     screen.getByText('opentrons-robot-name')
     expect(
@@ -130,6 +134,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })[1]
     const refreshButton = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
@@ -147,6 +152,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,
