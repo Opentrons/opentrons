@@ -12,7 +12,8 @@ stages:
     response:
       json:
         data: []
-        links: {}
+        links:
+          current: null
         meta:
           cursor: 0
           totalLength: 0

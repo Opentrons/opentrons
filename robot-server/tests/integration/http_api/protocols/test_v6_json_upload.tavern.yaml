@@ -98,6 +98,7 @@ stages:
                 location:
                   slotName: '12'
                 offsetId: null
+                displayName: null
               - id: sourcePlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
