@@ -275,8 +275,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)  # noqa: C901
-    def dispense(
+    @requires_version(2, 0)
+    def dispense(  # noqa: C901
         self,
         volume: Optional[float] = None,
         location: Optional[
