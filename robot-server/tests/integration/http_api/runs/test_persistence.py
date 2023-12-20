@@ -285,7 +285,7 @@ async def test_runs_completed_filled_started_at_none_persist(
     get_run_response = await client.get_run(run_id=run_id)
     run_data = get_run_response.json()["data"]
 
-    assert run_data['startedAt'] is None
+    assert run_data["startedAt"] is None
     assert datetime.fromisoformat(run_data["completedAt"]).timestamp() == pytest.approx(
         expected_completed_at.timestamp(), abs=2
     )

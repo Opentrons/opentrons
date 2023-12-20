@@ -16,7 +16,11 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 from robot_server.protocols.analysis_memcache import MemoryCache
-from robot_server.protocols.analysis_models import CompletedAnalysis, AnalysisResult, AnalysisStatus
+from robot_server.protocols.analysis_models import (
+    CompletedAnalysis,
+    AnalysisResult,
+    AnalysisStatus,
+)
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
