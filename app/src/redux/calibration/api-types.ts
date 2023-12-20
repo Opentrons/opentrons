@@ -11,7 +11,7 @@ import {
   CALIBRATION_SOURCE_LEGACY,
 } from './constants'
 
-import type { Mount } from '@opentrons/components'
+import type { PipetteMount } from '@opentrons/shared-data'
 
 export type DeckCalibrationStatus =
   | typeof DECK_CAL_STATUS_OK
@@ -106,7 +106,7 @@ export interface AllLabwareCalibrations {
 
 export interface PipetteOffsetCalibration {
   pipette: string
-  mount: Mount
+  mount: PipetteMount
   offset: [number, number, number]
   tiprack: string
   tiprackUri: string

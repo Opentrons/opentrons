@@ -23,6 +23,7 @@ import {
 import { createLogger } from './log'
 import { getProtocolSrcFilePaths } from './protocol-storage'
 
+import type { AxiosError } from 'axios'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type { Action, Dispatch } from './types'
@@ -103,8 +104,9 @@ async function usbListener(
       status: response.status,
       statusText: response.statusText,
     }
-  } catch (e) {
-    console.log(`axios request error ${e?.message ?? 'unknown'}`)
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e))
+      console.log(`axios request error ${e?.message ?? 'unknown'}`)
   }
 }
 

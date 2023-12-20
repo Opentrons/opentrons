@@ -89,7 +89,7 @@ export const PrimaryBtn: BtnComponent = styled(Btn)`
   }
 
   ${styleProps}
-`
+` as BtnComponent
 
 /**
  * Secondary button variant
@@ -118,7 +118,7 @@ export const SecondaryBtn: BtnComponent = styled(Btn)`
   }
 
   ${styleProps}
-`
+` as BtnComponent
 
 /**
  * New primary button variant used in app
@@ -148,7 +148,7 @@ export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
   }
 
   ${styleProps}
-`
+` as BtnComponent
 
 /**
  * New secondary button variant used in app
@@ -184,7 +184,8 @@ export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   }
 
   ${styleProps}
-`
+` as BtnComponent
+
 /**
  * Red primary button variant used in app
  *
@@ -203,7 +204,7 @@ export const NewAlertPrimaryBtn: BtnComponent = styled(NewPrimaryBtn)`
   }
 
   ${styleProps}
-`
+` as BtnComponent
 
 /**
  * Red secondary button variant used in app
@@ -223,7 +224,7 @@ export const NewAlertSecondaryBtn: BtnComponent = styled(NewSecondaryBtn)`
   }
 
   ${styleProps}
-`
+` as BtnComponent
 
 /**
  * Light secondary button variant
@@ -250,7 +251,7 @@ export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
   }
 
   ${styleProps}
-`
+` as BtnComponent
 
 /**
  * Tertiary button variant
@@ -259,4 +260,4 @@ export const LightSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
  */
 export const TertiaryBtn: BtnComponent = styled(LightSecondaryBtn)`
   border-width: 0;
-`
+` as BtnComponent

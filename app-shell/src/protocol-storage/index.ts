@@ -25,7 +25,9 @@ export const getParsedAnalysisFromPath = (
     return fse.readJsonSync(analysisPath)
   } catch (error) {
     return createFailedAnalysis(
-      error?.message ?? 'protocol analysis file cannot be parsed'
+      error instanceof Error
+        ? error.message
+        : 'protocol analysis file cannot be parsed'
     )
   }
 }

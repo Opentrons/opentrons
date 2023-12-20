@@ -23,7 +23,7 @@ import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 
-import type { Mount } from '@opentrons/components'
+import type { PipetteMount } from '@opentrons/shared-data'
 import type {
   CalibrationLabware,
   CalibrationSessionStep,
@@ -155,7 +155,7 @@ export function CalibratePipetteOffset(
             cleanUpAndExit={cleanUpAndExit}
             tipRack={tipRack}
             isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
+            mount={instrument?.mount.toLowerCase() as PipetteMount}
             calBlock={calBlock}
             currentStep={currentStep}
             sessionType={session.sessionType}

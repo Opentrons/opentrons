@@ -3,13 +3,13 @@ import styled from 'styled-components'
 import { BORDERS, COLORS, RESPONSIVENESS, SPACING } from '../ui-style-constants'
 import { StyleProps, styleProps } from '../primitives'
 import {
-  POSITION_FIXED,
-  POSITION_ABSOLUTE,
-  POSITION_RELATIVE,
-  POSITION_STICKY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  POSITION_STICKY,
 } from '../styles'
 export interface ModalShellProps extends StyleProps {
   /** Modal content */
@@ -22,6 +22,24 @@ export interface ModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
+}
+
+interface OverlayProps {
+  children?: React.ReactNode
+  'aria-label'?: string
+  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+}
+
+interface ContentAreaProps {
+  children?: React.ReactNode
+  zIndex: string | number
+}
+
+interface ModalAreaProps extends StyleProps {
+  isFullPage: boolean
+  backgroundColor?: string
+  children?: React.ReactNode
+  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
 /**
@@ -48,7 +66,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
   return (
     <Overlay
       aria-label="BackgroundOverlay_ModalShell"
-      onClick={e => {
+      onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
         e.stopPropagation()
         if (onOutsideClick != null) onOutsideClick(e)
       }}
@@ -56,7 +74,8 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
       <ContentArea zIndex={zIndex}>
         <ModalArea
           isFullPage={fullPage}
-          onClick={e => {
+          onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+            console.log(typeof e)
             e.stopPropagation()
           }}
           {...styleProps}
@@ -70,7 +89,7 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
   )
 }
 
-const Overlay = styled.div`
+const Overlay = styled.div<OverlayProps>`
   position: ${POSITION_FIXED};
   left: 0;
   right: 0;
@@ -84,7 +103,7 @@ const Overlay = styled.div`
     background-color: ${COLORS.darkBlack60};
   }
 `
-const ContentArea = styled.div<{ zIndex: string | number }>`
+const ContentArea = styled.div<ContentAreaProps>`
   display: flex;
   position: ${POSITION_ABSOLUTE};
   align-items: ${ALIGN_CENTER};
@@ -99,9 +118,7 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
   padding: ${SPACING.spacing16};
 `
 
-const ModalArea = styled.div<
-  { isFullPage: boolean; backgroundColor?: string } & StyleProps
->`
+const ModalArea = styled.div<ModalAreaProps>`
   position: ${POSITION_RELATIVE};
   overflow-y: ${OVERFLOW_AUTO};
   max-height: 100%;

@@ -15,7 +15,7 @@ export interface RenderWithProvidersOptions<State> extends RenderOptions {
   i18nInstance: React.ComponentProps<typeof I18nextProvider>['i18n']
 }
 
-export function renderWithProviders<State>(
+export function renderWithProviders<State extends unknown>(
   Component: React.ReactElement,
   options?: RenderWithProvidersOptions<State>
 ): [RenderResult, Store<State>] {

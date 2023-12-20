@@ -15,8 +15,13 @@ interface StyledDeckProps {
   trashCutoutId?: TrashCutoutId
 }
 
+interface StyleGProp {
+  deckFill: string
+  children?: React.ReactNode
+}
+
 // apply fill to .SLOT_BASE class from ot3_standard deck definition
-const StyledG = styled.g<Pick<StyledDeckProps, 'deckFill'>>`
+const StyledG = styled.g<StyleGProp>`
   .SLOT_BASE {
     fill: ${props => props.deckFill};
   }

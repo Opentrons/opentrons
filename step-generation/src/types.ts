@@ -1,12 +1,12 @@
 import {
+  HEATERSHAKER_MODULE_TYPE,
+  LabwareLocation,
+  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  LabwareLocation,
 } from '@opentrons/shared-data'
-import type { Mount } from '@opentrons/components'
+import type { PipetteMount } from '@opentrons/shared-data'
 import type {
   CreateCommand,
   LabwareDefinition2,
@@ -40,7 +40,7 @@ export interface LabwareTemporalProperties {
 }
 
 export interface PipetteTemporalProperties {
-  mount: Mount
+  mount: PipetteMount
   nozzles?: NozzleConfigurationStyle
 }
 

@@ -17,6 +17,11 @@ export interface CardProps extends StyleProps {
   className?: string
 }
 
+interface TitleProp {
+  children: React.ReactNode
+  className?: string
+}
+
 /**
  * Renders a basic card element with a white background, dropshadow, and zero padding.
  *
@@ -56,7 +61,7 @@ const Section: PrimitiveComponent<'section'> = styled.section.withConfig({
   ${styleProps}
 `
 
-const Title = styled.h3`
+const Title = styled.h3<TitleProp>`
   ${styles.FONT_HEADER_DARK}
   font-weight: ${styles.FONT_WEIGHT_REGULAR};
   margin: 0;
