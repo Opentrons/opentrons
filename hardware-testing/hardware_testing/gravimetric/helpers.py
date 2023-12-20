@@ -447,17 +447,17 @@ def _load_tipracks(
                     pick_up_offset=None,
                     drop_offset=None,
                 )
-                if ctx.deck[ls[0]] is not None:
-                    # remove the adapter from the slot too
-                    ui.print_info(f"removing {ctx.deck[ls[0]]} from slot {ls[0]}")
-                    del ctx.deck[ls[0]]
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
 
-    tipracks = [
-        ctx.load_labware(ls[1], location=ls[0], adapter=adapter)
-        for ls in tiprack_load_settings
-    ]
+    tipracks: List[Labware] = []
+    for ls in tiprack_load_settings:
+        if ctx.deck[ls[0]] is not None:
+            tipracks.append(
+                ctx.deck[ls[0]].load_labware(ls[1])  # type: ignore[union-attr]
+            )
+        else:
+            tipracks.append(ctx.load_labware(ls[1], location=ls[0], adapter=adapter))
     return tipracks
 
 
