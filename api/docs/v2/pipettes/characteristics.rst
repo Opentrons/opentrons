@@ -4,18 +4,44 @@
 Pipette Characteristics
 ***********************
 
+Each Opentrons pipette has different capabilities, which you'll want to take advantage of in your protocols. This page covers some fundamental pipette characteristics.
+
+:ref:`new-multichannel-pipettes` gives examples of how multi-channel pipettes move around the deck by using just one of their channels as a reference point. Taking this into account is important for commanding your pipettes to perform actions in the correct locations.
+
+:ref:`new-plunger-flow-rates` discusses how quickly each type of pipette can handle liquids. The defaults are designed to operate quickly, based on the pipette's hardware and assuming that you're handling aqueous liquids. You can speed up or slow down a pipette's flow rate to suit your protocol's needs.
+
+Finally, the volume ranges of pipettes affect what you can do with them. The volume ranges for current pipettes are listed on the :ref:`Loading Pipettes <loading-pipettes>` page. The :ref:`ot2-pipette-generations` section of this page describes how the API behaves when running protocols that specify older OT-2 pipettes.
+
 .. _new-multichannel-pipettes:
 
-Multi-Channel Pipettes
+Multi-Channel Movement
 ======================
 
-All building block and advanced commands work with single- and multi-channel pipettes.
+All :ref:`building block <v2-atomic-commands>` and :ref:`complex commands <v2-complex-commands>` work with single- and multi-channel pipettes.
 
-To keep the interface to the Opentrons API consistent between single- and multi-channel pipettes, commands treat the *backmost channel* (furthest from the door) of a multi-channel pipette as the location of the pipette. Location arguments to building block and advanced commands are specified for the backmost channel.
+To keep the protocol API consistent when using single- and multi-channel pipettes, commands treat the back left channel of a multi-channel pipette as its *primary channel*. Location arguments of pipetting commands use the primary channel. The :py:meth:`.InstrumentContext.configure_nozzle_layout` method can change the pipette's primary channel, using its ``start`` parameter. See :ref:`partial-tip-pickup` for more information.
 
-Also, this means that offset changes (such as :py:meth:`.Well.top` or :py:meth:`.Well.bottom`) can be applied to the single specified well, and each pipette channel will be at the same position relative to the well that it is over.
+With a pipette's default settings, you can generally access the wells indicated in the table below. Moving to any other well may cause the pipette to crash.
 
-Finally, because there is only one motor in a multi-channel pipette, these pipettes always aspirate and dispense on all channels simultaneously.
+.. list-table::
+   :header-rows: 1
+   
+   * - Channels
+     - 96-well plate
+     - 384-well plate
+   * - 1
+     - Any well, A1–H12
+     - Any well, A1–P24
+   * - 8
+     - A1–A12
+     - A1–B24
+   * - 96
+     - A1 only
+     - A1–B2
+
+Also, you should apply any location offset, such as :py:meth:`.Well.top` or :py:meth:`.Well.bottom`, to the well accessed by the primary channel. Since all of the pipette's channels move together, each channel will have the same offset relative to the well that it is over.
+
+Finally, because each multi-channel pipette has only one motor, they always aspirate and dispense on all channels simultaneously.
 
 8-Channel, 96-Well Plate Example
 --------------------------------
