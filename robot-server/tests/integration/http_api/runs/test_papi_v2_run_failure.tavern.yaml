@@ -94,7 +94,11 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
-            params: {}
+            intent: null
+            error: null
+            params:
+              skipIfMountPositionOk: null
+              axes: null
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -102,12 +106,16 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            intent: null
+            error: null
             params:
               location:
                 slotName: '1'
               loadName: opentrons_96_tiprack_300ul
               namespace: opentrons
               version: 1
+              labwareId: null
+              displayName: null
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -115,9 +123,12 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            intent: null
+            error: null
             params:
               pipetteName: p300_single
               mount: right
+              pipetteId: null
           - id: !anystr
             key: !anystr
             commandType: aspirate
@@ -125,6 +136,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: failed
+            intent: null
             error:
               id: !anystr
               errorType: LegacyContextCommandError
