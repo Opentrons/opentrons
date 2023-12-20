@@ -30,7 +30,10 @@ import type { InstrumentData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
-export const MountItem = styled.div<{ isReady: boolean }>`
+export const MountItem = styled.div<{
+  isReady: boolean
+  children: React.ReactNode
+}>`
   display: flex;
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};
@@ -201,7 +204,7 @@ const SpeccedInstrumentName = styled.p`
   line-height: ${TYPOGRAPHY.lineHeight28};
 `
 
-const CalibrationStatus = styled.p`
+const CalibrationStatus = styled.p<{ children: React.ReactNode }>`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSize22};

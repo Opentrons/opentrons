@@ -20,7 +20,7 @@ export function renderWithProviders<State extends unknown>(
   options?: RenderWithProvidersOptions<State>
 ): [RenderResult, Store<State>] {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const { initialState = {} as State, i18nInstance = null } = options || {}
+  const { initialState = {} as any, i18nInstance = null } = options || {}
 
   const store: Store<State> = createStore(jest.fn(), initialState)
   store.dispatch = jest.fn()

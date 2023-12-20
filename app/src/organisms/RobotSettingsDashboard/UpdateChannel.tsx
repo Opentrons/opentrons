@@ -25,6 +25,8 @@ import type { Dispatch } from '../../redux/types'
 
 interface LabelProps {
   isSelected?: boolean
+  children?: React.ReactNode
+  htmlFor?: string
 }
 
 const SettingButton = styled.input`

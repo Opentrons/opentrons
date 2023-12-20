@@ -11,6 +11,8 @@ import {
 interface ButtonProps extends StyleProps {
   /** optional isAlert boolean to turn the background red, only seen in ODD */
   isAlert?: boolean
+  children: React.ReactNode
+  onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 export const MenuItem = styled.button<ButtonProps>`
   text-align: ${TYPOGRAPHY.textAlignLeft};

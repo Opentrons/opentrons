@@ -32,6 +32,8 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface LabelProps {
   isSelected?: boolean
+  children: React.ReactNode
+  htmlFor?: string
 }
 
 const OptionButton = styled.input`
