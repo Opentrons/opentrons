@@ -174,7 +174,7 @@ First, tip tracking is not available with column 1. You must always specify a ``
 
     tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
     pipette.configure_nozzle_layout(style=COLUMN, start="A1")
-    row_a = tiprack.rows()[0]
+    row_a = tip_rack.rows()[0]
     pipette.pick_up_tip(row_a.pop())  # pick up A12-H12
     pipette.drop_tip()
     pipette.pick_up_tip(row_a.pop())  # pick up A11-H11
