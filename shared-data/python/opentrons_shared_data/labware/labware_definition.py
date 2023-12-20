@@ -326,3 +326,11 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
+
+    def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+        kwargs['exclude_unset'] = True
+        return super().dict(*args, **kwargs)
+
+    def json(self, *args: Any, **kwargs: Any) -> str:
+        kwargs['exclude_unset'] = True
+        return super().json(*args, **kwargs)

@@ -190,6 +190,7 @@ async def test_update_adds_details_and_completes_analysis(
 
     assert result == CompletedAnalysis(
         id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
         result=AnalysisResult.OK,
         robotType="OT-2 Standard",
         labware=[labware],
@@ -211,6 +212,8 @@ async def test_update_adds_details_and_completes_analysis(
                 "loadName": "load-name",
                 "definitionUri": "namespace/load-name/42",
                 "location": {"slotName": "1"},
+                "displayName": None,
+                "offsetId": None
             }
         ],
         "pipettes": [

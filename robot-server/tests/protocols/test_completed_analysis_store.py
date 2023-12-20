@@ -16,7 +16,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 from robot_server.protocols.analysis_memcache import MemoryCache
-from robot_server.protocols.analysis_models import CompletedAnalysis, AnalysisResult
+from robot_server.protocols.analysis_models import CompletedAnalysis, AnalysisResult, AnalysisStatus
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
@@ -80,6 +80,7 @@ def _completed_analysis_resource(
         "2",
         CompletedAnalysis(
             id=analysis_id,
+            status=AnalysisStatus.COMPLETED,
             result=AnalysisResult.OK,
             pipettes=[],
             labware=[],
