@@ -30,6 +30,7 @@ async def test_move_to_addressable_area_implementation(
         forceDirect=True,
         minimumZHeight=4.56,
         speed=7.89,
+        stayAtHighestPossibleZ=True,
     )
 
     decoy.when(
@@ -40,6 +41,7 @@ async def test_move_to_addressable_area_implementation(
             force_direct=True,
             minimum_z_height=4.56,
             speed=7.89,
+            stay_at_highest_possible_z=True,
         )
     ).then_return(Point(x=9, y=8, z=7))
 

@@ -255,6 +255,8 @@ function LabwareDisplayLocation(
     displayLocation = <LocationIcon slotName={String(t('offdeck'))} />
   } else if ('slotName' in location) {
     displayLocation = <LocationIcon slotName={location.slotName} />
+  } else if ('addressableAreaName' in location) {
+    displayLocation = <LocationIcon slotName={location.addressableAreaName} />
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModelFromRunData(
       protocolData,
@@ -292,6 +294,11 @@ function LabwareDisplayLocation(
       displayLocation = t('adapter_in_slot', {
         adapter: adapterDisplayName,
         slot_name: adapter.location.slotName,
+      })
+    } else if ('addressableAreaName' in adapter.location) {
+      return t('adapter_in_slot', {
+        adapter: adapterDisplayName,
+        slot: adapter.location.addressableAreaName,
       })
     } else if ('moduleId' in adapter.location) {
       const moduleIdUnderAdapter = adapter.location.moduleId

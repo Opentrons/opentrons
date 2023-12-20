@@ -50,34 +50,47 @@ class HardwareStopper:
             state_view=state_store,
         )
 
+    async def _home_everything_except_plungers(self) -> None:
+        # TODO: Update this once gripper MotorAxis is available in engine.
+        try:
+            ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
+            if (
+                not self._state_store.config.use_virtual_gripper
+                and ot3api.has_gripper()
+            ):
+                await ot3api.home_z(mount=OT3Mount.GRIPPER)
+        except HardwareNotSupportedError:
+            pass
+        await self._movement_handler.home(
+            axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        )
+
     async def _drop_tip(self) -> None:
         """Drop currently attached tip, if any, into trash after a run cancel."""
         attached_tips = self._state_store.pipettes.get_all_attached_tips()
 
         if attached_tips:
             await self._hardware_api.stop(home_after=False)
-            # TODO: Update this once gripper MotorAxis is available in engine.
-            try:
-                ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
-                if (
-                    not self._state_store.config.use_virtual_gripper
-                    and ot3api.has_gripper()
-                ):
-                    await ot3api.home_z(mount=OT3Mount.GRIPPER)
-            except HardwareNotSupportedError:
-                pass
-            await self._movement_handler.home(
-                axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
-            )
 
-            # OT-2 Will only ever use the Fixed Trash Addressable Area
-            if self._state_store.config.robot_type == "OT-2 Standard":
-                for pipette_id, tip in attached_tips:
-                    try:
+            await self._home_everything_except_plungers()
+
+            for pipette_id, tip in attached_tips:
+                try:
+                    if self._state_store.labware.get_fixed_trash_id() == FIXED_TRASH_ID:
+                        # OT-2 and Flex 2.15 protocols will default to the Fixed Trash Labware
                         await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
-                        # TODO: Add ability to drop tip onto custom trash as well.
-                        # if API is 2.15 and below aka is should_have_fixed_trash
-
+                        await self._movement_handler.move_to_well(
+                            pipette_id=pipette_id,
+                            labware_id=FIXED_TRASH_ID,
+                            well_name="A1",
+                        )
+                        await self._tip_handler.drop_tip(
+                            pipette_id=pipette_id,
+                            home_after=False,
+                        )
+                    elif self._state_store.config.robot_type == "OT-2 Standard":
+                        # API 2.16 and above OT2 protocols use addressable areas
+                        await self._tip_handler.add_tip(pipette_id=pipette_id, tip=tip)
                         await self._movement_handler.move_to_addressable_area(
                             pipette_id=pipette_id,
                             addressable_area_name="fixedTrash",
@@ -86,21 +99,19 @@ class HardwareStopper:
                             speed=None,
                             minimum_z_height=None,
                         )
-
                         await self._tip_handler.drop_tip(
                             pipette_id=pipette_id,
                             home_after=False,
                         )
+                    else:
+                        log.debug(
+                            "Flex Protocols API Version 2.16 and beyond do not support automatic tip dropping at this time."
+                        )
 
-                    except HwPipetteNotAttachedError:
-                        # this will happen normally during protocol analysis, but
-                        # should not happen during an actual run
-                        log.debug(f"Pipette ID {pipette_id} no longer attached.")
-
-            else:
-                log.debug(
-                    "Flex protocols do not support automatic tip dropping at this time."
-                )
+                except HwPipetteNotAttachedError:
+                    # this will happen normally during protocol analysis, but
+                    # should not happen during an actual run
+                    log.debug(f"Pipette ID {pipette_id} no longer attached.")
 
     async def do_halt(self, disengage_before_stopping: bool = False) -> None:
         """Issue a halt signal to the hardware API.
@@ -125,28 +136,7 @@ class HardwareStopper:
         if drop_tips_after_run:
             await self._drop_tip()
             await self._hardware_api.stop(home_after=home_after_stop)
-
-        elif home_after_stop:
-            if len(self._state_store.pipettes.get_all_attached_tips()) == 0:
-                await self._hardware_api.stop(home_after=home_after_stop)
-            else:
-                try:
-                    ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
-                    if (
-                        not self._state_store.config.use_virtual_gripper
-                        and ot3api.has_gripper()
-                    ):
-                        await ot3api.home_z(mount=OT3Mount.GRIPPER)
-                except HardwareNotSupportedError:
-                    pass
-
-                await self._movement_handler.home(
-                    axes=[
-                        MotorAxis.X,
-                        MotorAxis.Y,
-                        MotorAxis.LEFT_Z,
-                        MotorAxis.RIGHT_Z,
-                    ]
-                )
         else:
-            await self._hardware_api.stop(home_after=home_after_stop)
+            await self._hardware_api.stop(home_after=False)
+            if home_after_stop:
+                await self._home_everything_except_plungers()

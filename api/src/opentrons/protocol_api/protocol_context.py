@@ -821,7 +821,7 @@ class ProtocolContext(CommandPublisher):
     def load_instrument(
         self,
         instrument_name: str,
-        mount: Union[Mount, str],
+        mount: Union[Mount, str, None] = None,
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
@@ -831,15 +831,16 @@ class ProtocolContext(CommandPublisher):
         ensure that the correct instrument is attached in the specified
         location.
 
-        :param str instrument_name: The name of the instrument model, or a
-                                    prefix. For instance, 'p10_single' may be
-                                    used to request a P10 single regardless of
-                                    the version.
-        :param mount: The mount in which this instrument should be attached.
+        :param str instrument_name: Which instrument you want to load. See :ref:`new-pipette-models`
+                                    for the valid values.
+        :param mount: The mount where this instrument should be attached.
                       This can either be an instance of the enum type
-                      :py:class:`.types.Mount` or one of the strings `'left'`
-                      and `'right'`.
-        :type mount: types.Mount or str
+                      :py:class:`.types.Mount` or one of the strings ``"left"``
+                      or ``"right"``. If you're loading a Flex 96-Channel Pipette
+                      (``instrument_name="flex_96channel_1000"``), you can leave this unspecified,
+                      since it always occupies both mounts; if you do specify a value, it will be
+                      ignored.
+        :type mount: types.Mount or str or ``None``
         :param tip_racks: A list of tip racks from which to pick tips if
                           :py:meth:`.InstrumentContext.pick_up_tip` is called
                           without arguments.
@@ -850,9 +851,11 @@ class ProtocolContext(CommandPublisher):
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
         checked_instrument_name = validation.ensure_pipette_name(instrument_name)
-        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
+        checked_mount = validation.ensure_mount_for_pipette(
+            mount, checked_instrument_name
+        )
 
-        checked_mount = Mount.LEFT if is_96_channel else validation.ensure_mount(mount)
+        is_96_channel = checked_instrument_name == PipetteNameType.P1000_96
 
         tip_racks = tip_racks or []
 
@@ -1052,12 +1055,16 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def fixed_trash(self) -> Union[Labware, TrashBin]:
-        """The trash fixed to slot 12 of the robot deck.
+        """The trash fixed to slot 12 of an OT-2's deck.
 
-        In API Versions prior to 2.16 it has one well and should be accessed like labware in your protocol.
-        e.g. ``protocol.fixed_trash['A1']``
+        In API version 2.15 and earlier, the fixed trash is a :py:class:`.Labware` object with one well. Access it like labware in your protocol. For example, ``protocol.fixed_trash['A1']``.
 
-        In API Version 2.16 and above it returns a Trash fixture for OT-2 Protocols.
+        In API version 2.15 only, Flex protocols have a fixed trash in slot A3.
+
+        In API version 2.16 and later, the fixed trash only exists in OT-2 protocols. It is a :py:class:`.TrashBin` object, which doesn't have any wells. Trying to access ``fixed_trash`` in a Flex protocol will raise an error. See :ref:`configure-trash-bin` for details on using the movable trash in Flex protocols.
+
+        .. versionchanged:: 2.16
+            Returns a :py:class:`.TrashBin` object.
         """
         if self._api_version >= APIVersion(2, 16):
             if self._core.robot_type == "OT-3 Standard":

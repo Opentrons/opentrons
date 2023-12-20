@@ -27,7 +27,7 @@ describe('UpdateResultsModal', () => {
   it('renders correct text for a successful instrument update', () => {
     const { getByText } = render(props)
     getByText('Successful update!')
-    getByText(nestedTextMatcher('Your Gripper is ready to use!'))
+    getByText(nestedTextMatcher('Your Flex Gripper is ready to use!'))
   })
   it('calls close modal when the close button is pressed', () => {
     const { getByText } = render(props)

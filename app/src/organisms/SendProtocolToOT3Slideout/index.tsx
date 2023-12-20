@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
-import { FLEX_DISPLAY_NAME } from '@opentrons/shared-data'
+import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { PrimaryButton, IconProps, StyleProps } from '@opentrons/components'
 import { ERROR_TOAST, INFO_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
@@ -167,7 +167,7 @@ export function SendProtocolToOT3Slideout(
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
-      showOT3Only
+      robotType={FLEX_ROBOT_TYPE}
       isAnalysisError={isAnalysisError}
     />
   )
