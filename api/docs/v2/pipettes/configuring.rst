@@ -19,7 +19,7 @@ There are no mode configurations for OT-2 pipettes.
 Partial Tip Pickup
 ==================
 
-The 96-channel pipette occupies both pipette mounts on Flex, so it's not possible to attach another pipette at the same time. Partial tip pickup lets you perform some of the same actions that you would be able to perform with a second pipette. As of version 2.16 of the API, you can configure the 96-channel pipette pick up a single column of tips, similar to the behavior of an 8-channel pipette.
+The 96-channel pipette occupies both pipette mounts on Flex, so it's not possible to attach another pipette at the same time. Partial tip pickup lets you perform some of the same actions that you would be able to perform with a second pipette. As of version 2.16 of the API, you can configure the 96-channel pipette to pick up a single column of tips, similar to the behavior of an 8-channel pipette.
 
 Nozzle Layout
 -------------
