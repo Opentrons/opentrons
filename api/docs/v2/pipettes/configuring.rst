@@ -1,25 +1,13 @@
-.. _configuring-pipette-modes:
-
-*************************
-Configuring Pipette Modes
-*************************
-
-The API provides methods that let you configure a 96-channel pipette to perform partial tip pickup and configure Flex 50 µL pipettes for low-volume liquid handling. Each configuration method places the pipette in a new mode, which changes the default behavior of the pipette on an ongoing basis, until you call it again with different values. 
-
-This page covers the following modes, which currently apply only to Flex pipettes. There are no mode configurations for OT-2 pipettes.
-
-- :ref:`partial-tip-pickup`: The 96-channel pipette can be configured to use 8 or 96 nozzles for pipetting.
-- :ref:`pipette-volume-modes`: The Flex 50 µL pipettes can be configured to handle liquid differently for low or high volumes.
-
 .. _partial-tip-pickup:
 
+******************
 Partial Tip Pickup
-==================
+******************
 
 The 96-channel pipette occupies both pipette mounts on Flex, so it's not possible to attach another pipette at the same time. Partial tip pickup lets you perform some of the same actions that you would be able to perform with a second pipette. As of version 2.16 of the API, you can configure the 96-channel pipette to pick up a single column of tips, similar to the behavior of an 8-channel pipette.
 
 Nozzle Layout
--------------
+=============
 
 Use the :py:meth:`.configure_nozzle_layout` method to choose how many tips the 96-channel pipette will pick up. The method's ``style`` parameter accepts special layout constants. You must import these constants at the top of your protocol, or you won't be able to configure the pipette for partial tip pickup.
 
@@ -85,7 +73,7 @@ In this configuration, pipetting actions will use a single column::
 .. _partial-tip-rack-adapters:
 
 Tip Rack Adapters
------------------
+=================
 
 You can use both partial and full tip pickup in the same protocol. This requires having some tip racks directly on the deck, and some tip racks in the tip rack adapter.
 
@@ -134,12 +122,12 @@ This keeps tip tracking consistent across each type of pickup. And it reduces th
 
 
 Tip Pickup and Conflicts
-------------------------
+========================
 
 The horizontally offset position of the 96-channel pipette during partial tip pickup  places restrictions on where you can put other tall labware on the deck. The restrictions vary depending on the layout. For column layouts, Opentrons recommends using column 12. Currently, this is the *only* partial nozzle configuration for which the API will automatically detect labware placed in locations that could cause collisions, and raise errors to prevent them.
 
 Using Column 12
-^^^^^^^^^^^^^^^
+---------------
 
 All of the examples in this section will use a 96-channel pipette configured to pick up tips with column 12::
 
@@ -168,7 +156,7 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 One limitation of the column 12 nozzle layout is that it can't access column 1 wells of labware loaded onto the Thermocycler Module. If you need to use all 96 wells on the Thermocycler, you can temporarily switch to the column 1 nozzle layout.
 
 Using Column 1
-^^^^^^^^^^^^^^
+--------------
 
 If your application can't accommodate a deck layout that works well with column 12, you can configure the 96-channel pipette to pick up tips with column 1::
 
@@ -201,54 +189,5 @@ Second, the API does not provide the same collision detection for the column 1 l
     - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
     - Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
     
-Finally, you can't access the rightmost columns in labware in column 3, since they are beyond the movement limit of the pipette. The exact number of inaccessible columns varies by labware type. Any well that is within 28 mm of the right edge of the slot is inaccessible in a column 12 configuration. Call ``confiure_nozzle_layout()`` again to switch to a column 1 layout if you need to pipette in that area.
+Finally, you can't access the rightmost columns in labware in column 3, since they are beyond the movement limit of the pipette. The exact number of inaccessible columns varies by labware type. Any well that is within 28 mm of the right edge of the slot is inaccessible in a column 12 configuration. Call ``configure_nozzle_layout()`` again to switch to a column 1 layout if you need to pipette in that area.
 
-.. _pipette-volume-modes:
-
-Volume Modes
-============
-
-The Flex 1-Channel 50 µL and Flex 8-Channel 50 µL pipettes must operate in a low-volume mode to accurately dispense very small volumes of liquid. Set the volume mode by calling :py:meth:`.InstrumentContext.configure_for_volume` with the amount of liquid you plan to aspirate, in µL::
-
-    pipette50.configure_for_volume(1)
-    pipette50.pick_up_tip()
-    pipette50.aspirate(1, plate["A1"])
-    
-.. versionadded:: 2.15
-
-Passing different values to ``configure_for_volume()`` changes the minimum and maximum volume of Flex 50 µL pipettes as follows:
-
-.. list-table::
-    :header-rows: 1
-    :widths: 2 3 3
-    
-    * - Value
-      - Minimum Volume (µL)
-      - Maximum Volume (µL)
-    * - 1–4.9
-      - 1
-      - 30
-    * - 5–50
-      - 5
-      - 50
-
-.. note::
-    The pipette must not contain liquid when you call ``configure_for_volume()``, or the API will raise an error.
-    
-    Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode. Calling ``configure_for_volume()`` *before* ``pick_up_tip()`` helps to avoid this situation.
-
-In a protocol that handles many different volumes, it's a good practice to call ``configure_for_volume()`` once for each :py:meth:`.transfer` or :py:meth:`.aspirate`, specifying the volume that you are about to handle. When operating with a list of volumes, nest ``configure_for_volume()`` inside a ``for`` loop to ensure that the pipette is properly configured for each volume:
-
-.. code-block:: python
-    
-    volumes = [1, 2, 3, 4, 1, 5, 2, 8]
-    sources = plate.columns()[0]
-    destinations = plate.columns()[1]
-    for i in range(8):
-        pipette50.configure_for_volume(volumes[i])
-        pipette50.pick_up_tip()
-        pipette50.aspirate(volume=volumes[i], location=sources[i])
-        pipette50.dispense(location=destinations[i])
-        pipette50.drop_tip()
-
-If you know that all your liquid handling will take place in a specific mode, then you can call ``configure_for_volume()`` just once with a representative volume. Or if all the volumes correspond to the pipette's default mode, you don't have to call ``configure_for_volume()`` at all.
