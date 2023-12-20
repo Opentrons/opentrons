@@ -4,7 +4,7 @@ from typing import Optional, Any
 from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
 from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
-
+from .report import LSReport
 
 def build_ls_report() -> CSVReport:
     """Placeholder generate a CSV Report."""
