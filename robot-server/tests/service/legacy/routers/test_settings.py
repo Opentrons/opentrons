@@ -119,7 +119,7 @@ def mock_pipette_data():
 def mock_known_pipettes(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.known_pipettes",
-        new=decoy.mock(),
+        new=decoy.mock(name="opentrons_shared_data.pipette.mutable_configurations.known_pipettes"),
     ) as m:
         yield m
 
@@ -128,7 +128,7 @@ def mock_known_pipettes(decoy: Decoy) -> Decoy:
 def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs",
-        new=decoy.mock(),
+        new=decoy.mock(name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs"),
     ) as m:
         yield m
 
@@ -137,7 +137,7 @@ def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
 def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults",
-        new=decoy.mock(),
+        new=decoy.mock(name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults"),
     ) as m:
         yield m
 
@@ -146,7 +146,7 @@ def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
 def mock_save_overrides(decoy: Decoy) -> Decoy:
     with patch(
         "opentrons_shared_data.pipette.mutable_configurations.save_overrides",
-        new=decoy.mock(),
+        new=decoy.mock(name="opentrons_shared_data.pipette.mutable_configurations.save_overrides"),
     ) as m:
         yield m
 
@@ -155,7 +155,7 @@ def mock_save_overrides(decoy: Decoy) -> Decoy:
 def mock_get_opentrons_dir(decoy: Decoy) -> Decoy:
     with patch(
         "robot_server.service.legacy.routers.settings.get_opentrons_path",
-        new=decoy.mock(),
+        new=decoy.mock(name="robot_server.service.legacy.routers.settings.get_opentrons_path"),
     ) as m:
         yield m
 
