@@ -22,6 +22,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -30,8 +31,6 @@ import {
   startDiscovery,
   RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
-  ROBOT_MODEL_OT2,
-  ROBOT_MODEL_OT3,
 } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { Banner } from '../../atoms/Banner'
@@ -39,6 +38,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { AvailableRobotOption } from './AvailableRobotOption'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
@@ -86,7 +86,7 @@ interface ChooseRobotSlideoutProps
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
   isAnalysisError?: boolean
-  robotType: 'OT-2 Standard' | 'OT-3 Standard' | null
+  robotType: RobotType | null
   showIdleOnly?: boolean
 }
 
@@ -115,9 +115,9 @@ export function ChooseRobotSlideout(
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
   ).filter(robot => {
-    if (robotType === ROBOT_MODEL_OT3) {
+    if (robotType === FLEX_ROBOT_TYPE) {
       return RE_ROBOT_MODEL_OT3.test(robot.robotModel)
-    } else if (robotType === ROBOT_MODEL_OT2) {
+    } else if (robotType === OT2_ROBOT_TYPE) {
       return RE_ROBOT_MODEL_OT2.test(robot.robotModel)
     } else {
       return true
@@ -126,9 +126,9 @@ export function ChooseRobotSlideout(
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
   ).filter(robot => {
-    if (robotType === ROBOT_MODEL_OT3) {
+    if (robotType === FLEX_ROBOT_TYPE) {
       return RE_ROBOT_MODEL_OT3.test(robot.robotModel)
-    } else if (robotType === ROBOT_MODEL_OT2) {
+    } else if (robotType === OT2_ROBOT_TYPE) {
       return RE_ROBOT_MODEL_OT2.test(robot.robotModel)
     } else {
       return true
@@ -137,10 +137,10 @@ export function ChooseRobotSlideout(
   const healthyReachableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
   ).filter(robot => {
-    if (robotType === ROBOT_MODEL_OT3) {
-      return robot.robotModel === ROBOT_MODEL_OT3
-    } else if (robotType === ROBOT_MODEL_OT2) {
-      return robot.robotModel === ROBOT_MODEL_OT2
+    if (robotType === FLEX_ROBOT_TYPE) {
+      return robot.robotModel === FLEX_ROBOT_TYPE
+    } else if (robotType === OT2_ROBOT_TYPE) {
+      return robot.robotModel === OT2_ROBOT_TYPE
     } else {
       return true
     }
