@@ -217,6 +217,8 @@ The following table provides data on the default aspirate, dispense, and blowout
  
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/s and a well bottom clearance of 1 mm for aspirate and dispense actions.
 
+.. _ot2-pipette-generations:
+
 OT-2 Pipette Generations
 ========================
 

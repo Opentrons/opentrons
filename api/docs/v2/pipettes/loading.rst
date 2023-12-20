@@ -50,7 +50,7 @@ The pipette's API load name (``instrument_name``) is the first parameter of the 
         | P1000 Single-Channel GEN2   | 100-1000           | ``p1000_single_gen2`` |
         +-----------------------------+--------------------+-----------------------+
 
-        See the OT-2 Pipette Generations section below if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-chanel model.
+        See the :ref:`OT-2 Pipette Generations <ot2-pipette-generations>` section if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-channel model.
 
 Loading Flex 1- and 8-Channel Pipettes
 ======================================
@@ -83,15 +83,20 @@ If you're writing a protocol that uses the Flex Gripper, you might think that th
 Loading a Flex 96-Channel Pipette
 =================================
 
-This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. To load the 96-Channel Pipette, specify its position as ``mount='left'`` as shown here:
+This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. Load the 96-channel pipette as follows:
 
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        left = protocol.load_instrument(
-            instrument_name='flex_96channel_1000', mount='left')
+        pipette = protocol.load_instrument(
+            instrument_name='flex_96channel_1000'
+        )
+
+In protocols specifying API version 2.15, also include ``mount='left'`` as a parameter of ``load_instrument()``.
 
 .. versionadded:: 2.15
+.. versionchanged:: 2.16
+    The ``mount`` parameter is optional.
 
 Loading OT-2 Pipettes
 =====================
@@ -126,7 +131,12 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 Adding Tip Racks
 ================
 
-The ``load_instrument()`` method includes the optional argument ``tip_racks``. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. The advantage of using ``tip_racks`` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the :py:meth:`.InstrumentContext.pick_up_tip` method. For example, let's start by loading loading some labware and instruments like this::
+The ``load_instrument()`` method includes the optional argument ``tip_racks``. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. You can also edit a pipette's tip racks after loading it by setting its :py:obj:`.InstrumentContext.tip_racks` property.
+
+.. note::
+    Some methods, like :py:meth:`.configure_nozzle_layout`, reset a pipette's tip racks. See :ref:`partial-tip-pickup` for more information.
+
+The advantage of using ``tip_racks`` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the :py:meth:`.InstrumentContext.pick_up_tip` method. For example, let's start by loading loading some labware and instruments like this::
         
     def run(protocol: protocol_api.ProtocolContext):
         tiprack_left = protocol.load_labware(
@@ -166,6 +176,6 @@ Additional calls to ``pick_up_tip`` will automatically progress through the tips
     right_pipette.pick_up_tip()  # picks up from A3
     right_pipette.drop_tip()
        
-See also, :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
-
 .. versionadded:: 2.0
+
+See also :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
