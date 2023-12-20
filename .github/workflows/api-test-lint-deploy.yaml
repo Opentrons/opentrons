@@ -75,7 +75,7 @@ jobs:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
-        python: ['3.7', '3.10']
+        python: '3.10'
         with-ot-hardware: ['true', 'false']
         exclude:
           - os: 'windows-2022'
