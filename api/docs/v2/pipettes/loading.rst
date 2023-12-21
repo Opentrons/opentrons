@@ -1,3 +1,5 @@
+:og:description: How to load Opentrons pipettes and add tip racks to them in a Python protocol.
+
 .. _new-create-pipette:
 .. _loading-pipettes:
 

@@ -1,3 +1,5 @@
+:og:description: How to change the number of tips an Opentrons pipette uses.
+
 .. _partial-tip-pickup:
 
 ******************
