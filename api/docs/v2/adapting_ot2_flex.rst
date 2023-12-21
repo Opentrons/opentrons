@@ -34,7 +34,7 @@ You also need to specify ``'robotType': 'Flex'``. If you omit ``robotType`` in t
             metadata = {
                 "protocolName": "My Protocol",
                 "description": "This protocol uses the OT-2",
-                "apiLevel": "2.14" 
+                "apiLevel": "|apiLevel|"
             }
 
     .. tab:: Updated Flex code

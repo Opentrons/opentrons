@@ -123,7 +123,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
             }
 
             # requirements
-            requirements = {"robotType": "OT-2", "apiLevel": "2.14"}
+            requirements = {"robotType": "OT-2", "apiLevel": "|apiLevel|"}
 
             # protocol run function
             def run(protocol: protocol_api.ProtocolContext):

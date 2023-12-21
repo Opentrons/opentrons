@@ -164,7 +164,7 @@ You can also load labware off-deck, in preparation for a ``move_labware()`` comm
 
     from opentrons import protocol_api
 
-    metadata = {"apiLevel": "2.15", "protocolName": "Tip rack replacement"}
+    metadata = {"apiLevel": "|apiLevel|", "protocolName": "Tip rack replacement"}
     requirements = {"robotType": "OT-2"}
 
 

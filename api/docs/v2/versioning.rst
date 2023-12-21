@@ -44,7 +44,7 @@ From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` d
    from opentrons import protocol_api
 
    metadata = {'author': 'A. Biologist'}
-   requirements = {'apiLevel': '2.15', 'robotType': 'Flex'}
+   requirements = {'apiLevel': '|apiLevel|', 'robotType': 'Flex'}
 
    def run(protocol: protocol_api.ProtocolContext):
        protocol.comment('Hello, Flex!')
