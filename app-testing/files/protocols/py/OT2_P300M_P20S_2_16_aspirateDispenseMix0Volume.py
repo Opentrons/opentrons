@@ -2,12 +2,21 @@
 from opentrons import protocol_api
 
 metadata = {
-    "protocolName": "API 2.16 Aspirate Dispense Mix 0 Volume",
+    "protocolName": "QA Protocol - API 2.16 - Aspirate Dispense Mix with 0 Volume",
     "author": "Opentrons Engineering <engineering@opentrons.com>",
     "source": "Software Testing Team",
 }
 
 requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
+
+
+def perform_check(
+    method_sig: str,
+    actual: float,
+    expected: float,
+):
+    """Perform a check on the pipette's current volume."""
+    assert actual == expected, f"pipette volume after {method_sig} is {actual} instead of {expected}"
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -19,7 +28,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     tips_300ul_position = "5"
     tips_20ul_position = "4"
     dye_source_position = "3"
-    logo_position = "2"
 
     # 300ul tips
     tips_300ul = [
@@ -50,8 +58,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         label="dye container",
     )
 
-
-    # >= 2.14 define_liquid and load_liquid
     water = ctx.define_liquid(
         name="water", description="H₂O", display_color="#42AB2D"
     )  # subscript 2 https://www.compart.com/en/unicode/U+2082
@@ -59,15 +65,43 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     dye_container.wells_by_name()["A1"].load_liquid(liquid=water, volume=20)
 
     pipette_right.pick_up_tip()
-    
-    # >= 2.15: Aspirate everything, then dispense everything
-    # < 2.15: Aspirate nothing, then dispense everything(Which in this case means nothing)
-    # pipette_right.aspirate(volume=0, location=dye_container.wells_by_name()["A1"])
-    # pipette_right.dispense(location=dye_container.wells_by_name()["A1"])
 
-    # >= 2.15: Aspirate everything, dispense everything, mix everything
-    # < 2.15: Aspirate everything, dispense nothing, mix nothing
+    # Testing that volume=0 is a no-op
+    # In API versions previous to 2.16, volume=0 would use the pipette's entire volume
+
+    # Aspirate nothing, then dispense everything (Which in this case means nothing)
+    pipette_right.aspirate(volume=0, location=dye_container.wells_by_name()["A1"])
+    perform_check(
+        method_sig="aspirate(volume=0)",
+        actual=pipette_right.current_volume,
+        expected=0.0,
+    )
+
+    pipette_right.dispense(location=dye_container.wells_by_name()["A1"])
+    perform_check(
+        method_sig="dispense(volume=0)",
+        actual=pipette_right.current_volume,
+        expected=0.0,
+    )
+
+    # Aspirate full pipette volume, dispense nothing, mix nothing
     pipette_right.aspirate(volume=20, location=dye_container.wells_by_name()["A1"])
+    perform_check(
+        method_sig="aspirate(volume=20)",
+        actual=pipette_right.current_volume,
+        expected=20.0,
+    )
+
     pipette_right.dispense(volume=0, location=dye_container.wells_by_name()["A1"])
+    perform_check(
+        method_sig="dispense(volume=0)",
+        actual=pipette_right.current_volume,
+        expected=20.0,
+    )
+
     pipette_right.mix(volume=0, location=dye_container.wells_by_name()["A1"])
- 
+    perform_check(
+        method_sig="mix(volume=0)",
+        actual=pipette_right.current_volume,
+        expected=20.0,
+    )
