@@ -85,7 +85,6 @@ Every protocol needs to have a metadata dictionary with information about the pr
 You can include any other information you like in the metadata dictionary. The fields ``protocolName``, ``description``, and ``author`` are all displayed in the Opentrons App, so it’s a good idea to expand the dictionary to include them:
 
 .. code-block:: python
-    :substitutions:
 
     metadata = {
         'apiLevel': '2.16',
@@ -143,7 +142,6 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
         Here’s how to load the labware on a Flex in slots D1, D2, and D3 (repeating the ``def`` statement from above to show proper indenting):
 
         .. code-block:: python
-            :substitutions:
 
             def run(protocol: protocol_api.ProtocolContext):
                 tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
@@ -165,7 +163,6 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
         Here’s how to load the labware on an OT-2 in slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
         
         .. code-block:: python
-            :substitutions:
  
             def run(protocol: protocol_api.ProtocolContext):
                 tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
@@ -332,9 +329,7 @@ If you get any errors in simulation, or you don't get the outcome you expected w
 In Simulation
 -------------
 
-.. suggest linking to pip install rather than just using text in ``code`` format. Help reader find resource
-
-Simulation doesn’t require having a robot connected to your computer. You just need to install the `Opentrons Python module <https://pypi.org/project/opentrons/>`_ from Pip (``pip install opentrons``). This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows).
+Simulation doesn’t require having a robot connected to your computer. You just need to install the `Opentrons Python module <https://pypi.org/project/opentrons/>`_ using pip (``pip install opentrons``). This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows).
 
 To see a text preview of the steps your Flex or OT-2 will take, use the change directory (``cd``) command to navigate to the location of your saved protocol file and run:
 
