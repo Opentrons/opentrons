@@ -75,7 +75,7 @@ def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     )
 
 
-def build_results_section(tips: List[float]) -> CSVSection:
+def build_results_section(tips: List[int]) -> CSVSection:
     """Build section."""
     lines: List[CSVLine] = []
     for tip in tips:
@@ -143,7 +143,9 @@ def store_tip_results(
     report("RESULTS", f"{tip}ul-d", [d])
 
 
-def build_ls_report(test_name: str, run_id:str, trials: int, tips: List[int]) -> CSVReport:
+def build_ls_report(
+    test_name: str, run_id: str, trials: int, tips: List[int]
+) -> CSVReport:
     """Generate a CSV Report."""
     return CSVReport(
         test_name=test_name,
@@ -151,7 +153,7 @@ def build_ls_report(test_name: str, run_id:str, trials: int, tips: List[int]) ->
             build_serial_number_section(),
             build_config_section(),
             build_trials_section(trials, tips),
-            build_results_section(tips)
+            build_results_section(tips),
         ],
         run_id=run_id,
         start_time=0.0,
