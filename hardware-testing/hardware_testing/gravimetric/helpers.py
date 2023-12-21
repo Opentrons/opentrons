@@ -96,7 +96,6 @@ def get_api_context(
             version=APIVersion.from_string(api_level), extra_labware=extra_labware
         )
 
-    papi.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
     return papi
 
 
@@ -377,6 +376,7 @@ def _load_pipette(
     if pipette_mount in loaded_pipettes.keys():
         return loaded_pipettes[pipette_mount]
 
+    trash = ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
     pipette = ctx.load_instrument(pip_name, pipette_mount)
     loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
@@ -390,6 +390,7 @@ def _load_pipette(
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
         pipette.configure_nozzle_layout(NozzleLayout.SINGLE, "A1")
+    pipette.trash_container = trash
     return pipette
 
 
