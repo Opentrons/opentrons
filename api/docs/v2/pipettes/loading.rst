@@ -181,3 +181,37 @@ Additional calls to ``pick_up_tip`` will automatically progress through the tips
 .. versionadded:: 2.0
 
 See also :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
+
+.. _pipette-trash-containers:
+
+Adding Trash Containers
+=======================
+
+Pipettes are automatically assigned a :py:obj:`.trash_container` when you load them. The ``trash_container`` is where the pipette will dispose tips when you call :py:meth:`.drop_tip` with no arguments. You can change the trash container at any time in your protocol, if you don't want to use the default. 
+
+One example of when you might want to change the trash container is a Flex protocol that goes through a lot of tips. In a case where the protocol uses two pipettes, you could load two trash bins and assign one to each pipette::
+
+    left_pipette = protocol.load_instrument(
+        instrument_name='flex_8channel_1000', mount='left'
+    )
+    right_pipette = protocol.load_instrument(
+        instrument_name='flex_8channel_50', mount='right'
+    )
+    left_trash = load_trash_bin('A3')
+    right_trash = load_trash_bin('B3')
+    left_pipette.trash_container = left_trash
+    right_pipette.trash_container = right_trash
+
+Another example is a Flex protocol that uses a waste chute. Say you want to only dispose labware in the chute, and you want the pipette to drop tips in a trash bin. You can implicitly get the trash bin to be the pipette's ``trash_container`` based on load order, or you can ensure it by setting it after all the load commands::
+
+    pipette = protocol.load_instrument(
+        instrument_name="flex_1channel_1000",
+        mount="left"
+    )
+    chute = protocol.load_waste_chute()  # default because loaded first
+    trash = protocol.load_trash_bin("A3")
+    pipette.trash_container = trash  # overrides default
+
+.. versionadded:: 2.0
+.. versionchanged:: 2.16
+    Added support for ``TrashBin`` and ``WasteChute`` objects.

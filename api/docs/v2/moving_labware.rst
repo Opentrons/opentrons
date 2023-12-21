@@ -139,6 +139,8 @@ Move used tip racks and well plates to the waste chute to dispose of them. This 
         labware=plate, new_location=chute, use_gripper=True
     )
 
+.. versionadded:: 2.16
+
 This will pick up ``plate`` from its current location and drop it into the chute.
 
 Always specify ``use_gripper=True`` when moving labware into the waste chute. The chute is not designed for manual movement. You can still manually move labware to other locations, including off-deck, with the chute installed.
