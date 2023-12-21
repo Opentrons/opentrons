@@ -229,20 +229,7 @@ if __name__ == "__main__":
         for tip in run_args.tip_volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
-            run(
-                tip,
-                run_args.run_id,
-                run_args.pipette,
-                run_args.recorder,
-                run_args.pipette_volume,
-                run_args.pipette_channels,
-                run_args.environment_sensor,
-                run_args.trials,
-                args.z_speed,
-                run_args.ctx,
-                run_args.protocol_cfg,
-                run_args.test_report,
-            )
+            run(tip, run_args)
 
     finally:
         if run_args.recorder is not None:
@@ -251,7 +238,6 @@ if __name__ == "__main__":
             run_args.recorder.deactivate()
         if not run_args.ctx.is_simulating():
             serial_logger.terminate()
-        print(f"saving to disk")
         run_args.test_report.save_to_disk()
         run_args.test_report.print_results()
     ui.print_info("done\n\n")
