@@ -10,6 +10,7 @@ requirements = {
     "apiLevel": "2.16",
 }
 
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
     trash_bin = ctx.load_trash_bin("C3")
     tip_rack = ctx.load_labware("opentrons_flex_96_tiprack_1000ul", "A1", adapter="opentrons_flex_96_tiprack_adapter")
@@ -17,5 +18,3 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_96_channel.pick_up_tip()
     pipette_96_channel.drop_tip(trash_bin)
     ctx.move_labware(tip_rack, "C3", use_gripper=True)
-    
-    

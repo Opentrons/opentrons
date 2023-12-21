@@ -1,7 +1,7 @@
 from opentrons import protocol_api
 
 metadata = {
-    "protocolName": "QA Protocol - Analysis Error - Access to Fixed Trash Property",
+    "protocolName": "QA Protocol - Analysis Error - OT-2 Pipette in Flex Protocol",
     "author": "Derek Maggio <derek.maggio@opentrons.com>",
 }
 
@@ -21,5 +21,3 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ]
     pipette_left = ctx.load_instrument(instrument_name="p300_multi_gen2", mount="left", tip_racks=tips_300ul)
     pipette_left.pick_up_tip()
-    
-    

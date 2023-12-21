@@ -221,7 +221,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     pipette_right.prepare_to_aspirate()
     pipette_right.move_to(dye_container.wells_by_name()["A1"].bottom(z=2))
-    ctx.pause("Testing prepare_to_aspirate - watch pipette until next pause.\n The pipette should only move up out of the well after it has aspirated.")
+    ctx.pause(
+        "Testing prepare_to_aspirate - watch pipette until next pause.\n The pipette should only move up out of the well after it has aspirated."
+    )
     pipette_right.aspirate(10, dye_container.wells_by_name()["A1"].bottom(z=2))
     ctx.pause("Did the pipette move up out of the well, only once, after aspirating?")
     pipette_right.dispense(10, dye_container.wells_by_name()["A1"].bottom(z=2))

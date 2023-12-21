@@ -10,6 +10,7 @@ requirements = {
     "apiLevel": "2.16",
 }
 
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
 
     ctx.load_waste_chute()
@@ -22,4 +23,3 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_96_channel = ctx.load_instrument("flex_96channel_1000", mount="left", tip_racks=[tip_rack])
     pipette_96_channel.pick_up_tip()
     pipette_96_channel.drop_tip()
-    

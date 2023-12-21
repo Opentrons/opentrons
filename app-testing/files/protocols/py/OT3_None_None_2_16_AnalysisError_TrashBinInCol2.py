@@ -1,7 +1,7 @@
 from opentrons import protocol_api
 
 metadata = {
-    "protocolName": "QA Protocol - Analysis Error - Fixture Uses Middle Column",
+    "protocolName": "QA Protocol - Analysis Error - Trash Bin in Column 2",
     "author": "Derek Maggio <derek.maggio@opentrons.com>",
 }
 

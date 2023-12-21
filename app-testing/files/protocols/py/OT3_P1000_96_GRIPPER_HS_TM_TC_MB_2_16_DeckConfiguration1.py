@@ -60,7 +60,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     src_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "B2")
     dest_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "C2")
 
-    on_deck_tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, TIP_RACK_LOCATION_1, "opentrons_flex_96_tiprack_adapter")
+    on_deck_tip_rack_1 = ctx.load_labware(
+        TIPRACK_96_NAME, TIP_RACK_LOCATION_1, adapter="opentrons_flex_96_tiprack_adapter"
+    )
     tip_rack_adapter_1 = on_deck_tip_rack_1.parent
 
     on_deck_tip_rack_2 = ctx.load_labware(
