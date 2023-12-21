@@ -24,6 +24,8 @@ class Protocol(BaseModel):
     instruments: Optional[list[str]] = Field(description="list of instruments that will show in the app", default=None)
     modules: Optional[list[module_types]] = Field(description="list of modules that will show in the app", default=None)
     description: Optional[str] = Field(description="Details about this protocol", default=None)
+    expected_test_failure: bool = Field(description="Is this test expected to fail", default=False)
+    expected_test_reason: Optional[str] = Field(description="Reason test is failing", default=False)
 
     @property
     def file_path(self) -> Path:
