@@ -21,7 +21,9 @@ def _what_protocols() -> list[Protocol]:
         protocol = getattr(protocols, protocol_name)
         tests.append(
             # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-param
-            pytest.param(
+            # pytest.param returns a special ParamterSet type. But when pytest runs
+            # the test, it will be a Protocol type. Don't feel like fighting mypy.
+            pytest.param(  # type: ignore[arg-type]
                 protocol,
                 id=protocol.protocol_name,
                 # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-mark-xfail
