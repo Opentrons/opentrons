@@ -17,7 +17,8 @@ from hardware_testing.data import ui, create_run_id_and_start_time, get_git_desc
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 
-from .execute import build_ls_report, run
+from .execute import run
+from .report import build_ls_report, store_config, store_serial_numbers
 
 from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single,
@@ -60,6 +61,7 @@ class RunArgs:
     name: str
     environment_sensor: asair_sensor.AsairSensorBase
     trials: int
+    z_speed: float
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: CSVReport
@@ -138,7 +140,31 @@ class RunArgs:
         recorder = _load_scale(
             name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
         )
+        print(f"pipette_tag {pipette_tag}")
+        report = build_ls_report(name, run_id, trials, tip_volumes)
+        report.set_tag(name)
+        # go ahead and store the meta data now
+        store_serial_numbers(
+            report,
+            robot_serial,
+            pipette_tag,
+            scale.read_serial_number(),
+            environment_sensor.get_serial(),
+            git_description,
+        )
 
+        store_config(
+            report,
+            name,
+            args.pipette,
+            tip_volumes,
+            trials,
+            args.plunger_direction,
+            args.liquid,
+            args.labware_type,
+            args.z_speed,
+            args.start_height_offset,
+        )
         return RunArgs(
             tip_volumes=tip_volumes,
             run_id=run_id,
@@ -152,9 +178,10 @@ class RunArgs:
             name=name,
             environment_sensor=environment_sensor,
             trials=trials,
+            z_speed=args.z_speed,
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
-            test_report=build_ls_report(),
+            test_report=report,
         )
 
 
@@ -206,15 +233,12 @@ if __name__ == "__main__":
                 tip,
                 run_args.run_id,
                 run_args.pipette,
-                run_args.pipette_tag,
-                run_args.git_description,
-                run_args.robot_serial,
                 run_args.recorder,
                 run_args.pipette_volume,
                 run_args.pipette_channels,
-                run_args.name,
                 run_args.environment_sensor,
                 run_args.trials,
+                args.z_speed,
                 run_args.ctx,
                 run_args.protocol_cfg,
                 run_args.test_report,
@@ -227,4 +251,7 @@ if __name__ == "__main__":
             run_args.recorder.deactivate()
         if not run_args.ctx.is_simulating():
             serial_logger.terminate()
+        print(f"saving to disk")
+        run_args.test_report.save_to_disk()
+        run_args.test_report.print_results()
     ui.print_info("done\n\n")
