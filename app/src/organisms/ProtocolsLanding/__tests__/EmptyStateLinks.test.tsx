@@ -1,5 +1,5 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
+import '../../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
 import { screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'

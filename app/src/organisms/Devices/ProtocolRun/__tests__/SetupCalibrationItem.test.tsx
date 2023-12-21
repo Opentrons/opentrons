@@ -1,5 +1,5 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
+import '../../../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'

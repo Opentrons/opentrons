@@ -22,7 +22,7 @@ import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import type { IconName } from '@opentrons/components'
 import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
 import type { ChipType } from '../../../atoms/Chip'
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
 

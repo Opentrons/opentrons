@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
+import '../../../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {

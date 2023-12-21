@@ -1,5 +1,5 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
+import '../../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
 import {
   partialComponentPropsMatcher,

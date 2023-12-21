@@ -12,14 +12,14 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { PipetteRecalibrationODDWarning } from '../../pages/OnDeviceDisplay/PipetteRealibrationODDWarning'
+import { PipetteRecalibrationODDWarning } from '../../pages/InstrumentsDashboard/PipetteRealibrationODDWarning'
 import { getShowPipetteCalibrationWarning } from '../Devices/utils'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '@opentrons/app/src/pages/ProtocolSetup'
 import { isGripperInCommands } from '../../resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {

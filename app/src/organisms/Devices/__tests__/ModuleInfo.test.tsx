@@ -1,5 +1,5 @@
 import React from 'react'
-import '@testing-library/jest-dom'
+import '../../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { renderWithProviders } from '@opentrons/components'
