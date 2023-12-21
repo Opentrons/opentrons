@@ -17,14 +17,23 @@ def _what_protocols() -> list[Protocol]:
     protocols: Protocols = Protocols()
     protocols_to_test: str = os.getenv("APP_ANALYSIS_TEST_PROTOCOLS", "upload_protocol")
     tests: list[Protocol] = []
-    for protocol_name in [x.strip() for x in protocols_to_test.split(",")]:
+    for protocol_name in [x.strip() for x in protocols_to_test.split(",") if len(x.strip()) > 0]:
         protocol = getattr(protocols, protocol_name)
         tests.append(
-                pytest.param(
-                    protocol,
-                    id=protocol.protocol_name,
-                )
+            # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-param
+            pytest.param(
+                protocol,
+                id=protocol.protocol_name,
+                # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-mark-xfail
+                marks=pytest.mark.xfail(
+                    condition=protocol.expected_test_failure,
+                    reason=protocol.expected_test_reason,
+                    raises=AssertionError,
+                    run=True,
+                    strict=True,
+                ),
             )
+        )
     return tests
 
 
@@ -98,6 +107,7 @@ def test_analyses(
         if error_link is not None:
             protocol_landing.base.click_webelement(error_link)
             error_details = protocol_landing.get_popout_error().text
+            protocol_landing.click_popout_close()
             raise AssertionError(f"Unexpected analysis error: {error_details}")
 
     # Verifying elements on Protocol Landing Page
