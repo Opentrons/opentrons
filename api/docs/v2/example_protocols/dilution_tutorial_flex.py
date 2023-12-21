@@ -12,13 +12,14 @@ metadata = {
     
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.15'
+    'apiLevel': '2.16'
     }
 
 def run(protocol: protocol_api.ProtocolContext):
     tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
     reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
     plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
+    trash = protocol.load_trash_bin('A3')
     left_pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=[tips])
 
     # distribute diluent
