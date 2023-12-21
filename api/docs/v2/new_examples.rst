@@ -340,7 +340,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
                     load_name='corning_96_wellplate_360ul_flat',
                     location='D1')
                 tiprack_1 = protocol.load_labware(
-                    load_name='opentrons_flex_96_tiprack_200ul',
+                    load_name='opentrons_flex_96_tiprack_1000ul',
                     location='D2')
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
@@ -354,10 +354,10 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
                 pipette.pick_up_tip()
 
                 # aspirate from the first 5 wells
-                for well in reservoir.wells()[:4]:
+                for well in reservoir.wells()[:5]:
                     pipette.aspirate(volume=35, location=well)
                     pipette.air_gap(10)
-        
+
                 pipette.dispense(225, plate['A1'])
 
                 pipette.return_tip()
@@ -389,7 +389,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
                 p300.pick_up_tip()
 
                 # aspirate from the first 5 wells
-                for well in reservoir.wells()[:4]:
+                for well in reservoir.wells()[:5]:
                     p300.aspirate(volume=35, location=well)
                     p300.air_gap(10)
         
@@ -510,7 +510,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel': '2.15'}
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
                 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
