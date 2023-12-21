@@ -84,6 +84,13 @@ This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and
                     "flex_1channel_1000", "left", tip_racks[tips]
                 )
 
+Trash Container
+===============
+
+OT-2 protocols always have a :py:obj:`.fixed_trash` in slot 12. In Flex protocols specifying API version 2.16 or later, you need to :ref:`load a trash bin <configure-trash-bin>`. Put it in slot A3 to match the physical position of the OT-2 fixed trash::
+
+    trash = protocol.load_trash_bin("A3")
+
 Deck Slot Labels
 ================
 
