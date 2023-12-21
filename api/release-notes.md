@@ -4,6 +4,13 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
+---
+
+## Opentrons Robot Software Changes in 7.1.1
+
+Welcome to the v7.1.1 release of the Opentrons robot software! This release includes support for P1000 Single 3.6 FLEX pipettes.
+
+---
 
 ## Opentrons Robot Software Changes in 7.1.0
 
