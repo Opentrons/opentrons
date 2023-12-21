@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { Welcome } from '../Welcome'
+import { Welcome } from '..'
 
 const PNG_FILE_NAME = 'welcome_background.png'
 

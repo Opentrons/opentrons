@@ -22,7 +22,7 @@ import {
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
-import { useNetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
+import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 

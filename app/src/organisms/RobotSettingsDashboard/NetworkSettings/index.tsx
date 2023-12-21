@@ -20,7 +20,7 @@ import { Chip } from '../../../atoms/Chip'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 
 import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
+import type { NetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import type { ChipType } from '../../../atoms/Chip'
 import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
 

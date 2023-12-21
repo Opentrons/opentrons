@@ -44,7 +44,7 @@ import { UNREACHABLE } from '@opentrons/app/src/redux/discovery/constants'
 import { Navigation } from '@opentrons/app/src/organisms/Navigation'
 import { useLEDLights } from '@opentrons/app/src/organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '@opentrons/app/src/App/OnDeviceDisplayApp'
-import { useNetworkConnection } from '@opentrons/app/src/pages/OnDeviceDisplay/hooks'
+import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { RobotSettingButton } from '@opentrons/app/src/pages/RobotSettingsDashboard/RobotSettingButton'
 
 import type { Dispatch, State } from '@opentrons/app/src/redux/types'

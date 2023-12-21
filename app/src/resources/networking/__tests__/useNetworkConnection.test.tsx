@@ -6,12 +6,12 @@ import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 
-import { i18n } from '../../../../i18n'
-import { useWifiList } from '../../../../resources/networking/hooks'
-import * as Networking from '../../../../redux/networking'
-import * as Fixtures from '../../../../redux/networking/__fixtures__'
+import { i18n } from '../../../i18n'
+import { useWifiList } from '../../../resources/networking/hooks'
+import * as Networking from '../../../redux/networking'
+import * as Fixtures from '../../../redux/networking/__fixtures__'
 
-import { useNetworkConnection } from '..'
+import { useNetworkConnection } from '../hooks/useNetworkConnection'
 
 jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../../../redux/networking/selectors')

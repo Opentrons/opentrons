@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { useNetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
+import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 import { NavigationMenu } from '../NavigationMenu'

@@ -15,7 +15,7 @@ import {
   mockReachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 
-import { NameRobot } from '../NameRobot'
+import { NameRobot } from '..'
 
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/config')

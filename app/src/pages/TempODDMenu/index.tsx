@@ -4,17 +4,17 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Flex, useMountEffect, PrimaryButton } from '@opentrons/components'
 
-import { TertiaryButton } from '../../../atoms/buttons'
-import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
-import { State, Dispatch } from '../../../redux/types'
-import { checkShellUpdate } from '../../../redux/shell'
+import { TertiaryButton } from '../../atoms/buttons'
+import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
+import { State, Dispatch } from '../../redux/types'
+import { checkShellUpdate } from '../../redux/shell'
 import {
   getRobotUpdateVersion,
   startRobotUpdate,
-} from '../../../redux/robot-update'
-import { getLocalRobot } from '../../../redux/discovery'
+} from '../../redux/robot-update'
+import { getLocalRobot } from '../../redux/discovery'
 
-import type { RouteProps } from '../../../App/types'
+import type { RouteProps } from '../../App/types'
 
 export function TempODDMenu(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()

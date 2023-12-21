@@ -23,7 +23,7 @@ import {
   UpdateChannel,
 } from '@opentrons/app/src/organisms/RobotSettingsDashboard'
 import { getRobotUpdateAvailable } from '@opentrons/app/src/redux/robot-update'
-import { useNetworkConnection } from '@opentrons/app/src/pages/OnDeviceDisplay/hooks'
+import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
 import { useLEDLights } from '@opentrons/app/src/organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '@opentrons/app/src/pages/RobotSettingsDashboard'

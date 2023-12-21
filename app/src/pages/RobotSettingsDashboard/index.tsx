@@ -37,7 +37,7 @@ import {
   useDispatchApiRequest,
 } from '@opentrons/app/src/redux/robot-api'
 import { useWifiList } from '@opentrons/app/src/resources/networking/hooks'
-import { useNetworkConnection } from '@opentrons/app/src/pages/OnDeviceDisplay/hooks'
+import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { RobotSettingsList } from '@opentrons/app/src/pages/RobotSettingsDashboard/RobotSettingsList'
 
 import type { WifiSecurityType } from '@opentrons/api-client'

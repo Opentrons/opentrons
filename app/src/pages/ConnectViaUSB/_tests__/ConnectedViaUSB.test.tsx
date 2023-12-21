@@ -5,7 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { ConnectViaUSB } from '@opentrons/app/src/pages/ConnectViaUSB/ConnectViaUSB'
+import { ConnectViaUSB } from '@opentrons/app/src/pages/ConnectViaUSB'
 
 import type { UseQueryResult } from 'react-query'
 import type { ActiveConnections } from '@opentrons/api-client'
@@ -25,7 +25,7 @@ const mockUseConnectionsQuery = useConnectionsQuery as jest.MockedFunction<
   typeof useConnectionsQuery
 >
 
-const render = () => {
+const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
     <MemoryRouter>
       <ConnectViaUSB />
