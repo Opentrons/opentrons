@@ -52,11 +52,17 @@ export function createUi(): BrowserWindow {
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
   // open new windows (<a target="_blank" ...) in browser windows
-  mainWindow.webContents.on('new-window', (event, url) => {
-    log.debug('Opening external link', { url })
-    event.preventDefault()
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    shell.openExternal(url)
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http://localhost:8090')) {
+      log.debug('Opening external link', { url })
+      // event.preventDefault()
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      shell.openExternal(url)
+      return { action: 'allow' }
+    } else {
+      console.log("Blocked by 'setWindowOpenHandler'")
+      return { action: 'deny' }
+    }
   })
 
   return mainWindow

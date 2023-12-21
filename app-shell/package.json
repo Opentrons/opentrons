@@ -61,11 +61,9 @@
     "semver": "5.5.0",
     "serialport": "10.5.0",
     "tempy": "1.0.1",
+    "usb": "^2.11.0",
     "uuid": "3.2.1",
     "winston": "3.1.0",
     "yargs-parser": "13.1.2"
-  },
-  "optionalDependencies": {
-    "usb-detection": "4.14.1"
   }
 }
