@@ -184,11 +184,11 @@ You may notice that these deck maps don't show where the liquids will be at the 
 Trash Bin
 ^^^^^^^^^
 
-Every protocol that disposes of tips needs a place where the pipette will put them.
+Flex and OT-2 both come with a trash bin for disposing used tips.
 
-OT-2 always has its trash container in slot 12. You don't need to write any code to tell the API where the trash is on OT-2. Skip ahead to the Pipettes section below.
+The OT-2 trash bin is fixed in slot 12. Since it can't go anywhere else on the deck, you don't need to write any code to tell the API where it is. Skip ahead to the Pipettes section below.
 
-Flex lets you put a :ref:`trash bin <configure-trash-bin>` in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the :ref:`waste chute <configure-waste-chute>` instead, or if your protocol never trashes any tips). Loading a trash bin on Flex is done with the :py:meth:`.load_trash_bin` method, which takes one argument: its location. Here's how to load the trash in slot A3::
+Flex lets you put a :ref:`trash bin <configure-trash-bin>` in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the :ref:`waste chute <configure-waste-chute>` instead, or if your protocol never trashes any tips). For serial dilution, you'll need to dispose used tips, so you also need to tell the API where the trash container is located on your robot. Loading a trash bin on Flex is done with the :py:meth:`.load_trash_bin` method, which takes one argument: its location. Here's how to load the trash in slot A3::
 
     trash = protocol.load_trash_bin('A3')
 
