@@ -36,7 +36,7 @@ test-ci:
 
 .PHONY: test-protocol-analysis
 test-protocol-analysis:
-	pipenv run python -m pytest tests/protocol_analyze_test.py
+	pipenv run python -m pytest -v tests/protocol_analyze_test.py
 
 .PHONY: setup
 setup:
