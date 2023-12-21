@@ -13,8 +13,8 @@ import * as Fixtures from '../../../redux/networking/__fixtures__'
 
 import { useNetworkConnection } from '../hooks/useNetworkConnection'
 
-jest.mock('../../../../resources/networking/hooks')
-jest.mock('../../../../redux/networking/selectors')
+jest.mock('../../../resources/networking/hooks')
+jest.mock('../../../redux/networking/selectors')
 
 const mockRobotName = 'robot-name'
 const mockWifiList = [

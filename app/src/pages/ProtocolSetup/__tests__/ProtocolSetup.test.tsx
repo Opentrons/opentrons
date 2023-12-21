@@ -72,24 +72,22 @@ Object.defineProperty(window, 'IntersectionObserver', {
 
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../organisms/LabwarePositionCheck/useLaunchLPC')
-jest.mock('../../../../organisms/Devices/hooks')
+jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
+jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
-  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+  '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-jest.mock(
-  '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-)
-jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck')
-jest.mock('../../../../organisms/ProtocolSetupModulesAndDeck/utils')
-jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
-jest.mock('../../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../../organisms/ProtocolSetupLiquids')
-jest.mock('../../../../organisms/ModuleCard/hooks')
-jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+jest.mock('../../../organisms/ProtocolSetupModulesAndDeck')
+jest.mock('../../../organisms/ProtocolSetupModulesAndDeck/utils')
+jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
+jest.mock('../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../organisms/ProtocolSetupLiquids')
+jest.mock('../../../organisms/ModuleCard/hooks')
+jest.mock('../../../redux/discovery/selectors')
 jest.mock('../ConfirmAttachedModal')
-jest.mock('../../../../organisms/ToasterOven')
-jest.mock('../../../../resources/deck_configuration/hooks')
+jest.mock('../../../organisms/ToasterOven')
+jest.mock('../../../resources/deck_configuration/hooks')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import '../../../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
@@ -45,27 +45,27 @@ describe('SetupCalibrationItem', () => {
   })
 
   it('renders all nodes with prop contents', () => {
-    const { getByRole, getByText } = render({ subText: 'stub subtext' })
-    getByText('stub title')
-    getByText('stub subtext')
-    getByRole('button', { name: 'stub button' })
+    render({ subText: 'stub subtext' })
+    screen.getByText('stub title')
+    screen.getByText('stub subtext')
+    screen.getByRole('button', { name: 'stub button' })
   })
   it('renders calibrated date if there is no subtext', () => {
     when(mockFormatTimestamp)
       .calledWith('Thursday, September 9, 2021')
       .mockReturnValue('09/09/2021 00:00:00')
-    const { getByText } = render({
+    render({
       calibratedDate: 'Thursday, September 9, 2021',
     })
-    getByText('Last calibrated: 09/09/2021 00:00:00')
+    screen.getByText('Last calibrated: 09/09/2021 00:00:00')
   })
   it('renders not calibrated if there is no subtext or cal date', () => {
-    const { getByText } = render()
-    getByText('Not calibrated yet')
+    render()
+    screen.getByText('Not calibrated yet')
   })
   it('renders calibration data not available if run has started', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
-    const { getByText } = render()
-    getByText('Calibration data not available once run has started')
+    render()
+    screen.getByText('Calibration data not available once run has started')
   })
 })

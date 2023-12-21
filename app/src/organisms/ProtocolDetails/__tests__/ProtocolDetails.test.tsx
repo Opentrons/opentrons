@@ -1,12 +1,13 @@
 import * as React from 'react'
-import '../../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
+import { screen, waitFor } from '@testing-library/react'
+import { StaticRouter } from 'react-router-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
+
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
-import { waitFor } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
@@ -108,7 +109,7 @@ describe('ProtocolDetails', () => {
 
   it('renders protocol title as display name if present in metadata', () => {
     const protocolName = 'fakeProtocolDisplayName'
-    const { getByText } = render({
+    render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -123,10 +124,10 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    getByText('fakeProtocolDisplayName')
+    screen.getByText('fakeProtocolDisplayName')
   })
   it('renders protocol title as file name if not in metadata', () => {
-    const { getByText } = render({
+    render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -141,10 +142,10 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    expect(getByText('fakeSrcFileName')).toBeInTheDocument()
+    expect(screen.getByText('fakeSrcFileName')).toBeInTheDocument()
   })
   it('renders deck view section', () => {
-    const { getByRole, getByText } = render({
+    render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -158,11 +159,13 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    expect(getByRole('heading', { name: 'Deck View' })).toBeInTheDocument()
-    getByText('close Slideout')
+    expect(
+      screen.getByRole('heading', { name: 'Deck View' })
+    ).toBeInTheDocument()
+    screen.getByText('close Slideout')
   })
   it('opens choose robot slideout when Start setup button is clicked', async () => {
-    const { getByRole, getByText } = render({
+    render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -176,7 +179,9 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    const runProtocolButton = getByRole('button', { name: 'Start setup' })
+    const runProtocolButton = screen.getByRole('button', {
+      name: 'Start setup',
+    })
     runProtocolButton.click()
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
@@ -184,10 +189,10 @@ describe('ProtocolDetails', () => {
         properties: { sourceLocation: 'ProtocolsDetail' },
       })
     })
-    getByText('open Slideout')
+    screen.getByText('open Slideout')
   })
   it('renders the protocol creation method', () => {
-    const { getByRole, getByText } = render({
+    render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -201,11 +206,11 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    getByRole('heading', { name: 'creation method' })
-    getByText('Protocol Designer 6.0')
+    screen.getByRole('heading', { name: 'creation method' })
+    screen.getByText('Protocol Designer 6.0')
   })
   it('renders the last analyzed date', () => {
-    const { getByRole } = render({
+    render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -219,10 +224,10 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    getByRole('heading', { name: 'last analyzed' })
+    screen.getByRole('heading', { name: 'last analyzed' })
   })
   it('renders the protocol description', () => {
-    const { getByRole, getByText } = render({
+    render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -237,7 +242,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    getByRole('heading', { name: 'description' })
-    getByText('fake protocol description')
+    screen.getByRole('heading', { name: 'description' })
+    screen.getByText('fake protocol description')
   })
 })

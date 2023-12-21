@@ -42,11 +42,11 @@ Object.defineProperty(window, 'IntersectionObserver', {
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+jest.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
 jest.mock(
-  '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+  '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
-jest.mock('../../../Protocols/hooks')
+jest.mock('../../Protocols/hooks')
 jest.mock('../Deck')
 jest.mock('../Hardware')
 jest.mock('../Labware')

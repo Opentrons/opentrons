@@ -8,8 +8,8 @@ import { TitleHeader } from '@opentrons/app/src/pages/ConnectViaEthernet/TitleHe
 import { DisplayConnectionStatus } from '@opentrons/app/src/pages/ConnectViaEthernet/DisplayConnectionStatus'
 import { ConnectViaEthernet } from '@opentrons/app/src/pages/ConnectViaEthernet'
 
-jest.mock('../../../../redux/networking')
-jest.mock('../../../../redux/discovery')
+jest.mock('../../../redux/networking')
+jest.mock('../../../redux/discovery')
 jest.mock('../TitleHeader')
 jest.mock('../DisplayConnectionStatus')
 

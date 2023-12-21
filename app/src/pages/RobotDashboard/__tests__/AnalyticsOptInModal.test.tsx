@@ -10,9 +10,9 @@ import { AnalyticsOptInModal } from '../AnalyticsOptInModal'
 
 import type { DiscoveredRobot } from '../../../redux/discovery/types'
 
-jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/robot-settings')
+jest.mock('../../../redux/config')
+jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/robot-settings')
 
 const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
   typeof updateConfigValue

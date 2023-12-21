@@ -11,7 +11,7 @@ import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-jest.mock('../../../Protocols/hooks')
+jest.mock('../../Protocols/hooks')
 
 const mockUseRequiredProtocolLabware = useRequiredProtocolLabware as jest.MockedFunction<
   typeof useRequiredProtocolLabware

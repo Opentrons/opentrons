@@ -11,7 +11,7 @@ import { NavigationMenu } from '../NavigationMenu'
 import { Navigation } from '..'
 import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('../../../pages/OnDeviceDisplay/hooks/useNetworkConnection')
+jest.mock('../../../resources/networking/hooks/useNetworkConnection')
 jest.mock('../../../redux/discovery')
 jest.mock('../NavigationMenu')
 

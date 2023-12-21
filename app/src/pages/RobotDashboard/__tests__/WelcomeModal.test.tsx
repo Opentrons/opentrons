@@ -8,7 +8,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 
-jest.mock('../../../../redux/config')
+jest.mock('../../../redux/config')
 jest.mock('@opentrons/react-api-client')
 
 const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<

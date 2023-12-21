@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import '../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 

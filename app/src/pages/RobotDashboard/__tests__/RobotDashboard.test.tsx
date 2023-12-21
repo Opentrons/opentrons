@@ -28,13 +28,13 @@ jest.mock('react-router-dom', () => {
   }
 })
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
+jest.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
 jest.mock(
-  '../../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
+  '../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
 )
-jest.mock('../../../../organisms/Navigation')
-jest.mock('../../../Protocols/hooks')
-jest.mock('../../../../redux/config')
+jest.mock('../../../organisms/Navigation')
+jest.mock('../../Protocols/hooks')
+jest.mock('../../../redux/config')
 jest.mock('../WelcomeModal')
 
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>

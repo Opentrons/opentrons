@@ -10,8 +10,8 @@ import { i18n } from '../../../i18n'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
 import { Hardware } from '../Hardware'
 
-jest.mock('../../../Protocols/hooks')
-jest.mock('../../../../redux/config')
+jest.mock('../../Protocols/hooks')
+jest.mock('../../../redux/config')
 
 const mockUseRequiredProtocolHardware = useRequiredProtocolHardware as jest.MockedFunction<
   typeof useRequiredProtocolHardware

@@ -2,12 +2,12 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
   COLORS,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
@@ -15,7 +15,7 @@ import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 
-import welcomeModalImage from '../../../assets/images/on-device-display/welcome_dashboard_modal.png'
+import welcomeModalImage from '../../assets/images/on-device-display/welcome_dashboard_modal.png'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 

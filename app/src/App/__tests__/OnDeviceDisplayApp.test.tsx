@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import '../../pages/ProtocolDetails/__tests__/node_modules/@testing-library/jest-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -165,80 +165,80 @@ describe('OnDeviceDisplayApp', () => {
   })
 
   it('renders Welcome component from /welcome', () => {
-    const [{ getByText }] = render('/welcome')
-    getByText('Mock Welcome')
+    render('/welcome')
+    screen.getByText('Mock Welcome')
   })
 
   it('renders NetworkSetupMenu component from /network-setup', () => {
-    const [{ getByText }] = render('/network-setup')
-    getByText('Mock NetworkSetupMenu')
+    render('/network-setup')
+    screen.getByText('Mock NetworkSetupMenu')
   })
 
   it('renders ConnectViaEthernet component from /network-setup/ethernet', () => {
-    const [{ getByText }] = render('/network-setup/ethernet')
-    getByText('Mock ConnectViaEthernet')
+    render('/network-setup/ethernet')
+    screen.getByText('Mock ConnectViaEthernet')
   })
 
   it('renders ConnectViaUSB component from /network-setup/usb', () => {
-    const [{ getByText }] = render('/network-setup/usb')
-    getByText('Mock ConnectViaUSB')
+    render('/network-setup/usb')
+    screen.getByText('Mock ConnectViaUSB')
   })
 
   it('renders ConnectViaWifi component from /network-setup/wifi', () => {
-    const [{ getByText }] = render('/network-setup/wifi')
-    getByText('Mock ConnectViaWifi')
+    render('/network-setup/wifi')
+    screen.getByText('Mock ConnectViaWifi')
   })
 
   it('renders RobotDashboard component from /dashboard', () => {
-    const [{ getByText }] = render('/dashboard')
-    getByText('Mock RobotDashboard')
+    render('/dashboard')
+    screen.getByText('Mock RobotDashboard')
   })
   it('renders ProtocolDashboard component from /protocols', () => {
-    const [{ getByText }] = render('/protocols')
-    getByText('Mock ProtocolDashboard')
+    render('/protocols')
+    screen.getByText('Mock ProtocolDashboard')
   })
   it('renders ProtocolDetails component from /protocols/:protocolId/setup', () => {
-    const [{ getByText }] = render('/protocols/my-protocol-id')
-    getByText('Mock ProtocolDetails')
+    render('/protocols/my-protocol-id')
+    screen.getByText('Mock ProtocolDetails')
   })
 
   it('renders RobotSettingsDashboard component from /robot-settings', () => {
-    const [{ getByText }] = render('/robot-settings')
-    getByText('Mock RobotSettingsDashboard')
+    render('/robot-settings')
+    screen.getByText('Mock RobotSettingsDashboard')
   })
   it('renders InstrumentsDashboard component from /instruments', () => {
-    const [{ getByText }] = render('/instruments')
-    getByText('Mock InstrumentsDashboard')
+    render('/instruments')
+    screen.getByText('Mock InstrumentsDashboard')
   })
   it('when current run route present renders ProtocolSetup component from /runs/:runId/setup', () => {
     mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/setup')
-    const [{ getByText }] = render('/runs/my-run-id/setup')
-    getByText('Mock ProtocolSetup')
+    render('/runs/my-run-id/setup')
+    screen.getByText('Mock ProtocolSetup')
   })
   it('when current run route present renders RunningProtocol component from /runs/:runId/run', () => {
     mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/run')
-    const [{ getByText }] = render('/runs/my-run-id/run')
-    getByText('Mock RunningProtocol')
+    render('/runs/my-run-id/run')
+    screen.getByText('Mock RunningProtocol')
   })
   it('when current run route present renders a RunSummary component from /runs/:runId/summary', () => {
     mockUseCurrentRunRoute.mockReturnValue('/runs/my-run-id/summary')
-    const [{ getByText }] = render('/runs/my-run-id/summary')
-    getByText('Mock RunSummary')
+    render('/runs/my-run-id/summary')
+    screen.getByText('Mock RunSummary')
   })
   it('renders the loading screen on mount', () => {
-    const [{ getByText }] = render('/')
+    render('/')
     mockgetIsShellReady.mockReturnValue(true)
-    getByText('Mock Loading')
+    screen.getByText('Mock Loading')
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
     mockUseCurrentRunRoute.mockReturnValue('/emergency-stop')
-    const [{ getByText }] = render('/emergency-stop')
-    getByText('Mock EmergencyStop')
+    render('/emergency-stop')
+    screen.getByText('Mock EmergencyStop')
   })
   it('renders DeckConfiguration component from /deck-configuration', () => {
     mockUseCurrentRunRoute.mockReturnValue('/deck-configuration')
-    const [{ getByText }] = render('/deck-configuration')
-    getByText('Mock DeckConfiguration')
+    render('/deck-configuration')
+    screen.getByText('Mock DeckConfiguration')
   })
   it('renders protocol receipt toasts', () => {
     render('/')
