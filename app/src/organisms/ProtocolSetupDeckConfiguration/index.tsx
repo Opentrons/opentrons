@@ -28,7 +28,7 @@ import type {
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
-import type { SetupScreens } from '@opentrons/app/src/pages/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
   cutoutId: CutoutId | null

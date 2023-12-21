@@ -2,11 +2,11 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '@opentrons/app/src/i18n'
-import * as Networking from '@opentrons/app/src/redux/networking'
-import { TitleHeader } from '@opentrons/app/src/pages/ConnectViaEthernet/TitleHeader'
-import { DisplayConnectionStatus } from '@opentrons/app/src/pages/ConnectViaEthernet/DisplayConnectionStatus'
-import { ConnectViaEthernet } from '@opentrons/app/src/pages/ConnectViaEthernet'
+import { i18n } from '../../../i18n'
+import * as Networking from '../../../redux/networking'
+import { TitleHeader } from '../../../pages/ConnectViaEthernet/TitleHeader'
+import { DisplayConnectionStatus } from '../../../pages/ConnectViaEthernet/DisplayConnectionStatus'
+import { ConnectViaEthernet } from '../../../pages/ConnectViaEthernet'
 
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery')

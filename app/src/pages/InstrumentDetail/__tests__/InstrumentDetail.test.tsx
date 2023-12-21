@@ -9,8 +9,8 @@ import {
   getGripperDisplayName,
 } from '@opentrons/shared-data'
 
-import { i18n } from '@opentrons/app/src/i18n'
-import { InstrumentDetail } from '@opentrons/app/src/pages/InstrumentDetail'
+import { i18n } from '../../../i18n'
+import { InstrumentDetail } from '../../../pages/InstrumentDetail'
 
 import type { Instruments } from '@opentrons/api-client'
 

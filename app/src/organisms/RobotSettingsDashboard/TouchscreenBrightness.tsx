@@ -26,7 +26,7 @@ import {
 } from '../../redux/config'
 
 import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 interface BrightnessTileProps {
   isActive: boolean

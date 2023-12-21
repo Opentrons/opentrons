@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
 
-import { StyledText } from '@opentrons/app/src/atoms/text'
-import { SmallButton } from '@opentrons/app/src/atoms/buttons'
-import { Modal } from '@opentrons/app/src/molecules/Modal'
+import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '@opentrons/app/src/molecules/Modal/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface ConfirmAttachedModalProps {
   onCloseClick: () => void

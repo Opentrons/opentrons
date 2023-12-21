@@ -16,14 +16,14 @@ import {
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '@opentrons/app/src/atoms/text'
-import { MenuList } from '@opentrons/app/src/atoms/MenuList'
-import { MenuItem } from '@opentrons/app/src/atoms/MenuList/MenuItem'
-import { PipetteWizardFlows } from '@opentrons/app/src/organisms/PipetteWizardFlows'
-import { GripperWizardFlows } from '@opentrons/app/src/organisms/GripperWizardFlows'
-import { DropTipWizard } from '@opentrons/app/src/organisms/DropTipWizard'
-import { FLOWS } from '@opentrons/app/src/organisms/PipetteWizardFlows/constants'
-import { GRIPPER_FLOW_TYPES } from '@opentrons/app/src/organisms/GripperWizardFlows/constants'
+import { StyledText } from '../../atoms/text'
+import { MenuList } from '../../atoms/MenuList'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
+import { DropTipWizard } from '../../organisms/DropTipWizard'
+import { FLOWS } from '../../organisms/PipetteWizardFlows/constants'
+import { GRIPPER_FLOW_TYPES } from '../../organisms/GripperWizardFlows/constants'
 
 import type { PipetteData, GripperData } from '@opentrons/api-client'
 

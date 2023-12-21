@@ -27,7 +27,7 @@ import { useDispatchApiRequest } from '../../redux/robot-api'
 
 import type { Dispatch, State } from '../../redux/types'
 import type { ResetConfigRequest } from '../../redux/robot-admin/types'
-import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface LabelProps {

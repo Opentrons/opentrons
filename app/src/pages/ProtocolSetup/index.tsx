@@ -38,63 +38,60 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '@opentrons/app/src/atoms/text'
+import { StyledText } from '../../atoms/text'
 import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,
-} from '@opentrons/app/src/organisms/OnDeviceDisplay/ProtocolSetup'
+} from '../../organisms/OnDeviceDisplay/ProtocolSetup'
 import {
   useAttachedModules,
   useLPCDisabledReason,
   useModuleCalibrationStatus,
   useRobotType,
-} from '@opentrons/app/src/organisms/Devices/hooks'
+} from '../../organisms/Devices/hooks'
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '@opentrons/app/src/pages/Protocols/hooks'
-import { getProtocolModulesInfo } from '@opentrons/app/src/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '@opentrons/app/src/organisms/ProtocolSetupLabware'
-import { ProtocolSetupModulesAndDeck } from '@opentrons/app/src/organisms/ProtocolSetupModulesAndDeck'
-import { ProtocolSetupLiquids } from '@opentrons/app/src/organisms/ProtocolSetupLiquids'
-import { ProtocolSetupInstruments } from '@opentrons/app/src/organisms/ProtocolSetupInstruments'
-import { ProtocolSetupDeckConfiguration } from '@opentrons/app/src/organisms/ProtocolSetupDeckConfiguration'
-import { useLaunchLPC } from '@opentrons/app/src/organisms/LabwarePositionCheck/useLaunchLPC'
-import { getUnmatchedModulesForProtocol } from '@opentrons/app/src/organisms/ProtocolSetupModulesAndDeck/utils'
-import { ConfirmCancelRunModal } from '@opentrons/app/src/organisms/OnDeviceDisplay/RunningProtocol'
+} from '../../pages/Protocols/hooks'
+import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupModulesAndDeck } from '../../organisms/ProtocolSetupModulesAndDeck'
+import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
+import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
+import { ProtocolSetupDeckConfiguration } from '../../organisms/ProtocolSetupDeckConfiguration'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModulesAndDeck/utils'
+import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   getIncompleteInstrumentCount,
   getProtocolUsesGripper,
-} from '@opentrons/app/src/organisms/ProtocolSetupInstruments/utils'
+} from '../../organisms/ProtocolSetupInstruments/utils'
 import {
   useRunControls,
   useRunStatus,
-} from '@opentrons/app/src/organisms/RunTimeControl/hooks'
-import { useToaster } from '@opentrons/app/src/organisms/ToasterOven'
-import { useIsHeaterShakerInProtocol } from '@opentrons/app/src/organisms/ModuleCard/hooks'
-import { getLabwareSetupItemGroups } from '@opentrons/app/src/pages/Protocols/utils'
-import { getLocalRobot } from '@opentrons/app/src/redux/discovery'
+} from '../../organisms/RunTimeControl/hooks'
+import { useToaster } from '../../organisms/ToasterOven'
+import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
+import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { getLocalRobot } from '../../redux/discovery'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-} from '@opentrons/app/src/redux/analytics'
-import { getIsHeaterShakerAttached } from '@opentrons/app/src/redux/config'
-import { ConfirmAttachedModal } from '@opentrons/app/src/pages/ProtocolSetup/ConfirmAttachedModal'
-import { getLatestCurrentOffsets } from '@opentrons/app/src/organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import {
-  CloseButton,
-  PlayButton,
-} from '@opentrons/app/src/pages/ProtocolSetup/Buttons'
-import { useDeckConfigurationCompatibility } from '@opentrons/app/src/resources/deck_configuration/hooks'
-import { getRequiredDeckConfig } from '@opentrons/app/src/resources/deck_configuration/utils'
+} from '../../redux/analytics'
+import { getIsHeaterShakerAttached } from '../../redux/config'
+import { ConfirmAttachedModal } from '../../pages/ProtocolSetup/ConfirmAttachedModal'
+import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { CloseButton, PlayButton } from '../../pages/ProtocolSetup/Buttons'
+import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
+import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
-import type { OnDeviceRouteParams } from '@opentrons/app/src/App/types'
+import type { OnDeviceRouteParams } from '../../App/types'
 import type {
   ProtocolHardware,
   ProtocolFixture,
-} from '@opentrons/app/src/pages/Protocols/hooks'
-import type { ProtocolModuleInfo } from '@opentrons/app/src/organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+} from '../../pages/Protocols/hooks'
+import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {

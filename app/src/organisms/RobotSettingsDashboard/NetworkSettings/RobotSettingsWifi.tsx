@@ -7,7 +7,7 @@ import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { WifiConnectionDetails } from './WifiConnectionDetails'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 interface RobotSettingsWifiProps {
   setSelectedSsid: React.Dispatch<React.SetStateAction<string>>

@@ -13,7 +13,7 @@ import {
 import { SLEEP_NEVER_MS } from '../../App/constants'
 
 import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 

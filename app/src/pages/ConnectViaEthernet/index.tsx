@@ -9,17 +9,14 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { StepMeter } from '@opentrons/app/src/atoms/StepMeter'
-import { NetworkDetailsModal } from '@opentrons/app/src/organisms/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
-import {
-  getNetworkInterfaces,
-  fetchStatus,
-} from '@opentrons/app/src/redux/networking'
-import { getLocalRobot } from '@opentrons/app/src/redux/discovery'
-import { TitleHeader } from '@opentrons/app/src/pages/ConnectViaEthernet/TitleHeader'
-import { DisplayConnectionStatus } from '@opentrons/app/src/pages/ConnectViaEthernet/DisplayConnectionStatus'
+import { StepMeter } from '../../atoms/StepMeter'
+import { NetworkDetailsModal } from '../../organisms/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
+import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
+import { getLocalRobot } from '../../redux/discovery'
+import { TitleHeader } from '../../pages/ConnectViaEthernet/TitleHeader'
+import { DisplayConnectionStatus } from '../../pages/ConnectViaEthernet/DisplayConnectionStatus'
 
-import type { State, Dispatch } from '@opentrons/app/src/redux/types'
+import type { State, Dispatch } from '../../redux/types'
 
 const STATUS_REFRESH_MS = 5000
 

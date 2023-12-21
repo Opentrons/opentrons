@@ -32,7 +32,7 @@ import type {
   CutoutId,
   RobotType,
 } from '@opentrons/shared-data'
-import type { SetupScreens } from '@opentrons/app/src/pages/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { CutoutConfigAndCompatibility } from '../../resources/deck_configuration/hooks'
 
 interface FixtureTableProps {

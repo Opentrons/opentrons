@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '@opentrons/app/src/i18n'
-import { ConfirmAttachedModal } from '@opentrons/app/src/pages/ProtocolSetup/ConfirmAttachedModal'
+import { i18n } from '../../../i18n'
+import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 
 const mockOnCloseClick = jest.fn()
 const mockOnConfirmClick = jest.fn()

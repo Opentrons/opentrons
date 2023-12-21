@@ -4,19 +4,19 @@ import last from 'lodash/last'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
-import { StepMeter } from '@opentrons/app/src/atoms/StepMeter'
-import { DisplayWifiList } from '@opentrons/app/src/organisms/NetworkSettings'
-import * as Networking from '@opentrons/app/src/redux/networking'
-import { getLocalRobot } from '@opentrons/app/src/redux/discovery'
-import * as RobotApi from '@opentrons/app/src/redux/robot-api'
-import { useWifiList } from '@opentrons/app/src/resources/networking/hooks'
-import { JoinOtherNetwork } from '@opentrons/app/src/pages/ConnectViaWifi/JoinOtherNetwork'
-import { SelectAuthenticationType } from '@opentrons/app/src/pages/ConnectViaWifi/SelectAuthenticationType'
-import { SetWifiCred } from '@opentrons/app/src/pages/ConnectViaWifi/SetWifiCred'
-import { WifiConnectStatus } from '@opentrons/app/src/pages/ConnectViaWifi/WifiConnectStatus'
+import { StepMeter } from '../../atoms/StepMeter'
+import { DisplayWifiList } from '../../organisms/NetworkSettings'
+import * as Networking from '../../redux/networking'
+import { getLocalRobot } from '../../redux/discovery'
+import * as RobotApi from '../../redux/robot-api'
+import { useWifiList } from '../../resources/networking/hooks'
+import { JoinOtherNetwork } from '../../pages/ConnectViaWifi/JoinOtherNetwork'
+import { SelectAuthenticationType } from '../../pages/ConnectViaWifi/SelectAuthenticationType'
+import { SetWifiCred } from '../../pages/ConnectViaWifi/SetWifiCred'
+import { WifiConnectStatus } from '../../pages/ConnectViaWifi/WifiConnectStatus'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '@opentrons/app/src/redux/types'
+import type { State } from '../../redux/types'
 
 const WIFI_LIST_POLL_MS = 5000
 export type WifiScreenOption =

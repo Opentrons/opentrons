@@ -15,8 +15,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '@opentrons/app/src/atoms/text'
-import { MediumButton } from '@opentrons/app/src/atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
 
 interface DisplayConnectionStatusProps {
   isConnected: boolean

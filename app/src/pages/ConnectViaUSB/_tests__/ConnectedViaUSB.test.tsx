@@ -5,7 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { ConnectViaUSB } from '@opentrons/app/src/pages/ConnectViaUSB'
+import { ConnectViaUSB } from '../../../pages/ConnectViaUSB'
 
 import type { UseQueryResult } from 'react-query'
 import type { ActiveConnections } from '@opentrons/api-client'

@@ -20,11 +20,8 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import {
-  getLocalRobot,
-  getRobotApiVersion,
-} from '@opentrons/app/src/redux/discovery'
-import { getRobotUpdateAvailable } from '@opentrons/app/src/redux/robot-update'
+import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
+import { getRobotUpdateAvailable } from '../../redux/robot-update'
 import {
   DEV_INTERNAL_FLAGS,
   getApplyHistoricOffsets,
@@ -33,22 +30,19 @@ import {
   toggleDevInternalFlag,
   toggleDevtools,
   toggleHistoricOffsets,
-} from '@opentrons/app/src/redux/config'
-import { StyledText } from '@opentrons/app/src/atoms/text'
-import { InlineNotification } from '@opentrons/app/src/atoms/InlineNotification'
-import {
-  getRobotSettings,
-  updateSetting,
-} from '@opentrons/app/src/redux/robot-settings'
-import { UNREACHABLE } from '@opentrons/app/src/redux/discovery/constants'
-import { Navigation } from '@opentrons/app/src/organisms/Navigation'
-import { useLEDLights } from '@opentrons/app/src/organisms/Devices/hooks'
-import { onDeviceDisplayRoutes } from '@opentrons/app/src/App/OnDeviceDisplayApp'
+} from '../../redux/config'
+import { StyledText } from '../../atoms/text'
+import { InlineNotification } from '../../atoms/InlineNotification'
+import { getRobotSettings, updateSetting } from '../../redux/robot-settings'
+import { UNREACHABLE } from '../../redux/discovery/constants'
+import { Navigation } from '../../organisms/Navigation'
+import { useLEDLights } from '../../organisms/Devices/hooks'
+import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
-import { RobotSettingButton } from '@opentrons/app/src/pages/RobotSettingsDashboard/RobotSettingButton'
+import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'
 
-import type { Dispatch, State } from '@opentrons/app/src/redux/types'
-import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
+import type { Dispatch, State } from '../../redux/types'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 const HOME_GANTRY_SETTING_ID = 'disableHomeOnBoot'
 interface RobotSettingsListProps {

@@ -64,7 +64,7 @@ import type {
   CutoutId,
   CutoutFixtureId,
 } from '@opentrons/shared-data'
-import type { SetupScreens } from '@opentrons/app/src/pages/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
 import type { AttachedProtocolModuleMatch } from './utils'
 

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { TitleHeader } from '@opentrons/app/src/pages/ConnectViaEthernet/TitleHeader'
+import { TitleHeader } from '../../../pages/ConnectViaEthernet/TitleHeader'
 
 const mockPush = jest.fn()
 jest.mock('react-router-dom', () => {

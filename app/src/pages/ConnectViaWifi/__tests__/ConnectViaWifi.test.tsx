@@ -8,7 +8,7 @@ import * as RobotApi from '../../../redux/robot-api'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
 import { useWifiList } from '../../../resources/networking/hooks'
 import * as Networking from '../../../redux/networking'
-import { ConnectViaWifi } from '@opentrons/app/src/pages/ConnectViaWifi'
+import { ConnectViaWifi } from '../../../pages/ConnectViaWifi'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../resources/networking/hooks')

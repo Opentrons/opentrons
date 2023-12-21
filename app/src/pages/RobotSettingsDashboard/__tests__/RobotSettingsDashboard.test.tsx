@@ -4,15 +4,12 @@ import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '@opentrons/app/src/i18n'
-import { getRobotSettings } from '@opentrons/app/src/redux/robot-settings'
-import { getLocalRobot } from '@opentrons/app/src/redux/discovery'
-import {
-  toggleDevtools,
-  toggleHistoricOffsets,
-} from '@opentrons/app/src/redux/config'
-import { mockConnectedRobot } from '@opentrons/app/src/redux/discovery/__fixtures__'
-import { Navigation } from '@opentrons/app/src/organisms/Navigation'
+import { i18n } from '../../../i18n'
+import { getRobotSettings } from '../../../redux/robot-settings'
+import { getLocalRobot } from '../../../redux/discovery'
+import { toggleDevtools, toggleHistoricOffsets } from '../../../redux/config'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
+import { Navigation } from '../../../organisms/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -21,12 +18,12 @@ import {
   Privacy,
   RobotSystemVersion,
   UpdateChannel,
-} from '@opentrons/app/src/organisms/RobotSettingsDashboard'
-import { getRobotUpdateAvailable } from '@opentrons/app/src/redux/robot-update'
-import { useNetworkConnection } from '@opentrons/app/src/resources/networking/hooks/useNetworkConnection'
-import { useLEDLights } from '@opentrons/app/src/organisms/Devices/hooks'
+} from '../../../organisms/RobotSettingsDashboard'
+import { getRobotUpdateAvailable } from '../../../redux/robot-update'
+import { useNetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
+import { useLEDLights } from '../../../organisms/Devices/hooks'
 
-import { RobotSettingsDashboard } from '@opentrons/app/src/pages/RobotSettingsDashboard'
+import { RobotSettingsDashboard } from '../../../pages/RobotSettingsDashboard'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-update')

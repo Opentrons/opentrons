@@ -14,7 +14,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { StyledText } from '@opentrons/app/src/atoms/text'
+import { StyledText } from '../../atoms/text'
 
 interface TitleHeaderProps {
   title: string

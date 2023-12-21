@@ -5,8 +5,8 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { i18n } from '@opentrons/app/src/i18n'
-import { handleInstrumentDetailOverflowMenu } from '@opentrons/app/src/pages/InstrumentDetail/InstrumentDetailOverflowMenu'
+import { i18n } from '../../../i18n'
+import { handleInstrumentDetailOverflowMenu } from '../../../pages/InstrumentDetail/InstrumentDetailOverflowMenu'
 
 import type { PipetteData, GripperData } from '@opentrons/api-client'
 

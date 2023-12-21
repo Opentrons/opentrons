@@ -11,7 +11,7 @@ import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { InstrumentsDashboard } from '..'
 import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
-import { InstrumentDetail } from '@opentrons/app/src/pages/InstrumentDetail'
+import { InstrumentDetail } from '../../../pages/InstrumentDetail'
 import { fireEvent, screen } from '@testing-library/react'
 
 jest.mock('@opentrons/react-api-client')

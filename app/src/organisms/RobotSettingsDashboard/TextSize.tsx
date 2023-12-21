@@ -19,7 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
-import type { SetSettingOption } from '@opentrons/app/src/pages/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 
 interface RectProps {
   isActive: boolean

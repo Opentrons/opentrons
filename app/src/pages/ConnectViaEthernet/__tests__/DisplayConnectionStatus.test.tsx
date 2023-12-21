@@ -2,8 +2,8 @@ import * as React from 'react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '@opentrons/app/src/i18n'
-import { DisplayConnectionStatus } from '@opentrons/app/src/pages/ConnectViaEthernet/DisplayConnectionStatus'
+import { i18n } from '../../../i18n'
+import { DisplayConnectionStatus } from '../../../pages/ConnectViaEthernet/DisplayConnectionStatus'
 
 const mockFunc = jest.fn()
 const mockPush = jest.fn()

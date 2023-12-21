@@ -20,10 +20,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
-import { BackButton } from '@opentrons/app/src/atoms/buttons/BackButton'
-import { InstrumentInfo } from '@opentrons/app/src/organisms/InstrumentInfo'
-import { handleInstrumentDetailOverflowMenu } from '@opentrons/app/src/pages/InstrumentDetail/InstrumentDetailOverflowMenu'
-import { ODD_FOCUS_VISIBLE } from '@opentrons/app/src/atoms/buttons/constants'
+import { BackButton } from '../../atoms/buttons/BackButton'
+import { InstrumentInfo } from '../../organisms/InstrumentInfo'
+import { handleInstrumentDetailOverflowMenu } from '../../pages/InstrumentDetail/InstrumentDetailOverflowMenu'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 

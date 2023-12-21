@@ -10,7 +10,7 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '@opentrons/app/src/atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 // ToDo (kk:10/17/2023) This component will be modified more later.
 // This is the initial step to reduce ProtocolSetup component's code.

@@ -18,7 +18,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '@opentrons/app/src/atoms/text'
+import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
 
