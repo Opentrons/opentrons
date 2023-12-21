@@ -9,7 +9,7 @@ import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipet
 import { Navigation } from '../../../organisms/Navigation'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
-import { InstrumentsDashboard } from '../InstrumentsDashboard'
+import { InstrumentsDashboard } from '..'
 import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
 import { InstrumentDetail } from '@opentrons/app/src/pages/InstrumentDetail'
 import { fireEvent, screen } from '@testing-library/react'

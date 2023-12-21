@@ -6,21 +6,21 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../i18n'
 import { ConnectViaEthernet } from '@opentrons/app/src/pages/ConnectViaEthernet'
-import { ConnectViaUSB } from '@opentrons/app/src/pages/ConnectViaUSB/ConnectViaUSB'
+import { ConnectViaUSB } from '@opentrons/app/src/pages/ConnectViaUSB'
 import { ConnectViaWifi } from '@opentrons/app/src/pages/ConnectViaWifi'
-import { NetworkSetupMenu } from '../../pages/NetworkSetupMenu/NetworkSetupMenu'
-import { InstrumentsDashboard } from '../../pages/InstrumentsDashboard/InstrumentsDashboard'
+import { NetworkSetupMenu } from '../../pages/NetworkSetupMenu'
+import { InstrumentsDashboard } from '../../pages/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '@opentrons/app/src/pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/ProtocolDashboard'
 import { ProtocolSetup } from '@opentrons/app/src/pages/ProtocolSetup'
 import { ProtocolDetails } from '../../pages/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
-import { RunningProtocol } from '../../pages/RunningProtocol/RunningProtocol'
-import { RunSummary } from '../../pages/RunSummary/RunSummary'
-import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
-import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
-import { InitialLoadingScreen } from '../../pages/InitialLoading/InitialLoadingScreen'
+import { RunningProtocol } from '../../pages/RunningProtocol'
+import { RunSummary } from '../../pages/RunSummary'
+import { Welcome } from '../../pages/Welcome'
+import { NameRobot } from '../../pages/NameRobot'
+import { InitialLoadingScreen } from '../../pages/InitialLoadingScreen'
 import { EmergencyStop } from '../../pages/EmergencyStop'
 import { DeckConfigurationEditor } from '../../pages/DeckConfiguration'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
@@ -31,21 +31,21 @@ import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
-jest.mock('../../pages/OnDeviceDisplay/Welcome')
-jest.mock('../../pages/OnDeviceDisplay/NetworkSetupMenu')
-jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
-jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
-jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
-jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
-jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
+jest.mock('../../pages/Welcome')
+jest.mock('../../pages/NetworkSetupMenu')
+jest.mock('../../pages/ConnectViaEthernet')
+jest.mock('../../pages/ConnectViaUSB')
+jest.mock('../../pages/ConnectViaWifi')
+jest.mock('../../pages/RobotDashboard')
+jest.mock('../../pages/RobotSettingsDashboard')
 jest.mock('../../pages/ProtocolDashboard')
-jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
-jest.mock('../../pages/OnDeviceDisplay/ProtocolDetails')
-jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
-jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
-jest.mock('../../pages/OnDeviceDisplay/RunSummary')
-jest.mock('../../pages/OnDeviceDisplay/NameRobot')
-jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
+jest.mock('../../pages/ProtocolSetup')
+jest.mock('../../pages/ProtocolDetails')
+jest.mock('../../pages/InstrumentsDashboard')
+jest.mock('../../pages/RunningProtocol')
+jest.mock('../../pages/RunSummary')
+jest.mock('../../pages/NameRobot')
+jest.mock('../../pages/InitialLoadingScreen')
 jest.mock('../../pages/EmergencyStop')
 jest.mock('../../pages/DeckConfiguration')
 jest.mock('../../redux/config')

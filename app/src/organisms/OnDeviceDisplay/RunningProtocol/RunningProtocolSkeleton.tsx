@@ -14,7 +14,7 @@ import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { Skeleton } from '../../../atoms/Skeleton'
 
-import type { ScreenOption } from '../../../pages/RunningProtocol/RunningProtocol'
+import type { ScreenOption } from '../../../pages/RunningProtocol'
 
 const CURRENT_RUNNING_PROTOCOL_COMMAND_SIZE = '99rem' // CurrentRunningProtocolCommand screen
 const RUNNING_PROTOCOL_COMMAND_LIST_SIZE = '389rem' // RunningProtocolCommandList screen

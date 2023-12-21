@@ -17,7 +17,7 @@ export interface NetworkConnection {
   icon?: IconName
 }
 
-const CONNECTION_POLL_MS = 10000 // Note: (kj:02/02/2023) temp value
+const CONNECTION_POLL_MS = 10000
 
 export function useNetworkConnection(robotName: string): NetworkConnection {
   const { t } = useTranslation('device_settings')

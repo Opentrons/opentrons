@@ -33,7 +33,7 @@ import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningPro
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
-import { RunningProtocol } from '../RunningProtocol'
+import { RunningProtocol } from '..'
 
 import type { ProtocolAnalyses } from '@opentrons/api-client'
 

@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { NetworkSetupMenu } from '../NetworkSetupMenu'
+import { NetworkSetupMenu } from '..'
 
 const mockPush = jest.fn()
 
