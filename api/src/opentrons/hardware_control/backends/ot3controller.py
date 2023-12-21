@@ -1570,3 +1570,8 @@ class OT3Controller(FlexBackend):
                     "actual-jaw-width": current_gripper_position,
                 },
             )
+
+    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
+        """This is something we only use in the simulator.
+        It is required so that PE simulations using ot3api don't break."""
+        pass

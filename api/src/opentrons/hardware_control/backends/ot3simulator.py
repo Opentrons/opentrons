@@ -810,3 +810,8 @@ class OT3Simulator(FlexBackend):
         # This is a (pretty bad) simulation of the gripper actually gripping something,
         # but it should work.
         self._encoder_position[Axis.G] = (hard_limit_upper - jaw_width) / 2
+
+    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
+        """This is something we only use in the simulator.
+        It is required so that PE simulations using ot3api don't break."""
+        self._sim_tip_state[mount] = status
