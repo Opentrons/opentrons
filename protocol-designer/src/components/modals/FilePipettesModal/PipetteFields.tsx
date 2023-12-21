@@ -23,6 +23,7 @@ import { FormPipettesByMount } from '../../../step-forms'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
+import { TiprackSelect } from './TiprackSelect'
 
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
@@ -33,29 +34,6 @@ import { BaseState } from '../../../types'
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
-  // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
-  errors:
-    | null
-    | string
-    | {
-        left?: {
-          tiprackDefURI: string
-        }
-        right?: {
-          tiprackDefURI: string
-        }
-      }
-  touched:
-    | null
-    | boolean
-    | {
-        left?: {
-          tiprackDefURI: boolean
-        }
-        right?: {
-          tiprackDefURI: boolean
-        }
-      }
   onFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => unknown
   onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
@@ -82,8 +60,6 @@ export function PipetteFields(props: Props): JSX.Element {
     onSetFieldValue,
     onSetFieldTouched,
     onBlur,
-    errors,
-    touched,
     robotType,
   } = props
 
@@ -95,10 +71,32 @@ export function PipetteFields(props: Props): JSX.Element {
 
   React.useEffect(() => {
     if (has96Channel) {
-      values.right = { pipetteName: null, tiprackDefURI: null }
+      values.right = { pipetteName: null, tiprackDefURI: [] }
     }
   }, [values.left])
 
+
+  const renderTiprackSelect = (
+    props: TiprackSelectProps
+  ): JSX.Element | null => {
+    const { mount } = props
+    const selectedPipetteName = values[mount].pipetteName
+    const tiprackOptions = getTiprackOptions({
+      allLabware: allLabware,
+      allowAllTipracks: allowAllTipracks,
+      selectedPipetteName: selectedPipetteName,
+    })
+
+    return (
+      <TiprackSelect
+        mount={mount}
+        tiprackOptions={tiprackOptions}
+        values={values}
+        onSetFieldValue={onSetFieldValue}
+      />
+    )
+  }
+  
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
@@ -127,41 +125,6 @@ export function PipetteFields(props: Props): JSX.Element {
         disabled={mount === RIGHT && has96Channel}
         id={`PipetteSelect_${mount}`}
         className={styles.pipette_select}
-      />
-    )
-  }
-
-  const renderTiprackSelect = (props: TiprackSelectProps): JSX.Element => {
-    const { mount } = props
-    const selectedPipetteName = values[mount].pipetteName
-    const tiprackOptions = getTiprackOptions({
-      allLabware: allLabware,
-      allowAllTipracks: allowAllTipracks,
-      selectedPipetteName: selectedPipetteName,
-    })
-
-    return (
-      <DropdownField
-        error={
-          touched &&
-          typeof touched !== 'boolean' &&
-          touched[mount]?.tiprackDefURI &&
-          errors !== null &&
-          typeof errors !== 'string' &&
-          errors[mount] != null
-            ? errors[mount]?.tiprackDefURI
-            : null
-        }
-        tabIndex={initialTabIndex + 2}
-        disabled={
-          isEmpty(values[mount].pipetteName) ||
-          (mount === RIGHT && has96Channel)
-        }
-        options={tiprackOptions}
-        value={values[mount].tiprackDefURI}
-        name={`pipettesByMount.${mount}.tiprackDefURI`}
-        onChange={onFieldChange}
-        onBlur={onBlur}
       />
     )
   }

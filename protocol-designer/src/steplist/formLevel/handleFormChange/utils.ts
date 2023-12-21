@@ -58,8 +58,10 @@ export function getMaxDisposalVolumeForMultidispense(
     path: PathOption
     pipette: string | null
     volume: string | null
+    tipRack?: string | null
   },
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): number | null | undefined {
   // calculate max disposal volume for given volume & pipette. Might be negative!
   const pipetteId = values?.pipette
@@ -69,7 +71,11 @@ export function getMaxDisposalVolumeForMultidispense(
     `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${values.path}`
   )
   const pipetteEntity = pipetteEntities[pipetteId]
-  const pipetteCapacity = getPipetteCapacity(pipetteEntity)
+  const pipetteCapacity = getPipetteCapacity(
+    pipetteEntity,
+    labwareEntities,
+    values.tipRack
+  )
   const volume = Number(values.volume)
   const airGapChecked = values.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0
@@ -81,14 +87,17 @@ export function getMaxDisposalVolumeForMultidispense(
 // is responsibility of dependentFieldsUpdateMoveLiquid's clamp fn
 export function volumeInCapacityForMulti(
   rawForm: FormData,
-  pipetteEntities: PipetteEntities
+  pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities
 ): boolean {
   assert(
     rawForm.pipette in pipetteEntities,
     `volumeInCapacityForMulti expected pipette ${rawForm.pipette} to be in pipetteEntities`
   )
   const pipetteEntity = pipetteEntities[rawForm.pipette]
-  const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
+  const pipetteCapacity =
+    pipetteEntity &&
+    getPipetteCapacity(pipetteEntity, labwareEntities, rawForm.tipRack)
   const volume = Number(rawForm.volume)
   const airGapChecked = rawForm.aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(rawForm.aspirate_airGap_volume) : 0

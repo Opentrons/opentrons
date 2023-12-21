@@ -43,13 +43,14 @@ interface SP {
   maxDisposalVolume?: number | null
 }
 interface OP {
-  aspirate_airGap_checkbox?: boolean | null
-  aspirate_airGap_volume?: string | null
   path: PathOption
   pipette: string | null
   propsForFields: FieldPropsByName
   stepType: StepType
   volume: string | null
+  aspirate_airGap_checkbox?: boolean | null
+  aspirate_airGap_volume?: string | null
+  tipRack?: string | null
 }
 type Props = SP & OP
 
@@ -114,6 +115,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
     pipette,
     stepType,
     volume,
+    tipRack,
   } = ownProps
 
   const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
@@ -130,8 +132,10 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
       path,
       pipette,
       volume,
+      tipRack
     },
-    stepFormSelectors.getPipetteEntities(state)
+    stepFormSelectors.getPipetteEntities(state),
+    stepFormSelectors.getLabwareEntities(state)
   )
 
   return {

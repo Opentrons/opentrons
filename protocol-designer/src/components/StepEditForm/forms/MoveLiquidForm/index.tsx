@@ -10,6 +10,7 @@ import {
   DisposalVolumeField,
   PathField,
 } from '../../fields'
+import { TiprackField } from '../../fields/TiprackField'
 import { Configure96ChannelField } from '../../fields/Configure96ChannelField'
 import { DropTipField } from '../../fields/DropTipField'
 import styles from '../../StepEditForm.css'
@@ -41,6 +42,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
+        <TiprackField {...propsForFields.tipRack} />
         {is96Channel ? (
           <Configure96ChannelField {...propsForFields.nozzles} />
         ) : null}
@@ -113,6 +115,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
             dispense_wells={formData.dispense_wells}
             pipette={formData.pipette}
             volume={formData.volume}
+            tipRack={formData.tipRack}
           />
         </div>
         <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>

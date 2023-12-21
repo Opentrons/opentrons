@@ -62,6 +62,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 interface ReplaceTipArgs {
   pipette: string
   dropTipLocation: string
+  tipRack: string | null
   nozzles?: NozzleConfigurationStyle
 }
 
@@ -75,9 +76,16 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, dropTipLocation, nozzles } = args
+  const { pipette, dropTipLocation, nozzles, tipRack } = args
+
+  if (tipRack == null) {
+    return {
+      errors: [errorCreators.noTipSelected()],
+    }
+  }
   const { nextTiprack, tipracks } = getNextTiprack(
     pipette,
+    tipRack,
     invariantContext,
     prevRobotState,
     nozzles

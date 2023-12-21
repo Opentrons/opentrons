@@ -18,6 +18,7 @@ import {
   WellOrderField,
   WellSelectionField,
 } from '../fields'
+import { TiprackField } from '../fields/TiprackField'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
@@ -51,6 +52,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
+        <TiprackField {...propsForFields.tipRack} />
         {is96Channel ? (
           <Configure96ChannelField {...propsForFields.nozzles} />
         ) : null}

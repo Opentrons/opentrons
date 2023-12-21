@@ -73,7 +73,7 @@ const makeUpdatePipettes = (
     [pipetteId: string]: {
       mount: string
       name: PipetteName
-      tiprackDefURI: string
+      tiprackDefURI: string[]
       id: string
     }
   } = {}
@@ -155,9 +155,14 @@ const makeUpdatePipettes = (
     nextPipettes,
     (nextPipette: typeof nextPipettes[keyof typeof nextPipettes]) => {
       const newPipetteId = nextPipette.id
+      const nextTips = nextPipette.tiprackDefURI
+      const oldTips =
+        newPipetteId in prevPipettes
+          ? prevPipettes[newPipetteId].tiprackDefURI
+          : null
       const tiprackChanged =
-        newPipetteId in prevPipettes &&
-        nextPipette.tiprackDefURI !== prevPipettes[newPipetteId].tiprackDefURI
+        oldTips != null &&
+        nextTips.every((item, index) => item !== oldTips[index])
       return tiprackChanged
     }
   ).map(pipette => pipette.id)

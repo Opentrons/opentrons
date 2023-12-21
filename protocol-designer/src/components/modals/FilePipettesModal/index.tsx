@@ -129,13 +129,10 @@ const initialFormState: FormState = {
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
-    .nullable()
-    .when('pipetteName', {
-      is: (val: string | null): boolean => Boolean(val),
-      then: Yup.string().required('Required'),
-      otherwise: null,
-    }),
+  tiprackDefURI: Yup.array()
+    .of(Yup.string().required('Required'))
+    .min(1, 'At least one tiprack is required')
+    .nullable(),
 })
 // any typing this because TS says there are too many possibilities of what this could be
 const moduleValidationShape: any = Yup.object().shape({
@@ -216,16 +213,14 @@ export class FilePipettesModal extends React.Component<Props, State> {
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
-        // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
-        return formPipette &&
-          formPipette.pipetteName &&
-          formPipette.tiprackDefURI &&
+        return formPipette?.pipetteName != null &&
+          formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
               ...acc,
               {
                 mount,
-                name: formPipette.pipetteName,
+                name: formPipette.pipetteName as PipetteName,
                 tiprackDefURI: formPipette.tiprackDefURI,
               },
             ]
@@ -414,10 +409,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                         onFieldChange={handleChange}
                         onSetFieldValue={setFieldValue}
                         onBlur={handleBlur}
-                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                        errors={errors.pipettesByMount ?? null}
-                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                        touched={touched.pipettesByMount ?? null}
                         onSetFieldTouched={setFieldTouched}
                         robotType={robotType}
                       />

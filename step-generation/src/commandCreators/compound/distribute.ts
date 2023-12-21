@@ -152,7 +152,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const disposalVolume =
     args.disposalVolume && args.disposalVolume > 0 ? args.disposalVolume : 0
   const maxVolume =
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) -
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, args.tipRack) -
     aspirateAirGapVolume
   const maxWellsPerChunk = Math.floor(
     (maxVolume - disposalVolume) / args.volume
@@ -209,6 +209,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetSourceWell,
               isAirGap: true,
+              tipRack: args.tipRack,
             }),
             ...(aspirateDelay != null
               ? [
@@ -304,6 +305,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
             dropTipLocation: args.dropTipLocation,
+            tipRack: args.tipRack,
           }),
         ]
       }
@@ -332,6 +334,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
                 isAirGap: true,
+                tipRack: args.tipRack,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -433,6 +436,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               dispenseFlowRateUlSec,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
+              tipRack: args.tipRack,
             })
           : []
 
@@ -471,6 +475,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           well: args.sourceWell,
           flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
+          tipRack: args.tipRack,
         }),
         ...delayAfterAspirateCommands,
         ...touchTipAfterAspirateCommand,

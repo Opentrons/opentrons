@@ -94,6 +94,7 @@ export const mixFormToArgs = (
     dispenseOffsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
+    tipRack: hydratedFormData.tipRack,
     dispenseDelaySeconds,
     dropTipLocation: dropTip_location,
     nozzles,

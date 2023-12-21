@@ -100,7 +100,7 @@ export function denormalizePipetteEntities(
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
-        tiprackLabwareDef: labwareDefs[pipette.tiprackDefURI],
+        tiprackLabwareDef: pipette.tiprackDefURI.map(def => labwareDefs[def]),
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },

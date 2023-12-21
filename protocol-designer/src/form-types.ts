@@ -221,6 +221,8 @@ export interface HydratedMoveLiquidFormData {
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
     dropTip_location: string
     nozzles: NozzleConfigurationStyle | null
+    tipRack: string
+
   }
 }
 
@@ -238,6 +240,7 @@ export interface HydratedMoveLabwareFormData {
 export interface HydratedMixFormDataLegacy {
   id: string
   stepType: 'mix'
+  tipRack: string
   stepName: string
   stepDetails: string | null | undefined
   pipette: PipetteEntity

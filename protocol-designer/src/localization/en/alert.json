@@ -96,6 +96,10 @@
         "title": "Not enough tips to complete action",
         "body": "Add another tip rack to an empty slot in "
       },
+      "NO_TIP_SELECTED": {
+        "title": "No tip rack was selected to complete action",
+        "body": "Add a tip rack in the step"
+      },
       "NO_TIP_ON_PIPETTE": {
         "title": "No tip on pipette at the start of step",
         "body1": "Choose a different Change Tip setting. Change Tip cannot be \"Never\" the first time a pipette is used in a protocol, or following a step that used the ",

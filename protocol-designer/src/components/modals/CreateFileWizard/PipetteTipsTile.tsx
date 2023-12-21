@@ -177,10 +177,10 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   )
 
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
-  const currentValue = values.pipettesByMount[mount].tiprackDefURI
+  let selectedValues = values.pipettesByMount[mount].tiprackDefURI ?? []
 
   React.useEffect(() => {
-    if (currentValue === undefined) {
+    if (selectedValues === undefined) {
       // this timeout avoids an infinite loop caused by Formik and React 18 not playing nice
       // see https://github.com/downshift-js/downshift/issues/1511
       // TODO: migrate away from formik
@@ -188,7 +188,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
         setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
       })
     }
-  }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
+  }, [selectedValues, setFieldValue, nameAccessor, tiprackOptions])
 
   return (
     <Flex
@@ -200,13 +200,17 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
             key={o.name}
-            isSelected={currentValue === o.value}
+            isSelected={selectedValues.includes(o.value)}
             text={o.name}
             onClick={() => {
-              setFieldValue(nameAccessor, o.value)
+              const updatedValues = selectedValues?.includes(o.value)
+                ? selectedValues.filter(value => value !== o.value)
+                : [...(selectedValues ?? []), o.value]
+              setFieldValue(nameAccessor, updatedValues.slice(0, 3))
             }}
             width="21.75rem"
             minHeight="4rem"
+            showCheckbox
           />
         ))}
       </Flex>
@@ -259,13 +263,17 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               {customTiprackOptions.map(o => (
                 <EquipmentOption
                   key={o.name}
-                  isSelected={currentValue === o.value}
+                  isSelected={selectedValues.includes(o.value)}
                   text={o.name}
                   onClick={() => {
-                    setFieldValue(nameAccessor, o.value)
+                    const updatedValues = selectedValues?.includes(o.value)
+                      ? selectedValues.filter(value => value !== o.value)
+                      : [...(selectedValues ?? []), o.value]
+                    setFieldValue(nameAccessor, updatedValues.slice(0, 3))
                   }}
                   width="21.75rem"
                   minHeight="4rem"
+                  showCheckbox
                 />
               ))}
             </Flex>

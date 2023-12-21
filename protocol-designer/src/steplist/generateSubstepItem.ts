@@ -59,6 +59,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixBeforeAspirate: null,
       mixInDestination: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(transfer, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
@@ -75,6 +76,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       // set special values for substeps
       mixBeforeAspirate: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(distribute, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
@@ -92,6 +94,7 @@ function getCommandCreatorForTransferlikeSubsteps(
       mixFirstAspirate: null,
       mixInDestination: null,
       preWetTip: false,
+      tiprack: stepArgs.tipRack,
     }
     return curryCommandCreator(consolidate, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'mix') {

@@ -177,6 +177,7 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
+    tipRack: hydratedFormData.fields.tipRack,
     aspirateFlowRateUlSec:
       fields.aspirate_flowRate || pipetteSpec.defaultAspirateFlowRate.value,
     dispenseFlowRateUlSec:

@@ -20,7 +20,7 @@ import {
 } from '@opentrons/step-generation'
 export interface FormPipette {
   pipetteName: string | null | undefined
-  tiprackDefURI: string | null | undefined
+  tiprackDefURI: string[] | null | undefined
 }
 export interface FormPipettesByMount {
   left: FormPipette

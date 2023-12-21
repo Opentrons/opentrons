@@ -3,7 +3,7 @@ import * as React from 'react'
 import styles from './instrument.css'
 
 export interface InfoItemProps {
-  title: string
+  title: string | null
   value: string
   className?: string
 }
@@ -17,7 +17,7 @@ export function InfoItem(props: InfoItemProps): JSX.Element {
 
   return (
     <div className={className}>
-      <h2 className={styles.title}>{title}</h2>
+      {title != null ? <h2 className={styles.title}>{title}</h2> : null}
       <span className={styles.value}>{value}</span>
     </div>
   )

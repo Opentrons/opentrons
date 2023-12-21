@@ -4,9 +4,10 @@ import {
   getPipetteNameSpecs,
   getTiprackVolume,
   PipetteName,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
 import { Options } from '@opentrons/components'
-import { PipetteEntity } from '@opentrons/step-generation'
+import { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 const supportedPipetteNames: PipetteName[] = [
   'p10_single',
   'p10_multi',
@@ -32,21 +33,38 @@ export const pipetteOptions: Options = supportedPipetteNames
     (option: DropdownOption | null): option is DropdownOption => Boolean(option)
   )
 
-// NOTE: this is similar to getPipetteWithTipMaxVol, the fns could potentially
-// be merged once multiple tiprack types per pipette is supported
-export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
+// NOTE: this is similar to getPipetteWithTipMaxVol, the fns
+export function getPipetteCapacity(
+  pipetteEntity: PipetteEntity,
+  labwareEntities: LabwareEntities,
+  tipRack?: string | null
+): number {
   const spec = pipetteEntity.spec
-  const tiprackDef = pipetteEntity.tiprackLabwareDef
+  const tiprackDefs = pipetteEntity.tiprackLabwareDef
+  const tipRackDefUri =
+    tipRack != null && labwareEntities[tipRack] != null
+      ? labwareEntities[tipRack]?.labwareDefURI
+      : ''
+  let chosenTipRack = null
 
-  if (spec && tiprackDef) {
-    return Math.min(spec.maxVolume, getTiprackVolume(tiprackDef))
+  for (const def of tiprackDefs) {
+    if (getLabwareDefURI(def) === tipRackDefUri) {
+      chosenTipRack = def
+      break
+    }
   }
-
+  if (spec && tiprackDefs) {
+    return Math.min(
+      spec.maxVolume,
+      //  not sure if this is a good way to handle this. chosenTipRack is null until you select it
+      getTiprackVolume(chosenTipRack ?? tiprackDefs[0])
+    )
+  }
   assert(
     false,
     `Expected spec and tiprack def for pipette ${
       pipetteEntity ? pipetteEntity.id : '???'
-    }`
+    } and ${tipRack ?? '???'}`
   )
   return NaN
 }
