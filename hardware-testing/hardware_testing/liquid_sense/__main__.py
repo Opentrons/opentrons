@@ -167,7 +167,6 @@ if __name__ == "__main__":
     parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
-    parser.add_argument("--pre-heat", action="store_true")
     parser.add_argument(
         "--liquid", type=str, choices=["water", "glycerol", "alchohol"], default="water"
     )
@@ -199,9 +198,6 @@ if __name__ == "__main__":
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
-
-        if args.pre_heat:
-            helpers.preheat_pipette(run_args.ctx, run_args.environment_sensor)
 
         for tip in run_args.tip_volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
