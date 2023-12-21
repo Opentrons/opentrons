@@ -187,7 +187,7 @@ See also :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
 Adding Trash Containers
 =======================
 
-Pipettes are automatically assigned a :py:obj:`.trash_container` when you load them. The ``trash_container`` is where the pipette will dispose tips when you call :py:meth:`.drop_tip` with no arguments. You can change the trash container at any time in your protocol, if you don't want to use the default. 
+The API automatically assigns a :py:obj:`.trash_container` to pipettes, if one is available in your protocol. The ``trash_container`` is where the pipette will dispose tips when you call :py:meth:`.drop_tip` with no arguments. You can change the trash container, if you don't want to use the default. 
 
 One example of when you might want to change the trash container is a Flex protocol that goes through a lot of tips. In a case where the protocol uses two pipettes, you could load two trash bins and assign one to each pipette::
 

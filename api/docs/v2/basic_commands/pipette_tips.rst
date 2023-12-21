@@ -77,7 +77,7 @@ For a more advanced "real-world" example, review the :ref:`off-deck location pro
 Dropping a Tip
 ==============
 
-To drop a tip in the trash bin, call the :py:meth:`~.InstrumentContext.drop_tip` method with no arguments::
+To drop a tip in the pipette's trash container, call the :py:meth:`~.InstrumentContext.drop_tip` method with no arguments::
     
     pipette.pick_up_tip()
 
@@ -98,6 +98,11 @@ Returning a Tip
 To return a tip to its original location, call the :py:meth:`~.InstrumentContext.return_tip` method with no arguments::
 
     pipette.return_tip()
+
+.. versionadded:: 2.0
+
+.. note::
+    Returning tips isn't allowed when using :ref:`partial tip pickup <partial-tip-pickup>`. The API will raise an error.
 
 Working With Used Tips
 ======================
