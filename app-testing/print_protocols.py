@@ -13,14 +13,17 @@ rich.print(", ".join(stems))
 rich.print(Panel("What are actually defined?"))
 protocols = Protocols()
 props = [prop for prop in dir(protocols) if "__" not in prop]
-rich.print(", ".join(props))
+rich.print(",\n".join(props))
 
 possible = set(stems)
 actual = set(props)
-out = possible - actual
+missing_protocols = possible - actual
+orphan_protocols = actual - possible
 rich.print(Panel("Are all protocols mapped?"))
-if len(out) == 0:
+if len(missing_protocols) == 0 and len(orphan_protocols) == 0:
     rich.print("🥳 everything is mapped.")
 else:
-    rich.print("The below protocols need mapped:")
-    rich.print(out)
+    rich.print("The below protocols need to be mapped in protocols.py:")
+    rich.print(missing_protocols)
+    rich.print("\nThe below protocols are mapped in protocols.py, but don't exist in the protocols dir:")
+    rich.print(orphan_protocols)
