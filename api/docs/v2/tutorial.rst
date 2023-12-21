@@ -78,11 +78,11 @@ For this tutorial, you’ll write very little Python outside of the ``run()`` fu
 Metadata
 ^^^^^^^^
 
-Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version of the API <version-table>` the protocol requires. The `scripts <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/>`_ for this tutorial were validated against API version 2.15, so specify:
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version of the API <version-table>` the protocol requires. The `scripts <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/>`_ for this tutorial were validated against API version 2.16, so specify:
 
 .. code-block:: python
 
-    metadata = {'apiLevel': '2.15'}
+    metadata = {'apiLevel': '2.16'}
 
 You can include any other information you like in the metadata dictionary. The fields ``protocolName``, ``description``, and ``author`` are all displayed in the Opentrons App, so it’s a good idea to expand the dictionary to include them:
 
@@ -90,7 +90,7 @@ You can include any other information you like in the metadata dictionary. The f
     :substitutions:
 
     metadata = {
-        'apiLevel': '2.15',
+        'apiLevel': '2.16',
         'protocolName': 'Serial Dilution Tutorial',
         'description': '''This protocol is the outcome of following the 
                        Python Protocol API Tutorial located at 
@@ -114,11 +114,11 @@ Whether you need a ``requirements`` block depends on your robot model and API ve
 
 - **Flex:** The ``requirements`` block is always required. And, the API version does not go in the ``metadata`` section. The API version belongs in the ``requirements``. For example::
 
-    requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+    requirements = {"robotType": "Flex", "apiLevel": "2.16"}
 
 - **OT-2:** The ``requirements`` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the ``metadata``. For example::
     
-    requirements = {"robotType": "OT-2", "apiLevel": "2.15"} 
+    requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
 
 With the metadata and requirements defined, you can move on to creating the ``run()`` function for your protocol.
 
@@ -185,6 +185,18 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
             :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
 
 You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in `Protocol Designer <https://designer.opentrons.com/>`_. If you want to identify liquids, see `Labeling Liquids in Wells <https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells>`_. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
+
+Trash Bin
+---------
+
+Every protocol that disposes of tips needs a place where the pipette will put them.
+
+OT-2 always has its trash container in slot 12. You don't need to write any code to tell the API where the trash is on OT-2. Skip ahead to the Pipettes section below.
+
+Flex lets you put a :ref:`trash bin <configure-trash-bin>` in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the :ref:`waste chute <configure-waste-chute>` instead, or if your protocol never trashes any tips). Loading a trash bin on Flex is done with the :py:meth:`.load_trash_bin` method, which takes one argument: its location. Here's how to load the trash in slot A3::
+
+    trash = protocol.load_trash_bin('A3')
+
 
 Pipettes
 --------
