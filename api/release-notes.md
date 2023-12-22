@@ -8,7 +8,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ## Opentrons Robot Software Changes in 7.1.1
 
-Welcome to the v7.1.1 release of the Opentrons robot software! This release includes support for P1000 Single 3.6 FLEX pipettes.
+Welcome to the v7.1.1 release of the Opentrons robot software!
+
+### Bug Fixes
+
+- Fixed an issue with the pipette definition for Flex 1-Channel 1000 µL pipettes.
 
 ---
 
