@@ -50,7 +50,7 @@ clean:
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	NODE_OPTIONS=--openssl-legacy-provider webpack --profile
 
 # development
 #####################################################################
