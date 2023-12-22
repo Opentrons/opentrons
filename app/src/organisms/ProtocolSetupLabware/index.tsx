@@ -59,7 +59,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 import { LabwareMapViewModal } from './LabwareMapViewModal'
 
