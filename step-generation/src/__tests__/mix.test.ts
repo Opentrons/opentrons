@@ -40,7 +40,7 @@ beforeEach(() => {
     commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
-
+    tipRack: 'tiprack1Id',
     pipette: DEFAULT_PIPETTE,
     labware: SOURCE_LABWARE,
 

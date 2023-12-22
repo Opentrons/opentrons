@@ -63,7 +63,7 @@ beforeEach(() => {
     name: 'Transfer Test',
     description: 'test blah blah',
     pipette: DEFAULT_PIPETTE,
-
+    tipRack: 'tiprack1Id',
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
 
@@ -135,7 +135,6 @@ describe('pick up tip if no tip on pipette', () => {
     const result = transfer(noTipArgs, invariantContext, robotStateWithTip)
 
     const res = getSuccessResult(result)
-    console.log(res.commands)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 30),

@@ -96,6 +96,7 @@ beforeEach(() => {
     mixInDestination: null,
     blowoutLocation: null,
     dropTipLocation: FIXED_TRASH_ID,
+    tipRack: 'tiprack1Id',
   }
 })
 
@@ -3058,6 +3059,7 @@ describe('consolidate multi-channel', () => {
       ...args,
       volume: 140,
       changeTip: 'once',
+      tipRack: 'tiprack1Id',
     } as ConsolidateArgs
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)

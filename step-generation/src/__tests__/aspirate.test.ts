@@ -83,7 +83,7 @@ describe('aspirate', () => {
         labware: SOURCE_LABWARE,
         well: 'A1',
       } as AspDispAirgapParams),
-      tipRack: 'tipRack',
+      tipRack: 'tiprack1Id',
     }
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -122,7 +122,7 @@ describe('aspirate', () => {
           labware: SOURCE_LABWARE,
           well: 'A1',
         } as AspDispAirgapParams),
-        tipRack: 'tipRack',
+        tipRack: 'tiprack1Id',
       },
       invariantContext,
       robotStateWithTip

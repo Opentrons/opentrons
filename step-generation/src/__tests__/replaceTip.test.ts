@@ -292,7 +292,7 @@ describe('replaceTip', () => {
           pipette: p100096Id,
           dropTipLocation: 'wasteChuteId',
           nozzles: COLUMN,
-          tipRack: tiprack1Id,
+          tipRack: tiprack5Id,
         },
         invariantContext,
         initialRobotState

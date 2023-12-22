@@ -68,7 +68,7 @@ beforeEach(() => {
     commandCreatorFnName: 'distribute',
     name: 'distribute test',
     description: 'test blah blah',
-
+    tipRack: 'tiprack1Id',
     pipette: DEFAULT_PIPETTE,
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
@@ -245,6 +245,7 @@ describe('tip handling for multiple distribute chunks', () => {
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'always',
       volume: 150,
+      tipRack: 'tiprack1Id',
     } as DistributeArgs
 
     const result = distribute(
