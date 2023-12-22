@@ -603,6 +603,7 @@ interface AirGapArgs {
   offsetFromBottomMm: number
   pipetteId: string
   volume: number
+  tipRack: string
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
@@ -622,6 +623,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     sourceId,
     sourceWell,
     volume,
+    tipRack,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -654,6 +656,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           flowRate,
           offsetFromBottomMm,
           isAirGap: true,
+          tipRack,
         }),
       ]
       //  when aspirating out of multi wells for consolidate
@@ -667,6 +670,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           flowRate,
           offsetFromBottomMm,
           isAirGap: true,
+          tipRack,
         }),
       ]
     }

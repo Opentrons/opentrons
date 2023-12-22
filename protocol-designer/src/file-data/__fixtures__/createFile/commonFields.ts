@@ -55,8 +55,8 @@ export const pipetteEntities: PipetteEntities = {
     id: 'pipetteId',
     name: 'p10_single',
     spec: fixtureP10Single,
-    tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
-    tiprackLabwareDef: fixtureTiprack10ul,
+    tiprackDefURI: ['opentrons/opentrons_96_tiprack_10ul/1'],
+    tiprackLabwareDef: [fixtureTiprack10ul],
   },
 }
 export const labwareNicknamesById: Record<string, string> = {

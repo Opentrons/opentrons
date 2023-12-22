@@ -46,6 +46,7 @@ describe('generateRobotStateTimeline', () => {
           mixBeforeAspirate: null,
           description: null,
           nozzles: null,
+          tipRack: 'tiprack1Id',
         },
       },
       b: {
@@ -81,6 +82,7 @@ describe('generateRobotStateTimeline', () => {
           mixBeforeAspirate: null,
           description: null,
           nozzles: null,
+          tipRack: 'tiprack1Id',
         },
       },
       c: {
@@ -108,6 +110,7 @@ describe('generateRobotStateTimeline', () => {
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
           nozzles: null,
+          tipRack: 'tiprack1Id',
         },
       },
     }

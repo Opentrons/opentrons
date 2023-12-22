@@ -54,7 +54,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
     pipettesByMount: {
       left: {
         pipetteName: 'p50_single_flex',
-        tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
+        tiprackDefURI: ['opentrons/opentrons_flex_96_tiprack_200ul/1'],
       },
       right: { pipetteName: null, tiprackDefURI: null },
     } as FormPipettesByMount,
@@ -161,7 +161,7 @@ describe('PipetteTipsTile', () => {
         pipettesByMount: {
           left: {
             pipetteName: 'p10_single',
-            tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
+            tiprackDefURI: ['opentrons/opentrons_96_tiprack_10ul/1'],
           },
           right: { pipetteName: null, tiprackDefURI: null },
         } as FormPipettesByMount,

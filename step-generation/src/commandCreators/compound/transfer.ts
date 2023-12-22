@@ -134,7 +134,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       prevRobotState,
       invariantContext,
       args.sourceLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -154,7 +155,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       prevRobotState,
       invariantContext,
       args.destLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -538,6 +540,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
+                    tipRack,
                   }),
                   ...(aspirateDelay != null
                     ? [

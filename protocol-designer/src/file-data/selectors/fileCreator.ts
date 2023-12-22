@@ -154,9 +154,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         },
         pipetteTiprackAssignments: mapValues(
           pipetteEntities,
-          (
-            p: typeof pipetteEntities[keyof typeof pipetteEntities]
-          ): string[] | null | undefined => p.tiprackDefURI
+          (p: typeof pipetteEntities[keyof typeof pipetteEntities]): string[] =>
+            p.tiprackDefURI
         ),
         dismissedWarnings,
         ingredients,

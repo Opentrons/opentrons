@@ -49,7 +49,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
       robotType: FLEX_ROBOT_TYPE,
     },
     pipettesByMount: {
-      left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
+      left: { pipetteName: 'mockPipetteName', tiprackDefURI: ['mocktip'] },
       right: { pipetteName: null, tiprackDefURI: null },
     } as FormPipettesByMount,
     modulesByType: {
@@ -111,7 +111,7 @@ describe('ModulesAndOtherTile', () => {
           robotType: OT2_ROBOT_TYPE,
         },
         pipettesByMount: {
-          left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
+          left: { pipetteName: 'p1000_single', tiprackDefURI: ['mocktip'] },
           right: { pipetteName: null, tiprackDefURI: null },
         } as FormPipettesByMount,
         modulesByType: {

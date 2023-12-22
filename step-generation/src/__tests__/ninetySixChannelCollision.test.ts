@@ -8,6 +8,7 @@ let robotState: RobotState
 const mockSourceId = 'sourceId'
 const mockWestId = 'westId'
 const mockPipetteId = 'pipetteId'
+const mockTiprackId = 'tiprackId'
 const mockSourceDef: LabwareDefinition2 = {
   dimensions: { zDimension: 100 },
 } as any
@@ -37,8 +38,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
         [mockPipetteId]: {
           name: 'p1000_96',
           id: mockPipetteId,
-          tiprackDefURI: 'mockUri',
-          tiprackLabwareDef: mockTiprackDefinition,
+          tiprackDefURI: ['mockUri'],
+          tiprackLabwareDef: [mockTiprackDefinition],
           spec: {} as any,
         },
       },
@@ -57,7 +58,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
         robotState,
         invariantContext,
         mockSourceId,
-        mockPipetteId
+        mockPipetteId,
+        mockTiprackId
       )
     ).toBe(false)
   })
@@ -77,7 +79,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
         robotState,
         invariantContext,
         mockSourceId,
-        mockPipetteId
+        mockPipetteId,
+        mockTiprackId
       )
     ).toBe(false)
   })
@@ -88,7 +91,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
         robotState,
         invariantContext,
         mockSourceId,
-        mockPipetteId
+        mockPipetteId,
+        mockTiprackId
       )
     ).toBe(false)
   })
@@ -110,7 +114,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
         robotState,
         invariantContext,
         mockSourceId,
-        mockPipetteId
+        mockPipetteId,
+        mockTiprackId
       )
     ).toBe(false)
   })
@@ -132,7 +137,8 @@ describe('getIsTallLabwareWestOf96Channel ', () => {
         robotState,
         invariantContext,
         mockSourceId,
-        mockPipetteId
+        mockPipetteId,
+        mockTiprackId
       )
     ).toBe(true)
   })

@@ -4,11 +4,35 @@ import type {
 } from '@opentrons/shared-data'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
+export interface DesignerApplicationDataV8 {
+  ingredients: Record<
+    string,
+    {
+      name?: string | null
+      description?: string | null
+      serialize: boolean
+    }
+  >
+  ingredLocations: {
+    [labwareId: string]: {
+      [wellName: string]: { [liquidId: string]: { volume: number } }
+    }
+  }
+  savedStepForms: Record<string, any>
+  orderedStepIds: string[]
+  pipetteTiprackAssignments: Record<string, string>
+}
+
 export const migrateFile = (
-  appData: ProtocolFile<DesignerApplicationData>
-): ProtocolFile => {
+  appData: ProtocolFile<DesignerApplicationDataV8>
+): ProtocolFile<DesignerApplicationData> => {
   const { designerApplication, commands, labwareDefinitions } = appData
-  const tiprackAssignments = appData.designerApplication?.data
+
+  if (designerApplication == null || designerApplication?.data == null) {
+    throw Error('The designerApplication key in your file is corrupt.')
+  }
+
+  const tiprackAssignments = designerApplication.data
     ?.pipetteTiprackAssignments as Record<string, string>
 
   const newTiprackAssignments = Object.keys(tiprackAssignments).reduce(
@@ -24,7 +48,7 @@ export const migrateFile = (
       command.commandType === 'loadLabware'
   )
 
-  const savedStepForms = appData.designerApplication?.data
+  const savedStepForms = designerApplication.data
     ?.savedStepForms as DesignerApplicationData['savedStepForms']
   const pipettingSavedSteps = Object.values(savedStepForms).filter(
     form => form.stepName === 'transfer' || form.stepName === 'mix'
@@ -57,9 +81,9 @@ export const migrateFile = (
     designerApplication: {
       ...designerApplication,
       data: {
-        ...designerApplication?.data,
+        ...designerApplication.data,
         savedStepForms: {
-          ...designerApplication?.data?.savedStepForms,
+          ...designerApplication.data.savedStepForms,
           ...pipettingSavedStepsWithTipRack,
         },
         pipetteTiprackAssignments: newTiprackAssignments,

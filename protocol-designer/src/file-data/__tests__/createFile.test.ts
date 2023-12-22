@@ -126,16 +126,18 @@ describe('getLabwareDefinitionsInUse util', () => {
         // @ts-expect-error(sa, 2021-6-18): not a valid pipette name
         name: 'foo',
         spec: fixtureP10Single,
-        tiprackLabwareDef: assignedTiprackOnDeckDef as LabwareDefinition2,
-        tiprackDefURI: 'assignedTiprackOnDeckURI',
+        tiprackLabwareDef: [assignedTiprackOnDeckDef] as LabwareDefinition2[],
+        tiprackDefURI: ['assignedTiprackOnDeckURI'],
       },
       otherPipetteId: {
         id: 'otherPipetteId',
         // @ts-expect-error(sa, 2021-6-18): not a valid pipette name
         name: 'foo',
         spec: fixtureP300Single,
-        tiprackLabwareDef: assignedTiprackNotOnDeckDef as LabwareDefinition2,
-        tiprackDefURI: 'assignedTiprackNotOnDeckURI',
+        tiprackLabwareDef: [
+          assignedTiprackNotOnDeckDef,
+        ] as LabwareDefinition2[],
+        tiprackDefURI: ['assignedTiprackNotOnDeckURI'],
       },
     }
     const result = getLabwareDefinitionsInUse(

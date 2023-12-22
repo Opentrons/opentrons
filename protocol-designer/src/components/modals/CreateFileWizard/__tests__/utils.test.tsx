@@ -21,7 +21,7 @@ let MOCK_FORM_STATE = {
     robotType: FLEX_ROBOT_TYPE,
   },
   pipettesByMount: {
-    left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
+    left: { pipetteName: 'mockPipetteName', tiprackDefURI: ['mocktip'] },
     right: { pipetteName: null, tiprackDefURI: null },
   } as FormPipettesByMount,
   modulesByType: {

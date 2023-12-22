@@ -169,7 +169,8 @@ export const mix: CommandCreator<MixArgs> = (
       prevRobotState,
       invariantContext,
       labware,
-      pipette
+      pipette,
+      tipRack
     )
   ) {
     return {

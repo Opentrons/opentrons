@@ -95,7 +95,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
       prevRobotState,
       invariantContext,
       args.sourceLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -115,7 +116,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
       prevRobotState,
       invariantContext,
       args.destLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(

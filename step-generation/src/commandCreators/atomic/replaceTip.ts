@@ -164,7 +164,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       prevRobotState,
       invariantContext,
       nextTiprack.tiprackId,
-      pipette
+      pipette,
+      tipRack
     )
   ) {
     return {

@@ -95,7 +95,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       prevRobotState,
       invariantContext,
       args.sourceLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     return {
@@ -117,7 +118,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       prevRobotState,
       invariantContext,
       args.destLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     return {
@@ -429,6 +431,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destWell: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
+                tipRack: args.tipRack,
               }),
               ...(aspirateDelay != null
                 ? [

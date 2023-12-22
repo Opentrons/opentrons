@@ -18,7 +18,7 @@ export interface DesignerApplicationData {
   }
   savedStepForms: Record<string, any>
   orderedStepIds: string[]
-  pipetteTiprackAssignments: Record<string, string>
+  pipetteTiprackAssignments: Record<string, string[]>
 }
 
 export const getLoadLiquidCommands = (
