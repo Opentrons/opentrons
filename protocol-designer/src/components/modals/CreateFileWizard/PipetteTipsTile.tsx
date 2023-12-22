@@ -177,7 +177,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   )
 
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
-  let selectedValues = values.pipettesByMount[mount].tiprackDefURI ?? []
+  const selectedValues = values.pipettesByMount[mount].tiprackDefURI ?? []
 
   React.useEffect(() => {
     if (selectedValues === undefined) {

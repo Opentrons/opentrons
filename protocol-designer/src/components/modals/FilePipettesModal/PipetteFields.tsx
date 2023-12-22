@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import {
-  DropdownField,
   FormGroup,
   PipetteSelect,
   OutlineButton,
@@ -29,8 +28,8 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../../../types'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../../../types'
 export interface Props {
   initialTabIndex?: number
   values: FormPipettesByMount
@@ -54,14 +53,7 @@ interface TiprackSelectProps {
 }
 
 export function PipetteFields(props: Props): JSX.Element {
-  const {
-    values,
-    onFieldChange,
-    onSetFieldValue,
-    onSetFieldTouched,
-    onBlur,
-    robotType,
-  } = props
+  const { values, onSetFieldValue, onSetFieldTouched, robotType } = props
 
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
@@ -74,7 +66,6 @@ export function PipetteFields(props: Props): JSX.Element {
       values.right = { pipetteName: null, tiprackDefURI: [] }
     }
   }, [values.left])
-
 
   const renderTiprackSelect = (
     props: TiprackSelectProps
@@ -96,7 +87,7 @@ export function PipetteFields(props: Props): JSX.Element {
       />
     )
   }
-  
+
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
