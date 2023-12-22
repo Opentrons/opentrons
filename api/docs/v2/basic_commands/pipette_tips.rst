@@ -102,7 +102,9 @@ To return a tip to its original location, call the :py:meth:`~.InstrumentContext
 .. versionadded:: 2.0
 
 .. note::
-    Returning tips isn't allowed when using :ref:`partial tip pickup <partial-tip-pickup>`. The API will raise an error.
+    You can't return tips with a pipette that's configured to use :ref:`partial tip pickup <partial-tip-pickup>`. This restriction ensures that the pipette has clear access to unused tips. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is empty. 
+
+    If you call ``return_tip()`` while using partial tip pickup, the API will raise an error. Use ``drop_tip()`` to dispose the tips instead.
 
 Working With Used Tips
 ======================
