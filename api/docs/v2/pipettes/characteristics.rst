@@ -1,3 +1,5 @@
+:og:description: Details on Opentrons pipette movement and flow rates.
+
 .. _pipette-characteristics:
 
 ***********************

@@ -1,3 +1,5 @@
+:og:description: How to change the number of tips an Opentrons pipette uses.
+
 .. _partial-tip-pickup:
 
 ******************
@@ -38,6 +40,7 @@ Here is the start of a protocol that performs both imports, loads a 96-channel p
             load_name="opentrons_flex_96_tiprack_1000ul",
             location="D3"
         )
+        trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument("flex_96channel_1000")
         pipette.configure_nozzle_layout(
             style=COLUMN,
