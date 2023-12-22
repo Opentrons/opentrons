@@ -1,30 +1,121 @@
 """Logic for running a single liquid probe test."""
-from typing import Dict
-from opentrons.protocol_api import Well
+from typing import Dict, Any, List, Tuple, Optional
 from .report import store_tip_results, store_trial
 from opentrons.config.types import LiquidProbeSettings
 from .__main__ import RunArgs
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
+from hardware_testing.gravimetric.helpers import _calculate_stats
 from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
+from hardware_testing.gravimetric.tips import get_unused_tips
+from hardware_testing.data import ui
 from hardware_testing.opentrons_api.types import OT3Mount
 from opentrons.hardware_control.types import InstrumentProbeType
-from statistics import stdev
+
+from opentrons.protocol_api._types import OffDeckType
+
+from opentrons.protocol_api import ProtocolContext, Well, Labware
+
+
+def _load_tipracks(
+    ctx: ProtocolContext, pipette_channels: int, protocol_cfg: Any, tip: int
+) -> List[Labware]:
+    # TODO add logic here for partial tip using 96
+    use_adapters: bool = pipette_channels == 96
+    tiprack_load_settings: List[Tuple[int, str]] = [
+        (
+            slot,
+            f"opentrons_flex_96_tiprack_{tip}ul",
+        )
+        for slot in protocol_cfg.SLOTS_TIPRACK[tip]  # type: ignore[attr-defined]
+    ]
+    for ls in tiprack_load_settings:
+        ui.print_info(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
+
+    adapter: Optional[str] = (
+        "opentrons_flex_96_tiprack_adapter" if use_adapters else None
+    )
+    # If running multiple tests in one run, the labware may already be loaded
+    loaded_labwares = ctx.loaded_labwares
+    print(f"Loaded labwares {loaded_labwares}")
+    pre_loaded_tips: List[Labware] = []
+    for ls in tiprack_load_settings:
+        if ls[0] in loaded_labwares.keys():
+            if loaded_labwares[ls[0]].name == ls[1]:
+                pre_loaded_tips.append(loaded_labwares[ls[0]])
+            else:
+                # If something is in the slot that's not what we want, remove it
+                # we use this only for the 96 channel
+                ui.print_info(
+                    f"Removing {loaded_labwares[ls[0]].name} from slot {ls[0]}"
+                )
+                ctx._core.move_labware(
+                    loaded_labwares[ls[0]]._core,
+                    new_location=OffDeckType.OFF_DECK,
+                    use_gripper=False,
+                    pause_for_manual_move=False,
+                    pick_up_offset=None,
+                    drop_offset=None,
+                )
+    if len(pre_loaded_tips) == len(tiprack_load_settings):
+        return pre_loaded_tips
+
+    tipracks: List[Labware] = []
+    for ls in tiprack_load_settings:
+        if ctx.deck[ls[0]] is not None:
+            tipracks.append(
+                ctx.deck[ls[0]].load_labware(ls[1])  # type: ignore[union-attr]
+            )
+        else:
+            tipracks.append(ctx.load_labware(ls[1], location=ls[0], adapter=adapter))
+    return tipracks
+
+
+def _load_test_well(run_args: RunArgs) -> Labware:
+    slot_scale = run_args.protocol_cfg.SLOT_SCALE  # type: ignore[union-attr]
+    labware_on_scale = run_args.protocol_cfg.LABWARE_ON_SCALE  # type: ignore[union-attr]
+    ui.print_info(f'Loading labware on scale: "{labware_on_scale}"')
+    if labware_on_scale == "radwag_pipette_calibration_vial":
+        namespace = "custom_beta"
+    else:
+        namespace = "opentrons"
+    # If running multiple tests in one run, the labware may already be loaded
+    loaded_labwares = run_args.ctx.loaded_labwares
+    if (
+        slot_scale in loaded_labwares.keys()
+        and loaded_labwares[slot_scale].name == labware_on_scale
+    ):
+        return loaded_labwares[slot_scale]
+
+    labware_on_scale = run_args.ctx.load_labware(
+        labware_on_scale, location=slot_scale, namespace=namespace
+    )
+    return labware_on_scale
+
 
 def run(tip: int, run_args: RunArgs) -> None:
     """Run a liquid probe test."""
-    well: Well = Well()
-    results : List[float] = []
+    test_labware: Labware = _load_test_well(run_args)
+    test_well: Well = test_labware["A1"]
+    _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
+    tips: List[Well] = get_unused_tips(run_args.ctx, tip)
+    assert len(tips) >= run_args.trials
+    results: List[float] = []
     for trial in range(run_args.trials):
+        print(f"Picking up {tip}ul tip")
+        run_args.pipette.pick_up_tip(tips.pop(0))
         print(f"Running liquid probe test with tip {tip}")
-        height = _run_trial(run_args, tip, well, trial)
+        height = _run_trial(run_args, tip, test_well, trial)
+        print("Droping tip")
+        if run_args.return_tip:
+            run_args.pipette.return_tip()
+        else:
+            run_args.pipette.drop_tip()
         results.append(height)
         store_trial(run_args.test_report, trial, tip, height)
 
-    average:float = sum(results) / runargs.trials
-    cv: float = stdev(results) / average
-    #fake this for now
+    # fake this for now
     expected_height = 40.0
-    d: float = (average - expected_height) / expected_height
+    average, cv, d = _calculate_stats(results, expected_height)
     store_tip_results(run_args.test_report, tip, average, cv, d)
 
 
@@ -54,4 +145,4 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     # TODO add in stuff for secondary probe
     height = hw_api.liquid_probe(hw_mount, lps, InstrumentProbeType.PRIMARY)
     run_args.recorder.clear_sample_tag()
-    return
+    return height

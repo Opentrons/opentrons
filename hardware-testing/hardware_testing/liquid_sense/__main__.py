@@ -5,7 +5,7 @@ from json import load as json_load
 from pathlib import Path
 import subprocess
 from time import sleep
-from typing import List, Optional, Any
+from typing import List, Any
 
 from hardware_testing.gravimetric import helpers, workarounds
 from hardware_testing.data.csv_report import CSVReport
@@ -16,6 +16,7 @@ from hardware_testing.drivers import asair_sensor
 from hardware_testing.data import ui, create_run_id_and_start_time, get_git_description
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
+from opentrons.protocol_engine.types import LabwareOffset
 
 from .execute import run
 from .report import build_ls_report, store_config, store_serial_numbers
@@ -28,9 +29,10 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p1000_96,
 )
 
-API_LEVEL = "2.13"
+API_LEVEL = "2.16"
 
-LABWARE_OFFSETS: List[dict] = []
+LABWARE_OFFSETS: List[LabwareOffset] = []
+
 
 LIQUID_SENSE_CFG = {
     50: {
@@ -41,6 +43,18 @@ LIQUID_SENSE_CFG = {
         1: liquid_sense_ot3_p1000_single,
         8: liquid_sense_ot3_p1000_multi,
         96: liquid_sense_ot3_p1000_96,
+    },
+}
+
+PIPETTE_MODEL_NAME = {
+    50: {
+        1: "p50_single_flex",
+        8: "p50_multi_flex",
+    },
+    1000: {
+        1: "p1000_single_flex",
+        8: "p1000_multi_flex",
+        96: "p1000_96_flex",
     },
 }
 
@@ -55,13 +69,14 @@ class RunArgs:
     pipette_tag: str
     git_description: str
     robot_serial: str
-    recorder: Optional[GravimetricRecorder]
+    recorder: GravimetricRecorder
     pipette_volume: int
     pipette_channels: int
     name: str
     environment_sensor: asair_sensor.AsairSensorBase
     trials: int
     z_speed: float
+    return_tip: bool
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: CSVReport
@@ -75,13 +90,12 @@ class RunArgs:
             ui.print_info(
                 "Starting opentrons-robot-server, so we can http GET labware offsets"
             )
-            offsets = workarounds.http_get_all_labware_offsets()
-            ui.print_info(f"found {len(offsets)} offsets:")
-            for offset in offsets:
-                ui.print_info(f"\t{offset['createdAt']}:")
-                ui.print_info(f"\t\t{offset['definitionUri']}")
-                ui.print_info(f"\t\t{offset['vector']}")
-                LABWARE_OFFSETS.append(offset)
+            LABWARE_OFFSETS.extend(workarounds.http_get_all_labware_offsets())
+            ui.print_info(f"found {len(LABWARE_OFFSETS)} offsets:")
+            for offset in LABWARE_OFFSETS:
+                ui.print_info(f"\t{offset.createdAt}:")
+                ui.print_info(f"\t\t{offset.definitionUri}")
+                ui.print_info(f"\t\t{offset.vector}")
         # gather the custom labware (for simulation)
         custom_defs = {}
         if args.simulate:
@@ -96,9 +110,12 @@ class RunArgs:
         _ctx = helpers.get_api_context(
             API_LEVEL,  # type: ignore[attr-defined]
             is_simulating=args.simulate,
-            deck_version="2",
+            pipette_left=PIPETTE_MODEL_NAME[args.pipette][args.channels],
             extra_labware=custom_defs,
         )
+        for offset in LABWARE_OFFSETS:
+            engine = _ctx._core._engine_client._transport._engine  # type: ignore[attr-defined]
+            engine.state_view._labware_store._add_labware_offset(offset)
         return _ctx
 
     @classmethod
@@ -109,19 +126,13 @@ class RunArgs:
         run_id, start_time = create_run_id_and_start_time()
         environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
         git_description = get_git_description()
+        protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
+        name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
         ui.print_header("LOAD PIPETTE")
-        pipette = helpers._load_pipette(
-            _ctx,
-            args.channels,
-            args.pipette,
-            "left",
-            True,
-            True,
-            None,
+        pipette = _ctx.load_instrument(
+            f"flex_{args.channels}channel_{args.pipette}", "left"
         )
         pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
-
-        recorder: Optional[GravimetricRecorder] = None
 
         if args.trials == 0:
             trials = 10
@@ -133,11 +144,8 @@ class RunArgs:
         else:
             tip_volumes = [args.tip]
 
-        protocol_cfg = LIQUID_SENSE_CFG[args.pipette][args.channels]
-        name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
-
         scale = Scale.build(simulate=_ctx.is_simulating())
-        recorder = _load_scale(
+        recorder: GravimetricRecorder = _load_scale(
             name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
         )
         print(f"pipette_tag {pipette_tag}")
@@ -161,7 +169,7 @@ class RunArgs:
             trials,
             args.plunger_direction,
             args.liquid,
-            args.labware_type,
+            protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
             args.z_speed,
             args.start_height_offset,
         )
@@ -179,6 +187,7 @@ class RunArgs:
             environment_sensor=environment_sensor,
             trials=trials,
             z_speed=args.z_speed,
+            return_tip=args.return_tip,
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
