@@ -28,7 +28,6 @@ import { EmergencyStop } from '../pages/EmergencyStop'
 import { NameRobot } from '../pages/NameRobot'
 import { NetworkSetupMenu } from '../pages/NetworkSetupMenu'
 import { ProtocolSetup } from '../pages/ProtocolSetup'
-import { TempODDMenu } from '../pages/TempODDMenu'
 import { RobotDashboard } from '../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/ProtocolDashboard'
@@ -75,12 +74,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Welcome',
     path: '/welcome',
-  },
-  {
-    Component: TempODDMenu,
-    exact: true,
-    name: 'Temp ODD Menu',
-    path: '/menu',
   },
   {
     Component: RobotDashboard,
