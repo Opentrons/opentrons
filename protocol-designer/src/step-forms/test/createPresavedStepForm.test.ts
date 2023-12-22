@@ -29,7 +29,7 @@ beforeEach(() => {
     name: 'p10_single',
     id: 'leftPipetteId',
     spec: fixtureP10Single,
-    tiprackLabwareDef: fixture_tiprack_10_ul,
+    tiprackLabwareDef: [fixture_tiprack_10_ul],
   }
   const labwareOnMagModule = {
     id: 'labwareOnMagModule',
@@ -38,6 +38,10 @@ beforeEach(() => {
         magneticModuleEngageHeight: EXAMPLE_ENGAGE_HEIGHT,
       },
     },
+  }
+  const tipRack = {
+    id: 'tipRack',
+    def: fixture_tiprack_10_ul,
   }
   defaultArgs = {
     stepId,
@@ -57,6 +61,10 @@ beforeEach(() => {
           ...labwareOnMagModule,
           slot: 'someMagneticModuleId',
         },
+      },
+      tipRack: {
+        ...tipRack,
+        slot: '6',
       },
       modules: {
         someMagneticModuleId: {
@@ -129,6 +137,7 @@ describe('createPresavedStepForm', () => {
       pipette: 'leftPipetteId',
       nozzles: null,
       stepType: 'moveLiquid',
+      tipRack: null,
       // default fields
       dropTip_location: null,
       aspirate_airGap_checkbox: false,
@@ -206,6 +215,7 @@ describe('createPresavedStepForm', () => {
         volume: undefined,
         aspirate_flowRate: null,
         dispense_flowRate: null,
+        tipRack: null,
       })
     })
   })

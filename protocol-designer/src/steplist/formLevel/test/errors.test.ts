@@ -1,15 +1,18 @@
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { volumeTooHigh } from '../errors'
 
+const mockTiprack = 'mockTiprack:fixture_tiprack_10_ul/1'
+
 describe('volumeTooHigh', () => {
   let fieldsWithPipette: any // this is any typed because HydratedFormData in formLevel/errors is any typed :(
   beforeEach(() => {
     fieldsWithPipette = {
+      tipRack: mockTiprack,
       pipette: {
         spec: {
           maxVolume: 10,
         },
-        tiprackLabwareDef: { ...fixture_tiprack_10_ul }, // max tip volume is 10 ul
+        tiprackLabwareDef: [{ ...fixture_tiprack_10_ul }], // max tip volume is 10 ul
       },
     }
   })

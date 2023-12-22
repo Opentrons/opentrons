@@ -25,6 +25,7 @@ describe('TiprackOption', () => {
   })
   it('renders an unselected tiprack option', () => {
     props.isSelected = false
+    render(props)
     screen.getByText('mockText')
     expect(
       screen.getByLabelText('TiprackOption_checkbox-blank-outline')

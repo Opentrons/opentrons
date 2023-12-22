@@ -416,6 +416,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         // aspirate settings
+        tipRack: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_labware: {
           value: 'aspirate_labware_id',
           isIndeterminate: false,
@@ -599,6 +603,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
     beforeEach(() => {
       mockSavedStepFormsIndeterminate = {
         ...getMockMoveLiquidStep(),
+        tipRack: 'mockTiprack',
         // just doing this so the ids are not the exact same
         another_move_liquid_step_id: {
           ...getMockMoveLiquidStep().move_liquid_step_id,
@@ -645,6 +650,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         // aspirate settings
+        tipRack: {
+          isIndeterminate: false,
+        },
         aspirate_labware: {
           isIndeterminate: true,
         },
@@ -823,6 +831,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           mockMixMultiSelectItemIds
         )
       ).toEqual({
+        tipRack: { isIndeterminate: false },
         volume: { value: '100', isIndeterminate: false },
         times: { value: null, isIndeterminate: false },
         changeTip: { value: 'always', isIndeterminate: false },
@@ -892,6 +901,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           mockMixMultiSelectItemIds
         )
       ).toEqual({
+        tipRack: { isIndeterminate: false },
         volume: { isIndeterminate: true },
         times: { isIndeterminate: true },
         changeTip: { isIndeterminate: true },
