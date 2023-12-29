@@ -24,12 +24,14 @@ class NodeId(int, Enum):
     gripper = 0x20
     gripper_z = 0x21
     gripper_g = 0x22
+    hepa_filter = 0x80
     pipette_left_bootloader = pipette_left | 0xF
     pipette_right_bootloader = pipette_right | 0xF
     gantry_x_bootloader = gantry_x | 0xF
     gantry_y_bootloader = gantry_y | 0xF
     head_bootloader = head | 0xF
     gripper_bootloader = gripper | 0xF
+    hepa_filter_bootloader = hepa_filter | 0xF
 
     def is_bootloader(self) -> bool:
         """Whether this node ID is a bootloader."""
