@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { act, waitFor } from '@testing-library/react'
+import { act, fireEvent, waitFor } from '@testing-library/react'
 import { resetAllWhenMocks, when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
@@ -74,7 +74,7 @@ describe('RobotSettings Troubleshooting', () => {
     const [{ getByRole, queryByText }] = render()
     const downloadLogsButton = getByRole('button', { name: 'Download logs' })
     act(() => {
-      downloadLogsButton.click()
+      fireEvent.click(downloadLogsButton)
     })
     expect(downloadLogsButton).toBeDisabled()
     expect(MOCK_MAKE_TOAST).toBeCalledWith('Downloading logs...', 'info', {
