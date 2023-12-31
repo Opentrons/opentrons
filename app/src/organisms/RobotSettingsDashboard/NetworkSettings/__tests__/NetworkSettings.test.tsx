@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -77,21 +78,22 @@ describe('NetworkSettings', () => {
 
   it('selecting the Wi-Fi option displays the wifi details', () => {
     const [{ getByText }] = render(props)
-    getByText('Wi-Fi').click()
+    fireEvent.click(getByText('Wi-Fi'))
     expect(mockSetCurrentOption).toHaveBeenCalledWith('RobotSettingsWifi')
   })
 
   it('clicking back on the wifi details screen shows the network settings page again', () => {
     const [{ getByText, queryByText, container }] = render(props)
-    getByText('Wi-Fi').click()
-    container.querySelector('button')?.click()
+    fireEvent.click(getByText('Wi-Fi'))
+    const button = container.querySelector('button')
+    if (button != null) fireEvent.click(button)
     expect(queryByText('WIFI DETAILS')).toBeFalsy()
     expect(getByText('Network Settings')).toBeTruthy()
   })
 
   it('selecting the Ethernet option displays the ethernet details', () => {
     const [{ getByText }] = render(props)
-    getByText('Ethernet').click()
+    fireEvent.click(getByText('Ethernet'))
     expect(mockSetCurrentOption).toHaveBeenCalledWith(
       'EthernetConnectionDetails'
     )
@@ -99,8 +101,9 @@ describe('NetworkSettings', () => {
 
   it('clicking back on the ethernet details screen shows the network settings page again', () => {
     const [{ getByText, queryByText, container }] = render(props)
-    getByText('Ethernet').click()
-    container.querySelector('button')?.click()
+    fireEvent.click(getByText('Ethernet'))
+    const button = container.querySelector('button')
+    if (button != null) fireEvent.click(button)
     expect(queryByText('ETHERNET DETAILS')).toBeFalsy()
     expect(getByText('Network Settings')).toBeTruthy()
   })

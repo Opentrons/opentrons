@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { act } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 
 import {
   getProtocol,
@@ -89,7 +89,7 @@ describe('DeleteProtocolConfirmationModal', () => {
 
   it('should close the modal when tapping cancel button', () => {
     const { getByText } = render(props)
-    getByText('Cancel').click()
+    fireEvent.click(getByText('Cancel'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
@@ -102,7 +102,7 @@ describe('DeleteProtocolConfirmationModal', () => {
 
     const { getByText } = render(props)
     act(() => {
-      getByText('Delete').click()
+      fireEvent.click(getByText('Delete'))
     })
     await new Promise(setImmediate)
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
