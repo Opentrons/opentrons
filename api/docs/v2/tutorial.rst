@@ -111,11 +111,11 @@ Whether you need a ``requirements`` block depends on your robot model and API ve
 
 - **Flex:** The ``requirements`` block is always required. And, the API version does not go in the ``metadata`` section. The API version belongs in the ``requirements``. For example::
 
-    requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+    requirements = {'robotType': 'Flex', 'apiLevel': '2.16'}
 
 - **OT-2:** The ``requirements`` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the ``metadata``. For example::
     
-    requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
+    requirements = {'robotType': 'OT-2', 'apiLevel': '2.16'}
 
 With the metadata and requirements defined, you can move on to creating the ``run()`` function for your protocol.
 

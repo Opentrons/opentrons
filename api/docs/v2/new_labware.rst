@@ -213,7 +213,7 @@ In addition to referencing wells by name, you can also reference them with zero-
 
 .. tip::
 
-    You may find coordinate well names like ``"B3"`` easier to reason with, especially when working with irregular labware, e.g.
+    You may find coordinate well names like ``'B3'`` easier to reason with, especially when working with irregular labware, e.g.
     ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical`` (see the `Opentrons 10 Tube Rack <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_ in the Labware Library). Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
 
 .. versionadded:: 2.0
@@ -273,14 +273,14 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
 .. code-block:: python
 
         greenWater = protocol.define_liquid(
-            name="Green water",
-            description="Green colored water for demo",
-            display_color="#00FF00",
+            name='Green water',
+            description='Green colored water for demo',
+            display_color='#00FF00',
         )
         blueWater = protocol.define_liquid(
-            name="Blue water",
-            description="Blue colored water for demo",
-            display_color="#0000FF",
+            name='Blue water',
+            description='Blue colored water for demo',
+            display_color='#0000FF',
         )
 
 .. versionadded:: 2.14
@@ -294,12 +294,12 @@ This example uses ``load_liquid`` to label the initial well location, contents, 
 
 .. code-block:: python
 
-        well_plate["A1"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["A2"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["B1"].load_liquid(liquid=blueWater, volume=50)
-        well_plate["B2"].load_liquid(liquid=blueWater, volume=50)
-        reservoir["A1"].load_liquid(liquid=greenWater, volume=200)
-        reservoir["A2"].load_liquid(liquid=blueWater, volume=200)
+        well_plate['A1'].load_liquid(liquid=greenWater, volume=50)
+        well_plate['A2'].load_liquid(liquid=greenWater, volume=50)
+        well_plate['B1'].load_liquid(liquid=blueWater, volume=50)
+        well_plate['B2'].load_liquid(liquid=blueWater, volume=50)
+        reservoir['A1'].load_liquid(liquid=greenWater, volume=200)
+        reservoir['A2'].load_liquid(liquid=blueWater, volume=200)
         
 .. versionadded:: 2.14
 
