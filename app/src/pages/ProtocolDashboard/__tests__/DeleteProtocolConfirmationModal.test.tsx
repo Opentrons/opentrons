@@ -102,7 +102,7 @@ describe('DeleteProtocolConfirmationModal', () => {
 
     render(props)
     act(() => {
-      fireEvent.click(screen.getByText('Delete'))
+      screen.getByText('Delete').click()
     })
     await new Promise(setImmediate)
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
