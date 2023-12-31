@@ -117,7 +117,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
 
             # metadata
             metadata = {
-                protocolName': 'My Protocol',
+                'protocolName': 'My Protocol',
                 'author': 'Name <opentrons@example.com>',
                 'description': 'Simple protocol to get started using the OT-2',
             }
