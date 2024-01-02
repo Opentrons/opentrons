@@ -13,12 +13,12 @@ from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
 from hardware_testing.gravimetric.measurement.scale import Scale
 from hardware_testing.gravimetric.execute import _load_scale
 from hardware_testing.drivers import asair_sensor
-from hardware_testing.data import ui, create_run_id_and_start_time, get_git_description
+from hardware_testing.data import ui, create_run_id_and_start_time, get_git_description, get_testing_data_directory
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset
 
-from .execute import run
+from hardware_testing.liquid_sense import execute
 from .report import build_ls_report, store_config, store_serial_numbers
 
 from hardware_testing.protocols.liquid_sense_lpc import (
@@ -132,6 +132,8 @@ class RunArgs:
         pipette = _ctx.load_instrument(
             f"flex_{args.channels}channel_{args.pipette}", "left"
         )
+        trash = _ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
+        pipette.trash_container = trash
         pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
 
         if args.trials == 0:
@@ -140,7 +142,10 @@ class RunArgs:
             trials = args.trials
 
         if args.tip == 0:
-            tip_volumes: List[int] = [50, 200, 1000]
+            if args.pipette==1000:
+                tip_volumes: List[int] = [50, 200, 1000]
+            else:
+                tip_volumes = [50]
         else:
             tip_volumes = [args.tip]
 
@@ -221,9 +226,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():
+        data_dir = get_testing_data_directory()
+        data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
+        ui.print_info(f"logging can data to {data_file}")
         serial_logger = subprocess.Popen(
             [
-                "python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log"
+                f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"
             ],
             shell=True,
         )
@@ -234,11 +242,10 @@ if __name__ == "__main__":
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
-
         for tip in run_args.tip_volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
-            run(tip, run_args)
+            execute.run(tip, run_args)
 
     finally:
         if run_args.recorder is not None:
