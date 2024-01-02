@@ -30,6 +30,7 @@ interface SystemD {
 
 const provideExports = (): SystemD => {
   if (platform === 'linux') {
+    console.log('process env', process.env)
     return {
       ready: () => promisifyProcess('/bin/systemd-notify --ready'),
       sendStatus: text =>

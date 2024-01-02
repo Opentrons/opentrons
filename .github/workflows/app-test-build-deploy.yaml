@@ -63,7 +63,7 @@ jobs:
         with:
           node-version: '21'
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev build-essential libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -120,7 +120,7 @@ jobs:
         run: make --version
       - name: 'install libudev and libsystemd'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev build-essential libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -253,7 +253,7 @@ jobs:
         run: make --version
       - name: 'install libudev and libsystemd'
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev build-essential libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6
@@ -429,7 +429,7 @@ jobs:
         with:
           node-version: '21'
       - name: 'install udev'
-        run: sudo apt-get update && sudo apt-get install libudev-dev
+        run: sudo apt-get update && sudo apt-get install libudev-dev build-essential libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
         uses: actions/github-script@v6

@@ -36,7 +36,7 @@ const WINDOW_OPTS = {
   ),
 }
 
-export async function createUi(): Promise<BrowserWindow> {
+export function createUi(): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
@@ -49,7 +49,7 @@ export async function createUi(): Promise<BrowserWindow> {
 
   log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  await mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
+  mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
   // open new windows (<a target="_blank" ...) in browser windows
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -57,6 +57,7 @@ export async function createUi(): Promise<BrowserWindow> {
       log.debug('Opening external link', { url })
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       shell.openExternal(url)
+      // return { action: 'allow' }
       return { action: 'allow' }
     } else {
       console.log("Blocked by 'setWindowOpenHandler'")

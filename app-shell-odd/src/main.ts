@@ -54,7 +54,7 @@ app.once('window-all-closed', () => {
 
 function startUp(): void {
   log.info('Starting App')
-  console.log('Starting App')
+  // console.log('Starting App')
   const storeNeedsReset = fse.existsSync(
     path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
@@ -68,7 +68,7 @@ function startUp(): void {
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
   )
-
+  log.info('before dispatch')
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -77,7 +77,8 @@ function startUp(): void {
       mainWindow.webContents.send('dispatch', action)
     }
   }
-
+  log.info('Before createUI')
+  log.info('dispatch', dispatch)
   mainWindow = createUi(dispatch)
   rendererLogger = createRendererLogger()
 

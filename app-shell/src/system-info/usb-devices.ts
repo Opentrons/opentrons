@@ -1,14 +1,10 @@
 import assert from 'assert'
 import execa from 'execa'
-// import usbDetection from 'usb-detection'
 import { usb } from 'usb'
 import { isWindows } from '../os'
 import { createLogger } from '../log'
 
-// import type { Device } from 'usb-detection'
 import type { Device } from 'usb'
-
-export type { Device }
 
 export type UsbDeviceMonitorOptions = Partial<{
   onDeviceAdd?: (device: Device) => unknown
@@ -16,7 +12,6 @@ export type UsbDeviceMonitorOptions = Partial<{
 }>
 
 export interface UsbDeviceMonitor {
-  // getAllDevices: () => Promise<Device[]>
   getAllDevices: () => Device[]
   stop: () => void
 }
@@ -58,7 +53,7 @@ const decToHex = (number: number): string =>
   number.toString(16).toUpperCase().padStart(4, '0')
 
 export function getWindowsDriverVersion(
-  device: Device
+  device: USBDevice
 ): Promise<string | null> {
   const { vendorId: vidDecimal, productId: pidDecimal, serialNumber } = device
   const [vid, pid] = [decToHex(vidDecimal), decToHex(pidDecimal)]

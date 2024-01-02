@@ -42,6 +42,8 @@ const WINDOW_OPTS = {
 }
 
 export function createUi(dispatch: Dispatch): BrowserWindow {
+  log.debug('dispatch', dispatch)
+  log.info('hello')
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
@@ -58,18 +60,22 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
+  log.info('before setWindowOpenHandler')
   // open new windows (<a target="_blank" ...) in browser windows
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('http://localhost:8090')) {
+    log.info('setWindowOpenHandler')
+    if (url.startsWith('http://localhost')) {
       log.debug('Opening external link', { url })
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       shell.openExternal(url)
-      return { action: 'allow' }
+      return { action: 'allow', overrideBrowserWindowOptions: WINDOW_OPTS }
     } else {
-      console.log("Blocked by 'setWindowOpenHandler'")
+      log.error("Blocked by 'setWindowOpenHandler'")
       return { action: 'deny' }
     }
   })
+
+  log.info('mainWindow', mainWindow)
 
   return mainWindow
 }

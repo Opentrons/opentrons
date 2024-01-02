@@ -10,9 +10,10 @@ import {
   getActiveInterfaces,
 } from './network-interfaces'
 
+import type { WebUSBDevice } from 'usb'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { Action, Dispatch } from '../types'
-import type { UsbDeviceMonitor, Device } from './usb-devices'
+import type { UsbDeviceMonitor } from './usb-devices'
 import type {
   NetworkInterface,
   NetworkInterfaceMonitor,
@@ -21,13 +22,19 @@ import type {
 export { createNetworkInterfaceMonitor }
 export type { NetworkInterface, NetworkInterfaceMonitor }
 
+type Device = Partial<WebUSBDevice>
+
 const RE_REALTEK = /realtek/i
 const IFACE_POLL_INTERVAL_MS = 30000
 
 const log = createLogger('system-info')
 
-const addDriverVersion = (device: Device): Promise<UsbDevice> => {
-  if (isWindows() && RE_REALTEK.test(device.manufacturer)) {
+const addDriverVersion = (device: WebUSBDevice): Promise<WebUSBDevice> => {
+  if (
+    isWindows() &&
+    device.manufacturerName &&
+    RE_REALTEK.test(device.manufacturerName)
+  ) {
     return getWindowsDriverVersion(device).then(windowsDriverVersion => ({
       ...device,
       windowsDriverVersion,
