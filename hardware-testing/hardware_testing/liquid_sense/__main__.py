@@ -13,7 +13,12 @@ from hardware_testing.gravimetric.measurement.record import GravimetricRecorder
 from hardware_testing.gravimetric.measurement.scale import Scale
 from hardware_testing.gravimetric.execute import _load_scale
 from hardware_testing.drivers import asair_sensor
-from hardware_testing.data import ui, create_run_id_and_start_time, get_git_description, get_testing_data_directory
+from hardware_testing.data import (
+    ui,
+    create_run_id_and_start_time,
+    get_git_description,
+    get_testing_data_directory,
+)
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_engine.types import LabwareOffset
@@ -142,7 +147,7 @@ class RunArgs:
             trials = args.trials
 
         if args.tip == 0:
-            if args.pipette==1000:
+            if args.pipette == 1000:
                 tip_volumes: List[int] = [50, 200, 1000]
             else:
                 tip_volumes = [50]
@@ -230,9 +235,7 @@ if __name__ == "__main__":
         data_file = f"/{data_dir}/{run_args.name}/{run_args.run_id}/serial.log"
         ui.print_info(f"logging can data to {data_file}")
         serial_logger = subprocess.Popen(
-            [
-                f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"
-            ],
+            [f"python3 -m opentrons_hardware.scripts.can_mon > {data_file}"],
             shell=True,
         )
         sleep(1)
