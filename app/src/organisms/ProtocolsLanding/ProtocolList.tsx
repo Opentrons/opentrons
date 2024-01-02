@@ -133,13 +133,13 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       {selectedProtocol != null ? (
         <>
           <ChooseRobotToRunProtocolSlideout
-            key={selectedProtocol.protocolKey}
+            key={`ChooseRobotToRunProtocolSlideout_${selectedProtocol.protocolKey}`}
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={selectedProtocol}
           />
           <SendProtocolToOT3Slideout
-            key={selectedProtocol.protocolKey}
+            key={`SendProtocolToOT3Slideout_${selectedProtocol.protocolKey}`}
             isExpanded={showSendProtocolToOT3Slideout}
             onCloseClick={() => setShowSendProtocolToOT3Slideout(false)}
             storedProtocolData={selectedProtocol}
