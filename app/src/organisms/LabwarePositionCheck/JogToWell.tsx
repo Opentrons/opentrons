@@ -97,7 +97,10 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   }, [])
 
   let wellsToHighlight: string[] = []
-  if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
+  if (
+    getPipetteNameSpecs(pipetteName)?.channels === 8 &&
+    !shouldUseMetalProbe
+  ) {
     wellsToHighlight = labwareDef.ordering[0]
   } else {
     wellsToHighlight = ['A1']
@@ -150,6 +153,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                 <PipetteRender
                   labwareDef={labwareDef}
                   pipetteName={pipetteName}
+                  usingMetalProbe={shouldUseMetalProbe}
                 />
               </>
             )}
