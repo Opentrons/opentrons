@@ -37,7 +37,7 @@ jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../organisms/ChooseRobotToRunProtocolSlideout')
-jest.mock('../../../organisms/SendProtocolToOT3Slideout')
+jest.mock('../../../organisms/SendProtocolToFlexSlideout')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots

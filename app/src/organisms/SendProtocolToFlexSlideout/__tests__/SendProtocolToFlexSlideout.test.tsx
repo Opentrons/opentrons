@@ -34,7 +34,7 @@ import {
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { SendProtocolToOT3Slideout } from '..'
+import { SendProtocolToFlexSlideout } from '..'
 
 import type { State } from '../../../redux/types'
 import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
@@ -81,11 +81,11 @@ const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.Mocked
 >
 
 const render = (
-  props: React.ComponentProps<typeof SendProtocolToOT3Slideout>
+  props: React.ComponentProps<typeof SendProtocolToFlexSlideout>
 ) => {
   return renderWithProviders(
     <StaticRouter>
-      <SendProtocolToOT3Slideout {...props} />
+      <SendProtocolToFlexSlideout {...props} />
     </StaticRouter>,
     {
       i18nInstance: i18n,
@@ -118,7 +118,7 @@ const mockEatToast = jest.fn()
 const mockMutateAsync = jest.fn()
 const mockCustomLabwareFile: File = { path: 'fake_custom_labware_path' } as any
 
-describe('SendProtocolToOT3Slideout', () => {
+describe('SendProtocolToFlexSlideout', () => {
   beforeEach(() => {
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: '',

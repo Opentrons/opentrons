@@ -26,14 +26,14 @@ import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
 
-interface SendProtocolToOT3SlideoutProps extends StyleProps {
+interface SendProtocolToFlexSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   isExpanded: boolean
 }
 
-export function SendProtocolToOT3Slideout(
-  props: SendProtocolToOT3SlideoutProps
+export function SendProtocolToFlexSlideout(
+  props: SendProtocolToFlexSlideoutProps
 ): JSX.Element | null {
   const { isExpanded, onCloseClick, storedProtocolData } = props
   const {
