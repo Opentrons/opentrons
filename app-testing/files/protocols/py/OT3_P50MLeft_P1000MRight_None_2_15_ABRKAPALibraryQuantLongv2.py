@@ -1,7 +1,5 @@
 from opentrons import protocol_api
 
-from opentrons import types
-
 import inspect
 
 metadata = {

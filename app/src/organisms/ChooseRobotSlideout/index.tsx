@@ -22,14 +22,15 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
   getScanning,
   startDiscovery,
+  RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
-  ROBOT_MODEL_OT3,
 } from '../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { Banner } from '../../atoms/Banner'
@@ -37,6 +38,7 @@ import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { AvailableRobotOption } from './AvailableRobotOption'
 
+import type { RobotType } from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
@@ -83,8 +85,9 @@ interface ChooseRobotSlideoutProps
     Partial<UseCreateRun> {
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
-  showOT3Only?: boolean
   isAnalysisError?: boolean
+  robotType: RobotType | null
+  showIdleOnly?: boolean
 }
 
 export function ChooseRobotSlideout(
@@ -96,7 +99,6 @@ export function ChooseRobotSlideout(
     onCloseClick,
     title,
     footer,
-    showOT3Only = false,
     isAnalysisError = false,
     isCreatingRun = false,
     reset: resetCreateRun,
@@ -104,23 +106,45 @@ export function ChooseRobotSlideout(
     runCreationErrorCode,
     selectedRobot,
     setSelectedRobot,
+    robotType,
+    showIdleOnly = false,
   } = props
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
-  ).filter(robot =>
-    showOT3Only ? RE_ROBOT_MODEL_OT3.test(robot.robotModel) : true
-  )
+  ).filter(robot => {
+    if (robotType === FLEX_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT3.test(robot.robotModel)
+    } else if (robotType === OT2_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT2.test(robot.robotModel)
+    } else {
+      return true
+    }
+  })
   const unreachableRobots = useSelector((state: State) =>
     getUnreachableRobots(state)
-  ).filter(robot =>
-    showOT3Only ? RE_ROBOT_MODEL_OT3.test(robot.robotModel) : true
-  )
+  ).filter(robot => {
+    if (robotType === FLEX_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT3.test(robot.robotModel)
+    } else if (robotType === OT2_ROBOT_TYPE) {
+      return RE_ROBOT_MODEL_OT2.test(robot.robotModel)
+    } else {
+      return true
+    }
+  })
   const healthyReachableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
-  ).filter(robot => (showOT3Only ? robot.robotModel === ROBOT_MODEL_OT3 : true))
+  ).filter(robot => {
+    if (robotType === FLEX_ROBOT_TYPE) {
+      return robot.robotModel === FLEX_ROBOT_TYPE
+    } else if (robotType === OT2_ROBOT_TYPE) {
+      return robot.robotModel === OT2_ROBOT_TYPE
+    } else {
+      return true
+    }
+  })
 
   const [robotBusyStatusByName, registerRobotBusyStatus] = React.useReducer(
     robotBusyStatusByNameReducer,
@@ -155,9 +179,6 @@ export function ChooseRobotSlideout(
 
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
-
-  // for now, the only use case for showing idle only is also the only use case for showing OT-3 only
-  const showIdleOnly = showOT3Only
 
   return (
     <Slideout

@@ -147,11 +147,13 @@ You can also specify a particular well as the blowout location::
 
     pipette.blow_out(plate['B1'])
 
-Many protocols use the trash bin for blowing out the pipette. You can specify the trash bin as the blowout location by using the :py:obj:`.ProtocolContext.fixed_trash` property::
+Many protocols use a trash container for blowing out the pipette. You can specify the pipette's current trash container as the blowout location by using the :py:obj:`.InstrumentContext.trash_container` property::
 
-    pipette.blow_out(protocol.fixed_trash['A1'])  
+    pipette.blow_out(pipette.trash_container)
 
 .. versionadded:: 2.0
+.. versionchanged:: 2.16
+    Added support for ``TrashBin`` and ``WasteChute`` locations.
 
 .. _touch-tip:
 

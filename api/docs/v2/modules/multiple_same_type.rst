@@ -49,7 +49,7 @@ When working with multiple modules of the same type, load them in your protocol 
 
       from opentrons import protocol_api
 
-      metadata = { 'apiLevel': '2.14'}
+      metadata = { 'apiLevel': '|apiLevel|'}
 
       def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot C1 on USB port 1

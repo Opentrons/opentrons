@@ -129,6 +129,22 @@ Also note the ``hs_mod.open_labware_latch()`` command in the above example. To m
     
 If the labware is inaccessible, the API will raise an error. 
 
+Movement into the Waste Chute
+=============================
+
+Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first :ref:`configure the waste chute <configure-waste-chute>` in your protocol. Then use the loaded :py:class:`WasteChute` object as the value of ``new_location``::
+
+    chute = protocol.load_waste_chute()
+    protocol.move_labware(
+        labware=plate, new_location=chute, use_gripper=True
+    )
+
+.. versionadded:: 2.16
+
+This will pick up ``plate`` from its current location and drop it into the chute.
+
+Always specify ``use_gripper=True`` when moving labware into the waste chute. The chute is not designed for manual movement. You can still manually move labware to other locations, including off-deck, with the chute installed.
+
 .. _off-deck-location:
 
 The Off-Deck Location
@@ -148,7 +164,7 @@ You can also load labware off-deck, in preparation for a ``move_labware()`` comm
 
     from opentrons import protocol_api
 
-    metadata = {"apiLevel": "2.15", "protocolName": "Tip rack replacement"}
+    metadata = {"apiLevel": "|apiLevel|", "protocolName": "Tip rack replacement"}
     requirements = {"robotType": "OT-2"}
 
 

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'

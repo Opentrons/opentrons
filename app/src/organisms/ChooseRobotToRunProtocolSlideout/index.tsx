@@ -135,6 +135,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     first(srcFileNames) ??
     protocolKey
 
+  // intentionally show both robot types if analysis has any error
+  const robotType =
+    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+      ? mostRecentAnalysis?.robotType ?? null
+      : null
+
   return (
     <ChooseRobotSlideout
       isExpanded={showSlideout}
@@ -171,10 +177,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       }
       selectedRobot={selectedRobot}
       setSelectedRobot={setSelectedRobot}
+      robotType={robotType}
       isCreatingRun={isCreatingRun}
       reset={resetCreateRun}
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
+      showIdleOnly={true}
     />
   )
 }
