@@ -57,8 +57,6 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
   return (
     <>
       {parseHtml(
-        // TODO(bh, 2023-7-12): use svgson stringify option to apply individual attributes https://github.com/elrumordelaluz/svgson#svgsonstringify
-        // the goal would be to give more styling control over individual deck map elements
         stringify(groupNodeWrapper, {
           selfClose: false,
         })
