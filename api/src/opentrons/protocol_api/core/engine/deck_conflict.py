@@ -282,7 +282,7 @@ def _check_deck_conflict_for_96_channel(
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
 
-    destination_slot_num = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
+    destination_slot_num = labware_slot.as_int()
     adjacent_slot_num = None
     # TODO (spp, 2023-12-18): change this eventually to "column 1"/"column 12"
     #  via the column mappings in the pipette geometry definitions.
@@ -294,7 +294,7 @@ def _check_deck_conflict_for_96_channel(
     def _check_conflict_with_slot_item(
         adjacent_slot: DeckSlotName,
     ) -> None:
-        """Raises error if the pipette is ecpected to collide with adjacent slot items."""
+        """Raises error if the pipette is expected to collide with adjacent slot items."""
         slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
             DeckSlotLocation(slotName=adjacent_slot)
         )
@@ -358,7 +358,7 @@ def _check_deck_conflict_for_8_channel(
         )
 
     labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-    destination_slot = _deck_slot_to_int(DeckSlotLocation(slotName=labware_slot))
+    destination_slot = labware_slot.as_int()
     adjacent_slot_num = None
     # TODO (spp, 2023-12-18): change this eventually to use nozzles from mappings in
     #  the pipette geometry definitions.
