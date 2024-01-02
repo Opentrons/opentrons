@@ -112,7 +112,16 @@ def run(tip: int, run_args: RunArgs) -> None:
         else:
             run_args.pipette.drop_tip()
         results.append(height)
-        store_trial(run_args.test_report, trial, tip, height, plunger_pos)
+        env_data = run_args.environment_sensor.get_reading()
+        store_trial(
+            run_args.test_report,
+            trial,
+            tip,
+            height,
+            plunger_pos,
+            env_data.relative_humidity,
+            env_data.temperature,
+        )
 
     # fake this for now
     expected_height = 40.0
@@ -126,7 +135,9 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         run_args.pipette_channels
     ][tip]
     data_dir = get_testing_data_directory()
-    data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-{trial}.csv"
+    data_file = (
+        f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-{trial}.csv"
+    )
     ui.print_info(f"logging pressure data to {data_file}")
     lps = LiquidProbeSettings(
         starting_mount_height=well.top().point.z,
