@@ -21,26 +21,25 @@ import { ToasterOven } from '../organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { EstopTakeover } from '../organisms/EmergencyStop'
-import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
-import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
-import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
+import { ConnectViaEthernet } from '../pages/ConnectViaEthernet'
+import { ConnectViaUSB } from '../pages/ConnectViaUSB'
+import { ConnectViaWifi } from '../pages/ConnectViaWifi'
 import { EmergencyStop } from '../pages/EmergencyStop'
-import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
-import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
-import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
-import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
-import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
-import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import { NameRobot } from '../pages/NameRobot'
+import { NetworkSetupMenu } from '../pages/NetworkSetupMenu'
+import { ProtocolSetup } from '../pages/ProtocolSetup'
+import { RobotDashboard } from '../pages/RobotDashboard'
+import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/ProtocolDashboard'
-import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
-import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
-import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
-import { UpdateRobot } from '../pages/OnDeviceDisplay/UpdateRobot'
-import { UpdateRobotDuringOnboarding } from '../pages/OnDeviceDisplay/UpdateRobotDuringOnboarding'
-import { InstrumentsDashboard } from '../pages/OnDeviceDisplay/InstrumentsDashboard'
-import { InstrumentDetail } from '../pages/OnDeviceDisplay/InstrumentDetail'
-import { Welcome } from '../pages/OnDeviceDisplay/Welcome'
-import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScreen'
+import { ProtocolDetails } from '../pages/ProtocolDetails'
+import { RunningProtocol } from '../pages/RunningProtocol'
+import { RunSummary } from '../pages/RunSummary'
+import { UpdateRobot } from '../pages/UpdateRobot/UpdateRobot'
+import { UpdateRobotDuringOnboarding } from '../pages/UpdateRobot/UpdateRobotDuringOnboarding'
+import { InstrumentsDashboard } from '../pages/InstrumentsDashboard'
+import { InstrumentDetail } from '../pages/InstrumentDetail'
+import { Welcome } from '../pages/Welcome'
+import { InitialLoadingScreen } from '../pages/InitialLoadingScreen'
 import { DeckConfigurationEditor } from '../pages/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
@@ -75,12 +74,6 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Welcome',
     path: '/welcome',
-  },
-  {
-    Component: TempODDMenu,
-    exact: true,
-    name: 'Temp ODD Menu',
-    path: '/menu',
   },
   {
     Component: RobotDashboard,

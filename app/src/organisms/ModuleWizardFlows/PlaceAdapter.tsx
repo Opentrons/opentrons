@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
-import HeaterShaker_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
-import HeaterShaker_PlaceAdapter_R from '@opentrons/app/src/assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
-import TempModule_PlaceAdapter_L from '@opentrons/app/src/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
-import TempModule_PlaceAdapter_R from '@opentrons/app/src/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
-import Thermocycler_PlaceAdapter from '@opentrons/app/src/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import HeaterShaker_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_L.webm'
+import HeaterShaker_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/HeaterShaker_PlaceAdapter_R.webm'
+import TempModule_PlaceAdapter_L from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
+import TempModule_PlaceAdapter_R from '../../assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
+import Thermocycler_PlaceAdapter from '../../assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
 
 import {
   Flex,

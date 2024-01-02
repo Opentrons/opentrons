@@ -42,7 +42,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             from opentrons import protocol_api
             
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
             
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Magnetic Module GEN2 in deck slot 1.

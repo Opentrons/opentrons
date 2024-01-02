@@ -9,7 +9,7 @@ Pipettes
 .. toctree::
     pipettes/loading
     pipettes/characteristics
-    pipettes/configuring
+    pipettes/partial_tip_pickup
     pipettes/volume_modes
     
 Opentrons pipettes are configurable devices used to move liquids throughout the working area during the execution of protocols. Flex and OT-2 each have their own pipettes, which are available for use in the Python API.

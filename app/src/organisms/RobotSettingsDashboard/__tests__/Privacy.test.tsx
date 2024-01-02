@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -42,28 +42,26 @@ describe('Privacy', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText }] = render(props)
-    getByText('Privacy')
-    getByText(
+    render(props)
+    screen.getByText('Privacy')
+    screen.getByText(
       'Opentrons cares about your privacy. We anonymize all data and only use it to improve our products.'
     )
-    getByText('Share robot logs')
-    getByText('Data on actions the robot does, like running protocols.')
-    getByText('Share display usage')
-    getByText('Data on how you interact with the touchscreen on Flex.')
+    screen.getByText('Share robot logs')
+    screen.getByText('Data on actions the robot does, like running protocols.')
+    screen.getByText('Share display usage')
+    screen.getByText('Data on how you interact with the touchscreen on Flex.')
   })
 
   it('should toggle display usage sharing on click', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('Share display usage').click()
+    render(props)
+    fireEvent.click(screen.getByText('Share display usage'))
     expect(mockToggleAnalyticsOptedIn).toBeCalled()
   })
 
   it('should toggle robot logs sharing on click', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('Share robot logs').click()
+    render(props)
+    screen.getByText('Share robot logs').click()
     expect(mockUpdateSetting).toBeCalledWith(
       'Otie',
       'disableLogAggregation',

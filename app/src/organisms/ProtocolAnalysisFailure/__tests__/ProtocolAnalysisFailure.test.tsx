@@ -1,5 +1,4 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
