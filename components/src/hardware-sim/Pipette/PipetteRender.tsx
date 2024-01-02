@@ -55,14 +55,6 @@ export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
       probeOffsetX = 99 / 2
     }
   }
-  console.log(
-    '🚀 ~ file: PipetteRender.tsx:57 ~ PipetteRender ~ probeOffsetX:',
-    probeOffsetX
-  )
-  console.log(
-    '🚀 ~ file: PipetteRender.tsx:59 ~ PipetteRender ~ probeOffsetY:',
-    probeOffsetY
-  )
 
   return (
     <RobotCoordsForeignDiv
