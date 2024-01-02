@@ -7,7 +7,7 @@ from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.helpers import _calculate_stats
 from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
 from hardware_testing.gravimetric.tips import get_unused_tips
-from hardware_testing.data import ui
+from hardware_testing.data import ui, get_testing_data_directory
 from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, Axis
 
 from opentrons.protocol_api._types import OffDeckType
@@ -125,6 +125,9 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
     lqid_cfg: Dict[str, int] = LIQUID_PROBE_SETTINGS[run_args.pipette_volume][
         run_args.pipette_channels
     ][tip]
+    data_dir = get_testing_data_directory()
+    data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/pressure_sensor_data-{trial}.csv"
+    ui.print_info(f"logging pressure data to {data_file}")
     lps = LiquidProbeSettings(
         starting_mount_height=well.top().point.z,
         max_z_distance=min(well.depth, lqid_cfg["max_z_distance"]),
@@ -137,7 +140,7 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         aspirate_while_sensing=True,
         auto_zero_sensor=True,
         num_baseline_reads=10,
-        data_file="/user_data/testing_data/pressure_sensor_data.csv",
+        data_file=data_file,
     )
     run_args.pipette.move_to(well.top())
 
