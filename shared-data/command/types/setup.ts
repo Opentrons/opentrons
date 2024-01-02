@@ -1,4 +1,5 @@
 import type {
+  AddressableAreaName,
   CommonCommandRunTimeInfo,
   CommonCommandCreateInfo,
   LabwareDefinition2,
@@ -92,13 +93,13 @@ export type LabwareLocation =
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
-  | { addressableAreaName: string }
+  | { addressableAreaName: AddressableAreaName }
 
 export type NonStackedLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
-  | { addressableAreaName: string }
+  | { addressableAreaName: AddressableAreaName }
 
 export interface ModuleLocation {
   slotName: string

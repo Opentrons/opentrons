@@ -1,4 +1,5 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
+import type { AddressableAreaName } from '../../deck'
 import type {
   Coordinates,
   MotorAxes,
@@ -175,7 +176,7 @@ interface AddressableOffsetVector {
 }
 export interface MoveToAddressableAreaParams {
   pipetteId: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
   offset: AddressableOffsetVector
   speed?: number
   minimumZHeight?: number
