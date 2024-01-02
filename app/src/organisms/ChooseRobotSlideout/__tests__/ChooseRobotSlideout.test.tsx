@@ -11,7 +11,6 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -24,9 +23,6 @@ jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/networking')
 
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
 >
@@ -59,11 +55,6 @@ const mockSetSelectedRobot = jest.fn()
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: '',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])

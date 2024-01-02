@@ -32,7 +32,6 @@ import {
   RE_ROBOT_MODEL_OT2,
   RE_ROBOT_MODEL_OT3,
 } from '../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
