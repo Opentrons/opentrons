@@ -20,7 +20,6 @@ stages:
         data:
           id: !anystr
           protocolType: python
-          key: null
           files:
             - name: basic_transfer_standalone.py
               role: main

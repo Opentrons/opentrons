@@ -29,8 +29,6 @@ stages:
         data:
           id: !anystr
           createdAt: !anystr
-          startedAt: null
-          completedAt: null
           status: idle
           current: True
           actions: []
@@ -42,8 +40,6 @@ stages:
               loadName: !anystr
               definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
               location: !anydict
-              offsetId: null
-              displayName: null
           labwareOffsets: []
           protocolId: '{protocol_id}'
           liquids: []
@@ -90,8 +86,6 @@ stages:
         data:
           definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
           location:
-            definitionUri: null
-            moduleModel: null
             slotName: '1'
           vector:
             x: 1.11
@@ -106,8 +100,6 @@ stages:
           definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
           location:
             slotName: '1'
-            definitionUri: null
-            moduleModel: null
           vector:
             x: 1.11
             y: 2.22
@@ -170,23 +162,15 @@ stages:
             createdAt: !anystr
             startedAt: !anystr
             completedAt: !anystr
-            intent: null
-            error: null
             status: succeeded
-            params:
-              axes: null
-              skipIfMountPositionOk: null
+            params: { }
           - id: !anystr
             key: !anystr
             commandType: loadLabware
             status: succeeded
-            intent: null
-            error: null
             params:
               location:
                 slotName: '1'
-              labwareId: null
-              displayName: null
               loadName: 'biorad_96_wellplate_200ul_pcr'
               namespace: 'opentrons'
               version: 1
@@ -209,16 +193,12 @@ stages:
           key: !anystr
           commandType: loadLabware
           status: succeeded
-          intent: null
-          error: null
           params:
             location:
               slotName: '1'
             loadName: 'biorad_96_wellplate_200ul_pcr'
             namespace: 'opentrons'
             version: 1
-            labwareId: null
-            displayName: null
           result:
             labwareId: !anystr
             # Labware definitions are inconveniently verbose to test,
@@ -264,8 +244,6 @@ stages:
               definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
               location:
                 slotName: '1'
-                moduleModel: null
-                definitionUri: null
               vector:
                 x: 1.11
                 y: 2.22
@@ -276,15 +254,12 @@ stages:
               loadName: !anystr
               definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
               location: !anydict
-              offsetId: null
-              displayName: null
             - id: !anystr
               loadName: biorad_96_wellplate_200ul_pcr
               definitionUri: opentrons/biorad_96_wellplate_200ul_pcr/1
               location:
                 slotName: '1'
               offsetId: '{labware_offset_id}'
-              displayName: null
           # Changed when the run completed:
           status: succeeded
       save:

@@ -20,7 +20,6 @@ stages:
       json:
         data:
           id: !anystr
-          key: null
           protocolType: python
           files:
             - name: deck_coordinate_load.py

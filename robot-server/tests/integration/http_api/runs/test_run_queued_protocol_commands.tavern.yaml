@@ -86,8 +86,6 @@ stages:
         data:
           actions: []
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
-          completedAt: null
-          startedAt: null
           current: True
           errors: []
           id: '{run_id}'
@@ -97,7 +95,6 @@ stages:
           modules: []
           pipettes: []
           status: 'idle'
-          protocolId: null
 
   - name: Play the run
     request:
@@ -152,7 +149,6 @@ stages:
             commandType: comment
             status: succeeded
             intent: protocol
-            error: null
             params:
               message: 'test 1'
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
@@ -163,7 +159,6 @@ stages:
             commandType: comment
             status: succeeded
             intent: protocol
-            error: null
             params:
               message: 'test 2'
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
@@ -174,7 +169,6 @@ stages:
             commandType: comment
             status: succeeded
             intent: protocol
-            error: null
             params:
               message: 'test 3'
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
@@ -185,7 +179,6 @@ stages:
             commandType: comment
             status: succeeded
             intent: protocol
-            error: null
             params:
               message: 'test 4'
             createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"

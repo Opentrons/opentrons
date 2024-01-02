@@ -5,17 +5,6 @@ marks:
   - usefixtures:
       - ot3_server_base_url
 
-# lastModifiedAt is deliberately omitted from this expected object.
-# This requires turning off strict json checking.
-# A lastModifiedAt that's omitted or null means the deck configuration has never been set.
-#
-# Unfortunately, this makes this test order-dependent with any other tests
-# that modify the deck configuration, even if they try to restore the original value
-# after they're done. We probably need some kind of deck configuration factory-reset.
-strict:
-  - headers:off
-  - json:off
-
 stages:
   - name: Get the deck configuration and make sure there's a default
     request:
@@ -23,7 +12,14 @@ stages:
     response:
       json:
         data:
-
+          # lastModifiedAt is deliberately omitted from this expected object.
+          # A lastModifiedAt that's omitted or null means the deck configuration has never been set.
+          #
+          # Unfortunately, this makes this test order-dependent with any other tests
+          # that modify the deck configuration, even if they try to restore the original value
+          # after they're done. We probably need some kind of deck configuration factory-reset.
+          #
+          # lastModifiedAt: null
           cutoutFixtures: &expectedDefaultCutoutFixtures
             - cutoutFixtureId: singleLeftSlot
               cutoutId: cutoutA1

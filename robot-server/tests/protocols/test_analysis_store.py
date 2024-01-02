@@ -212,8 +212,6 @@ async def test_update_adds_details_and_completes_analysis(
                 "loadName": "load-name",
                 "definitionUri": "namespace/load-name/42",
                 "location": {"slotName": "1"},
-                "displayName": None,
-                "offsetId": None,
             }
         ],
         "pipettes": [

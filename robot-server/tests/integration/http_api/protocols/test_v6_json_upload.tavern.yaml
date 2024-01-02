@@ -39,7 +39,6 @@ stages:
       json:
         data:
           - id: '{protocol_id}'
-            analyses: []
             analysisSummaries:
               - id: '{analysis_id}'
                 status: completed
@@ -66,11 +65,10 @@ stages:
             author: engineering <engineering@opentrons.com>
             protocolName: Simple test protocol
           analyses: []
-          key: null
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-        links:
+        links: 
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
@@ -97,29 +95,24 @@ stages:
                 definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
                 location:
                   slotName: '12'
-                offsetId: null
-                displayName: null
               - id: sourcePlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
                 displayName: Source Plate
                 location:
                   moduleId: temperatureModuleId
-                offsetId: null
               - id: destPlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
                 displayName: Sample Collection Plate
                 location:
                   moduleId: magneticModuleId
-                offsetId: null
               - id: tipRackId
                 loadName: opentrons_96_tiprack_10ul
                 definitionUri: opentrons/opentrons_96_tiprack_10ul/1
                 displayName: Opentrons 96 Tip Rack 10 µL
                 location:
                   slotName: '8'
-                offsetId: null
             modules:
               - id: magneticModuleId
                 serialNumber: !anystr
@@ -138,14 +131,10 @@ stages:
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params:
-                  axes: null
-                  skipIfMountPositionOk: null
+                params: { }
                 result: { }
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadPipette
@@ -159,8 +148,6 @@ stages:
                   pipetteId: pipetteId
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadModule
@@ -178,8 +165,6 @@ stages:
                   serialNumber: !anystr
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadModule
@@ -197,8 +182,6 @@ stages:
                   serialNumber: !anystr
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadLabware
@@ -213,13 +196,10 @@ stages:
                   labwareId: sourcePlateId
                   displayName: Source Plate
                 result:
-                  offsetId: null
                   labwareId: sourcePlateId
                   definition: !anydict
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadLabware
@@ -236,11 +216,8 @@ stages:
                 result:
                   labwareId: destPlateId
                   definition: !anydict
-                  offsetId: null
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadLabware
@@ -257,11 +234,8 @@ stages:
                 result:
                   labwareId: tipRackId
                   definition: !anydict
-                  offsetId: null
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: loadLiquid
@@ -276,21 +250,15 @@ stages:
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params:
-                  axes: null
-                  skipIfMountPositionOk: null
+                params: {}
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: pickUpTip
@@ -307,17 +275,12 @@ stages:
                       y: 0
                       z: 0
                 result:
-                  position:
-                    x: 146.88
-                    y: 246.24
-                    z: 64.69
+                  position: { 'x': 146.88, 'y': 246.24, 'z': 64.69 }
                   tipVolume: 10.0
                   tipLength: 35.910000000000004
                   tipDiameter: 3.27
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: aspirate
@@ -336,15 +299,10 @@ stages:
                   volume: 5
                   flowRate: 3
                 result:
-                  position:
-                    x: 16.76
-                    y: 75.28
-                    z: 157.09
+                  position: { 'x': 16.76, 'y': 75.28, 'z': 157.09 }
                   volume: 5
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: waitForDuration
@@ -352,12 +310,9 @@ stages:
                 status: succeeded
                 params:
                   seconds: 42
-                  message: null
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: dispense
@@ -375,17 +330,11 @@ stages:
                       z: 1
                   volume: 4.5
                   flowRate: 2.5
-                  pushOut: null
                 result:
-                  position:
-                    x: 284.635
-                    y: 56.025
-                    z: 158.25
+                  position: { 'x': 284.635, 'y': 56.025, 'z': 158.25 }
                   volume: 4.5
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: touchTip
@@ -404,14 +353,9 @@ stages:
                   radius: 0.5
                   speed: 42.0
                 result:
-                  position:
-                    x: 284.635
-                    y: 56.025
-                    z: 168.25
+                  position: { 'x': 284.635, 'y': 56.025, 'z': 168.25 }
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: blowout
@@ -429,14 +373,9 @@ stages:
                       z: 12
                   flowRate: 2
                 result:
-                  position:
-                    x: 284.635
-                    y: 56.025
-                    z: 169.25
+                  position: { 'x': 284.635, 'y': 56.025, 'z': 169.25 }
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: moveToWell
@@ -453,17 +392,11 @@ stages:
                       y: 0
                       z: 0
                   forceDirect: false
-                  speed: null
-                  minimumZHeight: null
                 result:
                   position:
-                    x: 304.52500000000003
-                    y: 56.025
-                    z: 182.25
+                    { 'x': 304.52500000000003, 'y': 56.025, 'z': 182.25 }
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: moveToWell
@@ -484,13 +417,9 @@ stages:
                   speed: 12.3
                 result:
                   position:
-                    x: 306.52500000000003
-                    y: 59.025
-                    z: 167.25
+                    { 'x': 306.52500000000003, 'y': 59.025, 'z': 167.25 }
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: dropTip
@@ -507,16 +436,10 @@ stages:
                       y: 0
                       z: 0
                   alternateDropLocation: false
-                  homeAfter: null
                 result:
-                  position:
-                    x: 347.84000000000003
-                    y: 325.06
-                    z: 82.0
+                  position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: waitForResume
@@ -527,8 +450,6 @@ stages:
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: moveToCoordinates
@@ -544,14 +465,9 @@ stages:
                   forceDirect: true
                   speed: 12.3
                 result:
-                  position:
-                    x: 0.0
-                    y: 0.0
-                    z: 0.0
+                  position: { 'x': 0.0, 'y': 0.0, 'z': 0.0 }
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: moveRelative
@@ -568,8 +484,6 @@ stages:
                     z: !anyfloat
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: moveRelative
@@ -586,8 +500,6 @@ stages:
                     z: !anyfloat
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: savePosition
@@ -596,7 +508,6 @@ stages:
                 params:
                   pipetteId: pipetteId
                   failOnNotHomed: true
-                  positionId: null
                 result:
                   positionId: !anystr
                   position:
@@ -605,8 +516,6 @@ stages:
                     z: !anyfloat
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: moveRelative
@@ -623,8 +532,6 @@ stages:
                     z: !anyfloat
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
               - id: !anystr
                 createdAt: !anystr
                 commandType: savePosition
@@ -642,8 +549,6 @@ stages:
                     z: !anyfloat
                 startedAt: !anystr
                 completedAt: !anystr
-                error: null
-                intent: null
             errors: []
             liquids:
               - id: waterId

@@ -94,11 +94,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
-            params:
-              skipIfMountPositionOk: null
-              axes: null
-            intent: null
-            error: null
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: loadLabware
@@ -114,8 +110,6 @@ stages:
               version: 1
               labwareId: tipRackId
               displayName: Tip Rack
-            intent: null
-            error: null
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -127,8 +121,6 @@ stages:
               pipetteName: p10_single
               mount: left
               pipetteId: pipetteId
-            intent: null
-            error: null
           - id: !anystr
             key: !anystr
             commandType: aspirate
@@ -136,7 +128,6 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: failed
-            intent: null
             error:
               id: !anystr
               errorType: TipNotAttachedError
@@ -162,10 +153,7 @@ stages:
             commandType: pickUpTip
             createdAt: !anystr
             completedAt: !anystr
-            startedAt: null
             status: failed
-            intent: null
-            error: null
             params:
               pipetteId: pipetteId
               labwareId: tipRackId

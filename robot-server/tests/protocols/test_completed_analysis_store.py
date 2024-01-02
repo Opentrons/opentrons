@@ -159,7 +159,6 @@ async def test_get_by_analysis_id_as_document(
         "id": "analysis-id",
         "result": "ok",
         "status": "completed",
-        "robotType": None,
         "commands": [],
         "errors": [],
         "labware": [],
