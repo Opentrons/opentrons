@@ -40,7 +40,7 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
@@ -67,7 +67,7 @@ def read(*parts: str) -> str:
 
 if __name__ == "__main__":
     setup(
-        python_requires=">=3.7",
+        python_requires="~=3.10",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
