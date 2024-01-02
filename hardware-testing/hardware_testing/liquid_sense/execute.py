@@ -8,8 +8,7 @@ from hardware_testing.gravimetric.helpers import _calculate_stats
 from hardware_testing.gravimetric.config import LIQUID_PROBE_SETTINGS
 from hardware_testing.gravimetric.tips import get_unused_tips
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api.types import OT3Mount
-from opentrons.hardware_control.types import InstrumentProbeType
+from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, Axis
 
 from opentrons.protocol_api._types import OffDeckType
 
@@ -95,6 +94,7 @@ def _load_test_well(run_args: RunArgs) -> Labware:
 def run(tip: int, run_args: RunArgs) -> None:
     """Run a liquid probe test."""
     test_labware: Labware = _load_test_well(run_args)
+    hw_api = get_sync_hw_api(run_args.ctx)
     test_well: Well = test_labware["A1"]
     _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
     tips: List[Well] = get_unused_tips(run_args.ctx, tip)
@@ -105,13 +105,14 @@ def run(tip: int, run_args: RunArgs) -> None:
         run_args.pipette.pick_up_tip(tips.pop(0))
         print(f"Running liquid probe test with tip {tip}")
         height = _run_trial(run_args, tip, test_well, trial)
+        plunger_pos = hw_api.current_position_ot3(OT3Mount.LEFT)[Axis.P_L]
         print("Droping tip")
         if run_args.return_tip:
             run_args.pipette.return_tip()
         else:
             run_args.pipette.drop_tip()
         results.append(height)
-        store_trial(run_args.test_report, trial, tip, height)
+        store_trial(run_args.test_report, trial, tip, height, plunger_pos)
 
     # fake this for now
     expected_height = 40.0
