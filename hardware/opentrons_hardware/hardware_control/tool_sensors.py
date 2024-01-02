@@ -201,13 +201,13 @@ async def liquid_probe(
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
-    # output_option: OutputOptions,
     data_file: Optional[str] = None,
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
+    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
