@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 import { animated } from '@react-spring/web'
 import * as React from 'react'
-import { Svg } from '../../primitives'
 
 interface RobotCoordinateSpaceProps extends React.ComponentProps<typeof Svg> {
   animated?: boolean
@@ -17,7 +16,7 @@ export function RobotCoordinateSpace(
   return animated ? (
     <AnimatedSvg {...allPassThroughProps}>{children}</AnimatedSvg>
   ) : (
-    <Svg {...allPassThroughProps}>{children}</Svg>
+    <svg {...allPassThroughProps}>{children}</svg>
   )
 }
 

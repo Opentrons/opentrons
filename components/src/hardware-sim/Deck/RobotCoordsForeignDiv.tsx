@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Box } from '../../primitives'
 
 export interface RobotCoordsForeignDivProps {
   width?: string | number
@@ -7,7 +6,7 @@ export interface RobotCoordsForeignDivProps {
   x?: string | number
   y?: string | number
   children?: React.ReactNode
-  className?: string
+  outerProps?: any
   innerDivProps?: React.ComponentProps<typeof Box>
   transformWithSVG?: boolean
   extraTransform?: string
@@ -22,7 +21,7 @@ export const RobotCoordsForeignDiv = (
     y = 0,
     height = '100%',
     width = '100%',
-    className,
+    outerProps,
     innerDivProps,
     transformWithSVG = false,
     extraTransform = '',
@@ -31,16 +30,16 @@ export const RobotCoordsForeignDiv = (
   const transform = `scale(1, -1) ${extraTransform}`
   return (
     <foreignObject
-      {...{ x, y, height, width, className }}
+      {...{ x, y, height, width, ...outerProps}}
       transform={transformWithSVG ? transform : extraTransform}
     >
-      <Box
+      <div
         style={transformWithSVG ? {} : { transform }}
         xmlns="http://www.w3.org/1999/xhtml"
         {...innerDivProps}
       >
         {children}
-      </Box>
+      </div>
     </foreignObject>
   )
 }

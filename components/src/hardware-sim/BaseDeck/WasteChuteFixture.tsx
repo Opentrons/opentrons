@@ -3,7 +3,6 @@ import * as React from 'react'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 import { Icon } from '../../icons'
-import { Flex, Text } from '../../primitives'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -87,7 +86,7 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <Flex
+      <div
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColor}
         borderRadius="6px"
@@ -99,14 +98,14 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
         width="100%"
       >
         <Icon name="trash" color={wasteIconColor} height="2rem" />
-        <Text
+        <p
           color={COLORS.white}
           textAlign={TEXT_ALIGN_CENTER}
           css={TYPOGRAPHY.bodyTextSemiBold}
         >
           Waste chute
-        </Text>
-      </Flex>
+        </p>
+      </div>
     </RobotCoordsForeignObject>
   )
 }

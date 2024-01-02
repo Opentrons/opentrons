@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Svg } from '../../primitives'
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
 
 export interface RobotCoordinateSpaceWithDOMCoordsRenderProps {
@@ -10,8 +9,7 @@ export interface RobotCoordinateSpaceWithDOMCoordsRenderProps {
   ) => { x: number; y: number }
 }
 
-interface RobotCoordinateSpaceWithDOMCoordsProps
-  extends React.ComponentProps<typeof Svg> {
+interface RobotCoordinateSpaceWithDOMCoordsProps {
   viewBox?: string | null
   deckDef?: DeckDefinition
   children?: (
@@ -53,13 +51,13 @@ export function RobotCoordinateSpaceWithDOMCoords(
     wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
   }
   return (
-    <Svg
+    <svg
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
       transform="scale(1, -1)"
       {...restProps}
     >
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
-    </Svg>
+    </svg>
   )
 }

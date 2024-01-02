@@ -1,5 +1,5 @@
 import * as React from 'react'
-import parseHtml from 'html-react-parser'
+// import parseHtml from 'html-react-parser'
 import { stringify } from 'svgson'
 
 import ot2DeckDefV3 from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
@@ -54,15 +54,16 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
     children: layerGroupNodes,
   }
 
-  return (
-    <>
-      {parseHtml(
-        // TODO(bh, 2023-7-12): use svgson stringify option to apply individual attributes https://github.com/elrumordelaluz/svgson#svgsonstringify
-        // the goal would be to give more styling control over individual deck map elements
-        stringify(groupNodeWrapper, {
-          selfClose: false,
-        })
-      )}
-    </>
-  )
+  return  <p>Deck</p>
+  // (
+  //   <>
+  //     {parseHtml(
+  //       // TODO(bh, 2023-7-12): use svgson stringify option to apply individual attributes https://github.com/elrumordelaluz/svgson#svgsonstringify
+  //       // the goal would be to give more styling control over individual deck map elements
+  //       stringify(groupNodeWrapper, {
+  //         selfClose: false,
+  //       })
+  //     )}
+  //   </>
+  // )
 }
