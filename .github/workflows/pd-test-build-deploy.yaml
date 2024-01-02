@@ -53,7 +53,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '21'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -98,7 +98,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '21'
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
@@ -135,7 +135,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '21'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -178,7 +178,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '21'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
