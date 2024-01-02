@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { screen, waitFor, fireEvent } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { StaticRouter } from 'react-router-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
 
@@ -182,7 +182,7 @@ describe('ProtocolDetails', () => {
     const runProtocolButton = screen.getByRole('button', {
       name: 'Start setup',
     })
-    fireEvent.click(runProtocolButton)
+    runProtocolButton.click()
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
