@@ -79,6 +79,7 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
@@ -90,6 +91,7 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
@@ -104,6 +106,7 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
@@ -117,6 +120,7 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
@@ -131,6 +135,7 @@ describe('ChooseRobotSlideout', () => {
     const { dispatch } = render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
@@ -149,6 +154,7 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',

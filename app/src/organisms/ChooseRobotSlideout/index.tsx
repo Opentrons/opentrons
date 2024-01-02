@@ -83,10 +83,11 @@ function robotBusyStatusByNameReducer(
 interface ChooseRobotSlideoutProps
   extends Omit<SlideoutProps, 'children'>,
     Partial<UseCreateRun> {
+  isSelectedRobotOnDifferentSoftwareVersion: boolean
+  robotType: RobotType | null
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
   isAnalysisError?: boolean
-  robotType: RobotType | null
   showIdleOnly?: boolean
 }
 
@@ -101,6 +102,7 @@ export function ChooseRobotSlideout(
     footer,
     isAnalysisError = false,
     isCreatingRun = false,
+    isSelectedRobotOnDifferentSoftwareVersion,
     reset: resetCreateRun,
     runCreationError,
     runCreationErrorCode,
@@ -163,19 +165,6 @@ export function ChooseRobotSlideout(
       setSelectedRobot(null)
     }
   }, [healthyReachableRobots, selectedRobot, setSelectedRobot])
-
-  const isSelectedRobotOnWrongVersionOfSoftware = [
-    'upgrade',
-    'downgrade',
-  ].includes(
-    useSelector((state: State) => {
-      const value =
-        selectedRobot != null
-          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
-          : { autoUpdateAction: '' }
-      return value
-    })?.autoUpdateAction
-  )
 
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
@@ -246,7 +235,6 @@ export function ChooseRobotSlideout(
               <React.Fragment key={robot.ip}>
                 <AvailableRobotOption
                   robot={robot}
-                  // TODO: generalize to a disabled/reset prop
                   onClick={() => {
                     if (!isCreatingRun) {
                       resetCreateRun?.()
@@ -255,8 +243,8 @@ export function ChooseRobotSlideout(
                   }}
                   isError={runCreationError != null}
                   isSelected={isSelected}
-                  isOnDifferentSoftwareVersion={
-                    isSelectedRobotOnWrongVersionOfSoftware
+                  isSelectedRobotOnDifferentSoftwareVersion={
+                    isSelectedRobotOnDifferentSoftwareVersion
                   }
                   showIdleOnly={showIdleOnly}
                   registerRobotBusyStatus={registerRobotBusyStatus}
