@@ -68,7 +68,7 @@ def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     return CSVSection(
         title="TRIALS",
         lines=[
-            CSVLine(f"trial-{t + 1}-{tip}ul", [float])
+            CSVLine(f"trial-{t + 1}-{tip}ul", [float, float])
             for tip in tips
             for t in range(trials)
         ],
@@ -129,9 +129,11 @@ def store_config(
     report("CONFIG", "start_height_offset", [start_height_offset])
 
 
-def store_trial(report: CSVReport, trial: int, tip: float, height: float) -> None:
+def store_trial(
+    report: CSVReport, trial: int, tip: float, height: float, plunger_pos: float
+) -> None:
     """Report Trial."""
-    report("TRIALS", f"trial-{trial + 1}-{tip}ul", [height])
+    report("TRIALS", f"trial-{trial + 1}-{tip}ul", [height, plunger_pos])
 
 
 def store_tip_results(
