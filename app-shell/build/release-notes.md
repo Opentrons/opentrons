@@ -6,6 +6,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.1.1
+
+Welcome to the v7.1.1 release of the Opentrons app! This release adds support for P1000 Single FLEX 3.6 pipettes.
+
+
 ## Opentrons App Changes in 7.1.0
 
 Welcome to the v7.1.0 release of the Opentrons App! This release includes new deck and pipette functionality for Opentrons Flex, a new workflow for dropping tips after a protocol is canceled, and other improvements.
