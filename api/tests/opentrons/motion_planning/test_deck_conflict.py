@@ -9,7 +9,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.motion_planning import deck_conflict
 
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, StagingSlotName
 
 
 @pytest.mark.parametrize(
@@ -34,7 +34,11 @@ def test_empty_no_conflict(robot_type: RobotType, slot_name: DeckSlotName) -> No
 
 @pytest.mark.parametrize(
     "robot_type, slot_name",
-    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
+    [
+        ("OT-2 Standard", DeckSlotName.SLOT_1),
+        ("OT-3 Standard", DeckSlotName.SLOT_A1),
+        ("OT-3 Standard", StagingSlotName.SLOT_A4),
+    ],
 )
 def test_no_multiple_locations(robot_type: RobotType, slot_name: DeckSlotName) -> None:
     """It should not allow two items in the same slot."""

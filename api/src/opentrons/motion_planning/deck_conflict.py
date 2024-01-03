@@ -13,7 +13,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
 )
 
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, StagingSlotName
 
 _FIXED_TRASH_SLOT: Final[Set[DeckSlotName]] = {
     DeckSlotName.FIXED_TRASH,
@@ -97,9 +97,9 @@ DeckItem = Union[
 class _NothingAllowed(NamedTuple):
     """Nothing is allowed in this slot."""
 
-    location: DeckSlotName
+    location: Union[DeckSlotName, StagingSlotName]
     source_item: DeckItem
-    source_location: DeckSlotName
+    source_location: Union[DeckSlotName, StagingSlotName]
 
     def is_allowed(self, item: DeckItem) -> bool:
         return False
@@ -163,9 +163,9 @@ class DeckConflictError(ValueError):
 # things that don't fit into a single deck slot, like the Thermocycler.
 # Refactor this interface to take a more symbolic location.
 def check(
-    existing_items: Mapping[DeckSlotName, DeckItem],
+    existing_items: Mapping[Union[DeckSlotName, StagingSlotName], DeckItem],
     new_item: DeckItem,
-    new_location: DeckSlotName,
+    new_location: Union[DeckSlotName, StagingSlotName],
     robot_type: RobotType,
 ) -> None:
     """Check a deck layout for conflicts.
@@ -210,10 +210,12 @@ def check(
             )
 
 
-def _create_ot2_restrictions(
-    item: DeckItem, location: DeckSlotName
+def _create_ot2_restrictions(  # noqa: C901
+    item: DeckItem, location: Union[DeckSlotName, StagingSlotName]
 ) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
+    if isinstance(location, StagingSlotName):
+        raise DeckConflictError("OT-2 does not support staging slots.")
 
     if location not in _FIXED_TRASH_SLOT:
         # Disallow a different item from overlapping this item in this deck slot.
@@ -274,18 +276,15 @@ def _create_ot2_restrictions(
 
 
 def _create_flex_restrictions(
-    item: DeckItem, location: DeckSlotName
+    item: DeckItem, location: Union[DeckSlotName, StagingSlotName]
 ) -> List[_DeckRestriction]:
-    restrictions: List[_DeckRestriction] = []
-
-    if location not in _FIXED_TRASH_SLOT:
-        restrictions.append(
-            _NothingAllowed(
-                location=location,
-                source_item=item,
-                source_location=location,
-            )
+    restrictions: List[_DeckRestriction] = [
+        _NothingAllowed(
+            location=location,
+            source_item=item,
+            source_location=location,
         )
+    ]
 
     if isinstance(item, ThermocyclerModule):
         for covered_location in _flex_slots_covered_by_thermocycler():
@@ -301,7 +300,7 @@ def _create_flex_restrictions(
 
 
 def _create_restrictions(
-    item: DeckItem, location: DeckSlotName, robot_type: str
+    item: DeckItem, location: Union[DeckSlotName, StagingSlotName], robot_type: str
 ) -> List[_DeckRestriction]:
 
     if robot_type == "OT-2 Standard":
