@@ -197,8 +197,6 @@ def eap_check_config(eap_config: Dict[str, Any]) -> Dict[str, Any]:
     _eap_check_no_extra_args(eap_config, options)
 
     for opt in options:
-        # Ignoring most types to do with EAP_CONFIG_SHAPE because of issues
-        # wth type inference for dict comprehensions
         _eap_check_option_ok(opt, eap_config)
         if opt["type"] == "file" and opt["name"] in eap_config:
             # Special work for file: rewrite from key id to path
