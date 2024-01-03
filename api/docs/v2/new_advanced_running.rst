@@ -32,7 +32,7 @@ Rather than writing a  ``run`` function and embedding commands within it, start 
     :substitutions:
 
     import opentrons.execute
-    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
+    protocol = opentrons.execute.get_protocol_api("|apiLevel|")
     protocol.home()
 
 The first command you execute should always be :py:meth:`~opentrons.protocol_api.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
@@ -57,7 +57,7 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
 .. code-block:: python
     :substitutions:
 
-    protocol = opentrons.execute.get_protocol_api('|apiLevel|')
+    protocol = opentrons.execute.get_protocol_api("|apiLevel|")
     run(protocol)  # your protocol will now run
 
 .. _using_lpc:

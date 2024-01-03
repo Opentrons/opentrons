@@ -17,8 +17,8 @@ Use the :py:meth:`.ProtocolContext.move_labware` method to initiate a move, rega
     :substitutions:
         
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D1')
-        protocol.move_labware(labware=plate, new_location='D2')
+        plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D1")
+        protocol.move_labware(labware=plate, new_location="D2")
         
 .. versionadded:: 2.15
 
@@ -26,8 +26,8 @@ The required arguments of ``move_labware()`` are the ``labware`` you want to mov
 
 When the move step is complete, the API updates the labware's location, so you can move the plate multiple times::
 
-    protocol.move_labware(labware=plate, new_location='D2')
-    protocol.move_labware(labware=plate, new_location='D3')
+    protocol.move_labware(labware=plate, new_location="D2")
+    protocol.move_labware(labware=plate, new_location="D3")
     
 For the first move, the API knows to find the plate in its initial load location, slot D1. For the second move, the API knows to find the plate in D2.
 
@@ -45,16 +45,16 @@ The ``use_gripper`` parameter of :py:meth:`~.ProtocolContext.move_labware` deter
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D1')
+        plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D1")
         
         # have the gripper move the plate from D1 to D2
-        protocol.move_labware(labware=plate, new_location='D2', use_gripper=True)
+        protocol.move_labware(labware=plate, new_location="D2", use_gripper=True)
         
         # pause to move the plate manually from D2 to D3
-        protocol.move_labware(labware=plate, new_location='D3', use_gripper=False)
+        protocol.move_labware(labware=plate, new_location="D3", use_gripper=False)
         
         # pause to move the plate manually from D3 to C1
-        protocol.move_labware(labware=plate, new_location='C1')
+        protocol.move_labware(labware=plate, new_location="C1")
 
 .. versionadded:: 2.15
 

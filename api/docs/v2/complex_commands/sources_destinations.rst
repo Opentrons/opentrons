@@ -53,7 +53,7 @@ The following table summarizes the source and destination restrictions for each 
        - **Source:** Any number of wells.
        - **Destination:** Exactly one well.
 
-A single well can be passed by itself or as a list with one item: ``source=plate['A1']`` and ``source=[plate['A1']]`` are equivalent.
+A single well can be passed by itself or as a list with one item: ``source=plate["A1"]`` and ``source=[plate["A1"]]`` are equivalent.
     
 The section on :ref:`many-to-many transfers <many-to-many>` below covers how ``transfer()`` works when specifying sources and destinations of different sizes. However, if they don't meet the even divisibility requirement, the API will raise an error. You can work around such situations by making multiple calls to ``transfer()`` in sequence or by using a :ref:`list of volumes <complex-list-volumes>` to skip certain wells.
 
