@@ -40,7 +40,6 @@ RESET_AFTER_EACH_MOVE = True
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
-
     ################
     ### FIXTURES ###
     ################

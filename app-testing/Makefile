@@ -67,7 +67,7 @@ snapshot-test:
 snapshot-test-update:
 	python -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
 
-TARGET ?= v7.1.0-alpha.9
+TARGET ?= edge
 
 .PHONY: build-opentrons-analysis
 build-opentrons-analysis:
