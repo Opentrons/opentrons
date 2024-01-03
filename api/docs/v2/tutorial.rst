@@ -9,12 +9,12 @@ Tutorial
 Introduction
 ============
 
-This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on a Flex or an OT-2 robot. If you don’t have a Flex or an OT-2 (or if you’re away from your lab, or if your robot is in use), you can use the same file to simulate the protocol on your computer instead.
+This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you'll have a complete protocol that can run on a Flex or an OT-2 robot. If you don’t have a Flex or an OT-2 (or if you’re away from your lab, or if your robot is in use), you can use the same file to simulate the protocol on your computer instead.
 
-What You’ll Automate
+What You'll Automate
 --------------------
 
-The lab task that you’ll automate in this tutorial is `serial dilution`: taking a solution and progressively diluting it by transferring it stepwise across a plate from column 1 to column 12. With just a dozen or so lines of code, you can instruct your robot to perform the hundreds of individual pipetting actions necessary to fill an entire 96-well plate. And all of those liquid transfers will be done automatically, so you’ll have more time to do other work in your lab.
+The lab task that you'll automate in this tutorial is `serial dilution`: taking a solution and progressively diluting it by transferring it stepwise across a plate from column 1 to column 12. With just a dozen or so lines of code, you can instruct your robot to perform the hundreds of individual pipetting actions necessary to fill an entire 96-well plate. And all of those liquid transfers will be done automatically, so you’ll have more time to do other work in your lab.
 
 Before You Begin
 ----------------
@@ -80,21 +80,21 @@ Every protocol needs to have a metadata dictionary with information about the pr
 
 .. code-block:: python
 
-    metadata = {'apiLevel': '2.16'}
+    metadata = {"apiLevel": "2.16"}
 
 You can include any other information you like in the metadata dictionary. The fields ``protocolName``, ``description``, and ``author`` are all displayed in the Opentrons App, so it’s a good idea to expand the dictionary to include them:
 
 .. code-block:: python
 
     metadata = {
-        'apiLevel': '2.16',
-        'protocolName': 'Serial Dilution Tutorial',
-        'description': '''This protocol is the outcome of following the 
+        "apiLevel": "2.16",
+        "protocolName": "Serial Dilution Tutorial",
+        "description": """This protocol is the outcome of following the 
                        Python Protocol API Tutorial located at 
                        https://docs.opentrons.com/v2/tutorial.html. It takes a 
                        solution and progressively dilutes it by transferring it 
-                       stepwise across a plate.''',
-        'author': 'New API User'
+                       stepwise across a plate.""",
+        "author": "New API User"
         }
 
 Note, if you have a Flex, or are using an OT-2 with API v2.15 (or higher), we recommend adding a ``requirements`` section to your code. See the Requirements section below.
@@ -144,9 +144,9 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
         .. code-block:: python
 
             def run(protocol: protocol_api.ProtocolContext):
-                tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
-                reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
-                plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
+                tips = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
+                reservoir = protocol.load_labware("nest_12_reservoir_15ml", "D2")
+                plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D3")
 
         If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
         
@@ -165,9 +165,9 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
         .. code-block:: python
  
             def run(protocol: protocol_api.ProtocolContext):
-                tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
-                reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
-                plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
+                tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+                reservoir = protocol.load_labware("nest_12_reservoir_15ml", 2)
+                plate = protocol.load_labware("nest_96_wellplate_200ul_flat", 3)
         
         If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
        
@@ -190,7 +190,7 @@ The OT-2 trash bin is fixed in slot 12. Since it can't go anywhere else on the d
 
 Flex lets you put a :ref:`trash bin <configure-trash-bin>` in multiple locations on the deck. You can even have more than one trash bin, or none at all (if you use the :ref:`waste chute <configure-waste-chute>` instead, or if your protocol never trashes any tips). For serial dilution, you'll need to dispose used tips, so you also need to tell the API where the trash container is located on your robot. Loading a trash bin on Flex is done with the :py:meth:`.load_trash_bin` method, which takes one argument: its location. Here's how to load the trash in slot A3::
 
-    trash = protocol.load_trash_bin('A3')
+    trash = protocol.load_trash_bin("A3")
 
 
 Pipettes
@@ -201,12 +201,12 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
 .. code-block:: python
 
         # Flex
-        left_pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks=[tips])
+        left_pipette = protocol.load_instrument("flex_1channel_1000", "left", tip_racks=[tips])
 
 .. code-block:: python
 
         # OT-2
-        left_pipette = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
+        left_pipette = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tips])
 
 Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``left_pipette`` and the robot will know to use it when commanded to pick up tips.
 
@@ -231,7 +231,7 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 
 .. code-block:: python
 
-        left_pipette.transfer(100, reservoir['A1'], plate.wells())
+        left_pipette.transfer(100, reservoir["A1"], plate.wells())
 
 Breaking down these single lines of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them.
 
@@ -260,7 +260,7 @@ In each row, you first need to add solution. This will be similar to what you di
 
 .. code-block:: python
             
-        left_pipette.transfer(100, reservoir['A2'], row[0], mix_after(3, 50))
+        left_pipette.transfer(100, reservoir["A2"], row[0], mix_after(3, 50))
 
 As before, the first argument specifies to transfer 100 µL. The second argument is the source, column 2 of the reservoir. The third argument is the destination, the element at index 0 of the current ``row``. Since Python lists are zero-indexed, but columns on labware start numbering at 1, this will be well A1 on the first time through the loop, B1 the second time, and so on. The fourth argument specifies to mix 3 times with 50 µL of fluid each time.
 
@@ -300,14 +300,14 @@ Thus, when adding the diluent, instead of targeting every well on the plate, you
 
 .. code-block:: python
 
-        left_pipette.transfer(100, reservoir['A1'], plate.rows()[0]) 
+        left_pipette.transfer(100, reservoir["A1"], plate.rows()[0]) 
 
 And by accessing an entire column at once, the 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
 
 .. code-block:: python
     
     row = plate.rows()[0]
-    left_pipette.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
+    left_pipette.transfer(100, reservoir["A2"], row[0], mix_after=(3, 50))
     left_pipette.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
 Instead of tracking the current row in the ``row`` variable, this code sets it to always be row A (index 0). 

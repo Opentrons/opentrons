@@ -20,7 +20,7 @@ Flex requires you to specify an ``apiLevel`` of 2.15 or higher. If your OT-2 pro
 .. note::
     Consult the :ref:`list of changes in API versions <version-notes>` to see what effect raising the ``apiLevel`` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
 
-You also need to specify ``'robotType': 'Flex'``. If you omit ``robotType`` in the ``requirements`` dictionary, the API will assume the protocol is designed for the OT-2.
+You also need to specify ``"robotType": "Flex"``. If you omit ``robotType`` in the ``requirements`` dictionary, the API will assume the protocol is designed for the OT-2.
 
 .. tabs::
     
