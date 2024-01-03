@@ -6,7 +6,7 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Union, Any
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from pydantic import (
     BaseModel,
@@ -326,11 +326,3 @@ class LabwareDefinition(BaseModel):
         default_factory=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )
-
-    def dict(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-        kwargs["exclude_unset"] = True
-        return super().dict(*args, **kwargs)
-
-    def json(self, *args: Any, **kwargs: Any) -> str:
-        kwargs["exclude_unset"] = True
-        return super().json(*args, **kwargs)
