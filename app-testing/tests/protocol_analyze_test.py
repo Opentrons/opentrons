@@ -47,10 +47,7 @@ def get_error_text(protocol_landing: ProtocolLanding, error_link: WebElement) ->
     return error_details
 
 
-@pytest.mark.parametrize(
-    "protocol",
-    _what_protocols()
-)
+@pytest.mark.parametrize("protocol", _what_protocols())
 def test_analyses(
     driver: WebDriver,
     console: Console,
