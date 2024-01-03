@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TARGET: ${{ github.event.inputs.TARGET || 'v7.1.0' }}
-      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || '7.1-analyses-battery' }}
+      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || 'edge' }}
 
     steps:
     - name: Checkout Repository
