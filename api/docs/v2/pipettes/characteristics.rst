@@ -55,19 +55,19 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
 
     from opentrons import protocol_api
     
-    requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
+    requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 1000 µL tips
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_1000ul', location='D1')       
+            load_name="opentrons_flex_96_tiprack_1000ul", location="D1")       
         # Load a 96-well plate
         plate = protocol.load_labware(
-            load_name='corning_96_wellplate_360ul_flat', location='C1')       
+            load_name="corning_96_wellplate_360ul_flat", location="C1")       
         # Load an 8-channel pipette on the right mount
         right = protocol.load_instrument(
-            instrument_name='flex_8channel_1000',
-            mount='right',
+            instrument_name="flex_8channel_1000",
+            mount="right",
             tip_racks=[tiprack1])
 
 After loading our instruments and labware, let's tell the robot to pick up a pipette tip from location ``A1`` in ``tiprack1``::
@@ -78,13 +78,13 @@ With the backmost pipette channel above location A1 on the tip rack, all eight c
 
 After picking up a tip, let's tell the robot to aspirate 300 µL from the well plate at location ``A2``::
         
-    right.aspirate(volume=300, location=plate['A2'])
+    right.aspirate(volume=300, location=plate["A2"])
 
 With the backmost pipette tip above location A2 on the well plate, all eight channels are above the eight wells in column 2.
 
 Finally, let's tell the robot to dispense 300 µL into the well plate at location ``A3``::
 
-    right.dispense(volume=300, location=plate['A3'].top())
+    right.dispense(volume=300, location=plate["A3"].top())
 
 With the backmost pipette tip above location A3, all eight channels are above the eight wells in column 3. The pipette will dispense liquid into all the wells simultaneously.
 
@@ -100,14 +100,14 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 200 µL tips
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_200ul', location="D1")
+            load_name="opentrons_flex_96_tiprack_200ul", location="D1")
         # Load a well plate
         plate = protocol.load_labware(
-            load_name='corning_384_wellplate_112ul_flat', location="D2")
+            load_name="corning_384_wellplate_112ul_flat", location="D2")
         # Load an 8-channel pipette on the right mount
         right = protocol.load_instrument(
-            instrument_name='flex_8channel_1000',
-            mount='right',
+            instrument_name="flex_8channel_1000",
+            mount="right",
             tip_racks=[tiprack1])
 
 
@@ -119,13 +119,13 @@ With the backmost pipette channel above location A1 on the tip rack, all eight c
 
 After picking up a tip, let's tell the robot to aspirate 100 µL from the well plate at location ``A1``::
 
-    right.aspirate(volume=100, location=plate['A1'])
+    right.aspirate(volume=100, location=plate["A1"])
 
 The eight pipette channels will only aspirate from every other well in the column: A1, C1, E1, G1, I1, K1, M1, and O1.
 
 Finally, let's tell the robot to dispense 100 µL into the well plate at location ``B1``::
 
-    right.dispense(volume=100, location=plate['B1'])
+    right.dispense(volume=100, location=plate["B1"])
 
 The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1.
 
@@ -147,19 +147,19 @@ These flow rate properties operate independently. This means you can specify dif
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_1000ul', location='D1')       
+            load_name="opentrons_flex_96_tiprack_1000ul", location="D1")       
         pipette = protocol.load_instrument(
-            instrument_name='flex_1channel_1000',
-            mount='left',
+            instrument_name="flex_1channel_1000",
+            mount="left",
             tip_racks=[tiprack1])                
         plate = protocol.load_labware(
-            load_name='corning_96_wellplate_360ul_flat', location='D3')
+            load_name="corning_96_wellplate_360ul_flat", location="D3")
         pipette.pick_up_tip()
 
 Let's tell the robot to aspirate, dispense, and blow out the liquid using default flow rates. Notice how you don't need to specify a ``flow_rate`` attribute to use the defaults::
 
-        pipette.aspirate(200, plate['A1'])  # 160 µL/s
-        pipette.dispense(200, plate['A2'])  # 160 µL/s
+        pipette.aspirate(200, plate["A1"])  # 160 µL/s
+        pipette.dispense(200, plate["A2"])  # 160 µL/s
         pipette.blow_out()                  #  80 µL/s
 
 Now let's change the flow rates for each action::
@@ -167,8 +167,8 @@ Now let's change the flow rates for each action::
         pipette.flow_rate.aspirate = 50
         pipette.flow_rate.dispense = 100
         pipette.flow_rate.blow_out = 75
-        pipette.aspirate(200, plate['A1'])  #  50 µL/s
-        pipette.dispense(200, plate['A2'])  # 100 µL/s
+        pipette.aspirate(200, plate["A1"])  #  50 µL/s
+        pipette.dispense(200, plate["A2"])  # 100 µL/s
         pipette.blow_out()                  #  75 µL/s
         
 These flow rates will remain in effect until you change the ``flow_rate`` attribute again *or* call ``configure_for_volume()``. Calling ``configure_for_volume()`` always resets all pipette flow rates to the defaults for the mode that it sets.

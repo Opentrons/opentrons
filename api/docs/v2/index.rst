@@ -64,33 +64,33 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
             
             # metadata
             metadata = {
-                'protocolName': 'My Protocol',
-                'author': 'Name <opentrons@example.com>',
-                'description': 'Simple protocol to get started using the Flex',
+                "protocolName": "My Protocol",
+                "author": "Name <opentrons@example.com>",
+                "description": "Simple protocol to get started using the Flex",
             }
             
             # requirements
-            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
             
             # protocol run function
             def run(protocol: protocol_api.ProtocolContext):
                 # labware
                 plate = protocol.load_labware(
-                    'corning_96_wellplate_360ul_flat', location='D1'
+                    "corning_96_wellplate_360ul_flat", location="D1"
                 )
                 tiprack = protocol.load_labware(
-                    'opentrons_flex_96_tiprack_200ul', location='D2'
+                    "opentrons_flex_96_tiprack_200ul", location="D2"
                 )
             
                 # pipettes
                 left_pipette = protocol.load_instrument(
-                    'flex_1channel_1000', mount='left', tip_racks=[tiprack]
+                    "flex_1channel_1000", mount="left", tip_racks=[tiprack]
                 )
             
                 # commands
                 left_pipette.pick_up_tip()
-                left_pipette.aspirate(100, plate['A1'])
-                left_pipette.dispense(100, plate['B2'])
+                left_pipette.aspirate(100, plate["A1"])
+                left_pipette.dispense(100, plate["B2"])
                 left_pipette.drop_tip()
         
         This example proceeds completely linearly. Following it line-by-line, you can see that it has the following effects:
@@ -117,33 +117,33 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
 
             # metadata
             metadata = {
-                'protocolName': 'My Protocol',
-                'author': 'Name <opentrons@example.com>',
-                'description': 'Simple protocol to get started using the OT-2',
+                "protocolName": "My Protocol",
+                "author": "Name <opentrons@example.com>",
+                "description": "Simple protocol to get started using the OT-2",
             }
 
             # requirements
-            requirements = {'robotType': 'OT-2', 'apiLevel': '|apiLevel|'}
+            requirements = {"robotType": "OT-2", "apiLevel": "|apiLevel|"}
 
             # protocol run function
             def run(protocol: protocol_api.ProtocolContext):
                 # labware
                 plate = protocol.load_labware(
-                    'corning_96_wellplate_360ul_flat', location='1'
+                    "corning_96_wellplate_360ul_flat", location="1"
                 )
                 tiprack = protocol.load_labware(
-                    'opentrons_96_tiprack_300ul', location='2'
+                    "opentrons_96_tiprack_300ul", location="2"
                 )
 
                 # pipettes
                 left_pipette = protocol.load_instrument(
-                    'p300_single', mount='left', tip_racks=[tiprack]
+                    "p300_single", mount="left", tip_racks=[tiprack]
                 )
 
                 # commands
                 left_pipette.pick_up_tip()
-                left_pipette.aspirate(100, plate['A1'])
-                left_pipette.dispense(100, plate['B2'])
+                left_pipette.aspirate(100, plate["A1"])
+                left_pipette.dispense(100, plate["B2"])
                 left_pipette.drop_tip()
 
         This example proceeds completely linearly. Following it line-by-line, you can see that it has the following effects:
