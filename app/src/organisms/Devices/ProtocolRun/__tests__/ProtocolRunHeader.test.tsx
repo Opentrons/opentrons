@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
@@ -92,6 +91,7 @@ import { getPipettesWithTipAttached } from '../../../DropTipWizard/getPipettesWi
 import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/utils'
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
@@ -140,6 +140,7 @@ jest.mock('../../../DropTipWizard/getPipettesWithTipAttached')
 jest.mock('../../../../resources/deck_configuration/utils')
 jest.mock('../../../../resources/deck_configuration/hooks')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+jest.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -187,11 +188,11 @@ const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
 const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
   typeof usePipettesQuery
 >
-const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
-  typeof useDismissCurrentRunMutation
->
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
+>
+const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
+  typeof useDismissCurrentRunMutation
 >
 const mockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
@@ -245,6 +246,9 @@ const mockUseDeckConfigurationCompatibility = useDeckConfigurationCompatibility 
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
+>
+const mockUseMostRecentRunId = useMostRecentRunId as jest.MockedFunction<
+  typeof useMostRecentRunId
 >
 
 const ROBOT_NAME = 'otie'
@@ -396,17 +400,17 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue({
         data: { data: mockIdleUnstartedRun },
       } as UseQueryResult<Run>)
-    when(mockUseDismissCurrentRunMutation)
-      .calledWith()
-      .mockReturnValue({
-        dismissCurrentRun: jest.fn(),
-      } as any)
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
+    when(mockUseDismissCurrentRunMutation)
+      .calledWith()
+      .mockReturnValue({
+        dismissCurrentRun: jest.fn(),
+      } as any)
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
@@ -438,6 +442,7 @@ describe('ProtocolRunHeader', () => {
       } as any)
     mockUseDeckConfigurationCompatibility.mockReturnValue([])
     when(mockGetIsFixtureMismatch).mockReturnValue(false)
+    when(mockUseMostRecentRunId).mockReturnValue(RUN_ID)
   })
 
   afterEach(() => {
@@ -835,7 +840,7 @@ describe('ProtocolRunHeader', () => {
     render()
 
     fireEvent.click(screen.getByText('View error'))
-    expect(mockCloseCurrentRun).not.toBeCalled()
+    expect(mockCloseCurrentRun).toBeCalled()
     screen.getByText('mock RunFailedModal')
   })
 
@@ -1012,7 +1017,7 @@ describe('ProtocolRunHeader', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('renders the drop tip banner when the run is over and a pipette has a tip attached', async () => {
+  it('renders the drop tip banner when the run is over and a pipette has a tip attached and is a flex', async () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -1047,30 +1052,6 @@ describe('ProtocolRunHeader', () => {
         },
       } as UseQueryResult<Run>)
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
-
-    render()
-    await waitFor(() => {
-      expect(
-        screen.queryByText('Tips may be attached.')
-      ).not.toBeInTheDocument()
-    })
-  })
-
-  it('does not show the drop tip banner when the run is not over', async () => {
-    when(mockUseRunQuery)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        data: {
-          data: {
-            ...mockIdleUnstartedRun,
-            current: false,
-            status: RUN_STATUS_SUCCEEDED,
-          },
-        },
-      } as UseQueryResult<Run>)
-    when(mockUseRunStatus)
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_SUCCEEDED)
 
     render()
     await waitFor(() => {

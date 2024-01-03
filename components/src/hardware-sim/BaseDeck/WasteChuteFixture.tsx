@@ -20,7 +20,7 @@ interface WasteChuteFixtureProps extends React.SVGProps<SVGGElement> {
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
-  slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
+  wasteChuteColor?: string
   showExtensions?: boolean
 }
 
@@ -31,7 +31,7 @@ export function WasteChuteFixture(
     cutoutId,
     deckDefinition,
     fixtureBaseColor = COLORS.light1,
-    slotClipColor = COLORS.darkGreyEnabled,
+    wasteChuteColor = COLORS.grey2,
     ...restProps
   } = props
 
@@ -59,7 +59,7 @@ export function WasteChuteFixture(
         fill={fixtureBaseColor}
       />
       <WasteChute
-        backgroundColor={slotClipColor}
+        backgroundColor={wasteChuteColor}
         wasteIconColor={fixtureBaseColor}
       />
     </g>

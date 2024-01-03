@@ -91,6 +91,8 @@ This code only loads the instruments and labware listed above, and performs no o
                 reservoir = protocol.load_labware(
                     load_name="usascientific_12_reservoir_22ml", location="D1"
                 )
+                # load trash bin in deck slot A3
+                trash = protocol.load_trash_bin("A3")
                 # Put protocol commands here
     
     .. tab:: OT-2 
@@ -100,7 +102,7 @@ This code only loads the instruments and labware listed above, and performs no o
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 # load tip rack in deck slot 3
@@ -151,15 +153,16 @@ This protocol uses some :ref:`building block commands <v2-atomic-commands>` to t
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
                     location='D2')
-                pipette_1 = protocol.load_instrument(
+                trash = protocol.load_trash_bin('A3')
+                pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
                 tip_racks=[tiprack_1])
 
-                pipette_1.pick_up_tip()
-                pipette_1.aspirate(100, plate['A1'])
-                pipette_1.dispense(100, plate['B1'])
-                pipette_1.drop_tip()
+                pipette.pick_up_tip()
+                pipette.aspirate(100, plate['A1'])
+                pipette.dispense(100, plate['B1'])
+                pipette.drop_tip()
 
     .. tab:: OT-2
 
@@ -168,7 +171,7 @@ This protocol uses some :ref:`building block commands <v2-atomic-commands>` to t
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -210,12 +213,13 @@ This protocol accomplishes the same thing as the previous example, but does it a
                 tiprack_1 = protocol.load_labware(
                     load_name='opentrons_flex_96_tiprack_200ul',
                     location='D2')
-                pipette_1 = protocol.load_instrument(
+                trash = protocol.load_trash_bin('A3')
+                pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
                     tip_racks=[tiprack_1])
                 # transfer 100 µL from well A1 to well B1
-                pipette_1.transfer(100, plate['A1'], plate['B1'])
+                pipette.transfer(100, plate['A1'], plate['B1'])
     
     .. tab:: OT-2
 
@@ -224,7 +228,7 @@ This protocol accomplishes the same thing as the previous example, but does it a
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -269,7 +273,8 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
                     location='D3')
-                pipette_1 = protocol.load_instrument(
+                trash = protocol.load_trash_bin('A3')
+                pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
                     tip_racks=[tiprack_1])
@@ -279,7 +284,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
                 # etc...
                 # range() starts at 0 and stops before 8, creating a range of 0-7
                 for i in range(8):
-                    pipette_1.distribute(200, reservoir.wells()[i], plate.rows()[i])
+                    pipette.distribute(200, reservoir.wells()[i], plate.rows()[i])
 
     .. tab:: OT-2
 
@@ -288,7 +293,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -335,26 +340,27 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
                     load_name='corning_96_wellplate_360ul_flat',
                     location='D1')
                 tiprack_1 = protocol.load_labware(
-                    load_name='opentrons_flex_96_tiprack_200ul',
+                    load_name='opentrons_flex_96_tiprack_1000ul',
                     location='D2')
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
                     location='D3')
-                pipette_1 = protocol.load_instrument(
+                trash = protocol.load_trash_bin('A3')
+                pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000', 
                     mount='left',
                     tip_racks=[tiprack_1])
 
-                pipette_1.pick_up_tip()
+                pipette.pick_up_tip()
 
                 # aspirate from the first 5 wells
-                for well in reservoir.wells()[:4]:
-                    pipette_1.aspirate(volume=35, location=well)
-                    pipette_1.air_gap(10)
-        
-                pipette_1.dispense(225, plate['A1'])
+                for well in reservoir.wells()[:5]:
+                    pipette.aspirate(volume=35, location=well)
+                    pipette.air_gap(10)
 
-                pipette_1.return_tip()
+                pipette.dispense(225, plate['A1'])
+
+                pipette.return_tip()
 
     .. tab:: OT-2
 
@@ -363,7 +369,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -383,7 +389,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
                 p300.pick_up_tip()
 
                 # aspirate from the first 5 wells
-                for well in reservoir.wells()[:4]:
+                for well in reservoir.wells()[:5]:
                     p300.aspirate(volume=35, location=well)
                     p300.air_gap(10)
         
@@ -422,12 +428,13 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
                     location='C1')
-                pipette_1 = protocol.load_instrument(
+                trash = protocol.load_trash_bin('A3')
+                pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='left',
                     tip_racks=[tiprack_1, tiprack_2])
                 # Dispense diluent
-                pipette_1.distribute(50, reservoir['A12'], plate.wells())
+                pipette.distribute(50, reservoir['A12'], plate.wells())
 
                 # loop through each row
                 for i in range(8):
@@ -436,10 +443,10 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
                     row = plate.rows()[i]
 
                 # transfer 30 µL of source to first well in column
-                pipette_1.transfer(30, source, row[0], mix_after=(3, 25))
+                pipette.transfer(30, source, row[0], mix_after=(3, 25))
 
                 # dilute the sample down the column
-                pipette_1.transfer(
+                pipette.transfer(
                     30, row[:11], row[1:],
                     mix_after=(3, 25))
     
@@ -450,7 +457,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -503,7 +510,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel': '2.15'}
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
                 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(
@@ -518,7 +525,8 @@ This protocol dispenses different volumes of liquids to a well plate and automat
                 reservoir = protocol.load_labware(
                     load_name='usascientific_12_reservoir_22ml',
                     location='C1')
-                pipette_1 = protocol.load_instrument(
+                trash = protocol.load_trash_bin('A3')
+                pipette = protocol.load_instrument(
                     instrument_name='flex_1channel_1000',
                     mount='right',
                 tip_racks=[tiprack_1, tiprack_2])
@@ -539,7 +547,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
                     89, 90, 91, 92, 93, 94, 95, 96
                     ]
 
-                pipette_1.distribute(water_volumes, reservoir['A12'], plate.wells())
+                pipette.distribute(water_volumes, reservoir['A12'], plate.wells())
 
     .. tab:: OT-2
         
@@ -547,7 +555,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             :substitutions:
 
             from opentrons import protocol_api
-            metadata = {'apiLevel': '2.14'}
+            metadata = {'apiLevel': '|apiLevel|'}
                 
             def run(protocol: protocol_api.ProtocolContext):
                 plate = protocol.load_labware(

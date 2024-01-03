@@ -681,6 +681,28 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
+    def is_tip_tracking_available(self) -> bool:
+        primary_nozzle = self._engine_client.state.pipettes.get_primary_nozzle(
+            self._pipette_id
+        )
+        if self.get_nozzle_configuration() == NozzleConfigurationType.FULL:
+            return True
+        else:
+            if self.get_channels() == 96:
+                # SINGLE configuration with H12 nozzle is technically supported by the
+                # current tip tracking implementation but we don't do any deck conflict
+                # checks for it, so we won't provide full support for it yet.
+                return (
+                    self.get_nozzle_configuration() == NozzleConfigurationType.COLUMN
+                    and primary_nozzle == "A12"
+                )
+            if self.get_channels() == 8:
+                return (
+                    self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
+                    and primary_nozzle == "H1"
+                )
+        return False
+
     def set_flow_rate(
         self,
         aspirate: Optional[float] = None,

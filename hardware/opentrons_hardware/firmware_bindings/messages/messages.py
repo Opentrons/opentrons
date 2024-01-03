@@ -96,6 +96,9 @@ MessageDefinition = Union[
     defs.GetMotorUsageResponse,
     defs.GripperJawStateRequest,
     defs.GripperJawStateResponse,
+    defs.SetGripperJawHoldoffRequest,
+    defs.GripperJawHoldoffRequest,
+    defs.GripperJawHoldoffResponse,
 ]
 
 
