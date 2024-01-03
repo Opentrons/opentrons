@@ -233,6 +233,7 @@ class ErrorCode(int, Enum):
     motor_busy = 0x0B
     stop_requested = 0x0C
     over_pressure = 0x0D
+    motor_driver_error_detected = 0x0E
 
 
 @unique
