@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
+import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
@@ -43,7 +44,7 @@ export function StagingAreaConfigFixture(
       flexProps={{ flex: '1' }}
       foreignObjectProps={{ flex: '1' }}
     >
-      <button
+      <Btn
         css={
           handleClickRemove != null
             ? STAGING_AREA_CONFIG_STYLE_EDITABLE
@@ -56,13 +57,13 @@ export function StagingAreaConfigFixture(
             : () => {}
         }
       >
-        <p css={TYPOGRAPHY.smallBodyTextSemiBold}>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
           {STAGING_AREA_DISPLAY_NAME}
-        </p>
+        </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
-      </>button
+      </Btn>
     </RobotCoordsForeignObject>
   )
 }

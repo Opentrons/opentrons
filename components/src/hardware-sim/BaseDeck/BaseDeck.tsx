@@ -18,11 +18,11 @@ import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { Module } from '../Module'
 import { LabwareRender } from '../Labware'
 import { FlexTrash } from '../Deck/FlexTrash'
-// import { DeckFromLayers } from '../Deck/DeckFromLayers'
+import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { SlotLabels } from '../Deck'
 import { COLORS } from '../../ui-style-constants'
 
-// import { Svg } from '../../primitives'
+import { Svg } from '../../primitives'
 import { SingleSlotFixture } from './SingleSlotFixture'
 import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
@@ -78,8 +78,7 @@ interface BaseDeckProps {
   /** whether to make wrapping svg tag animatable via @react-spring/web, defaults to false */
   animatedSVG?: boolean
   /** extra props to pass to svg tag */
-  svgProps?: any 
-  /** React.ComponentProps<typeof Svg> */
+  svgProps?: React.ComponentProps<typeof Svg>
 }
 
 export function BaseDeck(props: BaseDeckProps): JSX.Element {
@@ -131,7 +130,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       {...svgProps}
     >
       {robotType === OT2_ROBOT_TYPE ? (
-        <p>HELLO WORLD</p>
+        <DeckFromLayers
+          robotType={robotType}
+          layerBlocklist={deckLayerBlocklist}
+        />
       ) : (
         <>
           {showSlotLabels ? (
@@ -257,7 +259,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               !('slotName' in labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===
-                'opentrons_1_trash_3200ml_fixed'
+              'opentrons_1_trash_3200ml_fixed'
             ) {
               return null
             }

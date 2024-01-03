@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
+import { Btn, Text } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
@@ -47,8 +48,9 @@ export function TrashBinConfigFixture(
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
+      foreignObjectProps={{ flex: '1' }}
     >
-      <button
+      <Btn
         css={
           handleClickRemove != null
             ? TRASH_BIN_CONFIG_STYLE_EDTIABLE
@@ -61,13 +63,13 @@ export function TrashBinConfigFixture(
             : () => {}
         }
       >
-        <p css={TYPOGRAPHY.smallBodyTextSemiBold}>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
           {TRASH_BIN_DISPLAY_NAME}
-        </p>
+        </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}
-      </button>
+      </Btn>
     </RobotCoordsForeignObject>
   )
 }

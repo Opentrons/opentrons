@@ -6,6 +6,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { Icon } from '../../icons'
+import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
@@ -87,7 +88,7 @@ export const FlexTrash = ({
         flexProps={{ flex: '1' }}
         foreignObjectProps={{ flex: '1' }}
       >
-        <div
+        <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={backgroundColor}
           borderRadius={BORDERS.radiusSoftCorners}
@@ -96,7 +97,7 @@ export const FlexTrash = ({
           width="100%"
         >
           {rotateDegrees === '180' ? (
-            <p
+            <Text
               color={COLORS.white}
               // rotate text back 180 degrees
               transform={`rotate(${rotateDegrees}deg)`}
@@ -104,7 +105,7 @@ export const FlexTrash = ({
               css={TYPOGRAPHY.bodyTextSemiBold}
             >
               Trash bin
-            </p>
+            </Text>
           ) : null}
           <Icon
             name="trash"
@@ -115,11 +116,11 @@ export const FlexTrash = ({
             transformOrigin="center"
           />
           {rotateDegrees === '0' ? (
-            <p color={COLORS.white} css={TYPOGRAPHY.bodyTextSemiBold}>
+            <Text color={COLORS.white} css={TYPOGRAPHY.bodyTextSemiBold}>
               Trash bin
-            </p>
+            </Text>
           ) : null}
-        </div>
+        </Flex>
       </RobotCoordsForeignObject>
     </g>
   ) : null

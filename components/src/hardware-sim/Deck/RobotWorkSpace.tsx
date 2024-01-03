@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { StyleProps } from '../../primitives'
+import { StyleProps, Svg } from '../../primitives'
 import { StyledDeck } from './StyledDeck'
 
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
@@ -76,7 +76,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
     wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
   }
   return (
-    <svg
+    <Svg
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
       id={id}
@@ -94,6 +94,6 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
         />
       ) : null}
       {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
-    </svg>
+    </Svg>
   )
 }
