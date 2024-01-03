@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import { COLORS } from '@opentrons/components'
 import {
@@ -11,6 +12,8 @@ import {
   getModuleType,
   getModuleDisplayName,
   LEFT,
+  CutoutId,
+  FLEX_CUTOUT_BY_SLOT_ID,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -67,10 +70,28 @@ export const ModuleWizardFlows = (
       : attachedPipettes.right
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const occupiedCutouts = deckConfig.reduce<CutoutId[]>((acc, fixture) => {
+    return fixture.cutoutFixtureId?.includes('single')
+      ? acc
+      : [...acc, fixture.cutoutId]
+  }, [])
   const availableSlotNames =
-    FLEX_SLOT_NAMES_BY_MOD_TYPE[getModuleType(attachedModule.moduleModel)] ?? []
+    FLEX_SLOT_NAMES_BY_MOD_TYPE[
+      getModuleType(attachedModule.moduleModel)
+    ]?.filter(
+      slot =>
+        !occupiedCutouts.some(
+          occCutout => occCutout === FLEX_CUTOUT_BY_SLOT_ID[slot]
+        )
+    ) ?? []
+  console.log(
+    '🚀 ~ file: index.tsx:80 ~ availableSlotNames:',
+    availableSlotNames
+  )
+
   const [slotName, setSlotName] = React.useState(
-    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? 'D1'
+    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? null
   )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1

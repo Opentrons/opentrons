@@ -81,6 +81,7 @@ export const SelectLocation = (
       bodyText={bodyText}
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}
+      proceedIsDisabled={slotName == null}
     />
   )
 }
