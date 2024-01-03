@@ -85,10 +85,6 @@ export const ModuleWizardFlows = (
           occCutout => occCutout === FLEX_CUTOUT_BY_SLOT_ID[slot]
         )
     ) ?? []
-  console.log(
-    '🚀 ~ file: index.tsx:80 ~ availableSlotNames:',
-    availableSlotNames
-  )
 
   const [slotName, setSlotName] = React.useState(
     initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? null
