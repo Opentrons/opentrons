@@ -60,22 +60,15 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
-  log.info('before setWindowOpenHandler')
   // open new windows (<a target="_blank" ...) in browser windows
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    log.info('setWindowOpenHandler')
-    if (url.startsWith('http://localhost')) {
-      log.debug('Opening external link', { url })
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  mainWindow.webContents.setWindowOpenHandler(({ url, disposition }) => {
+    if (disposition === 'new-window' && url === 'about:blank') {
       shell.openExternal(url)
-      return { action: 'allow', overrideBrowserWindowOptions: WINDOW_OPTS }
-    } else {
-      log.error("Blocked by 'setWindowOpenHandler'")
       return { action: 'deny' }
+    } else {
+      return { action: 'allow' }
     }
   })
-
-  log.info('mainWindow', mainWindow)
 
   return mainWindow
 }
