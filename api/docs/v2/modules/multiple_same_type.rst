@@ -46,10 +46,11 @@ When working with multiple modules of the same type, load them in your protocol 
     In this example, ``temperature_module_1`` loads first because it's connected to USB port 1. ``temperature_module_2`` loads next because it's connected to USB port 3.
 
     .. code-block:: python
+    :substitutions:
 
       from opentrons import protocol_api
 
-      metadata = { 'apiLevel': '|apiLevel|'}
+      metadata = { "apiLevel": "|apiLevel|"}
 
       def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot C1 on USB port 1

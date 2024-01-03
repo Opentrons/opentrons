@@ -160,7 +160,10 @@ Remove labware from the deck to perform tasks like retrieving samples or discard
 
 Moving labware off-deck always requires user intervention, because the gripper can't reach outside of the robot. Omit the ``use_gripper`` parameter or explicitly set it to ``False``. If you try to move labware off-deck with ``use_gripper=True``, the API will raise an error.
 
-You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it `onto` the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one::
+You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it `onto` the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one:
+
+    .. code-block:: python
+    :substitutions:
 
     from opentrons import protocol_api
 
