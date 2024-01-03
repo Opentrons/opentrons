@@ -3,11 +3,11 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
   ModuleDefinition,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 import {
   C_DARK_GRAY,
@@ -22,12 +22,12 @@ import {
 import { RobotCoordsForeignObject } from '../Deck'
 import { multiplyMatrices } from '../utils'
 import { Thermocycler } from './Thermocycler'
-import { ModuleFromDef } from './ModuleFromDef'
 import { HeaterShaker } from './HeaterShaker'
 import { Temperature } from './Temperature'
+import { MagneticBlock } from './MagneticBlock'
+import { MagneticModule } from './MagneticModule'
 
 export * from './Thermocycler'
-export * from './ModuleFromDef'
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 
@@ -37,11 +37,10 @@ interface Props {
   def: ModuleDefinition
   orientation?: 'left' | 'right'
   innerProps?:
-    | React.ComponentProps<typeof Thermocycler>
-    | React.ComponentProps<typeof ModuleFromDef>
-    | React.ComponentProps<typeof HeaterShaker>
-    | React.ComponentProps<typeof Temperature>
-    | {}
+  | React.ComponentProps<typeof Thermocycler>
+  | React.ComponentProps<typeof HeaterShaker>
+  | React.ComponentProps<typeof Temperature>
+  | {}
   statusInfo?: React.ReactNode // contents of small status rectangle, not displayed if absent
   children?: React.ReactNode // contents to be rendered on top of the labware mating surface of the module
   targetSlotId?: string
@@ -105,8 +104,8 @@ export const Module = (props: Props): JSX.Element => {
   const transformsForDeckBySlot = def?.slotTransforms?.[targetDeckId]
   const slotTransformsForDeckSlot =
     targetSlotId != null &&
-    transformsForDeckBySlot != null &&
-    targetSlotId in transformsForDeckBySlot
+      transformsForDeckBySlot != null &&
+      targetSlotId in transformsForDeckBySlot
       ? transformsForDeckBySlot[targetSlotId]
       : null
   const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
@@ -178,37 +177,26 @@ export const Module = (props: Props): JSX.Element => {
     )
   }
 
-  const magneticBlockLayerBlockList = ['Module_Title', 'Well_Labels', 'Wells']
-
-  let moduleViz: JSX.Element = (
-    <ModuleFromDef
-      layerBlocklist={
-        moduleType === MAGNETIC_BLOCK_TYPE
-          ? magneticBlockLayerBlockList
-          : undefined
-      }
-      {...(innerProps as React.ComponentProps<typeof ModuleFromDef>)}
-      def={def}
-    />
-  )
-  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+  let moduleViz: JSX.Element | null = null
+  if (moduleType === MAGNETIC_BLOCK_TYPE) {
+    moduleViz = <MagneticBlock />
+  } else if (moduleType === MAGNETIC_MODULE_TYPE) {
+    moduleViz = <MagneticModule />
+  } else if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     const thermocyclerProps = {
+      lidMotorState: 'unknown' as const,
       ...innerProps,
-      model: def.model as ThermocyclerModuleModel,
+      model: def.model,
     }
 
     moduleViz = <Thermocycler {...thermocyclerProps} />
   } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
     moduleViz = (
-      <HeaterShaker
-        {...(innerProps as React.ComponentProps<typeof HeaterShaker>)}
-      />
+      <HeaterShaker {...(innerProps as React.ComponentProps<typeof HeaterShaker>)} />
     )
   } else if (moduleType === TEMPERATURE_MODULE_TYPE) {
     moduleViz = (
-      <Temperature
-        {...(innerProps as React.ComponentProps<typeof Temperature>)}
-      />
+      <Temperature {...(innerProps as React.ComponentProps<typeof Temperature>)} />
     )
   }
   return (
