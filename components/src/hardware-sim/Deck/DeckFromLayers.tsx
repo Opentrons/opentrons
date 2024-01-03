@@ -15,13 +15,14 @@ import {
 } from './OT2Layers'
 
 import type { RobotType } from '@opentrons/shared-data'
+import { ALL_OT2_DECK_LAYERS } from './constants'
 
 export interface DeckFromLayersProps {
   robotType: RobotType
   layerBlocklist: string[]
 }
 
-const OT2_LAYER_MAP: { [layer: string]: JSX.Element } = {
+const OT2_LAYER_MAP: { [layer in typeof ALL_OT2_DECK_LAYERS[number]]: JSX.Element } = {
   fixedBase: <FixedBase />,
   fixedTrash: <FixedTrash />,
   doorStops: <DoorStops />,
@@ -46,7 +47,7 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
 
   return (
     <g id="deckLayers">
-      {Object.keys(OT2_LAYER_MAP).reduce<JSX.Element[]>(
+      {ALL_OT2_DECK_LAYERS.reduce<JSX.Element[]>(
         (acc, layer) => {
           if (layerBlocklist.includes(layer)) return acc
           return [...acc, OT2_LAYER_MAP[layer]]
