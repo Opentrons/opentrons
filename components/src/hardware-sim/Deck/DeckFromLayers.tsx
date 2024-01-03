@@ -22,7 +22,7 @@ export interface DeckFromLayersProps {
 }
 
 const OT2_LAYER_MAP: { [layer: string]: JSX.Element } = {
-  flexBase: <FixedBase />,
+  fixedBase: <FixedBase />,
   fixedTrash: <FixedTrash />,
   doorStops: <DoorStops />,
   metalFrame: <MetalFrame />,

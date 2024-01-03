@@ -32,7 +32,6 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
-   
     <BaseDeck
       deckConfig={deckConfig}
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}

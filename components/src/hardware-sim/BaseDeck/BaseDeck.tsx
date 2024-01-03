@@ -131,9 +131,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     >
       {robotType === OT2_ROBOT_TYPE ? (
         <DeckFromLayers
-          robotType={robotType}
-          layerBlocklist={deckLayerBlocklist}
-        />
+        robotType={robotType}
+        layerBlocklist={deckLayerBlocklist}
+      />
       ) : (
         <>
           {showSlotLabels ? (
@@ -221,7 +221,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               moduleLocation.slotName,
               deckDef
             )
-
             const moduleDef = getModuleDef2(moduleModel)
             return slotPosition != null ? (
               <Module
@@ -259,7 +258,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               !('slotName' in labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===
-              'opentrons_1_trash_3200ml_fixed'
+                'opentrons_1_trash_3200ml_fixed'
             ) {
               return null
             }
