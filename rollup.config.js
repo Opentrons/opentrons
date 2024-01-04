@@ -8,7 +8,6 @@ import resolve from '@rollup/plugin-node-resolve'
 import { terser } from 'rollup-plugin-terser'
 import peerDepsExternal from 'rollup-plugin-peer-deps-external'
 
-
 export const ALIAS_ENTRIES = {
   '@opentrons/api-client': join(__dirname, './api-client/src/index.ts'),
   '@opentrons/react-api-client': join(
@@ -32,7 +31,7 @@ const output = ({ packageName, browser }) => ({
       format: 'cjs',
       sourcemap: true,
       plugins: [terser()],
-      interop: 'auto'
+      interop: 'auto',
     },
     {
       file: join(
@@ -43,7 +42,7 @@ const output = ({ packageName, browser }) => ({
       format: 'esm',
       sourcemap: true,
       plugins: [terser()],
-      interop: 'auto'
+      interop: 'auto',
     },
   ],
 })

@@ -7,9 +7,9 @@ import type {
 } from '@opentrons/shared-data'
 
 interface LabwareInSlot {
-  labwareId: string,
-  labwareDef: LabwareDefinition2,
-  labwareNickName: string | null,
+  labwareId: string
+  labwareDef: LabwareDefinition2
+  labwareNickName: string | null
   location: { slotName: string }
 }
 
@@ -21,7 +21,10 @@ export const getTopMostLabwareInSlots = (
     commands
   )
   return commands
-    .filter((command): command is LoadLabwareRunTimeCommand => command.commandType === 'loadLabware')
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
     .reduce<LabwareInSlot[]>((acc, command) => {
       const labwareId = command.result?.labwareId
       const location = command.params.location
@@ -58,7 +61,9 @@ export const getTopMostLabwareInSlots = (
         labwareInAdapter?.result?.definition ?? labwareDef
       const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
       const topLabwareNickName =
-        labwareInAdapter?.params?.displayName ?? command.params.displayName ?? null
+        labwareInAdapter?.params?.displayName ??
+        command.params.displayName ??
+        null
 
       return [
         ...acc,

@@ -50,9 +50,7 @@ const Template: Story<{
         orientation={args.orientation}
       >
         {args.hasLabware ? (
-          <LabwareRender
-            definition={fixture_96_plate as LabwareDefinition2}
-          />
+          <LabwareRender definition={fixture_96_plate as LabwareDefinition2} />
         ) : null}
       </ModuleComponent>
     </RobotCoordinateSpace>
@@ -82,13 +80,13 @@ Module.argTypes = {
   },
   innerProps: {
     control: {
-      type: 'object'
+      type: 'object',
     },
     defaultValue: {
       lidMotorState: 'open',
       blockTargetTemp: 90,
       targetTemperature: 4,
-      targetTemp: 40
-    }
-  }
+      targetTemp: 40,
+    },
+  },
 }

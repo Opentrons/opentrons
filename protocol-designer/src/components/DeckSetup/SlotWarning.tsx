@@ -18,7 +18,7 @@ const OVERHANG = 60
 const StyledRect = styled.rect`
   rx: 6;
   fill: transparent;
-  stroke: #CCC;
+  stroke: #ccc;
   stroke-width: 2;
   stroke-dasharray: 8 4;
 `
@@ -46,13 +46,13 @@ export const SlotWarning = (props: Props): JSX.Element => {
             fontWeight: TYPOGRAPHY.fontWeightSemiBold,
             color: '#9B9B9B',
             lineHeight: 1.25,
-          }
+          },
         }}
         width={OVERHANG}
         height={yDimension}
       >
         {i18n.t(`deck.warning.${warningType}`)}
       </RobotCoordsForeignDiv>
-    </g >
+    </g>
   )
 }

@@ -38,10 +38,10 @@ interface Props {
   def: ModuleDefinition
   orientation?: 'left' | 'right'
   innerProps?:
-  | React.ComponentProps<typeof Thermocycler>
-  | React.ComponentProps<typeof HeaterShaker>
-  | React.ComponentProps<typeof Temperature>
-  | {}
+    | React.ComponentProps<typeof Thermocycler>
+    | React.ComponentProps<typeof HeaterShaker>
+    | React.ComponentProps<typeof Temperature>
+    | {}
   statusInfo?: React.ReactNode // contents of small status rectangle, not displayed if absent
   children?: React.ReactNode // contents to be rendered on top of the labware mating surface of the module
   targetSlotId?: string
@@ -105,8 +105,8 @@ export const Module = (props: Props): JSX.Element => {
   const transformsForDeckBySlot = def?.slotTransforms?.[targetDeckId]
   const slotTransformsForDeckSlot =
     targetSlotId != null &&
-      transformsForDeckBySlot != null &&
-      targetSlotId in transformsForDeckBySlot
+    transformsForDeckBySlot != null &&
+    targetSlotId in transformsForDeckBySlot
       ? transformsForDeckBySlot[targetSlotId]
       : null
   const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
@@ -193,11 +193,15 @@ export const Module = (props: Props): JSX.Element => {
     moduleViz = <Thermocycler {...thermocyclerProps} />
   } else if (moduleType === HEATERSHAKER_MODULE_TYPE) {
     moduleViz = (
-      <HeaterShaker {...(innerProps as React.ComponentProps<typeof HeaterShaker>)} />
+      <HeaterShaker
+        {...(innerProps as React.ComponentProps<typeof HeaterShaker>)}
+      />
     )
   } else if (moduleType === TEMPERATURE_MODULE_TYPE) {
     moduleViz = (
-      <Temperature {...(innerProps as React.ComponentProps<typeof Temperature>)} />
+      <Temperature
+        {...(innerProps as React.ComponentProps<typeof Temperature>)}
+      />
     )
   }
   return (

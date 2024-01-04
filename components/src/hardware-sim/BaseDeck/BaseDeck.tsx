@@ -127,9 +127,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     >
       {robotType === OT2_ROBOT_TYPE ? (
         <DeckFromLayers
-        robotType={robotType}
-        layerBlocklist={deckLayerBlocklist}
-      />
+          robotType={robotType}
+          layerBlocklist={deckLayerBlocklist}
+        />
       ) : (
         <>
           {showSlotLabels ? (

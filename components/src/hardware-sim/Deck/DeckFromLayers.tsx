@@ -22,7 +22,9 @@ export interface DeckFromLayersProps {
   layerBlocklist: string[]
 }
 
-const OT2_LAYER_MAP: { [layer in typeof ALL_OT2_DECK_LAYERS[number]]: JSX.Element } = {
+const OT2_LAYER_MAP: {
+  [layer in typeof ALL_OT2_DECK_LAYERS[number]]: JSX.Element
+} = {
   fixedBase: <FixedBase />,
   fixedTrash: <FixedTrash />,
   doorStops: <DoorStops />,
@@ -47,12 +49,10 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
 
   return (
     <g id="deckLayers">
-      {ALL_OT2_DECK_LAYERS.reduce<JSX.Element[]>(
-        (acc, layer) => {
-          if (layerBlocklist.includes(layer)) return acc
-          return [...acc, OT2_LAYER_MAP[layer]]
-        }, []
-      )}
+      {ALL_OT2_DECK_LAYERS.reduce<JSX.Element[]>((acc, layer) => {
+        if (layerBlocklist.includes(layer)) return acc
+        return [...acc, OT2_LAYER_MAP[layer]]
+      }, [])}
     </g>
   )
 }

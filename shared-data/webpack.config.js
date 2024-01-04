@@ -2,7 +2,7 @@
 
 const path = require('path')
 const webpackMerge = require('webpack-merge')
-const { baseConfig, rules } = require('@opentrons/webpack-config')
+const { baseConfig } = require('@opentrons/webpack-config')
 
 const ENTRY_INDEX = path.join(__dirname, 'js/index.ts')
 const OUTPUT_PATH = path.join(__dirname, 'lib')
@@ -15,6 +15,6 @@ module.exports = async () =>
       filename: 'opentrons-shared-data.js',
       library: '@opentrons/shared-data',
       libraryTarget: 'umd',
-      globalObject: 'this'
+      globalObject: 'this',
     },
   })

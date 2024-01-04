@@ -31,7 +31,7 @@ export const RobotCoordsForeignDiv = (
   const transform = `scale(1, -1) ${extraTransform}`
   return (
     <foreignObject
-      {...{ x, y, height, width, ...outerProps}}
+      {...{ x, y, height, width, ...outerProps }}
       transform={transformWithSVG ? transform : extraTransform}
     >
       <Box

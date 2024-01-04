@@ -39,36 +39,49 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
 
   const modulesInSlots = getModulesInSlots(protocolAnalysis)
-  const modulesOnDeck = modulesInSlots.map(({
-    moduleModel,
-    moduleLocation,
-    nestedLabwareId,
-    nestedLabwareDef,
-    nestedLabwareNickName,
-  }) => ({
-    moduleModel,
-    moduleLocation,
-    nestedLabwareDef,
-    nestedLabwareWellFill: getWellFillFromLabwareId(nestedLabwareId ?? '', protocolAnalysis.liquids, labwareByLiquidId),
-    moduleChildren: nestedLabwareDef != null && !(nestedLabwareDef.allowedRoles ?? []).includes('adapter')
-      ? (
-        <LabwareInfo def={nestedLabwareDef}>
-          {nestedLabwareNickName ?? getLabwareDisplayName(nestedLabwareDef)}
-        </LabwareInfo>
-      ) : null
-  }))
+  const modulesOnDeck = modulesInSlots.map(
+    ({
+      moduleModel,
+      moduleLocation,
+      nestedLabwareId,
+      nestedLabwareDef,
+      nestedLabwareNickName,
+    }) => ({
+      moduleModel,
+      moduleLocation,
+      nestedLabwareDef,
+      nestedLabwareWellFill: getWellFillFromLabwareId(
+        nestedLabwareId ?? '',
+        protocolAnalysis.liquids,
+        labwareByLiquidId
+      ),
+      moduleChildren:
+        nestedLabwareDef != null &&
+        !(nestedLabwareDef.allowedRoles ?? []).includes('adapter') ? (
+          <LabwareInfo def={nestedLabwareDef}>
+            {nestedLabwareNickName ?? getLabwareDisplayName(nestedLabwareDef)}
+          </LabwareInfo>
+        ) : null,
+    })
+  )
 
   const topMostLabwareInSlots = getTopMostLabwareInSlots(protocolAnalysis)
-  const labwareOnDeck = topMostLabwareInSlots.map(({ labwareId, labwareDef, labwareNickName, location }) => ({
-    definition: labwareDef,
-    labwareLocation: location,
-    wellFill: getWellFillFromLabwareId(labwareId, protocolAnalysis.liquids, labwareByLiquidId),
-    labwareChildren: showLabwareInfo ? (
-      <LabwareInfo def={labwareDef}>
-        {labwareNickName ?? getLabwareDisplayName(labwareDef)}
-      </LabwareInfo>
-    ) : null
-  }))
+  const labwareOnDeck = topMostLabwareInSlots.map(
+    ({ labwareId, labwareDef, labwareNickName, location }) => ({
+      definition: labwareDef,
+      labwareLocation: location,
+      wellFill: getWellFillFromLabwareId(
+        labwareId,
+        protocolAnalysis.liquids,
+        labwareByLiquidId
+      ),
+      labwareChildren: showLabwareInfo ? (
+        <LabwareInfo def={labwareDef}>
+          {labwareNickName ?? getLabwareDisplayName(labwareDef)}
+        </LabwareInfo>
+      ) : null,
+    })
+  )
 
   return (
     <BaseDeck

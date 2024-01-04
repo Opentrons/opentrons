@@ -1,9 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import {
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { LabwareDefinition2 } from '@opentrons/shared-data'
 import { RobotCoordsForeignDiv } from '../Deck'
 import {
   DISPLAY_FLEX,
@@ -13,8 +11,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_START,
 } from '../../styles'
-import { Box, Flex, Text, } from '../../primitives'
-import { TYPOGRAPHY, SPACING, COLORS, } from '../../ui-style-constants'
+import { Box, Flex, Text } from '../../primitives'
+import { TYPOGRAPHY, SPACING, COLORS } from '../../ui-style-constants'
 
 const labwareDisplayNameStyle = css`
   overflow: hidden;
@@ -24,7 +22,10 @@ const labwareDisplayNameStyle = css`
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `
-export function LabwareInfo(props: { def: LabwareDefinition2, children: React.ReactNode }): JSX.Element {
+export function LabwareInfo(props: {
+  def: LabwareDefinition2
+  children: React.ReactNode
+}): JSX.Element {
   const width = props.def.dimensions.xDimension
   const height = props.def.dimensions.yDimension
   return (
