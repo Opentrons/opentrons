@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
@@ -194,22 +194,24 @@ describe('SetupLabware', () => {
   })
 
   it('should render LPC button and clicking should launch modal', () => {
-    const { getByRole } = render()
-    getByRole('button', {
-      name: 'run labware position check',
-    }).click()
+    render()
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'run labware position check',
+      })
+    )
     expect(mockLaunchLPC).toHaveBeenCalled()
   })
   it('should render a disabled LPC button when a run has started', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole, queryByText } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
     fireEvent.click(button)
-    expect(queryByText('mock Labware Position Check')).toBeNull()
+    expect(screen.queryByText('mock Labware Position Check')).toBeNull()
   })
 
   it('should close Labware Offset Success toast when LPC is launched', () => {
@@ -217,8 +219,8 @@ describe('SetupLabware', () => {
     when(mockUseLPCSuccessToast).calledWith().mockReturnValue({
       setIsShowingLPCSuccessToast: mockSetIsShowingLPCSuccessToast,
     })
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     fireEvent.click(button)
@@ -231,8 +233,8 @@ describe('SetupLabware', () => {
         protocolData: null,
       } as any)
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
@@ -244,8 +246,8 @@ describe('SetupLabware', () => {
         protocolData: { labware: {}, pipettes: {} },
       } as any)
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
@@ -257,8 +259,8 @@ describe('SetupLabware', () => {
         complete: false,
       })
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
@@ -271,8 +273,8 @@ describe('SetupLabware', () => {
         remainingAttachedModules: [],
       })
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
@@ -290,8 +292,8 @@ describe('SetupLabware', () => {
         remainingAttachedModules: [],
       })
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
@@ -320,8 +322,8 @@ describe('SetupLabware', () => {
         },
       } as any)
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()
@@ -351,8 +353,8 @@ describe('SetupLabware', () => {
         },
       } as any)
     when(mockUseLPCDisabledReason).mockReturnValue(DISABLED_REASON)
-    const { getByRole } = render()
-    const button = getByRole('button', {
+    render()
+    const button = screen.getByRole('button', {
       name: 'run labware position check',
     })
     expect(button).toBeDisabled()

@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent } from '@testing-library/react'
+
 import {
   renderWithProviders,
   BaseDeck,
@@ -12,6 +14,7 @@ import {
 } from '@opentrons/shared-data'
 import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+
 import { i18n } from '../../../i18n'
 import { getLabwareRenderInfo } from '../../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { getStandardDeckViewLayerBlockList } from '../../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
@@ -80,7 +83,7 @@ describe('LabwareMapViewModal', () => {
     const { getByText, getByLabelText } = render(props)
     getByText('Map View')
     getByText('mock base deck')
-    getByLabelText('closeIcon').click()
+    fireEvent.click(getByLabelText('closeIcon'))
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 

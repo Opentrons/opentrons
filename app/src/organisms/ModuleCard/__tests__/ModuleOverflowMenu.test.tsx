@@ -545,7 +545,7 @@ describe('ModuleOverflowMenu', () => {
     }
     const { getByRole } = render(props)
 
-    getByRole('button', { name: 'Calibrate' }).click()
+    fireEvent.click(getByRole('button', { name: 'Calibrate' }))
     expect(props.handleCalibrateClick).toHaveBeenCalled()
   })
 })
