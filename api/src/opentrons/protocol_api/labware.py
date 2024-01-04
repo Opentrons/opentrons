@@ -175,9 +175,12 @@ class Well:
     @property
     @requires_version(2, 7)
     def well_name(self) -> str:
-        """A human-readable name for the well's coordinates.
+        """A string representing the well's coordinates.
 
         For example, "A1" or "H12".
+
+        The format of strings that this property returns is the same format as the key
+        for :ref:`accessing wells in a dictionary <well-dictionary-access>`.
         """
         return self._core.get_name()
 
