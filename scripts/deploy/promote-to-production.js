@@ -84,7 +84,6 @@ if (projectDomain === PROTOCOL_DESIGNER_DOMAIN) {
   getDeployMetadata(s3, stagingBucket)
     .then(deployMetadata => {
       const { current } = deployMetadata
-      console.log('current', current)
       console.log(
         `Promoting ${projectDomain} ${current} from staging to production\n`
       )
