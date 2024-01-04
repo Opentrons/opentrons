@@ -290,7 +290,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
     def is_tip_tracking_available(self) -> bool:
         """Return whether auto tip tracking is available for the pipette's current nozzle configuration."""
 
-    def _retract(self) -> None:
+    def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         ...
 
