@@ -33,7 +33,7 @@ interface AvailableRobotOptionProps {
   robot: Robot
   onClick: () => void
   isSelected: boolean
-  isOnDifferentSoftwareVersion: boolean
+  isSelectedRobotOnDifferentSoftwareVersion: boolean
   registerRobotBusyStatus: React.Dispatch<RobotBusyStatusAction>
   isError?: boolean
   showIdleOnly?: boolean
@@ -47,7 +47,7 @@ export function AvailableRobotOption(
     onClick,
     isSelected,
     isError = false,
-    isOnDifferentSoftwareVersion,
+    isSelectedRobotOnDifferentSoftwareVersion,
     showIdleOnly = false,
     registerRobotBusyStatus,
   } = props
@@ -99,7 +99,9 @@ export function AvailableRobotOption(
       <MiniCard
         onClick={onClick}
         isSelected={isSelected}
-        isError={(isError || isOnDifferentSoftwareVersion) && isSelected}
+        isError={
+          (isError || isSelectedRobotOnDifferentSoftwareVersion) && isSelected
+        }
       >
         <img
           src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
@@ -134,7 +136,8 @@ export function AvailableRobotOption(
             </StyledText>
           </Box>
         </Flex>
-        {(isError || isOnDifferentSoftwareVersion) && isSelected ? (
+        {(isError || isSelectedRobotOnDifferentSoftwareVersion) &&
+        isSelected ? (
           <>
             <Box flex="1 1 auto" />
             <Icon
@@ -146,7 +149,7 @@ export function AvailableRobotOption(
         ) : null}
       </MiniCard>
 
-      {isOnDifferentSoftwareVersion && isSelected ? (
+      {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <StyledText
           as="label"
           color={COLORS.errorText}
