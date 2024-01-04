@@ -51,7 +51,7 @@ def validate_attitude_deck_calibration(
     """
     curr_cal = np.array(deck_cal.attitude)
     row, _ = curr_cal.shape
-    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
+    rank: int = np.linalg.matrix_rank(curr_cal)
     if row != rank:
         # Check that the matrix is non-singular
         return DeckTransformState.SINGULARITY
@@ -71,7 +71,7 @@ def validate_gantry_calibration(gantry_cal: List[List[float]]) -> DeckTransformS
     curr_cal = np.array(gantry_cal)
     row, _ = curr_cal.shape
 
-    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
+    rank: int = np.linalg.matrix_rank(curr_cal)
 
     id_matrix = linal.identity_deck_transform()
 

@@ -42,8 +42,8 @@ from opentrons.calibration_storage.ot3.deck_attitude import (
 )
 from opentrons.config.robot_configs import (
     default_ot3_deck_calibration,
-    defaults_ot3,
 )
+from opentrons.config import defaults_ot3
 from .util import DeckTransformState
 
 if TYPE_CHECKING:
@@ -477,7 +477,7 @@ def _edges_from_data(
     # an N-sample rolling average. by inverting the sign of half the kernel, which is
     # why we need it to be even, we do the same thing but while also taking a finite
     # difference.
-    average_difference_kernel = np.concatenate(  # type: ignore
+    average_difference_kernel = np.concatenate(
         (
             np.full(average_width_samples // 2, 1 / average_width_samples),
             np.full(average_width_samples // 2, -1 / average_width_samples),
@@ -954,7 +954,7 @@ def apply_machine_transform(
     """
     belt_attitude_arr = np.array(belt_attitude)
     machine_transform_arr = np.array(defaults_ot3.DEFAULT_MACHINE_TRANSFORM)
-    deck_attitude_arr = np.dot(belt_attitude_arr, machine_transform_arr)  # type: ignore[no-untyped-call]
+    deck_attitude_arr = np.dot(belt_attitude_arr, machine_transform_arr)
     deck_attitude = deck_attitude_arr.round(4).tolist()
     return deck_attitude  # type: ignore[no-any-return]
 
@@ -993,7 +993,7 @@ def validate_attitude_deck_calibration(
     """
     curr_cal = np.array(deck_cal.attitude)
     row, _ = curr_cal.shape
-    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
+    rank: int = np.linalg.matrix_rank(curr_cal)
     if row != rank:
         # Check that the matrix is non-singular
         return DeckTransformState.SINGULARITY

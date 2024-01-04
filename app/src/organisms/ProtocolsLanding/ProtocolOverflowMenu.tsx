@@ -35,7 +35,7 @@ import type { Dispatch } from '../../redux/types'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
-  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
 
@@ -45,7 +45,7 @@ export function ProtocolOverflowMenu(
   const {
     storedProtocolData,
     handleRunProtocol,
-    handleSendProtocolToOT3,
+    handleSendProtocolToFlex,
   } = props
   const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
@@ -90,7 +90,7 @@ export function ProtocolOverflowMenu(
   const handleClickSendToOT3: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    handleSendProtocolToOT3(storedProtocolData)
+    handleSendProtocolToFlex(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {

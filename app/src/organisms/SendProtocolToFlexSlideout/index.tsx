@@ -26,14 +26,14 @@ import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware'
 
-interface SendProtocolToOT3SlideoutProps extends StyleProps {
+interface SendProtocolToFlexSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   isExpanded: boolean
 }
 
-export function SendProtocolToOT3Slideout(
-  props: SendProtocolToOT3SlideoutProps
+export function SendProtocolToFlexSlideout(
+  props: SendProtocolToFlexSlideoutProps
 ): JSX.Element | null {
   const { isExpanded, onCloseClick, storedProtocolData } = props
   const {
@@ -46,18 +46,14 @@ export function SendProtocolToOT3Slideout(
 
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
 
-  const isSelectedRobotOnWrongVersionOfSoftware = [
+  const { autoUpdateAction } = useSelector((state: State) =>
+    getRobotUpdateDisplayInfo(state, selectedRobot?.name ?? '')
+  )
+
+  const isSelectedRobotOnDifferentSoftwareVersion = [
     'upgrade',
     'downgrade',
-  ].includes(
-    useSelector((state: State) => {
-      const updateInfo =
-        selectedRobot != null
-          ? getRobotUpdateDisplayInfo(state, selectedRobot.name)
-          : { autoUpdateAction: '' }
-      return updateInfo
-    })?.autoUpdateAction
-  )
+  ].includes(autoUpdateAction)
 
   const { eatToast, makeToast } = useToaster()
 
@@ -150,6 +146,9 @@ export function SendProtocolToOT3Slideout(
   return (
     <ChooseRobotSlideout
       isExpanded={isExpanded}
+      isSelectedRobotOnDifferentSoftwareVersion={
+        isSelectedRobotOnDifferentSoftwareVersion
+      }
       onCloseClick={onCloseClick}
       title={t('protocol_list:send_to_robot', {
         robot_display_name: FLEX_DISPLAY_NAME,
@@ -157,7 +156,7 @@ export function SendProtocolToOT3Slideout(
       footer={
         <PrimaryButton
           disabled={
-            selectedRobot == null || isSelectedRobotOnWrongVersionOfSoftware
+            selectedRobot == null || isSelectedRobotOnDifferentSoftwareVersion
           }
           onClick={handleSendClick}
           width="100%"

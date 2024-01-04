@@ -283,7 +283,7 @@ class GeometryView:
             # Since the module was rotated, the calibration offset vector needs to be rotated by 180 degrees along the z axis
             saved_offset = array([offset.x, offset.y, offset.z])
             rotation_matrix = array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
-            new_offset = dot(saved_offset, rotation_matrix)  # type: ignore[no-untyped-call]
+            new_offset = dot(saved_offset, rotation_matrix)
             offset = ModuleOffsetVector(
                 x=new_offset[0], y=new_offset[1], z=new_offset[2]
             )

@@ -677,7 +677,7 @@ class ModuleView(HasState[ModuleState]):
 
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
-        xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
+        xformed = dot(xform, pre_transform)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
