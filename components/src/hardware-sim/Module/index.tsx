@@ -8,6 +8,7 @@ import {
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  ThermocyclerModuleModel,
 } from '@opentrons/shared-data'
 import {
   C_DARK_GRAY,
@@ -184,9 +185,9 @@ export const Module = (props: Props): JSX.Element => {
     moduleViz = <MagneticModule />
   } else if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     const thermocyclerProps = {
-      lidMotorState: 'unknown' as const,
+      lidMotorState: 'open' as const,
       ...innerProps,
-      model: def.model,
+      model: def.model as ThermocyclerModuleModel,
     }
 
     moduleViz = <Thermocycler {...thermocyclerProps} />

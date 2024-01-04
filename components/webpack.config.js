@@ -3,7 +3,7 @@
 const path = require('path')
 const { rules } = require('@opentrons/webpack-config')
 
-const ENTRY_INDEX = path.join(__dirname, 'src/manifest.ts')
+const ENTRY_INDEX = path.join(__dirname, 'src/barrel.ts')
 const OUTPUT_PATH = path.join(__dirname, 'lib')
 
 module.exports = {

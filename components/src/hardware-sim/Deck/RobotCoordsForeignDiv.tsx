@@ -7,7 +7,7 @@ export interface RobotCoordsForeignDivProps {
   x?: string | number
   y?: string | number
   children?: React.ReactNode
-  className?: string
+  outerProps?: any
   innerDivProps?: React.ComponentProps<typeof Box>
   transformWithSVG?: boolean
   extraTransform?: string
@@ -22,7 +22,7 @@ export const RobotCoordsForeignDiv = (
     y = 0,
     height = '100%',
     width = '100%',
-    className,
+    outerProps,
     innerDivProps,
     transformWithSVG = false,
     extraTransform = '',
@@ -31,7 +31,7 @@ export const RobotCoordsForeignDiv = (
   const transform = `scale(1, -1) ${extraTransform}`
   return (
     <foreignObject
-      {...{ x, y, height, width, className }}
+      {...{ x, y, height, width, ...outerProps}}
       transform={transformWithSVG ? transform : extraTransform}
     >
       <Box

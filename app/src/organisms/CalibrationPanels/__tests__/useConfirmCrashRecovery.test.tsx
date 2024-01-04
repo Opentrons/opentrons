@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { fireEvent, renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
-import { LEFT, renderWithProviders } from '@opentrons/components'
-
+import { LEFT } from '@opentrons/shared-data'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
 import { mockCalibrationCheckLabware } from '../../../redux/sessions/__fixtures__'

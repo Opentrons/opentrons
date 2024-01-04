@@ -17,8 +17,4 @@ module.exports = async () =>
       libraryTarget: 'umd',
       globalObject: 'this'
     },
-    plugins: [],
-    module: { rules: [rules.js] },
-    optimization: {},
-    devServer: {}
   })

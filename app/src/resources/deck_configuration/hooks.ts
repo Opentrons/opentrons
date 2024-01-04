@@ -1,4 +1,4 @@
-import { getLabwareOnDeck } from '@opentrons/components'
+import { getTopMostLabwareInSlots } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -6,6 +6,7 @@ import {
   getCutoutFixturesForCutoutId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  getLabwareDisplayName,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
@@ -37,8 +38,8 @@ export function useDeckConfigurationCompatibility(
     protocolAnalysis != null
       ? getAddressableAreasInProtocol(protocolAnalysis)
       : []
-  const labwareOnDeck =
-    protocolAnalysis != null ? getLabwareOnDeck(protocolAnalysis) : []
+  const labwareInSlots =
+    protocolAnalysis != null ? getTopMostLabwareInSlots(protocolAnalysis) : []
 
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
@@ -63,26 +64,21 @@ export function useDeckConfigurationCompatibility(
       // get the on-deck labware name for a missing single-slot addressable area
       const missingSingleSlotLabware =
         cutoutFixtureId != null &&
-        // fixture mismatch
-        !compatibleCutoutFixtureIds.includes(cutoutFixtureId) &&
-        compatibleCutoutFixtureIds[0] != null &&
-        // compatible fixture is single-slot
-        SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
-          ? labwareOnDeck.find(
-              ({ labwareLocation }) =>
-                labwareLocation !== 'offDeck' &&
-                // match the addressable area to an on-deck labware
-                (('slotName' in labwareLocation &&
-                  requiredAddressableAreasForCutoutId[0] ===
-                    labwareLocation.slotName) ||
-                  ('addressableAreaName' in labwareLocation &&
-                    requiredAddressableAreasForCutoutId[0] ===
-                      labwareLocation.addressableAreaName))
-            )
-          : null
+          // fixture mismatch
+          !compatibleCutoutFixtureIds.includes(cutoutFixtureId) &&
+          compatibleCutoutFixtureIds[0] != null &&
+          // compatible fixture is single-slot
+          SINGLE_SLOT_FIXTURES.includes(compatibleCutoutFixtureIds[0])
+          ? labwareInSlots.find(
+            ({ location }) =>
+              // match the addressable area to an on-deck labware
+              requiredAddressableAreasForCutoutId[0] ===
+              location.slotName
+          ) : null
 
-      const missingLabwareDisplayName =
-        missingSingleSlotLabware?.displayName ?? null
+      const missingLabwareDisplayName = missingSingleSlotLabware !=  null 
+        ? missingSingleSlotLabware.labwareNickName ?? getLabwareDisplayName(missingSingleSlotLabware.labwareDef) ?? null
+        : null
 
       return [
         ...acc,
