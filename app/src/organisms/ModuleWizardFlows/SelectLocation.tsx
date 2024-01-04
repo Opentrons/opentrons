@@ -82,6 +82,11 @@ export const SelectLocation = (
       proceedButtonText={t('confirm_location')}
       proceed={handleOnClick}
       proceedIsDisabled={slotName == null}
+      disableProceedReason={
+        slotName == null
+          ? 'Current deck configuration prevents module placement'
+          : undefined
+      }
     />
   )
 }
