@@ -81,6 +81,7 @@ describe('useModuleMatchResults', () => {
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
           slotName: '1',
+          conflictedFixture: null,
         },
       })
 
@@ -108,6 +109,7 @@ describe('useModuleMatchResults', () => {
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
           slotName: '1',
+          conflictedFixture: null,
         },
       })
     when(mockUseAttachedModules).calledWith().mockReturnValue([])
@@ -135,6 +137,7 @@ describe('useModuleMatchResults', () => {
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
           slotName: '1',
+          conflictedFixture: null,
         },
       })
 
@@ -164,6 +167,7 @@ describe('useModuleMatchResults', () => {
           protocolLoadOrder: 0,
           attachedModuleMatch: null,
           slotName: '1',
+          conflictedFixture: null,
         },
       })
 
