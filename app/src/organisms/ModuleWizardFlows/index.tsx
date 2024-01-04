@@ -38,6 +38,7 @@ import { DetachProbe } from './DetachProbe'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { SingleSlotCutoutFixtureId } from '@opentrons/shared-data'
 
 interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
@@ -72,7 +73,9 @@ export const ModuleWizardFlows = (
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const occupiedCutouts = deckConfig.reduce<CutoutId[]>((acc, fixture) => {
-    return fixture.cutoutFixtureId?.includes('single')
+    return (fixture.cutoutFixtureId as SingleSlotCutoutFixtureId)?.includes(
+      'single'
+    )
       ? acc
       : [...acc, fixture.cutoutId]
   }, [])
