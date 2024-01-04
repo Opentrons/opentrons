@@ -6,6 +6,14 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in [!!EDIT ME WITH THE ACTUAL NUMBER OF THE NEXT RELEASE!!]
+
+### HTTP API
+
+- Removed the `/notifications/subscribe` WebSocket endpoint and the `notify_server` Python package. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+
+---
+
 ## Opentrons Robot Software Changes in 7.1.1
 
 Welcome to the v7.1.1 release of the Opentrons robot software!
