@@ -2,7 +2,7 @@
 import pytest
 from typing import List, Optional
 
-from opentrons.types import StagingSlotName
+from opentrons.types import DeckSlotName, StagingSlotName
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_slot,
     get_south_slot,
@@ -12,6 +12,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_north_south_slots,
     get_adjacent_slots,
     get_west_of_staging_slot,
+    get_adjacent_staging_slot,
 )
 
 
@@ -98,14 +99,32 @@ def test_get_adjacent_slots(slot: int, expected_adjacent: List[int]) -> None:
 @pytest.mark.parametrize(
     argnames=["slot", "expected_adjacent"],
     argvalues=[
-        (StagingSlotName.SLOT_A4, "A3"),
-        (StagingSlotName.SLOT_B4, "B3"),
-        (StagingSlotName.SLOT_C4, "C3"),
-        (StagingSlotName.SLOT_D4, "D3"),
+        (StagingSlotName.SLOT_A4, DeckSlotName.SLOT_A3),
+        (StagingSlotName.SLOT_B4, DeckSlotName.SLOT_B3),
+        (StagingSlotName.SLOT_C4, DeckSlotName.SLOT_C3),
+        (StagingSlotName.SLOT_D4, DeckSlotName.SLOT_D3),
     ],
 )
 def test_get_west_of_staging_slot(
-    slot: StagingSlotName, expected_adjacent: str
+    slot: StagingSlotName, expected_adjacent: DeckSlotName
 ) -> None:
     """It should find the slot directly west of a staging slot."""
     assert get_west_of_staging_slot(slot) == expected_adjacent
+
+
+@pytest.mark.parametrize(
+    argnames=["slot", "expected_adjacent"],
+    argvalues=[
+        (DeckSlotName.SLOT_A3, StagingSlotName.SLOT_A4),
+        (DeckSlotName.SLOT_B3, StagingSlotName.SLOT_B4),
+        (DeckSlotName.SLOT_C3, StagingSlotName.SLOT_C4),
+        (DeckSlotName.SLOT_D3, StagingSlotName.SLOT_D4),
+        (DeckSlotName.SLOT_D1, None),
+        (DeckSlotName.SLOT_1, None),
+    ],
+)
+def test_get_adjacent_staging_slot(
+    slot: DeckSlotName, expected_adjacent: Optional[StagingSlotName]
+) -> None:
+    """It should find the adjacent slot east of a staging slot if it exists."""
+    assert get_adjacent_staging_slot(slot) == expected_adjacent

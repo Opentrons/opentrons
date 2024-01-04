@@ -11,6 +11,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_slots,
     get_south_slot,
     get_adjacent_slots,
+    get_adjacent_staging_slot,
 )
 
 from opentrons.types import DeckSlotName, StagingSlotName
@@ -71,6 +72,11 @@ class HeaterShakerModule(_Module):
 
 
 @dataclass
+class MagneticBlockModule(_Module):
+    """A Magnetic Block module."""
+
+
+@dataclass
 class ThermocyclerModule(_Module):
     """A Thermocycler module."""
 
@@ -89,6 +95,7 @@ class OtherModule(_Module):
 DeckItem = Union[
     Labware,
     HeaterShakerModule,
+    MagneticBlockModule,
     ThermocyclerModule,
     OtherModule,
 ]
@@ -286,7 +293,21 @@ def _create_flex_restrictions(
         )
     ]
 
-    if isinstance(item, ThermocyclerModule):
+    # Magnetic block module does not have staging slot restriction
+    if isinstance(item, (HeaterShakerModule, OtherModule)):
+        if isinstance(location, StagingSlotName):
+            raise DeckConflictError("Cannot have a module loaded on a staging slot.")
+        adjacent_staging_slot = get_adjacent_staging_slot(location)
+        if adjacent_staging_slot is not None:
+            restrictions.append(
+                _NothingAllowed(
+                    location=adjacent_staging_slot,
+                    source_item=item,
+                    source_location=location,
+                )
+            )
+
+    elif isinstance(item, ThermocyclerModule):
         for covered_location in _flex_slots_covered_by_thermocycler():
             restrictions.append(
                 _NothingAllowed(

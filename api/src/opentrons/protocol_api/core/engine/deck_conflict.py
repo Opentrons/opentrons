@@ -490,6 +490,14 @@ def _map_module(
                 highest_z_including_labware=highest_z_including_labware,
             ),
         )
+    elif module_type == ModuleType.MAGNETIC_BLOCK:
+        return (
+            mapped_location,
+            wrapped_deck_conflict.MagneticBlockModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
     elif module_type == ModuleType.THERMOCYCLER:
         return (
             mapped_location,
