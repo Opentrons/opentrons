@@ -293,17 +293,24 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled menu items except restart robot and robot settings when e-stop is pressed', () => {
+    when(mockGetBuildrootUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     when(mockUseIsEstopNotDisengaged)
       .calledWith(mockConnectableRobot.name)
       .mockReturnValue(true)
-    const { getByRole } = render(props)
-    getByRole('button').click()
-    expect(getByRole('button', { name: 'Run a protocol' })).toBeDisabled()
-    expect(getByRole('button', { name: 'Restart robot' })).toBeEnabled()
-    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    render(props)
+    fireEvent.click(screen.getByRole('button'))
     expect(
-      getByRole('button', { name: 'Disconnect from network' })
+      screen.getByRole('button', { name: 'Run a protocol' })
     ).toBeDisabled()
-    expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Restart robot' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(
+      screen.getByRole('button', { name: 'Disconnect from network' })
+    ).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 })
