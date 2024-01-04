@@ -160,31 +160,34 @@ Remove labware from the deck to perform tasks like retrieving samples or discard
 
 Moving labware off-deck always requires user intervention, because the gripper can't reach outside of the robot. Omit the ``use_gripper`` parameter or explicitly set it to ``False``. If you try to move labware off-deck with ``use_gripper=True``, the API will raise an error.
 
-You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it `onto` the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one::
+You can also load labware off-deck, in preparation for a ``move_labware()`` command that brings it *onto* the deck. For example, you could assign two tip racks to a pipette — one on-deck, and one off-deck — and then swap out the first rack for the second one:
 
-    from opentrons import protocol_api
+    .. code-block:: python
+        :substitutions:
 
-    metadata = {"apiLevel": "|apiLevel|", "protocolName": "Tip rack replacement"}
-    requirements = {"robotType": "OT-2"}
+        from opentrons import protocol_api
+
+        metadata = {"apiLevel": "|apiLevel|", "protocolName": "Tip rack replacement"}
+        requirements = {"robotType": "OT-2"}
 
 
-    def run(protocol: protocol_api.ProtocolContext):
-        tips1 = protocol.load_labware("opentrons_96_tiprack_1000ul", 1)
-        # load another tip rack but don't put it in a slot yet
-        tips2 = protocol.load_labware(
-            "opentrons_96_tiprack_1000ul", protocol_api.OFF_DECK
-        )
-        pipette = protocol.load_instrument(
-            "p1000_single_gen2", "left", tip_racks=[tips1, tips2]
-        )
-        # use all the on-deck tips
-        for i in range(96):
+        def run(protocol: protocol_api.ProtocolContext):
+            tips1 = protocol.load_labware("opentrons_96_tiprack_1000ul", 1)
+            # load another tip rack but don't put it in a slot yet
+            tips2 = protocol.load_labware(
+                "opentrons_96_tiprack_1000ul", protocol_api.OFF_DECK
+            )
+            pipette = protocol.load_instrument(
+                "p1000_single_gen2", "left", tip_racks=[tips1, tips2]
+            )
+            # use all the on-deck tips
+            for i in range(96):
+                pipette.pick_up_tip()
+                pipette.drop_tip()
+            # pause to move the spent tip rack off-deck
+            protocol.move_labware(labware=tips1, new_location=protocol_api.OFF_DECK)
+            # pause to move the fresh tip rack on-deck
+            protocol.move_labware(labware=tips2, new_location=1)
             pipette.pick_up_tip()
-            pipette.drop_tip()
-        # pause to move the spent tip rack off-deck
-        protocol.move_labware(labware=tips1, new_location=protocol_api.OFF_DECK)
-        # pause to move the fresh tip rack on-deck
-        protocol.move_labware(labware=tips2, new_location=1)
-        pipette.pick_up_tip()
 
 Using the off-deck location to remove or replace labware lets you continue your workflow in a single protocol, rather than needing to end a protocol, reset the deck, and start a new protocol run.
