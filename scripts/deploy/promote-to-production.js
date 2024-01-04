@@ -10,6 +10,8 @@ const { getDeployMetadata } = require('./lib/deploy-metadata')
 const { getAssumeRole } = require('./assume-role')
 const { getCreateInvalidation } = require('./create-invalidation')
 
+const PROTOCOL_DESIGNER_DOMAIN = 'designer.opentrons.com'
+
 const USAGE =
   '\nUsage:\n  node ./scripts/deploy/promote-to-production <project_domain> [--deploy]'
 
@@ -19,56 +21,91 @@ const dryrun = !flags.includes('--deploy')
 
 assert(projectDomain, USAGE)
 
-getAssumeRole(
-  'arn:aws:iam::043748923082:role/administrator',
-  'promoteToProduction'
-)
-  .then(credentials => {
-    const productionCredentials = new AWS.Credentials({
-      accessKeyId: credentials.AccessKeyId,
-      secretAccessKey: credentials.SecretAccessKey,
-      sessionToken: credentials.SessionToken,
+if (projectDomain === PROTOCOL_DESIGNER_DOMAIN) {
+  getAssumeRole(
+    'arn:aws:iam::043748923082:role/administrator',
+    'promoteToProduction'
+  )
+    .then(credentials => {
+      const productionCredentials = new AWS.Credentials({
+        accessKeyId: credentials.AccessKeyId,
+        secretAccessKey: credentials.SecretAccessKey,
+        sessionToken: credentials.SessionToken,
+      })
+
+      const s3 = new AWS.S3({
+        apiVersion: '2006-03-01',
+        region: 'us-east-1',
+        credentials: productionCredentials,
+      })
+
+      const stagingBucket = `staging.${projectDomain}`
+      const productionBucket = projectDomain
+
+      getDeployMetadata(s3, stagingBucket)
+        .then(deployMetadata => {
+          const { current } = deployMetadata
+          console.log(
+            `Promoting ${projectDomain} ${current} from staging to production\n`
+          )
+
+          return syncBuckets(
+            s3,
+            { bucket: stagingBucket },
+            { bucket: productionBucket },
+            dryrun
+          )
+        })
+        .then(() => {
+          console.log('Promotion to production done\n')
+          getCreateInvalidation(
+            productionCredentials,
+            `arn:aws:cloudfront::043748923082:distribution/E20OHY6J3BRVIF`
+          )
+        })
+        .then(() => {
+          console.log('Cache invalidation initiated for production\n')
+          process.exit(0)
+        })
+        .catch(error => {
+          console.error(error.message)
+          process.exit(1)
+        })
     })
-
-    const s3 = new AWS.S3({
-      apiVersion: '2006-03-01',
-      region: 'us-east-1',
-      credentials: productionCredentials,
+    .catch(err => {
+      console.error(err)
     })
+} else {
+  const s3 = new AWS.S3({ apiVersion: '2006-03-01', region: 'us-east-1' })
 
-    const stagingBucket = `staging.${projectDomain}`
-    const productionBucket = projectDomain
+  getDeployMetadata(s3, stagingBucket)
+    .then(deployMetadata => {
+      const { current } = deployMetadata
+      console.log(
+        `Promoting ${projectDomain} ${current} from staging to production\n`
+      )
 
-    getDeployMetadata(s3, stagingBucket)
-      .then(deployMetadata => {
-        const { current } = deployMetadata
-        console.log(
-          `Promoting ${projectDomain} ${current} from staging to production\n`
-        )
-
-        return syncBuckets(
+      return syncBuckets(
+        s3,
+        { bucket: sandboxBucket, path: tag },
+        { bucket: stagingBucket },
+        dryrun
+      ).then(() =>
+        setDeployMetadata(
           s3,
-          { bucket: stagingBucket },
-          { bucket: productionBucket },
+          stagingBucket,
+          '',
+          { previous: prevDeployMetadata.current || null, current: tag },
           dryrun
         )
-      })
-      .then(() => {
-        console.log('Promotion to production done\n')
-        getCreateInvalidation(
-          productionCredentials,
-          `arn:aws:cloudfront::043748923082:distribution/E20OHY6J3BRVIF`
-        )
-      })
-      .then(() => {
-        console.log('Cache invalidation initiated for production\n')
-        process.exit(0)
-      })
-      .catch(error => {
-        console.error(error.message)
-        process.exit(1)
-      })
-  })
-  .catch(err => {
-    console.error(err)
-  })
+      )
+    })
+    .then(() => {
+      console.log('Promotion to production done\n')
+      process.exit(0)
+    })
+    .catch(error => {
+      console.error(error.message)
+      process.exit(1)
+    })
+}
