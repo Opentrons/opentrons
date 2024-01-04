@@ -135,7 +135,7 @@ describe('CalibrationDataDownload', () => {
     getByText('Download Calibration Data')
   })
 
-  it('renders an OT-3 title and description - About Calibration', () => {
+  it('renders a Flex title and description - About Calibration', () => {
     when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
     const [{ queryByText }] = render()
     queryByText(

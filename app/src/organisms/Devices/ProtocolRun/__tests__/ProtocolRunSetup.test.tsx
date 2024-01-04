@@ -235,7 +235,7 @@ describe('ProtocolRunSetup', () => {
       fireEvent.click(robotCalibrationSetup)
       expect(screen.getByText('Mock SetupRobotCalibration')).toBeVisible()
     })
-    it('renders robot calibration setup for OT-3', () => {
+    it('renders robot calibration setup for Flex', () => {
       when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
       render()
 
