@@ -7,6 +7,7 @@ let _log: Logger | undefined
 const log = (): Logger => _log ?? (_log = createLogger('config'))
 
 export function registerAppRestart(): (action: Action) => unknown {
+  log().info('registerAppRestart')
   return function handleAction(action: Action) {
     switch (action.type) {
       case APP_RESTART:

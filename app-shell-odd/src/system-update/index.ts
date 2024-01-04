@@ -60,6 +60,7 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
       case 'shell:CHECK_UPDATE':
         updateLatestVersion()
           .then(() => {
+            log.info('right after updateLatestVersion')
             if (isUpdateAvailable() && !isGettingLatestSystemFiles) {
               isGettingLatestSystemFiles = true
               log.info('before getLatestSystemUpdateFiles')

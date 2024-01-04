@@ -65,6 +65,7 @@ export const updateLatestVersion = (): Promise<string> => {
           `Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`
         )
       }
+      log.info('before return version')
       return LATEST_OT_SYSTEM_VERSION
     })
     .catch((e: Error) => {
@@ -97,6 +98,7 @@ export function registerUpdate(
 }
 
 export function registerUpdateBrightness(): (action: Action) => unknown {
+  log.info('registerUpdateBrightness')
   return function handleAction(action: Action) {
     switch (action.type) {
       case UPDATE_BRIGHTNESS:

@@ -99,17 +99,21 @@ function startUp(): void {
   ]
 
   ipcMain.on('dispatch', (_, action) => {
+    log.info('on: dispatch')
     log.debug('Received action via IPC from renderer', { action })
     actionHandlers.forEach(handler => handler(action))
+    log.info('after forEach')
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
 
   ipcMain.once('dispatch', () => {
+    log.info('systemd dispatch start')
     systemd.sendStatus('started')
     systemd.ready()
     const stopWatching = watchForMassStorage(dispatch)
     ipcMain.once('quit', stopWatching)
+    log.info('systemd dispatch end')
   })
 }
 
