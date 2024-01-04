@@ -76,28 +76,24 @@ if (projectDomain === PROTOCOL_DESIGNER_DOMAIN) {
       console.error(err)
     })
 } else {
-  const s3 = new AWS.S3({ apiVersion: '2006-03-01', region: 'us-east-1' })
+  const s3 = new AWS.S3({ apiVersion: '2006-03-01', region: 'us-east-2' })
+
+  const stagingBucket = `staging.${projectDomain}`
+  const productionBucket = projectDomain
 
   getDeployMetadata(s3, stagingBucket)
     .then(deployMetadata => {
       const { current } = deployMetadata
+      console.log('current', current)
       console.log(
         `Promoting ${projectDomain} ${current} from staging to production\n`
       )
 
       return syncBuckets(
         s3,
-        { bucket: sandboxBucket, path: tag },
         { bucket: stagingBucket },
+        { bucket: productionBucket },
         dryrun
-      ).then(() =>
-        setDeployMetadata(
-          s3,
-          stagingBucket,
-          '',
-          { previous: prevDeployMetadata.current || null, current: tag },
-          dryrun
-        )
       )
     })
     .then(() => {
