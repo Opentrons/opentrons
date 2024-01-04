@@ -182,7 +182,7 @@ async def create_run_command(
     if waitUntilComplete:
         timeout_sec = None if timeout is None else timeout / 1000.0
         with move_on_after(timeout_sec):
-            await protocol_engine.wait_for_command(command.id),
+            await protocol_engine.wait_for_command(command.id)
 
     response_data = protocol_engine.state_view.commands.get(command.id)
 

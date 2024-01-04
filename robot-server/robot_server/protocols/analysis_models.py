@@ -82,7 +82,7 @@ class CompletedAnalysis(BaseModel):
     # Fields that are currently unique to robot-server, missing from local analysis:
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: Literal[AnalysisStatus.COMPLETED] = Field(
-        AnalysisStatus.COMPLETED,
+        ...,
         description="Status marking the analysis as completed",
     )
     result: AnalysisResult = Field(

@@ -46,7 +46,6 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -61,10 +60,10 @@ PACKAGES = find_packages(where="src")
 INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
     "aionotify==0.2.0",
-    "anyio==3.3.0",
+    "anyio==3.6.1",
     "jsonschema==3.0.2",
     "numpy>=1.15.1,<2",
-    "pydantic==1.8.2",
+    "pydantic==1.9.2",
     "pyserial==3.5",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",
@@ -88,7 +87,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires=">=3.7",
+        python_requires=">=3.8",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,

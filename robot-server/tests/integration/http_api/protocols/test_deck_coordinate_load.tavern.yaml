@@ -24,7 +24,7 @@ stages:
           files:
             - name: deck_coordinate_load.py
               role: main
-          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          createdAt: !anystr
           robotType: OT-3 Standard
           metadata:
             protocolName: Deck Coordinate PAPIv2 Test

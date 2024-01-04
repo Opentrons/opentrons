@@ -82,10 +82,10 @@ def test_load_tip_length(
         tipLength=1.23,
         lastModified=datetime(year=2023, month=1, day=1),
         uri=LabwareUri("def456"),
-        source=subject.types.SourceType.factory,
+        source=subject.SourceType.factory,
         status=v1_models.CalibrationStatus(
             markedBad=True,
-            source=subject.types.SourceType.user,
+            source=subject.SourceType.user,
             markedAt=datetime(year=2023, month=2, day=2),
         ),
     )
@@ -106,14 +106,14 @@ def test_load_tip_length(
 
     assert result == subject.TipLengthCalibration(
         tip_length=1.23,
-        source=subject.types.SourceType.factory,
+        source=subject.SourceType.factory,
         pipette="abc123",
         tiprack="asdfghjk",
         last_modified=datetime(year=2023, month=1, day=1),
         uri=LabwareUri("def456"),
-        status=subject.types.CalibrationStatus(
+        status=subject.CalibrationStatus(
             markedBad=True,
-            source=subject.types.SourceType.user,
+            source=subject.SourceType.user,
             markedAt=datetime(year=2023, month=2, day=2),
         ),
     )

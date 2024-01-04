@@ -85,17 +85,17 @@ class Well:
         self._core = core
         self._api_version = api_version
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Labware:
         return self._parent
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def has_tip(self) -> bool:
         """Whether this well contains a tip. Always ``False`` if the parent labware
@@ -121,7 +121,7 @@ class Well:
             return self._core.geometry
         raise APIVersionError("Well.geometry has been deprecated.")
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
         """
@@ -130,7 +130,7 @@ class Well:
         """
         return self._core.diameter
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def length(self) -> Optional[float]:
         """
@@ -139,7 +139,7 @@ class Well:
         """
         return self._core.length
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def width(self) -> Optional[float]:
         """
@@ -148,7 +148,7 @@ class Well:
         """
         return self._core.width
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 9)
     def depth(self) -> float:
         """
@@ -161,7 +161,7 @@ class Well:
     def display_name(self) -> str:
         return self._core.get_display_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 7)
     def well_name(self) -> str:
         return self._core.get_name()
@@ -349,7 +349,7 @@ class Labware:
         )
         return False
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
@@ -357,7 +357,7 @@ class Labware:
     def __getitem__(self, key: str) -> Well:
         return self.wells_by_name()[key]
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def uri(self) -> str:
         """A string fully identifying the labware.
@@ -366,7 +366,7 @@ class Labware:
         """
         return self._core.get_uri()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parent(self) -> Union[str, Labware, ModuleTypes, OffDeckType]:
         """The parent of this labware---where this labware is loaded.
@@ -403,7 +403,7 @@ class Labware:
 
         return labware_location
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def name(self) -> str:
         """Can either be the canonical name of the labware, which is used to
@@ -425,19 +425,19 @@ class Labware:
         assert isinstance(self._core, LegacyLabwareCore)
         cast(LegacyLabwareCore, self._core).set_name(new_name)
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def load_name(self) -> str:
         """The API load name of the labware definition."""
         return self._core.load_name
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def parameters(self) -> "LabwareParameters":
         """Internal properties of a labware including type and quirks."""
         return self._core.get_parameters()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def quirks(self) -> List[str]:
         """Quirks specific to this labware."""
@@ -446,7 +446,7 @@ class Labware:
     # TODO(mm, 2023-02-08):
     # Specify units and origin after we resolve RSS-110.
     # Remove warning once we resolve RSS-109 more broadly.
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
         """Return the default magnet engage height that
@@ -471,7 +471,7 @@ class Labware:
         else:
             return p["magneticModuleEngageHeight"]
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def child(self) -> Optional[Labware]:
         """The labware (if any) present on this labware."""
@@ -589,7 +589,7 @@ class Labware:
         else:
             self._core.set_calibration(Point(x=x, y=y, z=z))
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
         return self._core.get_calibrated_offset()
@@ -780,7 +780,7 @@ class Labware:
         _log.warning("columns_by_index is deprecated. Use columns_by_name instead.")
         return self.columns_by_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def highest_z(self) -> float:
         """
@@ -796,17 +796,17 @@ class Labware:
         """as is_tiprack but not subject to version checking for speed"""
         return self._core.is_tip_rack()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def is_tiprack(self) -> bool:
         return self._is_tiprack
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 15)
     def is_adapter(self) -> bool:
         return self._core.is_adapter()
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def tip_length(self) -> float:
         return self._core.get_tip_length()

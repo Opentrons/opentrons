@@ -166,7 +166,7 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         """Return the API version supported by this protocol context.
@@ -188,7 +188,7 @@ class ProtocolContext(CommandPublisher):
         )
         return HardwareManager(hardware=self._core.get_hardware())
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def bundled_data(self) -> Dict[str, bytes]:
         """Accessor for data files bundled with this protocol, if any.
@@ -210,7 +210,7 @@ class ProtocolContext(CommandPublisher):
         if getattr(self, "_unsubscribe_commands", None):
             self._unsubscribe_commands()  # type: ignore
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def max_speeds(self) -> AxisMaxSpeeds:
         """Per-axis speed limits when moving this instrument.
@@ -577,7 +577,7 @@ class ProtocolContext(CommandPublisher):
 
     # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
     # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def loaded_labwares(self) -> Dict[int, Labware]:
         """Get the labwares that have been loaded into the protocol context.
@@ -796,7 +796,7 @@ class ProtocolContext(CommandPublisher):
 
     # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
     # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def loaded_modules(self) -> Dict[int, ModuleTypes]:
         """Get the modules loaded into the protocol context.
@@ -911,7 +911,7 @@ class ProtocolContext(CommandPublisher):
 
         return instrument
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def loaded_instruments(self) -> Dict[str, InstrumentContext]:
         """Get the instruments that have been loaded into the protocol.
@@ -1018,7 +1018,7 @@ class ProtocolContext(CommandPublisher):
     def location_cache(self, loc: Optional[Location]) -> None:
         self._core.set_last_location(loc)
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def deck(self) -> Deck:
         """An interface to provide information about what's currently loaded on the deck.
@@ -1052,7 +1052,7 @@ class ProtocolContext(CommandPublisher):
         """
         return self._deck
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def fixed_trash(self) -> Union[Labware, TrashBin]:
         """The trash fixed to slot 12 of an OT-2's deck.
@@ -1126,13 +1126,13 @@ class ProtocolContext(CommandPublisher):
             display_color=display_color,
         )
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
         """Returns True if the rail lights are on"""
         return self._core.get_rail_lights_on()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 5)
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
