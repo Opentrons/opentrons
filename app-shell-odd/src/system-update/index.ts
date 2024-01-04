@@ -62,13 +62,16 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
           .then(() => {
             if (isUpdateAvailable() && !isGettingLatestSystemFiles) {
               isGettingLatestSystemFiles = true
+              log.info('before getLatestSystemUpdateFiles')
               return getLatestSystemUpdateFiles(dispatch)
             }
           })
           .then(() => {
+            log.info('no getLatestSystemUpdateFiles')
             isGettingLatestSystemFiles = false
           })
           .catch((error: Error) => {
+            log.info('error: ', error)
             log.warn('Error checking for update', {
               error,
             })
@@ -281,6 +284,7 @@ const dispatchUpdateInfo = (
 export function getLatestSystemUpdateFiles(
   dispatch: Dispatch
 ): Promise<unknown> {
+  log.info('getLatestSystemUpdateFiles start')
   const fileDownloadDir = path.join(
     getSystemUpdateDir(),
     'robot-system-updates'
@@ -294,6 +298,7 @@ export function getLatestSystemUpdateFiles(
         log.warn('No release files in manifest', {
           version: latestVersion,
         })
+        log.info('getLatestSystemUpdateFiles end reject')
         return Promise.reject(
           new Error(`No release files in manifest for version ${latestVersion}`)
         )
@@ -318,8 +323,10 @@ export function getLatestSystemUpdateFiles(
         }
       }
 
+      log.info('getLatestSystemUpdateFiles handleProgress')
       return getReleaseFiles(urls, fileDownloadDir, handleProgress)
         .then(filepaths => {
+          log.info('getLatestSystemUpdateFiles end cacheUpdateSet')
           return cacheUpdateSet(filepaths)
         })
         .then(
@@ -328,6 +335,7 @@ export function getLatestSystemUpdateFiles(
             dispatchUpdateInfo({ force: false, ...updateInfo }, dispatch)
         )
         .catch((error: Error) => {
+          log.info('getLatestSystemUpdateFiles end error')
           return dispatch({
             type: 'robotUpdate:DOWNLOAD_ERROR',
             payload: { error: error.message, target: 'flex' },
