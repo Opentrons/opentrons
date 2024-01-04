@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 import mqtt from 'mqtt'
+import { uniqueId } from 'lodash'
 
 import { Flex, POSITION_FIXED, DIRECTION_ROW } from '@opentrons/components'
 
@@ -19,22 +20,15 @@ export const AppComponent = (): JSX.Element | null => {
 
   React.useEffect(() => {
     const client = mqtt.connect('ws://broker.emqx.io:8083/mqtt', {
-      clientId: 'emqx_test7526',
+      clientId: uniqueId('emqx_'),
       username: 'emqx2',
       password: '**********',
     })
 
     client.on('connect', function () {
-      console.log('HITTING CONNECT BLOCK')
       client.subscribe('opentrons/test', function (err) {
         if (err == null) {
-          console.log('PUBLISHING MESSAGE')
-          client.publish(
-            'opentrons/test',
-            JSON.stringify({
-              content: 'Hello world!',
-            })
-          )
+          console.log('NO ERROR SUBSCRIBING TO /TEST')
         } else {
           console.log('ERROR')
           console.log(err)
@@ -44,7 +38,12 @@ export const AppComponent = (): JSX.Element | null => {
 
     client.on('message', function (topic, message) {
       // message is Buffer
+      console.log('TEST MESSAGE')
       console.log(message.toString())
+    })
+
+    client.on('disconnect', function (packet) {
+      console.log('DISCONNECTED FROM INITIAL MQTT CONNECTION')
     })
 
     return () => {
