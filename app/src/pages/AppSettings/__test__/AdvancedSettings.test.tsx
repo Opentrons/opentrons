@@ -2,7 +2,6 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   renderWithProviders,
   useConditionalConfirm,

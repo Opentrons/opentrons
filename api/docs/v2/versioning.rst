@@ -30,11 +30,11 @@ You must specify the API version you are targeting in your Python protocol. In a
    from opentrons import protocol_api
 
    metadata = {
-       'apiLevel': '|apiLevel|',
-       'author': 'A. Biologist'}
+       "apiLevel": "|apiLevel|",
+       "author": "A. Biologist"}
 
    def run(protocol: protocol_api.ProtocolContext):
-       protocol.comment('Hello, world!')
+       protocol.comment("Hello, world!")
        
 From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` dictionary instead:
 
@@ -43,11 +43,11 @@ From version 2.15 onward, you can specify ``apiLevel`` in the ``requirements`` d
 
    from opentrons import protocol_api
 
-   metadata = {'author': 'A. Biologist'}
-   requirements = {'apiLevel': '2.15', 'robotType': 'Flex'}
+   metadata = {"author": "A. Biologist"}
+   requirements = {"apiLevel": "|apiLevel|", "robotType": "Flex"}
 
    def run(protocol: protocol_api.ProtocolContext):
-       protocol.comment('Hello, Flex!')
+       protocol.comment("Hello, Flex!")
 
 Choose only one of these places to specify ``apiLevel``. If you put it in neither or both places, you will not be able to simulate or run your protocol.
 

@@ -339,6 +339,14 @@ class VirtualTipHandler(TipHandler):
         This should not be called when using virtual pipettes.
         """
 
+    async def get_tip_presence(self, pipette_id: str) -> TipPresenceStatus:
+        """Get tip presence.
+
+        This is a check to the physical machine's sensors  and should not be
+        called on a virtual pipette.
+        """
+        raise RuntimeError("Do not call VirtualTipHandler.get_tip_presence")
+
 
 def create_tip_handler(
     state_view: StateView, hardware_api: HardwareControlAPI

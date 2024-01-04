@@ -35,7 +35,7 @@ import type { Dispatch } from '../../redux/types'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
-  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
 
@@ -45,9 +45,9 @@ export function ProtocolOverflowMenu(
   const {
     storedProtocolData,
     handleRunProtocol,
-    handleSendProtocolToOT3,
+    handleSendProtocolToFlex,
   } = props
-  const { protocolKey } = storedProtocolData
+  const { mostRecentAnalysis, protocolKey } = storedProtocolData
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
@@ -65,6 +65,11 @@ export function ProtocolOverflowMenu(
     dispatch(removeProtocol(protocolKey))
     trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
   }, true)
+
+  const robotType =
+    mostRecentAnalysis != null && mostRecentAnalysis.errors.length === 0
+      ? mostRecentAnalysis?.robotType ?? null
+      : null
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -85,7 +90,7 @@ export function ProtocolOverflowMenu(
   const handleClickSendToOT3: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    handleSendProtocolToOT3(storedProtocolData)
+    handleSendProtocolToFlex(storedProtocolData)
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
@@ -135,14 +140,16 @@ export function ProtocolOverflowMenu(
           >
             {t('shared:reanalyze')}
           </MenuItem>
-          <MenuItem
-            onClick={handleClickSendToOT3}
-            data-testid="ProtocolOverflowMenu_sendToOT3"
-          >
-            {t('protocol_list:send_to_robot_overflow', {
-              robot_display_name: FLEX_DISPLAY_NAME,
-            })}
-          </MenuItem>
+          {robotType !== 'OT-2 Standard' ? (
+            <MenuItem
+              onClick={handleClickSendToOT3}
+              data-testid="ProtocolOverflowMenu_sendToOT3"
+            >
+              {t('protocol_list:send_to_robot_overflow', {
+                robot_display_name: FLEX_DISPLAY_NAME,
+              })}
+            </MenuItem>
+          ) : null}
           <MenuItem
             onClick={handleClickShowInFolder}
             data-testid="ProtocolOverflowMenu_showInFolder"

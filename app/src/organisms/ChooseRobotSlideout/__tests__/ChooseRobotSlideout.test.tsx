@@ -11,7 +11,6 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -24,9 +23,6 @@ jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/robot-update')
 jest.mock('../../../redux/networking')
 
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
 >
@@ -59,11 +55,6 @@ const mockSetSelectedRobot = jest.fn()
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: '',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
@@ -79,9 +70,11 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     screen.getByText('choose robot slideout title')
   })
@@ -89,10 +82,12 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
       isAnalysisError: true,
+      robotType: 'OT-2 Standard',
     })
     screen.getByText(
       'This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.'
@@ -102,9 +97,11 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     screen.getByText('opentrons-robot-name')
     screen.getByText('2 unavailable robots are not listed.')
@@ -114,9 +111,11 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: jest.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     screen.getByText('opentrons-robot-name')
     expect(
@@ -127,9 +126,11 @@ describe('ChooseRobotSlideout', () => {
     const { dispatch } = render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })[1]
     const refreshButton = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
@@ -144,9 +145,11 @@ describe('ChooseRobotSlideout', () => {
     render({
       onCloseClick: jest.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,

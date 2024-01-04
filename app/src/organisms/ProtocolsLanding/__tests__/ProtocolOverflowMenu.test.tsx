@@ -21,7 +21,7 @@ jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/protocol-storage')
 
 const mockHandleRunProtocol = jest.fn()
-const mockHandleSendProtocolToOT3 = jest.fn()
+const mockHandleSendProtocolToFlex = jest.fn()
 
 const mockViewProtocolSourceFolder = viewProtocolSourceFolder as jest.MockedFunction<
   typeof viewProtocolSourceFolder
@@ -38,7 +38,7 @@ const render = () => {
     <MemoryRouter>
       <ProtocolOverflowMenu
         handleRunProtocol={mockHandleRunProtocol}
-        handleSendProtocolToOT3={mockHandleSendProtocolToOT3}
+        handleSendProtocolToFlex={mockHandleSendProtocolToFlex}
         storedProtocolData={storedProtocolData}
       />
     </MemoryRouter>,

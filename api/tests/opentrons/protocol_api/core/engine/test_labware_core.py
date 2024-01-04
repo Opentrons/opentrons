@@ -80,6 +80,10 @@ def test_set_calibration(subject: LabwareCore) -> None:
             namespace="hello",
             parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
             ordering=[],
+            allowedRoles=[],
+            stackingOffsetWithLabware={},
+            stackingOffsetWithModule={},
+            gripperOffsets={},
         )
     ],
 )

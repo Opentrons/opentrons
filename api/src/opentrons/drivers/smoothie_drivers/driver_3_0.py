@@ -1667,7 +1667,7 @@ class SmoothieDriver:
         self.push_active_current()
         self.set_active_current(
             {
-                ax: self._config.high_current["default"][ax]  # type: ignore[misc]
+                ax: self._config.high_current["default"][ax]  # type: ignore[literal-required]
                 for ax in axes
             }
         )
@@ -1848,7 +1848,7 @@ class SmoothieDriver:
             await asyncio.sleep(0.25)
             self.run_flag.set()
 
-    async def update_firmware(  # noqa: C901
+    async def update_firmware(
         self,
         filename: str,
         loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -1896,8 +1896,8 @@ class SmoothieDriver:
             "stdout": asyncio.subprocess.PIPE,
             "stderr": asyncio.subprocess.PIPE,
         }
-        if loop:
-            kwargs["loop"] = loop
+        # if loop:
+        #    kwargs["loop"] = loop
         log.info(update_cmd)
         before = time()
         proc = await asyncio.create_subprocess_shell(update_cmd, **kwargs)

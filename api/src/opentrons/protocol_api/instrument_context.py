@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from contextlib import nullcontext
+from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Union, cast, Dict
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
@@ -107,12 +107,12 @@ class InstrumentContext(publisher.CommandPublisher):
         ] = trash
         self.requested_as = requested_as
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def starting_tip(self) -> Union[labware.Well, None]:
         """
@@ -140,7 +140,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tiprack.reset()
         self.starting_tip = None
 
-    @property  # type: ignore[misc]
+    @property
     @requires_version(2, 0)
     def default_speed(self) -> float:
         """The speed at which the robot's gantry moves in mm/s.
@@ -275,8 +275,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)  # noqa: C901
-    def dispense(
+    @requires_version(2, 0)
+    def dispense(  # noqa: C901
         self,
         volume: Optional[float] = None,
         location: Optional[
@@ -748,8 +748,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 0)  # noqa: C901
-    def pick_up_tip(
+    @requires_version(2, 0)
+    def pick_up_tip(  # noqa: C901
         self,
         location: Union[types.Location, labware.Well, labware.Labware, None] = None,
         presses: Optional[int] = None,
@@ -1155,9 +1155,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publisher.publish(command=cmds.transfer)  # noqa: C901
+    @publisher.publish(command=cmds.transfer)
     @requires_version(2, 0)
-    def transfer(
+    def transfer(  # noqa: C901
         self,
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,
@@ -1416,7 +1416,6 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
         """
-        publish_ctx = nullcontext()
 
         if isinstance(location, (TrashBin, WasteChute)):
             self._core.move_to(
@@ -1429,12 +1428,15 @@ class InstrumentContext(publisher.CommandPublisher):
             # TODO handle publish
             return self
 
-        if publish:
-            publish_ctx = publisher.publish_context(
-                broker=self.broker,
-                command=cmds.move_to(instrument=self, location=location),
-            )
-        with publish_ctx:
+        with ExitStack() as contexts:
+            if publish:
+                contexts.enter_context(
+                    publisher.publish_context(
+                        broker=self.broker,
+                        command=cmds.move_to(instrument=self, location=location),
+                    )
+                )
+
             _, well = location.labware.get_parent_labware_and_well()
 
             self._core.move_to(
@@ -1447,7 +1449,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def mount(self) -> str:
         """
@@ -1457,7 +1459,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_mount().name.lower()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def speed(self) -> "PlungerSpeeds":
         """The speeds (in mm/s) configured for the pipette plunger.
@@ -1485,7 +1487,7 @@ class InstrumentContext(publisher.CommandPublisher):
         assert isinstance(self._core, LegacyInstrumentCore)
         return cast(LegacyInstrumentCore, self._core).get_speed()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def flow_rate(self) -> "FlowRates":
         """The speeds, in µL/s, configured for the pipette.
@@ -1502,7 +1504,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_flow_rate()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def type(self) -> str:
         """``'single'`` if this is a 1-channel pipette, or ``'multi'`` otherwise.
@@ -1515,7 +1517,7 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             return "multi"
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def tip_racks(self) -> List[labware.Labware]:
         """
@@ -1530,7 +1532,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def tip_racks(self, racks: List[labware.Labware]) -> None:
         self._tip_racks = racks
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def trash_container(self) -> Union[labware.Labware, TrashBin, WasteChute]:
         """The trash container associated with this pipette.
@@ -1565,7 +1567,7 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> None:
         self._user_specified_trash = trash
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def name(self) -> str:
         """
@@ -1573,7 +1575,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_pipette_name()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def model(self) -> str:
         """
@@ -1581,7 +1583,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_model()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def min_volume(self) -> float:
         """
@@ -1591,7 +1593,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_min_volume()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def max_volume(self) -> float:
         """
@@ -1604,7 +1606,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_max_volume()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def current_volume(self) -> float:
         """
@@ -1612,7 +1614,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_current_volume()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 7)
     def has_tip(self) -> bool:
         """Whether this instrument has a tip attached or not.
@@ -1631,7 +1633,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.has_tip()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def hw_pipette(self) -> PipetteDict:
         """View the information returned by the hardware API directly.
@@ -1641,7 +1643,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_hardware_state()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def channels(self) -> int:
         """The number of channels on the pipette.
@@ -1652,7 +1654,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_channels()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 16)
     def active_channels(self) -> int:
         """The number of channels the pipette will use to pick up tips.
@@ -1662,7 +1664,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_active_channels()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 2)
     def return_height(self) -> float:
         """The height to return a tip to its tip rack.
@@ -1673,7 +1675,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         return self._core.get_return_height()
 
-    @property  # type: ignore
+    @property
     @requires_version(2, 0)
     def well_bottom_clearance(self) -> "Clearances":
         """The distance above the bottom of a well to aspirate or dispense.

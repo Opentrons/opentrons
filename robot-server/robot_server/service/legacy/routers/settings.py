@@ -390,7 +390,7 @@ def _pipette_settings_from_mutable_configs(
             converted_dict[k] = v.dict_for_encode()
         elif k == "quirks":
             converted_dict[k] = {q: b.dict_for_encode() for q, b in v.items()}
-    fields = PipetteSettingsFields(**converted_dict)  # type: ignore
+    fields = PipetteSettingsFields(**converted_dict)
 
     # TODO(mc, 2020-09-17): s/fields/setting_fields (?)
     # need model and name?
