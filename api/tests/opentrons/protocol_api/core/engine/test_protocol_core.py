@@ -730,7 +730,7 @@ def test_move_labware(
             existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="labware-id",
-        )
+        ),
     )
 
 
@@ -768,7 +768,7 @@ def test_move_labware_on_staging_slot(
             existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="labware-id",
-        )
+        ),
     )
 
 
@@ -811,7 +811,7 @@ def test_move_labware_on_non_connected_module(
             existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="labware-id",
-        )
+        ),
     )
 
 
@@ -850,7 +850,7 @@ def test_move_labware_off_deck(
             existing_labware_ids=[],
             existing_module_ids=[],
             new_labware_id="labware-id",
-        )
+        ),
     )
 
 
