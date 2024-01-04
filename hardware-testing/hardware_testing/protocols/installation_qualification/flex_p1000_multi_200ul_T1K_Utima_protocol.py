@@ -8,7 +8,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
 #                EDIT - START                #
 ##############################################
 
-metadata = {"protocolName": "Flex IQ: P1000 Multi 200ul"}
+metadata = {"protocolName": "Flex IQ: P1000 Multi 200ul Ultima Gen Test"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 ALLOW_TEST_PIPETTE_TO_TRANSFER_DILUENT = False
@@ -16,9 +16,9 @@ RETURN_TIP = True
 DILUENT_WELLS = ["A11", "A12"]
 
 TEST_VOLUME = 200
-TEST_PUSH_OUT = 20
+TEST_PUSH_OUT = None
 TEST_PIPETTE = "flex_8channel_1000"
-TEST_TIPS = "opentrons_flex_96_tiprack_200uL"
+TEST_TIPS = "opentrons_flex_96_tiprack_1000uL"
 TEST_SOURCES = [
     {
         "source": "A1",
@@ -35,8 +35,8 @@ TEST_SOURCES = [
 ##############################################
 
 SUBMERGE_MM = {
-    "aspirate": 3.0,
-    "dispense": 1.0,
+    "aspirate": 2.0,
+    "dispense": 2.0,
 }
 RETRACT_MM = 5.0
 MIN_MM_FROM_BOTTOM = 1.0
