@@ -27,6 +27,11 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 commands_router = APIRouter()
 
 
+# https://github.com/pydantic/pydantic/issues/3782
+class RequestModelWithCommand(RequestModel[StatelessCommandCreate]):
+    data: StatelessCommandCreate
+
+
 class CommandNotFound(ErrorDetails):
     """An error returned if the given command cannot be found."""
 
@@ -50,7 +55,7 @@ class CommandNotFound(ErrorDetails):
     },
 )
 async def create_command(
-    request_body: RequestModel[StatelessCommandCreate],
+    request_body: RequestModelWithCommand,
     waitUntilComplete: bool = Query(
         False,
         description=(

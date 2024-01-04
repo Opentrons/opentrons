@@ -38,6 +38,11 @@ _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 commands_router = APIRouter()
 
 
+# https://github.com/pydantic/pydantic/issues/3782
+class RequestModelWithCommand(RequestModel[pe_commands.CommandCreate]):
+    data: pe_commands.CommandCreate
+
+
 class CommandNotFound(ErrorDetails):
     """An error if a given run command is not found."""
 
@@ -146,7 +151,7 @@ async def get_current_run_engine_from_url(
     },
 )
 async def create_run_command(
-    request_body: RequestModel[pe_commands.CommandCreate],
+    request_body: RequestModelWithCommand,
     waitUntilComplete: bool = Query(
         default=False,
         description=(
