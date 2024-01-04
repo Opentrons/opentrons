@@ -16,6 +16,9 @@ from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
+import json
+from robot_server.mqtt_example import client as mqtt_client
+
 
 def _build_run(
     run_id: str,
@@ -97,11 +100,17 @@ class MaintenanceRunDataManager:
             deck_configuration=deck_configuration,
         )
 
-        return _build_run(
+        maintenance_run_data = _build_run(
             run_id=run_id,
             created_at=created_at,
             state_summary=state_summary,
         )
+
+        #TOME: Send here!
+        print('SENDING MR DATA')
+        mqtt_client.publish('opentrons/test/maintenance_runs', payload=json.dumps({"data": maintenance_run_data.json()}), qos=2)
+
+        return maintenance_run_data
 
     def get(self, run_id: str) -> MaintenanceRun:
         """Get a maintenance run resource.
@@ -140,6 +149,8 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
+            print('SENDING MR DATA')
+            mqtt_client.publish('opentrons/test/maintenance_runs', payload=json.dumps(None), qos=2)
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
 
