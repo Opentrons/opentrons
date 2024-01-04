@@ -10,7 +10,7 @@ const mockOT2ProtocolAnalysisOutput = {
 } as ProtocolAnalysisOutput
 
 describe('getisFlexProtocol', () => {
-  it('should return true for protocols intended for an OT-3', () => {
+  it('should return true for protocols intended for a Flex', () => {
     const result = getisFlexProtocol(mockOT3ProtocolAnalysisOutput)
     expect(result).toBe(true)
   })
@@ -32,7 +32,7 @@ describe('getisFlexProtocol', () => {
 })
 
 describe('getRobotTypeDisplayName', () => {
-  it('should return OT-3 for protocols intended for an OT-3', () => {
+  it('should return OT-3 for protocols intended for a Flex', () => {
     const result = getRobotTypeDisplayName('OT-3 Standard')
     expect(result).toBe('Opentrons Flex')
   })
