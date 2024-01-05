@@ -72,7 +72,9 @@ export const movableTrashCommandsUtil = (
   let inPlaceCommands: CurriedCommandCreator[] = []
 
   const addressableAreaName =
-    trashLocation != null && cutouts != null ? cutouts[trashLocation][0] : null
+    trashLocation != null && cutouts != null
+      ? cutouts[trashLocation]?.[0] ?? null
+      : null
 
   if (addressableAreaName == null) {
     console.error(
