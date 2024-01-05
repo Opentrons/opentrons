@@ -3,7 +3,9 @@ import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  MAGNETIC_BLOCK_TYPE,
   SINGLE_SLOT_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
 
@@ -18,7 +20,7 @@ import type { ProtocolModuleInfo } from '../ProtocolRun/utils/getProtocolModules
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null
-  conflictedFixture?: CutoutConfig
+  conflictedFixture: CutoutConfig | null
 }
 
 export interface ModuleRenderInfoById {
@@ -65,12 +67,20 @@ export function useModuleRenderInfoForProtocolById(
         deckDef
       )
 
-      const conflictedFixture = deckConfig?.find(
-        fixture =>
-          fixture.cutoutId === cutoutIdForSlotName &&
-          fixture.cutoutFixtureId != null &&
-          !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
-      )
+      const isMagneticBlockModule =
+        protocolMod.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
+
+      const conflictedFixture =
+        deckConfig?.find(
+          fixture =>
+            fixture.cutoutId === cutoutIdForSlotName &&
+            fixture.cutoutFixtureId != null &&
+            // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
+            !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&
+            // special case the magnetic module because unlike other modules it sits in a slot that can also be provided by a staging area fixture
+            (!isMagneticBlockModule ||
+              fixture.cutoutFixtureId !== STAGING_AREA_RIGHT_SLOT_FIXTURE)
+        ) ?? null
 
       if (compatibleAttachedModule !== null) {
         matchedAmod = [...matchedAmod, compatibleAttachedModule]
