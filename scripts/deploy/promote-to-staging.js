@@ -14,6 +14,17 @@ const { getAssumeRole } = require('./assume-role')
 const { getCreateInvalidation } = require('./create-invalidation')
 
 const PROTOCOL_DESIGNER_DOMAIN = 'designer.opentrons.com'
+const DOCS_DOMAIN = 'docs.opentrons.com'
+
+const ADMINISTRATOR_ROLE_ARN = 'arn:aws:iam::043748923082:role/administrator'
+const ROBOTICS_STATIC_WEBSITE_ROLE_ARN =
+  'arn:aws:iam::480034758691:role/robotics-static-website-deployer-root'
+const STAGING_DOCS_CLOUDFRONT_ARN =
+  'arn:aws:cloudfront::480034758691:distribution/E8IWASMDOWHYP'
+const STAGING_LL_CLOUDFRONT_ARN =
+  'arn:aws:cloudfront::480034758691:distribution/E1IPE9BNVE8OGU'
+const STAGING_PD_CLOUDFRONT_ARN =
+  'arn:aws:cloudfront::043748923082:distribution/EB2QTLE7OJ8O6'
 
 const USAGE =
   '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> <tag> [--deploy]'
@@ -27,89 +38,65 @@ assert(projectDomain && tag, USAGE)
 const sandboxBucket = `sandbox.${projectDomain}`
 const stagingBucket = `staging.${projectDomain}`
 
+let cloudfrontArn
 if (projectDomain === PROTOCOL_DESIGNER_DOMAIN) {
-  getAssumeRole(
-    'arn:aws:iam::043748923082:role/administrator',
-    'promoteToStaging'
-  )
-    .then(credentials => {
-      const stagingCredentials = new AWS.Credentials({
-        accessKeyId: credentials.AccessKeyId,
-        secretAccessKey: credentials.SecretAccessKey,
-        sessionToken: credentials.SessionToken,
-      })
-
-      const s3WithCreds = new AWS.S3({
-        apiVersion: '2006-03-01',
-        region: 'us-east-1',
-        credentials: stagingCredentials,
-      })
-
-      getDeployMetadata(s3WithCreds, stagingBucket)
-        .then(prevDeployMetadata => {
-          console.log('Previous deploy metadata: %j', prevDeployMetadata)
-          return syncBuckets(
-            s3WithCreds,
-            { bucket: sandboxBucket, path: tag },
-            { bucket: stagingBucket },
-            dryrun
-          ).then(() =>
-            setDeployMetadata(
-              s3WithCreds,
-              stagingBucket,
-              '',
-              { previous: prevDeployMetadata.current || null, current: tag },
-              dryrun
-            )
-          )
-        })
-        .then(() => {
-          console.log('Promotion to staging done\n')
-          getCreateInvalidation(
-            stagingCredentials,
-            `arn:aws:cloudfront::043748923082:distribution/EB2QTLE7OJ8O6`
-          )
-        })
-        .then(() => {
-          console.log('Cache invalidation initiated for staging\n')
-          process.exit(0)
-        })
-        .catch(error => {
-          console.error(error.message)
-          process.exit(1)
-        })
-    })
-    .catch(err => {
-      console.error(err)
-    })
+  cloudfrontArn = STAGING_PD_CLOUDFRONT_ARN
+} else if (projectDomain === DOCS_DOMAIN) {
+  cloudfrontArn = STAGING_DOCS_CLOUDFRONT_ARN
 } else {
-  const s3 = new AWS.S3({ apiVersion: '2006-03-01', region: 'us-east-1' })
-
-  getDeployMetadata(s3, stagingBucket)
-    .then(prevDeployMetadata => {
-      console.log('Previous deploy metadata: %j', prevDeployMetadata)
-
-      return syncBuckets(
-        s3,
-        { bucket: sandboxBucket, path: tag },
-        { bucket: stagingBucket },
-        dryrun
-      ).then(() =>
-        setDeployMetadata(
-          s3,
-          stagingBucket,
-          '',
-          { previous: prevDeployMetadata.current || null, current: tag },
-          dryrun
-        )
-      )
-    })
-    .then(() => {
-      console.log('Promotion to staging done\n')
-      process.exit(0)
-    })
-    .catch(error => {
-      console.error(error.message)
-      process.exit(1)
-    })
+  cloudfrontArn = STAGING_LL_CLOUDFRONT_ARN
 }
+
+getAssumeRole(
+  PROTOCOL_DESIGNER_DOMAIN
+    ? ADMINISTRATOR_ROLE_ARN
+    : ROBOTICS_STATIC_WEBSITE_ROLE_ARN,
+  'promoteToStaging'
+)
+  .then(credentials => {
+    const stagingCredentials = new AWS.Credentials({
+      accessKeyId: credentials.AccessKeyId,
+      secretAccessKey: credentials.SecretAccessKey,
+      sessionToken: credentials.SessionToken,
+    })
+
+    const s3WithCreds = new AWS.S3({
+      apiVersion: '2006-03-01',
+      region: 'us-east-1',
+      credentials: stagingCredentials,
+    })
+
+    getDeployMetadata(s3WithCreds, stagingBucket)
+      .then(prevDeployMetadata => {
+        console.log('Previous deploy metadata: %j', prevDeployMetadata)
+        return syncBuckets(
+          s3WithCreds,
+          { bucket: sandboxBucket, path: tag },
+          { bucket: stagingBucket },
+          dryrun
+        ).then(() =>
+          setDeployMetadata(
+            s3WithCreds,
+            stagingBucket,
+            '',
+            { previous: prevDeployMetadata.current || null, current: tag },
+            dryrun
+          )
+        )
+      })
+      .then(() => {
+        console.log('Promotion to staging done\n')
+        getCreateInvalidation(stagingCredentials, cloudfrontArn)
+      })
+      .then(() => {
+        console.log('Cache invalidation initiated for staging\n')
+        process.exit(0)
+      })
+      .catch(error => {
+        console.error(error.message)
+        process.exit(1)
+      })
+  })
+  .catch(err => {
+    console.error(err)
+  })
