@@ -37,15 +37,14 @@ if (projectDomain === PROTOCOL_DESIGNER_DOMAIN) {
 } else {
   cloudfrontArn = PROD_LL_CLOUDFRONT_ARN
 }
+const ROLE_ARN =
+  projectDomain === PROTOCOL_DESIGNER_DOMAIN
+    ? ADMINISTRATOR_ROLE_ARN
+    : ROBOTICS_STATIC_WEBSITE_ROLE_ARN
 
 assert(projectDomain, USAGE)
 
-getAssumeRole(
-  PROTOCOL_DESIGNER_DOMAIN
-    ? ADMINISTRATOR_ROLE_ARN
-    : ROBOTICS_STATIC_WEBSITE_ROLE_ARN,
-  'promoteToProduction'
-)
+getAssumeRole(ROLE_ARN, 'promoteToProduction')
   .then(credentials => {
     const productionCredentials = new AWS.Credentials({
       accessKeyId: credentials.AccessKeyId,

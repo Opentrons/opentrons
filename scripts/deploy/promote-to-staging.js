@@ -46,13 +46,12 @@ if (projectDomain === PROTOCOL_DESIGNER_DOMAIN) {
 } else {
   cloudfrontArn = STAGING_LL_CLOUDFRONT_ARN
 }
-
-getAssumeRole(
-  PROTOCOL_DESIGNER_DOMAIN
+const ROLE_ARN =
+  projectDomain === PROTOCOL_DESIGNER_DOMAIN
     ? ADMINISTRATOR_ROLE_ARN
-    : ROBOTICS_STATIC_WEBSITE_ROLE_ARN,
-  'promoteToStaging'
-)
+    : ROBOTICS_STATIC_WEBSITE_ROLE_ARN
+
+getAssumeRole(ROLE_ARN, 'promoteToStaging')
   .then(credentials => {
     const stagingCredentials = new AWS.Credentials({
       accessKeyId: credentials.AccessKeyId,
