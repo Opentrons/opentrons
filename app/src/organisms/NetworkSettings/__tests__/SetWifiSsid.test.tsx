@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -47,9 +48,9 @@ describe('SetWifiSsid', () => {
     const aKey = getByRole('button', { name: 'a' })
     const bKey = getByRole('button', { name: 'b' })
     const cKey = getByRole('button', { name: 'c' })
-    aKey.click()
-    bKey.click()
-    cKey.click()
+    fireEvent.click(aKey)
+    fireEvent.click(bKey)
+    fireEvent.click(cKey)
     expect(inputBox).toHaveValue('mockSsid')
   })
 })

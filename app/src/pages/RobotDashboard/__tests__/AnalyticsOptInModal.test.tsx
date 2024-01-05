@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -53,7 +54,7 @@ describe('AnalyticsOptInModal', () => {
 
   it('should call a mock function when tapping opt out button', () => {
     const [{ getByText }] = render(props)
-    getByText('Opt out').click()
+    fireEvent.click(getByText('Opt out'))
 
     expect(mockUpdateConfigValue).toHaveBeenCalledWith(
       'analytics.optedIn',
@@ -69,7 +70,7 @@ describe('AnalyticsOptInModal', () => {
 
   it('should call a mock function when tapping out in button', () => {
     const [{ getByText }] = render(props)
-    getByText('Opt in').click()
+    fireEvent.click(getByText('Opt in'))
 
     expect(mockUpdateConfigValue).toHaveBeenCalledWith(
       'analytics.optedIn',

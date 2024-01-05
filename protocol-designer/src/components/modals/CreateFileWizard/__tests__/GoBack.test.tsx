@@ -1,5 +1,6 @@
 import * as React from 'react'
 import i18n from 'i18next'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { GoBack } from '../GoBack'
 
@@ -21,7 +22,7 @@ describe('GoBack', () => {
   it('the go back renders and clicking on it calls prop', () => {
     const { getByLabelText } = render(props)
 
-    getByLabelText('GoBack_button').click()
+    fireEvent.click(getByLabelText('GoBack_button'))
     expect(props.onClick).toHaveBeenCalled()
   })
 })
