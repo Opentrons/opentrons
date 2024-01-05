@@ -398,7 +398,7 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
-  it('should disable overflow menu buttons for thermocycler gen 1 when the robot is an OT-3', () => {
+  it('should disable overflow menu buttons for thermocycler gen 1 when the robot is a Flex', () => {
     props = {
       ...props,
       module: mockTCBlockHeating,
@@ -545,7 +545,7 @@ describe('ModuleOverflowMenu', () => {
     }
     const { getByRole } = render(props)
 
-    getByRole('button', { name: 'Calibrate' }).click()
+    fireEvent.click(getByRole('button', { name: 'Calibrate' }))
     expect(props.handleCalibrateClick).toHaveBeenCalled()
   })
 })

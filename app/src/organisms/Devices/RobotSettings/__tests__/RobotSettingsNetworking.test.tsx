@@ -154,7 +154,7 @@ describe('RobotSettingsNetworking', () => {
     ).toBeNull()
   })
 
-  it('should render title and description for OT-3', () => {
+  it('should render title and description for Flex', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     render()
@@ -170,7 +170,7 @@ describe('RobotSettingsNetworking', () => {
     expect(screen.queryByText('Go to Advanced App Settings')).toBeNull()
   })
 
-  it('should render USB connection message for OT-3 when connected via USB', () => {
+  it('should render USB connection message for Flex when connected via USB', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     when(mockUseIsFlex).calledWith(ROBOT_NAME).mockReturnValue(true)
     when(mockGetRobotAddressesByName)

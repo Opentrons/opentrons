@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -45,7 +46,7 @@ describe('EnableStatusLight', () => {
 
   it('should call a mock function when clicking toggle button', () => {
     const [{ getByLabelText }] = render(props)
-    getByLabelText('enable_status_light').click()
+    fireEvent.click(getByLabelText('enable_status_light'))
     expect(mockToggleLights).toHaveBeenCalled()
   })
 

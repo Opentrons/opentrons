@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -54,19 +55,19 @@ describe('DisplayConnectionStatus', () => {
 
   it('should call a mock function when tapping view network details button when the connection status is connected', () => {
     const [{ getByText }] = render(props)
-    getByText('View network details').click()
+    fireEvent.click(getByText('View network details'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping view network details button when the connection status is not connected', () => {
     const [{ getByText }] = render(props)
-    getByText('View network details').click()
+    fireEvent.click(getByText('View network details'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call a mock push when tapping continue button', () => {
     const [{ getByText }] = render(props)
-    getByText('Continue').click()
+    fireEvent.click(getByText('Continue'))
     expect(mockPush).toHaveBeenCalledWith(
       '/robot-settings/update-robot-during-onboarding'
     )
