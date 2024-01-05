@@ -61,13 +61,13 @@ OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 
 TEMP_DECK_LABWARE = "nest_12_reservoir_15ml"
 TEMP_DECK_SLOT = 1
-# OFFSET_FOR_TEMP_DECK = Point(x=23, y=9 * 7 * 0.5, z=-4.5) #ultima
-OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-9) #nest 12 well
+OFFSET_FOR_TEMP_DECK = Point(x=23, y=9 * 7 * 0.5, z=-4.5) #ultima
+# OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-9) #nest 12 well
 # OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-25) #nest 12 well no temp
 # Temp deck temp of 36C keeps fluid at ~32
 
-# DISPENSE_OFFSET = 20 #ultima
-DISPENSE_OFFSET = 8 #nest 12 well
+DISPENSE_OFFSET = 18 #ultima
+# DISPENSE_OFFSET = 18 #nest 12 well
 
 NUM_PRESSURE_READINGS = 10
 SECONDS_BETWEEN_READINGS = 0.25
