@@ -59,6 +59,7 @@ router = APIRouter()
 
 @router.post(
     path="/settings",
+    summary="Change a setting",
     description="Change an advanced setting (feature flag)",
     response_model=AdvancedSettingsResponse,
     response_model_exclude_unset=True,
@@ -89,6 +90,7 @@ async def post_settings(
 
 @router.get(
     "/settings",
+    summary="Get settings",
     description="Get a list of available advanced settings (feature "
     "flags) and their values",
     response_model=AdvancedSettingsResponse,
@@ -135,6 +137,7 @@ def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
 
 @router.post(
     path="/settings/log_level/local",
+    summary="Set the local log level",
     description="Set the minimum level of logs saved locally",
     response_model=V1BasicResponse,
     responses={
@@ -165,6 +168,7 @@ async def post_log_level_local(
 
 @router.post(
     path="/settings/log_level/upstream",
+    summary="Set the upstream log level",
     description=(
         "Set the minimum level of logs sent upstream via"
         " syslog-ng to Opentrons. Only available on"
@@ -212,7 +216,8 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
 
 @router.get(
     "/settings/reset/options",
-    description="Get the settings that can be reset as part of factory reset",
+    summary="Get the things that can be factory-reset",
+    description="Get the things that can be reset through `POST /settings/reset`.",
     response_model=FactoryResetOptions,
 )
 async def get_settings_reset_options(
