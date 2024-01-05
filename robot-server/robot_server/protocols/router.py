@@ -19,6 +19,8 @@ from opentrons.protocol_reader import (
     FileHasher,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
+
+from robot_server.docs_helpers.xrefs import OperationId
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
@@ -467,6 +469,7 @@ async def get_protocol_analyses(
 
 @protocols_router.get(
     path="/protocols/{protocolId}/analyses/{analysisId}",
+    operation_id=OperationId.GET_PROTOCOL_ANALYSIS,
     summary="Get one of a protocol's analyses",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[ProtocolAnalysis]},

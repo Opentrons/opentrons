@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 
+from robot_server.docs_helpers.xrefs import OperationId
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
@@ -219,6 +220,7 @@ async def create_run_command(
 
 @commands_router.get(
     path="/runs/{runId}/commands",
+    operation_id=OperationId.GET_RUN_COMMANDS,
     summary="Get a list of all protocol commands in the run",
     description=(
         "Get a list of all commands in the run and their statuses. "
