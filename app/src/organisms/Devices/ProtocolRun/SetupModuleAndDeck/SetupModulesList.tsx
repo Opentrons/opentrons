@@ -216,7 +216,7 @@ interface ModulesListItemProps {
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
   deckDef: DeckDefinition
-  conflictedFixture?: CutoutConfig
+  conflictedFixture: CutoutConfig | null
 }
 
 export function ModulesListItem({
