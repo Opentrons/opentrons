@@ -98,11 +98,11 @@ class WifiNetworkFull(WifiNetwork):
 
     signal: int = Field(
         ...,
-        description="A unitless signal strength; a higher number is a " "better signal",
+        description="A unitless signal strength; a higher number is a better signal",
     )
     active: bool = Field(..., description="Whether there is a connection active")
     security: str = Field(
-        ..., description="The raw NetworkManager output about the wifi " "security"
+        ..., description="The raw NetworkManager output about the Wi-Fi security"
     )
     securityType: NetworkingSecurityType
 
