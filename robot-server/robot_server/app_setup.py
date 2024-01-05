@@ -38,6 +38,9 @@ app = FastAPI(
     ),
     version=__version__,
     exception_handlers=exception_handlers,
+    # Disable documentation hosting via Swagger UI, normally at /docs.
+    # We instead focus on the docs hosted by ReDoc, at /redoc.
+    docs_url=None,
 )
 
 # cors
