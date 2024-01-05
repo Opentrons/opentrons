@@ -25,7 +25,6 @@ import {
   EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
-import type { INode } from 'svgson'
 import type { RunTimeCommand, LabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
@@ -361,7 +360,7 @@ export interface ModuleDefinition {
   quirks: string[]
   slotTransforms: SlotTransforms
   compatibleWith: ModuleModel[]
-  twoDimensionalRendering: INode
+  twoDimensionalRendering: any // deprecated SVGson INode use Module SVG Components instead
 }
 
 export type AffineTransformMatrix = number[][]
