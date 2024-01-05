@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from robot_server.docs_helpers.xrefs import OperationId
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
@@ -106,6 +107,7 @@ async def get_current_run_engine_from_url(
 
 @commands_router.post(
     path="/maintenance_runs/{runId}/commands",
+    operation_id=OperationId.POST_MAINTENANCE_RUN_COMMAND,
     summary="Enqueue a command",
     description=textwrap.dedent(
         """

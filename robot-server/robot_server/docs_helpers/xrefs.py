@@ -17,6 +17,7 @@ class OperationId(
     """
     GET_PROTOCOL_ANALYSIS = "get_protocol_analysis"
     GET_RUN_COMMANDS = "get_run_commands"
+    POST_MAINTENANCE_RUN_COMMAND = "post_maintenance_run_command"
 
 
 def xref(operation_id: OperationId, text: str) -> str:

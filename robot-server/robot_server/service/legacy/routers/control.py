@@ -12,6 +12,7 @@ from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.hardware_control import HardwareControlAPI
 
 from opentrons.types import Mount, Point
+from robot_server.docs_helpers.xrefs import OperationId as OpID, xref
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.service.dependencies import get_motion_lock
@@ -38,8 +39,15 @@ async def post_identify(
 
 @router.get(
     "/robot/positions",
-    description="Get a list of useful positions",
+    summary="Get robot positions",
+    description=(
+        "Get a list of useful positions."
+        "\n\n"
+        "**Deprecated:** This data only makes sense for OT-2 robots, not Flex robots."
+        " There is currently no public way to get these positions for Flex robots."
+    ),
     response_model=control.RobotPositionsResponse,
+    deprecated=True,
 )
 async def get_robot_positions() -> control.RobotPositionsResponse:
     """
@@ -61,14 +69,20 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
 
 @router.post(
     path="/robot/move",
+    summary="Move the robot",
     description=(
         "Move the robot's gantry to a position (usually to a "
-        "position retrieved from GET /robot/positions)"
+        "position retrieved from `GET /robot/positions`)."
+        "\n\n"
+        "**Deprecated:**"
+        f" {xref(OpID.POST_MAINTENANCE_RUN_COMMAND, 'Run a `moveToCoordinates` command in a maintenance run')}"
+        " instead."
     ),
     response_model=V1BasicResponse,
     responses={
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
     },
+    deprecated=True,
 )
 async def post_move_robot(
     robot_move_target: control.RobotMoveTarget,
