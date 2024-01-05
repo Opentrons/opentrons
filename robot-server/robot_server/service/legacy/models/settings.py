@@ -17,6 +17,7 @@ class AdvancedSetting(BaseModel):
         ...,
         description="The ID by which the property used to be known; not"
         " useful now and may contain spaces or hyphens",
+        deprecated=True,
     )
     title: str = Field(
         ...,
