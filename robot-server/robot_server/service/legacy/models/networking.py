@@ -133,13 +133,13 @@ class WifiConfiguration(BaseModel):
         ...,
         description="The SSID to connect to. If this isn't an SSID that "
         "is being broadcast by a network, you "
-        "should also set hidden to true.",
+        "should also set `hidden` to `true`.",
     )
     hidden: typing.Optional[bool] = Field(
         False,
-        description="True if the network is hidden (not broadcasting an "
-        "ssid). False (default if key is not "
-        "present) otherwise",
+        description="`true` if the network is hidden (not broadcasting an SSID). "
+        "`false` (default if key is not "
+        "present) otherwise.",
     )
     securityType: typing.Optional[NetworkingSecurityType]
 

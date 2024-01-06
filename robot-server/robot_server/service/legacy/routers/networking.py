@@ -71,9 +71,11 @@ async def get_wifi_networks(
     rescan: Optional[bool] = Query(
         default=False,
         description=(
-            "If `true` it forces a rescan for beaconing WiFi networks, "
-            "this is an expensive operation which can take ~10 seconds."
-            "If `false` it returns the cached wifi networks, "
+            "If `true`, forces a rescan for beaconing Wi-Fi networks. "
+            "This is an expensive operation that can take ~10 seconds, "
+            "so only do it based on user needs like clicking a \"scan network\" "
+            "button, not just to poll. "
+            "If `false`, returns the cached Wi-Fi networks, "
             "letting the system decide when to do a rescan."
         ),
     )
