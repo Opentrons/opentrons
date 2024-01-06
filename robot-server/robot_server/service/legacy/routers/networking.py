@@ -123,6 +123,7 @@ async def post_wifi_configure(
 
 @router.get(
     "/wifi/keys",
+    summary="Get Wi-Fi keys",
     description="Get a list of key files known to the system",
     response_model=WifiKeyFiles,
     response_model_by_alias=True,
@@ -146,6 +147,7 @@ async def get_wifi_keys():
 
 @router.post(
     "/wifi/keys",
+    summary="Add a Wi-Fi key",
     description="Send a new key file to the robot",
     responses={status.HTTP_200_OK: {"model": AddWifiKeyFileResponse}},
     response_model=AddWifiKeyFileResponse,
@@ -170,6 +172,7 @@ async def post_wifi_key(key: UploadFile = File(...)):
 
 @router.delete(
     path="/wifi/keys/{key_uuid}",
+    summary="Delete a Wi-Fi key",
     description="Delete a key file from the robot",
     response_model=V1BasicResponse,
     responses={
@@ -195,6 +198,7 @@ async def delete_wifi_key(
 
 @router.get(
     "/wifi/eap-options",
+    summary="Get EAP options",
     description="Get the supported EAP variants and their " "configuration parameters",
     response_model=EapOptions,
 )
