@@ -216,7 +216,7 @@ Once you've confirmed you're running the correct versions of Node.js and Python,
 npm install --global yarn@1
 ```
 
-If you are using [corepack][], you can install `yarn` via `corepack`.
+If you are using [Corepack][], you can install `yarn` via `corepack`.
 
 ```shell
 corepack enable
