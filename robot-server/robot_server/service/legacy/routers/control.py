@@ -24,7 +24,8 @@ router = APIRouter()
 
 @router.post(
     "/identify",
-    description="Blink the OT-2's gantry lights so you can pick it " "out of a crowd",
+    summary="Blink the lights",
+    description="Blink the gantry lights so you can pick it out of a crowd",
 )
 async def post_identify(
     seconds: int = Query(..., description="Time to blink the lights for"),
@@ -85,7 +86,8 @@ async def post_move_robot(
 
 @router.post(
     path="/robot/home",
-    description="Home the robot",
+    summary="Home the robot",
+    description="Home the robot.",
     response_model=V1BasicResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
@@ -126,7 +128,8 @@ async def post_home_robot(
 
 @router.get(
     "/robot/lights",
-    description="Get the current status of the OT-2's rail lights",
+    summary="Get whether the lights are on",
+    description="Get the current status of the robot's rail lights",
     response_model=control.RobotLightState,
 )
 async def get_robot_light_state(
@@ -138,6 +141,7 @@ async def get_robot_light_state(
 
 @router.post(
     "/robot/lights",
+    summary="Turn the lights on or off",
     description="Turn the rail lights on or off",
     response_model=control.RobotLightState,
 )
