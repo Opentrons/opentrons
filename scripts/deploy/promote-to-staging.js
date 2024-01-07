@@ -57,7 +57,6 @@ async function runPromoteToStaging() {
   try {
     await checkCurrentAWSProfile()
 
-    // Prompt the user for confirmation
     const confirmation = await promptUser('Is the AWS profile correct?')
 
     if (!confirmation) {
@@ -67,7 +66,6 @@ async function runPromoteToStaging() {
       process.exit(0)
     }
 
-    // Proceed with assuming the role and other operations
     await getAssumeRole(ROLE_ARN, 'promoteToStaging')
       .then(credentials => {
         const stagingCredentials = new AWS.Credentials({
