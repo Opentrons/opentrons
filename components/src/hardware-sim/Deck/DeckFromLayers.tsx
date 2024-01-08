@@ -23,18 +23,18 @@ export interface DeckFromLayersProps {
 }
 
 const OT2_LAYER_MAP: {
-  [layer in typeof ALL_OT2_DECK_LAYERS[number]]: JSX.Element
+  [layer in typeof ALL_OT2_DECK_LAYERS[number]]: React.FunctionComponent<{key: number}>
 } = {
-  fixedBase: <FixedBase />,
-  fixedTrash: <FixedTrash />,
-  doorStops: <DoorStops />,
-  metalFrame: <MetalFrame />,
-  removableDeckOutline: <RemovableDeckOutline />,
-  slotRidges: <SlotRidges />,
-  slotNumbers: <SlotNumbers />,
-  calibrationMarkings: <CalibrationMarkings />,
-  removalHandle: <RemovalHandle />,
-  screwHoles: <ScrewHoles />,
+  fixedBase: ({key}: {key: number}) => <FixedBase key={key} />,
+  fixedTrash: ({key}: {key: number}) => <FixedTrash key={key} />,
+  doorStops: ({key}: {key: number}) => <DoorStops key={key} />,
+  metalFrame: ({key}: {key: number}) => <MetalFrame key={key} />,
+  removableDeckOutline: ({key}: {key: number}) => <RemovableDeckOutline key={key} />,
+  slotRidges: ({key}: {key: number}) => <SlotRidges key={key} />,
+  slotNumbers: ({key}: {key: number}) => <SlotNumbers key={key} />,
+  calibrationMarkings: ({key}: {key: number}) => <CalibrationMarkings key={key} />,
+  removalHandle: ({key}: {key: number}) => <RemovalHandle key={key} />,
+  screwHoles: ({key}: {key: number}) => <ScrewHoles key={key} />,
 }
 
 /**
@@ -49,9 +49,9 @@ export function DeckFromLayers(props: DeckFromLayersProps): JSX.Element | null {
 
   return (
     <g id="deckLayers">
-      {ALL_OT2_DECK_LAYERS.reduce<JSX.Element[]>((acc, layer) => {
+      {ALL_OT2_DECK_LAYERS.reduce<Array<JSX.Element | null>>((acc, layer, index) => {
         if (layerBlocklist.includes(layer)) return acc
-        return [...acc, OT2_LAYER_MAP[layer]]
+        return [...acc, OT2_LAYER_MAP[layer]({key: index})]
       }, [])}
     </g>
   )

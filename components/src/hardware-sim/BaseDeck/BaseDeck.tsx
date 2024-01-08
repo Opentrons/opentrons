@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import {
   getDeckDefFromRobotType,
+  getLabwareDefURI,
   getModuleDef2,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
@@ -144,7 +145,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ) : null}
           {singleSlotFixtures.map(fixture => (
             <SingleSlotFixture
-              key={fixture.cutoutId}
+              key={`${fixture.cutoutFixtureId ?? 'empty'}_${fixture.cutoutId}`}
               cutoutId={fixture.cutoutId}
               deckDefinition={deckDef}
               slotClipColor={darkFill}
@@ -154,7 +155,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ))}
           {stagingAreaFixtures.map(fixture => (
             <StagingAreaFixture
-              key={fixture.cutoutId}
+              key={`${fixture.cutoutFixtureId ?? 'empty'}_${fixture.cutoutId}`}
               // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.cutoutId as StagingAreaLocation}
               deckDefinition={deckDef}
@@ -163,7 +164,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             />
           ))}
           {trashBinFixtures.map(fixture => (
-            <React.Fragment key={fixture.cutoutId}>
+            <React.Fragment key={`${fixture.cutoutFixtureId ?? 'empty'}_${fixture.cutoutId}`}>
               <SingleSlotFixture
                 cutoutId={fixture.cutoutId}
                 deckDefinition={deckDef}
@@ -181,7 +182,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ))}
           {wasteChuteOnlyFixtures.map(fixture => (
             <WasteChuteFixture
-              key={fixture.cutoutId}
+              key={`${fixture.cutoutFixtureId ?? 'empty'}_${fixture.cutoutId}`}
               // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.cutoutId as typeof WASTE_CHUTE_CUTOUT}
               deckDefinition={deckDef}
@@ -191,7 +192,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ))}
           {wasteChuteStagingAreaFixtures.map(fixture => (
             <WasteChuteStagingAreaFixture
-              key={fixture.cutoutId}
+              key={`${fixture.cutoutFixtureId ?? 'empty'}_${fixture.cutoutId}`}
               // TODO(bh, 2023-10-09): typeguard fixture location
               cutoutId={fixture.cutoutId as typeof WASTE_CHUTE_CUTOUT}
               deckDefinition={deckDef}
@@ -254,7 +255,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               !('slotName' in labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===
-                'opentrons_1_trash_3200ml_fixed'
+              'opentrons_1_trash_3200ml_fixed'
             ) {
               return null
             }
@@ -266,7 +267,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
 
             return slotPosition != null ? (
               <g
-                key={labwareLocation.slotName}
+                key={`${getLabwareDefURI(definition)}_${labwareLocation.slotName}`}
                 transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
                 cursor={onLabwareClick != null ? 'pointer' : ''}
               >
