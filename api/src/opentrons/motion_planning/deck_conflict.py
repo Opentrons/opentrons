@@ -222,7 +222,7 @@ def _create_ot2_restrictions(  # noqa: C901
 ) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
     if isinstance(location, StagingSlotName):
-        raise DeckConflictError("OT-2 does not support staging slots.")
+        raise DeckConflictError(f"OT-2 does not support staging slots ({location.id}).")
 
     if location not in _FIXED_TRASH_SLOT:
         # Disallow a different item from overlapping this item in this deck slot.
@@ -293,12 +293,16 @@ def _create_flex_restrictions(
         )
     ]
 
-    # Magnetic block module does not have staging slot restriction
     if isinstance(item, (HeaterShakerModule, OtherModule)):
         if isinstance(location, StagingSlotName):
-            raise DeckConflictError("Cannot have a module loaded on a staging slot.")
+            raise DeckConflictError(
+                "Cannot have a module loaded on a staging area slot."
+            )
         adjacent_staging_slot = get_adjacent_staging_slot(location)
         if adjacent_staging_slot is not None:
+            # You can't have anything on a staging area slot next to a heater-shaker or
+            # temperature module because the module caddy physically blocks you from having
+            # that staging area slot installed in the first place.
             restrictions.append(
                 _NothingAllowed(
                     location=adjacent_staging_slot,
