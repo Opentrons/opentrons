@@ -40,7 +40,6 @@ test-protocol-analysis:
 
 .PHONY: setup
 setup: install-pipenv
-	$(MAKE) install-pipenv
 	python -m pipenv install
 
 .PHONY: teardown
