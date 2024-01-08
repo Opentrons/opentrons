@@ -51,13 +51,14 @@ _log = logging.getLogger(__name__)
 
 # TODO (spp, 2023-12-06): move this to a location like motion planning where we can
 #  derive these values from geometry definitions
+#  Also, verify y-axis extents values for the nozzle columns.
 # Bounding box measurements
-A12_column_front_left_bound = Point(x=-1.8, y=2)
-A12_column_back_right_bound = Point(x=592, y=506.2)
+A12_column_front_left_bound = Point(x=-11.03, y=2)
+A12_column_back_right_bound = Point(x=526.77, y=506.2)
 
-A1_column_front_left_bound = Point(x=-100.8, y=2)
-A1_column_back_right_bound = Point(x=493, y=506.2)
-
+_NOZZLE_PITCH = 9
+A1_column_front_left_bound = Point(x=A12_column_front_left_bound.x - _NOZZLE_PITCH * 11, y=2)
+A1_column_back_right_bound = Point(x=A12_column_back_right_bound.x - _NOZZLE_PITCH * 11, y=506.2)
 
 # Arbitrary safety margin in z-direction
 Z_SAFETY_MARGIN = 10
@@ -255,7 +256,7 @@ def _check_deck_conflict_for_96_channel(
         engine_state.pipettes.get_nozzle_layout_type(pipette_id)
         == NozzleConfigurationType.COLUMN
     ):
-        # Checking deck conflicts only for 12th column config
+        # Checking deck conflicts only for column config
         return
 
     if isinstance(well_location, DropTipWellLocation):
@@ -330,7 +331,7 @@ def _check_deck_conflict_for_8_channel(
         engine_state.pipettes.get_nozzle_layout_type(pipette_id)
         == NozzleConfigurationType.SINGLE
     ):
-        # Checking deck conflicts only for H1 single tip config
+        # Checking deck conflicts only for single tip config
         return
 
     if isinstance(well_location, DropTipWellLocation):
@@ -408,20 +409,20 @@ def _is_within_pipette_extents(
             if primary_nozzle == "A12":
                 return (
                     A12_column_front_left_bound.x
-                    < location.x
-                    < A12_column_back_right_bound.x
+                    <= location.x
+                    <= A12_column_back_right_bound.x
                     and A12_column_front_left_bound.y
-                    < location.y
-                    < A12_column_back_right_bound.y
+                    <= location.y
+                    <= A12_column_back_right_bound.y
                 )
             elif primary_nozzle == "A1":
                 return (
                     A1_column_front_left_bound.x
-                    < location.x
-                    < A1_column_back_right_bound.x
+                    <= location.x
+                    <= A1_column_back_right_bound.x
                     and A1_column_front_left_bound.y
-                    < location.y
-                    < A1_column_back_right_bound.y
+                    <= location.y
+                    <= A1_column_back_right_bound.y
                 )
     # TODO (spp, 2023-11-07): check for 8-channel nozzle A1 & H1 extents on Flex & OT2
     return True

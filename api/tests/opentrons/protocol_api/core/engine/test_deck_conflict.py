@@ -322,7 +322,7 @@ module = LoadedModule(
         ),
         # Out-of-bounds error
         (
-            Point(x=-10, y=100, z=60),
+            Point(x=-12, y=100, z=60),
             pytest.raises(
                 deck_conflict.PartialTipMovementNotAllowedError,
                 match="outside of robot bounds",
