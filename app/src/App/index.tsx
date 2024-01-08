@@ -18,38 +18,6 @@ export const AppComponent = (): JSX.Element | null => {
   const hasConfigLoaded = useSelector(getConfig) != null
   const isOnDevice = useSelector(getIsOnDevice)
 
-  React.useEffect(() => {
-    const client = mqtt.connect('ws://broker.emqx.io:8083/mqtt', {
-      clientId: uniqueId('emqx_'),
-      username: 'emqx2',
-      password: '**********',
-    })
-
-    client.on('connect', function () {
-      client.subscribe('opentrons/test', function (err) {
-        if (err == null) {
-          console.log('NO ERROR SUBSCRIBING TO /TEST')
-        } else {
-          console.log('ERROR')
-          console.log(err)
-        }
-      })
-    })
-
-    client.on('message', function (topic, message) {
-      // message is Buffer
-      console.log('TEST MESSAGE')
-      console.log(message.toString())
-    })
-
-    client.on('disconnect', function (packet) {
-      console.log('DISCONNECTED FROM INITIAL MQTT CONNECTION')
-    })
-
-    return () => {
-      client.end()
-    }
-  }, [])
   // render null until getIsOnDevice returns the isOnDevice value from config
   return hasConfigLoaded ? (
     <>

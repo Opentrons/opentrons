@@ -257,6 +257,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queued_command_ids.discard(command.id)
             self._state.queued_setup_command_ids.discard(command.id)
 
+            # TOME: Here is an example where you can push. 
+            # When the running_command_id is new, you can follow the logic below to emit the actual command.
             if command.status == CommandStatus.RUNNING:
                 self._state.running_command_id = command.id
             elif self._state.running_command_id == command.id:
@@ -513,6 +515,7 @@ class CommandView(HasState[CommandState]):
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
+        #TOME: Anytime _state.running_command_id changes, that's a new "current" command. 
         if self._state.running_command_id:
             entry = self._state.commands_by_id[self._state.running_command_id]
             return CurrentCommand(
