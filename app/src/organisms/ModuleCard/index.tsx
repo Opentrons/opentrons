@@ -130,9 +130,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isFlex = useIsFlex(robotName)
   const requireModuleCalibration =
     isFlex &&
-    !MODULE_MODELS_OT2_ONLY.some(
-      module_model => module_model === module.moduleModel
-    ) &&
+    !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
     module.moduleOffset?.last_modified == null
   const isPipetteReady =
     (!attachPipetteRequired ?? false) &&
