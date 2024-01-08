@@ -266,26 +266,3 @@ def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> None:
         analyze_many(protocols_to_process, container)
     finally:
         stop_and_remove_containers(image_name)
-
-
-def main() -> None:
-    # # Create the parser
-    # parser = argparse.ArgumentParser(description="Process some integers.")
-    # # Add the arguments
-    # parser.add_argument("tag", type=str, help="The tag to process")
-    # # Execute the parse_args() method
-    # args = parser.parse_args()
-    # tag = args.tag
-    # console.print(f"Received tag: {tag}")
-    # tag = "v7.0.2"
-    # tag = "v7.1.0-alpha.1"
-    # tag = "v7.1.0-alpha.2"
-    # tag = "v7.1.0-alpha.3"
-    # base_tag = "v7.0.2"
-    new_release_tag = "v7.1.0-alpha.3"
-    # analyze_against_image(base_tag)
-    analyze_against_image(new_release_tag)
-
-
-if __name__ == "__main__":
-    main()
