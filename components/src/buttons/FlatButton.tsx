@@ -8,6 +8,8 @@ import type { ButtonProps } from './Button'
 
 /**
  * Flat-styled button with a default width of `9rem` and no background fill
+ * 
+ * @deprecated
  */
 export function FlatButton(props: ButtonProps): JSX.Element {
   const className = classnames(styles.button_flat, props.className, {
