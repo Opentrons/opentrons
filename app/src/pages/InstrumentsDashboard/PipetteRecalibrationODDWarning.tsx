@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import {
-  Flex,
-  Icon,
-  Btn,
-  SPACING,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   BORDERS,
+  Btn,
+  COLORS,
+  Flex,
+  Icon,
   JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -34,6 +34,7 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
           color={COLORS.yellow2}
           width="45px"
           marginRight={SPACING.spacing12}
+          aria-label="alert-circle_icon"
         />
         <StyledText as="p">
           <Trans

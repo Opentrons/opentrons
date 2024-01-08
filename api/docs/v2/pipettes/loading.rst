@@ -64,20 +64,20 @@ This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-C
 
     from opentrons import protocol_api
     
-    requirements = {'robotType': 'Flex', 'apiLevel':'|apiLevel|'}
+    requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_1000ul', location='D1')
+            load_name="opentrons_flex_96_tiprack_1000ul", location="D1")
         tiprack2 = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_1000ul', location='C1')       
+            load_name="opentrons_flex_96_tiprack_1000ul", location="C1")       
         left = protocol.load_instrument(
-            instrument_name='flex_1channel_1000',
-            mount='left',
+            instrument_name="flex_1channel_1000",
+            mount="left",
             tip_racks=[tiprack1])                
         right = protocol.load_instrument(
-            instrument_name='flex_8channel_1000',
-            mount='right',
+            instrument_name="flex_8channel_1000",
+            mount="right",
             tip_racks=[tiprack2]) 
 
 If you're writing a protocol that uses the Flex Gripper, you might think that this would be the place in your protocol to declare that. However, the gripper doesn't require ``load_instrument``! Whether your gripper requires a protocol is determined by the presence of :py:meth:`.ProtocolContext.move_labware` commands. See :ref:`moving-labware` for more details.
@@ -91,10 +91,10 @@ This code sample loads the Flex 96-Channel Pipette. Because of its size, the Fle
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument(
-            instrument_name='flex_96channel_1000'
+            instrument_name="flex_96channel_1000"
         )
 
-In protocols specifying API version 2.15, also include ``mount='left'`` as a parameter of ``load_instrument()``.
+In protocols specifying API version 2.15, also include ``mount="left"`` as a parameter of ``load_instrument()``.
 
 .. versionadded:: 2.15
 .. versionchanged:: 2.16
@@ -110,20 +110,20 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {"apiLevel": "|apiLevel|"}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack1 = protocol.load_labware(
-            load_name='opentrons_96_tiprack_1000ul', location=1)
+            load_name="opentrons_96_tiprack_1000ul", location=1)
         tiprack2 = protocol.load_labware(
-            load_name='opentrons_96_tiprack_1000ul', location=2)
+            load_name="opentrons_96_tiprack_1000ul", location=2)
         left = protocol.load_instrument(
-            instrument_name='p1000_single_gen2',
-            mount='left',
+            instrument_name="p1000_single_gen2",
+            mount="left",
             tip_racks=[tiprack1])
         right = protocol.load_instrument(
-            instrument_name='p300_multi_gen2',
-            mount='right',
+            instrument_name="p300_multi_gen2",
+            mount="right",
             tip_racks=[tiprack1])
 
 .. versionadded:: 2.0
@@ -142,28 +142,28 @@ The advantage of using ``tip_racks`` is twofold. First, associating tip racks wi
         
     def run(protocol: protocol_api.ProtocolContext):
         tiprack_left = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_200ul', location='D1')
+            load_name="opentrons_flex_96_tiprack_200ul", location="D1")
         tiprack_right = protocol.load_labware(
-            load_name='opentrons_flex_96_tiprack_200ul', location='D2')
+            load_name="opentrons_flex_96_tiprack_200ul", location="D2")
         left_pipette = protocol.load_instrument(
-            instrument_name='flex_8channel_1000', mount='left')
+            instrument_name="flex_8channel_1000", mount="left")
         right_pipette = protocol.load_instrument(
-            instrument_name='flex_8channel_1000',
-            mount='right',
+            instrument_name="flex_8channel_1000",
+            mount="right",
             tip_racks=[tiprack_right])
 
 Let's pick up a tip with the left pipette. We need to specify the location as an argument of ``pick_up_tip()``, since we loaded the left pipette without a ``tip_racks`` argument.
 
 .. code-block:: python
 
-    left_pipette.pick_up_tip(tiprack_left['A1'])
+    left_pipette.pick_up_tip(tiprack_left["A1"])
     left_pipette.drop_tip()
 
 But now you have to specify ``tiprack_left`` every time you call ``pick_up_tip``, which means you're doing all your own tip tracking::
 
-    left_pipette.pick_up_tip(tiprack_left['A2'])
+    left_pipette.pick_up_tip(tiprack_left["A2"])
     left_pipette.drop_tip()
-    left_pipette.pick_up_tip(tiprack_left['A3'])
+    left_pipette.pick_up_tip(tiprack_left["A3"])
     left_pipette.drop_tip()
 
 However, because you specified a tip rack location for the right pipette, the robot will automatically pick up from location ``A1`` of its associated tiprack::
@@ -192,13 +192,13 @@ The API automatically assigns a :py:obj:`.trash_container` to pipettes, if one i
 One example of when you might want to change the trash container is a Flex protocol that goes through a lot of tips. In a case where the protocol uses two pipettes, you could load two trash bins and assign one to each pipette::
 
     left_pipette = protocol.load_instrument(
-        instrument_name='flex_8channel_1000', mount='left'
+        instrument_name="flex_8channel_1000", mount="left"
     )
     right_pipette = protocol.load_instrument(
-        instrument_name='flex_8channel_50', mount='right'
+        instrument_name="flex_8channel_50", mount="right"
     )
-    left_trash = load_trash_bin('A3')
-    right_trash = load_trash_bin('B3')
+    left_trash = load_trash_bin("A3")
+    right_trash = load_trash_bin("B3")
     left_pipette.trash_container = left_trash
     right_pipette.trash_container = right_trash
 

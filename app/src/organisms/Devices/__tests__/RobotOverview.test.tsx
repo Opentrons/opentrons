@@ -212,7 +212,7 @@ describe('RobotOverview', () => {
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
-  it('renders an OT-3 image', () => {
+  it('renders a Flex image', () => {
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
       .mockReturnValue('Opentrons Flex')

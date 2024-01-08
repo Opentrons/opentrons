@@ -93,7 +93,7 @@ describe('useCanDisconnect', () => {
     expect(result.current).toBe(false)
   })
 
-  it('useCanDisconnect returns true for an OT-3', () => {
+  it('useCanDisconnect returns true for a Flex', () => {
     when(useWifiList)
       .calledWith('otie')
       .mockReturnValue([{ ...mockWifiNetwork, active: true }])

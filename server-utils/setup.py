@@ -44,18 +44,18 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Common utilities for various Opentrons Python servers."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    "anyio==3.3.0",
+    "anyio==3.6.1",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",
     "python-multipart==0.0.5",
-    "pydantic==1.8.2",
+    "pydantic==1.9.2",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.14.0",
     "wsproto==1.0.0",
@@ -76,7 +76,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires=">=3.7",
+        python_requires="~=3.10",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
