@@ -25,6 +25,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -47,6 +48,7 @@ import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useChainLiveCommands } from '../../resources/runs/hooks'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
+import { useIsFlex } from '../../organisms/Devices/hooks'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
 import { useToaster } from '../ToasterOven'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -125,7 +127,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       }
     },
   })
-  const requireModuleCalibration = module.moduleOffset?.last_modified == null
+  const isFlex = useIsFlex(robotName)
+  const requireModuleCalibration =
+    isFlex &&
+    !MODULE_MODELS_OT2_ONLY.some(
+      module_model => module_model === module.moduleModel
+    ) &&
+    module.moduleOffset?.last_modified == null
   const isPipetteReady =
     (!attachPipetteRequired ?? false) &&
     (!calibratePipetteRequired ?? false) &&
