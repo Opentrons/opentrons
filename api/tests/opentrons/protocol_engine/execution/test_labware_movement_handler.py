@@ -177,7 +177,7 @@ def subject(
 
 
 @pytest.mark.ot3_only
-async def test_check_labware_pickup(
+async def test_raise_error_if_gripper_pickup_failed(
     decoy: Decoy,
     state_store: StateStore,
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
@@ -226,7 +226,7 @@ async def test_check_labware_pickup(
         )
     ).then_return(Point(201, 202, 219.5))
 
-    decoy.when(ot3_hardware_api.hardware_gripper.check_labware_pickup(85)).then_return()
+    decoy.when(ot3_hardware_api.raise_error_if_gripper_pickup_failed(85)).then_return()
 
     await subject.move_labware_with_gripper(
         labware_id="my-teleporting-labware",
@@ -242,11 +242,11 @@ async def test_check_labware_pickup(
         await ot3_hardware_api.grip(force_newtons=100),
         await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.grip(force_newtons=100),
-        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        ot3_hardware_api.raise_error_if_gripper_pickup_failed(labware_width=85),
         await ot3_hardware_api.grip(force_newtons=100),
-        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        ot3_hardware_api.raise_error_if_gripper_pickup_failed(labware_width=85),
         await ot3_hardware_api.grip(force_newtons=100),
-        ot3_hardware_api.hardware_gripper.check_labware_pickup(labware_width=85),
+        ot3_hardware_api.raise_error_if_gripper_pickup_failed(labware_width=85),
         await ot3_hardware_api.disengage_axes([Axis.Z_G]),
         await ot3_hardware_api.ungrip(),
         await ot3_hardware_api.ungrip(),
