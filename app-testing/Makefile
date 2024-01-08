@@ -39,7 +39,7 @@ test-protocol-analysis:
 	pipenv run python -m pytest -v tests/protocol_analyze_test.py
 
 .PHONY: setup
-setup:
+setup: install-pipenv
 	$(MAKE) install-pipenv
 	python -m pipenv install
 
