@@ -1,30 +1,33 @@
+import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
 import type {
   CompletedProtocolAnalysis,
   LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { getWellFillFromLabwareId } from './getWellFillFromLabwareId'
-import type { LabwareOnDeck } from '../../BaseDeck'
-import { getLabwareInfoByLiquidId } from './getLabwareInfoByLiquidId'
-import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
 
-export const getLabwareOnDeck = (
+interface LabwareInSlot {
+  labwareId: string
+  labwareDef: LabwareDefinition2
+  labwareNickName: string | null
+  location: { slotName: string }
+}
+
+export const getTopMostLabwareInSlots = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
-): LabwareOnDeck[] => {
-  const { commands, liquids } = protocolAnalysis
+): LabwareInSlot[] => {
+  const { commands } = protocolAnalysis
   const initialLoadedLabwareByAdapter = getInitialLoadedLabwareByAdapter(
     commands
   )
-  const labwareByLiquidId = getLabwareInfoByLiquidId(commands)
   return commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
         command.commandType === 'loadLabware'
     )
-    .reduce<LabwareOnDeck[]>((acc, command) => {
+    .reduce<LabwareInSlot[]>((acc, command) => {
       const labwareId = command.result?.labwareId
       const location = command.params.location
-      const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
       if (
         location === 'offDeck' ||
@@ -52,24 +55,23 @@ export const getLabwareOnDeck = (
 
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
 
-      //  NOTE: only rendering the labware on top most layer so
-      //  either the adapter or the labware are rendered but not both
+      //  NOTE: only grabbing the labware on top most layer so
+      //  either the adapter or the labware but not both
       const topLabwareDefinition =
         labwareInAdapter?.result?.definition ?? labwareDef
       const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
+      const topLabwareNickName =
+        labwareInAdapter?.params?.displayName ??
+        command.params.displayName ??
+        null
 
-      const wellFill = getWellFillFromLabwareId(
-        topLabwareId ?? '',
-        liquids,
-        labwareByLiquidId
-      )
       return [
         ...acc,
         {
-          labwareLocation: { slotName },
-          definition: topLabwareDefinition,
-          wellFill: wellFill,
-          displayName: displayName,
+          labwareId: topLabwareId,
+          labwareDef: topLabwareDefinition,
+          labwareNickName: topLabwareNickName,
+          location: { slotName },
         },
       ]
     }, [])
