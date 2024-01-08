@@ -60,6 +60,5 @@ it('should render form-level alerts when form-level errors are present', () => {
   formikConfig.initialErrors = { [FORM_LEVEL_ERRORS]: { FAKE_ERROR } }
   render(wrapInFormik(<Preview />, formikConfig))
 
-  // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
-  screen.getByText(FAKE_ERROR)
+  screen.getByRole('alert')
 })

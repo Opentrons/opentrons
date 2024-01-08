@@ -63,8 +63,7 @@ describe('Export', () => {
     formikConfig.initialTouched = { pipetteName: true }
     render(wrapInFormik(<Export onExportClick={onExportClick} />, formikConfig))
 
-    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
-    screen.getByText(FAKE_ERROR)
+    screen.getByRole('alert', {name: FAKE_ERROR})
   })
 
   it('should render the tip rack button when tip rack is selected', () => {

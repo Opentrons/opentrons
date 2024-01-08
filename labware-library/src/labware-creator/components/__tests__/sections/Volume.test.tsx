@@ -95,8 +95,7 @@ describe('Volume', () => {
     formikConfig.initialTouched = { wellVolume: true }
     render(wrapInFormik(<Volume />, formikConfig))
 
-    // TODO(IL, 2021-05-26): AlertItem should have role="alert", then we can `getByRole('alert', {name: FAKE_ERROR})`
-    screen.getByText(FAKE_ERROR)
+    screen.getByRole('alert')
   })
 
   it('should not render when all fields are hidden', () => {

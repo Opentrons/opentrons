@@ -65,7 +65,7 @@ export function AlertItem(props: AlertItemProps): JSX.Element {
   }
 
   return (
-    <div className={className}>
+    <div className={className} role="alert">
       <div className={styles.title_bar}>
         <Icon {...iconProps} />
         <span className={styles.title} data-testid="alert_item_title">
