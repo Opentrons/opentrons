@@ -216,6 +216,12 @@ Once you've confirmed you're running the correct versions of Node.js and Python,
 npm install --global yarn@1
 ```
 
+If you are using [Corepack][], you can install `yarn` via `corepack`.
+
+```shell
+corepack enable
+```
+
 Finally, you need to download and install all of our various development dependencies. **This step will take several minutes** the first time you run it!
 
 ```shell
@@ -236,3 +242,4 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv
 [contributing guide]: ./CONTRIBUTING.md
+[corepack]: https://github.com/nodejs/corepack
