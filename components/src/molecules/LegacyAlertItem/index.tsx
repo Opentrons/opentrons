@@ -1,14 +1,14 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon } from '../icons'
-import { IconButton } from '../buttons'
-import styles from './alerts.css'
+import { Icon } from '../../icons'
+import { IconButton } from '../../buttons'
+import styles from './LegacyAlertItem.css'
 
-import type { IconProps } from '../icons'
+import type { IconProps } from '../../icons'
 
 export type AlertType = 'success' | 'warning' | 'error' | 'info'
 
-export interface AlertItemProps {
+export interface LegacyAlertItemProps {
   /** name constant of the icon to display */
   type: AlertType
   /** title/main message of colored alert bar */
@@ -54,7 +54,7 @@ const ALERT_PROPS_BY_TYPE: Record<
  * @deprecated Use 'Banner' instead
  */
 
-export function AlertItem(props: AlertItemProps): JSX.Element {
+export function LegacyAlertItem(props: LegacyAlertItemProps): JSX.Element {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
   const icon = props.icon ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)

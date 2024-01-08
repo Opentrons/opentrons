@@ -4,7 +4,6 @@ export * from './hooks'
 export * from './utils'
 
 // Components
-export * from './alerts'
 export * from './buttons'
 export * from './controls'
 export * from './hardware-sim'
@@ -34,8 +33,8 @@ export * from './robot-types'
 // testing utilities
 export * from './testing/utils'
 
-//  Molecules
-export * from './molecules'
-
 // Atoms
 export * from './atoms'
+
+//  Molecules
+export * from './molecules'

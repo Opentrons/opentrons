@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { FormikTouched } from 'formik'
-import { AlertItem } from '@opentrons/components'
+import { LegacyAlertItem } from '@opentrons/components'
 import {
   SUGGESTED_X,
   SUGGESTED_Y,
@@ -36,6 +36,6 @@ export const XYDimensionAlerts = (props: Props): JSX.Element | null => {
     Math.abs(yAsNum - SUGGESTED_Y) > SUGGESTED_XY_RANGE
 
   return showXInfo || showYInfo ? (
-    <AlertItem type="info" title={xyMessage} />
+    <LegacyAlertItem type="info" title={xyMessage} />
   ) : null
 }

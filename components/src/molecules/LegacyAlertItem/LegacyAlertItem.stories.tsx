@@ -1,16 +1,16 @@
 import * as React from 'react'
-import { AlertItem } from './AlertItem'
+import { LegacyAlertItem } from './LegacyAlertItem'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Molecules/AlertItem',
-  component: AlertItem,
+  title: 'Library/Molecules/LegacyAlertItem',
+  component: LegacyAlertItem,
   argTypes: { onCloseClick: { action: 'clicked' } },
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof AlertItem>> = args => (
-  <AlertItem {...args} />
+const Template: Story<React.ComponentProps<typeof LegacyAlertItem>> = args => (
+  <LegacyAlertItem {...args} />
 )
 
 export const Basic = Template.bind({})
@@ -27,7 +27,7 @@ OverriddenIcon.args = {
 }
 
 export const Stackable: Story<
-  React.ComponentProps<typeof AlertItem>
+  React.ComponentProps<typeof LegacyAlertItem>
 > = args => (
   <div>
     <Template {...args} type="warning" title={'Warning with close button'} />

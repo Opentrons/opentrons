@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AlertItem } from '@opentrons/components'
+import { LegacyAlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
 interface Props {
@@ -14,7 +14,7 @@ export function ConfigErrorBanner(props: Props): JSX.Element | null {
   if (message == null || dismissed) return null
 
   return (
-    <AlertItem
+    <LegacyAlertItem
       type="warning"
       onCloseClick={() => setDismissed(true)}
       title={TITLE}
@@ -26,6 +26,6 @@ export function ConfigErrorBanner(props: Props): JSX.Element | null {
         <strong>ERROR: {message}</strong>
       </p>
       <p className={styles.config_submit_error}>Please contact support.</p>
-    </AlertItem>
+    </LegacyAlertItem>
   )
 }

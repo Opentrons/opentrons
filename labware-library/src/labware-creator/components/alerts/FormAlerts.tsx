@@ -1,7 +1,7 @@
 import * as React from 'react'
 import toPairs from 'lodash/toPairs'
 import pick from 'lodash/pick'
-import { AlertItem } from '@opentrons/components'
+import { LegacyAlertItem } from '@opentrons/components'
 import {
   getLabel,
   LabwareFields,
@@ -25,7 +25,7 @@ export interface Props {
 }
 
 export const IrregularLabwareAlert = (): JSX.Element => (
-  <AlertItem
+  <LegacyAlertItem
     type="error"
     title={
       <>
@@ -38,7 +38,7 @@ export const IrregularLabwareAlert = (): JSX.Element => (
 )
 
 export const LabwareTooSmallAlert = (): JSX.Element => (
-  <AlertItem
+  <LegacyAlertItem
     type="error"
     title={
       <>
@@ -51,7 +51,7 @@ export const LabwareTooSmallAlert = (): JSX.Element => (
 )
 
 export const LabwareTooLargeAlert = (): JSX.Element => (
-  <AlertItem
+  <LegacyAlertItem
     type="error"
     title={
       <>
@@ -64,7 +64,7 @@ export const LabwareTooLargeAlert = (): JSX.Element => (
 )
 
 export const LooseTipFitAlert = (): JSX.Element => (
-  <AlertItem
+  <LegacyAlertItem
     type="error"
     title={
       <>
@@ -103,16 +103,16 @@ export const FormAlerts = (props: Props): JSX.Element | null => {
         // should use the dynamic label from getLabel.
         if (error === MUST_BE_A_NUMBER_ERROR) {
           const message = `${getLabel(name, values)} must be a number`
-          return <AlertItem key={message} type="warning" title={message} />
+          return <LegacyAlertItem key={message} type="warning" title={message} />
         }
         if (error === REQUIRED_FIELD_ERROR) {
           const message = `${getLabel(name, values)} is a required field`
-          return <AlertItem key={message} type="warning" title={message} />
+          return <LegacyAlertItem key={message} type="warning" title={message} />
         }
 
         // TODO(IL, 2021-07-22): is there actually any cases
         // where the error could be falsey here?
-        if (error) return <AlertItem key={error} type="warning" title={error} />
+        if (error) return <LegacyAlertItem key={error} type="warning" title={error} />
         return null
       })}
     </>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AlertItem } from '@opentrons/components'
+import { LegacyAlertItem } from '@opentrons/components'
 import { LabwareCreatorErrors, FORM_LEVEL_ERRORS } from '../formLevelValidation'
 
 export const FormLevelErrorAlerts = (props: {
@@ -12,7 +12,7 @@ export const FormLevelErrorAlerts = (props: {
     return (
       <>
         {errorTypesAndErrors.map(([errorType, errorMessage]) => (
-          <AlertItem type="error" title={errorMessage} key={errorType} />
+          <LegacyAlertItem type="error" title={errorMessage} key={errorType} />
         ))}
       </>
     )
