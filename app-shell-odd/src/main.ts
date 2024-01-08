@@ -1,5 +1,5 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
+import { app, ipcMain, crashReporter } from 'electron'
 import fse from 'fs-extra'
 import path from 'path'
 import { createUi } from './ui'
@@ -26,7 +26,12 @@ import { watchForMassStorage } from './usb'
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
 
-systemd.sendStatus('starting app')
+// app.setPath('crashDumps', '/data/ODD')
+// crashReporter.start({
+//   uploadToServer: false,
+// })
+// eslint-disable-next-line no-void
+void systemd.sendStatus('starting app')
 const config = getConfig()
 const log = createLogger('main')
 
@@ -36,7 +41,8 @@ log.debug('App config', {
   overrides: getOverrides(),
 })
 
-systemd.setRemoteDevToolsEnabled(config.devtools)
+// eslint-disable-next-line no-void
+void systemd.setRemoteDevToolsEnabled(config.devtools)
 
 // hold on to references so they don't get garbage collected
 let mainWindow: BrowserWindow | null | undefined
@@ -63,7 +69,8 @@ function startUp(): void {
     resetStore()
     fse.removeSync(path.join(ODD_DIR, `_CONFIG_TO_BE_DELETED_ON_REBOOT`))
   }
-  systemd.sendStatus('loading app')
+  // eslint-disable-next-line no-void
+  void systemd.sendStatus('loading app')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
@@ -71,10 +78,13 @@ function startUp(): void {
   log.info('before dispatch')
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
+    log.info('inside dispatch')
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (mainWindow) {
       log.silly('Sending action via IPC to renderer', { action })
+      log.info('before send', action)
       mainWindow.webContents.send('dispatch', action)
+      log.info('after send')
     }
   }
   log.info('Before createUI')
@@ -109,8 +119,13 @@ function startUp(): void {
 
   ipcMain.once('dispatch', () => {
     log.info('systemd dispatch start')
-    systemd.sendStatus('started')
-    systemd.ready()
+    log.info('before calling systemd.sendStatus')
+    // eslint-disable-next-line no-void
+    void systemd.sendStatus('started')
+    log.info('before calling systemd.ready')
+    // eslint-disable-next-line no-void
+    void systemd.ready()
+    log.info('before calling watchForMassStorage')
     const stopWatching = watchForMassStorage(dispatch)
     ipcMain.once('quit', stopWatching)
     log.info('systemd dispatch end')

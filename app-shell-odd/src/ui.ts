@@ -24,18 +24,22 @@ const WINDOW_OPTS = {
   width: config.width,
   minWidth: config.minWidth,
   height: config.height,
+  paintWhenInitiallyHidden: true,
   frame: false, // hide menubar
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {
       // NOTE: __dirname refers to output directory
       preload: path.join(__dirname, './preload.js'),
-      nodeIntegration: false,
+      nodeIntegration: true,
       // TODO: remove this by using electron contextBridge to specify
       // exact, argument-sanitation-involved methods instead of just
       // binding the entire ipcRenderer in. This is necessary because
       // as of electron 12, contextIsolation defaults to true.
       contextIsolation: false,
+      webSecurity: false,
+      sandbox: false,
+      allowRunningInsecureContent: true,
     },
     config.webPreferences
   ),
@@ -45,28 +49,72 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('dispatch', dispatch)
   log.info('hello')
   log.debug('Creating main window', { options: WINDOW_OPTS })
+  log.info('before ready-to-show')
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
     'ready-to-show',
     () => {
       log.debug('Main window ready to show')
+      log.info('before show')
       mainWindow.show()
+      log.info('after show')
       process.env.NODE_ENV !== 'development' &&
         waitForRobotServerAndShowMainWIndow(dispatch)
     }
   )
+  log.info('after ready-to-show')
+
+  // test
+  mainWindow.webContents.on('will-navigate', () => {
+    log.info('will-navigate')
+  })
+
+  mainWindow.webContents.on('did-fail-load', () => {
+    log.info('did-fail-load')
+  })
+
+  mainWindow.webContents.on('did-fail-load', () => {
+    log.info('did-fail-load')
+  })
+
+  mainWindow.webContents.on('dom-ready', () => {
+    log.info('dom-ready')
+  })
+
+  mainWindow.webContents.on('did-create-window', () => {
+    log.info('did-create-window')
+  })
+
+  mainWindow.webContents.on('unresponsive', () => {
+    log.info('unresponsive')
+    mainWindow.webContents.reload()
+  })
+
+  mainWindow.webContents.on('did-attach-webview', () => {
+    log.info('did-attach-webview')
+  })
+
+  log.info('isCrashed', mainWindow.webContents.isCrashed())
+
+  log.info('mainWindow', mainWindow)
 
   log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
-
+  mainWindow
+    .loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
+    .then(() => log.info('loadURL is fine'))
+    .catch((e: any) => log.info('load url error', e))
   // open new windows (<a target="_blank" ...) in browser windows
   mainWindow.webContents.setWindowOpenHandler(({ url, disposition }) => {
+    log.info('setWindowOpenHandler')
     if (disposition === 'new-window' && url === 'about:blank') {
-      shell.openExternal(url)
+      // eslint-disable-next-line no-void
+      void shell.openExternal(url)
       return { action: 'deny' }
     } else {
-      return { action: 'allow' }
+      return {
+        action: 'allow',
+      }
     }
   })
 

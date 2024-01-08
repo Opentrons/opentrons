@@ -31,7 +31,7 @@ export const DEFAULTS_V12: ConfigV12 = {
     width: 1024,
     height: 600,
     url: { protocol: 'file:', path: 'ui/index.html' },
-    webPreferences: { webSecurity: true },
+    webPreferences: { webSecurity: false },
     minWidth: 600,
   },
   analytics: {
