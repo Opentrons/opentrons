@@ -46,8 +46,6 @@ export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition2
   wellFill?: WellFill
-  /** user defined name for this instance of the labware */
-  displayName?: string | null
   /** generic prop to render self-positioned children for each labware */
   labwareChildren?: React.ReactNode
   onLabwareClick?: () => void
@@ -58,8 +56,6 @@ export interface ModuleOnDeck {
   moduleLocation: ModuleLocation
   nestedLabwareDef?: LabwareDefinition2 | null
   nestedLabwareWellFill?: WellFill
-  /** user defined name for this instance of the nested labware */
-  nestedLabwareDisplayName?: string | null
   innerProps?: React.ComponentProps<typeof Module>['innerProps']
   /** generic prop to render self-positioned children for each module */
   moduleChildren?: React.ReactNode
@@ -235,7 +231,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               moduleLocation.slotName,
               deckDef
             )
-
             const moduleDef = getModuleDef2(moduleModel)
             return slotPosition != null ? (
               <Module

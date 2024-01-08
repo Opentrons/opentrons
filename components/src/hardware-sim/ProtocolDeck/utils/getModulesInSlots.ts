@@ -2,8 +2,6 @@ import {
   SPAN7_8_10_11_SLOT,
   getModuleDef2,
   getLoadedLabwareDefinitionsByUri,
-  getModuleType,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
   CompletedProtocolAnalysis,
@@ -12,23 +10,27 @@ import type {
   LoadModuleRunTimeCommand,
   RunTimeCommand,
   ModuleLocation,
+  ModuleModel,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
-import { getWellFillFromLabwareId } from './getWellFillFromLabwareId'
-import { getLabwareInfoByLiquidId } from './getLabwareInfoByLiquidId'
 import { getInitialLoadedLabwareByAdapter } from './getInitiallyLoadedLabwareByAdapter'
 
-import type { ModuleOnDeck } from '../../BaseDeck'
-
-export const getModulesOnDeck = (
+interface ModuleInSlot {
+  moduleModel: ModuleModel
+  moduleLocation: ModuleLocation
+  nestedLabwareId: string | null
+  nestedLabwareDef: LabwareDefinition2 | null
+  nestedLabwareNickName: string | null
+}
+export const getModulesInSlots = (
   protocolAnalysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
-): ModuleOnDeck[] => {
+): ModuleInSlot[] => {
   if (protocolAnalysis != null && 'modules' in protocolAnalysis) {
-    const { commands, modules, labware, liquids } = protocolAnalysis
+    const { commands, modules, labware } = protocolAnalysis
     const initialLoadedLabwareByAdapter = getInitialLoadedLabwareByAdapter(
       commands
     )
-    const labwareByLiquidId = getLabwareInfoByLiquidId(commands)
-    return modules.reduce<ModuleOnDeck[]>((acc, module) => {
+    return modules.reduce<ModuleInSlot[]>((acc, module) => {
       const moduleDef = getModuleDef2(module.model)
       const nestedLabwareId =
         commands
@@ -74,23 +76,14 @@ export const getModulesOnDeck = (
         labwareInAdapterInMod != null
           ? labwareInAdapterInMod.params.displayName?.toString() ?? null
           : nestedLabware?.displayName?.toString() ?? null
-      const nestedLabwareWellFill = getWellFillFromLabwareId(
-        topLabwareId ?? '',
-        liquids,
-        labwareByLiquidId
-      )
       return [
         ...acc,
         {
           moduleModel: moduleDef.model,
           moduleLocation: { slotName },
-          nestedLabwareWellFill,
-          innerProps:
-            getModuleType(moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-              ? { lidMotorState: 'open' }
-              : {},
+          nestedLabwareId: topLabwareId,
           nestedLabwareDef: topLabwareDefinition,
-          nestedLabwareDisplayName: topLabwareDisplayName,
+          nestedLabwareNickName: topLabwareDisplayName,
         },
       ]
     }, [])

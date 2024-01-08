@@ -93,6 +93,7 @@ class Well:
     @property
     @requires_version(2, 0)
     def parent(self) -> Labware:
+        """The :py:class:`.Labware` object that the well is a part of."""
         return self._parent
 
     @property
@@ -113,6 +114,10 @@ class Well:
 
     @property
     def max_volume(self) -> float:
+        """The maximum volume, in µL, that the well can hold.
+
+        This amount is set by the JSON labware definition, specifically the ``totalLiquidVolume`` property of the particular well.
+        """
         return self._core.get_max_volume()
 
     @property
@@ -159,11 +164,24 @@ class Well:
 
     @property
     def display_name(self) -> str:
+        """A human-readable name for the well, including labware and deck location.
+
+        For example, "A1 of Corning 96 Well Plate 360 µL Flat on slot D1". Run log
+        entries use this format for identifying wells. See
+        :py:meth:`.ProtocolContext.commands`.
+        """
         return self._core.get_display_name()
 
     @property
     @requires_version(2, 7)
     def well_name(self) -> str:
+        """A string representing the well's coordinates.
+
+        For example, "A1" or "H12".
+
+        The format of strings that this property returns is the same format as the key
+        for :ref:`accessing wells in a dictionary <well-dictionary-access>`.
+        """
         return self._core.get_name()
 
     @requires_version(2, 0)

@@ -36,6 +36,7 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
+    FailedGripperPickupError,
 )
 
 from opentrons import types as top_types
@@ -1322,6 +1323,24 @@ class OT3API(
                 )
         except GripperNotPresentError:
             pass
+
+    def raise_error_if_gripper_pickup_failed(self, labware_width: float) -> None:
+        """Ensure that a gripper pickup succeeded."""
+        # check if the gripper is at an acceptable position after attempting to
+        #  pick up labware
+        assert self.hardware_gripper
+        expected_gripper_position = labware_width
+        current_gripper_position = self.hardware_gripper.jaw_width
+        if (
+            abs(current_gripper_position - expected_gripper_position)
+            > self.hardware_gripper.max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                details={
+                    "expected jaw width": expected_gripper_position,
+                    "actual jaw width": current_gripper_position,
+                },
+            )
 
     def gripper_jaw_can_home(self) -> bool:
         return self._gripper_handler.is_ready_for_jaw_home()
