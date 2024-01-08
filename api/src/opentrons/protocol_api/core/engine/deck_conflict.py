@@ -57,8 +57,12 @@ A12_column_front_left_bound = Point(x=-11.03, y=2)
 A12_column_back_right_bound = Point(x=526.77, y=506.2)
 
 _NOZZLE_PITCH = 9
-A1_column_front_left_bound = Point(x=A12_column_front_left_bound.x - _NOZZLE_PITCH * 11, y=2)
-A1_column_back_right_bound = Point(x=A12_column_back_right_bound.x - _NOZZLE_PITCH * 11, y=506.2)
+A1_column_front_left_bound = Point(
+    x=A12_column_front_left_bound.x - _NOZZLE_PITCH * 11, y=2
+)
+A1_column_back_right_bound = Point(
+    x=A12_column_back_right_bound.x - _NOZZLE_PITCH * 11, y=506.2
+)
 
 # Arbitrary safety margin in z-direction
 Z_SAFETY_MARGIN = 10
