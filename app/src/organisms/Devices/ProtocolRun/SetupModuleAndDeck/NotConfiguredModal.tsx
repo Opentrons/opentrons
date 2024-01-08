@@ -50,13 +50,9 @@ export const NotConfiguredModal = (
   return (
     <Portal level="top">
       <LegacyModal
-        title={
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {t('add_fixture', {
-              fixtureName: getFixtureDisplayName(requiredFixtureId),
-            })}
-          </StyledText>
-        }
+        title={t('add_fixture', {
+          fixtureName: getFixtureDisplayName(requiredFixtureId),
+        })}
         onClose={onCloseClick}
         width="27.75rem"
       >
@@ -74,7 +70,7 @@ export const NotConfiguredModal = (
                 {getFixtureDisplayName(requiredFixtureId)}
               </StyledText>
               <TertiaryButton onClick={handleUpdateDeck}>
-                {i18n.format(t('add'), 'capitalize')}
+                {i18n.format(t('shared:add'), 'capitalize')}
               </TertiaryButton>
             </Flex>
           </Flex>

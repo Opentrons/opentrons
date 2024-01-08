@@ -11,6 +11,8 @@ on:
       - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
+      - '.github/actions/webstack/deploy-to-sandbox/**'
+      - '.github/workflows/utils.js'
   push:
     paths:
       - 'labware-library/**'

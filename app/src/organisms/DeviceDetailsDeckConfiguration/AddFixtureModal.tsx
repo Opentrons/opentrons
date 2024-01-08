@@ -71,7 +71,7 @@ export function AddFixtureModal({
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
-    hasExitIcon: true,
+    hasExitIcon: providedFixtureOptions == null,
     onClick: () => setShowAddFixtureModal(false),
   }
 
@@ -109,15 +109,18 @@ export function AddFixtureModal({
     [CutoutFixtureId | 'WASTE_CHUTE', string]
   > = fixtureOptions.map(fixture => [fixture, getFixtureDisplayName(fixture)])
 
-  const showSelectWasteChuteOptions = cutoutId === WASTE_CHUTE_CUTOUT
-  if (showSelectWasteChuteOptions) {
-    fixtureOptionsWithDisplayNames.push([
-      GENERIC_WASTE_CHUTE_OPTION,
-      t('waste_chute'),
-    ])
-  }
+  const showSelectWasteChuteOptions =
+    cutoutId === WASTE_CHUTE_CUTOUT && providedFixtureOptions == null
 
-  fixtureOptionsWithDisplayNames.sort((a, b) => a[1].localeCompare(b[1]))
+  const fixtureOptionsWithDisplayNamesAndGenericWasteChute = fixtureOptionsWithDisplayNames.concat(
+    showSelectWasteChuteOptions
+      ? [[GENERIC_WASTE_CHUTE_OPTION, t('waste_chute')]]
+      : []
+  )
+
+  fixtureOptionsWithDisplayNamesAndGenericWasteChute.sort((a, b) =>
+    a[1].localeCompare(b[1])
+  )
 
   const wasteChuteOptionsWithDisplayNames = WASTE_CHUTE_FIXTURES.map(
     fixture => [fixture, getFixtureDisplayName(fixture)]
@@ -125,7 +128,7 @@ export function AddFixtureModal({
 
   const displayedFixtureOptions = showWasteChuteOptions
     ? wasteChuteOptionsWithDisplayNames
-    : fixtureOptionsWithDisplayNames
+    : fixtureOptionsWithDisplayNamesAndGenericWasteChute
 
   const handleAddDesktop = (requiredFixtureId: CutoutFixtureId): void => {
     const newDeckConfig = deckConfig.map(fixture =>
@@ -143,7 +146,11 @@ export function AddFixtureModal({
       {isOnDevice ? (
         <Modal
           header={modalHeader}
-          onOutsideClick={() => setShowAddFixtureModal(false)}
+          onOutsideClick={() =>
+            providedFixtureOptions != null
+              ? null
+              : setShowAddFixtureModal(false)
+          }
         >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>

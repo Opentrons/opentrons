@@ -61,7 +61,7 @@ describe('Privacy', () => {
 
   it('should toggle robot logs sharing on click', () => {
     render(props)
-    screen.getByText('Share robot logs').click()
+    fireEvent.click(screen.getByText('Share robot logs'))
     expect(mockUpdateSetting).toBeCalledWith(
       'Otie',
       'disableLogAggregation',

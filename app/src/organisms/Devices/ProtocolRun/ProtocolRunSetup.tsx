@@ -182,7 +182,7 @@ export function ProtocolRunSetup({
           calibrationStatus={calibrationStatusRobot}
         />
       ),
-      // change description for OT-3
+      // change description for Flex
       description: isFlex
         ? t(`${ROBOT_CALIBRATION_STEP_KEY}_description_pipettes_only`)
         : t(`${ROBOT_CALIBRATION_STEP_KEY}_description`),

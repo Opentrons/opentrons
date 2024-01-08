@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { PipetteRecalibrationODDWarning } from '../../pages/InstrumentsDashboard/PipetteRealibrationODDWarning'
+import { PipetteRecalibrationODDWarning } from '../../pages/InstrumentsDashboard/PipetteRecalibrationODDWarning'
 import { getShowPipetteCalibrationWarning } from '../Devices/utils'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'

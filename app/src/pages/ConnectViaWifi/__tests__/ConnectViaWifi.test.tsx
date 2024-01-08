@@ -117,7 +117,7 @@ describe('ConnectViaWifi', () => {
     render()
     fireEvent.click(screen.getByRole('button', { name: 'foo' }))
     fireEvent.click(screen.getByText('Continue'))
-    screen.getByText('Connect').click()
+    fireEvent.click(screen.getByText('Connect'))
   })
 
   /* 
