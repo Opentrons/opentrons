@@ -64,7 +64,16 @@ export function FixtureTable({
     deckConfigCompatibility
   )
 
-  return requiredDeckConfigCompatibility.length > 0 ? (
+  // list not configured/conflicted fixtures first
+  const sortedDeckConfigCompatibility = requiredDeckConfigCompatibility.sort(
+    a =>
+      a.cutoutFixtureId != null &&
+      a.compatibleCutoutFixtureIds.includes(a.cutoutFixtureId)
+        ? 1
+        : -1
+  )
+
+  return sortedDeckConfigCompatibility.length > 0 ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <Flex
         color={COLORS.darkBlack70}
@@ -78,7 +87,7 @@ export function FixtureTable({
         <StyledText flex="2 0 0">{t('location')}</StyledText>
         <StyledText flex="4 0 0"> {t('status')}</StyledText>
       </Flex>
-      {requiredDeckConfigCompatibility.map((fixtureCompatibility, index) => {
+      {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
         return (
           <FixtureTableItem
             key={`FixtureTableItem_${index}`}
