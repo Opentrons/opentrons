@@ -11,8 +11,9 @@ function checkCurrentAWSProfile() {
         )
       )
     } else {
+      const currentProfile = credentials.profile
       console.log(`Current AWS profile: ${credentials.profile}`)
-      resolve()
+      resolve(currentProfile)
     }
   })
 }

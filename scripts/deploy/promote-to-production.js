@@ -48,12 +48,12 @@ assert(projectDomain, USAGE)
 
 async function runPromoteToProduction() {
   try {
-    await checkCurrentAWSProfile()
+    const AWS_PROFILE = await checkCurrentAWSProfile()
     const confirmation = await promptUser('Is the AWS profile correct?')
 
     if (!confirmation) {
       console.log(
-        'Exiting script. Please configure the correct AWS profile and run the script again.'
+        `Exiting script. Please configure the correct AWS profile through the ${AWS_PROFILE} environment and run the script again.`
       )
       process.exit(0)
     }
