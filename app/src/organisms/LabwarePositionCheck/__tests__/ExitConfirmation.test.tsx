@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { ExitConfirmation } from '../ExitConfirmation'
@@ -35,9 +36,9 @@ describe('ExitConfirmation', () => {
   })
   it('should invoke callback props when ctas are clicked', () => {
     const { getByRole } = render(props)
-    getByRole('button', { name: 'Go back' }).click()
+    fireEvent.click(getByRole('button', { name: 'Go back' }))
     expect(props.onGoBack).toHaveBeenCalled()
-    getByRole('button', { name: 'Exit' }).click()
+    fireEvent.click(getByRole('button', { name: 'Exit' }))
     expect(props.onConfirmExit).toHaveBeenCalled()
   })
   it('should render correct copy for golden tip LPC', () => {

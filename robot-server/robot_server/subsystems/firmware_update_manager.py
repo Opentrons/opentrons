@@ -148,9 +148,7 @@ class _UpdateProcess:
         self._status_cache_lock = Lock()
         self._created_at = created_at
         self._update_id = update_id
-        # mypy thinks this is assignment to a method, which it is not. that means
-        # it's ok to assign this and it's also okay to not take a self argument
-        self._complete_callback = complete_callback  # type: ignore[assignment,misc]
+        self._complete_callback = complete_callback
 
     @property
     def status_cache(self) -> UpdateProgress:
@@ -206,9 +204,7 @@ class _UpdateProcess:
                 UpdateProgress(UpdateState.failed, last_progress, be)
             )
         finally:
-            # mypy continues to think this is a method but it is a function stored in an
-            # attribute and therefore does not need a self argument
-            await self._complete_callback()  # type: ignore[misc]
+            await self._complete_callback()
 
     def get_handle(self) -> "UpdateProcessHandle":
         """Get a public handle for the task that is usable elsewhere.

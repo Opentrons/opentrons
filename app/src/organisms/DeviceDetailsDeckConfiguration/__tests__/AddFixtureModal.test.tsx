@@ -70,6 +70,23 @@ describe('Touchscreen AddFixtureModal', () => {
     fireEvent.click(screen.getAllByText('Add')[0])
     expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
   })
+
+  it('when fixture options are provided, should only render those options', () => {
+    props = {
+      ...props,
+      providedFixtureOptions: ['trashBinAdapter'],
+    }
+    render(props)
+    screen.getByText('Add to slot D3')
+    screen.getByText(
+      'Choose a fixture below to add to your deck configuration. It will be referenced during protocol analysis.'
+    )
+    expect(screen.queryByText('Staging area slot')).toBeNull()
+    screen.getByText('Trash bin')
+    expect(screen.queryByText('Waste chute')).toBeNull()
+    expect(screen.getAllByText('Add').length).toBe(1)
+    expect(screen.queryByText('Select options')).toBeNull()
+  })
 })
 
 describe('Desktop AddFixtureModal', () => {

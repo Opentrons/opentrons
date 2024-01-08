@@ -22,19 +22,19 @@ This section demonstrates the options available for controlling tips
     '''
     from opentrons import labware, instruments, robot
 
-    tiprack = labware.load('opentrons_96_tiprack_300ul', '2')
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "2")
 
-    pipette = instruments.P300_Single(mount='left')
+    pipette = instruments.P300_Single(mount="left")
 
 
 Pick Up Tip
 ===========
 
-Before any liquid handling can be done, your pipette must have a tip on it. The command ``pick_up_tip()`` will move the pipette over to the specified tip, the press down into it to create a vacuum seal. The below example picks up the tip at location ``'A1'``.
+Before any liquid handling can be done, your pipette must have a tip on it. The command ``pick_up_tip()`` will move the pipette over to the specified tip, the press down into it to create a vacuum seal. The below example picks up the tip at location ``"A1"``.
 
 .. code-block:: python
 
-    pipette.pick_up_tip(tiprack.wells('A1'))
+    pipette.pick_up_tip(tiprack.wells("A1"))
 
 Drop Tip
 ===========
@@ -44,24 +44,24 @@ If no location is specified, it will go to the fixed trash location on the deck.
 
 .. code-block:: python
 
-    pipette.drop_tip(tiprack.wells('A1'))
+    pipette.drop_tip(tiprack.wells("A1"))
 
 Instead of returning a tip to the tip rack, we can also drop it in an alternative trash container besides the fixed trash on the deck.
 
 .. code-block:: python
 
-    trash = labware.load('trash-box', '1')
-    pipette.pick_up_tip(tiprack.wells('A2'))
+    trash = labware.load("trash-box", "1")
+    pipette.pick_up_tip(tiprack.wells("A2"))
     pipette.drop_tip(trash)
 
 Return Tip
 ===========
 
-When we need to return the tip to its originating location on the tip rack, we can simply call ``return_tip()``. The example below will automatically return the tip to ``'A3'`` on the tip rack.
+When we need to return the tip to its originating location on the tip rack, we can simply call ``return_tip()``. The example below will automatically return the tip to ``"A3"`` on the tip rack.
 
 .. code-block:: python
 
-    pipette.pick_up_tip(tiprack.wells('A3'))
+    pipette.pick_up_tip(tiprack.wells("A3"))
     pipette.return_tip()
 
 
@@ -80,9 +80,9 @@ If no location is specified, the pipette will move to the next available tip by 
     '''
     from opentrons import labware, instruments, robot
 
-    trash = labware.load('trash-box', '1')
-    tip_rack_1 = containers.load('opentrons_96_tiprack_300ul', '2')
-    tip_rack_2 = containers.load('opentrons_96_tiprack_300ul', '3')
+    trash = labware.load("trash-box", "1")
+    tip_rack_1 = containers.load("opentrons_96_tiprack_300ul", "2")
+    tip_rack_2 = containers.load("opentrons_96_tiprack_300ul", "3")
 
 Attach Tip Rack to Pipette
 --------------------------
@@ -95,7 +95,7 @@ Multiple tip racks are can be attached with the option ``tip_racks=[RACK_1, RACK
 
 .. code-block:: python
 
-    pipette = instruments.P300_Single(mount='left',
+    pipette = instruments.P300_Single(mount="left",
                                       tip_racks=[tip_rack_1, tip_rack_2],
                                       trash_container=trash)
 
@@ -147,18 +147,18 @@ If you plan to change out tipracks during the protocol run, you must reset tip t
 Select Starting Tip
 -------------------
 
-Calls to ``pick_up_tip()`` will by default start at the attached tip rack's ``'A1'`` location in order of tipracks listed. If you however want to start automatic tip iterating at a different tip, you can use ``start_at_tip()``.
+Calls to ``pick_up_tip()`` will by default start at the attached tip rack's ``"A1"`` location in order of tipracks listed. If you however want to start automatic tip iterating at a different tip, you can use ``start_at_tip()``.
 
 .. code-block:: python
 
-    pipette.start_at_tip(tip_rack_1.well('C3'))
+    pipette.start_at_tip(tip_rack_1.well("C3"))
     pipette.pick_up_tip()  # pick up C3 from "tip_rack_1"
     pipette.return_tip()
 
 Get Current Tip
 ---------------
 
-Get the source location of the pipette's current tip by calling ``current_tip()``. If the tip was from the ``'A1'`` position on our tip rack, ``current_tip()`` will return that position.
+Get the source location of the pipette's current tip by calling ``current_tip()``. If the tip was from the ``"A1"`` position on our tip rack, ``current_tip()`` will return that position.
 
 .. code-block:: python
 
@@ -191,8 +191,8 @@ Please note that the default now for pipette aspirate and dispense location is a
     '''
     Examples in this section expect the following:
     '''
-    plate = labware.load('96-flat', '1')
-    pipette = instruments.P300_Single(mount='left')
+    plate = labware.load("96-flat", "1")
+    pipette = instruments.P300_Single(mount="left")
     pipette.pick_up_tip()
 
 
@@ -203,11 +203,11 @@ To aspirate is to pull liquid up into the pipette's tip. When calling aspirate o
 
 .. code-block:: python
 
-    pipette.aspirate(50, plate.wells('A1'))  # aspirate 50uL from plate:A1
+    pipette.aspirate(50, plate.wells("A1"))  # aspirate 50uL from plate:A1
 
 Now our pipette's tip is holding 50uL.
 
-We can also simply specify how many microliters to aspirate, and not mention a location. The pipette in this circumstance will aspirate from it's current location (which we previously set as ``plate.wells('A1'))``.
+We can also simply specify how many microliters to aspirate, and not mention a location. The pipette in this circumstance will aspirate from it's current location (which we previously set as ``plate.wells("A1"))``.
 
 .. code-block:: python
 
@@ -219,7 +219,7 @@ We can also specify only the location to aspirate from. If we do not tell the pi
 
 .. code-block:: python
 
-    pipette.aspirate(plate.wells('A2'))      # aspirate until pipette fills from plate:A2
+    pipette.aspirate(plate.wells("A2"))      # aspirate until pipette fills from plate:A2
 
 
 Dispense
@@ -229,11 +229,11 @@ To dispense is to push out liquid from the pipette's tip. It's usage in the Open
 
 .. code-block:: python
 
-    pipette.dispense(50, plate.wells('B1')) # dispense 50uL to plate:B1
+    pipette.dispense(50, plate.wells("B1")) # dispense 50uL to plate:B1
     pipette.dispense(50)                    # dispense 50uL to current position
-    pipette.dispense(plate.wells('B2'))     # dispense until pipette empties to plate:B2
+    pipette.dispense(plate.wells("B2"))     # dispense until pipette empties to plate:B2
 
-That final dispense without specifying a micoliter amount will dispense all remaining liquids in the tip to ``plate.wells('B2')``, and now our pipette is empty.
+That final dispense without specifying a micoliter amount will dispense all remaining liquids in the tip to ``plate.wells("B2")``, and now our pipette is empty.
 
 Blow Out
 ========
@@ -245,7 +245,7 @@ When calling ``blow_out()`` on a pipette, we have the option to specify a locati
 .. code-block:: python
 
     pipette.blow_out()                  # blow out in current location
-    pipette.blow_out(plate.wells('B3')) # blow out in current plate:B3
+    pipette.blow_out(plate.wells("B3")) # blow out in current plate:B3
 
 
 Touch Tip
@@ -259,7 +259,7 @@ When calling ``touch_tip()`` on a pipette, we have the option to specify a locat
 
     pipette.touch_tip()                  # touch tip within current location
     pipette.touch_tip(v_offset=-2)       # touch tip 2mm below the top of the current location
-    pipette.touch_tip(plate.wells('B1')) # touch tip within plate:B1
+    pipette.touch_tip(plate.wells("B1")) # touch tip within plate:B1
 
 
 Mix
@@ -271,7 +271,7 @@ The mix command takes three arguments: ``mix(repetitions, volume, location)``
 
 .. code-block:: python
 
-    pipette.mix(4, 100, plate.wells('A2'))   # mix 4 times, 100uL, in plate:A2
+    pipette.mix(4, 100, plate.wells("A2"))   # mix 4 times, 100uL, in plate:A2
     pipette.mix(3, 50)                       # mix 3 times, 50uL, in current location
     pipette.mix(2)                           # mix 2 times, pipette's max volume, in current location
 
@@ -283,7 +283,7 @@ Some liquids need an extra amount of air in the pipette's tip to prevent it from
 
 .. code-block:: python
 
-    pipette.aspirate(100, plate.wells('B4'))
+    pipette.aspirate(100, plate.wells("B4"))
     pipette.air_gap(20)
     pipette.drop_tip()
 
@@ -297,10 +297,10 @@ Some liquids need an extra amount of air in the pipette's tip to prevent it from
     '''
     Examples in this section expect the following
     '''
-    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
-    plate = labware.load('96-flat', '2')
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "1")
+    plate = labware.load("96-flat", "2")
 
-    pipette = instruments.P300_Single(mount='right', tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount="right", tip_racks=[tiprack])
 
 Controlling Speed
 =================
@@ -316,10 +316,10 @@ using our `set_flow_rate` function. This can be called at any time during the pr
     '''
     Examples in this section expect the following
     '''
-    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
-    plate = labware.load('96-flat', '2')
+    tiprack = labware.load("opentrons_96_tiprack_300ul", "1")
+    plate = labware.load("96-flat", "2")
 
-    pipette = instruments.P300_Single(mount='right', tip_racks=[tiprack])
+    pipette = instruments.P300_Single(mount="right", tip_racks=[tiprack])
 
     pipette.set_flow_rate(aspirate=50, dispense=100)
 
@@ -341,35 +341,35 @@ For example, we can move to the first tip in our tip rack:
 
 .. code-block:: python
 
-    pipette.move_to(tiprack.wells('A1'))
+    pipette.move_to(tiprack.wells("A1"))
 
 You can also specify at what height you would like the robot to move to inside of a location using ``top()`` and ``bottom()`` methods on that location.
 
 .. code-block:: python
 
-    pipette.move_to(plate.wells('A1').bottom())  # move to the bottom of well A1
-    pipette.move_to(plate.wells('A1').top())     # move to the top of well A1
-    pipette.move_to(plate.wells('A1').bottom(2)) # move to 2mm above the bottom of well A1
-    pipette.move_to(plate.wells('A1').top(-2))   # move to 2mm below the top of well A1
+    pipette.move_to(plate.wells("A1").bottom())  # move to the bottom of well A1
+    pipette.move_to(plate.wells("A1").top())     # move to the top of well A1
+    pipette.move_to(plate.wells("A1").bottom(2)) # move to 2mm above the bottom of well A1
+    pipette.move_to(plate.wells("A1").top(-2))   # move to 2mm below the top of well A1
 
-The above commands will cause the robot's head to first move upwards, then over to above the target location, then finally downwards until the target location is reached. If instead you would like the robot to move in a straight line to the target location, you can set the movement strategy to ``'direct'``.
+The above commands will cause the robot's head to first move upwards, then over to above the target location, then finally downwards until the target location is reached. If instead you would like the robot to move in a straight line to the target location, you can set the movement strategy to ``"direct"``.
 
 .. code-block:: python
 
-    pipette.move_to(plate.wells('A1'), strategy='direct')
+    pipette.move_to(plate.wells("A1"), strategy="direct")
 
 .. note::
 
-    Moving with ``strategy='direct'`` will run the risk of colliding with things on your deck. Be very careful when using this option.
+    Moving with ``strategy="direct"`` will run the risk of colliding with things on your deck. Be very careful when using this option.
 
-Usually the ``strategy='direct'`` option is useful when moving inside of a well. Take a look at the below sequence of movements, which first move the head to a well, and use 'direct' movements inside that well, then finally move on to a different well.
+Usually the ``strategy="direct"`` option is useful when moving inside of a well. Take a look at the below sequence of movements, which first move the head to a well, and use "direct" movements inside that well, then finally move on to a different well.
 
 .. code-block:: python
 
-    pipette.move_to(plate.wells('A1'))
-    pipette.move_to(plate.wells('A1').bottom(1), strategy='direct')
-    pipette.move_to(plate.wells('A1').top(-2), strategy='direct')
-    pipette.move_to(plate.wells('A1'))
+    pipette.move_to(plate.wells("A1"))
+    pipette.move_to(plate.wells("A1").bottom(1), strategy="direct")
+    pipette.move_to(plate.wells("A1").top(-2), strategy="direct")
+    pipette.move_to(plate.wells("A1"))
 
 Delay
 =====

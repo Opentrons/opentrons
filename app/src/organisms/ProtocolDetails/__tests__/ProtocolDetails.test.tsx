@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import { StaticRouter } from 'react-router-dom'
 import { resetAllWhenMocks, when } from 'jest-when'
 
@@ -9,10 +9,12 @@ import {
 } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
+import { ChooseRobotToRunProtocolSlideout } from '../../../organisms/ChooseRobotToRunProtocolSlideout'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -27,8 +29,6 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__'
 import { ProtocolDetails } from '..'
-import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
-import { ChooseRobotToRunProtocolSlideout } from '../../ChooseRobotToRunProtocolSlideout'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
@@ -36,7 +36,8 @@ jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
-jest.mock('../../ChooseRobotToRunProtocolSlideout')
+jest.mock('../../../organisms/ChooseRobotToRunProtocolSlideout')
+jest.mock('../../../organisms/SendProtocolToFlexSlideout')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -95,10 +96,10 @@ describe('ProtocolDetails', () => {
 
     when(mockChooseRobotToRunProtocolSlideout)
       .calledWith(partialComponentPropsMatcher({ showSlideout: true }))
-      .mockReturnValue(<div>open Slideout</div>)
+      .mockReturnValue(<div>open ChooseRobotToRunProtocolSlideout</div>)
     when(mockChooseRobotToRunProtocolSlideout)
       .calledWith(partialComponentPropsMatcher({ showSlideout: false }))
-      .mockReturnValue(<div>close Slideout</div>)
+      .mockReturnValue(<div>close ChooseRobotToRunProtocolSlideout</div>)
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
   })
@@ -162,9 +163,9 @@ describe('ProtocolDetails', () => {
     expect(
       screen.getByRole('heading', { name: 'Deck View' })
     ).toBeInTheDocument()
-    screen.getByText('close Slideout')
+    screen.getByText('close ChooseRobotToRunProtocolSlideout')
   })
-  it('opens choose robot slideout when Start setup button is clicked', async () => {
+  it('opens choose robot to run protocol slideout when Start setup button is clicked', async () => {
     render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
@@ -182,14 +183,16 @@ describe('ProtocolDetails', () => {
     const runProtocolButton = screen.getByRole('button', {
       name: 'Start setup',
     })
-    runProtocolButton.click()
+    act(() => {
+      runProtocolButton.click()
+    })
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'ProtocolsDetail' },
       })
     })
-    screen.getByText('open Slideout')
+    screen.getByText('open ChooseRobotToRunProtocolSlideout')
   })
   it('renders the protocol creation method', () => {
     render({

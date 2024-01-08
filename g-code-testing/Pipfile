@@ -11,20 +11,20 @@ server-utils = { editable = true, path = "./../server-utils" }
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons_hardware = { editable = true, path = "../hardware" }
 g-code-testing = { editable = true, path = "." }
-anyio = "==3.3.0"
-pydantic = "==1.8.2"
+anyio = "==3.6.1"
+pydantic = "==1.9.2"
 # opentrons dependency on linux, spec'd here to force lockfile inclusion
 # https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
-systemd-python = { version = "==234", sys_platform = "== 'linux'" }
+systemd-python = { version = "==234", markers="sys_platform=='linux'" }
 
 [dev-packages]
 diff-match-patch = "==20200713"
-pytest = "~=6.1"
+pytest = "~=7.1"
 pytest-aiohttp = "==0.3.0"
 pytest-cov = "==2.10.1"
-pytest-xdist = "~=2.2.1 "
-mock = "~=4.0.2"
-mypy = "==0.812.0"
+pytest-xdist = "~=2.5.0"
+mock = "~=4.0.3"
+mypy = "==0.981"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
@@ -33,4 +33,4 @@ black = "==22.3.0"
 decoy = "~=1.10.0"
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"

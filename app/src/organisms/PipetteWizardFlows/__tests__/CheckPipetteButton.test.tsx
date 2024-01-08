@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { CheckPipetteButton } from '../CheckPipetteButton'
-import { waitFor } from '@testing-library/react'
 
 const render = (props: React.ComponentProps<typeof CheckPipetteButton>) => {
   return renderWithProviders(<CheckPipetteButton {...props} />)[0]
@@ -34,7 +34,7 @@ describe('CheckPipetteButton', () => {
   })
   it('clicking on the button calls refetch and proceed', async () => {
     const { getByRole } = render(props)
-    getByRole('button', { name: 'continue' }).click()
+    fireEvent.click(getByRole('button', { name: 'continue' }))
     expect(refetch).toHaveBeenCalled()
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })

@@ -53,14 +53,14 @@ import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
-  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToFlex: (storedProtocolData: StoredProtocolData) => void
   storedProtocolData: StoredProtocolData
 }
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
     handleRunProtocol,
-    handleSendProtocolToOT3,
+    handleSendProtocolToFlex,
     storedProtocolData,
   } = props
   const {
@@ -116,7 +116,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       >
         <ProtocolOverflowMenu
           handleRunProtocol={handleRunProtocol}
-          handleSendProtocolToOT3={handleSendProtocolToOT3}
+          handleSendProtocolToFlex={handleSendProtocolToFlex}
           storedProtocolData={storedProtocolData}
         />
       </Box>

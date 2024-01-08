@@ -303,5 +303,5 @@ def vectorize(position: Coordinates[AxisKey, np.float64]) -> "NDArray[np.float64
 def is_unit_vector(position: Coordinates[AxisKey, np.float64]) -> bool:
     """Check whether a coordinate vector has unit magnitude."""
     vectorized = vectorize(position)
-    magnitude = np.linalg.norm(vectorized)  # type: ignore[no-untyped-call]
+    magnitude = np.linalg.norm(vectorized)
     return cast(bool, np.isclose(magnitude, 1.0))

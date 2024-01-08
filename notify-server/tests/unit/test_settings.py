@@ -2,7 +2,7 @@
 
 import json
 import os
-from typing import Generator
+from typing import Generator, Dict, cast
 from unittest.mock import patch, MagicMock
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -11,9 +11,9 @@ from notify_server.settings import Settings, ServerBindAddress
 
 
 @pytest.fixture
-def envvar_patch() -> Generator[MagicMock, None, None]:
+def envvar_patch() -> Generator[Dict[str, str], None, None]:
     """Patch os.environ."""
-    with patch.object(os, "environ", new=dict()) as p:
+    with patch.object(os, "environ", new=cast(Dict[str, str], dict())) as p:
         yield p
 
 
