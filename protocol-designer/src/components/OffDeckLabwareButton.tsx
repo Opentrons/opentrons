@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import {
-  DeprecatedPrimaryButton,
+  LegacyPrimaryButton,
   Flex,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -19,9 +19,9 @@ export const OffDeckLabwareButton = (): JSX.Element => {
   return (
     <Flex position={POSITION_ABSOLUTE} right={SPACING.spacing16} zIndex={2}>
       <Flex position={POSITION_RELATIVE} padding={SPACING.spacing16}>
-        <DeprecatedPrimaryButton onClick={() => setShowSlideout(true)}>
+        <LegacyPrimaryButton onClick={() => setShowSlideout(true)}>
           {i18n.t('button.edit_off_deck')}
-        </DeprecatedPrimaryButton>
+        </LegacyPrimaryButton>
       </Flex>
       {showSlideout ? (
         <OffDeckLabwareSlideout

@@ -10,7 +10,7 @@ import {
   FormGroup,
   InputField,
   OutlineButton,
-  DeprecatedPrimaryButton,
+  LegacyPrimaryButton,
   Flex,
   JUSTIFY_END,
   TYPOGRAPHY,
@@ -185,17 +185,17 @@ export function LiquidEditForm(props: Props): JSX.Element {
                 >
                   {i18n.t('button.delete')}
                 </OutlineButton>
-                <DeprecatedPrimaryButton onClick={cancelForm}>
+                <LegacyPrimaryButton onClick={cancelForm}>
                   {i18n.t('button.cancel')}
-                </DeprecatedPrimaryButton>
-                <DeprecatedPrimaryButton
+                </LegacyPrimaryButton>
+                <LegacyPrimaryButton
                   disabled={
                     !dirty || errors.name != null || errors.displayColor != null
                   }
                   type="submit"
                 >
                   {i18n.t('button.save')}
-                </DeprecatedPrimaryButton>
+                </LegacyPrimaryButton>
               </div>
             </form>
           </Card>

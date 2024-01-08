@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
   Tooltip,
-  DeprecatedPrimaryButton,
+  LegacyPrimaryButton,
   useHoverTooltip,
   Flex,
   COLORS,
@@ -73,14 +73,14 @@ export const OffDeckLabwareSlideout = (
       isExpanded={props.isExpanded}
       footer={
         <div {...targetProps}>
-          <DeprecatedPrimaryButton
+          <LegacyPrimaryButton
             onClick={() => dispatch(openAddLabwareModal({ slot: 'offDeck' }))}
             marginTop={SPACING.spacing16}
             marginRight={SPACING.spacing16}
             disabled={disabled}
           >
             {i18n.t('button.add_off_deck')}
-          </DeprecatedPrimaryButton>
+          </LegacyPrimaryButton>
           {disabled ? (
             <Tooltip {...tooltipProps}>
               {i18n.t(`tooltip.disabled_off_deck`)}

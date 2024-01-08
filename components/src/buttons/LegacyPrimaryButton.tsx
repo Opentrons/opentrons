@@ -12,7 +12,7 @@ import type { ButtonProps } from './Button'
  *
  * @deprecated Use {@link PrimaryButton}
  */
-export function DeprecatedPrimaryButton(props: ButtonProps): JSX.Element {
+export function LegacyPrimaryButton(props: ButtonProps): JSX.Element {
   const className = cx(styles.button_primary, props.className, {
     [styles.inverted]: props.inverted,
   })

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { OutlineButton, DeprecatedPrimaryButton } from '@opentrons/components'
+import { OutlineButton, LegacyPrimaryButton } from '@opentrons/components'
 import { i18n } from '../../../localization'
 
 import modalStyles from '../../modals/modal.css'
@@ -37,19 +37,19 @@ export const ButtonRow = (props: ButtonRowProps): JSX.Element => {
         </OutlineButton>
       </div>
       <div>
-        <DeprecatedPrimaryButton
+        <LegacyPrimaryButton
           className={styles.form_button}
           onClick={handleClose}
         >
           {i18n.t('button.close')}
-        </DeprecatedPrimaryButton>
-        <DeprecatedPrimaryButton
+        </LegacyPrimaryButton>
+        <LegacyPrimaryButton
           className={styles.form_button}
           disabled={!canSave}
           onClick={handleSave}
         >
           {i18n.t('button.save')}
-        </DeprecatedPrimaryButton>
+        </LegacyPrimaryButton>
       </div>
     </div>
   )

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Tooltip,
-  DeprecatedPrimaryButton,
+  LegacyPrimaryButton,
   useHoverTooltip,
   TOOLTIP_RIGHT,
   TOOLTIP_TOP,
@@ -58,13 +58,13 @@ export const StepCreationButtonComponent = (
           {i18n.t(`tooltip.disabled_step_creation`)}
         </Tooltip>
       )}
-      <DeprecatedPrimaryButton
+      <LegacyPrimaryButton
         id="StepCreationButton"
         onClick={() => setExpanded(!expanded)}
         disabled={disabled}
       >
         {i18n.t('button.add_step')}
-      </DeprecatedPrimaryButton>
+      </LegacyPrimaryButton>
 
       <div className={styles.buttons_popover}>{expanded && children}</div>
     </div>
@@ -86,12 +86,12 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
   return (
     <>
       <div {...targetProps}>
-        <DeprecatedPrimaryButton
+        <LegacyPrimaryButton
           onClick={onClick}
           iconName={stepIconsByType[stepType]}
         >
           {i18n.t(`application.stepType.${stepType}`, stepType)}
-        </DeprecatedPrimaryButton>
+        </LegacyPrimaryButton>
       </div>
       <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
     </>

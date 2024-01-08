@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DeprecatedPrimaryButton, Icon } from '@opentrons/components'
+import { LegacyPrimaryButton, Icon } from '@opentrons/components'
 import styles from './importLabware.css'
 
 interface Props {
@@ -26,7 +26,7 @@ const stopEvent = (e: React.SyntheticEvent): void => e.preventDefault()
 function UploadInput(props: UploadInputProps): JSX.Element {
   const { isButton, onUpload } = props
 
-  const Label = isButton ? DeprecatedPrimaryButton : 'label'
+  const Label = isButton ? LegacyPrimaryButton : 'label'
 
   const labelText = isButton
     ? 'upload labware file'

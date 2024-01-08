@@ -2,6 +2,6 @@
 
 export * from './Button'
 export * from './FlatButton'
-export * from './DeprecatedPrimaryButton'
+export * from './LegacyPrimaryButton'
 export * from './IconButton'
 export * from './OutlineButton'

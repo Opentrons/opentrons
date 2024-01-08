@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   Box,
-  DeprecatedPrimaryButton,
+  LegacyPrimaryButton,
   OutlineButton,
   Tooltip,
   useHoverTooltip,
@@ -184,12 +184,12 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
             className={buttonStyles.form_button}
             display="inline-block"
           >
-            <DeprecatedPrimaryButton
+            <LegacyPrimaryButton
               disabled={disableSave}
               onClick={handleSave}
             >
               {i18n.t('button.save')}
-            </DeprecatedPrimaryButton>
+            </LegacyPrimaryButton>
             <Tooltip {...saveButtonTooltipProps}>
               {i18n.t(
                 `tooltip.save_batch_edit.${

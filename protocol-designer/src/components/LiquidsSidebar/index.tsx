@@ -2,7 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import {
-  DeprecatedPrimaryButton,
+  LegacyPrimaryButton,
   SidePanel,
   truncateString,
 } from '@opentrons/components'
@@ -54,9 +54,9 @@ function LiquidsSidebarComponent(props: Props): JSX.Element {
         />
       ))}
       <div className={listButtonStyles.list_item_button}>
-        <DeprecatedPrimaryButton iconName="water" onClick={createNewLiquid}>
+        <LegacyPrimaryButton iconName="water" onClick={createNewLiquid}>
           {i18n.t('button.new_liquid')}
-        </DeprecatedPrimaryButton>
+        </LegacyPrimaryButton>
       </div>
     </SidePanel>
   )

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { LegacyAlertItem } from './LegacyAlertItem'
+import { LegacyAlertItem } from './'
 
 import type { Story, Meta } from '@storybook/react'
 

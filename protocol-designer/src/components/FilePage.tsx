@@ -9,7 +9,7 @@ import {
   InputField,
   InstrumentGroup,
   OutlineButton,
-  DeprecatedPrimaryButton,
+  LegacyPrimaryButton,
 } from '@opentrons/components'
 import { i18n } from '../localization'
 import { resetScrollElements } from '../ui/steps/utils'
@@ -181,13 +181,13 @@ export class FilePage extends React.Component<Props, State> {
           <div className={styles.card_content}>
             <InstrumentGroup {...instruments} showMountLabel />
             <div className={styles.pipette_button_row}>
-              <DeprecatedPrimaryButton
+              <LegacyPrimaryButton
                 onClick={this.openEditPipetteModal}
                 className={styles.edit_button}
                 name={'editPipettes'}
               >
                 {i18n.t('button.edit')}
-              </DeprecatedPrimaryButton>
+              </LegacyPrimaryButton>
               <OutlineButton
                 onClick={swapPipettes}
                 className={styles.swap_button}
@@ -207,14 +207,14 @@ export class FilePage extends React.Component<Props, State> {
         />
 
         <div className={modalStyles.button_row}>
-          <DeprecatedPrimaryButton
+          <LegacyPrimaryButton
             onClick={goToNextPage}
             className={styles.continue_button}
             iconName="arrow-right"
             name={'continueToLiquids'}
           >
             {i18n.t('button.continue_to_liquids')}
-          </DeprecatedPrimaryButton>
+          </LegacyPrimaryButton>
         </div>
 
         <Portal>
