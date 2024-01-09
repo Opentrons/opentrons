@@ -25,7 +25,7 @@ const publishConfig =
 module.exports = async () => ({
   appId:
     project === 'robot-stack' ? 'com.opentrons.app' : 'com.opentrons.appot3',
-  electronVersion: '28.1.1',
+  electronVersion: '27.2.1',
   npmRebuild: false,
   releaseInfo: {
     releaseNotesFile:

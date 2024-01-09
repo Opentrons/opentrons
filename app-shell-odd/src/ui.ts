@@ -69,14 +69,6 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
     log.info('will-navigate')
   })
 
-  mainWindow.webContents.on('did-fail-load', () => {
-    log.info('did-fail-load')
-  })
-
-  mainWindow.webContents.on('did-fail-load', () => {
-    log.info('did-fail-load')
-  })
-
   mainWindow.webContents.on('dom-ready', () => {
     log.info('dom-ready')
   })
@@ -85,25 +77,74 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
     log.info('did-create-window')
   })
 
-  mainWindow.webContents.on('unresponsive', () => {
-    log.info('unresponsive')
-    mainWindow.webContents.reload()
-  })
-
   mainWindow.webContents.on('did-attach-webview', () => {
     log.info('did-attach-webview')
   })
 
+  mainWindow.webContents.on('did-finish-load', () =>
+    log.info('did-finish-load')
+  )
+
+  mainWindow.webContents.on(
+    'did-fail-load',
+    (
+      event,
+      errorCode,
+      errorDescription,
+      validatedURL,
+      isMainFrame,
+      frameProcessId,
+      frameRoutingId
+    ) => {
+      log.info('did-fail-load', {
+        event,
+        errorCode,
+        errorDescription,
+        validatedURL,
+        isMainFrame,
+        frameProcessId,
+        frameRoutingId,
+      })
+    }
+  )
+
+  mainWindow.webContents.on(
+    'did-fail-provisional-load',
+    (
+      event,
+      errorCode,
+      errorDescription,
+      validatedURL,
+      isMainFrame,
+      frameProcessId,
+      frameRoutingId
+    ) => {
+      log.info('did-fail-provisional-load', {
+        event,
+        errorCode,
+        errorDescription,
+        validatedURL,
+        isMainFrame,
+        frameProcessId,
+        frameRoutingId,
+      })
+    }
+  )
+
   log.info('isCrashed', mainWindow.webContents.isCrashed())
 
-  log.info('mainWindow', mainWindow)
+  log.info('did-start-loading', () => log.info('did-start-loading'))
+  log.info('did-stop-loading', () => log.info('did-stop-loading'))
 
   log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   mainWindow
     .loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
     .then(() => log.info('loadURL is fine'))
-    .catch((e: any) => log.info('load url error', e))
+    .catch((e: any) => {
+      log.info('load url error', e)
+      // mainWindow.webContents.reload()
+    })
   // open new windows (<a target="_blank" ...) in browser windows
   mainWindow.webContents.setWindowOpenHandler(({ url, disposition }) => {
     log.info('setWindowOpenHandler')

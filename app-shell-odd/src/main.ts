@@ -1,5 +1,5 @@
 // electron main entry point
-import { app, ipcMain, crashReporter } from 'electron'
+import { app, ipcMain } from 'electron'
 import fse from 'fs-extra'
 import path from 'path'
 import { createUi } from './ui'

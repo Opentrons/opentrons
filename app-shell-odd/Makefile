@@ -83,7 +83,7 @@ push-ot3: dist-ot3
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	NODE_OPTIONS=--openssl-legacy-provider webpack
+	NODE_OPTIONS=--openssl-legacy-provider ELECTRON_ENABLE_LOGGING=true ELECTRON_ENABLE_STACK_DUMPING webpack
 	$(electron)
 
 .PHONY: test
