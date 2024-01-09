@@ -35,7 +35,6 @@ export function DropTipField(
   const options: DropdownOption[] = []
   if (wasteChute != null) options.push(wasteChuteOption)
   if (trashBin != null) options.push(trashOption)
-
   return (
     <FormGroup
       label={i18n.t('form.step_edit_form.field.location.label')}

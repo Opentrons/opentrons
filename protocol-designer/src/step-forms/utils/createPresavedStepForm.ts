@@ -101,7 +101,6 @@ const _patchDefaultDropTipLocation = (args: {
   } else if (trashBin != null) {
     defaultDropTipId = trashBin.id
   }
-
   const formHasDropTipField = formData && 'dropTip_location' in formData
 
   if (formHasDropTipField && defaultDropTipId !== null) {

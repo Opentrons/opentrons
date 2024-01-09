@@ -89,6 +89,23 @@ const getLabwareOrAdditionalEquipmentEntity = (
   } else return null
 }
 
+const getDropTipLocation = (state: InvariantContext): string | null => {
+  const { additionalEquipmentEntities } = state
+  const trashBin = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'trashBin'
+  )
+  const wasteChute = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'wasteChute'
+  )
+  let defaultDropTipId = null
+  if (wasteChute != null) {
+    defaultDropTipId = wasteChute.id
+  } else if (trashBin != null) {
+    defaultDropTipId = trashBin.id
+  }
+
+  return defaultDropTipId
+}
 const getIsAdapterLocation = (
   newLocation: string,
   labwareEntities: LabwareEntities
@@ -397,6 +414,10 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   newLocation: {
     getErrors: composeErrors(requiredField),
     hydrate: getLabwareLocation,
+  },
+  dropTip_location: {
+    getErrors: composeErrors(requiredField),
+    hydrate: getDropTipLocation,
   },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
