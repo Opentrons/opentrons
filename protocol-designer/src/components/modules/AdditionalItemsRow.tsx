@@ -27,7 +27,7 @@ import { FlexSlotMap } from './FlexSlotMap'
 
 import styles from './styles.css'
 
-import type { Cutout } from '@opentrons/shared-data'
+import type { CutoutId } from '@opentrons/shared-data'
 
 interface AdditionalItemsRowProps {
   handleAttachment: () => void
@@ -105,7 +105,7 @@ export function AdditionalItemsRow(
                   value={`${getCutoutDisplayName(
                     (name === 'trashBin'
                       ? trashBinSlot ?? ''
-                      : WASTE_CHUTE_CUTOUT) as Cutout
+                      : WASTE_CHUTE_CUTOUT) as CutoutId
                   )}`}
                 />
               </div>

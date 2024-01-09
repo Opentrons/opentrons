@@ -36,7 +36,7 @@ export function useDeckConfigurationCompatibility(
   const deckDef = getDeckDefFromRobotType(robotType)
   const allAddressableAreas =
     protocolAnalysis != null
-      ? getAddressableAreasInProtocol(protocolAnalysis)
+      ? getAddressableAreasInProtocol(protocolAnalysis, deckDef)
       : []
   const labwareInSlots =
     protocolAnalysis != null ? getTopMostLabwareInSlots(protocolAnalysis) : []

@@ -1,4 +1,5 @@
 import type {
+  AddressableAreaName,
   CompletedProtocolAnalysis,
   MoveToAddressableAreaParams,
 } from '@opentrons/shared-data'
@@ -32,7 +33,9 @@ export function getAddressableAreaDisplayName(
   else return addressableAreaName
 }
 
-const getMovableTrashSlot = (addressableAreaName: string): string => {
+const getMovableTrashSlot = (
+  addressableAreaName: AddressableAreaName
+): string => {
   switch (addressableAreaName) {
     case 'movableTrashA1':
       return 'A1'

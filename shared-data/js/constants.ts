@@ -190,6 +190,17 @@ export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
 
+export const MOVABLE_TRASH_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
+
 export const SINGLE_LEFT_CUTOUTS: CutoutId[] = [
   'cutoutA1',
   'cutoutB1',

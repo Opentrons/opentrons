@@ -24,7 +24,6 @@ import type {
   DeckConfiguration,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
-import type { TrashCutoutId } from './FlexTrash'
 
 const getModulePosition = (
   deckDef: DeckDefinition,
@@ -141,7 +140,6 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   deckConfig: DeckConfiguration
   backgroundItems?: React.ReactNode
   deckFill?: string
-  trashCutoutId?: TrashCutoutId
 }
 export function MoveLabwareOnDeck(
   props: MoveLabwareOnDeckProps

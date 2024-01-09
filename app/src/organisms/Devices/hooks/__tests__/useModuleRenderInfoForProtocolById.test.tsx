@@ -31,7 +31,6 @@ import type {
 jest.mock('@opentrons/react-api-client/src/deck_configuration')
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
-jest.mock('../useProtocolDetailsForRun')
 jest.mock('../useStoredProtocolAnalysis')
 jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
