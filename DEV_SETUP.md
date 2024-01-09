@@ -171,7 +171,7 @@ On Windows, we rely on:
 #### 1. Install `nvs` and Node.js
 
 #### 2. Install Python
-
+For Windows, 3.10.11 is the latest available version.
 #### 3. Install build tools via Visual Studio Installer
 
 ### Linux
