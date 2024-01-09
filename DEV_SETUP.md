@@ -12,7 +12,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - git
 - curl
 - ssh
-- Python v3.7
+- Python v3.10
 - Node.js v16
 
 ### macOS
