@@ -108,7 +108,7 @@ class MaintenanceRunDataManager:
 
         #TOME: Send here!
         print('SENDING MR DATA')
-        mqtt_client.publish('opentrons/test/maintenance_runs', payload=json.dumps({"data": maintenance_run_data.json()}), qos=2, retain=True)
+        mqtt_client.publish('robot-server/maintenance_runs', payload=json.dumps({"data": maintenance_run_data.json()}), qos=1, retain=True)
 
         return maintenance_run_data
 
@@ -150,7 +150,7 @@ class MaintenanceRunDataManager:
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
             print('SENDING MR DATA')
-            mqtt_client.publish('opentrons/test/maintenance_runs', payload=json.dumps(None), qos=2, retain=True)
+            mqtt_client.publish('robot-server/maintenance_runs', payload=json.dumps(None), qos=1, retain=True)
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
 
