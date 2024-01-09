@@ -124,10 +124,10 @@ Close and re-open your terminal to verify that `pyenv` is installed
 pyenv --version
 ```
 
-Now, install the required version of Python. Use the latest available version of `3.10.x`, which is `3.10.6` at the time of writing.
+Now, install the required version of Python. Use the latest available version of `3.10.x`, which is `3.10.13` at the time of writing.
 
 ```shell
-pyenv install 3.10.6
+pyenv install 3.10.13
 ```
 
 If your `pyenv` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zprofile` and `~/.zshrc`, you should see something similar to the following:
@@ -199,14 +199,14 @@ Once you are inside the repository for the first time, you should do two things:
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
 2. Tell `pyenv` to use Python 3.10
-3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.10.6`. Then check `python --version` again.
+3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.10.13`. Then check `python --version` again.
 
 ```shell
 # confirm Node v16
 node --version
 
 # set Python version, and confirm
-pyenv local 3.10.6
+pyenv local 3.10.13
 python --version
 ```
 
