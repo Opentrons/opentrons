@@ -14,6 +14,7 @@ import type {
 import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
+  CreateCommand as CreateCommandV8,
   LabwareV2Mixin,
   LiquidV1Mixin,
   LoadPipetteCreateCommand,
@@ -22,6 +23,7 @@ import type {
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV8'
+import type { CreateCommand as CreateCommandV7 } from '@opentrons/shared-data/protocol/types/schemaV7'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 // NOTE: this migration is to schema v8 and updates fixed trash by
@@ -67,6 +69,20 @@ export const migrateFile = (
     },
   ]
 
+  const migrateCommands = (
+    v7Commands: CreateCommandV7[]
+  ): CreateCommandV8[] => {
+    return v7Commands.filter(
+      v7Command =>
+        !(
+          v7Command.commandType === 'loadLabware' &&
+          v7Command.params.labwareId === 'fixedTrash'
+        )
+    )
+  }
+
+  const migratedV7Commands = migrateCommands(commands)
+
   const newLabwareLocationUpdate: LabwareLocationUpdate = Object.keys(
     labwareLocationUpdate
   ).reduce((acc: LabwareLocationUpdate, labwareId: string) => {
@@ -90,6 +106,7 @@ export const migrateFile = (
       if (stepForm.stepType === 'moveLiquid') {
         return {
           ...stepForm,
+          nozzles: null,
           aspirate_labware:
             stepForm.aspirate_labware === 'fixedTrash'
               ? null
@@ -103,6 +120,7 @@ export const migrateFile = (
       } else if (stepForm.stepType === 'mix') {
         return {
           ...stepForm,
+          nozzles: null,
           labware: stepForm.labware === 'fixedTrash' ? null : stepForm.labware,
           ...sharedParams,
         }
@@ -176,7 +194,7 @@ export const migrateFile = (
 
   const commandv8Mixin: CommandV8Mixin = {
     commandSchemaId: 'opentronsCommandSchemaV8',
-    commands: [...commands, ...trashMoveToAddressableAreaCommand],
+    commands: [...migratedV7Commands, ...trashMoveToAddressableAreaCommand],
   }
 
   const commandAnnotionaV1Mixin: CommandAnnotationV1Mixin = {

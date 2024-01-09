@@ -115,7 +115,8 @@
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
           "stepType": "moveLiquid",
           "stepName": "transfer",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "54dc3200-75c7-11ea-b42f-4b64e50f43e5": {
           "pauseAction": "untilResume",
@@ -167,7 +168,8 @@
           "id": "a4cee9a0-75dc-11ea-b42f-4b64e50f43e5",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         }
       },
       "orderedStepIds": [
@@ -1194,49 +1196,6 @@
       "namespace": "opentrons",
       "version": 1,
       "schemaVersion": 2,
-      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
-    },
-    "opentrons/opentrons_1_trash_1100ml_fixed/1": {
-      "ordering": [["A1"]],
-      "metadata": {
-        "displayCategory": "trash",
-        "displayVolumeUnits": "mL",
-        "displayName": "Opentrons Fixed Trash",
-        "tags": []
-      },
-      "schemaVersion": 2,
-      "version": 1,
-      "namespace": "opentrons",
-      "dimensions": {
-        "xDimension": 172.86,
-        "yDimension": 165.86,
-        "zDimension": 82
-      },
-      "parameters": {
-        "format": "trash",
-        "isTiprack": false,
-        "loadName": "opentrons_1_trash_1100ml_fixed",
-        "isMagneticModuleCompatible": false,
-        "quirks": [
-          "fixedTrash",
-          "centerMultichannelOnWells",
-          "touchTipDisabled"
-        ]
-      },
-      "wells": {
-        "A1": {
-          "shape": "rectangular",
-          "yDimension": 165.67,
-          "xDimension": 107.11,
-          "totalLiquidVolume": 1100000,
-          "depth": 0,
-          "x": 82.84,
-          "y": 80,
-          "z": 82
-        }
-      },
-      "brand": { "brand": "Opentrons" },
-      "groups": [{ "wells": ["A1"], "metadata": {} }],
       "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
     },
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1": {
@@ -2781,6 +2740,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "814036fd-ea55-40d0-932b-d13f6113a77f",
+      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
+    },
+    {
       "commandType": "waitForResume",
       "key": "00cedccd-f5dc-4b12-9142-979758ba0dd9",
       "params": { "message": "Wait until user intervention" }
@@ -2903,7 +2867,11 @@
         "alternateDropLocation": true
       }
     },
-
+    {
+      "commandType": "dropTipInPlace",
+      "key": "c55edd6b-b323-4d72-81d3-39e08ec71a88",
+      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
+    },
     {
       "commandType": "pickUpTip",
       "key": "d83c457e-4183-4bac-a9cc-f58ece48e808",
@@ -3021,6 +2989,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "3bd0eb5c-3115-4953-aad4-a530dfb962fb",
+      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
     }
   ],
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",

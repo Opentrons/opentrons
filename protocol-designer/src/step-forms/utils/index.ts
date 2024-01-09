@@ -32,6 +32,21 @@ import type {
 import type { FormData } from '../../form-types'
 export { createPresavedStepForm } from './createPresavedStepForm'
 
+const slotToCutoutOt2Map: { [key: string]: string } = {
+  '1': 'cutout1',
+  '2': 'cutout2',
+  '3': 'cutout3',
+  '4': 'cutout4',
+  '5': 'cutout5',
+  '6': 'cutout6',
+  '7': 'cutout7',
+  '8': 'cutout8',
+  '9': 'cutout9',
+  '10': 'cutout10',
+  '11': 'cutout11',
+  '12': 'cutout12',
+}
+
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
   startId: T,
@@ -128,24 +143,29 @@ export const getSlotIsEmpty = (
     return false
   }
 
-  const filteredAdditionalEquipmentOnDeck = includeStagingAreas
-    ? values(
-        initialDeckSetup.additionalEquipmentOnDeck
-      ).filter((additionalEquipment: AdditionalEquipmentOnDeck) =>
-        additionalEquipment.location?.includes(slot)
-      )
-    : values(initialDeckSetup.additionalEquipmentOnDeck).filter(
-        (additionalEquipment: AdditionalEquipmentOnDeck) =>
-          additionalEquipment.location?.includes(slot) &&
-          additionalEquipment.name !== 'stagingArea'
-      )
+  const filteredAdditionalEquipmentOnDeck = values(
+    initialDeckSetup.additionalEquipmentOnDeck
+  ).filter((additionalEquipment: AdditionalEquipmentOnDeck) => {
+    const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
+    const includeStaging = includeStagingAreas
+      ? true
+      : additionalEquipment.name !== 'stagingArea'
+    if (cutoutForSlotOt2 != null) {
+      //  for Ot-2
+      return additionalEquipment.location === cutoutForSlotOt2 && includeStaging
+    } else {
+      //  for Flex
+      return additionalEquipment.location?.includes(slot) && includeStaging
+    }
+  })
+
   return (
     [
-      ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>
-        slot.includes(moduleOnDeck.slot)
+      ...values(initialDeckSetup.modules).filter(
+        (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.slot === slot
       ),
-      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
-        slot.includes(labware.slot)
+      ...values(initialDeckSetup.labware).filter(
+        (labware: LabwareOnDeckType) => labware.slot === slot
       ),
       ...filteredAdditionalEquipmentOnDeck,
     ].length === 0

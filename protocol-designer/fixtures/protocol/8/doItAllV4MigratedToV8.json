@@ -149,7 +149,8 @@
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
           "stepType": "moveLiquid",
           "stepName": "transfer",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "4f4057e0-75c7-11ea-b42f-4b64e50f43e5": {
           "moduleId": "0b419310-75c7-11ea-b42f-4b64e50f43e5:magneticModuleType",
@@ -1224,49 +1225,6 @@
       "namespace": "opentrons",
       "version": 1,
       "schemaVersion": 2,
-      "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
-    },
-    "opentrons/opentrons_1_trash_1100ml_fixed/1": {
-      "ordering": [["A1"]],
-      "metadata": {
-        "displayCategory": "trash",
-        "displayVolumeUnits": "mL",
-        "displayName": "Opentrons Fixed Trash",
-        "tags": []
-      },
-      "schemaVersion": 2,
-      "version": 1,
-      "namespace": "opentrons",
-      "dimensions": {
-        "xDimension": 172.86,
-        "yDimension": 165.86,
-        "zDimension": 82
-      },
-      "parameters": {
-        "format": "trash",
-        "isTiprack": false,
-        "loadName": "opentrons_1_trash_1100ml_fixed",
-        "isMagneticModuleCompatible": false,
-        "quirks": [
-          "fixedTrash",
-          "centerMultichannelOnWells",
-          "touchTipDisabled"
-        ]
-      },
-      "wells": {
-        "A1": {
-          "shape": "rectangular",
-          "yDimension": 165.67,
-          "xDimension": 107.11,
-          "totalLiquidVolume": 1100000,
-          "depth": 0,
-          "x": 82.84,
-          "y": 80,
-          "z": 82
-        }
-      },
-      "brand": { "brand": "Opentrons" },
-      "groups": [{ "wells": ["A1"], "metadata": {} }],
       "cornerOffsetFromSlot": { "x": 0, "y": 0, "z": 0 }
     },
     "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1": {
@@ -2742,6 +2700,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "e9745ff2-9404-432f-acb7-0f8400f37821",
+      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "9969785e-f71d-4344-9241-c1b2d63845fa",
       "params": {
@@ -2783,6 +2746,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "1cf684b0-27e7-48c6-bb66-09ba0acf0630",
+      "params": { "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5" }
     },
     {
       "commandType": "temperatureModule/waitForTemperature",

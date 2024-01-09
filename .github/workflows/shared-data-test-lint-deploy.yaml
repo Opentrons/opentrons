@@ -19,6 +19,8 @@ on:
       - '*hotfix*'
     tags:
       - 'v*'
+      - 'shared-data*'
+      - 'components*'
   pull_request:
     paths:
       - 'Makefile'
@@ -52,7 +54,7 @@ jobs:
           node-version: '16'
       - uses: 'actions/setup-python@v3'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -69,10 +71,8 @@ jobs:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
-        python: ['3.7', '3.10']
-        exclude:
-          - os: 'macos-latest'
-            python: '3.10'
+        python: ['3.10']
+
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
@@ -127,7 +127,7 @@ jobs:
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
+      - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
           yarn config set cache-folder ./.yarn-cache
@@ -162,7 +162,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data/python'
@@ -187,3 +187,76 @@ jobs:
           project: 'shared-data/python'
           repository_url: 'https://upload.pypi.org/legacy/'
           password: '${{ secrets.OT_PYPI_PASSWORD }}'
+
+  publish-switch:
+      runs-on: 'ubuntu-latest'
+      name: 'Determine whether or not to publish artifacts'
+      outputs:
+        should_publish: ${{steps.publish-switch.outputs.should_publish}}
+      steps:
+        - id: publish-switch
+          run: |
+            echo "Determining whether to publish artifacts for event ${{github.event_type}} and ref ${{github.ref}}"
+            if [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/shared-data')) }}" = "true" ] ; then
+              echo "Publishing builds for shared-data@ tags"
+              echo 'should_publish=true' >> $GITHUB_OUTPUT
+            elif [ "${{ format('{0}', startsWith(github.ref, 'refs/tags/components')) }}" = "true" ] ; then
+              echo "Publishing builds for components@ tags"
+              echo 'should_publish=true' >> $GITHUB_OUTPUT
+            else 
+              echo "No publish for ref ${{github.ref}} and event ${{github.event_type}}"
+              echo 'should_publish=false' >> $GITHUB_OUTPUT
+            fi
+
+  publish-to-npm:
+    name: 'publish shared-data package to npm'
+    runs-on: 'ubuntu-latest'
+    needs: ['js-test', 'publish-switch']
+    if: needs.publish-switch.outputs.should_publish == 'true'
+    steps:
+      - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+          registry-url: 'https://registry.npmjs.org'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.npm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
+      - name: 'js deps'
+        run: |
+          npm config set cache ./.npm-cache
+          yarn config set cache-folder ./.yarn-cache
+          yarn config set network-timeout 60000
+          yarn
+      - name: 'build library'
+        run: |
+          make -C shared-data lib-js
+      # replace package.json stub version number with version from tag
+      - name: 'set version number'
+        run: |
+          npm install -g json
+          VERSION_STRING=$(echo ${{ github.ref }} | sed -E 's/refs\/tags\/(components|shared-data)@//')
+          json -I -f ./shared-data/package.json -e "this.version=\"$VERSION_STRING\""
+          cd ./shared-data
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+          registry-url: 'https://registry.npmjs.org'
+      - name: 'publish to npm registry'
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./shared-data && echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ./.npmrc && npm publish --access public
+          

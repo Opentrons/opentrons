@@ -216,7 +216,7 @@ interface ModulesListItemProps {
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
   deckDef: DeckDefinition
-  conflictedFixture?: CutoutConfig
+  conflictedFixture: CutoutConfig | null
 }
 
 export function ModulesListItem({
@@ -366,7 +366,6 @@ export function ModulesListItem({
       {showLocationConflictModal && cutoutIdForSlotName != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
         />

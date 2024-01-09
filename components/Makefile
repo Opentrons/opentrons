@@ -26,6 +26,11 @@ clean:
 dist:
 	yarn --cwd .. build-storybook
 
+.PHONY: lib
+lib: export NODE_ENV := production
+lib:
+	yarn webpack
+
 # development
 #####################################################################
 

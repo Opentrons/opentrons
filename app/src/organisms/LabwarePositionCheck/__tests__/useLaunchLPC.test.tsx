@@ -2,7 +2,13 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { renderHook } from '@testing-library/react-hooks'
+import {
+  act,
+  fireEvent,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import {
@@ -63,7 +69,7 @@ const mockCurrentOffsets: LabwareOffset[] = [
 const mockLabwareDef = fixture_tiprack_300_ul as LabwareDefinition2
 
 describe('useLaunchLPC hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let mockCreateMaintenanceRun: jest.Mock
   let mockCreateLabwareDefinition: jest.Mock
   let mockDeleteMaintenanceRun: jest.Mock
@@ -168,25 +174,33 @@ describe('useLaunchLPC hook', () => {
       () => useLaunchLPC(MOCK_RUN_ID, FLEX_ROBOT_TYPE),
       { wrapper }
     )
-    await result.current.launchLPC()
-    await expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
-      maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
-      labwareDef: mockLabwareDef,
+    act(() => {
+      result.current.launchLPC()
     })
-    expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
-      labwareOffsets: mockCurrentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
+    await waitFor(() => {
+      expect(mockCreateLabwareDefinition).toHaveBeenCalledWith({
+        maintenanceRunId: MOCK_MAINTENANCE_RUN_ID,
+        labwareDef: mockLabwareDef,
+      })
     })
-    expect(result.current.LPCWizard).not.toBeNull()
-    const { getByText } = renderWithProviders(
-      result.current.LPCWizard ?? <></>
-    )[0]
-    getByText('exit').click()
+
+    await waitFor(() => {
+      expect(mockCreateMaintenanceRun).toHaveBeenCalledWith({
+        labwareOffsets: mockCurrentOffsets.map(
+          ({ vector, location, definitionUri }) => ({
+            vector,
+            location,
+            definitionUri,
+          })
+        ),
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.LPCWizard).not.toBeNull()
+    })
+    renderWithProviders(result.current.LPCWizard ?? <></>)
+    fireEvent.click(screen.getByText('exit'))
     expect(mockDeleteMaintenanceRun).toHaveBeenCalledWith(
       MOCK_MAINTENANCE_RUN_ID,
       {

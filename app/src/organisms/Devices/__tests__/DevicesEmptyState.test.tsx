@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -33,7 +34,7 @@ describe('DevicesEmptyState', () => {
     const refreshButton = getByRole('button', {
       name: 'Refresh',
     })
-    refreshButton.click()
+    fireEvent.click(refreshButton)
     expect(mockStartDiscovery).toBeCalled()
   })
 

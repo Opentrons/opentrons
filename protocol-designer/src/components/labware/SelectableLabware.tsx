@@ -1,12 +1,8 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import {
-  SELECTABLE_WELL_CLASS,
-  Channels,
-  WellMouseEvent,
-  WellGroup,
-} from '@opentrons/components'
+import { WellMouseEvent, WellGroup } from '@opentrons/components'
+import { COLUMN } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -16,9 +12,10 @@ import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
 import { WellTooltip } from './WellTooltip'
 
-import { ContentsByWell } from '../../labware-ingred/types'
-import { WellIngredientNames } from '../../steplist/types'
-import { GenericRect } from '../../collision-types'
+import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
+import type { GenericRect } from '../../collision-types'
+import type { NozzleType } from '../../types'
 
 export interface Props {
   labwareProps: Omit<
@@ -30,14 +27,24 @@ export interface Props {
   selectWells: (wellGroup: WellGroup) => unknown
   deselectWells: (wellGroup: WellGroup) => unknown
   updateHighlightedWells: (wellGroup: WellGroup) => unknown
-  pipetteChannels?: Channels | null
+  nozzleType: NozzleType | null
   ingredNames: WellIngredientNames
   wellContents: ContentsByWell
 }
 
+type ChannelType = 8 | 96
+
+const getChannelsFromNozleType = (nozzleType: NozzleType): ChannelType => {
+  if (nozzleType === '8-channel' || nozzleType === COLUMN) {
+    return 8
+  } else {
+    return 96
+  }
+}
+
 export class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
-    const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
+    const selectedWells = getCollidingWells(rect)
     return this._wellsFromSelected(selectedWells)
   }
 
@@ -45,9 +52,10 @@ export class SelectableLabware extends React.Component<Props> {
     selectedWells: WellGroup
   ) => WellGroup = selectedWells => {
     const labwareDef = this.props.labwareProps.definition
+
     // Returns PRIMARY WELLS from the selection.
-    if (this.props.pipetteChannels === 8 || this.props.pipetteChannels === 96) {
-      const channels = this.props.pipetteChannels
+    if (this.props.nozzleType != null) {
+      const channels = getChannelsFromNozleType(this.props.nozzleType)
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
       const primaryWells: WellGroup = reduce(
@@ -76,11 +84,8 @@ export class SelectableLabware extends React.Component<Props> {
   ) => {
     const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
-      if (
-        this.props.pipetteChannels === 8 ||
-        this.props.pipetteChannels === 96
-      ) {
-        const channels = this.props.pipetteChannels
+      if (this.props.nozzleType != null) {
+        const channels = getChannelsFromNozleType(this.props.nozzleType)
         const selectedWells = this._getWellsFromRect(rect)
         const allWellsForMulti: WellGroup = reduce(
           selectedWells,
@@ -115,8 +120,8 @@ export class SelectableLabware extends React.Component<Props> {
   }
 
   handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
-    if (this.props.pipetteChannels === 8 || this.props.pipetteChannels === 96) {
-      const channels = this.props.pipetteChannels
+    if (this.props.nozzleType != null) {
+      const channels = getChannelsFromNozleType(this.props.nozzleType)
       const labwareDef = this.props.labwareProps.definition
       const wellSet = getWellSetForMultichannel(
         labwareDef,
@@ -140,19 +145,20 @@ export class SelectableLabware extends React.Component<Props> {
       labwareProps,
       ingredNames,
       wellContents,
-      pipetteChannels,
+      nozzleType,
       selectedPrimaryWells,
     } = this.props
     // For rendering, show all wells not just primary wells
     const allSelectedWells =
-      pipetteChannels === 8 || pipetteChannels === 96
+      nozzleType != null
         ? reduce<WellGroup, WellGroup>(
             selectedPrimaryWells,
             (acc, _, wellName): WellGroup => {
+              const channels = getChannelsFromNozleType(nozzleType)
               const wellSet = getWellSetForMultichannel(
                 this.props.labwareProps.definition,
                 wellName,
-                pipetteChannels
+                channels
               )
               if (!wellSet) return acc
               return { ...acc, ...arrayToWellGroup(wellSet) }
@@ -179,7 +185,6 @@ export class SelectableLabware extends React.Component<Props> {
                 this.handleMouseLeaveWell(mouseEventArgs)
                 handleMouseLeaveWell(mouseEventArgs.event)
               }}
-              selectableWellClass={SELECTABLE_WELL_CLASS}
               onMouseEnterWell={({ wellName, event }) => {
                 if (wellContents !== null) {
                   this.handleMouseEnterWell({ wellName, event })

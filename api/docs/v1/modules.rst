@@ -18,7 +18,7 @@ within a protocol. To do this, you call:
 
     from opentrons import modules
 
-    module = modules.load('Module Name', slot)
+    module = modules.load("Module Name", slot)
 
 
 Above, `Module Name` represents either `tempdeck` or `magdeck`.
@@ -29,7 +29,7 @@ To add a labware onto a given module, you will need to use the `share=True` call
 
    from opentrons import labware
 
-   labware = labware.load('96-flat', slot, share=True)
+   labware = labware.load("96-flat", slot, share=True)
 
 Where slot is the same slot in which you loaded your module.
 
@@ -49,7 +49,7 @@ be done like the following:
     robot.connect()
     robot.discover_modules()
 
-    module = modules.load('Module Name', slot)
+    module = modules.load("Module Name", slot)
     ... etc
 
 Checking the status of your Module
@@ -60,7 +60,7 @@ Both modules have the ability to check what state they are currently in. To do t
 
     from opentrons import modules
 
-    module = modules.load('Module Name', slot)
+    module = modules.load("Module Name", slot)
     status = module.status
 
 For the temperature module this will return a string stating whether it's `heating`, `cooling`, `holding at target` or `idle`.
@@ -84,8 +84,8 @@ To set the temperature module to a given temperature in degrees celsius do the f
 
     from opentrons import modules, labware
 
-    module = modules.load('tempdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
+    module = modules.load("tempdeck", slot)
+    plate = labware.load("96-flat", slot, share=True)
 
     module.set_temperature(4)
 
@@ -99,8 +99,8 @@ This function will pause your protocol until your target temperature is reached.
 
     from opentrons import modules, labware
 
-    module = modules.load('tempdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
+    module = modules.load("tempdeck", slot)
+    plate = labware.load("96-flat", slot, share=True)
 
     module.set_temperature(4)
     module.wait_for_temp()
@@ -120,8 +120,8 @@ You can read the current real-time temperature of the module by the following:
 
     from opentrons import modules, labware
 
-    module = modules.load('tempdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
+    module = modules.load("tempdeck", slot)
+    plate = labware.load("96-flat", slot, share=True)
 
     temperature = module.temperature
 
@@ -135,8 +135,8 @@ We can read the target temperature of the module by the following:
 
     from opentrons import modules, labware
 
-    module = modules.load('tempdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
+    module = modules.load("tempdeck", slot)
+    plate = labware.load("96-flat", slot, share=True)
 
     temperature = module.target
 
@@ -152,8 +152,8 @@ or cooling phase again.
 
     from opentrons import modules, labware
 
-    module = modules.load('tempdeck', slot)
-    plate = labware.load('96-flat', slot, share=True)
+    module = modules.load("tempdeck", slot)
+    plate = labware.load("96-flat", slot, share=True)
 
     module.set_temperature(4)
     module.wait_for_temp()
@@ -192,8 +192,8 @@ Engage
 
     from opentrons import modules, labware
 
-    module = modules.load('magdeck', slot)
-    plate = labware.load('biorad-hardshell-96-PCR', slot, share=True)
+    module = modules.load("magdeck", slot)
+    plate = labware.load("biorad-hardshell-96-PCR", slot, share=True)
 
     module.engage()
 
@@ -213,8 +213,8 @@ You can also use a custom height parameter with engage():
 
     from opentrons import modules, labware
 
-    module = modules.load('magdeck', slot)
-    plate = labware.load('96-deep-well', slot, share=True)
+    module = modules.load("magdeck", slot)
+    plate = labware.load("96-deep-well", slot, share=True)
 
     module.engage(height=12)
 
@@ -232,8 +232,8 @@ Disengage
 
     from opentrons import modules, labware
 
-    module = modules.load('magdeck', slot)
-    plate = labware.load('biorad-hardshell-96-PCR', slot, share=True)
+    module = modules.load("magdeck", slot)
+    plate = labware.load("biorad-hardshell-96-PCR", slot, share=True)
 
     module.engage()
     ## OTHER PROTOCOL ACTIONS

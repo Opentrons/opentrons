@@ -191,7 +191,8 @@
           "id": "f9a294f1-f42b-4cae-893a-592405349d56",
           "stepType": "moveLiquid",
           "stepName": "transfer",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "5fdb9a12-fab4-42fd-886f-40af107b15d6": {
           "times": "2",
@@ -217,7 +218,8 @@
           "id": "5fdb9a12-fab4-42fd-886f-40af107b15d6",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": ""
+          "stepDetails": "",
+          "nozzles": null
         },
         "3901f6f9-cecd-4d2a-8d85-40d85f9f8b4f": {
           "labware": "fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
@@ -4008,6 +4010,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "ac00f670-852b-4426-97dc-871b44ba66a1",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "57a9e3bc-16e5-4dbf-840f-ef209cf856e1",
       "params": {
@@ -4049,6 +4056,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "2090ef62-ea92-4b94-bd06-db2b728be791",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4094,6 +4106,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "bb648909-b03d-4968-8c70-2805f62e25ea",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "30b832e2-d26d-4a67-8a2f-e016fed5bf5f",
       "params": {
@@ -4135,6 +4152,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "976eb63e-6088-4557-8db5-03e7eea31c1e",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4180,6 +4202,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "f5dd6139-a8ed-4581-bf1b-0be264a64d7d",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "f6d713e8-89ff-4d3e-aaab-fbe2989dd179",
       "params": {
@@ -4221,6 +4248,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "89b50486-6526-4583-bf14-0e69b1c9e734",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4266,6 +4298,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "44e645f1-3e34-41d8-beb8-3f372040417f",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "faac2fd6-a6c2-4476-855f-050e6de30f50",
       "params": {
@@ -4307,6 +4344,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "8e019e03-08fb-4ffa-95f8-2b5772ead81f",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4352,6 +4394,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "c934ec98-5a28-40ec-88cb-3b1860d8bac7",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "bd57a694-9816-47fb-b4aa-c80d2c3a0b2c",
       "params": {
@@ -4393,6 +4440,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "95585fea-74b8-4d30-bd98-2019c1f024e9",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4438,6 +4490,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "479a02e3-e2f5-4c45-96f7-e8517fc17bd4",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "57d8e8c3-64ba-416d-bbed-eb7675ddde76",
       "params": {
@@ -4479,6 +4536,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "2f509f24-3b12-4fee-ad61-9f509021a38f",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4524,6 +4586,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "d90df5ec-8ec5-4d07-84eb-3b223096ad96",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "8779a116-4dd8-4e75-bb64-971be73ce999",
       "params": {
@@ -4565,6 +4632,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "825d8d92-b475-4ad1-bab3-59bce3790ad2",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4610,6 +4682,11 @@
       }
     },
     {
+      "commandType": "dropTipInPlace",
+      "key": "a2d3c0d6-eb9c-49e1-b956-714799ad22c4",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
+    },
+    {
       "commandType": "pickUpTip",
       "key": "fc43bd31-0414-4eaa-b5c2-f19569955525",
       "params": {
@@ -4651,6 +4728,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "4317a410-eceb-4130-b499-f6e717887fee",
+      "params": { "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe" }
     },
     {
       "commandType": "pickUpTip",
@@ -4726,6 +4808,11 @@
         "offset": { "x": 0, "y": 0, "z": 0 },
         "alternateDropLocation": true
       }
+    },
+    {
+      "commandType": "dropTipInPlace",
+      "key": "b7a75837-05f9-4fd5-ae46-d36c67717daf",
+      "params": { "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193" }
     },
     {
       "commandType": "moveLabware",

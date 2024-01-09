@@ -73,5 +73,4 @@ function mergeProps(
     },
   }
 }
-// @ts-expect-error(sa, 2021-6-21): TODO: refactor to use hooks api
 export const TimelineAlerts = connect(mapStateToProps, null, mergeProps)(Alerts)

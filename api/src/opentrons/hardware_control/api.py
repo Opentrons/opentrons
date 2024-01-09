@@ -88,7 +88,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[RobotCalibration],
+    HardwareControlInterface[RobotCalibration, top_types.Mount, RobotConfig],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -167,8 +167,8 @@ class API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    @classmethod  # noqa: C901
-    async def build_hardware_controller(
+    @classmethod
+    async def build_hardware_controller(  # noqa: C901
         cls,
         config: Union[RobotConfig, OT3Config, None] = None,
         port: Optional[str] = None,
@@ -425,6 +425,9 @@ class API(
         return await self._backend.update_firmware(
             firmware_file, checked_loop, explicit_modeset
         )
+
+    def has_gripper(self) -> bool:
+        return False
 
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None

@@ -326,9 +326,6 @@ class ProtocolCore(
 
         to_location = self._convert_labware_location(location=new_location)
 
-        # TODO(mm, 2023-02-23): Check for conflicts with other items on the deck,
-        # when move_labware() support is no longer experimental.
-
         self._engine_client.move_labware(
             labware_id=labware_core.labware_id,
             new_location=to_location,
@@ -341,6 +338,18 @@ class ProtocolCore(
             # Clear out last location since it is not relevant to pipetting
             # and we only use last location for in-place pipetting commands
             self.set_last_location(location=None, mount=Mount.EXTENSION)
+
+        # FIXME(jbl, 2024-01-04) deck conflict after execution logic issue, read notes in load_labware for more info:
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_labware_id=labware_core.labware_id,
+            existing_labware_ids=[
+                labware_id
+                for labware_id in self._labware_cores_by_id
+                if labware_id != labware_core.labware_id
+            ],
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+        )
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel

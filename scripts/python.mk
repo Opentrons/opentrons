@@ -7,7 +7,7 @@ OT_PYTHON ?= python
 # Python version to use for a project's virtual environment.
 # Defaults to Python 3.7, which is the version that runs on the OT-2.
 # https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
-OT_VIRTUALENV_VERSION ?= 3.7
+OT_VIRTUALENV_VERSION ?= 3.10
 
 # Use legacy editable installs to avoid breaking mypy type-checking
 # when using newer versions of setuptools
@@ -20,7 +20,7 @@ pip := $(pipenv) run pip
 pytest := $(pipenv) run py.test
 
 pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
-pipenv_opts += $(and $(CI),--keep-outdated --clear)
+pipenv_opts += $(and $(CI),--clear)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 
 poetry := poetry

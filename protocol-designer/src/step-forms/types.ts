@@ -7,6 +7,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import { DeckSlot } from '../types'
 
@@ -88,6 +89,8 @@ export interface LabwareTemporalProperties {
 }
 export interface PipetteTemporalProperties {
   mount: Mount
+  nozzles?: NozzleConfigurationStyle
+  prevNozzles?: NozzleConfigurationStyle
 }
 // =========== ON DECK ========
 // The "on deck" types are entities with added properties (slot / mount)

@@ -27,7 +27,6 @@ import {
   getLoadLiquidCommands,
 } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { swatchColors } from '../../components/swatchColors'
-import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -45,6 +44,7 @@ import {
   COLUMN_4_SLOTS,
 } from '@opentrons/step-generation'
 import type {
+  AddressableAreaName,
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
@@ -114,8 +114,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-  getAdditionalEquipmentEntities,
-
   (
     fileMetadata,
     initialRobotState,
@@ -130,8 +128,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI,
-    additionalEquipmentEntities
+    labwareDefsByURI
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -285,7 +282,12 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         } else if (isOnAdapter) {
           location = { labwareId: labware.slot }
         } else if (isAddressableAreaName) {
-          location = { addressableAreaName: labware.slot }
+          // TODO(bh, 2024-01-02): check slots against addressable areas via the deck definition
+          location = {
+            addressableAreaName: labware.slot as AddressableAreaName,
+          }
+        } else if (labware.slot === 'offDeck') {
+          location = 'offDeck'
         }
 
         const loadLabwareCommands = {

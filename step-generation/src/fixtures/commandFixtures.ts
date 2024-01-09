@@ -1,5 +1,6 @@
 import { tiprackWellNamesFlat } from './data'
 import {
+  AddressableAreaName,
   AspDispAirgapParams,
   BlowoutParams,
   CreateCommand,
@@ -308,6 +309,13 @@ export const dropTipHelper = (pipette?: string): CreateCommand[] => [
       alternateDropLocation: true,
     },
   },
+  {
+    commandType: 'dropTipInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: pipette ?? DEFAULT_PIPETTE,
+    },
+  },
 ]
 export const dropTipIntoWasteChuteHelper = (
   pipette?: string
@@ -357,7 +365,7 @@ export const dropTipInPlaceHelper = (params?: {
 })
 export const moveToAddressableAreaHelper = (params?: {
   pipetteId?: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }): CreateCommand => ({
   commandType: 'moveToAddressableArea',
   key: expect.any(String),

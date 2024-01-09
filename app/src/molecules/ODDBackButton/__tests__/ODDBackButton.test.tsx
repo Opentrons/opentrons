@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders, COLORS } from '@opentrons/components'
 import { ODDBackButton } from '..'
 
@@ -21,12 +22,12 @@ describe('ODDBackButton', () => {
   })
 
   it('should render text and icon', () => {
-    const { getByText, getByTestId, getByRole } = render(props)
-    getByText('button label')
-    expect(getByTestId('back_icon')).toBeInTheDocument()
-    const button = getByRole('button')
+    render(props)
+    screen.getByText('button label')
+    expect(screen.getByTestId('back_icon')).toBeInTheDocument()
+    const button = screen.getByRole('button')
     expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
-    button.click()
+    fireEvent.click(button)
     expect(props.onClick).toHaveBeenCalled()
   })
 })

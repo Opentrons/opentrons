@@ -56,7 +56,7 @@ class OutdatedApiVersionResponse(ErrorDetails):
 async def check_version_header(
     request: Request,
     response: Response,
-    opentrons_version: Union[int, Literal["*"]] = Header(
+    opentrons_version: Union[Literal["*"], int] = Header(
         ...,
         description=(
             "The HTTP API version to use for this request. Must be "

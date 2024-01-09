@@ -101,6 +101,12 @@ export const MODULE_MODELS = [
   ...MAGNETIC_BLOCK_MODELS,
 ]
 
+export const MODULE_MODELS_OT2_ONLY = [
+  ...MAGNETIC_MODULE_MODELS,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
+]
+
 export const MODULE_TYPES = [
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -183,6 +189,17 @@ export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
 export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'
+
+export const MOVABLE_TRASH_CUTOUTS: CutoutId[] = [
+  'cutoutA1',
+  'cutoutB1',
+  'cutoutC1',
+  'cutoutD1',
+  'cutoutA3',
+  'cutoutB3',
+  'cutoutC3',
+  'cutoutD3',
+]
 
 export const SINGLE_LEFT_CUTOUTS: CutoutId[] = [
   'cutoutA1',

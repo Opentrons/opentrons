@@ -8,7 +8,6 @@ metadata = {
 
 
 def run(ctx):
-
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     labware = ctx.load_labware("usascientific_12_reservoir_22ml", 2)
     other_labware = ctx.load_labware("corning_96_wellplate_360ul_flat", 3)
