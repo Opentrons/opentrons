@@ -15,6 +15,7 @@ import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCa
 import { useDeckCalibrationData, useIsFlex } from '../../hooks'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
+import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import { PipetteCard } from '..'
 
 import {
@@ -34,6 +35,7 @@ jest.mock('../AboutPipetteSlideout')
 jest.mock('../../../../redux/robot-api')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/pipettes')
+jest.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -62,6 +64,9 @@ const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jes
 >
 const mockUsePipetteSettingsQuery = usePipetteSettingsQuery as jest.MockedFunction<
   typeof usePipetteSettingsQuery
+>
+const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
+  typeof useIsEstopNotDisengaged
 >
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
@@ -116,6 +121,9 @@ describe('PipetteCard', () => {
     when(mockUsePipetteSettingsQuery)
       .calledWith({ refetchInterval: 5000, enabled: true })
       .mockReturnValue({} as any)
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(mockRobotName)
+      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -159,6 +167,31 @@ describe('PipetteCard', () => {
     expect(overflowButton).not.toBeDisabled()
     screen.getByText('mock pipette overflow menu')
   })
+
+  it('renders information for a 96 channel pipette with overflow menu button disabled when e-stop is pressed', () => {
+    props = {
+      pipetteModelSpecs: mockLeftSpecs,
+      mount: LEFT,
+      robotName: mockRobotName,
+      pipetteId: 'id',
+      pipetteIs96Channel: true,
+      isPipetteCalibrated: false,
+      pipetteIsBad: false,
+      updatePipette: jest.fn(),
+      isRunActive: false,
+    }
+    when(mockUseIsEstopNotDisengaged)
+      .calledWith(mockRobotName)
+      .mockReturnValue(true)
+    render(props)
+    screen.getByText('Both Mounts')
+    const overflowButton = screen.getByRole('button', {
+      name: /overflow/i,
+    })
+    fireEvent.click(overflowButton)
+    expect(overflowButton).toBeDisabled()
+  })
+
   it('renders information for a right pipette', () => {
     props = {
       pipetteModelSpecs: mockRightSpecs,

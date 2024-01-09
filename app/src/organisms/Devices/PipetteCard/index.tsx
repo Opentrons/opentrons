@@ -42,6 +42,7 @@ import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
 import { PipetteSettingsSlideout } from './PipetteSettingsSlideout'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { PipetteModelSpecs, PipetteName } from '@opentrons/shared-data'
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
@@ -153,6 +154,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     selectedPipette,
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleChangePipette = (): void => {
     if (isFlexPipetteAttached && isFlex) {
@@ -323,7 +325,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               pipetteDisplayName
             )}`}
           >
-            <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
+            <OverflowBtn
+              aria-label="overflow"
+              onClick={handleOverflowClick}
+              disabled={isEstopNotDisengaged}
+            />
           </Box>
         </>
       )}
