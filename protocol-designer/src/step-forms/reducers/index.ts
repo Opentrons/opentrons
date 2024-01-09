@@ -57,6 +57,7 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
+  _getAdditionalEquipmentEntitiesRootState,
 } from '../selectors'
 import {
   CreateDeckFixtureAction,
@@ -190,6 +191,9 @@ export const unsavedForm = (
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
         robotStateTimeline: action.meta.robotStateTimeline,
+        additionalEquipmentEntities: _getAdditionalEquipmentEntitiesRootState(
+          rootState
+        ),
       })
     }
 

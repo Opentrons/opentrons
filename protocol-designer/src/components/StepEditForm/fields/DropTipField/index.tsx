@@ -36,13 +36,6 @@ export function DropTipField(
   if (wasteChute != null) options.push(wasteChuteOption)
   if (trashBin != null) options.push(trashOption)
 
-  const [selectedValue, setSelectedValue] = React.useState(
-    dropdownItem || (options[0] && options[0].value)
-  )
-  React.useEffect(() => {
-    updateValue(selectedValue)
-  }, [selectedValue])
-
   return (
     <FormGroup
       label={i18n.t('form.step_edit_form.field.location.label')}
@@ -51,13 +44,11 @@ export function DropTipField(
       <DropdownField
         options={options}
         name={name}
-        value={dropdownItem ? String(dropdownItem) : options[0].value}
+        value={dropdownItem ? String(dropdownItem) : null}
         onBlur={onFieldBlur}
         onFocus={onFieldFocus}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          const newValue = e.currentTarget.value
-          setSelectedValue(newValue)
-          updateValue(newValue)
+          updateValue(e.currentTarget.value)
         }}
       />
     </FormGroup>
